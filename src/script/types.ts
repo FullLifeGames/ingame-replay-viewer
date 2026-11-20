@@ -26,3 +26,24 @@ export interface DroppedLine {
   /** What was left unread, for an `unsupported` line. */
   readonly detail?: string
 }
+
+/** Player 1 is the near side; a flipped view would change only `sideOf` in `refs.ts`. */
+export type Side = 'near' | 'far'
+
+/** A Pokémon as an index into `teams[side]`, in order of first appearance. */
+export interface PokemonRef {
+  readonly side: Side
+  readonly index: number
+}
+
+/** HP on the log's own scale: `71/100` stays 71 of 100, `24/48` stays 24 of 48. */
+export interface HpFraction {
+  readonly hp: number
+  readonly max: number
+}
+
+/** An effect as the log names it (`item: Leftovers`, `Sandstorm`). */
+export interface Effect {
+  readonly name: string
+  readonly kind?: 'move' | 'item' | 'ability'
+}
