@@ -1,0 +1,10 @@
+{
+  "upstream": {
+    "repository": "https://github.com/rh-hideout/pokeemerald-expansion.git",
+    "tag": "expansion/1.17.2",
+    "commit": "79dd436920845ebc145577649de624f65298c209"
+  },
+  "baseRom": {
+    "sha1": "f3ae088181bf583e55daf962a92bb46f4f1d07b7"
+  }
+}

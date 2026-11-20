@@ -3,12 +3,12 @@
 // that the page reads.
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
+
+import { ROM_DIR } from './rom-config.ts'
 
 export const SLOT_SYMBOL = 'gReplaySlot'
-export const SLOT_HEADER_PATH = fileURLToPath(
-  new URL('../rom/gen3/include/replay_slot.h', import.meta.url),
-)
+export const SLOT_HEADER_PATH = join(ROM_DIR, 'include', 'replay_slot.h')
 
 export interface SlotLayout {
   magic: string
