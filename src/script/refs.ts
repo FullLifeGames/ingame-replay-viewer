@@ -1,7 +1,7 @@
 // How the battle script names sides, Pokémon, HP and effects. The only place that knows that
 // player 1 is the near side.
 
-import type { Battle, Pokemon } from '@pkmn/client'
+import type { Battle, Side as ClientSide, Pokemon } from '@pkmn/client'
 import type { StatusName } from '@pkmn/data'
 import { Protocol } from '@pkmn/protocol'
 
@@ -19,23 +19,40 @@ export function sideOf(player: string, at: number): Side {
   return side
 }
 
+/** The side of a side the client tracks; `n` counts players from 0, `id` holds a name. */
+export function sideOfClient(side: ClientSide, at: number): Side {
+  return sideOf(`p${String(side.n + 1)}`, at)
+}
+
 /** A Pokémon the client tracks, as its side and team index. */
 export function refOfPokemon(pokemon: Pokemon, at: number): PokemonRef {
-  // `side.n` counts players from 0; `side.id` holds the player's name instead.
-  const player = `p${String(pokemon.side.n + 1)}`
-  return { side: sideOf(player, at), index: pokemon.side.team.indexOf(pokemon) }
+  return { side: sideOfClient(pokemon.side, at), index: pokemon.side.team.indexOf(pokemon) }
 }
 
 /**
- * The team member a log ident (`p2a: Fantasy Meadow`) names. The client hands back whoever is
- * active in the named slot, so the name is checked as well.
+ * The client's Pokémon for a log ident (`p2a: Fantasy Meadow`). The client hands back whoever
+ * is active in the named slot, so the name is checked as well.
  */
-export function refOf(battle: Battle, ident: string, at: number): PokemonRef {
+export function pokemonOf(battle: Battle, ident: string, at: number): Pokemon {
   const pokemon = battle.getPokemon(ident as Protocol.PokemonIdent)
   if (pokemon?.name !== Protocol.parsePokemonIdent(ident as Protocol.PokemonIdent).name) {
     throw new ScriptError(at, `no Pokémon "${ident}" has appeared`)
   }
-  return refOfPokemon(pokemon, at)
+  return pokemon
+}
+
+/** The team member a log ident names. */
+export function refOf(battle: Battle, ident: string, at: number): PokemonRef {
+  return refOfPokemon(pokemonOf(battle, ident, at), at)
+}
+
+/** A count from the log (`|turn|12`, `|teamsize|p1|6`). */
+export function numberOf(text: string, at: number): number {
+  const value = Number(text)
+  if (text === '' || !Number.isInteger(value)) {
+    throw new ScriptError(at, `"${text}" is not a whole number`)
+  }
+  return value
 }
 
 interface Health {
