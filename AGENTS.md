@@ -1,6 +1,7 @@
 # AGENTS.md
 
 Rules for agents working on the Ingame Replay Viewer. Claude Code reads this file through `CLAUDE.md`.
+
 - `GLOSSARY.md` names every concept.
 - `docs/adr/` holds the decisions, and `docs/plan.md` holds the other decisions and the roadmap.
 - Every task is a GitHub issue. The milestones are the roadmap steps, and the board "Ingame Replay Viewer" (project 3) carries the wave in hand.
@@ -50,11 +51,11 @@ The viewer plays Pokémon Showdown replays back inside real Pokémon games. A ga
 
 Every change gets a class before work starts: the integrator proposes it, and the user can move it.
 
-| Class | What it is | Process |
-| --- | --- | --- |
-| Small fix | A bug or small task with a known cause and a local fix | Red test, fix, green; collected in a batch wave |
-| Larger bug | The cause is unclear or spans modules | A written diagnosis first, then its issue, then the fix, test first |
-| Feature | New behaviour for the viewer | An issue inside a wave |
+| Class      | What it is                                             | Process                                                             |
+| ---------- | ------------------------------------------------------ | ------------------------------------------------------------------- |
+| Small fix  | A bug or small task with a known cause and a local fix | Red test, fix, green; collected in a batch wave                     |
+| Larger bug | The cause is unclear or spans modules                  | A written diagnosis first, then its issue, then the fix, test first |
+| Feature    | New behaviour for the viewer                           | An issue inside a wave                                              |
 
 ## Issues and the board
 
