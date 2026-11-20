@@ -18,6 +18,10 @@ function crcTable(): Uint32Array {
 export function crc32(bytes: Uint8Array): number {
   const lookup = crcTable()
   let crc = 0xffffffff
-  for (const byte of bytes) crc = (lookup[(crc ^ byte) & 0xff] as number) ^ (crc >>> 8)
+  // An indexed loop: for-of over a typed array made applying a 32 MiB patch take 4 s instead of 0.5 s.
+  // eslint-disable-next-line @typescript-eslint/prefer-for-of
+  for (let index = 0; index < bytes.length; index++) {
+    crc = (lookup[(crc ^ (bytes[index] as number)) & 0xff] as number) ^ (crc >>> 8)
+  }
   return (crc ^ 0xffffffff) >>> 0
 }
