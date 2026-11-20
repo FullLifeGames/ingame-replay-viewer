@@ -8,6 +8,7 @@ import { loadBuildConfig, readBuildConfig, ROM_DIR } from './rom-config.ts'
 const valid = {
   upstream: { repository: 'https://example.org/x.git', tag: 'v1', commit: 'a'.repeat(40) },
   baseRom: { sha1: 'b'.repeat(40) },
+  make: { jobs: 2 },
 }
 const text = (value: unknown) => JSON.stringify(value)
 
@@ -20,6 +21,7 @@ describe('the build config', () => {
         commit: '79dd436920845ebc145577649de624f65298c209',
       },
       baseRom: { sha1: 'f3ae088181bf583e55daf962a92bb46f4f1d07b7' },
+      make: { jobs: 3 },
     })
   })
 
@@ -45,6 +47,10 @@ describe('the build config', () => {
     ],
     ['an upper-case SHA1', { ...valid, baseRom: { sha1: 'B'.repeat(40) } }, /baseRom\.sha1/],
     ['no baseRom', { upstream: valid.upstream }, /baseRom\.sha1/],
+    ['zero make jobs', { ...valid, make: { jobs: 0 } }, /make\.jobs/],
+    ['fractional make jobs', { ...valid, make: { jobs: 1.5 } }, /make\.jobs/],
+    ['make jobs as a string', { ...valid, make: { jobs: '3' } }, /make\.jobs/],
+    ['no make', { upstream: valid.upstream, baseRom: valid.baseRom }, /make\.jobs/],
     ['no object', [], /upstream\.repository/],
   ])('refuses %s', (_, value, message) => {
     expect(() => readBuildConfig(text(value))).toThrow(message)
