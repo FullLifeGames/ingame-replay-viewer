@@ -1,14 +1,18 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildBattleScript } from '../build'
-import { eventsAt, eventsFrom, logOf, NEXT, refIn, scriptOf } from '../testing'
+import { eventsAt, eventsFrom, NEXT, refIn, replayScript, scriptOf } from '../testing'
+
+// Built once, outside the specs' time limit.
+const REPLAY_994052 = replayScript('smogtours-gen3ou-994052')
+const REPLAY_994086 = replayScript('smogtours-gen3ou-994086')
+const REPLAY_994128 = replayScript('smogtours-gen3ou-994128')
 
 const DUGTRIO = { side: 'near', index: 0 } as const
 const TYRANITAR = { side: 'far', index: 0 } as const
 
 describe('the move rules', () => {
   it('keeps the miss flag of a missed move and its miss event', () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994052'))
+    const script = REPLAY_994052
     const skarmory = refIn(script, 'far', 'Skarmory')
     const claydol = refIn(script, 'near', 'Claydol')
 
@@ -49,7 +53,7 @@ describe('the move rules', () => {
   })
 
   it("makes Protect's activation a block event", () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994086'))
+    const script = REPLAY_994086
 
     expect(eventsAt(script, 62)).toEqual([
       {
@@ -77,7 +81,7 @@ describe('the move rules', () => {
   })
 
   it('gives Clear Body as the cause and source of a failed unboost', () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994128'))
+    const script = REPLAY_994128
     const metagross = refIn(script, 'far', 'Metagross')
 
     expect(eventsAt(script, 152)).toEqual([

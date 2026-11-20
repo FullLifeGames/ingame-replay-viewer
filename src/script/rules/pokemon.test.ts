@@ -1,13 +1,18 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildBattleScript } from '../build'
-import { eventsAt, eventsFrom, logOf, NEXT, refIn, scriptOf } from '../testing'
+import { eventsAt, eventsFrom, NEXT, refIn, replayScript, scriptOf } from '../testing'
+
+// Built once, outside the specs' time limit.
+const REPLAY_994052 = replayScript('smogtours-gen3ou-994052')
+const REPLAY_994086 = replayScript('smogtours-gen3ou-994086')
+const REPLAY_994128 = replayScript('smogtours-gen3ou-994128')
+const REPLAY_994141 = replayScript('smogtours-gen3ou-994141')
 
 const DUGTRIO = { side: 'near', index: 0 } as const
 
 describe('the HP rules', () => {
   it('gives Leech Seed damage its cause and source, then a silent heal', () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994086'))
+    const script = REPLAY_994086
     const seeder = refIn(script, 'far', 'Beanstalk Park')
 
     expect(eventsFrom(script, 327).slice(0, 2)).toEqual([
@@ -24,7 +29,7 @@ describe('the HP rules', () => {
   })
 
   it('keeps the wisher of a Wish', () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994141'))
+    const script = REPLAY_994141
     const vaporeon = refIn(script, 'far', 'Vaporeon')
 
     expect(eventsAt(script, 516)).toEqual([
@@ -66,7 +71,7 @@ describe('the HP rules', () => {
 
 describe('the status rules', () => {
   it('gives Rest as the cause of sleep, then fills the bar silently', () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994052'))
+    const script = REPLAY_994052
     const suicune = refIn(script, 'near', 'Suicune')
 
     expect(eventsFrom(script, 210).slice(0, 2)).toEqual([
@@ -89,7 +94,7 @@ describe('the status rules', () => {
   })
 
   it('cures Natural Cure silently before the switch', () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994052'))
+    const script = REPLAY_994052
 
     expect(eventsFrom(script, 326).slice(0, 2)).toMatchObject([
       {
@@ -105,7 +110,7 @@ describe('the status rules', () => {
   })
 
   it("marks a cure that shows the status's own message", () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994128'))
+    const script = REPLAY_994128
 
     expect(eventsAt(script, 67)).toEqual([
       {
@@ -119,7 +124,7 @@ describe('the status rules', () => {
   })
 
   it('cures the team with Aromatherapy', () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994052'))
+    const script = REPLAY_994052
 
     expect(eventsAt(script, 290)).toEqual([
       {
@@ -134,7 +139,7 @@ describe('the status rules', () => {
 
 describe('the stat change rules', () => {
   it('counts a raise as positive stages', () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994052'))
+    const script = REPLAY_994052
 
     expect(eventsAt(script, 127)).toEqual([
       {
@@ -148,7 +153,7 @@ describe('the stat change rules', () => {
   })
 
   it('counts a drop as negative stages', () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994128'))
+    const script = REPLAY_994128
 
     expect(eventsAt(script, 28)).toEqual([
       {

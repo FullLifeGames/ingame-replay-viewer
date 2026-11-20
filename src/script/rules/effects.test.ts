@@ -1,38 +1,41 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildBattleScript } from '../build'
-import { eventsAt, eventsFrom, logOf, NEXT, refIn, scriptOf } from '../testing'
+import { eventsAt, eventsFrom, NEXT, refIn, replayScript, scriptOf } from '../testing'
+
+// Built once, outside the specs' time limit.
+const REPLAY_994052 = replayScript('smogtours-gen3ou-994052')
+const REPLAY_994086 = replayScript('smogtours-gen3ou-994086')
+const REPLAY_994128 = replayScript('smogtours-gen3ou-994128')
+const REPLAY_994176 = replayScript('smogtours-gen3ou-994176')
 
 const DUGTRIO = { side: 'near', index: 0 } as const
 const TYRANITAR = { side: 'far', index: 0 } as const
 
-const short = buildBattleScript(logOf('smogtours-gen3ou-994052'))
-
 describe('the weather rule', () => {
   it('names the rain that ends', () => {
-    expect(eventsAt(short, 224)).toEqual([
+    expect(eventsAt(REPLAY_994052, 224)).toEqual([
       { kind: 'weather', line: 224, weather: 'Rain', phase: 'start' },
     ])
-    expect(eventsAt(short, 226)).toEqual([
+    expect(eventsAt(REPLAY_994052, 226)).toEqual([
       { kind: 'weather', line: 226, weather: 'Rain', phase: 'upkeep' },
     ])
-    expect(eventsAt(short, 272)).toEqual([
+    expect(eventsAt(REPLAY_994052, 272)).toEqual([
       { kind: 'weather', line: 272, weather: 'Rain', phase: 'end' },
     ])
   })
 
   it('gives Sand Stream as the cause of the sandstorm, and its upkeep phase upkeep', () => {
-    expect(eventsAt(short, 26)).toEqual([
+    expect(eventsAt(REPLAY_994052, 26)).toEqual([
       {
         kind: 'weather',
         line: 26,
         weather: 'Sand',
         phase: 'start',
         cause: { name: 'Sand Stream', kind: 'ability' },
-        source: refIn(short, 'far', 'Tyranitar'),
+        source: refIn(REPLAY_994052, 'far', 'Tyranitar'),
       },
     ])
-    expect(eventsAt(short, 40)).toEqual([
+    expect(eventsAt(REPLAY_994052, 40)).toEqual([
       { kind: 'weather', line: 40, weather: 'Sand', phase: 'upkeep' },
     ])
   })
@@ -44,12 +47,12 @@ describe('the weather rule', () => {
 
 describe('the side and field rules', () => {
   it('lays Spikes on a side, and Rapid Spin clears them', () => {
-    const claydol = refIn(short, 'near', 'Claydol')
+    const claydol = refIn(REPLAY_994052, 'near', 'Claydol')
 
-    expect(eventsAt(short, 47)).toEqual([
+    expect(eventsAt(REPLAY_994052, 47)).toEqual([
       { kind: 'sideStart', line: 47, side: 'near', condition: { name: 'Spikes' } },
     ])
-    expect(eventsAt(short, 237)).toEqual([
+    expect(eventsAt(REPLAY_994052, 237)).toEqual([
       {
         kind: 'sideEnd',
         line: 237,
@@ -62,7 +65,7 @@ describe('the side and field rules', () => {
   })
 
   it('starts Perish Song silently on both sides, then counts it at the upkeep', () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994176'))
+    const script = REPLAY_994176
     const suicune = refIn(script, 'near', 'Suicune')
     const celebi = refIn(script, 'far', 'Celebi')
 
@@ -79,12 +82,12 @@ describe('the side and field rules', () => {
 
 describe('the effect rules of a Pokémon', () => {
   it('starts a Substitute, which takes a hit and then breaks', () => {
-    const zapdos = refIn(short, 'near', 'Zapdos')
+    const zapdos = refIn(REPLAY_994052, 'near', 'Zapdos')
 
-    expect(eventsAt(short, 58)).toEqual([
+    expect(eventsAt(REPLAY_994052, 58)).toEqual([
       { kind: 'effectStart', line: 58, who: zapdos, effect: { name: 'Substitute' } },
     ])
-    expect(eventsAt(short, 71)).toEqual([
+    expect(eventsAt(REPLAY_994052, 71)).toEqual([
       {
         kind: 'effectActivate',
         line: 71,
@@ -93,11 +96,11 @@ describe('the effect rules of a Pokémon', () => {
         damage: true,
       },
     ])
-    expect(eventsAt(short, 89)).toEqual([
+    expect(eventsAt(REPLAY_994052, 89)).toEqual([
       {
         kind: 'effectEnd',
         line: 89,
-        who: refIn(short, 'near', 'Dugtrio'),
+        who: refIn(REPLAY_994052, 'near', 'Dugtrio'),
         effect: { name: 'Substitute' },
       },
     ])
@@ -128,7 +131,7 @@ describe('the effect rules of a Pokémon', () => {
   })
 
   it('tightens Focus Punch for the turn', () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994086'))
+    const script = REPLAY_994086
 
     expect(eventsAt(script, 35)).toEqual([
       {
@@ -141,7 +144,7 @@ describe('the effect rules of a Pokémon', () => {
   })
 
   it('shows Intimidate with what it did', () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994128'))
+    const script = REPLAY_994128
 
     expect(eventsAt(script, 27)).toEqual([
       {
@@ -163,7 +166,7 @@ describe('the effect rules of a Pokémon', () => {
 
 describe('the item rules', () => {
   it('lets Thief take the item silently, then shows it with its cause and source', () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994086'))
+    const script = REPLAY_994086
     const skySands = refIn(script, 'far', 'Sky Sands')
     const skarmory = refIn(script, 'near', 'Skarmory')
     const thief = { name: 'Thief', kind: 'move' }
@@ -190,7 +193,7 @@ describe('the item rules', () => {
   })
 
   it('eats a Lum Berry', () => {
-    const script = buildBattleScript(logOf('smogtours-gen3ou-994128'))
+    const script = REPLAY_994128
 
     expect(eventsAt(script, 66)).toEqual([
       {

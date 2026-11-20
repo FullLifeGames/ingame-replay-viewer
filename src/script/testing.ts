@@ -27,6 +27,15 @@ export function logOf(id: string): string {
   return replay.log
 }
 
+const scripts = new Map<string, BattleScript>()
+
+/** The battle script of a test replay, built once per spec file. */
+export function replayScript(id: string): BattleScript {
+  const script = scripts.get(id) ?? buildBattleScript(logOf(id))
+  scripts.set(id, script)
+  return script
+}
+
 const INTRO = [
   '|gen|3',
   '|player|p1|Alice|1|',

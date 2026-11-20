@@ -7,6 +7,7 @@ import type { Protocol } from '@pkmn/protocol'
 import { newBattle } from './client'
 import { dropReasonOf } from './drops'
 import { ScriptError } from './errors'
+import { HitFolder } from './hits'
 import { readLines } from './lines'
 import type { LogLine } from './lines'
 import { eventsOf, ruleFor, unreadPart } from './rules/index'
@@ -18,6 +19,7 @@ interface Build {
   readonly battle: Battle
   readonly events: ScriptEvent[]
   readonly dropped: DroppedLine[]
+  readonly hits: HitFolder
   started: boolean
 }
 
@@ -66,7 +68,7 @@ function readLine(build: Build, line: LogLine): void {
     drop(build, line, 'unsupported', unread)
     return
   }
-  build.events.push(...eventsOf(rule, line, build.battle, before))
+  build.events.push(...build.hits.pass(eventsOf(rule, line, build.battle, before)))
 }
 
 function memberOf(pokemon: Pokemon): TeamMember {
@@ -76,11 +78,13 @@ function memberOf(pokemon: Pokemon): TeamMember {
 
 /** Turns a battle log into its battle script. Throws a ScriptError the script cannot follow. */
 export function buildBattleScript(log: string): BattleScript {
-  const build: Build = { battle: newBattle(), events: [], dropped: [], started: false }
+  const hits = new HitFolder()
+  const build: Build = { battle: newBattle(), events: [], dropped: [], hits, started: false }
   for (const line of readLines(log)) {
     readLine(build, line)
   }
   const { battle, events, dropped } = build
+  events.push(...hits.flush())
   return {
     gen: battle.gen.num,
     format: battle.tier,
