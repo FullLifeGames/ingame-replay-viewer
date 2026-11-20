@@ -15,9 +15,16 @@ export interface PreflightInput {
 const TOOLS = ['arm-none-eabi-gcc', 'arm-none-eabi-nm', 'make', 'python3', 'pkg-config']
 
 // The packages of the expansion's docs/install/linux/UBUNTU.md, plus pkgconf for tools/gbagfx.
+export const APT_PACKAGES = [
+  'binutils-arm-none-eabi',
+  'gcc-arm-none-eabi',
+  'libnewlib-arm-none-eabi',
+  'libpng-dev',
+  'pkgconf',
+]
+
 export const APT_INSTALL =
-  'sudo apt-get update && sudo apt-get install -y --no-install-recommends ' +
-  'binutils-arm-none-eabi gcc-arm-none-eabi libnewlib-arm-none-eabi libpng-dev pkgconf'
+  'sudo apt-get update && sudo apt-get install -y --no-install-recommends ' + APT_PACKAGES.join(' ')
 
 const GIB = 1024 ** 3
 const MIN_AVAILABLE = 3 * GIB
