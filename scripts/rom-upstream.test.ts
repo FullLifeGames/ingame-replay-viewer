@@ -16,7 +16,7 @@ import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { ROM_DIR } from './rom-config.ts'
 import type { UpstreamPin } from './rom-config.ts'
-import { ensureCheckout, prepareTree, readSeries } from './rom-upstream.ts'
+import { cleanTree, ensureCheckout, prepareTree, readSeries } from './rom-upstream.ts'
 import type { TreeOptions } from './rom-upstream.ts'
 
 const scratch = mkdtempSync(join(tmpdir(), 'irv-upstream-'))
@@ -226,6 +226,26 @@ describe('prepareTree', () => {
     write(join(upstream, 'src/a.o'), 'object')
     expect(prepareTree(options({ stampPath, clean: true })).applied).toBe(true)
     expect(existsSync(join(upstream, 'src/a.o'))).toBe(false)
+  })
+})
+
+describe('cleanTree', () => {
+  it('removes the build products and our copies', () => {
+    write(join(rom, 'src/replay_slot.c'), '// ours\n')
+    prepareTree(options())
+    write(join(upstream, 'src/a.o'), 'object')
+    cleanTree(upstream, pin)
+    expect(existsSync(join(upstream, 'src/a.o'))).toBe(false)
+    expect(existsSync(join(upstream, 'src/replay_slot.c'))).toBe(false)
+    expect(read('src/main.c')).toBe(MAIN_C)
+  })
+
+  it('refuses a tree inside another checkout before it removes anything', () => {
+    write(join(upstream, 'src/a.o'), 'object')
+    expect(() => {
+      cleanTree(join(upstream, 'src'), pin)
+    }).toThrow(/src is not the top of a git checkout/)
+    expect(read('src/a.o')).toBe('object')
   })
 })
 

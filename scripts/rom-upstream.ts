@@ -188,3 +188,9 @@ export function prepareTree(options: TreeOptions): TreeResult {
   const copied = copyOurFiles(tree, romDir)
   return { applied, patches: patches.map((patch) => patch.name), copied }
 }
+
+// For rom:clean: drops the build products and our copies, keeps upstream files and the patches.
+export function cleanTree(tree: string, pin: UpstreamPin): void {
+  checkPin(tree, pin)
+  git(tree, ['clean', '-fdxq'])
+}
