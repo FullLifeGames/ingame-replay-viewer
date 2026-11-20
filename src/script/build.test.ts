@@ -2,37 +2,16 @@ import { describe, expect, it } from 'vitest'
 
 import { buildBattleScript } from './build'
 import { ScriptError } from './errors'
-import { readReplay } from './replay'
 import type { ScriptEvent } from './events'
+import { NEXT, replayScript, scriptOf } from './testing'
 
-const files = import.meta.glob('../../test/fixtures/replays/*.json', {
-  eager: true,
-  import: 'default',
-})
-
-function logOf(id: string): string {
-  return readReplay(files[`../../test/fixtures/replays/${id}.json`]).log
-}
-
-const script = buildBattleScript(logOf('smogtours-gen3ou-994052'))
+// Built once, outside the specs' time limit.
+const script = replayScript('smogtours-gen3ou-994052')
+const nicknamed = replayScript('smogtours-gen3ou-994086')
 
 function eventAt(line: number): ScriptEvent | undefined {
   return script.events.find((event) => event.line === line)
 }
-
-const INTRO = ['|player|p1|Alice|1|', '|player|p2|Bob|2|', '|teamsize|p1|6', '|teamsize|p2|6']
-const LEADS = [
-  '|start',
-  '|switch|p1a: Dugtrio|Dugtrio, M|100/100',
-  '|switch|p2a: Tyranitar|Tyranitar, M|100/100',
-]
-
-function scriptOf(...lines: string[]): ReturnType<typeof buildBattleScript> {
-  return buildBattleScript(`${[...INTRO, ...LEADS, ...lines].join('\n')}\n`)
-}
-
-/** The index of the first line after the intro and the two leads. */
-const NEXT = INTRO.length + LEADS.length
 
 describe('buildBattleScript: switches and faints', () => {
   it('names whom a voluntary switch replaces', () => {
@@ -111,6 +90,18 @@ describe('buildBattleScript: intro and end', () => {
     expect(eventAt(372)).toEqual({ kind: 'win', line: 372, side: 'near', name: 'A Welcome Guest' })
   })
 
+  it('names the side of a winner who left the room before the win', () => {
+    const { events } = scriptOf('|player|p1|', '|win|Alice')
+
+    expect(events.at(-1)).toEqual({ kind: 'win', line: NEXT + 1, side: 'near', name: 'Alice' })
+  })
+
+  it('matches the winner against the players of the intro, not a later player line', () => {
+    const { events } = scriptOf('|player|p1|Carol|1|', '|win|Alice')
+
+    expect(events.at(-1)).toEqual({ kind: 'win', line: NEXT + 1, side: 'near', name: 'Alice' })
+  })
+
   it('names no side for a winner who is not a player', () => {
     expect(scriptOf('|win|Carol').events.at(-1)).toEqual({ kind: 'win', line: NEXT, name: 'Carol' })
   })
@@ -145,9 +136,7 @@ describe('buildBattleScript: intro and end', () => {
   })
 
   it('keeps a nickname apart from the species', () => {
-    const { teams } = buildBattleScript(logOf('smogtours-gen3ou-994086'))
-
-    expect(teams.far[0]).toMatchObject({ species: 'Tyranitar', name: 'Fantasy Meadow' })
+    expect(nicknamed.teams.far[0]).toMatchObject({ species: 'Tyranitar', name: 'Fantasy Meadow' })
   })
 })
 

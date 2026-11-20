@@ -13,13 +13,14 @@ import type { LogLine } from './lines'
 import { eventsOf, ruleFor, unreadPart } from './rules/index'
 import type { Before } from './rules/index'
 import type { BattleScript, ScriptEvent } from './events'
-import type { DroppedLine, DropReason, TeamMember } from './types'
+import type { DroppedLine, DropReason, Side, TeamMember } from './types'
 
 interface Build {
   readonly battle: Battle
   readonly events: ScriptEvent[]
   readonly dropped: DroppedLine[]
   readonly hits: HitFolder
+  readonly players: Partial<Record<Side, string>>
   started: boolean
 }
 
@@ -35,9 +36,18 @@ function refuseGameType(line: LogLine): void {
   }
 }
 
-function beforeOf(battle: Battle): Before {
+function beforeOf({ battle, players }: Build): Before {
   const active = { near: battle.p1.active[0] ?? null, far: battle.p2.active[0] ?? null }
-  return { active, weather: battle.field.weather }
+  return { active, weather: battle.field.weather, players: { ...players } }
+}
+
+/** Keeps the names the intro shows, for the win to match against. */
+function notePlayers(build: Build, events: readonly ScriptEvent[]): void {
+  for (const event of events) {
+    if (event.kind === 'player') {
+      build.players[event.side] = event.name
+    }
+  }
 }
 
 function addToClient(battle: Battle, line: LogLine): void {
@@ -54,7 +64,7 @@ function readLine(build: Build, line: LogLine): void {
     return
   }
   refuseGameType(line)
-  const before = beforeOf(build.battle)
+  const before = beforeOf(build)
   addToClient(build.battle, line)
   const reason = dropReasonOf(line, build.started)
   build.started ||= line.key === '|start|'
@@ -68,7 +78,9 @@ function readLine(build: Build, line: LogLine): void {
     drop(build, line, 'unsupported', unread)
     return
   }
-  build.events.push(...build.hits.pass(eventsOf(rule, line, build.battle, before)))
+  const events = eventsOf(rule, line, build.battle, before)
+  notePlayers(build, events)
+  build.events.push(...build.hits.pass(events))
 }
 
 function memberOf(pokemon: Pokemon): TeamMember {
@@ -79,7 +91,14 @@ function memberOf(pokemon: Pokemon): TeamMember {
 /** Turns a battle log into its battle script. Throws a ScriptError the script cannot follow. */
 export function buildBattleScript(log: string): BattleScript {
   const hits = new HitFolder()
-  const build: Build = { battle: newBattle(), events: [], dropped: [], hits, started: false }
+  const build: Build = {
+    battle: newBattle(),
+    events: [],
+    dropped: [],
+    hits,
+    players: {},
+    started: false,
+  }
   for (const line of readLines(log)) {
     readLine(build, line)
   }

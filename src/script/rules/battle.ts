@@ -2,8 +2,11 @@
 
 import { isNamedPlayer } from '../drops'
 import { ScriptError } from '../errors'
-import { numberOf, sideOf, sideOfClient } from '../refs'
+import { numberOf, sideOf } from '../refs'
+import type { Side } from '../types'
 import type { Rules } from './index'
+
+const SIDES: readonly Side[] = ['near', 'far']
 
 export const BATTLE_RULES = {
   '|player|': {
@@ -48,9 +51,8 @@ export const BATTLE_RULES = {
   '|win|': {
     arity: 1,
     reads: [],
-    build: ({ line, args: [, name], battle }) => {
-      const winner = battle.sides.find((side) => side.name === name)
-      const side = winner && sideOfClient(winner, line)
+    build: ({ line, args: [, name], before: { players } }) => {
+      const side = SIDES.find((candidate) => players[candidate] === name)
       return [{ kind: 'win', line, ...(side ? { side } : {}), name }]
     },
   },

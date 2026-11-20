@@ -13,10 +13,14 @@ import { FIELD_RULES } from './field'
 import { MOVE_RULES } from './moves'
 import { POKEMON_RULES } from './pokemon'
 
-/** Client state from just before the line was added. */
+/** What the build knew just before the line was added. */
 export interface Before {
+  /** The client's active Pokémon. */
   readonly active: Readonly<Record<Side, Pokemon | null>>
+  /** The client's weather. */
   readonly weather: WeatherName | undefined
+  /** The player names the intro showed; a player line after the start changes none. */
+  readonly players: Readonly<Partial<Record<Side, string>>>
 }
 
 export interface RuleInput<K extends Protocol.BattleArgName> {
