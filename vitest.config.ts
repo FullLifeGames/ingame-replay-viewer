@@ -16,6 +16,7 @@ export default defineConfig({
       thresholds: {
         'src/script/**': { lines: 90, branches: 90 },
         'src/gen3/**': { lines: 90, branches: 90 },
+        'src/patch/**': { lines: 90, branches: 90 },
       },
     },
   },
