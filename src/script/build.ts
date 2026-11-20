@@ -11,7 +11,8 @@ import { readLines } from './lines'
 import type { LogLine } from './lines'
 import { eventsOf, ruleFor, unreadPart } from './rules/index'
 import type { Before } from './rules/index'
-import type { BattleScript, DroppedLine, DropReason, ScriptEvent, TeamMember } from './types'
+import type { BattleScript, ScriptEvent } from './events'
+import type { DroppedLine, DropReason, TeamMember } from './types'
 
 interface Build {
   readonly battle: Battle

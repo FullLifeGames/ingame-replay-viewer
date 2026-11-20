@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { buildBattleScript } from './build'
 import { readLines } from './lines'
 import { readReplay } from './replay'
-import type { BattleScript } from './types'
+import type { BattleScript } from './events'
 
 const DIR = '../../test/fixtures/replays/'
 

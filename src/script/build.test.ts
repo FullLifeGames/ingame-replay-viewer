@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { buildBattleScript } from './build'
 import { ScriptError } from './errors'
 import { readReplay } from './replay'
-import type { ScriptEvent } from './types'
+import type { ScriptEvent } from './events'
 
 const files = import.meta.glob('../../test/fixtures/replays/*.json', {
   eager: true,

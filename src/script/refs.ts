@@ -46,6 +46,22 @@ export function refOf(battle: Battle, ident: string, at: number): PokemonRef {
   return refOfPokemon(pokemonOf(battle, ident, at), at)
 }
 
+/** The team member an optional ident names; a move without a target gives `''` or `null`. */
+export function refIfAny(
+  battle: Battle,
+  ident: string | undefined,
+  at: number,
+): PokemonRef | undefined {
+  return ident === undefined || ident === '' || ident === 'null'
+    ? undefined
+    : refOf(battle, ident, at)
+}
+
+/** The side a side ident names (`p1: A Welcome Guest`). */
+export function sideOfArg(ident: string, at: number): Side {
+  return sideOf(ident.split(':', 1)[0] ?? '', at)
+}
+
 /** A count from the log (`|turn|12`, `|teamsize|p1|6`). */
 export function numberOf(text: string, at: number): number {
   const value = Number(text)
@@ -82,4 +98,35 @@ export function healthOf(hpStatus: string, max: number, at: number): Health {
 export function effectOf(name: string): Effect {
   const { name: effect, type } = Protocol.parseEffect(name)
   return type === undefined ? { name: effect } : { name: effect, kind: type }
+}
+
+interface CauseArgs {
+  readonly from?: string | undefined
+  readonly of?: string | undefined
+}
+
+interface Cause {
+  readonly cause?: Effect
+  readonly source?: PokemonRef
+}
+
+/** What `[from]` and `[of]` name, as fields to spread into an event. */
+export function causeOf(kwArgs: CauseArgs, battle: Battle, at: number): Cause {
+  const { from, of } = kwArgs
+  return {
+    ...(from ? { cause: effectOf(from) } : {}),
+    ...(of ? { source: refOf(battle, of, at) } : {}),
+  }
+}
+
+/** The flags among `names` that a line sets, such as `[miss]` or `[silent]`, as fields. */
+export function flagsOf<K extends string>(
+  kwArgs: Partial<Record<K, unknown>>,
+  names: readonly K[],
+): Partial<Record<K, true>> {
+  const flags: Partial<Record<K, true>> = {}
+  for (const name of names.filter((flag) => kwArgs[flag])) {
+    flags[name] = true
+  }
+  return flags
 }

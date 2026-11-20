@@ -1,7 +1,7 @@
 // Rules for the lines that move Pokémon in and out: switches, drags and faints.
 
 import { effectOf, healthOf, pokemonOf, refOf, refOfPokemon } from '../refs'
-import type { ScriptEvent } from '../types'
+import type { ScriptEvent } from '../events'
 import type { RuleInput, Rules } from './index'
 
 type SwitchKey = '|switch|' | '|drag|'

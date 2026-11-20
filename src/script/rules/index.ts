@@ -5,8 +5,10 @@ import type { Battle, Pokemon } from '@pkmn/client'
 import type { Protocol } from '@pkmn/protocol'
 
 import type { LogLine } from '../lines'
-import type { ScriptEvent, Side } from '../types'
+import type { ScriptEvent } from '../events'
+import type { Side } from '../types'
 import { BATTLE_RULES } from './battle'
+import { MOVE_RULES } from './moves'
 import { POKEMON_RULES } from './pokemon'
 
 /** Client state from just before the line was added. */
@@ -40,7 +42,11 @@ interface AnyRule {
   build(input: RuleInput<Protocol.BattleArgName>): ScriptEvent[]
 }
 
-const RULES: Readonly<Partial<Record<string, AnyRule>>> = { ...BATTLE_RULES, ...POKEMON_RULES }
+const RULES: Readonly<Partial<Record<string, AnyRule>>> = {
+  ...BATTLE_RULES,
+  ...POKEMON_RULES,
+  ...MOVE_RULES,
+}
 
 /** The rule for a protocol key, if the battle script shows that kind of line. */
 export function ruleFor(key: Protocol.ArgName): AnyRule | undefined {
