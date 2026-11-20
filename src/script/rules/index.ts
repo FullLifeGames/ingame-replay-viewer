@@ -1,19 +1,22 @@
 // A rule turns one kind of battle log line into events. Each rule states what it reads, so a
 // line with anything more becomes an `unsupported` dropped line instead of losing a part.
 
-import type { Battle, Pokemon } from '@pkmn/client'
+import type { Battle, Pokemon, WeatherName } from '@pkmn/client'
 import type { Protocol } from '@pkmn/protocol'
 
 import type { LogLine } from '../lines'
 import type { ScriptEvent } from '../events'
 import type { Side } from '../types'
 import { BATTLE_RULES } from './battle'
+import { EFFECT_RULES } from './effects'
+import { FIELD_RULES } from './field'
 import { MOVE_RULES } from './moves'
 import { POKEMON_RULES } from './pokemon'
 
 /** Client state from just before the line was added. */
 export interface Before {
   readonly active: Readonly<Record<Side, Pokemon | null>>
+  readonly weather: WeatherName | undefined
 }
 
 export interface RuleInput<K extends Protocol.BattleArgName> {
@@ -46,6 +49,8 @@ const RULES: Readonly<Partial<Record<string, AnyRule>>> = {
   ...BATTLE_RULES,
   ...POKEMON_RULES,
   ...MOVE_RULES,
+  ...EFFECT_RULES,
+  ...FIELD_RULES,
 }
 
 /** The rule for a protocol key, if the battle script shows that kind of line. */

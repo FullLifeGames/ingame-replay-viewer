@@ -214,7 +214,7 @@ interface EffectivenessEvent {
   readonly effectiveness: Effectiveness
 }
 
-interface EffectStartEvent {
+interface EffectStartEvent extends Caused {
   readonly kind: 'effectStart'
   readonly line: number
   readonly who: PokemonRef
@@ -223,7 +223,7 @@ interface EffectStartEvent {
 }
 
 /** A Substitute that breaks is a hit. */
-interface EffectEndEvent extends Hit {
+interface EffectEndEvent extends Caused, Hit {
   readonly kind: 'effectEnd'
   readonly line: number
   readonly who: PokemonRef
@@ -286,7 +286,7 @@ interface ItemEndEvent extends Caused {
   readonly silent?: true
 }
 
-interface AbilityEvent {
+interface AbilityEvent extends Caused {
   readonly kind: 'ability'
   readonly line: number
   readonly who: PokemonRef

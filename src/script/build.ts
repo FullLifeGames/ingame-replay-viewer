@@ -34,7 +34,8 @@ function refuseGameType(line: LogLine): void {
 }
 
 function beforeOf(battle: Battle): Before {
-  return { active: { near: battle.p1.active[0] ?? null, far: battle.p2.active[0] ?? null } }
+  const active = { near: battle.p1.active[0] ?? null, far: battle.p2.active[0] ?? null }
+  return { active, weather: battle.field.weather }
 }
 
 function addToClient(battle: Battle, line: LogLine): void {
