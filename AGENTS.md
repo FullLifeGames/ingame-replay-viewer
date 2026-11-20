@@ -67,7 +67,7 @@ Every change gets a class before work starts: the integrator proposes it, and th
 
 - A wave runs as stages with no gate between them. A stage holds at most two lanes side by side; a stage that the rest depends on holds one. Each lane owns one issue or a few, its own branch, worktree and files, and runs planner, builders, reviewer and fixes before it merges.
 - Branches: `wave/NN` from `master`. A stage's lanes branch from it as `wave/NN-s<k>a` and `wave/NN-s<k>b`, in the worktrees `~/code/ingame-replay-viewer-wa` and `-wb`, each with its own `node_modules`.
-- A lane merges into the wave branch after its review. Each stage reaches `master` through a pull request of the wave branch that closes the stage's issues (`Closes #N`); CI runs on it.
+- A lane merges into the wave branch after its review. Each stage reaches `master` through a pull request that closes the stage's issues (`Closes #N`); CI runs on it. Its head is the wave branch frozen at the stage's end as `wave/NN-s<k>` (a one-lane stage uses its lane branch), so later stages stay out of a pull request that waits for its okay.
 - The integrator queues heavy checks and runs one at a time.
 - A wave ends with one gate: a table over its stages and lanes, the decisions taken without the user, and, once there is a page, a preview link on devbox over Tailscale (`tailscale ip -4`).
 - Booking: `docs/waves/wave-NN.md` (goal, delivered, evidence, decided without the user, gate, rests). Documentation moves with the change in the same pull request.
