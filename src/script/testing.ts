@@ -19,7 +19,7 @@ export const REPLAYS = Object.entries(files).map(([path, json]) => {
 })
 
 /** The battle log of a test replay. */
-export function logOf(id: string): string {
+function logOf(id: string): string {
   const replay = REPLAYS.find((candidate) => candidate.id === id)
   if (replay === undefined) {
     throw new Error(`no test replay ${id}`)

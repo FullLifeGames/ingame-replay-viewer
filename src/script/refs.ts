@@ -20,7 +20,7 @@ export function sideOf(player: string, at: number): Side {
 }
 
 /** The side of a side the client tracks; `n` counts players from 0, `id` holds a name. */
-export function sideOfClient(side: ClientSide, at: number): Side {
+function sideOfClient(side: ClientSide, at: number): Side {
   return sideOf(`p${String(side.n + 1)}`, at)
 }
 
