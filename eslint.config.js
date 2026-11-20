@@ -20,6 +20,17 @@ const BROWSER_GLOBALS = Object.keys(globals.browser).filter((name) => !NEUTRAL_G
 const NO_BROWSER_MESSAGE =
   'src/script/ and src/gen3/ use no DOM or browser API; take data from the caller.'
 
+const PURE_IMPORT_PATTERNS = [
+  {
+    group: ['**/web', '**/web/**'],
+    message: 'src/script/ and src/gen3/ import nothing from the pages in src/web/.',
+  },
+  {
+    group: ['@thenick775/*'],
+    message: 'src/script/ and src/gen3/ import no emulator.',
+  },
+]
+
 const pureZone = {
   files: PURE_MODULES,
   rules: {
@@ -32,17 +43,23 @@ const pureZone = {
       'error',
       { types: Object.fromEntries(BROWSER_GLOBALS.map((name) => [name, NO_BROWSER_MESSAGE])) },
     ],
+    'no-restricted-imports': ['error', { patterns: PURE_IMPORT_PATTERNS }],
+  },
+}
+
+// The battle script is game-neutral (ADR 0004): a game backend imports it, never the other way.
+// Flat config replaces a rule's options per file, so this block repeats the pure patterns.
+const scriptZone = {
+  files: ['src/script/**/*.ts'],
+  rules: {
     'no-restricted-imports': [
       'error',
       {
         patterns: [
+          ...PURE_IMPORT_PATTERNS,
           {
-            group: ['**/web', '**/web/**'],
-            message: 'src/script/ and src/gen3/ import nothing from the pages in src/web/.',
-          },
-          {
-            group: ['@thenick775/*'],
-            message: 'src/script/ and src/gen3/ import no emulator.',
+            group: ['**/gen3', '**/gen3/**'],
+            message: 'src/script/ is game-neutral and imports nothing from a game backend.',
           },
         ],
       },
@@ -106,6 +123,7 @@ export default defineConfig([
     languageOptions: { globals: globals.node },
   },
   pureZone,
+  scriptZone,
   ceilings,
   specs,
   prettier,
