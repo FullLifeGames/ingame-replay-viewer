@@ -42,6 +42,8 @@ const FOLDER = '/replay'
 const IMAGE = `${FOLDER}/irv-emerald.gba`
 const SAVE = `${FOLDER}/irv-emerald.sav`
 const CRASH_LINE = 'The emulator crashed. Press Start to run the replay again.'
+/** Restart's refusal before any Start; the session gives it before the emulator has loaded. */
+export const NOT_STARTED_LINE = 'No replay runs yet: press Start first.'
 
 // mGBA's defaults write a savestate every 30 s and restore it on load and on quickReload.
 const QUIET = { autoSaveStateEnable: false, restoreAutoSaveStateOnLoad: false, rewindEnable: false }
@@ -94,7 +96,7 @@ export function createEmulator(core: EmulatorCore): Emulator {
       wakeAudio(core)
     },
     restart: () => {
-      if (state === 'none') throw new EmulatorError('No replay runs yet: press Start first.')
+      if (state === 'none') throw new EmulatorError(NOT_STARTED_LINE)
       if (state === 'crashed') throw new EmulatorError(CRASH_LINE)
       core.quickReload()
       wakeAudio(core)
