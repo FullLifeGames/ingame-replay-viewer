@@ -7,13 +7,14 @@ import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'no
 import { dirname, join } from 'node:path'
 
 import { buildRom } from './rom-build.ts'
+import { runCli } from './rom-cli.ts'
 import { loadBuildConfig } from './rom-config.ts'
 import type { BuildConfig } from './rom-config.ts'
+import { git } from './rom-git.ts'
 import { OUTPUT_NAMES } from './rom-outputs.ts'
 import { buildPaths, checkRemovable, removeInside } from './rom-paths.ts'
 import type { BuildPaths } from './rom-paths.ts'
 import { GBA_ROM_BASE } from './rom-slot.ts'
-import { git } from './rom-upstream.ts'
 
 export interface MapSymbol {
   name: string
@@ -204,16 +205,11 @@ function repro(): ReproComparison {
 }
 
 function main(): void {
-  try {
+  runCli('rom:repro', () => {
     const result = repro()
     say(describeResult(result))
     if (!result.pass) process.exitCode = 1
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    const cause = error instanceof Error && error.cause instanceof Error ? error.cause.message : ''
-    process.stderr.write(`rom:repro: ${message}\n${cause === '' ? '' : `${cause}\n`}`)
-    process.exitCode = 1
-  }
+  })
 }
 
 if (import.meta.main) main()

@@ -7,6 +7,7 @@ import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { parseArgs } from 'node:util'
 
+import { runCli } from './rom-cli.ts'
 import { loadBuildConfig, ROM_DIR } from './rom-config.ts'
 import type { BuildConfig } from './rom-config.ts'
 import { packageVersions, readRomUsage, runMake, toolVersions } from './rom-make.ts'
@@ -14,7 +15,12 @@ import { buildPaths, emptyInside, removeInside } from './rom-paths.ts'
 import type { BuildPaths } from './rom-paths.ts'
 import { makeOutputs, OUTPUT_NAMES, writeOutputs } from './rom-outputs.ts'
 import type { RomOutputs } from './rom-outputs.ts'
-import { APT_PACKAGES, preflightProblems, readPreflightInput } from './rom-preflight.ts'
+import {
+  APT_PACKAGES,
+  BUILD_TOOLS,
+  preflightProblems,
+  readPreflightInput,
+} from './rom-preflight.ts'
 import { loadSlotLayout } from './rom-slot.ts'
 import { cleanTree, ensureCheckout, prepareTree } from './rom-upstream.ts'
 import type { TreeResult } from './rom-upstream.ts'
@@ -27,8 +33,6 @@ export interface BuildArgs {
 
 // What upstream's plain `make` writes at the top of the tree (Makefile:29, 99-107).
 const MADE = { rom: 'pokeemerald.gba', elf: 'pokeemerald.elf', map: 'pokeemerald.map' }
-
-const TOOLS = ['arm-none-eabi-gcc', 'arm-none-eabi-as', 'arm-none-eabi-ld', 'make', 'python3']
 
 export function parseBuildArgs(argv: string[]): BuildArgs {
   const { values } = parseArgs({
@@ -108,7 +112,7 @@ function buildInfo(record: BuildRecord): unknown {
     copied: tree.copied,
     make: { jobs: config.make.jobs, flavour: 'plain make' },
     toolchain: {
-      tools: toolVersions(TOOLS, process.env),
+      tools: toolVersions(BUILD_TOOLS, process.env),
       packages: packageVersions(APT_PACKAGES, process.env),
       node: process.version,
     },
@@ -162,18 +166,13 @@ export function buildRom(paths: BuildPaths, config: BuildConfig, clean: boolean)
 }
 
 function main(): void {
-  try {
+  runCli('rom:build', () => {
     const args = parseBuildArgs(process.argv.slice(2))
     const paths = buildPaths()
     const config = loadBuildConfig()
     if (args.cleanOnly) cleanOutputs(paths, config, args.all)
     else buildRom(paths, config, args.clean)
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    const cause = error instanceof Error && error.cause instanceof Error ? error.cause.message : ''
-    process.stderr.write(`rom:build: ${message}\n${cause === '' ? '' : `${cause}\n`}`)
-    process.exitCode = 1
-  }
+  })
 }
 
 if (import.meta.main) main()

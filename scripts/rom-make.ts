@@ -4,6 +4,8 @@
 import { spawnSync } from 'node:child_process'
 import { closeSync, openSync, readFileSync } from 'node:fs'
 
+import { withoutGitVariables } from './rom-git.ts'
+
 export interface MakeOptions {
   tree: string
   jobs: number
@@ -12,8 +14,8 @@ export interface MakeOptions {
 }
 
 // DEVKITARM switches the toolchain, the make variables leak a parent make's flags, and
-// GITHUB_REPOSITORY_OWNER turns on upstream's own warning flags (Makefile:183-193). GIT_* from a
-// hook would point check_history.sh at another repository.
+// GITHUB_REPOSITORY_OWNER turns on upstream's own warning flags (Makefile:183-193). The GIT_*
+// variables go by the rule of rom-git.ts.
 const DROPPED = new Set([
   'DEVKITARM',
   'MAKEFLAGS',
@@ -27,7 +29,7 @@ const PINNED = { LC_ALL: 'C', TZ: 'UTC', PYTHONHASHSEED: '0' }
 const LOG_TAIL_LINES = 20
 
 export function makeEnvironment(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
-  const kept = Object.entries(env).filter(([key]) => !DROPPED.has(key) && !key.startsWith('GIT_'))
+  const kept = Object.entries(withoutGitVariables(env)).filter(([key]) => !DROPPED.has(key))
   return { ...Object.fromEntries(kept), ...PINNED }
 }
 

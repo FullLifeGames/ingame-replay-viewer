@@ -5,11 +5,11 @@ import { join } from 'node:path'
 
 import { afterAll, describe, expect, it } from 'vitest'
 
-import { APT_INSTALL, preflightProblems, readPreflightInput } from './rom-preflight.ts'
+import { APT_INSTALL, BUILD_TOOLS, preflightProblems, readPreflightInput } from './rom-preflight.ts'
 import type { PreflightInput } from './rom-preflight.ts'
 
 const GIB_IN_KB = 1024 * 1024
-const TOOLS = ['arm-none-eabi-gcc', 'arm-none-eabi-nm', 'make', 'python3', 'pkg-config']
+const TOOLS = BUILD_TOOLS
 
 const scratch = mkdtempSync(join(tmpdir(), 'irv-preflight-'))
 afterAll(() => {
@@ -42,6 +42,20 @@ function input(changes: Partial<PreflightInput>): PreflightInput {
     ...changes,
   }
 }
+
+describe('the build tools', () => {
+  it('are one list for the check and the record, with the binutils and pkg-config the build runs', () => {
+    expect(BUILD_TOOLS[0]).toBe('arm-none-eabi-gcc')
+    expect(BUILD_TOOLS).toEqual(
+      expect.arrayContaining([
+        'arm-none-eabi-as',
+        'arm-none-eabi-ld',
+        'arm-none-eabi-nm',
+        'pkg-config',
+      ]),
+    )
+  })
+})
 
 describe('preflightProblems', () => {
   it('passes with the tools, 5 GiB available and the right base ROM', () => {

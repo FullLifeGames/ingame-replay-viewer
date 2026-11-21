@@ -2,7 +2,8 @@
 // the make job cap (3 keeps a build beside another session on devbox's 6 shared cores and 12 GB).
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+
+import { REPO_DIR } from './rom-paths.ts'
 
 export interface UpstreamPin {
   repository: string
@@ -16,7 +17,7 @@ export interface BuildConfig {
   make: { jobs: number }
 }
 
-export const ROM_DIR = fileURLToPath(new URL('../rom/gen3', import.meta.url))
+export const ROM_DIR = join(REPO_DIR, 'rom', 'gen3')
 
 const FULL_SHA1 = /^[0-9a-f]{40}$/
 

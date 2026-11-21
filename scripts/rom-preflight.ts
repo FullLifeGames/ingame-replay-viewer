@@ -12,7 +12,16 @@ export interface PreflightInput {
   baseRomSha1: string
 }
 
-const TOOLS = ['arm-none-eabi-gcc', 'arm-none-eabi-nm', 'make', 'python3', 'pkg-config']
+// The tools the build runs: the preflight requires each, and build-info.json records its version.
+export const BUILD_TOOLS = [
+  'arm-none-eabi-gcc',
+  'arm-none-eabi-as',
+  'arm-none-eabi-ld',
+  'arm-none-eabi-nm',
+  'make',
+  'python3',
+  'pkg-config',
+]
 
 // The packages of the expansion's docs/install/linux/UBUNTU.md, plus pkgconf for tools/gbagfx.
 export const APT_PACKAGES = [
@@ -42,7 +51,7 @@ function isExecutable(path: string): boolean {
 
 function toolProblem(pathVariable: string): string | undefined {
   const dirs = pathVariable.split(delimiter).filter((dir) => dir !== '')
-  const missing = TOOLS.filter((tool) => !dirs.some((dir) => isExecutable(join(dir, tool))))
+  const missing = BUILD_TOOLS.filter((tool) => !dirs.some((dir) => isExecutable(join(dir, tool))))
   if (missing.length === 0) return undefined
   return `missing ${missing.join(', ')}; install the build tools with: ${APT_INSTALL}`
 }

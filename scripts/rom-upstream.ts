@@ -1,7 +1,6 @@
 // The pinned upstream tree and our changes on it (plan §3, ADR 0007): clone the tag, check the
 // commit, reset, apply rom/gen3/patches in the order of `series`, copy our own files in. A stamp
 // skips the reset and the patches when nothing changed, so make sees no new times on patched files.
-import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import {
   cpSync,
@@ -15,6 +14,7 @@ import {
 import { dirname, join, relative } from 'node:path'
 
 import type { UpstreamPin } from './rom-config.ts'
+import { git } from './rom-git.ts'
 import { removeInside } from './rom-paths.ts'
 import type { RomRoots } from './rom-paths.ts'
 
@@ -46,24 +46,6 @@ interface Stamp {
 
 // Our files land in the same folders of the tree, where the Makefile's wildcards find them.
 const OUR_DIRS = ['src', 'include', 'test']
-
-// Git variables from a calling hook (GIT_DIR, GIT_INDEX_FILE) would point git at another repo.
-function gitEnv(): NodeJS.ProcessEnv {
-  return Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_')))
-}
-
-export function git(dir: string, args: string[]): string {
-  const result = spawnSync('git', ['-C', dir, ...args], {
-    encoding: 'utf8',
-    env: gitEnv(),
-    maxBuffer: 256 * 1024 * 1024,
-  })
-  if (result.error !== undefined) throw result.error
-  if (result.status !== 0) {
-    throw new Error(`git ${args.join(' ')} in ${dir} failed: ${result.stderr.trim()}`)
-  }
-  return result.stdout
-}
 
 const sha256 = (data: string | Buffer) => createHash('sha256').update(data).digest('hex')
 
