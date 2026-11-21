@@ -203,6 +203,26 @@ describe('createEmulator', () => {
     expect(core.calls).toEqual(['quickReload'])
   })
 
+  // quitGame closes SDL's audio device, but an audio event already queued for the old game's
+  // node still runs its handler, which calls into the closed device ("divide by zero").
+  it("drops the running game's audio handler before it quits the game", () => {
+    const node: { onaudioprocess: (() => void) | null } = { onaudioprocess: () => undefined }
+    const core: FakeCore = Object.assign(fakeCore(), {
+      SDL2: { audio: { scriptProcessorNode: node } },
+    })
+    const emulator = createEmulator(core)
+    emulator.run(ROM)
+    const quit = core.quitGame
+    let handlerAtQuit: unknown = 'never quit'
+    core.quitGame = () => {
+      handlerAtQuit = node.onaudioprocess
+      quit()
+    }
+    emulator.run(OTHER_ROM)
+
+    expect(handlerAtQuit).toBeNull()
+  })
+
   // Sound needs a user gesture; Start and Restart are the page's gestures.
   it('resumes a suspended audio context on Start and Restart', () => {
     const resume = vi.fn(() => Promise.resolve())

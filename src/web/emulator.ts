@@ -25,7 +25,10 @@ export type EmulatorCore = Pick<
 > & {
   readonly FS: ReplayFs
   /** Created with the game's audio, so absent before it; sound is best effort. */
-  readonly SDL2?: { readonly audioContext?: Pick<AudioContext, 'state' | 'resume'> }
+  readonly SDL2?: {
+    readonly audioContext?: Pick<AudioContext, 'state' | 'resume'>
+    readonly audio?: { readonly scriptProcessorNode?: { onaudioprocess: unknown } }
+  }
 }
 
 /** What the page asks of the emulator. */
@@ -73,9 +76,14 @@ export function createEmulator(core: EmulatorCore): Emulator {
     core.setCoreSettings(QUIET)
     prepared = true
   }
-  // A fresh image and a blank save each Start, so every run boots the same way.
+  // A fresh image and a blank save each Start, so every run boots the same way. quitGame closes
+  // SDL's audio device, yet an audio event already queued for its node would still call into it.
   const replaceImage = (rom: Uint8Array): void => {
-    if (state !== 'none') core.quitGame()
+    if (state !== 'none') {
+      const node = core.SDL2?.audio?.scriptProcessorNode
+      if (node !== undefined) node.onaudioprocess = null
+      core.quitGame()
+    }
     state = 'none'
     for (const path of [IMAGE, SAVE]) {
       if (core.FS.analyzePath(path).exists) core.FS.unlink(path)
