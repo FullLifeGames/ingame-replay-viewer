@@ -27,6 +27,7 @@
     "rom:shots": "node scripts/rom-shot.ts",
     "wasm:build": "node scripts/wasm-build.ts",
     "wasm:census": "node scripts/wasm-build.ts --census",
+    "wasm:convert": "node scripts/wasm-convert.ts",
     "gen3:tables": "node scripts/gen3-tables.ts"
   },
   "devDependencies": {
