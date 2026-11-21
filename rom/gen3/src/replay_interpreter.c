@@ -14,6 +14,7 @@
 #include "text.h"
 #include "constants/battle.h"
 #include "constants/characters.h"
+#include "constants/moves.h"
 #include "constants/rgb.h"
 
 // The ROM interpreter (#6). Replay_Load checks the whole stream first (replay_stream_check.c), so a
@@ -145,6 +146,7 @@ void Replay_TakeOverBattleMain(void)
         return;
     sReplay.upstreamIntro = gBattleMainFunc;
     gBattleMainFunc = Replay_RunBattle;
+    gCurrentMove = MOVE_NONE;
 }
 
 static void Replay_RunBattle(void)
@@ -201,9 +203,11 @@ static bool32 Op_End(const volatile u8 *operands, u32 step)
     return TRUE;
 }
 
-// TURN: the number of the turn that starts.
+// TURN: the number of the turn that starts. No move of the last turn is still in action, as
+// HandleAction_ActionFinished clears gCurrentMove after each action.
 static bool32 Op_Turn(const volatile u8 *operands, u32 step)
 {
+    gCurrentMove = MOVE_NONE;
     gReplayProgress.turn = Replay_ReadU16(operands);
     return TRUE;
 }
