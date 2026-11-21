@@ -53,7 +53,7 @@ const sha256File = (path: string) => createHash('sha256').update(readFileSync(pa
 
 // Every delete goes through the guard of rom-paths.ts; --all deletes the tree and the stamp, never
 // the cache folder that holds them.
-function cleanOutputs(paths: BuildPaths, config: BuildConfig, all: boolean): void {
+export function cleanOutputs(paths: BuildPaths, config: BuildConfig, all: boolean): void {
   emptyInside(paths.roots, paths.outDir)
   removeInside(paths.roots, paths.stampPath)
   if (all) {
