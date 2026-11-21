@@ -1,2 +1,4 @@
 # The changes to upstream files, one patch file per line, applied in this order (rom/gen3/README.md).
-# The replay slot needs none; the first patch comes with the ROM interpreter (#6).
+0001-replay-takes-over-battle-main.patch
+0002-hide-hp-numbers.patch
+0003-boot-into-replay.patch

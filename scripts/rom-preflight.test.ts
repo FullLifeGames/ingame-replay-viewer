@@ -5,7 +5,13 @@ import { join } from 'node:path'
 
 import { afterAll, describe, expect, it } from 'vitest'
 
-import { APT_INSTALL, BUILD_TOOLS, preflightProblems, readPreflightInput } from './rom-preflight.ts'
+import {
+  APT_INSTALL,
+  BUILD_TOOLS,
+  hostProblems,
+  preflightProblems,
+  readPreflightInput,
+} from './rom-preflight.ts'
 import type { PreflightInput } from './rom-preflight.ts'
 
 const GIB_IN_KB = 1024 * 1024
@@ -107,6 +113,15 @@ describe('preflightProblems', () => {
     expect(problems).toEqual([
       expect.stringMatching(/no base ROM at .*none\.gba; set IRV_BASE_ROM/),
     ])
+  })
+})
+
+describe('hostProblems', () => {
+  it('checks the tools and the memory but no base ROM, for make check', () => {
+    const missing = join(scratch, 'none.gba')
+    expect(hostProblems(input({ baseRomPath: missing }))).toEqual([])
+    expect(hostProblems(input({ meminfo: meminfo(2 * GIB_IN_KB) }))).toHaveLength(1)
+    expect(hostProblems(input({ pathVariable: '/nonexistent' }))[0]).toMatch(/^missing /)
   })
 })
 

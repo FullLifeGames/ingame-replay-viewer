@@ -6,8 +6,9 @@ import { join } from 'node:path'
 
 import { applyBps } from '../src/patch/bps-apply.ts'
 import { createBps } from '../src/patch/bps-create.ts'
+import type { SlotDescription } from '../src/patch/slot.ts'
 import { describeSlot, findSymbol, SLOT_SYMBOL } from './rom-slot.ts'
-import type { SlotDescription, SlotLayout } from './rom-slot.ts'
+import type { SlotLayout } from './rom-slot.ts'
 
 // The files in build/rom/; the ROM build and the reproducibility check both name them from here.
 export const OUTPUT_NAMES = {

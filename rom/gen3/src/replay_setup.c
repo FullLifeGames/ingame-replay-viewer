@@ -1,0 +1,133 @@
+#include "global.h"
+#include "battle.h"
+#include "battle_main.h"
+#include "malloc.h"
+#include "pokemon.h"
+#include "recorded_battle.h"
+#include "replay_interpreter.h"
+#include "replay_stream.h"
+#include "constants/battle.h"
+#include "constants/characters.h"
+#include "constants/global.h"
+#include "constants/pokemon.h"
+#include "constants/trainers.h"
+
+// The battle a replay plays in (#6): a recorded link battle, as the expansion's own singles tests
+// start one (test/test_runner_battle.c). It needs no input: the recorded controllers play no
+// menus, and BattlePutTextOnWindow scrolls text by itself in a recorded battle.
+
+#define REPLAY_BATTLE_FLAGS (BATTLE_TYPE_IS_MASTER | BATTLE_TYPE_RECORDED_IS_MASTER | BATTLE_TYPE_RECORDED_LINK | BATTLE_TYPE_TRAINER)
+
+static void CopyString(u8 *dest, const volatile u8 *src, u32 length)
+{
+    u32 i;
+
+    for (i = 0; i < length; i++)
+        dest[i] = src[i];
+    dest[length] = EOS;
+}
+
+// GetMonPersonality's gender of each REPLAY_GENDER_*. It gives a species of one gender, or of
+// none, its own.
+static const u8 sGenders[] =
+{
+    [REPLAY_GENDER_MALE]   = MON_MALE,
+    [REPLAY_GENDER_FEMALE] = MON_FEMALE,
+    [REPLAY_GENDER_NONE]   = MON_GENDERLESS,
+};
+
+// A side's link player gender when its trainer pic is neither BRENDAN nor MAY (S3a D9).
+static const u8 sDefaultGenders[] =
+{
+    [REPLAY_SIDE_NEAR] = MALE,
+    [REPLAY_SIDE_FAR]  = FEMALE,
+};
+
+// A mon of a team table: species, level, gender and shininess, the nickname, and HP on the battle
+// log's scale. Only the gender comes from the personality, so the rest of it stays random.
+static void CreateReplayMon(struct Pokemon *mon, const volatile u8 *entry)
+{
+    u8 nickname[REPLAY_MON_NICKNAME_LENGTH];
+    u32 species = Replay_ReadU16(entry + REPLAY_MON_OFFSET_SPECIES);
+    u32 hp = Replay_ReadU16(entry + REPLAY_MON_OFFSET_MAX_HP);
+    u32 personality = GetMonPersonality(species, sGenders[entry[REPLAY_MON_OFFSET_GENDER]], NATURE_RANDOM, RANDOM_UNOWN_LETTER);
+    u8 shiny = entry[REPLAY_MON_OFFSET_SHINY];
+
+    CreateMon(mon, species, entry[REPLAY_MON_OFFSET_LEVEL], personality, OTID_STRUCT_PRESET(0));
+    SetMonData(mon, MON_DATA_IS_SHINY, &shiny);
+    CopyString(nickname, entry + REPLAY_MON_OFFSET_NICKNAME, POKEMON_NAME_LENGTH);
+    SetMonData(mon, MON_DATA_NICKNAME, nickname);
+    SetMonData(mon, MON_DATA_MAX_HP, &hp);
+    SetMonData(mon, MON_DATA_HP, &hp);
+}
+
+static void FillParties(struct RecordedBattleSave *save, const volatile u8 *stream)
+{
+    u32 side, slot;
+
+    for (side = 0; side < REPLAY_STREAM_SIDE_COUNT; side++)
+    {
+        for (slot = 0; slot < REPLAY_STREAM_PARTY_SIZE; slot++)
+        {
+            if (Replay_HoldsMon(stream, side, slot))
+                CreateReplayMon(&save->parties[side][slot], Replay_GetMon(stream, side, slot));
+        }
+    }
+}
+
+// The recorded controllers draw BRENDAN for a male link player and MAY for a female one.
+static u32 GetLinkPlayerGender(const volatile u8 *stream, u32 side)
+{
+    switch (Replay_ReadU16(Replay_GetTrainer(stream, side) + REPLAY_TRAINER_OFFSET_TRAINER_PIC))
+    {
+    case TRAINER_PIC_BRENDAN:
+        return MALE;
+    case TRAINER_PIC_MAY:
+        return FEMALE;
+    default:
+        return sDefaultGenders[side];
+    }
+}
+
+// The link players are the two trainers, near side first. Their names are cut to the length of
+// a link player's name; the stream's PRINT texts carry the full names.
+static void FillLinkPlayers(struct RecordedBattleSave *save, const volatile u8 *stream)
+{
+    u32 i;
+
+    for (i = 0; i < MAX_LINK_PLAYERS; i++)
+    {
+        if (i < REPLAY_STREAM_SIDE_COUNT)
+        {
+            CopyString(save->playersName[i], Replay_GetTrainer(stream, i) + REPLAY_TRAINER_OFFSET_NAME, PLAYER_NAME_LENGTH);
+            save->playersGender |= GetLinkPlayerGender(stream, i) << i;
+        }
+        else
+        {
+            save->playersName[i][0] = EOS;
+        }
+        save->playersLanguage[i] = GAME_LANGUAGE;
+        save->playersBattlers |= (i << (2 * (i >> 1) + 4 * (i & BIT_SIDE)));
+    }
+}
+
+enum ReplayError Replay_Start(const volatile u8 *stream, u32 length, enum ReplayEnd end, MainCallback afterBattle)
+{
+    struct RecordedBattleSave *save;
+    enum ReplayError error = Replay_Load(stream, length, end);
+
+    if (error != REPLAY_ERROR_NONE)
+        return error;
+    save = AllocZeroed(sizeof(*save));
+    FillParties(save, stream);
+    FillLinkPlayers(save, stream);
+    save->battleFlags = REPLAY_BATTLE_FLAGS;
+    save->opponentA = TRAINER_LINK_OPPONENT;
+    save->textSpeed = OPTIONS_TEXT_SPEED_FAST;
+    gBattleTypeFlags = save->battleFlags;
+    SetVariablesForRecordedBattle(save);
+    Free(save);
+    gMain.savedCallback = afterBattle;
+    SetMainCallback2(CB2_InitBattle);
+    return REPLAY_ERROR_NONE;
+}

@@ -1,0 +1,138 @@
+#include "global.h"
+#include "battle.h"
+#include "pokemon.h"
+#include "sprite.h"
+#include "test/replay_test.h"
+#include "constants/battle.h"
+#include "constants/moves.h"
+#include "constants/songs.h"
+#include "constants/species.h"
+
+// A move and its damage (#6): MOVE plays the user's move animation, HIT the effectiveness sound and
+// the hit animation, HP moves the HP bar and sets the mon's HP, FAINT plays the faint cry and the
+// faint animation.
+
+// Dugtrio near and Magneton far, both on the field.
+static void StartDugtrioVsMagneton(u32 nearHp, u32 farHp)
+{
+    ReplayStream_Mon(REPLAY_SIDE_NEAR, 0, SPECIES_DUGTRIO, 100);
+    ReplayStream_Mon(REPLAY_SIDE_FAR, 0, SPECIES_MAGNETON, 100);
+    ReplayStream_Intro();
+    ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, farHp, REPLAY_STATUS_NONE);
+    ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, nearHp, REPLAY_STATUS_NONE);
+}
+
+REPLAY_TEST("Dugtrio uses Earthquake on Magneton: move animation, super effective sound, HP bar")
+{
+    STREAM
+    {
+        StartDugtrioVsMagneton(100, 100);
+        ReplayStream_Move(REPLAY_SIDE_NEAR, REPLAY_SIDE_FAR, MOVE_EARTHQUAKE);
+        ReplayStream_Hit(REPLAY_SIDE_FAR, REPLAY_EFFECTIVENESS_SUPER);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 0);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_EARTHQUAKE, nearMon, target: farMon);
+        EFFECTIVENESS_SE(farMon, SE_SUPER_EFFECTIVE);
+        HP_BAR(farMon, hp: 0);
+    }
+    THEN
+    {
+        EXPECT_EQ(gBattlerAttacker, GetBattlerAtPosition(B_POSITION_PLAYER_LEFT));
+        EXPECT_EQ(gBattlerTarget, GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT));
+        EXPECT_EQ(gCurrentMove, MOVE_EARTHQUAKE);
+    }
+}
+
+REPLAY_TEST("A normal hit plays SE_EFFECTIVE and a resisted one SE_NOT_EFFECTIVE")
+{
+    STREAM
+    {
+        StartDugtrioVsMagneton(100, 100);
+        ReplayStream_Move(REPLAY_SIDE_FAR, REPLAY_SIDE_NEAR, MOVE_TACKLE);
+        ReplayStream_Hit(REPLAY_SIDE_NEAR, REPLAY_EFFECTIVENESS_NORMAL);
+        ReplayStream_Move(REPLAY_SIDE_NEAR, REPLAY_SIDE_FAR, MOVE_ROCK_SLIDE);
+        ReplayStream_Hit(REPLAY_SIDE_FAR, REPLAY_EFFECTIVENESS_RESISTED);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_TACKLE, farMon, target: nearMon);
+        EFFECTIVENESS_SE(nearMon, SE_EFFECTIVE);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_ROCK_SLIDE, nearMon, target: farMon);
+        EFFECTIVENESS_SE(farMon, SE_NOT_EFFECTIVE);
+    }
+}
+
+REPLAY_TEST("Leftovers heal 71 to 77: the HP bar rises and the mon has 77 HP")
+{
+    STREAM
+    {
+        StartDugtrioVsMagneton(71, 100);
+        ReplayStream_Hp(REPLAY_SIDE_NEAR, 77);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        HP_BAR(nearMon, hp: 77);
+    }
+    THEN
+    {
+        EXPECT_EQ(nearMon->hp, 77);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_HP), 77);
+    }
+}
+
+REPLAY_TEST("HP keeps to the mon's max HP")
+{
+    STREAM
+    {
+        StartDugtrioVsMagneton(100, 71);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 101);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        HP_BAR(farMon, hp: 100);
+    }
+    THEN
+    {
+        EXPECT_EQ(farMon->hp, 100);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_HP), 100);
+    }
+}
+
+REPLAY_TEST("FAINT after HP 0 takes the mon off the field on both sides")
+{
+    u32 nearBattler = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
+    u32 farBattler = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
+
+    STREAM
+    {
+        StartDugtrioVsMagneton(100, 100);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 0);
+        ReplayStream_Faint(REPLAY_SIDE_FAR);
+        ReplayStream_Hp(REPLAY_SIDE_NEAR, 0);
+        ReplayStream_Faint(REPLAY_SIDE_NEAR);
+        ReplayStream_End(REPLAY_OUTCOME_TIE);
+    }
+    SCENE
+    {
+        HP_BAR(farMon, hp: 0);
+        HP_BAR(nearMon, hp: 0);
+    }
+    THEN
+    {
+        EXPECT_EQ(farMon->hp, 0);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_HP), 0);
+        EXPECT(!gSprites[gBattlerSpriteIds[farBattler]].inUse);
+        EXPECT(gSprites[gHealthboxSpriteIds[farBattler]].invisible);
+        EXPECT(gBattleStruct->battlerState[farBattler].notOnField);
+        EXPECT_EQ(nearMon->hp, 0);
+        EXPECT(!gSprites[gBattlerSpriteIds[nearBattler]].inUse);
+        EXPECT(gSprites[gHealthboxSpriteIds[nearBattler]].invisible);
+        EXPECT(gBattleStruct->battlerState[nearBattler].notOnField);
+    }
+}

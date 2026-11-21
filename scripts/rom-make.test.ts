@@ -66,6 +66,13 @@ describe('running make', () => {
     )
   })
 
+  it('passes the goal and the variables after the job cap', () => {
+    const env = fakeTools('goal', { make: 'echo "args $*"' })
+    const log = join(scratch, 'goal.log')
+    runMake({ tree, jobs: 3, logPath: log, env, args: ['check', 'TESTS=Replay'] })
+    expect(readFileSync(log, 'utf8')).toBe('args -j3 -O check TESTS=Replay\n')
+  })
+
   it('names the status and the log and quotes its last lines when make fails', () => {
     const lines = Array.from({ length: 30 }, (_, index) => `echo line${String(index)}`)
     const env = fakeTools('fail', { make: `${lines.join('\n')}\nexit 2` })

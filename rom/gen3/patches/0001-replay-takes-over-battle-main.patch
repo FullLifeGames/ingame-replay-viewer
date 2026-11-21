@@ -1,0 +1,24 @@
+BeginBattleIntro hands the battle main loop to the ROM interpreter (#6, plan D1).
+Replay_TakeOverBattleMain does nothing unless a replay is loaded, so every other battle,
+the expansion's own tests among them, keeps DoBattleIntro.
+
+diff --git a/src/battle_main.c b/src/battle_main.c
+index a8da2e1c..20fa2644 100644
+--- a/src/battle_main.c
++++ b/src/battle_main.c
+@@ -46,6 +46,7 @@
+ #include "pokerus.h"
+ #include "random.h"
+ #include "recorded_battle.h"
++#include "replay_interpreter.h"
+ #include "roamer.h"
+ #include "safari_zone.h"
+ #include "scanline_effect.h"
+@@ -2727,6 +2728,7 @@ void BeginBattleIntro(void)
+     gBattleCommunication[1] = 0;
+     gBattleStruct->eventState.battleIntro = 0;
+     gBattleMainFunc = DoBattleIntro;
++    Replay_TakeOverBattleMain();
+ }
+ 
+ static void BattleMainCB1(void)

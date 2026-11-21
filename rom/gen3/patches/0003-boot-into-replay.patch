@@ -1,0 +1,18 @@
+The ROM boots straight into the replay in its slot (#6, ADR 0003, plan section 2):
+CB2_ReplayBoot (src/replay_boot.c) takes the copyright screen's place as the first callback.
+The ROM links with this script alone; the test ELF links with ld_script_test.ld and keeps
+CB2_TestRunner.
+
+diff --git a/ld_script_modern.ld b/ld_script_modern.ld
+index 005ca63..3c039c0 100644
+--- a/ld_script_modern.ld
++++ b/ld_script_modern.ld
+@@ -2,7 +2,7 @@ ENTRY(Start)
+ 
+ gNumMusicPlayers = 4;
+ gMaxLines = 0;
+-gInitialMainCB2 = CB2_InitCopyrightScreenAfterBootup;
++gInitialMainCB2 = CB2_ReplayBoot;
+ 
+ MEMORY
+ {

@@ -1,0 +1,27 @@
+UpdateHpTextInHealthbox prints no HP numbers on the near side while a replay is loaded (#6,
+plan "HP display"): a replay carries HP as percentages, so both sides show the HP bar alone.
+The far side prints none already (B_HP_PERCENTAGE_DISPLAY is FALSE). Replay_HidesHpNumbers
+is FALSE in every other battle, the expansion's own tests among them.
+
+diff --git a/src/battle_interface.c b/src/battle_interface.c
+index 69099bc4..afbf16bc 100644
+--- a/src/battle_interface.c
++++ b/src/battle_interface.c
+@@ -28,6 +28,7 @@
+ #include "item.h"
+ #include "item_icon.h"
+ #include "item_use.h"
++#include "replay_interpreter.h"
+ #include "test_runner.h"
+ #include "constants/battle_anim.h"
+ #include "constants/rgb.h"
+@@ -1089,7 +1090,8 @@ void UpdateHpTextInHealthbox(u32 healthboxSpriteId, u32 maxOrCurrent, s16 currHp
+     {
+         if (IsOnPlayerSide(battler)) // Player
+         {
+-            PrintHpOnHealthbox(healthboxSpriteId, currHp, maxHp, HEALTHBOX_BG_INDEX, 0, 16);
++            if (!Replay_HidesHpNumbers())
++                PrintHpOnHealthbox(healthboxSpriteId, currHp, maxHp, HEALTHBOX_BG_INDEX, 0, 16);
+         }
+         else // Opponent
+         {
