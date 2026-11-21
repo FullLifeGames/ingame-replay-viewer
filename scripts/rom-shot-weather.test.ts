@@ -57,6 +57,19 @@ describe('the weather an ability starts, on the screen (#22)', () => {
     expect(sceneOf(apart)).toBe(undefined)
   })
 
+  it('has no scene for a weather a move starts, before the next upkeep animation', () => {
+    // 994052's Rain Dance, gen3 snapshot ops 277-280.
+    const rainDance: readonly Instruction[] = [
+      ...SAND_STREAM.slice(0, 2),
+      { op: 'weather', weather: 'rain' },
+      { op: 'print', text: 'It started to rain!' },
+      { op: 'print', text: 'Rain continues to fall.' },
+      { op: 'anim', side: 'near', anim: 'rainContinues' },
+      { op: 'end', outcome: 'tie' },
+    ]
+    expect(sceneOf(rainDance)).toBe(undefined)
+  })
+
   it('has no scene for a weather with no animation after it', () => {
     expect(sceneOf(SAND_STREAM.filter((instruction) => instruction.op !== 'anim'))).toBe(undefined)
   })

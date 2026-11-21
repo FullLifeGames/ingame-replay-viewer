@@ -14,16 +14,19 @@ import type { Scene } from './rom-shot-scenes.ts'
 // in, the blend is full.
 const WEATHER_FRAMES = 60
 
-// The first ANIM op after a WEATHER op that starts a weather, with only PRINTs between them.
+// The start's own shape: a WEATHER op that starts a weather, its PRINT and the ANIM, three ops in
+// a row. A weather a move starts ends after its PRINT, and the next ANIM can be the upkeep's
+// (994052's Rain Dance: "It started to rain!", then "Rain continues to fall." and its
+// `rainContinues`), so a gap of any length would take an upkeep animation for a start's.
 function weatherAnimAt(instructions: readonly Instruction[]): number {
-  let started = false
-  return instructions.findIndex((instruction) => {
-    if (instruction.op === 'anim' && started) return true
-    if (instruction.op !== 'print') {
-      started = instruction.op === 'weather' && instruction.weather !== 'none'
-    }
-    return false
-  })
+  const at = instructions.findIndex(
+    (instruction, index) =>
+      instruction.op === 'weather' &&
+      instruction.weather !== 'none' &&
+      instructions[index + 1]?.op === 'print' &&
+      instructions[index + 2]?.op === 'anim',
+  )
+  return at < 0 ? at : at + 2
 }
 
 /** The weather's animation against the frame before it, on the sky of the battle background. */
