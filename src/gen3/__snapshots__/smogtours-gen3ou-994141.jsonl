@@ -1,4 +1,4 @@
-{"length":19966,"crc32":"8fa06a00","trainers":{"near":{"name":"SoggyBagel64","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Nametab","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":373,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Salamence"},{"species":51,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Dugtrio"}],"far":[{"species":286,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Breloom"},{"species":385,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Jirachi"},{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"},{"species":205,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Forretress"},{"species":51,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Dugtrio"},{"species":134,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Vaporeon"}]}}
+{"length":19942,"crc32":"05cbd19f","trainers":{"near":{"name":"SoggyBagel64","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Nametab","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":373,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Salamence"},{"species":51,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Dugtrio"}],"far":[{"species":286,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Breloom"},{"species":385,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Jirachi"},{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"},{"species":205,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Forretress"},{"species":51,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Dugtrio"},{"species":134,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Vaporeon"}]}}
 {"line":23,"op":"intro"}
 {"line":23,"op":"print","text":"You are challenged by Nametab!"}
 {"line":25,"op":"print","text":"Nametab sent out Breloom!"}
@@ -213,7 +213,6 @@
 {"line":169,"op":"print","text":"A sandstorm kicked up!"}
 {"line":169,"op":"ability","side":"far","ability":45,"show":false}
 {"line":170,"op":"print","text":"Celebi used Psychic!"}
-{"line":170,"op":"move","user":"near","target":"far","move":94}
 {"line":171,"op":"print","text":"It doesn't affect the opposing Tyranitar…"}
 {"line":173,"op":"print","text":"The sandstorm is raging."}
 {"line":173,"op":"anim","side":"near","anim":"sandstormContinues"}
@@ -276,7 +275,6 @@
 {"line":220,"op":"move","user":"near","target":"near","move":182}
 {"line":221,"op":"print","text":"Skarmory protected itself!"}
 {"line":222,"op":"print","text":"The opposing Tyranitar used Crunch!"}
-{"line":222,"op":"move","user":"far","target":"near","move":242}
 {"line":223,"op":"print","text":"Skarmory protected itself!"}
 {"line":225,"op":"print","text":"The sandstorm is raging."}
 {"line":225,"op":"anim","side":"near","anim":"sandstormContinues"}
@@ -978,7 +976,6 @@
 {"line":660,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":662,"op":"turn","number":48}
 {"line":665,"op":"print","text":"Blissey used Thunder Wave!"}
-{"line":665,"op":"move","user":"near","target":"far","move":86}
 {"line":666,"op":"print","text":"The opposing Vaporeon is already paralyzed!"}
 {"line":667,"op":"print","text":"The opposing Vaporeon used Surf!"}
 {"line":667,"op":"move","user":"far","target":"near","move":57}
@@ -1004,7 +1001,6 @@
 {"line":675,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":677,"op":"turn","number":49}
 {"line":680,"op":"print","text":"Blissey used Thunder Wave!"}
-{"line":680,"op":"move","user":"near","target":"far","move":86}
 {"line":681,"op":"print","text":"The opposing Vaporeon is already paralyzed!"}
 {"line":682,"op":"print","text":"The opposing Vaporeon couldn't move because it's paralyzed!"}
 {"line":682,"op":"anim","side":"far","anim":"statusPrz"}

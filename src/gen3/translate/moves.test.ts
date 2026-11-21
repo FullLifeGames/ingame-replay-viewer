@@ -51,6 +51,50 @@ describe('moves', () => {
     expect(sceneOf(alone).map(plain)).toEqual(['Dugtrio used Earthquake!'])
   })
 
+  // The game plays no animation for a move that did nothing (#23): 994052 log lines 316 and 317.
+  it('plays no animation for a move that fails at once', () => {
+    const toxic = sceneOf('|move|p2a: Tyranitar|Toxic|p1a: Dugtrio', '|-fail|p1a: Dugtrio|tox')
+    expect(toxic.map(plain)).toEqual([
+      'The opposing Tyranitar used Toxic!',
+      'Dugtrio is already poisoned!',
+    ])
+    const substitute = sceneOf(
+      '|move|p1a: Dugtrio|Substitute|p1a: Dugtrio',
+      '|-fail|p1a: Dugtrio|move: Substitute',
+    )
+    expect(substitute.map(plain)).not.toContainEqual(expect.objectContaining({ op: 'move' }))
+  })
+
+  it('plays no animation for a move the target is immune to', () => {
+    const scene = sceneOf(earthquake, '|-immune|p2a: Tyranitar')
+    expect(scene.map(plain)).toEqual([
+      'Dugtrio used Earthquake!',
+      "It doesn't affect the opposing Tyranitar…",
+    ])
+  })
+
+  it('plays no animation for a move that Protect stops', () => {
+    const scene = sceneOf(earthquake, '|-activate|p2a: Tyranitar|Protect')
+    expect(scene.map(plain)).toEqual([
+      'Dugtrio used Earthquake!',
+      'The opposing Tyranitar protected itself!',
+    ])
+  })
+
+  // gen3ou-2717395946: Jirachi's Calm Mind at +6/+6, copied onto Dugtrio.
+  it('plays no animation for a stat move whose stats are all at their limit', () => {
+    const scene = sceneOf(
+      '|move|p1a: Dugtrio|Calm Mind|p1a: Dugtrio',
+      '|-boost|p1a: Dugtrio|spa|0',
+      '|-boost|p1a: Dugtrio|spd|0',
+    )
+    expect(scene.map(plain)).toEqual([
+      'Dugtrio used Calm Mind!',
+      "Dugtrio's Sp. Atk won't go any higher!",
+      "Dugtrio's Sp. Def won't go any higher!",
+    ])
+  })
+
   it('aims a move on the user at its own side, and a far move at the near side', () => {
     const swordsDance = moveOf('Swords Dance').number
     const rockSlide = moveOf('Rock Slide').number
