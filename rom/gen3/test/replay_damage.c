@@ -136,3 +136,63 @@ REPLAY_TEST("FAINT after HP 0 takes the mon off the field on both sides")
         EXPECT(gBattleStruct->battlerState[nearBattler].notOnField);
     }
 }
+
+// The KO animation (#24): when a mon faints, the expansion plays the back or front animation of the
+// mon that stays (B_ANIMATE_MON_AFTER_KO, AnimateMonAfterKnockout in battle_controllers.c) while
+// the faint text prints, and its faint script waits for it (waitanimation). Headless tests skip
+// the animation unless FORCE_MOVE_ANIM is set.
+
+// battlerKOAnimsRunning is a bit-field, which EXPECT_EQ cannot take.
+static u32 KOAnimsRunning(void)
+{
+    return gBattleStruct->battlerKOAnimsRunning;
+}
+
+REPLAY_TEST("The near mon's KO animation has ended when the op after the faint text starts")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        StartDugtrioVsMagneton(100, 100);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 0);
+        ReplayStream_Faint(REPLAY_SIDE_FAR);
+        ReplayStream_Print(COMPOUND_STRING("The opposing Magneton fainted!"));
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        MESSAGE("The opposing Magneton fainted!");
+    }
+    THEN
+    {
+        EXPECT_EQ(KOAnimsRunning(), 0);
+    }
+}
+
+REPLAY_TEST("The near mon faints only after its KO animation for the far mon has ended")
+{
+    u32 nearBattler = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
+
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        StartDugtrioVsMagneton(100, 100);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 0);
+        ReplayStream_Faint(REPLAY_SIDE_FAR);
+        ReplayStream_Hp(REPLAY_SIDE_NEAR, 0);
+        ReplayStream_Faint(REPLAY_SIDE_NEAR);
+        ReplayStream_End(REPLAY_OUTCOME_TIE);
+    }
+    SCENE
+    {
+        HP_BAR(farMon, hp: 0);
+        HP_BAR(nearMon, hp: 0);
+    }
+    THEN
+    {
+        EXPECT_EQ(KOAnimsRunning(), 0);
+        EXPECT(!gSprites[gBattlerSpriteIds[nearBattler]].inUse);
+        EXPECT(gSprites[gHealthboxSpriteIds[nearBattler]].invisible);
+        EXPECT(gBattleStruct->battlerState[nearBattler].notOnField);
+    }
+}

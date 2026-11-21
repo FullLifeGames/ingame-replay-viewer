@@ -150,6 +150,26 @@ void Replay_TakeOverBattleMain(void)
     gReplayProgress.playing = TRUE;
 }
 
+// The KO animation (#24). When a mon faints, the faint handler starts the animation of the mon
+// that stays (AnimateMonAfterKnockout in battle_controllers.c, B_ANIMATE_MON_AFTER_KO), and the
+// faint text prints while it runs. BattleScript_FaintBattler (data/battle_scripts_1.s) waits for
+// it before its next step:
+//     dofaintanimation BS_FAINTED
+//     ...
+//     printstring STRINGID_BATTLERFAINTED
+//     ...
+//     flushtextbox
+//     waitanimation
+// and Cmd_waitanimation (src/battle_script_commands.c) returns while
+//     gBattleControllerExecFlags != 0 || gBattleStruct->battlerKOAnimsRunning != 0
+// So a PRINT starts during the animation, and every other op waits for its end. The faint handler
+// runs on two frames and starts the animation on both, so after a faint the counter is 2; both
+// animations end on the same frame.
+static bool32 Replay_WaitsForKOAnimation(u32 op, u32 step)
+{
+    return step == 0 && op != REPLAY_OP_PRINT && gBattleStruct->battlerKOAnimsRunning != 0;
+}
+
 static void Replay_RunBattle(void)
 {
     const volatile u8 *instruction;
@@ -162,6 +182,8 @@ static void Replay_RunBattle(void)
         return;
     }
     instruction = sReplay.instructions + sReplay.at;
+    if (Replay_WaitsForKOAnimation(instruction[0], sReplay.step))
+        return;
     if (!sOps[instruction[0]](instruction + REPLAY_INSTRUCTION_HEADER_SIZE, sReplay.step))
     {
         sReplay.step++;
