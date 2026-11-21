@@ -18,7 +18,10 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "check": "npm run lint && npm run typecheck && npm run format:check && npm run knip && npm run test:coverage",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "rom:build": "node scripts/rom-build.ts",
+    "rom:clean": "node scripts/rom-build.ts --clean-only",
+    "rom:repro": "node scripts/rom-repro.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
