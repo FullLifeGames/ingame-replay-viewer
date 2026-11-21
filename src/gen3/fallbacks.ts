@@ -29,8 +29,8 @@ export interface Fallback {
 }
 
 /**
- * Whether `fallback` stands in for content the game lacks (a phrase, a character, a form, a move,
- * an ability, an item). A test replay may take none of these; a mechanic fallback shows nothing
- * in either case, so it is listed and allowed.
+ * Whether the game shows something in place of `fallback`'s content gap: a phrase, a character, a
+ * form, a move, an ability or an item. A mechanic the game lacks is a content gap too, but on a
+ * silent line nothing shows either way, so a test replay may list it.
  */
-export const isContentGap = (fallback: Fallback): boolean => fallback.kind !== 'mechanic'
+export const showsInPlace = (fallback: Fallback): boolean => fallback.kind !== 'mechanic'

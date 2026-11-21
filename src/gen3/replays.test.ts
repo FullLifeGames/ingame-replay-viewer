@@ -6,7 +6,7 @@ import type { Side } from '../script/types'
 import { REPLAYS, replayScript } from '../script/testing'
 import { crc32 } from '../patch/crc32'
 import { buildGen3Stream, type Gen3Stream } from './backend'
-import { isContentGap } from './fallbacks'
+import { showsInPlace } from './fallbacks'
 import { decodeStream } from './stream/decode'
 import { decodeText, encodeText } from './text/charset'
 import { translate, type Translation } from './translate'
@@ -55,8 +55,8 @@ describe.each(replays)('the instruction stream of $id', ({ id, script, stream, t
     await expect(toJsonl(stream, tables)).toMatchFileSnapshot(`./__snapshots__/${id}.jsonl`)
   })
 
-  it('takes no fallback for content the game lacks', () => {
-    const gaps = stream.fallbacks.filter(isContentGap)
+  it('takes no fallback that shows something in place of a content gap', () => {
+    const gaps = stream.fallbacks.filter(showsInPlace)
     expect(gaps, gaps.map(({ line, detail }) => `${String(line)}: ${detail}`).join('\n')).toEqual(
       [],
     )
