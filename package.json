@@ -21,7 +21,8 @@
     "prepare": "lefthook install",
     "rom:build": "node scripts/rom-build.ts",
     "rom:clean": "node scripts/rom-build.ts --clean-only",
-    "rom:repro": "node scripts/rom-repro.ts"
+    "rom:repro": "node scripts/rom-repro.ts",
+    "gen3:tables": "node scripts/gen3-tables.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
