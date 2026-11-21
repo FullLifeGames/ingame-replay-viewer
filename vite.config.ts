@@ -14,6 +14,8 @@ export default defineConfig({
     // Tailscale's HTTPS names, for the user's link (plan S5b D1 (a)).
     allowedHosts: ['.ts.net'],
   },
+  // mgba.js starts its pthread worker and loads its wasm from its own URL, so it is served as is.
+  optimizeDeps: { exclude: ['@thenick775/mgba-wasm'] },
   build: {
     outDir: resolve(import.meta.dirname, 'dist'),
     emptyOutDir: true,

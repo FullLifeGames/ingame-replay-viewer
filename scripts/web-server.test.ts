@@ -200,3 +200,12 @@ describe('the file guard for /@fs/', () => {
     expect(config.plugins.map((plugin) => plugin.name)).toContain('irv-rom-server')
   })
 })
+
+describe('the emulator package in the dev server', () => {
+  // mgba.js finds its pthread worker and its wasm beside itself (new URL(..., import.meta.url)),
+  // which a pre-bundled copy in node_modules/.vite would break.
+  it('stays out of the dependency optimizer', async () => {
+    const config = await resolveConfig({ logLevel: 'silent' }, 'serve')
+    expect(config.optimizeDeps.exclude).toContain('@thenick775/mgba-wasm')
+  })
+})
