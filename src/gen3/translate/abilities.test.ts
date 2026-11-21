@@ -14,7 +14,7 @@ const popUp = (side: Side, name: string, show: boolean) => ({
 })
 
 describe('ability pop-ups', () => {
-  it('sends the leads out, then raises Sand Stream with its pop-up (X10)', () => {
+  it('sends the leads out, then raises and plays Sand Stream inside its pop-up (X10)', () => {
     const result = streamOfLog(
       '|-weather|Sandstorm|[from] ability: Sand Stream|[of] p2a: Tyranitar',
     )
@@ -25,6 +25,7 @@ describe('ability pop-ups', () => {
       popUp('far', 'Sand Stream', true),
       { op: 'weather', weather: 'sand' },
       'A sandstorm kicked up!',
+      { op: 'anim', side: 'near', anim: 'sandstormContinues' },
       popUp('far', 'Sand Stream', false),
       { op: 'end', outcome: 'unknown' },
     ])

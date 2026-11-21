@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
-import { moveOf } from '../tables/lookup'
+import { abilityOf, moveOf } from '../tables/lookup'
 import { plain, sceneOf, streamOfLog } from '../testing'
+
+const popUp = (name: string, show: boolean) => ({
+  op: 'ability',
+  side: 'far',
+  ability: abilityOf(name).number,
+  show,
+})
 
 describe('weather', () => {
   it('sets the weather a move starts, then says it', () => {
@@ -13,6 +20,33 @@ describe('weather', () => {
       { op: 'weather', weather: 'rain' },
       'It started to rain!',
     ])
+  })
+
+  it('plays the rain Drizzle starts after its line, inside the pop-up', () => {
+    const scene = sceneOf('|-weather|RainDance|[from] ability: Drizzle|[of] p2a: Tyranitar')
+    expect(scene.map(plain)).toEqual([
+      popUp('Drizzle', true),
+      { op: 'weather', weather: 'rain' },
+      'It started to rain!',
+      { op: 'anim', side: 'near', anim: 'rainContinues' },
+      popUp('Drizzle', false),
+    ])
+  })
+
+  it('plays the sunlight Drought starts after its line, inside the pop-up', () => {
+    const scene = sceneOf('|-weather|SunnyDay|[from] ability: Drought|[of] p2a: Tyranitar')
+    expect(scene.map(plain)).toEqual([
+      popUp('Drought', true),
+      { op: 'weather', weather: 'sun' },
+      'The sunlight turned harsh!',
+      { op: 'anim', side: 'near', anim: 'sunContinues' },
+      popUp('Drought', false),
+    ])
+  })
+
+  it('plays no animation for a weather the game lacks, even from an ability', () => {
+    const scene = sceneOf('|-weather|Snow|[from] ability: Snow Warning|[of] p2a: Tyranitar')
+    expect(scene.map(({ op }) => op)).toEqual(['ability', 'print', 'ability'])
   })
 
   it('says the sandstorm rages, plays it, then hurts with it (X10)', () => {
