@@ -12,6 +12,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 
 import { writeReplaySlot } from '../src/patch/slot.ts'
 import { FRAME_HEIGHT, FRAME_WIDTH, widenFrame } from '../src/web/wasm/frame.ts'
+import type { GameModule, ModuleHooks } from '../src/web/wasm/game.ts'
 import { readProgress } from '../src/web/wasm/progress.ts'
 import type { Progress } from '../src/web/wasm/progress.ts'
 import { runCliAsync } from './rom-cli.ts'
@@ -33,21 +34,8 @@ import { wasmPaths } from './wasm-compile.ts'
 import { LINK_OUTPUTS } from './wasm-link.ts'
 import { wasmRoots } from './wasm-platform.ts'
 
-/** What the harness uses of the module that build/wasm/irv-emerald.js instantiates. */
-export interface GameModule {
-  HEAPU8: Uint8Array
-  HEAPU16: Uint16Array
-  _AgbMain(): void
-  _IrvWasm_Slot(): number
-  _IrvWasm_Progress(): number
-}
-
-/** The imports the module calls: the frame (irv_wasm_frame.c) and its two print lines. */
-export interface ModuleHooks {
-  irvFrame(pixels: number): void
-  print(line: string): void
-  printErr(line: string): void
-}
+// The module's shape lives in src/web/wasm, which the page's worker shares.
+export type { GameModule, ModuleHooks } from '../src/web/wasm/game.ts'
 
 type ModuleFactory = (hooks: ModuleHooks) => Promise<GameModule>
 
