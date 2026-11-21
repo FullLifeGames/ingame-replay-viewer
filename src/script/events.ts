@@ -133,6 +133,8 @@ interface FailEvent extends Caused {
   readonly effect?: Effect
   /** The stat an `unboost` failure kept, as @pkmn/protocol gives it (`atk`). */
   readonly stat?: string
+  /** Too little HP for the move (`[weak]`); in Gen 3, a Substitute's failure. */
+  readonly weak?: true
 }
 
 interface BlockEvent {

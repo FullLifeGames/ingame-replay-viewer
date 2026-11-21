@@ -21,6 +21,11 @@ export const MOVE_TEMPLATES = {
     return `It doesn't affect ${nameInside(who)}…`
   }),
   failed: tagged('STRINGID_BUTITFAILED', () => 'But it failed!'),
+  // B_MSG_SUBSTITUTE_FAILED in `gSubstituteUsedStringIds`; `BattleScript_EffectSubstitute`
+  // prints it and skips the animation (data/battle_scripts_1.s).
+  substituteWeak: tagged('STRINGID_TOOWEAKFORSUBSTITUTE', () => {
+    return 'But it does not have enough HP left to make a substitute!'
+  }),
   alreadyAsleep: tagged('STRINGID_PKMNALREADYASLEEP', (who: Mon) => {
     return `${nameAtStart(who)} is already asleep!`
   }),
@@ -93,8 +98,12 @@ const ALREADY: Partial<Record<StatusName | 'unboost', (who: Mon) => string>> = {
   unboost: MOVE_TEMPLATES.statsNotLowered.render,
 }
 
-/** A failure the log names a status or `unboost` for has its own line; any other fails. */
-export function failed(who: Mon, effect: Effect | undefined): string {
+/**
+ * A failure the log names a status or `unboost` for has its own line, and so has one for too
+ * little HP (`weak`, Substitute's); any other fails.
+ */
+export function failed(who: Mon, effect: Effect | undefined, weak?: true): string {
+  if (weak) return MOVE_TEMPLATES.substituteWeak.render()
   const own = effect && ALREADY[effect.name as StatusName | 'unboost']
   return own ? own(who) : MOVE_TEMPLATES.failed.render()
 }

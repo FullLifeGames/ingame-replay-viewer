@@ -105,6 +105,22 @@ describe('the move rules', () => {
     ])
   })
 
+  // Showdown's Substitute, `onTryHit`: `this.add('-fail', source, 'move: Substitute', '[weak]')`.
+  it('keeps a Substitute that fails for too little HP as a weak failure', () => {
+    const script = scriptOf('|-fail|p1a: Dugtrio|move: Substitute|[weak]')
+
+    expect(eventsFrom(script, NEXT)).toEqual([
+      {
+        kind: 'fail',
+        line: NEXT,
+        who: DUGTRIO,
+        effect: { name: 'Substitute', kind: 'move' },
+        weak: true,
+      },
+    ])
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
+
   it('names the reason a Pokémon cannot move, and the move when the log gives it', () => {
     const script = scriptOf('|cant|p2a: Tyranitar|par', '|cant|p1a: Dugtrio|Disable|Earthquake')
 

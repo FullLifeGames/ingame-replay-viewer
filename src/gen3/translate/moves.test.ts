@@ -65,6 +65,17 @@ describe('moves', () => {
     expect(substitute.map(plain)).not.toContainEqual(expect.objectContaining({ op: 'move' }))
   })
 
+  it('plays no animation for a Substitute that the user has too little HP for', () => {
+    const scene = sceneOf(
+      '|move|p1a: Dugtrio|Substitute|p1a: Dugtrio',
+      '|-fail|p1a: Dugtrio|move: Substitute|[weak]',
+    )
+    expect(scene.map(plain)).toEqual([
+      'Dugtrio used Substitute!',
+      'But it does not have enough HP left to make a substitute!',
+    ])
+  })
+
   it('plays no animation for a move the target is immune to', () => {
     const scene = sceneOf(earthquake, '|-immune|p2a: Tyranitar')
     expect(scene.map(plain)).toEqual([

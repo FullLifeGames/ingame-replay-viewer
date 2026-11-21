@@ -75,8 +75,8 @@ export function immunity({ who, line }: EventOf<'immune'>, ctx: Context): void {
   ctx.print(line, immune(ctx.mon(who)))
 }
 
-export function failure({ who, effect, line }: EventOf<'fail'>, ctx: Context): void {
-  ctx.print(line, failed(ctx.mon(who), effect))
+export function failure({ who, effect, weak, line }: EventOf<'fail'>, ctx: Context): void {
+  ctx.print(line, failed(ctx.mon(who), effect, weak))
 }
 
 /** A critical hit that no hit took in. */
