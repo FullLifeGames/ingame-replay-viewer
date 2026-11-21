@@ -6,6 +6,8 @@ import type { Fallback } from '../fallbacks'
 import type { Stream } from '../stream/instructions'
 import { Context, type EventOf, type Placed } from './context'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
+import { damage, heal } from './hp'
+import { crit, effectiveness, failure, immunity, miss, move } from './moves'
 import { faint, switchIn } from './switches'
 import { tablesOf } from './tables'
 
@@ -26,20 +28,20 @@ const HANDLERS = {
   message: notYet,
   win: notYet,
   tie: notYet,
-  move: notYet,
+  move,
   cant: notYet,
-  miss: notYet,
-  immune: notYet,
-  fail: notYet,
+  miss,
+  immune: immunity,
+  fail: failure,
   block: notYet,
-  damage: notYet,
-  heal: notYet,
+  damage,
+  heal,
   status: notYet,
   cureStatus: notYet,
   cureTeam: notYet,
   statChange: notYet,
-  crit: notYet,
-  effectiveness: notYet,
+  crit,
+  effectiveness,
   effectStart: notYet,
   effectEnd: notYet,
   effectActivate: notYet,

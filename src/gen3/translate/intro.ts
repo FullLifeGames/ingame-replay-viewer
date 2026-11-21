@@ -22,7 +22,9 @@ export function battleStart(event: EventOf<'battleStart'>, ctx: Context): void {
   ctx.leads = { near: [], far: [] }
 }
 
+/** A new turn; the last move's user is no longer the one paying HP. */
 export function turn(event: EventOf<'turn'>, ctx: Context): void {
+  ctx.mover = undefined
   ctx.emit(event.line, { op: 'turn', number: event.number })
 }
 

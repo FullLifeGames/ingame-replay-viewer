@@ -25,7 +25,7 @@ export interface Placed {
 }
 
 /** Text for one PRINT, with what a phrase or a name reports beside it. */
-type PrintText = string | { readonly text: string; readonly fallback?: Noted }
+export type PrintText = string | { readonly text: string; readonly fallback?: Noted }
 
 /** The leads' text and SEND_OUT, by side, while the intro sends them out. */
 export type Leads = Readonly<Record<Side, Placed[]>>
