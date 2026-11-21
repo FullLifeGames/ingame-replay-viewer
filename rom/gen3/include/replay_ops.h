@@ -39,4 +39,9 @@ bool32 Replay_OpItem(const volatile u8 *operands, u32 step);
 // replay_anims.c
 bool32 Replay_OpAnim(const volatile u8 *operands, u32 step);
 
+// replay_ops_field.c
+bool32 Replay_OpWeather(const volatile u8 *operands, u32 step);
+bool32 Replay_OpVolatile(const volatile u8 *operands, u32 step);
+bool32 Replay_OpAbility(const volatile u8 *operands, u32 step);
+
 #endif // GUARD_REPLAY_OPS_H

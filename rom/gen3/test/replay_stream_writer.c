@@ -196,6 +196,24 @@ void ReplayStream_Anim(u32 side, u32 anim)
     ReplayStream_Op(REPLAY_OP_ANIM, REPLAY_OP_ANIM_SIZE, operands);
 }
 
+void ReplayStream_Weather(u32 weather)
+{
+    const u8 operands[REPLAY_OP_WEATHER_SIZE] = { weather };
+    ReplayStream_Op(REPLAY_OP_WEATHER, REPLAY_OP_WEATHER_SIZE, operands);
+}
+
+void ReplayStream_Volatile(u32 side, u32 volatileId, bool32 on)
+{
+    const u8 operands[REPLAY_OP_VOLATILE_SIZE] = { side, volatileId, on };
+    ReplayStream_Op(REPLAY_OP_VOLATILE, REPLAY_OP_VOLATILE_SIZE, operands);
+}
+
+void ReplayStream_Ability(u32 side, u32 ability, bool32 show)
+{
+    const u8 operands[REPLAY_OP_ABILITY_SIZE] = { side, ability, ability >> 8, show };
+    ReplayStream_Op(REPLAY_OP_ABILITY, REPLAY_OP_ABILITY_SIZE, operands);
+}
+
 void ReplayStream_Item(u32 side, u32 slot, u32 item)
 {
     const u8 operands[REPLAY_OP_ITEM_SIZE] = { side, slot, item, item >> 8 };

@@ -14,7 +14,7 @@ enum ReplayError
     REPLAY_ERROR_EMPTY,   // a stream of no bytes, as in the replay slot of the built ROM
     REPLAY_ERROR_VERSION, // a stream version other than REPLAY_STREAM_VERSION
     REPLAY_ERROR_HEADER,  // a header size, table entry size or instruction span of another layout
-    REPLAY_ERROR_OP,      // an op this interpreter does not play
+    REPLAY_ERROR_OP,      // an op outside format v1
     REPLAY_ERROR_SIZE,    // a size byte other than the op's own
     REPLAY_ERROR_OVERRUN, // an instruction running past the end of the instructions
     REPLAY_ERROR_NO_END,  // the instructions do not end with their only END
@@ -55,6 +55,10 @@ void Replay_TakeOverBattleMain(void);
 
 bool32 Replay_IsLoaded(void);
 
+// Called by UpdateHpTextInHealthbox (patch 0002): TRUE while a replay is loaded, so the near
+// side's healthbox shows its HP bar without numbers, as the far side's does.
+bool32 Replay_HidesHpNumbers(void);
+
 #if TESTING
 // Defined by the test runner (test/replay_test_runner.c): with REPLAY_EXIT_AT_END, the interpreter
 // calls it after END, while the battle is still up and before it is left.
@@ -69,9 +73,6 @@ enum ReplayError Replay_Load(const volatile u8 *stream, u32 length, enum ReplayE
 
 // For the interpreter: Replay_Validate, which also counts the instructions (replay_stream_check.c).
 enum ReplayError Replay_ValidateStream(const volatile u8 *stream, u32 length, u16 *count);
-
-// For replay_stream_check.c: whether this interpreter plays an op of the format.
-bool32 Replay_PlaysOp(u32 op);
 
 // Reads from a stream, which may lie in ROM (replay_stream.c). Numbers are little-endian.
 u32 Replay_ReadU16(const volatile u8 *bytes);

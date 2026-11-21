@@ -49,8 +49,7 @@ static void Replay_Exit(void);
 EWRAM_DATA struct ReplayProgress gReplayProgress = {0};
 static EWRAM_DATA struct ReplayState sReplay = {0};
 
-// The step function of each op. An op without one is one this interpreter does not play yet, and
-// Replay_Validate refuses it.
+// The step function of each op of format v1. Replay_Validate refuses any other op.
 static const ReplayOpFunc sOps[] =
 {
     [REPLAY_OP_END]       = Op_End,
@@ -67,8 +66,13 @@ static const ReplayOpFunc sOps[] =
     [REPLAY_OP_STATUS]    = Replay_OpStatus,
     [REPLAY_OP_STAT]      = Replay_OpStat,
     [REPLAY_OP_ANIM]      = Replay_OpAnim,
+    [REPLAY_OP_WEATHER]   = Replay_OpWeather,
+    [REPLAY_OP_VOLATILE]  = Replay_OpVolatile,
+    [REPLAY_OP_ABILITY]   = Replay_OpAbility,
     [REPLAY_OP_ITEM]      = Replay_OpItem,
 };
+
+STATIC_ASSERT(ARRAY_COUNT(sOps) == REPLAY_OP_ITEM + 1, ReplayOpsCoverFormatV1);
 
 // The battle outcome of each REPLAY_OUTCOME_*. A tie and an unknown end are draws.
 static const u8 sOutcomes[] =
@@ -99,11 +103,6 @@ static const u32 sStatus1[] =
     [REPLAY_STATUS_TOX]  = STATUS1_TOXIC_POISON,
 };
 
-bool32 Replay_PlaysOp(u32 op)
-{
-    return op < ARRAY_COUNT(sOps) && sOps[op] != NULL;
-}
-
 enum ReplayError Replay_Load(const volatile u8 *stream, u32 length, enum ReplayEnd end)
 {
     u16 count;
@@ -123,6 +122,13 @@ enum ReplayError Replay_Load(const volatile u8 *stream, u32 length, enum ReplayE
 }
 
 bool32 Replay_IsLoaded(void)
+{
+    return sReplay.loaded;
+}
+
+// A replay carries HP as percentages, not as the mon's numbers, so it shows the HP bar alone on
+// both sides (docs/plan.md, "HP display").
+bool32 Replay_HidesHpNumbers(void)
 {
     return sReplay.loaded;
 }

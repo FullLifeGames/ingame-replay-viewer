@@ -1,2 +1,3 @@
 # The changes to upstream files, one patch file per line, applied in this order (rom/gen3/README.md).
 0001-replay-takes-over-battle-main.patch
+0002-hide-hp-numbers.patch

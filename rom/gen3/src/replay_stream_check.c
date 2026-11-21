@@ -214,8 +214,8 @@ static enum ReplayError ValidatePrint(const volatile u8 *text, u32 size)
     return text[size - 1] == EOS ? REPLAY_ERROR_NONE : REPLAY_ERROR_OPERAND;
 }
 
-// One instruction at instructions[at]: an op of the format and one the interpreter plays, its
-// size byte, its operands, and its end inside the span.
+// One instruction at instructions[at]: an op of the format, its size byte, its operands, and its
+// end inside the span.
 static enum ReplayError ValidateInstruction(const volatile u8 *stream, const volatile u8 *instructions, u32 length, u32 at)
 {
     const struct ReplayOpFormat *format;
@@ -237,8 +237,6 @@ static enum ReplayError ValidateInstruction(const volatile u8 *stream, const vol
         error = REPLAY_ERROR_SIZE;
     else
         error = ValidateOperands(stream, instructions + at + REPLAY_INSTRUCTION_HEADER_SIZE, format->operands);
-    if (error == REPLAY_ERROR_NONE && !Replay_PlaysOp(op))
-        error = REPLAY_ERROR_OP;
     return error;
 }
 

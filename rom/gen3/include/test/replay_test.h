@@ -65,6 +65,10 @@ void ReplayStream_Status(u32 side, u32 slot, u32 status);
 void ReplayStream_Stat(u32 side, u32 stat, s32 stages, u32 arrows);
 void ReplayStream_Anim(u32 side, u32 anim);
 void ReplayStream_Item(u32 side, u32 slot, u32 item);
+void ReplayStream_Weather(u32 weather);
+void ReplayStream_Volatile(u32 side, u32 volatileId, bool32 on);
+// show: TRUE shows the ability pop-up, FALSE hides it.
+void ReplayStream_Ability(u32 side, u32 ability, bool32 show);
 // Any op with any size byte, for streams the interpreter must refuse.
 void ReplayStream_Op(u32 op, u32 size, const u8 *operands);
 // Overwrites stream bytes, for streams the interpreter must refuse.
