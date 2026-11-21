@@ -5,14 +5,12 @@
 // drains first; hazards, recoil, items and abilities move the bar before the line.
 import { toID } from '@pkmn/dex'
 
-import type { PokemonRef } from '../../script/types'
-import type { Instruction } from '../stream/instructions'
+import type { Anim } from '../stream/instructions'
 import { critical, effective } from '../text/phrases'
 import { healed, hurt, isTrapping, wishCameTrue } from '../text/phrases-hp'
-import type { Context, EventOf, PrintText } from './context'
+import { type Context, type EventOf, type PrintText, sameMon } from './context'
 import { scaleHp } from './scale'
 
-type Anim = Extract<Instruction, { op: 'anim' }>['anim']
 type Step = 'say' | 'hit' | 'bar' | Anim
 
 const SAY_HIT_BAR: readonly Step[] = ['say', 'hit', 'bar']
@@ -36,12 +34,10 @@ type DamageEvent = EventOf<'damage'>
 type HealEvent = EventOf<'heal'>
 type HpEvent = DamageEvent | HealEvent
 
-const same = (a: PokemonRef | undefined, b: PokemonRef) => a?.side === b.side && a.index === b.index
-
 export function damage(event: DamageEvent, ctx: Context): void {
   const { who, cause } = event
   // HP a move's user pays itself (Substitute, Belly Drum) moves the bar with no hit.
-  if (event.silent || (cause === undefined && same(ctx.mover, who))) {
+  if (event.silent || (cause === undefined && sameMon(ctx.mover, who))) {
     bar(event, ctx)
   } else if (cause === undefined) {
     moveHit(event, ctx)

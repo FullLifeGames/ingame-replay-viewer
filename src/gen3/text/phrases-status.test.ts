@@ -18,10 +18,9 @@ describe('status phrases (P1)', () => {
     expect(statusGiven(mon(event.who), event.status)).toBe(text)
   })
 
-  it('says Rest put a Pokémon to sleep, and that it healed a status if it had one', () => {
+  it('says Rest slept and restored HP every time, as the pinned script prints it', () => {
     const { event, mon } = sceneOf('status', '|-status|p1a: Dugtrio|slp|[from] move: Rest')
-    expect(rested(mon(event.who), false)).toBe('Dugtrio went to sleep!')
-    expect(rested(mon(event.who), true)).toBe('Dugtrio slept and restored its HP!')
+    expect(rested(mon(event.who))).toBe('Dugtrio slept and restored its HP!')
   })
 
   it.each([

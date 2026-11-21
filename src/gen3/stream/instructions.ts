@@ -21,13 +21,13 @@ import {
 
 type Gender = keyof typeof GENDER
 type Outcome = keyof typeof OUTCOME
-type Status = keyof typeof STATUS
+export type Status = keyof typeof STATUS
 type Weather = keyof typeof WEATHER
 type Stat = keyof typeof STAT
 type Arrows = keyof typeof ARROWS
 type Effectiveness = keyof typeof EFFECTIVENESS
 type Volatile = keyof typeof VOLATILE
-type Anim = keyof typeof ANIM
+export type Anim = keyof typeof ANIM
 
 interface OnSide {
   readonly side: Side

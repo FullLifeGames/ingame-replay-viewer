@@ -29,7 +29,6 @@ export const STATUS_TEMPLATES = {
     'STRINGID_PKMNWASPARALYZED',
     start('is paralyzed, so it may be unable to move!'),
   ),
-  wentToSleep: tagged('STRINGID_PKMNWENTTOSLEEP', start('went to sleep!')),
   sleptHealthy: tagged('STRINGID_PKMNSLEPTHEALTHY', start('slept and restored its HP!')),
   wokeUp: tagged('STRINGID_PKMNWOKEUP', start('woke up!')),
   thawed: tagged('STRINGID_PKMNWASDEFROSTED', start('thawed out!')),
@@ -95,10 +94,11 @@ const ITEM_CURED: Readonly<Record<StatusName, ItemLine>> = {
 /** A status a move, an ability or a hazard gave; Rest has `rested`. */
 export const statusGiven = (who: Mon, status: StatusName) => GIVEN[status](who)
 
-/** Rest: the game says more when Rest replaced another status. */
-export function rested(who: Mon, hadStatus: boolean): string {
-  return (hadStatus ? STATUS_TEMPLATES.sleptHealthy : STATUS_TEMPLATES.wentToSleep).render(who)
-}
+/**
+ * Rest: the pinned `BattleScript_EffectRest` prints STRINGID_PKMNSLEPTHEALTHY whether or not Rest
+ * replaced another status (the expansion's line since Gen 5).
+ */
+export const rested = (who: Mon) => STATUS_TEMPLATES.sleptHealthy.render(who)
 
 export const statusCured = (who: Mon, status: StatusName) => CURED[status](who)
 

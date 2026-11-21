@@ -18,6 +18,10 @@ export type EventOf<K extends ScriptEvent['kind']> = ScriptEvent extends infer E
     : never
   : never
 
+/** Whether `a` and `b` name the same team member. */
+export const sameMon = (a: PokemonRef | undefined, b: PokemonRef) =>
+  a?.side === b.side && a.index === b.index
+
 /** An instruction and the battle log line it came from. */
 export interface Placed {
   readonly line: number
@@ -46,6 +50,8 @@ export class Context {
   readonly teamSizes: Partial<Record<Side, number>> = {}
   /** The leads while the intro sends them out; INTRO's handler opens it. */
   leads: Leads | undefined
+  /** The index in `script.events` of the event in hand; the walk sets it. */
+  at = 0
   /** The Pokémon whose move the log shows last; its own HP loss is no hit. */
   mover: PokemonRef | undefined
   private readonly named: Readonly<Record<Side, readonly NamedMon[]>>
@@ -121,6 +127,11 @@ export class Context {
       throw new Gen3Error(`team member ${String(ref.index)} is not active on the ${ref.side} side`)
     }
     return ref.side
+  }
+
+  /** The event `offset` places from the one in hand: -1 the one before, 1 the one after. */
+  near(offset: number): ScriptEvent | undefined {
+    return this.script.events[this.at + offset]
   }
 
   /** The line that first sends the team member in, for what its name or form needs. */

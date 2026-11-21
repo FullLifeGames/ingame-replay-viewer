@@ -9,6 +9,7 @@ import { message, tie, win } from './end'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
 import { damage, heal } from './hp'
 import { crit, effectiveness, failure, immunity, miss, move } from './moves'
+import { cant, cureStatus, cureTeam, status } from './status'
 import { faint, switchIn } from './switches'
 import { tablesOf } from './tables'
 
@@ -30,16 +31,16 @@ const HANDLERS = {
   win,
   tie,
   move,
-  cant: notYet,
+  cant,
   miss,
   immune: immunity,
   fail: failure,
   block: notYet,
   damage,
   heal,
-  status: notYet,
-  cureStatus: notYet,
-  cureTeam: notYet,
+  status,
+  cureStatus,
+  cureTeam,
   statChange: notYet,
   crit,
   effectiveness,
@@ -64,7 +65,8 @@ export interface Translation extends Omit<Stream, 'instructions'> {
 
 export function translate(script: BattleScript): Translation {
   const ctx = new Context(script)
-  for (const event of script.events) {
+  for (const [index, event] of script.events.entries()) {
+    ctx.at = index
     if (event.kind !== 'switchIn') endIntro(ctx)
     const handle = HANDLERS[event.kind] as (event: ScriptEvent, ctx: Context) => void
     handle(event, ctx)
