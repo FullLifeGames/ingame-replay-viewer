@@ -8,7 +8,7 @@ import charmap from '../tables/charmap.json'
 export const EOS = charmap.eos
 
 /** The game's no-break space, which keeps a name on one line. */
-const NBSP = ' '
+const NBSP = '\u00a0'
 
 function nbspByte(): number {
   const [byte, ...rest] = charmap.named.NBSP
