@@ -7,7 +7,7 @@ const any = expect.any(Number) as number
 const substitute = (on: boolean) => ({ op: 'volatile', side: 'near', volatile: 'substitute', on })
 
 describe('Substitute (X12)', () => {
-  it('starts, takes a hit and fades in the order of the expansion', () => {
+  it('starts, pays its HP before its line, takes a hit and fades in the order of the expansion', () => {
     const scene = sceneOf(
       '|move|p1a: Dugtrio|Substitute|p1a: Dugtrio',
       '|-start|p1a: Dugtrio|Substitute',
@@ -23,8 +23,8 @@ describe('Substitute (X12)', () => {
       'Dugtrio used Substitute!',
       { op: 'move', user: 'near', target: 'near', move: any },
       substitute(true),
-      'Dugtrio put in a substitute!',
       { op: 'hp', side: 'near', hp: 75 },
+      'Dugtrio put in a substitute!',
       'The opposing Tyranitar used Rock Slide!',
       { op: 'move', user: 'far', target: 'near', move: any },
       { op: 'hit', side: 'near', effectiveness: 'normal' },

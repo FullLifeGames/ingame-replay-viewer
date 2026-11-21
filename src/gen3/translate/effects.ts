@@ -1,8 +1,8 @@
-// Effects on one Pokémon (plan §6). Substitute is the one the stream holds (VOLATILE): it starts
-// with its line; a hit on it plays the hit and says the substitute took the damage
-// (`CancelerHealthBarUpdate`); a hit that breaks it then fades it (`BattleScript_SubstituteFade`)
-// before the critical hit and effectiveness lines. Other effects are a line each; a silent one
-// the stream has no state for is a mechanic fallback.
+// Effects on one Pokémon (plan §6). Substitute is the one the stream holds (VOLATILE): it starts,
+// moves the bar by its HP cost and says so; a hit on it plays the hit and says the substitute took
+// the damage (`CancelerHealthBarUpdate`); a hit that breaks it then fades it
+// (`BattleScript_SubstituteFade`) before the critical hit and effectiveness lines. Other effects
+// are a line each; a silent one the stream has no state for is a mechanic fallback.
 import { toID } from '@pkmn/dex'
 
 import { mechanicGap } from '../fallbacks'
@@ -15,7 +15,7 @@ import {
   singleTurn as lastsTheTurn,
 } from '../text/phrases-effects'
 import type { Context, EventOf } from './context'
-import { hitLines } from './hp'
+import { bar, hitLines, isSubstituteCost } from './hp'
 
 const VOLATILES: Partial<Readonly<Record<string, Volatile>>> = { substitute: 'substitute' }
 
@@ -29,6 +29,8 @@ export function effectStart(event: EventOf<'effectStart'>, ctx: Context): void {
   if (volatile !== undefined) {
     ctx.emit(line, { op: 'volatile', side: ctx.activeSide(who), volatile, on: true })
   }
+  const cost = ctx.near(1)
+  if (cost?.kind === 'damage' && isSubstituteCost(event, cost)) bar(cost, ctx)
   if (!event.silent) {
     ctx.print(line, effectStarted(ctx.mon(who), effect, event.source && ctx.mon(event.source)))
   } else if (volatile === undefined) {
