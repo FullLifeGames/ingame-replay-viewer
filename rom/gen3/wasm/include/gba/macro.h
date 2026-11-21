@@ -8,6 +8,11 @@
 
 #undef DmaSet
 void DmaSet(int dmaNum, const void *src, void *dest, u32 control);
+// The expansion passes plain addresses such as VRAM, which its macro cast to vu32. The platform
+// files define the function itself and see no macro.
+#ifndef IRV_WASM_PLATFORM
+#define DmaSet(dmaNum, src, dest, control) DmaSet(dmaNum, (const void *)(src), (void *)(dest), control)
+#endif
 
 #undef CPU_FILL
 #define CPU_FILL(value, dest, size, bit) CPU_FILL_UNCHECKED(value, dest, size, bit)
