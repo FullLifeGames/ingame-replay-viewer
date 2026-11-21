@@ -35,12 +35,12 @@ export interface SessionDeps {
   readonly baseSha1?: string
 }
 
-interface DumpSummary {
+export interface DumpSummary {
   /** The patched ROM's SHA1, which replay-slot.json names. */
   readonly romSha1: string
 }
 
-interface ReplaySummary {
+export interface ReplaySummary {
   readonly id: string
   readonly streamBytes: number
   readonly instructions: number
@@ -49,7 +49,7 @@ interface ReplaySummary {
   readonly counts: readonly NotShownCount[]
 }
 
-interface StartSummary {
+export interface StartSummary {
   readonly id: string
   readonly romSha1: string
   readonly streamBytes: number
