@@ -7,6 +7,10 @@ import { dirname, join } from 'node:path'
 import { ROM_DIR } from './rom-config.ts'
 import { findSymbol } from './rom-slot.ts'
 
+// The progress layout lives in src/web/wasm, which the page's worker shares.
+export { readProgressLayout } from '../src/web/wasm/progress.ts'
+export type { ProgressLayout } from '../src/web/wasm/progress.ts'
+
 const TOOL_SOURCE = join(ROM_DIR, 'shot', 'replay_shot.c')
 const INCLUDE_DIR = join(ROM_DIR, 'include')
 export const INTERPRETER_HEADER_PATH = join(INCLUDE_DIR, 'replay_interpreter.h')
@@ -14,53 +18,6 @@ export const INTERPRETER_HEADER_PATH = join(INCLUDE_DIR, 'replay_interpreter.h')
 export const PROGRESS_HEADER_PATH = join(INCLUDE_DIR, 'replay_progress.h')
 
 const PROGRESS_SYMBOL = 'gReplayProgress'
-
-/** The byte offsets of the fields of struct ReplayProgress. */
-interface ProgressOffsets {
-  done: number
-  total: number
-  turn: number
-  error: number
-  finished: number
-  playing: number
-}
-
-export interface ProgressLayout {
-  /** sizeof(struct ReplayProgress). */
-  size: number
-  offsets: ProgressOffsets
-  /** The refusal screen's backdrop as the tool's frames show it, 0xRRGGBB. */
-  refusedColour: number
-}
-
-function readNumberDefine(headerText: string, name: string): number {
-  const text = new RegExp(`^#define\\s+${name}\\s+(.+?)\\s*(?://.*)?$`, 'm').exec(headerText)?.[1]
-  if (text === undefined) throw new Error(`replay_progress.h: ${name} missing`)
-  if (!/^(?:0x[0-9a-f]+|\d+)$/i.test(text)) {
-    throw new Error(`replay_progress.h: ${name} is "${text}", not a plain number`)
-  }
-  return Number(text)
-}
-
-/** mGBA widens each five-bit channel of a GBA colour to eight bits: the five bits, then their top three. */
-export const widenChannel = (channel: number) => (channel << 3) | (channel >> 2)
-
-const offset = (headerText: string, field: string) =>
-  readNumberDefine(headerText, `REPLAY_PROGRESS_OFFSET_${field}`)
-
-export function readProgressLayout(headerText: string): ProgressLayout {
-  const offsets: ProgressOffsets = {
-    done: offset(headerText, 'DONE'),
-    total: offset(headerText, 'TOTAL'),
-    turn: offset(headerText, 'TURN'),
-    error: offset(headerText, 'ERROR'),
-    finished: offset(headerText, 'FINISHED'),
-    playing: offset(headerText, 'PLAYING'),
-  }
-  const size = readNumberDefine(headerText, 'REPLAY_PROGRESS_SIZE')
-  const red = readNumberDefine(headerText, 'REPLAY_REFUSED_RED')
-  return { size, offsets, refusedColour: widenChannel(red) << 16 }
-}
 
 interface ShotLine {
   shot: string

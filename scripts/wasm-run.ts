@@ -11,6 +11,9 @@ import { basename, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 import { writeReplaySlot } from '../src/patch/slot.ts'
+import { FRAME_HEIGHT, FRAME_WIDTH, widenFrame } from '../src/web/wasm/frame.ts'
+import { readProgress } from '../src/web/wasm/progress.ts'
+import type { Progress } from '../src/web/wasm/progress.ts'
 import { runCliAsync } from './rom-cli.ts'
 import { emptyInside, REPO_DIR } from './rom-paths.ts'
 import type { Frame } from './rom-shot-probes.ts'
@@ -20,7 +23,6 @@ import {
   readErrorNames,
   readProgressLayout,
   readToolOutput,
-  widenChannel,
 } from './rom-shot-run.ts'
 import type { ProgressLayout, ToolOutput } from './rom-shot-run.ts'
 import type { Scene } from './rom-shot-scenes.ts'
@@ -53,47 +55,17 @@ type ModuleFactory = (hooks: ModuleHooks) => Promise<GameModule>
 // refused run ends this many frames after the error, with the refusal screen up.
 export const STALL_FRAMES = 3600
 const ERROR_FRAMES = 30
-const WIDTH = 240
-const HEIGHT = 160
 // A run of 994052 takes about 41000 frames; the module plays a few hundred per second.
 const RUN_SECONDS = 900
 
 type Shot = Scene['shots'][number]
 type Status = ToolOutput['status']
 
-interface Progress {
-  done: number
-  total: number
-  turn: number
-  error: number
-  finished: boolean
-  playing: boolean
-}
-
-function readProgress(memory: Uint8Array, at: number, layout: ProgressLayout): Progress {
-  const view = new DataView(memory.buffer, memory.byteOffset + at, layout.size)
-  const { offsets } = layout
-  return {
-    done: view.getUint16(offsets.done, true),
-    total: view.getUint16(offsets.total, true),
-    turn: view.getUint16(offsets.turn, true),
-    error: view.getUint8(offsets.error),
-    finished: view.getUint8(offsets.finished) !== 0,
-    playing: view.getUint8(offsets.playing) !== 0,
-  }
-}
-
 /** The module's 240x160 BGR555 frame as the shot tool's frames show it, each channel widened. */
 function readFrame(words: Uint16Array, pixels: number): Frame {
-  const rgb = new Uint8Array(WIDTH * HEIGHT * 3)
-  const first = pixels >> 1
-  for (let i = 0; i < WIDTH * HEIGHT; i++) {
-    const colour = words[first + i] ?? 0
-    rgb[i * 3] = widenChannel(colour & 0x1f)
-    rgb[i * 3 + 1] = widenChannel((colour >> 5) & 0x1f)
-    rgb[i * 3 + 2] = widenChannel((colour >> 10) & 0x1f)
-  }
-  return { width: WIDTH, height: HEIGHT, rgb }
+  const rgb = new Uint8Array(FRAME_WIDTH * FRAME_HEIGHT * 3)
+  widenFrame(words, pixels >> 1, rgb, 3)
+  return { width: FRAME_WIDTH, height: FRAME_HEIGHT, rgb }
 }
 
 /** The stream goes into the slot through the same rule as into a ROM (src/patch/slot.ts). */
