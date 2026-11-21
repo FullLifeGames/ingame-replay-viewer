@@ -11,6 +11,7 @@ import { critical, effective } from '../text/phrases'
 import { healed, hurt, isTrapping, wishCameTrue } from '../text/phrases-hp'
 import { type Context, type EventOf, type PrintText, sameMon } from './context'
 import { scaleHp } from './scale'
+import { STATUS_ANIM } from './status'
 
 type Step = 'say' | 'hit' | 'bar' | Anim
 
@@ -23,9 +24,9 @@ const CAUSED: Readonly<Record<string, readonly Step[]>> = {
   sandstorm: SAY_HIT_BAR,
   hail: SAY_HIT_BAR,
   confusion: SAY_HIT_BAR,
-  psn: ['say', 'statusPsn', 'bar'],
-  tox: ['say', 'statusPsn', 'bar'],
-  brn: ['say', 'statusBrn', 'bar'],
+  psn: ['say', STATUS_ANIM.psn, 'bar'],
+  tox: ['say', STATUS_ANIM.tox, 'bar'],
+  brn: ['say', STATUS_ANIM.brn, 'bar'],
   leechseed: ['leechSeedDrain', 'bar', 'say'],
   curse: SAY_BAR,
   nightmare: SAY_BAR,

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { NEXT } from '../../script/testing'
 import { plain, sceneOf, streamOfLog } from '../testing'
 import { scaleHp } from './scale'
+import { STATUS_ANIM } from './status'
 
 const hp = (side: 'near' | 'far', value: number) => ({ op: 'hp', side, hp: value })
 const hit = (side: 'near' | 'far') => ({ op: 'hit', side, effectiveness: 'normal' })
@@ -37,6 +38,13 @@ describe('damage with a cause', () => {
       { op: 'anim', side: 'far', anim: 'statusPsn' },
       hp('far', 88),
     ])
+  })
+
+  it('plays the animation of the status that hurts, as a status given plays it', () => {
+    for (const status of ['psn', 'tox', 'brn'] as const) {
+      const scene = sceneOf(`|-damage|p2a: Tyranitar|88/100 ${status}|[from] ${status}`)
+      expect(scene[1], status).toEqual({ op: 'anim', side: 'far', anim: STATUS_ANIM[status] })
+    }
   })
 
   it('moves the bar before the line for Spikes and recoil', () => {

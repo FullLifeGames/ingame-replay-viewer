@@ -19,7 +19,8 @@ import {
 } from '../text/phrases-status'
 import { type Context, type EventOf, sameMon } from './context'
 
-const STATUS_ANIM: Readonly<Record<StatusName, Anim>> = {
+/** Each status's animation; a status given, one held back and one that hurts all play it. */
+export const STATUS_ANIM: Readonly<Record<StatusName, Anim>> = {
   slp: 'statusSlp',
   psn: 'statusPsn',
   tox: 'statusPsn',
