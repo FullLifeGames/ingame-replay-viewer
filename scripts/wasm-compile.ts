@@ -12,6 +12,9 @@ export interface WasmPaths {
   out: string
   obj: string
   shadow: string
+  // Patched copies: upstream files from rom/gen3/wasm/patches, platform files from platform-patches.
+  overlay: string
+  platform: string
   emcc: string
 }
 
@@ -25,6 +28,19 @@ export interface CompileCommand {
 
 export interface CompileOptions {
   optimise: '-O0' | '-O2'
+  // Sources of the tree that compile from their patched copy under build/wasm/overlay.
+  overlay?: readonly string[]
+}
+
+// One file to compile: its name in the census, where cpp reads it, and what it adds.
+interface Unit {
+  source: string
+  input: string
+  object: string
+  defines: readonly string[]
+  flags: readonly string[]
+  // Quote dirs searched after the tree's include.
+  after: readonly string[]
 }
 
 // The Makefile's CPPFLAGS with TEST=0 and GAME_VERSION=EMERALD, plus our own marker.
@@ -47,6 +63,8 @@ export function wasmPaths(
     out,
     obj: join(out, 'obj'),
     shadow: join(repoDir, 'rom', 'gen3', 'wasm', 'include'),
+    overlay: join(out, 'overlay'),
+    platform: join(out, 'platform'),
     emcc: join(emsdk, 'upstream', 'emscripten', 'emcc'),
   }
 }
@@ -54,7 +72,7 @@ export function wasmPaths(
 // An exclude or a define that names no file of the tree would change nothing, silently.
 export function checkNamedSources(config: WasmConfig, sources: readonly string[]): void {
   const known = new Set(sources)
-  const named = [...config.exclude, ...Object.keys(config.defines)]
+  const named = [...config.exclude, ...Object.keys(config.defines), ...Object.keys(config.flags)]
   const unknown = named.filter((source) => !known.has(source))
   if (unknown.length > 0) {
     throw new Error(`rom/gen3/wasm/wasm.json names no source of the tree: ${unknown.join(', ')}`)
@@ -70,21 +88,28 @@ function objectPath(paths: WasmPaths, source: string): string {
   return object
 }
 
-function command(
-  config: WasmConfig,
-  paths: WasmPaths,
-  source: string,
-  options: CompileOptions,
-): CompileCommand {
-  const object = objectPath(paths, source)
-  const defines = (config.defines[source] ?? []).map((define) => `-D${define}`)
-  const includes = ['-iquote', paths.shadow, '-iquote', 'include', '-I', paths.shadow]
+function command(paths: WasmPaths, unit: Unit, options: CompileOptions): CompileCommand {
+  const after = unit.after.flatMap((dir) => ['-iquote', dir])
+  const quoteDirs = ['-iquote', paths.shadow, '-iquote', join(paths.overlay, 'include')]
+  const includes = [...quoteDirs, '-iquote', 'include', ...after, '-I', paths.shadow]
+  const defines = unit.defines.map((define) => `-D${define}`)
   return {
-    source,
-    object,
-    preprocess: [paths.emcc, '-E', ...includes, ...CPPFLAGS, '-DIRV_WASM', ...defines, source],
-    preproc: [PREPROC, '-i', '-g', ASSETS_DIR, source, 'charmap.txt'],
-    compile: [paths.emcc, '-x', 'c', '-c', options.optimise, ...CFLAGS, '-o', object, '-'],
+    source: unit.source,
+    object: unit.object,
+    preprocess: [paths.emcc, '-E', ...includes, ...CPPFLAGS, '-DIRV_WASM', ...defines, unit.input],
+    preproc: [PREPROC, '-i', '-g', ASSETS_DIR, unit.input, 'charmap.txt'],
+    compile: [
+      paths.emcc,
+      '-x',
+      'c',
+      '-c',
+      options.optimise,
+      ...CFLAGS,
+      ...unit.flags,
+      '-o',
+      unit.object,
+      '-',
+    ],
   }
 }
 
@@ -95,9 +120,48 @@ export function compileCommands(
   options: CompileOptions = { optimise: '-O2' },
 ): CompileCommand[] {
   const excluded = new Set(config.exclude)
-  return sources
-    .filter((source) => !excluded.has(source))
-    .map((source) => command(config, paths, source, options))
+  const kept = sources.filter((source) => !excluded.has(source))
+  const overlay = new Set(options.overlay ?? [])
+  const missing = [...overlay].filter((source) => !kept.includes(source))
+  if (missing.length > 0) {
+    throw new Error(
+      `an overlay patch changes a file the build does not compile: ${missing.join(', ')}`,
+    )
+  }
+  return kept.map((source) => {
+    const unit = {
+      source,
+      input: overlay.has(source) ? join(paths.overlay, source) : source,
+      object: objectPath(paths, source),
+      defines: config.defines[source] ?? [],
+      flags: config.flags[source] ?? [],
+      after: [],
+    }
+    return command(paths, unit, options)
+  })
+}
+
+// The C files of the platform layer, from their patched copies under build/wasm/platform. Its own
+// headers (platform/dma.h) come after the tree's include, so global.h stays the expansion's.
+export function platformCommands(
+  config: WasmConfig,
+  paths: WasmPaths,
+  options: CompileOptions = { optimise: '-O2' },
+): CompileCommand[] {
+  return config.platform.files
+    .filter((file) => file.endsWith('.c'))
+    .map((file) => {
+      const source = `platform/${file}`
+      const unit = {
+        source,
+        input: join(paths.platform, file),
+        object: objectPath(paths, source),
+        defines: config.platform.defines,
+        flags: [],
+        after: [join(paths.platform, 'include')],
+      }
+      return command(paths, unit, options)
+    })
 }
 
 const quote = (arg: string) => `'${arg.replaceAll("'", "'\\''")}'`

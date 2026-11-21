@@ -6,13 +6,12 @@
     "repository": "https://github.com/gradenGnostic/pokeemerald-multiplatform.git",
     "commit": "db1cab3d2dc9f0e0a9f4a3d67983e5acf30a9a46",
     "files": [
+      "include/platform/dma.h",
       "src/platform/bios.c",
       "src/platform/dma.c",
-      "src/platform/gba_easy_draw.c",
-      "src/platform/cgb_audio.c",
-      "src/sound_mixer.c",
-      "src/music_player.c"
-    ]
+      "src/platform/gba_easy_draw.c"
+    ],
+    "defines": ["IRV_WASM_PLATFORM", "RENDERER_EASY_DRAW"]
   },
   "exclude": [
     "src/agb_flash.c",
@@ -28,7 +27,11 @@
     "src/siirtc.c"
   ],
   "defines": {
-    "src/random.c": ["Random32=IrvWasm_UnusedRandom32"]
+    "src/random.c": ["Random32=IrvWasm_UnusedRandom32", "IRV_WASM_NO_ASM"],
+    "src/recorded_battle.c": ["IRV_WASM_NO_SAVE_SIZE_ASSERTS"]
+  },
+  "flags": {
+    "src/ow_abilities.c": ["-Wno-error=incompatible-function-pointer-types"]
   },
   "jobs": 2
 }

@@ -10,21 +10,33 @@ const valid = {
   platform: {
     repository: 'https://example.org/platform.git',
     commit: 'c'.repeat(40),
-    files: ['src/platform/bios.c'],
+    files: ['src/platform/bios.c', 'include/platform/dma.h'],
+    defines: ['RENDERER_EASY_DRAW'],
   },
   exclude: ['src/agb_flash.c'],
   defines: { 'src/random.c': ['Random32=IrvWasm_UnusedRandom32'] },
+  flags: { 'src/ow_abilities.c': ['-Wno-error=incompatible-function-pointer-types'] },
   jobs: 2,
 }
 const text = (value: unknown) => JSON.stringify(value)
-const noCommit = { repository: valid.platform.repository, files: valid.platform.files }
+const noCommit = Object.fromEntries(
+  Object.entries(valid.platform).filter(([key]) => key !== 'commit'),
+)
+const platform = (change: object) => ({ ...valid, platform: { ...valid.platform, ...change } })
 
 describe('the WebAssembly build config', () => {
   it('pins Emscripten 7.0.0, the platform commit and two jobs', () => {
     const config = loadWasmConfig()
     expect(config.emscripten.version).toBe('7.0.0')
     expect(config.platform.commit).toBe('db1cab3d2dc9f0e0a9f4a3d67983e5acf30a9a46')
-    expect(config.defines['src/random.c']).toEqual(['Random32=IrvWasm_UnusedRandom32'])
+    expect(config.defines['src/random.c']).toEqual([
+      'Random32=IrvWasm_UnusedRandom32',
+      'IRV_WASM_NO_ASM',
+    ])
+    expect(config.flags['src/ow_abilities.c']).toEqual([
+      '-Wno-error=incompatible-function-pointer-types',
+    ])
+    expect(config.platform.defines).toEqual(['IRV_WASM_PLATFORM', 'RENDERER_EASY_DRAW'])
     expect(config.jobs).toBe(2)
   })
 
@@ -38,17 +50,19 @@ describe('the WebAssembly build config', () => {
 
   it.each([
     ['no platform commit', { ...valid, platform: noCommit }, /platform\.commit/],
-    [
-      'a short platform commit',
-      { ...valid, platform: { ...valid.platform, commit: 'db1cab3' } },
-      /platform\.commit/,
-    ],
+    ['a short platform commit', platform({ commit: 'db1cab3' }), /platform\.commit/],
     ['a version with a prefix', { ...valid, emscripten: { version: 'v7.0.0' } }, /emscripten/],
-    ['no platform files', { ...valid, platform: { ...valid.platform, files: [] } }, /files/],
+    ['no platform files', platform({ files: [] }), /files/],
     ['an excluded file outside src', { ...valid, exclude: ['../x.c'] }, /exclude/],
     ['an exclude that is no list', { ...valid, exclude: 'src/x.c' }, /exclude/],
     ['a define with a space', { ...valid, defines: { 'src/x.c': ['A B'] } }, /defines/],
     ['defines for a file outside src', { ...valid, defines: { 'x.c': ['A'] } }, /defines/],
+    ['a platform file that is no C file or header', platform({ files: ['src/a.s'] }), /files/],
+    ['a platform define with a space', platform({ defines: ['A B'] }), /platform\.defines/],
+    ['a flag that is no option', { ...valid, flags: { 'src/x.c': ['Wall'] } }, /flags\.src/],
+    ['a flag with a space', { ...valid, flags: { 'src/x.c': ['-W all'] } }, /flags\.src/],
+    ['flags for a file outside src', { ...valid, flags: { 'x.c': ['-Wall'] } }, /flags/],
+    ['flags that are no map', { ...valid, flags: ['-Wall'] }, /flags/],
     ['zero jobs', { ...valid, jobs: 0 }, /jobs/],
     ['no object', [], /emscripten\.version/],
   ])('refuses %s', (_, value, message) => {

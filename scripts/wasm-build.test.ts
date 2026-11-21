@@ -10,6 +10,13 @@ describe('the wasm:build arguments', () => {
     })
   })
 
+  it('compiles every file of the build at -O2 with its report in build/wasm by default', () => {
+    expect(parseBuildArgs(['--compile'], '/repo/build/wasm')).toEqual({
+      mode: 'compile',
+      out: '/repo/build/wasm/compile.md',
+    })
+  })
+
   it('takes a report path after the mode', () => {
     expect(parseBuildArgs(['--census-report', '/x/census.md'], '/o')).toEqual({
       mode: 'report',

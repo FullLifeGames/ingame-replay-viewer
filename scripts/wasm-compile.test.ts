@@ -8,6 +8,7 @@ import {
   checkNamedSources,
   compileCommands,
   pipelineScript,
+  platformCommands,
   treeSources,
   wasmPaths,
 } from './wasm-compile.ts'
@@ -20,13 +21,21 @@ const paths: WasmPaths = {
   out: '/repo/build/wasm',
   obj: '/repo/build/wasm/obj',
   shadow: '/repo/rom/gen3/wasm/include',
+  overlay: '/repo/build/wasm/overlay',
+  platform: '/repo/build/wasm/platform',
   emcc: '/tools/emsdk/upstream/emscripten/emcc',
 }
 const config: WasmConfig = {
   emscripten: { version: '7.0.0' },
-  platform: { repository: 'https://example.org/p.git', commit: 'c'.repeat(40), files: ['a.c'] },
+  platform: {
+    repository: 'https://example.org/p.git',
+    commit: 'c'.repeat(40),
+    files: ['include/platform/dma.h', 'src/platform/dma.c'],
+    defines: ['RENDERER_EASY_DRAW'],
+  },
   exclude: ['src/agb_flash.c'],
   defines: { 'src/random.c': ['Random32=IrvWasm_UnusedRandom32'] },
+  flags: { 'src/ow_abilities.c': ['-Wno-error=incompatible-function-pointer-types'] },
   jobs: 2,
 }
 
@@ -46,6 +55,7 @@ describe('the compile commands', () => {
   it.each([
     ['an exclude', { ...config, exclude: ['src/gone.c'] }],
     ['a define', { ...config, exclude: [], defines: { 'src/gone.c': ['A'] } }],
+    ['a flag', { ...config, exclude: [], defines: {}, flags: { 'src/gone.c': ['-Wall'] } }],
   ])('refuses %s that names no source of the tree', (_, named) => {
     expect(() => {
       checkNamedSources(named, ['src/main.c', 'src/random.c'])
@@ -54,7 +64,7 @@ describe('the compile commands', () => {
 
   it('accepts a config whose every name is a source of the tree', () => {
     expect(() => {
-      checkNamedSources(config, ['src/agb_flash.c', 'src/random.c'])
+      checkNamedSources(config, ['src/agb_flash.c', 'src/ow_abilities.c', 'src/random.c'])
     }).not.toThrow()
   })
 
@@ -65,9 +75,43 @@ describe('the compile commands', () => {
     expect(main.preprocess).not.toContain('-DRandom32=IrvWasm_UnusedRandom32')
   })
 
+  it('adds the flags of wasm.json to the compile step of that file only', () => {
+    const flag = '-Wno-error=incompatible-function-pointer-types'
+    const [abilities, main] = compileCommands(config, ['src/ow_abilities.c', 'src/main.c'], paths)
+    expect(abilities?.compile.slice(-4)).toEqual([
+      flag,
+      '-o',
+      `${paths.obj}/src/ow_abilities.o`,
+      '-',
+    ])
+    expect(abilities?.preprocess).not.toContain(flag)
+    expect(main?.compile).not.toContain(flag)
+  })
+
+  it('compiles an overlaid file from its copy under build/wasm/overlay, into the same object', () => {
+    const options = { optimise: '-O2' as const, overlay: ['src/script.c'] }
+    const [script, main] = compileCommands(config, ['src/script.c', 'src/main.c'], paths, options)
+    expect(script?.preprocess.at(-1)).toBe('/repo/build/wasm/overlay/src/script.c')
+    expect(script?.preproc[4]).toBe('/repo/build/wasm/overlay/src/script.c')
+    expect(script?.object).toBe('/repo/build/wasm/obj/src/script.o')
+    expect(main?.preprocess.at(-1)).toBe('src/main.c')
+  })
+
+  it('refuses an overlay copy of a file the build does not compile', () => {
+    const options = { optimise: '-O2' as const, overlay: ['src/agb_flash.c'] }
+    expect(() => compileCommands(config, ['src/agb_flash.c'], paths, options)).toThrow(
+      /src\/agb_flash\.c/,
+    )
+  })
+
   it('puts the shadow include dir first on -iquote and -I, the tree include on -iquote only', () => {
     const { preprocess } = only(compileCommands(config, ['src/main.c'], paths))
-    expect(pairs(preprocess, '-iquote')).toEqual([paths.shadow, 'include'])
+    // An overlay copy of a header comes before the tree's own.
+    expect(pairs(preprocess, '-iquote')).toEqual([
+      paths.shadow,
+      `${paths.overlay}/include`,
+      'include',
+    ])
     // The tree's include holds a strings.h of its own that would hide libc's from <strings.h>.
     expect(pairs(preprocess, '-I')).toEqual([paths.shadow])
   })
@@ -121,6 +165,29 @@ describe('the compile commands', () => {
   it('finds the tree, the outputs, the shadow headers and emcc from the repo and EMSDK', () => {
     expect(wasmPaths('/repo', { EMSDK: '/opt/emsdk' }, '/home/u')).toEqual(pathsFor('/opt/emsdk'))
     expect(wasmPaths('/repo', {}, '/home/u')).toEqual(pathsFor('/home/u/tools/emsdk'))
+  })
+})
+
+describe('the platform commands', () => {
+  it('compile each C file of the platform from its patched copy, under the platform defines', () => {
+    const command = only(platformCommands(config, paths))
+    expect(command.source).toBe('platform/src/platform/dma.c')
+    expect(command.object).toBe('/repo/build/wasm/obj/platform/src/platform/dma.o')
+    expect(command.preprocess.at(-1)).toBe('/repo/build/wasm/platform/src/platform/dma.c')
+    expect(command.preprocess).toEqual(
+      expect.arrayContaining(['-DIRV_WASM', '-DRENDERER_EASY_DRAW', '-DMODERN=1']),
+    )
+    expect(command.compile).toContain('-O2')
+  })
+
+  it('reach the platform headers after the tree include, so global.h stays the tree copy', () => {
+    const { preprocess } = only(platformCommands(config, paths))
+    expect(pairs(preprocess, '-iquote')).toEqual([
+      paths.shadow,
+      `${paths.overlay}/include`,
+      'include',
+      `${paths.platform}/include`,
+    ])
   })
 })
 

@@ -1,7 +1,7 @@
 // rom/gen3/wasm/wasm.json: the WebAssembly build of the expansion (#35). It pins the Emscripten
-// release, the platform layer borrowed at build time and never committed (plan D7), the upstream
-// files our glue replaces, the per-file defines and the job cap (2: one clang per job, beside
-// another session on devbox's 12 GB).
+// release, the platform layer borrowed at build time and never committed (plan D7) with the
+// defines its files compile under, the upstream files our glue replaces, the per-file defines and
+// compiler flags, and the job cap (2: one clang per job, beside another session on devbox's 12 GB).
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -11,6 +11,7 @@ interface PlatformPin {
   repository: string
   commit: string
   files: string[]
+  defines: string[]
 }
 
 export interface WasmConfig {
@@ -18,6 +19,7 @@ export interface WasmConfig {
   platform: PlatformPin
   exclude: string[]
   defines: Record<string, string[]>
+  flags: Record<string, string[]>
   jobs: number
 }
 
@@ -28,8 +30,9 @@ const VERSION = /^\d+\.\d+\.\d+$/
 const NO_SPACE = /^\S+$/
 // A source of the tree, named from its root: src/x.c or deeper, never with a step up.
 const TREE_SOURCE = /^src\/(?:[\w-]+\/)*[\w-]+\.c$/
-const RELATIVE_FILE = /^(?:[\w-]+\/)*[\w-]+\.c$/
+const RELATIVE_FILE = /^(?:[\w-]+\/)*[\w-]+\.[ch]$/
 const DEFINE = /^[A-Za-z_]\w*(?:=\S*)?$/
+const FLAG = /^-[A-Za-z][\w=,.+-]*$/
 
 function fail(path: string, rule: string): never {
   throw new Error(`rom/gen3/wasm/wasm.json: ${path} ${rule}`)
@@ -60,15 +63,16 @@ function nonEmpty(list: string[], path: string): string[] {
   return list
 }
 
-function defines(value: unknown): Record<string, string[]> {
-  const found = lookup(value, 'defines')
+// defines and flags: a source of the tree to its list.
+function perSource(value: unknown, path: string, pattern: RegExp): Record<string, string[]> {
+  const found = lookup(value, path)
   if (typeof found !== 'object' || found === null || Array.isArray(found)) {
-    fail('defines', 'must map a source to its defines')
+    fail(path, `must map a source to its ${path}`)
   }
   return Object.fromEntries(
     Object.entries(found).map(([source, list]) => {
-      if (!TREE_SOURCE.test(source)) fail(`defines.${source}`, `must match ${String(TREE_SOURCE)}`)
-      return [source, strings(list, `defines.${source}`, DEFINE)]
+      if (!TREE_SOURCE.test(source)) fail(`${path}.${source}`, `must match ${String(TREE_SOURCE)}`)
+      return [source, strings(list, `${path}.${source}`, pattern)]
     }),
   )
 }
@@ -92,9 +96,11 @@ export function readWasmConfig(text: string): WasmConfig {
         strings(lookup(value, 'platform.files'), 'platform.files', RELATIVE_FILE),
         'platform.files',
       ),
+      defines: strings(lookup(value, 'platform.defines'), 'platform.defines', DEFINE),
     },
     exclude: strings(lookup(value, 'exclude'), 'exclude', TREE_SOURCE),
-    defines: defines(value),
+    defines: perSource(value, 'defines', DEFINE),
+    flags: perSource(value, 'flags', FLAG),
     jobs: positiveInteger(value, 'jobs'),
   }
 }
