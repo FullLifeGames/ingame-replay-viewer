@@ -110,6 +110,7 @@ describe('the link command', () => {
     '-sERROR_ON_UNDEFINED_SYMBOLS=1',
     '-sEXPORTED_FUNCTIONS=_AgbMain,_IrvWasm_Slot,_IrvWasm_Progress',
     '-sEXPORTED_RUNTIME_METHODS=HEAPU8,HEAPU16',
+    '--profiling-funcs',
   ])('sets %s', (flag) => {
     expect(argv).toContain(flag)
   })

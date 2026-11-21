@@ -99,6 +99,8 @@ export function linkCommand(
     '-sERROR_ON_UNDEFINED_SYMBOLS=1',
     `-sEXPORTED_FUNCTIONS=${exports}`,
     '-sEXPORTED_RUNTIME_METHODS=HEAPU8,HEAPU16',
+    // Function names stay in the module, so a trap's stack names the game's functions.
+    '--profiling-funcs',
     '-o',
     join(paths.out, LINK_OUTPUTS.js),
   ]
