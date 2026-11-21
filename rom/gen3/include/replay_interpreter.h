@@ -18,6 +18,8 @@ enum ReplayError
     REPLAY_ERROR_SIZE,    // a size byte other than the op's own
     REPLAY_ERROR_OVERRUN, // an instruction running past the end of the instructions
     REPLAY_ERROR_NO_END,  // the instructions do not end with their only END
+    REPLAY_ERROR_OPERAND, // an operand outside its range, a party slot without a mon, or a PRINT text that is not glyphs and one EOS
+    REPLAY_ERROR_TEAM,    // a trainer or team table entry outside its range, or a side without a mon
 };
 
 // What the interpreter does after END: the ROM holds the last scene, the tests leave the battle
@@ -59,8 +61,17 @@ void Replay_Unload(void);
 // For replay_setup.c: checks the stream and loads it into the interpreter.
 enum ReplayError Replay_Load(const volatile u8 *stream, u32 length, enum ReplayEnd end);
 
-// Little-endian reads from a stream, which may lie in ROM.
+// For the interpreter: Replay_Validate, which also counts the instructions.
+enum ReplayError Replay_ValidateStream(const volatile u8 *stream, u32 length, u16 *count);
+
+// For replay_stream.c: whether this interpreter plays an op of the format.
+bool32 Replay_PlaysOp(u32 op);
+
+// Reads from a stream, which may lie in ROM (replay_stream.c). Numbers are little-endian.
 u32 Replay_ReadU16(const volatile u8 *bytes);
 u32 Replay_ReadU32(const volatile u8 *bytes);
+const volatile u8 *Replay_GetTrainer(const volatile u8 *stream, u32 side);
+const volatile u8 *Replay_GetMon(const volatile u8 *stream, u32 side, u32 slot);
+bool32 Replay_HoldsMon(const volatile u8 *stream, u32 side, u32 slot);
 
 #endif // GUARD_REPLAY_INTERPRETER_H

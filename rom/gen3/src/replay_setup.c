@@ -16,16 +16,6 @@
 
 #define REPLAY_BATTLE_FLAGS (BATTLE_TYPE_IS_MASTER | BATTLE_TYPE_RECORDED_IS_MASTER | BATTLE_TYPE_RECORDED_LINK | BATTLE_TYPE_TRAINER)
 
-static const volatile u8 *GetMon(const volatile u8 *stream, u32 side, u32 slot)
-{
-    return stream + REPLAY_STREAM_MONS_OFFSET + (side * REPLAY_STREAM_PARTY_SIZE + slot) * REPLAY_MON_SIZE;
-}
-
-static const volatile u8 *GetTrainer(const volatile u8 *stream, u32 side)
-{
-    return stream + REPLAY_STREAM_TRAINERS_OFFSET + side * REPLAY_TRAINER_SIZE;
-}
-
 static void CopyString(u8 *dest, const volatile u8 *src, u32 length)
 {
     u32 i;
@@ -56,9 +46,8 @@ static void FillParties(struct RecordedBattleSave *save, const volatile u8 *stre
     {
         for (slot = 0; slot < REPLAY_STREAM_PARTY_SIZE; slot++)
         {
-            const volatile u8 *entry = GetMon(stream, side, slot);
-            if (Replay_ReadU16(entry + REPLAY_MON_OFFSET_SPECIES) != SPECIES_NONE)
-                CreateReplayMon(&save->parties[side][slot], entry);
+            if (Replay_HoldsMon(stream, side, slot))
+                CreateReplayMon(&save->parties[side][slot], Replay_GetMon(stream, side, slot));
         }
     }
 }
@@ -72,7 +61,7 @@ static void FillLinkPlayers(struct RecordedBattleSave *save, const volatile u8 *
     for (i = 0; i < MAX_LINK_PLAYERS; i++)
     {
         if (i < REPLAY_STREAM_SIDE_COUNT)
-            CopyString(save->playersName[i], GetTrainer(stream, i) + REPLAY_TRAINER_OFFSET_NAME, PLAYER_NAME_LENGTH);
+            CopyString(save->playersName[i], Replay_GetTrainer(stream, i) + REPLAY_TRAINER_OFFSET_NAME, PLAYER_NAME_LENGTH);
         else
             save->playersName[i][0] = EOS;
         save->playersLanguage[i] = GAME_LANGUAGE;

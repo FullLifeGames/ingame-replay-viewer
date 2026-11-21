@@ -1,6 +1,9 @@
 #include "global.h"
 #include "test/test.h"
 #include "test/replay_test.h"
+#include "constants/characters.h"
+#include "constants/pokemon.h"
+#include "constants/species.h"
 
 // The interpreter refuses a stream it cannot play before any battle starts (#6, AGENTS.md: the
 // ROM interpreter refuses a version it does not know).
@@ -91,4 +94,81 @@ TEST("Replay: a stream of TURN and END passes")
     ReplayStream_Turn(1);
     ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
     EXPECT_EQ(Validate(), REPLAY_ERROR_NONE);
+}
+
+// The team tables: every filled slot holds a mon the game can make, every name ends with EOS, and
+// each side has a mon.
+
+static enum ReplayError ValidateFarMon(u32 offset, u32 value)
+{
+    ReplayStream_Begin();
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    ReplayStream_SetU8(ReplayStream_MonOffset(REPLAY_SIDE_FAR, 0) + offset, value);
+    return Validate();
+}
+
+TEST("Replay: a species past the expansion's own is refused")
+{
+    ReplayStream_Begin();
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    ReplayStream_SetU16(ReplayStream_MonOffset(REPLAY_SIDE_NEAR, 0) + REPLAY_MON_OFFSET_SPECIES, NUM_SPECIES);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_TEAM);
+}
+
+TEST("Replay: a level of 0 or above 100 is refused")
+{
+    EXPECT_EQ(ValidateFarMon(REPLAY_MON_OFFSET_LEVEL, 0), REPLAY_ERROR_TEAM);
+    EXPECT_EQ(ValidateFarMon(REPLAY_MON_OFFSET_LEVEL, MAX_LEVEL + 1), REPLAY_ERROR_TEAM);
+    EXPECT_EQ(ValidateFarMon(REPLAY_MON_OFFSET_LEVEL, 1), REPLAY_ERROR_NONE);
+}
+
+TEST("Replay: a mon of 0 max HP is refused")
+{
+    ReplayStream_Begin();
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    ReplayStream_SetU16(ReplayStream_MonOffset(REPLAY_SIDE_FAR, 0) + REPLAY_MON_OFFSET_MAX_HP, 0);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_TEAM);
+}
+
+TEST("Replay: a gender outside REPLAY_GENDER_* is refused")
+{
+    EXPECT_EQ(ValidateFarMon(REPLAY_MON_OFFSET_GENDER, REPLAY_GENDER_NONE + 1), REPLAY_ERROR_TEAM);
+    EXPECT_EQ(ValidateFarMon(REPLAY_MON_OFFSET_GENDER, REPLAY_GENDER_NONE), REPLAY_ERROR_NONE);
+}
+
+TEST("Replay: a shiny flag other than 0 and 1 is refused")
+{
+    EXPECT_EQ(ValidateFarMon(REPLAY_MON_OFFSET_SHINY, 2), REPLAY_ERROR_TEAM);
+    EXPECT_EQ(ValidateFarMon(REPLAY_MON_OFFSET_SHINY, TRUE), REPLAY_ERROR_NONE);
+}
+
+TEST("Replay: a nickname without EOS or with a control code is refused")
+{
+    u32 i;
+
+    ReplayStream_Begin();
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    for (i = 0; i < REPLAY_MON_NICKNAME_LENGTH; i++)
+        ReplayStream_SetU8(ReplayStream_MonOffset(REPLAY_SIDE_NEAR, 0) + REPLAY_MON_OFFSET_NICKNAME + i, CHAR_A);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_TEAM);
+    EXPECT_EQ(ValidateFarMon(REPLAY_MON_OFFSET_NICKNAME, CHAR_NEWLINE), REPLAY_ERROR_TEAM);
+}
+
+TEST("Replay: a trainer name without EOS is refused")
+{
+    u32 i;
+
+    ReplayStream_Begin();
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    for (i = 0; i < REPLAY_TRAINER_NAME_LENGTH; i++)
+        ReplayStream_SetU8(ReplayStream_TrainerOffset(REPLAY_SIDE_FAR) + REPLAY_TRAINER_OFFSET_NAME + i, CHAR_A);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_TEAM);
+}
+
+TEST("Replay: a side without a mon is refused")
+{
+    ReplayStream_Begin();
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    ReplayStream_SetU16(ReplayStream_MonOffset(REPLAY_SIDE_FAR, 0) + REPLAY_MON_OFFSET_SPECIES, SPECIES_NONE);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_TEAM);
 }

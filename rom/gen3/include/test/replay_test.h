@@ -40,18 +40,24 @@ extern bool8 gReplayTestRunStream;
 
 #define STREAM for (; gReplayTestRunStream; gReplayTestRunStream = FALSE)
 
-// The stream writer, a second encoder for the tests only. ReplayStream_Begin starts a stream with
-// a trainer and one level 100 Wobbuffet with 100 HP on each side; each op call appends one
-// instruction and keeps the header's instruction length right.
+// The stream writer (replay_stream_writer.c), a second encoder for the tests only.
+// ReplayStream_Begin starts a stream with a trainer (BRENDAN near, MAY far) and one level 100
+// Wobbuffet with 100 HP on each side; each op call appends one instruction and keeps the header's
+// instruction length right.
 void ReplayStream_Begin(void);
+void ReplayStream_Trainer(u32 side, const u8 *name, u32 trainerPic);
+// A level 100 male mon, not shiny, named as its species.
+void ReplayStream_Mon(u32 side, u32 slot, u32 species, u32 maxHp);
 void ReplayStream_Turn(u32 number);
 void ReplayStream_End(u32 outcome);
 // Any op with any size byte, for streams the interpreter must refuse.
 void ReplayStream_Op(u32 op, u32 size, const u8 *operands);
-// Overwrites header fields, for streams the interpreter must refuse.
+// Overwrites stream bytes, for streams the interpreter must refuse.
 void ReplayStream_SetU8(u32 offset, u32 value);
 void ReplayStream_SetU16(u32 offset, u32 value);
 void ReplayStream_SetU32(u32 offset, u32 value);
+u32 ReplayStream_TrainerOffset(u32 side);
+u32 ReplayStream_MonOffset(u32 side, u32 slot);
 const u8 *ReplayStream_Data(void);
 u32 ReplayStream_Length(void);
 

@@ -25,9 +25,9 @@ The build deletes files only inside `.cache/rom/` and `build/rom/`. A script tha
 
 ## Testing the ROM interpreter
 
-The ROM interpreter (`src/replay_interpreter.c`, `src/replay_setup.c`) plays an instruction stream (`include/replay_stream.h`) in a recorded link battle. Patch 0001 hands it the battle main loop. Its tests sit in `test/replay_*.c` and use `include/test/replay_test.h`:
+The ROM interpreter (`src/replay_interpreter.c`, `src/replay_setup.c`) plays an instruction stream (`include/replay_stream.h`) in a recorded link battle. Patch 0001 hands it the battle main loop. `src/replay_stream.c` reads the stream and checks all of it before a battle starts. The tests sit in `test/replay_*.c` and use `include/test/replay_test.h`:
 
-- `REPLAY_TEST(name)` writes a stream in its `STREAM` block with the `ReplayStream_*` writer, queues the events it expects in `SCENE` with upstream's matchers (`MESSAGE`, `HP_BAR`, `ANIMATION` and the rest), and checks the battle in `THEN`, after the stream has played.
+- `REPLAY_TEST(name)` writes a stream in its `STREAM` block with the `ReplayStream_*` writer (`test/replay_stream_writer.c`), queues the events it expects in `SCENE` with upstream's matchers (`MESSAGE`, `HP_BAR`, `ANIMATION` and the rest), and checks the battle in `THEN`, after the stream has played.
 - A plain `TEST` whose name starts with `Replay:` checks a refusal with `Replay_Validate`, without a battle.
 
 ## Adding a patch

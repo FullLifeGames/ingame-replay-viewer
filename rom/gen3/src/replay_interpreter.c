@@ -6,8 +6,9 @@
 #include "replay_stream.h"
 #include "constants/rgb.h"
 
-// The ROM interpreter (#6). Replay_Load checks the whole stream first, so a refusal never starts a
-// battle and the step functions below can read their operands without checks.
+// The ROM interpreter (#6). Replay_Load checks the whole stream first (replay_stream.c), so a
+// refusal never starts a battle and the step functions below can read their operands without
+// checks.
 //
 // Replay_RunBattle stands in for the battle engine's gBattleMainFunc: once a frame, while no
 // controller is busy and no wait runs, it runs one step of the current op. An op that needs two
@@ -15,12 +16,6 @@
 // step. When an op returns TRUE, the next op starts on the next frame.
 
 typedef bool32 (*ReplayOpFunc)(const volatile u8 *operands, u32 step);
-
-struct ReplayOpInfo
-{
-    ReplayOpFunc run;
-    u8 size;
-};
 
 struct ReplayState
 {
@@ -42,11 +37,12 @@ static void Replay_Hold(void);
 EWRAM_DATA struct ReplayProgress gReplayProgress = {0};
 static EWRAM_DATA struct ReplayState sReplay = {0};
 
-// An op without a row is one this interpreter does not play, and Replay_Validate refuses it.
-static const struct ReplayOpInfo sOps[] =
+// The step function of each op. An op without one is one this interpreter does not play yet, and
+// Replay_Validate refuses it.
+static const ReplayOpFunc sOps[] =
 {
-    [REPLAY_OP_END]  = { Op_End,  REPLAY_OP_END_SIZE },
-    [REPLAY_OP_TURN] = { Op_Turn, REPLAY_OP_TURN_SIZE },
+    [REPLAY_OP_END]  = Op_End,
+    [REPLAY_OP_TURN] = Op_Turn,
 };
 
 // The battle outcome of each REPLAY_OUTCOME_*. A tie and an unknown end are draws.
@@ -58,106 +54,15 @@ static const u8 sOutcomes[] =
     [REPLAY_OUTCOME_UNKNOWN]  = B_OUTCOME_DREW,
 };
 
-u32 Replay_ReadU16(const volatile u8 *bytes)
+bool32 Replay_PlaysOp(u32 op)
 {
-    return bytes[0] | (bytes[1] << 8);
-}
-
-u32 Replay_ReadU32(const volatile u8 *bytes)
-{
-    return Replay_ReadU16(bytes) | (Replay_ReadU16(bytes + 2) << 16);
-}
-
-static const struct ReplayOpInfo *GetOpInfo(u32 op)
-{
-    if (op >= ARRAY_COUNT(sOps) || sOps[op].run == NULL)
-        return NULL;
-    return &sOps[op];
-}
-
-static enum ReplayError ValidateHeader(const volatile u8 *stream, u32 length)
-{
-    u32 offset, span;
-
-    if (length == 0)
-        return REPLAY_ERROR_EMPTY;
-    if (length < REPLAY_STREAM_HEADER_SIZE)
-        return REPLAY_ERROR_HEADER;
-    if (Replay_ReadU16(stream + REPLAY_STREAM_OFFSET_VERSION) != REPLAY_STREAM_VERSION)
-        return REPLAY_ERROR_VERSION;
-    if (Replay_ReadU16(stream + REPLAY_STREAM_OFFSET_HEADER_SIZE) != REPLAY_STREAM_HEADER_SIZE
-     || stream[REPLAY_STREAM_OFFSET_TRAINER_SIZE] != REPLAY_TRAINER_SIZE
-     || stream[REPLAY_STREAM_OFFSET_MON_SIZE] != REPLAY_MON_SIZE)
-        return REPLAY_ERROR_HEADER;
-    offset = Replay_ReadU32(stream + REPLAY_STREAM_OFFSET_INSTRUCTIONS_OFFSET);
-    span = Replay_ReadU32(stream + REPLAY_STREAM_OFFSET_INSTRUCTIONS_LENGTH);
-    if (offset < REPLAY_STREAM_TABLES_END || offset > length || span > length - offset)
-        return REPLAY_ERROR_HEADER;
-    return REPLAY_ERROR_NONE;
-}
-
-// One instruction at instructions[at]: its size byte fits the op, and it ends inside the span.
-static enum ReplayError ValidateInstruction(const volatile u8 *instructions, u32 length, u32 at)
-{
-    const struct ReplayOpInfo *info;
-    u32 size;
-
-    if (length - at < REPLAY_INSTRUCTION_HEADER_SIZE)
-        return REPLAY_ERROR_OVERRUN;
-    size = instructions[at + 1];
-    if (size > length - at - REPLAY_INSTRUCTION_HEADER_SIZE)
-        return REPLAY_ERROR_OVERRUN;
-    info = GetOpInfo(instructions[at]);
-    if (info == NULL)
-        return REPLAY_ERROR_OP;
-    if (size != info->size)
-        return REPLAY_ERROR_SIZE;
-    return REPLAY_ERROR_NONE;
-}
-
-static enum ReplayError ValidateInstructions(const volatile u8 *instructions, u32 length, u16 *count)
-{
-    enum ReplayError error;
-    bool32 ended = FALSE;
-    u32 at = 0;
-
-    *count = 0;
-    while (at < length)
-    {
-        if (ended)
-            return REPLAY_ERROR_NO_END;
-        error = ValidateInstruction(instructions, length, at);
-        if (error != REPLAY_ERROR_NONE)
-            return error;
-        ended = (instructions[at] == REPLAY_OP_END);
-        at += REPLAY_INSTRUCTION_HEADER_SIZE + instructions[at + 1];
-        (*count)++;
-    }
-    return ended ? REPLAY_ERROR_NONE : REPLAY_ERROR_NO_END;
-}
-
-static enum ReplayError ValidateStream(const volatile u8 *stream, u32 length, u16 *count)
-{
-    enum ReplayError error = ValidateHeader(stream, length);
-    const volatile u8 *instructions;
-
-    *count = 0;
-    if (error != REPLAY_ERROR_NONE)
-        return error;
-    instructions = stream + Replay_ReadU32(stream + REPLAY_STREAM_OFFSET_INSTRUCTIONS_OFFSET);
-    return ValidateInstructions(instructions, Replay_ReadU32(stream + REPLAY_STREAM_OFFSET_INSTRUCTIONS_LENGTH), count);
-}
-
-enum ReplayError Replay_Validate(const volatile u8 *stream, u32 length)
-{
-    u16 count;
-    return ValidateStream(stream, length, &count);
+    return op < ARRAY_COUNT(sOps) && sOps[op] != NULL;
 }
 
 enum ReplayError Replay_Load(const volatile u8 *stream, u32 length, enum ReplayEnd end)
 {
     u16 count;
-    enum ReplayError error = ValidateStream(stream, length, &count);
+    enum ReplayError error = Replay_ValidateStream(stream, length, &count);
 
     memset(&gReplayProgress, 0, sizeof(gReplayProgress));
     memset(&sReplay, 0, sizeof(sReplay));
@@ -203,7 +108,7 @@ static void Replay_RunBattle(void)
         return;
     }
     instruction = sReplay.instructions + sReplay.at;
-    if (!sOps[instruction[0]].run(instruction + REPLAY_INSTRUCTION_HEADER_SIZE, sReplay.step))
+    if (!sOps[instruction[0]](instruction + REPLAY_INSTRUCTION_HEADER_SIZE, sReplay.step))
     {
         sReplay.step++;
         return;
@@ -222,7 +127,7 @@ static void Replay_Hold(void)
 // battle (BattleMainCB2). gMain.savedCallback runs after CB2_QuitRecordedBattle.
 static bool32 Op_End(const volatile u8 *operands, u32 step)
 {
-    gBattleOutcome = sOutcomes[operands[0] < ARRAY_COUNT(sOutcomes) ? operands[0] : REPLAY_OUTCOME_UNKNOWN];
+    gBattleOutcome = sOutcomes[operands[0]];
     gReplayProgress.finished = TRUE;
     gBattleMainFunc = Replay_Hold;
     if (sReplay.end == REPLAY_EXIT_AT_END)

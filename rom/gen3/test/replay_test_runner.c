@@ -7,8 +7,6 @@
 #include "pokemon.h"
 #include "window.h"
 #include "test/replay_test.h"
-#include "constants/characters.h"
-#include "constants/species.h"
 
 // The runner of REPLAY_TEST (#7). It borrows upstream's event queue and matchers: SCENE queues
 // into gBattleTestRunnerState, and the recorders in test_runner_battle.c match each message, HP
@@ -19,11 +17,7 @@
 #define STATE gBattleTestRunnerState
 #define DATA gBattleTestRunnerState->data
 
-#define STREAM_CAPACITY 0x1000
-
 EWRAM_DATA bool8 gReplayTestRunStream = FALSE;
-static EWRAM_DATA u8 sStream[STREAM_CAPACITY] = {0};
-static EWRAM_DATA u32 sStreamLength = 0;
 static EWRAM_DATA u16 sCheckedProgress = 0;
 
 static void CB2_ReplayTest_Done(void);
@@ -52,7 +46,7 @@ static void ReplayTest_Run(void *data)
     InvokeReplayTest(data);
     gReplayTestRunStream = FALSE;
     STATE->runScene = FALSE;
-    error = Replay_Start(sStream, sStreamLength, REPLAY_EXIT_AT_END, CB2_ReplayTest_Done);
+    error = Replay_Start(ReplayStream_Data(), ReplayStream_Length(), REPLAY_EXIT_AT_END, CB2_ReplayTest_Done);
     if (error != REPLAY_ERROR_NONE)
         Test_ExitWithResult(TEST_RESULT_FAIL, SourceLine(0), "%s:%d: the interpreter refused the stream with error %d", gTestRunnerState.test->filename, SourceLine(0), error);
 }
@@ -124,108 +118,3 @@ const struct TestRunner gReplayTestRunner =
     .tearDown = ReplayTest_TearDown,
     .checkProgress = ReplayTest_CheckProgress,
 };
-
-static u8 *Reserve(u32 size)
-{
-    u8 *at = &sStream[sStreamLength];
-
-    if (size > STREAM_CAPACITY - sStreamLength)
-        Test_ExitWithResult(TEST_RESULT_INVALID, SourceLine(0), "%s:%d: the test stream is longer than %d bytes", gTestRunnerState.test->filename, SourceLine(0), STREAM_CAPACITY);
-    sStreamLength += size;
-    return at;
-}
-
-void ReplayStream_SetU8(u32 offset, u32 value)
-{
-    sStream[offset] = value;
-}
-
-void ReplayStream_SetU16(u32 offset, u32 value)
-{
-    sStream[offset] = value;
-    sStream[offset + 1] = value >> 8;
-}
-
-void ReplayStream_SetU32(u32 offset, u32 value)
-{
-    ReplayStream_SetU16(offset, value);
-    ReplayStream_SetU16(offset + 2, value >> 16);
-}
-
-static void WriteName(u8 *dest, const u8 *name, u32 capacity)
-{
-    u32 i;
-
-    for (i = 0; i < capacity; i++)
-        dest[i] = EOS;
-    for (i = 0; i + 1 < capacity && name[i] != EOS; i++)
-        dest[i] = name[i];
-}
-
-static void WriteTrainer(u32 side, const u8 *name)
-{
-    u8 *trainer = &sStream[REPLAY_STREAM_TRAINERS_OFFSET + side * REPLAY_TRAINER_SIZE];
-
-    WriteName(trainer + REPLAY_TRAINER_OFFSET_NAME, name, REPLAY_TRAINER_NAME_LENGTH);
-    trainer[REPLAY_TRAINER_OFFSET_TEAM_SIZE] = 1;
-}
-
-static void WriteWobbuffet(u32 side)
-{
-    u32 at = REPLAY_STREAM_MONS_OFFSET + side * REPLAY_STREAM_PARTY_SIZE * REPLAY_MON_SIZE;
-
-    ReplayStream_SetU16(at + REPLAY_MON_OFFSET_SPECIES, SPECIES_WOBBUFFET);
-    ReplayStream_SetU16(at + REPLAY_MON_OFFSET_MAX_HP, 100);
-    sStream[at + REPLAY_MON_OFFSET_LEVEL] = 100;
-    sStream[at + REPLAY_MON_OFFSET_GENDER] = REPLAY_GENDER_MALE;
-    WriteName(&sStream[at + REPLAY_MON_OFFSET_NICKNAME], COMPOUND_STRING("WOBBUFFET"), REPLAY_MON_NICKNAME_LENGTH);
-}
-
-void ReplayStream_Begin(void)
-{
-    memset(sStream, 0, sizeof(sStream));
-    sStreamLength = REPLAY_STREAM_TABLES_END;
-    ReplayStream_SetU16(REPLAY_STREAM_OFFSET_VERSION, REPLAY_STREAM_VERSION);
-    ReplayStream_SetU16(REPLAY_STREAM_OFFSET_HEADER_SIZE, REPLAY_STREAM_HEADER_SIZE);
-    sStream[REPLAY_STREAM_OFFSET_TRAINER_SIZE] = REPLAY_TRAINER_SIZE;
-    sStream[REPLAY_STREAM_OFFSET_MON_SIZE] = REPLAY_MON_SIZE;
-    ReplayStream_SetU32(REPLAY_STREAM_OFFSET_INSTRUCTIONS_OFFSET, REPLAY_STREAM_TABLES_END);
-    ReplayStream_SetU32(REPLAY_STREAM_OFFSET_INSTRUCTIONS_LENGTH, 0);
-    WriteTrainer(REPLAY_SIDE_NEAR, COMPOUND_STRING("NEAR"));
-    WriteTrainer(REPLAY_SIDE_FAR, COMPOUND_STRING("FAR"));
-    WriteWobbuffet(REPLAY_SIDE_NEAR);
-    WriteWobbuffet(REPLAY_SIDE_FAR);
-}
-
-void ReplayStream_Op(u32 op, u32 size, const u8 *operands)
-{
-    u8 *at = Reserve(REPLAY_INSTRUCTION_HEADER_SIZE + size);
-
-    at[0] = op;
-    at[1] = size;
-    if (size != 0)
-        memcpy(at + REPLAY_INSTRUCTION_HEADER_SIZE, operands, size);
-    ReplayStream_SetU32(REPLAY_STREAM_OFFSET_INSTRUCTIONS_LENGTH, sStreamLength - REPLAY_STREAM_TABLES_END);
-}
-
-void ReplayStream_Turn(u32 number)
-{
-    const u8 operands[REPLAY_OP_TURN_SIZE] = { number, number >> 8 };
-    ReplayStream_Op(REPLAY_OP_TURN, REPLAY_OP_TURN_SIZE, operands);
-}
-
-void ReplayStream_End(u32 outcome)
-{
-    const u8 operands[REPLAY_OP_END_SIZE] = { outcome };
-    ReplayStream_Op(REPLAY_OP_END, REPLAY_OP_END_SIZE, operands);
-}
-
-const u8 *ReplayStream_Data(void)
-{
-    return sStream;
-}
-
-u32 ReplayStream_Length(void)
-{
-    return sStreamLength;
-}
