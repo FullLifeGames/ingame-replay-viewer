@@ -1,12 +1,12 @@
 // npm run wasm:build: the WebAssembly build of the expansion (#35). `--census [report.md]` compiles
 // every C file of the tree once at -O0, excluded ones included, and writes the report,
-// build/wasm/census.json and one .err file per failure; `--census-report [report.md]` renders the
-// report again from census.json. `--compile [report.md]` compiles what the build links at -O2: the
-// files of the tree that wasm.json keeps, the patched copies of build/wasm/overlay and the
-// platform files, fetched into .cache/wasm/platform and patched in build/wasm/platform; it writes
-// compile.json, the .err files and the report, and fails when a file fails. Everything it writes
-// lies under build/wasm and .cache/wasm, apart from a report path named on the command line. The
-// tree comes from `npm run rom:build`.
+// build/wasm/census.json and one .err file per failure in build/wasm/census; `--census-report
+// [report.md]` renders the report again from census.json. `--compile [report.md]` compiles what
+// the build links at -O2: the files of the tree that wasm.json keeps, the patched copies of
+// build/wasm/overlay and the platform files, fetched into .cache/wasm/platform and patched in
+// build/wasm/platform; it writes compile.json, the .err files in build/wasm/compile and the
+// report, and fails when a file fails. Everything it writes lies under build/wasm and .cache/wasm,
+// apart from a report path named on the command line. The tree comes from `npm run rom:build`.
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { isAbsolute, join } from 'node:path'
@@ -97,8 +97,8 @@ function heading(config: WasmConfig, mode: Run, seconds: number): string {
 
 type Run = 'census' | 'compile'
 
-function writeErrors(paths: WasmPaths, results: readonly CensusResult[]): void {
-  const dir = join(paths.out, 'census')
+function writeErrors(paths: WasmPaths, mode: Run, results: readonly CensusResult[]): void {
+  const dir = join(paths.out, mode)
   mkdirSync(dir, { recursive: true })
   for (const { entry, stderr } of results.filter((result) => !result.entry.ok)) {
     writeFileSync(join(dir, errorFileName(entry.source)), `${stderr}\n`)
@@ -125,7 +125,7 @@ async function runAll(
   })
   const entries = results.map((result) => result.entry)
   mkdirSync(paths.out, { recursive: true })
-  writeErrors(paths, results)
+  writeErrors(paths, mode, results)
   const json = { heading: heading(config, mode, (performance.now() - start) / 1000), entries }
   writeFileSync(join(paths.out, `${mode}.json`), `${JSON.stringify(json, null, 2)}\n`)
   return entries
