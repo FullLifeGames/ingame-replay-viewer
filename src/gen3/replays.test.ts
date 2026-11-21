@@ -6,7 +6,7 @@ import type { Side } from '../script/types'
 import { REPLAYS, replayScript } from '../script/testing'
 import { crc32 } from '../patch/crc32'
 import { buildGen3Stream, type Gen3Stream } from './backend'
-import { showsInPlace } from './fallbacks'
+import { mechanicGap, showsInPlace } from './fallbacks'
 import { decodeStream } from './stream/decode'
 import { decodeText, encodeText } from './text/charset'
 import { translate, type Translation } from './translate'
@@ -29,6 +29,12 @@ const HEADER_KINDS: ReadonlySet<ScriptEvent['kind']> = new Set(['player', 'teamS
  * (`'` as `’`, `_` as `-`), which the game draws alike.
  */
 const charsetRead = (text: string) => decodeText(encodeText(text))
+
+/**
+ * The mechanic fallbacks the test replays may take, each a silent line the game shows nothing for:
+ * Perish Song's first count, whose later counts print. A new one fails until it is named here.
+ */
+const NAMED_MECHANICS: ReadonlySet<string> = new Set([mechanicGap('perish3', 'starting').detail])
 
 const replays = REPLAYS.map(({ id }) => {
   const script = replayScript(id)
@@ -60,6 +66,13 @@ describe.each(replays)('the instruction stream of $id', ({ id, script, stream, t
     expect(gaps, gaps.map(({ line, detail }) => `${String(line)}: ${detail}`).join('\n')).toEqual(
       [],
     )
+  })
+
+  it('takes mechanic fallbacks only for the silent effects named above', () => {
+    const unnamed = stream.fallbacks.filter(
+      (fallback) => !showsInPlace(fallback) && !NAMED_MECHANICS.has(fallback.detail),
+    )
+    expect(unnamed.map(({ line, detail }) => `${String(line)}: ${detail}`)).toEqual([])
   })
 
   it('fits the replay slot', () => {
