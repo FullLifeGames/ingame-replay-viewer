@@ -11,6 +11,8 @@ export interface MakeOptions {
   jobs: number
   logPath: string
   env: NodeJS.ProcessEnv
+  // Goals and variables after the job cap, such as ['check', 'TESTS=Replay'].
+  args?: string[]
 }
 
 // DEVKITARM switches the toolchain, the make variables leak a parent make's flags, and
@@ -43,7 +45,8 @@ function logTail(logPath: string): string {
 export function runMake(options: MakeOptions): void {
   const log = openSync(options.logPath, 'w')
   try {
-    const result = spawnSync('make', [`-j${String(options.jobs)}`, '-O'], {
+    const args = [`-j${String(options.jobs)}`, '-O', ...(options.args ?? [])]
+    const result = spawnSync('make', args, {
       cwd: options.tree,
       env: makeEnvironment(options.env),
       stdio: ['ignore', log, log],

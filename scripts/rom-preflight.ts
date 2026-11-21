@@ -72,12 +72,16 @@ function baseRomProblem(path: string, expectedSha1: string): string | undefined 
   return `the base ROM ${path} has SHA1 ${sha1}, rom/gen3/build.json expects ${expectedSha1}`
 }
 
+// The checks of the machine alone: make check builds no patch, so it needs no base ROM.
+export function hostProblems(input: Pick<PreflightInput, 'pathVariable' | 'meminfo'>): string[] {
+  return [toolProblem(input.pathVariable), memoryProblem(input.meminfo)].filter(
+    (problem) => problem !== undefined,
+  )
+}
+
 export function preflightProblems(input: PreflightInput): string[] {
-  return [
-    toolProblem(input.pathVariable),
-    memoryProblem(input.meminfo),
-    baseRomProblem(input.baseRomPath, input.baseRomSha1),
-  ].filter((problem) => problem !== undefined)
+  const baseRom = baseRomProblem(input.baseRomPath, input.baseRomSha1)
+  return [...hostProblems(input), ...(baseRom === undefined ? [] : [baseRom])]
 }
 
 export function readPreflightInput(env: NodeJS.ProcessEnv, baseRomSha1: string): PreflightInput {

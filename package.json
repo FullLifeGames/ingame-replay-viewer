@@ -20,6 +20,7 @@
     "check": "npm run lint && npm run typecheck && npm run format:check && npm run knip && npm run test:coverage",
     "prepare": "lefthook install",
     "rom:build": "node scripts/rom-build.ts",
+    "rom:check": "node scripts/rom-check.ts",
     "rom:clean": "node scripts/rom-build.ts --clean-only",
     "rom:repro": "node scripts/rom-repro.ts",
     "gen3:tables": "node scripts/gen3-tables.ts"
