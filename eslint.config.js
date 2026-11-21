@@ -1,12 +1,14 @@
+import { builtinModules } from 'node:module'
+
 import js from '@eslint/js'
 import { defineConfig, globalIgnores } from 'eslint/config'
 import prettier from 'eslint-config-prettier'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
-// Import zone (AGENTS.md): the battle script and the Gen 3 game backend are plain TypeScript. They
-// use no DOM or browser API, import nothing from the pages and no emulator.
-const PURE_MODULES = ['src/script/**/*.ts', 'src/gen3/**/*.ts']
+// Import zone (AGENTS.md): the battle script, the Gen 3 game backend and the BPS codec are plain
+// TypeScript. They use no DOM or browser API, import nothing from the pages and no emulator.
+const PURE_MODULES = ['src/script/**/*.ts', 'src/gen3/**/*.ts', 'src/patch/**/*.ts']
 
 // Environment-neutral helpers that browsers list among their globals and Node has as well.
 const NEUTRAL_GLOBALS = new Set([
@@ -18,16 +20,16 @@ const NEUTRAL_GLOBALS = new Set([
 ])
 const BROWSER_GLOBALS = Object.keys(globals.browser).filter((name) => !NEUTRAL_GLOBALS.has(name))
 const NO_BROWSER_MESSAGE =
-  'src/script/ and src/gen3/ use no DOM or browser API; take data from the caller.'
+  'src/script/, src/gen3/ and src/patch/ use no DOM or browser API; take data from the caller.'
 
 const PURE_IMPORT_PATTERNS = [
   {
     group: ['**/web', '**/web/**'],
-    message: 'src/script/ and src/gen3/ import nothing from the pages in src/web/.',
+    message: 'src/script/, src/gen3/ and src/patch/ import nothing from the pages in src/web/.',
   },
   {
     group: ['@thenick775/*'],
-    message: 'src/script/ and src/gen3/ import no emulator.',
+    message: 'src/script/, src/gen3/ and src/patch/ import no emulator.',
   },
 ]
 
@@ -67,6 +69,22 @@ const scriptZone = {
   },
 }
 
+// The BPS codec runs in the build and on the page (#8), so it imports nothing from Node either.
+// This block repeats the pure patterns for the same reason as the one above.
+const NO_NODE_MESSAGE = 'src/patch/ runs on the page as well; it imports nothing from Node.'
+const patchZone = {
+  files: ['src/patch/**/*.ts'],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: builtinModules.map((name) => ({ name, message: NO_NODE_MESSAGE })),
+        patterns: [...PURE_IMPORT_PATTERNS, { group: ['node:*'], message: NO_NODE_MESSAGE }],
+      },
+    ],
+  },
+}
+
 // Ceilings (AGENTS.md): fixed for every TypeScript file from the first commit.
 const ceilings = {
   files: ['**/*.ts'],
@@ -89,7 +107,7 @@ const specs = {
 }
 
 export default defineConfig([
-  globalIgnores(['dist', 'coverage', '.waves']),
+  globalIgnores(['dist', 'coverage', '.waves', '.cache', 'build']),
   {
     files: ['**/*.ts'],
     extends: [
@@ -124,6 +142,7 @@ export default defineConfig([
   },
   pureZone,
   scriptZone,
+  patchZone,
   ceilings,
   specs,
   prettier,

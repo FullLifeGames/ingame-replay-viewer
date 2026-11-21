@@ -1,0 +1,115 @@
+// The build loop: battle log in, battle script out (plan "No silent drops"). Every line becomes
+// events or a dropped line; nothing is skipped.
+
+import type { Battle, Pokemon } from '@pkmn/client'
+import type { Protocol } from '@pkmn/protocol'
+
+import { newBattle } from './client'
+import { dropReasonOf } from './drops'
+import { ScriptError } from './errors'
+import { HitFolder } from './hits'
+import { readLines } from './lines'
+import { bySide } from './refs'
+import type { LogLine } from './lines'
+import { eventsOf, ruleFor, unreadPart } from './rules/index'
+import type { Before } from './rules/index'
+import type { BattleScript, ScriptEvent } from './events'
+import type { DroppedLine, DropReason, Side, TeamMember } from './types'
+
+interface Build {
+  readonly battle: Battle
+  readonly events: ScriptEvent[]
+  readonly dropped: DroppedLine[]
+  readonly hits: HitFolder
+  readonly players: Partial<Record<Side, string>>
+  started: boolean
+}
+
+function drop(build: Build, line: LogLine, reason: DropReason, detail?: string): void {
+  const { index, text } = line
+  build.dropped.push({ line: index, text, reason, ...(detail === undefined ? {} : { detail }) })
+}
+
+function refuseGameType(line: LogLine): void {
+  const [, gameType] = line.args as Protocol.Args['|gametype|']
+  if (line.key === '|gametype|' && gameType !== 'singles') {
+    throw new ScriptError(line.index, `the game type "${gameType}" is not singles`)
+  }
+}
+
+function beforeOf({ battle, players }: Build): Before {
+  const active = bySide(battle, (side) => side.active[0] ?? null)
+  return { active, weather: battle.field.weather, players: { ...players } }
+}
+
+/** Keeps the names the intro shows, for the win to match against. */
+function notePlayers(build: Build, events: readonly ScriptEvent[]): void {
+  for (const event of events) {
+    if (event.kind === 'player') {
+      build.players[event.side] = event.name
+    }
+  }
+}
+
+function addToClient(battle: Battle, line: LogLine): void {
+  try {
+    battle.add(line.args, line.kwArgs)
+  } catch (error) {
+    throw new ScriptError(line.index, `the client cannot follow "${line.text}"`, { cause: error })
+  }
+}
+
+function readLine(build: Build, line: LogLine): void {
+  if (line.key === undefined) {
+    drop(build, line, 'unknown')
+    return
+  }
+  refuseGameType(line)
+  const before = beforeOf(build)
+  addToClient(build.battle, line)
+  const reason = dropReasonOf(line, build.started)
+  build.started ||= line.key === '|start|'
+  const rule = ruleFor(line.key)
+  if (reason !== undefined || rule === undefined) {
+    drop(build, line, reason ?? 'unsupported', reason ? undefined : `no rule for ${line.key}`)
+    return
+  }
+  const unread = unreadPart(rule, line)
+  if (unread !== undefined) {
+    drop(build, line, 'unsupported', unread)
+    return
+  }
+  const events = eventsOf(rule, line, build.battle, before)
+  notePlayers(build, events)
+  build.events.push(...build.hits.pass(events))
+}
+
+function memberOf(pokemon: Pokemon): TeamMember {
+  const { speciesForme: species, name, gender, level, shiny } = pokemon
+  return { species, name, ...(gender === 'M' || gender === 'F' ? { gender } : {}), level, shiny }
+}
+
+/** Turns a battle log into its battle script. Throws a ScriptError the script cannot follow. */
+export function buildBattleScript(log: string): BattleScript {
+  const hits = new HitFolder()
+  const build: Build = {
+    battle: newBattle(),
+    events: [],
+    dropped: [],
+    hits,
+    players: {},
+    started: false,
+  }
+  for (const line of readLines(log)) {
+    readLine(build, line)
+  }
+  const { battle, events, dropped } = build
+  events.push(...hits.flush())
+  return {
+    gen: battle.gen.num,
+    format: battle.tier,
+    teams: bySide(battle, (side) => side.team.map(memberOf)),
+    events,
+    dropped,
+  }
+}

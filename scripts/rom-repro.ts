@@ -1,0 +1,215 @@
+// npm run rom:repro (plan §7): two clean builds of the pinned tree, the second in a fresh git
+// worktree at another path, must give the same ROM, patch and slot description. The worktree goes
+// again when the run ends, pass or fail; both builds' outputs stay in build/rom/ for a look.
+// A heavy check on devbox: about two full builds, alone and in the background (AGENTS.md).
+import { createHash } from 'node:crypto'
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+
+import { buildRom } from './rom-build.ts'
+import { runCli } from './rom-cli.ts'
+import { loadBuildConfig } from './rom-config.ts'
+import type { BuildConfig } from './rom-config.ts'
+import { git } from './rom-git.ts'
+import { OUTPUT_NAMES } from './rom-outputs.ts'
+import { buildPaths, checkRemovable, removeInside } from './rom-paths.ts'
+import type { BuildPaths } from './rom-paths.ts'
+import { GBA_ROM_BASE } from './rom-slot.ts'
+
+export interface MapSymbol {
+  name: string
+  offset: number
+  file: string | undefined
+}
+
+export interface ReproComparison {
+  pass: boolean
+  sha1: { a: string; b: string }
+  differing: string[]
+  firstDifference?: { offset: number; symbol: MapSymbol | undefined }
+}
+
+interface MapSection {
+  name: string
+  start: number
+  file: string
+}
+
+const COMPARED = [OUTPUT_NAMES.rom, OUTPUT_NAMES.patch, OUTPUT_NAMES.slot]
+
+const sha1 = (bytes: Uint8Array) => createHash('sha1').update(bytes).digest('hex')
+
+// The second build's tree, stamp and outputs sit beside the first's, never inside its tree.
+export function reproPaths(paths: BuildPaths): BuildPaths {
+  const cacheDir = join(dirname(paths.tree), 'repro')
+  return {
+    roots: paths.roots,
+    outDir: join(paths.outDir, 'repro'),
+    tree: join(cacheDir, 'expansion'),
+    stampPath: join(cacheDir, 'applied.json'),
+  }
+}
+
+export function firstDifference(a: Uint8Array, b: Uint8Array): number | undefined {
+  const length = Math.min(a.length, b.length)
+  for (let offset = 0; offset < length; offset++) {
+    if (a[offset] !== b[offset]) return offset
+  }
+  return a.length === b.length ? undefined : length
+}
+
+const SECTION_LINE = /^ (\.\S+)?\s+0x([0-9a-f]+)\s+0x([0-9a-f]+)\s+(\S.*)$/
+const SYMBOL_LINE = /^\s+0x([0-9a-f]+)\s+([A-Za-z_$][\w$.]*)$/
+const NAME_LINE = /^ (\.\S+)$/
+
+// " .name 0xSTART 0xSIZE file"; a long name stands alone on the line before. Empty ones don't count.
+function readSection(line: string, pendingName: string | undefined): MapSection | undefined {
+  const match = SECTION_LINE.exec(line)
+  if (match === null) return undefined
+  const [, ownName, start = '', size = '', file = ''] = match
+  const name = ownName ?? pendingName
+  if (name === undefined || parseInt(size, 16) === 0) return undefined
+  return { name, start: parseInt(start, 16), file }
+}
+
+// GNU ld map lines: sections as above and "0xADDRESS name" for a symbol. Assignments such as
+// ". = ALIGN (0x4)" match neither.
+function readMap(mapText: string): { sections: MapSection[]; symbols: Map<number, string> } {
+  const sections: MapSection[] = []
+  const symbols = new Map<number, string>()
+  let pendingName: string | undefined
+  for (const line of mapText.split('\n')) {
+    const section = readSection(line, pendingName)
+    const [, address = '', symbol] = SYMBOL_LINE.exec(line) ?? []
+    if (section !== undefined) sections.push(section)
+    else if (symbol !== undefined) symbols.set(parseInt(address, 16), symbol)
+    pendingName = NAME_LINE.exec(line)?.[1]
+  }
+  return { sections, symbols }
+}
+
+// The nearest symbol at or below the address inside the section that holds it, else the section.
+export function symbolAt(mapText: string, address: number): MapSymbol | undefined {
+  const { sections, symbols } = readMap(mapText)
+  let section: MapSection | undefined
+  for (const next of sections) {
+    if (next.start <= address && (section === undefined || next.start > section.start)) {
+      section = next
+    }
+  }
+  if (section === undefined) return undefined
+  let found = { name: section.name, start: section.start }
+  for (const [start, name] of symbols) {
+    if (start <= address && start >= found.start) found = { name, start }
+  }
+  return { name: found.name, offset: address - found.start, file: section.file }
+}
+
+export function compareOutputs(dirA: string, dirB: string): ReproComparison {
+  const read = (dir: string, name: string) => readFileSync(join(dir, name))
+  const differing = COMPARED.filter((name) => !read(dirA, name).equals(read(dirB, name)))
+  const romA = read(dirA, OUTPUT_NAMES.rom)
+  const romB = read(dirB, OUTPUT_NAMES.rom)
+  const result: ReproComparison = {
+    pass: differing.length === 0,
+    sha1: { a: sha1(romA), b: sha1(romB) },
+    differing,
+  }
+  const offset = firstDifference(romA, romB)
+  if (offset !== undefined) {
+    const mapText = readFileSync(join(dirA, OUTPUT_NAMES.map), 'utf8')
+    result.firstDifference = { offset, symbol: symbolAt(mapText, GBA_ROM_BASE + offset) }
+  }
+  return result
+}
+
+// B's worktree of A's tree. A worktree holds a .git file; anything else at the path is a leftover
+// folder. The guard decides before git or rm touch it.
+export function removeWorktree(a: BuildPaths): void {
+  const path = reproPaths(a).tree
+  checkRemovable(a.roots, path)
+  const dotGit = join(path, '.git')
+  if (existsSync(dotGit) && statSync(dotGit).isFile()) {
+    git(a.tree, ['worktree', 'remove', '--force', '--force', path])
+  }
+  removeInside(a.roots, path)
+  git(a.tree, ['worktree', 'prune'])
+}
+
+export function addWorktree(a: BuildPaths, commit: string): void {
+  const path = reproPaths(a).tree
+  removeWorktree(a)
+  mkdirSync(dirname(path), { recursive: true })
+  git(a.tree, ['worktree', 'add', '--quiet', '--detach', path, commit])
+}
+
+const say = (line: string) => process.stdout.write(`rom:repro: ${line}\n`)
+
+function describeResult(result: ReproComparison): string {
+  if (result.pass) return `pass: both builds give ROM SHA1 ${result.sha1.a}`
+  const symbol = result.firstDifference?.symbol
+  const offset = result.firstDifference?.offset.toString(16)
+  const where = symbol === undefined ? '' : ` (${symbol.name}+0x${symbol.offset.toString(16)})`
+  const at = offset === undefined ? '' : `; first ROM difference at 0x${offset}${where}`
+  const sha = `ROM SHA1 ${result.sha1.a} and ${result.sha1.b}`
+  return `fail: ${sha}; ${result.differing.join(', ')} differ${at}; both builds stay in build/rom`
+}
+
+export type BuildStep = (paths: BuildPaths, config: BuildConfig) => void
+
+function timed(seconds: Record<string, number>, key: string, run: () => void): void {
+  const start = performance.now()
+  run()
+  seconds[key] = Math.round((performance.now() - start) / 1000)
+}
+
+// Build A, then B in a fresh worktree of A's tree. B's worktree and its folder under .cache/rom go
+// again whether B passes or throws.
+export function buildTwice(
+  a: BuildPaths,
+  config: BuildConfig,
+  build: BuildStep,
+): Record<string, number> {
+  const b = reproPaths(a)
+  const seconds: Record<string, number> = {}
+  say(`build a in ${a.tree}`)
+  timed(seconds, 'a', () => {
+    build(a, config)
+  })
+  try {
+    addWorktree(a, config.upstream.commit)
+    say(`build b in ${b.tree}`)
+    timed(seconds, 'b', () => {
+      build(b, config)
+    })
+  } finally {
+    removeWorktree(a)
+    removeInside(a.roots, dirname(b.tree))
+    say(`removed the worktree ${b.tree}`)
+  }
+  return seconds
+}
+
+function repro(): ReproComparison {
+  const config = loadBuildConfig()
+  const a = buildPaths()
+  const b = reproPaths(a)
+  const seconds = buildTwice(a, config, (paths, pinned) => buildRom(paths, pinned, true))
+  const result = compareOutputs(a.outDir, b.outDir)
+  const record = { ...result, trees: { a: a.tree, b: b.tree }, outDirs: [a.outDir, b.outDir] }
+  writeFileSync(
+    join(a.outDir, 'repro.json'),
+    `${JSON.stringify({ ...record, seconds }, null, 2)}\n`,
+  )
+  return result
+}
+
+function main(): void {
+  runCli('rom:repro', () => {
+    const result = repro()
+    say(describeResult(result))
+    if (!result.pass) process.exitCode = 1
+  })
+}
+
+if (import.meta.main) main()

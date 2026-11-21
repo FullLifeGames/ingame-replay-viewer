@@ -1,0 +1,724 @@
+{"gen":3,"format":"[Gen 3] OU","teams":{"near":[{"species":"Starmie","name":"Starmie","level":100,"shiny":false},{"species":"Blissey","name":"Blissey","gender":"F","level":100,"shiny":false},{"species":"Celebi","name":"Celebi","level":100,"shiny":false},{"species":"Skarmory","name":"Skarmory","gender":"F","level":100,"shiny":false},{"species":"Salamence","name":"Salamence","gender":"F","level":100,"shiny":false},{"species":"Dugtrio","name":"Dugtrio","gender":"M","level":100,"shiny":false}],"far":[{"species":"Breloom","name":"Breloom","gender":"M","level":100,"shiny":false},{"species":"Jirachi","name":"Jirachi","level":100,"shiny":false},{"species":"Tyranitar","name":"Tyranitar","gender":"F","level":100,"shiny":false},{"species":"Forretress","name":"Forretress","gender":"F","level":100,"shiny":false},{"species":"Dugtrio","name":"Dugtrio","gender":"M","level":100,"shiny":false},{"species":"Vaporeon","name":"Vaporeon","gender":"F","level":100,"shiny":false}]}}
+{"line":0,"text":"|inactive|Battle timer is ON: inactive players will automatically lose when time's up.","reason":"timer"}
+{"line":1,"text":"|t:|1795206963","reason":"timestamp"}
+{"line":2,"text":"|gametype|singles","reason":"metadata"}
+{"kind":"player","line":3,"side":"near","name":"SoggyBagel64","avatar":"ltsurge-gen2"}
+{"kind":"player","line":4,"side":"far","name":"Nametab","avatar":"bugmaniac-gen3"}
+{"line":5,"text":"|gen|3","reason":"metadata"}
+{"line":6,"text":"|tier|[Gen 3] OU","reason":"metadata"}
+{"line":7,"text":"|rule|HP Percentage Mod: HP is shown in percentages","reason":"rule"}
+{"line":8,"text":"|rule|Beat Up Nicknames Mod: Beat Up will not reveal any party members","reason":"rule"}
+{"line":9,"text":"|rule|Endless Battle Clause: Forcing endless battles is banned","reason":"rule"}
+{"line":10,"text":"|rule|Sleep Clause Mod: Limit one foe put to sleep","reason":"rule"}
+{"line":11,"text":"|rule|Switch Priority Clause Mod: Faster Pokemon switch first","reason":"rule"}
+{"line":12,"text":"|rule|Species Clause: Limit one of each Pokemon","reason":"rule"}
+{"line":13,"text":"|rule|OHKO Clause: OHKO moves are banned","reason":"rule"}
+{"line":14,"text":"|rule|Evasion Items Clause: Evasion items are banned","reason":"rule"}
+{"line":15,"text":"|rule|Evasion Moves Clause: Evasion moves are banned","reason":"rule"}
+{"line":16,"text":"|rule|One Boost Passer Clause: Limit one Baton Passer that has a way to boost its stats","reason":"rule"}
+{"line":17,"text":"|rule|Freeze Clause Mod: Limit one foe frozen","reason":"rule"}
+{"line":18,"text":"|rule|Baton Pass Stat Clause: No Baton Passer may have a way to boost its Speed","reason":"rule"}
+{"line":19,"text":"|","reason":"spacer"}
+{"line":20,"text":"|t:|1795206963","reason":"timestamp"}
+{"kind":"teamSize","line":21,"side":"near","size":6}
+{"kind":"teamSize","line":22,"side":"far","size":6}
+{"kind":"battleStart","line":23}
+{"kind":"switchIn","line":24,"who":{"side":"near","index":0},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"switchIn","line":25,"who":{"side":"far","index":0},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"turn","line":26,"number":1}
+{"line":27,"text":"|c|☆SoggyBagel64|hf!","reason":"chat"}
+{"line":28,"text":"|","reason":"spacer"}
+{"line":29,"text":"|t:|1795206978","reason":"timestamp"}
+{"kind":"switchIn","line":30,"who":{"side":"far","index":1},"replaces":{"side":"far","index":0},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":31,"user":{"side":"near","index":0},"move":"Ice Beam","target":{"side":"far","index":1}}
+{"kind":"damage","line":33,"who":{"side":"far","index":1},"hp":{"hp":89,"max":100},"effectiveness":"resisted","folded":[32]}
+{"line":34,"text":"|","reason":"spacer"}
+{"kind":"heal","line":35,"who":{"side":"far","index":1},"hp":{"hp":95,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":36,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":37,"number":2}
+{"line":38,"text":"|","reason":"spacer"}
+{"line":39,"text":"|t:|1795206991","reason":"timestamp"}
+{"kind":"move","line":40,"user":{"side":"near","index":0},"move":"Hydro Pump","target":{"side":"far","index":1}}
+{"kind":"damage","line":41,"who":{"side":"far","index":1},"hp":{"hp":52,"max":100}}
+{"kind":"move","line":42,"user":{"side":"far","index":1},"move":"Calm Mind","target":{"side":"far","index":1}}
+{"kind":"statChange","line":43,"who":{"side":"far","index":1},"stat":"spa","stages":1}
+{"kind":"statChange","line":44,"who":{"side":"far","index":1},"stat":"spd","stages":1}
+{"line":45,"text":"|","reason":"spacer"}
+{"kind":"heal","line":46,"who":{"side":"far","index":1},"hp":{"hp":59,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":47,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":48,"number":3}
+{"line":49,"text":"|","reason":"spacer"}
+{"line":50,"text":"|t:|1795206997","reason":"timestamp"}
+{"kind":"switchIn","line":51,"who":{"side":"near","index":1},"replaces":{"side":"near","index":0},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":52,"user":{"side":"far","index":1},"move":"Thunderbolt","target":{"side":"near","index":1}}
+{"kind":"damage","line":53,"who":{"side":"near","index":1},"hp":{"hp":87,"max":100}}
+{"line":54,"text":"|","reason":"spacer"}
+{"kind":"heal","line":55,"who":{"side":"far","index":1},"hp":{"hp":65,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":56,"who":{"side":"near","index":1},"hp":{"hp":93,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":57,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":58,"number":4}
+{"line":59,"text":"|","reason":"spacer"}
+{"line":60,"text":"|t:|1795207000","reason":"timestamp"}
+{"kind":"move","line":61,"user":{"side":"far","index":1},"move":"Substitute","target":{"side":"far","index":1}}
+{"kind":"effectStart","line":62,"who":{"side":"far","index":1},"effect":{"name":"Substitute"}}
+{"kind":"damage","line":63,"who":{"side":"far","index":1},"hp":{"hp":40,"max":100}}
+{"kind":"move","line":64,"user":{"side":"near","index":1},"move":"Seismic Toss","target":{"side":"far","index":1}}
+{"kind":"effectActivate","line":65,"who":{"side":"far","index":1},"effect":{"name":"Substitute"},"damage":true}
+{"line":66,"text":"|","reason":"spacer"}
+{"kind":"heal","line":67,"who":{"side":"far","index":1},"hp":{"hp":46,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":68,"who":{"side":"near","index":1},"hp":{"hp":99,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":69,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":70,"number":5}
+{"line":71,"text":"|","reason":"spacer"}
+{"line":72,"text":"|t:|1795207002","reason":"timestamp"}
+{"kind":"move","line":73,"user":{"side":"far","index":1},"move":"Ice Punch","target":{"side":"near","index":1}}
+{"kind":"damage","line":74,"who":{"side":"near","index":1},"hp":{"hp":89,"max":100}}
+{"kind":"status","line":75,"who":{"side":"near","index":1},"status":"frz"}
+{"kind":"cureStatus","line":76,"who":{"side":"near","index":1},"status":"frz","msg":true}
+{"kind":"move","line":77,"user":{"side":"near","index":1},"move":"Seismic Toss","target":{"side":"far","index":1}}
+{"kind":"effectEnd","line":78,"who":{"side":"far","index":1},"effect":{"name":"Substitute"}}
+{"line":79,"text":"|","reason":"spacer"}
+{"kind":"heal","line":80,"who":{"side":"far","index":1},"hp":{"hp":52,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":81,"who":{"side":"near","index":1},"hp":{"hp":95,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":82,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":83,"number":6}
+{"line":84,"text":"|","reason":"spacer"}
+{"line":85,"text":"|t:|1795207010","reason":"timestamp"}
+{"kind":"move","line":86,"user":{"side":"far","index":1},"move":"Substitute","target":{"side":"far","index":1}}
+{"kind":"effectStart","line":87,"who":{"side":"far","index":1},"effect":{"name":"Substitute"}}
+{"kind":"damage","line":88,"who":{"side":"far","index":1},"hp":{"hp":27,"max":100}}
+{"kind":"move","line":89,"user":{"side":"near","index":1},"move":"Seismic Toss","target":{"side":"far","index":1}}
+{"kind":"effectActivate","line":90,"who":{"side":"far","index":1},"effect":{"name":"Substitute"},"damage":true}
+{"line":91,"text":"|","reason":"spacer"}
+{"kind":"heal","line":92,"who":{"side":"far","index":1},"hp":{"hp":33,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":93,"who":{"side":"near","index":1},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":94,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":95,"number":7}
+{"line":96,"text":"|","reason":"spacer"}
+{"line":97,"text":"|t:|1795207012","reason":"timestamp"}
+{"kind":"move","line":98,"user":{"side":"far","index":1},"move":"Ice Punch","target":{"side":"near","index":1}}
+{"kind":"damage","line":99,"who":{"side":"near","index":1},"hp":{"hp":90,"max":100}}
+{"kind":"move","line":100,"user":{"side":"near","index":1},"move":"Seismic Toss","target":{"side":"far","index":1}}
+{"kind":"effectEnd","line":101,"who":{"side":"far","index":1},"effect":{"name":"Substitute"}}
+{"line":102,"text":"|","reason":"spacer"}
+{"kind":"heal","line":103,"who":{"side":"far","index":1},"hp":{"hp":40,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":104,"who":{"side":"near","index":1},"hp":{"hp":96,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":105,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":106,"number":8}
+{"line":107,"text":"|","reason":"spacer"}
+{"line":108,"text":"|t:|1795207023","reason":"timestamp"}
+{"kind":"move","line":109,"user":{"side":"far","index":1},"move":"Substitute","target":{"side":"far","index":1}}
+{"kind":"effectStart","line":110,"who":{"side":"far","index":1},"effect":{"name":"Substitute"}}
+{"kind":"damage","line":111,"who":{"side":"far","index":1},"hp":{"hp":15,"max":100}}
+{"kind":"move","line":112,"user":{"side":"near","index":1},"move":"Seismic Toss","target":{"side":"far","index":1}}
+{"kind":"effectActivate","line":113,"who":{"side":"far","index":1},"effect":{"name":"Substitute"},"damage":true}
+{"line":114,"text":"|","reason":"spacer"}
+{"kind":"heal","line":115,"who":{"side":"far","index":1},"hp":{"hp":21,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":116,"who":{"side":"near","index":1},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":117,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":118,"number":9}
+{"line":119,"text":"|","reason":"spacer"}
+{"line":120,"text":"|t:|1795207024","reason":"timestamp"}
+{"kind":"move","line":121,"user":{"side":"far","index":1},"move":"Ice Punch","target":{"side":"near","index":1}}
+{"kind":"damage","line":122,"who":{"side":"near","index":1},"hp":{"hp":89,"max":100}}
+{"kind":"move","line":123,"user":{"side":"near","index":1},"move":"Seismic Toss","target":{"side":"far","index":1}}
+{"kind":"effectEnd","line":124,"who":{"side":"far","index":1},"effect":{"name":"Substitute"}}
+{"line":125,"text":"|","reason":"spacer"}
+{"kind":"heal","line":126,"who":{"side":"far","index":1},"hp":{"hp":27,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":127,"who":{"side":"near","index":1},"hp":{"hp":95,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":128,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":129,"number":10}
+{"line":130,"text":"|","reason":"spacer"}
+{"line":131,"text":"|t:|1795207032","reason":"timestamp"}
+{"kind":"move","line":132,"user":{"side":"far","index":1},"move":"Ice Punch","target":{"side":"near","index":1}}
+{"kind":"damage","line":134,"who":{"side":"near","index":1},"hp":{"hp":74,"max":100},"crit":true,"folded":[133]}
+{"kind":"move","line":135,"user":{"side":"near","index":1},"move":"Seismic Toss","target":{"side":"far","index":1}}
+{"kind":"damage","line":136,"who":{"side":"far","index":1},"hp":{"hp":2,"max":100}}
+{"line":137,"text":"|","reason":"spacer"}
+{"kind":"heal","line":138,"who":{"side":"far","index":1},"hp":{"hp":8,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":139,"who":{"side":"near","index":1},"hp":{"hp":80,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":140,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":141,"number":11}
+{"line":142,"text":"|c|☆Nametab|ah gg","reason":"chat"}
+{"line":143,"text":"|c|☆Nametab|I have to play like this cos ur better","reason":"chat"}
+{"line":144,"text":"|","reason":"spacer"}
+{"line":145,"text":"|t:|1795207049","reason":"timestamp"}
+{"kind":"switchIn","line":146,"who":{"side":"far","index":0},"replaces":{"side":"far","index":1},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":147,"user":{"side":"near","index":1},"move":"Seismic Toss","target":{"side":"far","index":0}}
+{"kind":"damage","line":148,"who":{"side":"far","index":0},"hp":{"hp":63,"max":100}}
+{"line":149,"text":"|","reason":"spacer"}
+{"kind":"heal","line":150,"who":{"side":"far","index":0},"hp":{"hp":69,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":151,"who":{"side":"near","index":1},"hp":{"hp":86,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":152,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":153,"number":12}
+{"line":154,"text":"|","reason":"spacer"}
+{"line":155,"text":"|t:|1795207067","reason":"timestamp"}
+{"kind":"singleTurn","line":156,"who":{"side":"far","index":0},"effect":{"name":"Focus Punch","kind":"move"}}
+{"kind":"switchIn","line":157,"who":{"side":"near","index":2},"replaces":{"side":"near","index":1},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":158,"user":{"side":"far","index":0},"move":"Focus Punch","target":{"side":"near","index":2}}
+{"kind":"damage","line":160,"who":{"side":"near","index":2},"hp":{"hp":74,"max":100},"effectiveness":"resisted","folded":[159]}
+{"line":161,"text":"|","reason":"spacer"}
+{"kind":"heal","line":162,"who":{"side":"far","index":0},"hp":{"hp":75,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":163,"who":{"side":"near","index":2},"hp":{"hp":80,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":164,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":165,"number":13}
+{"line":166,"text":"|","reason":"spacer"}
+{"line":167,"text":"|t:|1795207085","reason":"timestamp"}
+{"kind":"switchIn","line":168,"who":{"side":"far","index":2},"replaces":{"side":"far","index":0},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"weather","line":169,"weather":"Sand","phase":"start","cause":{"name":"Sand Stream","kind":"ability"},"source":{"side":"far","index":2}}
+{"kind":"move","line":170,"user":{"side":"near","index":2},"move":"Psychic","target":{"side":"far","index":2}}
+{"kind":"immune","line":171,"who":{"side":"far","index":2}}
+{"line":172,"text":"|","reason":"spacer"}
+{"kind":"weather","line":173,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":174,"who":{"side":"near","index":2},"hp":{"hp":74,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":175,"who":{"side":"near","index":2},"hp":{"hp":80,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":176,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":177,"number":14}
+{"line":178,"text":"|c|☆Nametab|why are ur mono nat cute","reason":"chat"}
+{"line":179,"text":"|c|☆Nametab|smh","reason":"chat"}
+{"line":180,"text":"|c|☆SoggyBagel64|lol","reason":"chat"}
+{"line":181,"text":"|inactive|SoggyBagel64 has 270 seconds left.","reason":"timer"}
+{"line":182,"text":"|c|+yyyyyfyyyyy|cuz theyre so cute ","reason":"chat"}
+{"line":183,"text":"|","reason":"spacer"}
+{"line":184,"text":"|t:|1795207115","reason":"timestamp"}
+{"kind":"switchIn","line":185,"who":{"side":"far","index":1},"replaces":{"side":"far","index":2},"dragged":false,"hp":{"hp":8,"max":100}}
+{"kind":"move","line":186,"user":{"side":"near","index":2},"move":"Leech Seed","target":{"side":"far","index":1}}
+{"kind":"effectStart","line":187,"who":{"side":"far","index":1},"effect":{"name":"Leech Seed","kind":"move"}}
+{"line":188,"text":"|","reason":"spacer"}
+{"kind":"weather","line":189,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":190,"who":{"side":"near","index":2},"hp":{"hp":74,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":191,"who":{"side":"far","index":1},"hp":{"hp":15,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"damage","line":192,"who":{"side":"far","index":1},"hp":{"hp":2,"max":100},"cause":{"name":"Leech Seed"},"source":{"side":"near","index":2}}
+{"kind":"heal","line":193,"who":{"side":"near","index":2},"hp":{"hp":86,"max":100},"silent":true}
+{"kind":"heal","line":194,"who":{"side":"near","index":2},"hp":{"hp":93,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":195,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":196,"number":15}
+{"line":197,"text":"|inactive|SoggyBagel64 has 270 seconds left.","reason":"timer"}
+{"line":198,"text":"|","reason":"spacer"}
+{"line":199,"text":"|t:|1795207133","reason":"timestamp"}
+{"kind":"switchIn","line":200,"who":{"side":"far","index":2},"replaces":{"side":"far","index":1},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"switchIn","line":201,"who":{"side":"near","index":3},"replaces":{"side":"near","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"line":202,"text":"|","reason":"spacer"}
+{"kind":"weather","line":203,"weather":"Sand","phase":"upkeep"}
+{"line":204,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":205,"number":16}
+{"line":206,"text":"|","reason":"spacer"}
+{"line":207,"text":"|t:|1795207136","reason":"timestamp"}
+{"kind":"move","line":208,"user":{"side":"near","index":3},"move":"Spikes","target":{"side":"far","index":2}}
+{"kind":"sideStart","line":209,"side":"far","condition":{"name":"Spikes"}}
+{"kind":"move","line":210,"user":{"side":"far","index":2},"move":"Fire Blast","target":{"side":"near","index":3}}
+{"kind":"damage","line":212,"who":{"side":"near","index":3},"hp":{"hp":38,"max":100},"effectiveness":"super","folded":[211]}
+{"line":213,"text":"|","reason":"spacer"}
+{"kind":"weather","line":214,"weather":"Sand","phase":"upkeep"}
+{"kind":"heal","line":215,"who":{"side":"near","index":3},"hp":{"hp":44,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":216,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":217,"number":17}
+{"line":218,"text":"|","reason":"spacer"}
+{"line":219,"text":"|t:|1795207148","reason":"timestamp"}
+{"kind":"move","line":220,"user":{"side":"near","index":3},"move":"Protect","target":{"side":"near","index":3}}
+{"kind":"singleTurn","line":221,"who":{"side":"near","index":3},"effect":{"name":"Protect"}}
+{"kind":"move","line":222,"user":{"side":"far","index":2},"move":"Crunch","target":{"side":"near","index":3}}
+{"kind":"block","line":223,"who":{"side":"near","index":3},"effect":{"name":"Protect"}}
+{"line":224,"text":"|","reason":"spacer"}
+{"kind":"weather","line":225,"weather":"Sand","phase":"upkeep"}
+{"kind":"heal","line":226,"who":{"side":"near","index":3},"hp":{"hp":50,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":227,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":228,"number":18}
+{"line":229,"text":"|","reason":"spacer"}
+{"line":230,"text":"|t:|1795207166","reason":"timestamp"}
+{"kind":"switchIn","line":231,"who":{"side":"near","index":1},"replaces":{"side":"near","index":3},"dragged":false,"hp":{"hp":86,"max":100}}
+{"kind":"switchIn","line":232,"who":{"side":"far","index":3},"replaces":{"side":"far","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":233,"who":{"side":"far","index":3},"hp":{"hp":88,"max":100},"cause":{"name":"Spikes"}}
+{"line":234,"text":"|","reason":"spacer"}
+{"kind":"weather","line":235,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":236,"who":{"side":"near","index":1},"hp":{"hp":80,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":237,"who":{"side":"near","index":1},"hp":{"hp":86,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":238,"who":{"side":"far","index":3},"hp":{"hp":94,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":239,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":240,"number":19}
+{"line":241,"text":"|","reason":"spacer"}
+{"line":242,"text":"|t:|1795207176","reason":"timestamp"}
+{"kind":"switchIn","line":243,"who":{"side":"near","index":3},"replaces":{"side":"near","index":1},"dragged":false,"hp":{"hp":50,"max":100}}
+{"kind":"move","line":244,"user":{"side":"far","index":3},"move":"Rapid Spin","target":{"side":"near","index":3}}
+{"kind":"damage","line":246,"who":{"side":"near","index":3},"hp":{"hp":48,"max":100},"effectiveness":"resisted","folded":[245]}
+{"kind":"sideEnd","line":247,"side":"far","condition":{"name":"Spikes"},"cause":{"name":"Rapid Spin","kind":"move"},"source":{"side":"far","index":3}}
+{"line":248,"text":"|","reason":"spacer"}
+{"kind":"weather","line":249,"weather":"Sand","phase":"upkeep"}
+{"kind":"heal","line":250,"who":{"side":"near","index":3},"hp":{"hp":54,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":251,"who":{"side":"far","index":3},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":252,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":253,"number":20}
+{"line":254,"text":"|","reason":"spacer"}
+{"line":255,"text":"|t:|1795207179","reason":"timestamp"}
+{"kind":"move","line":256,"user":{"side":"near","index":3},"move":"Drill Peck","target":{"side":"far","index":3}}
+{"kind":"damage","line":257,"who":{"side":"far","index":3},"hp":{"hp":84,"max":100}}
+{"kind":"move","line":258,"user":{"side":"far","index":3},"move":"Spikes","target":{"side":"near","index":3}}
+{"kind":"sideStart","line":259,"side":"near","condition":{"name":"Spikes"}}
+{"line":260,"text":"|","reason":"spacer"}
+{"kind":"weather","line":261,"weather":"Sand","phase":"upkeep"}
+{"kind":"heal","line":262,"who":{"side":"near","index":3},"hp":{"hp":60,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":263,"who":{"side":"far","index":3},"hp":{"hp":91,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":264,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":265,"number":21}
+{"line":266,"text":"|","reason":"spacer"}
+{"line":267,"text":"|t:|1795207194","reason":"timestamp"}
+{"kind":"switchIn","line":268,"who":{"side":"far","index":0},"replaces":{"side":"far","index":3},"dragged":false,"hp":{"hp":75,"max":100}}
+{"kind":"move","line":269,"user":{"side":"near","index":3},"move":"Spikes","target":{"side":"far","index":0}}
+{"kind":"sideStart","line":270,"side":"far","condition":{"name":"Spikes"}}
+{"line":271,"text":"|","reason":"spacer"}
+{"kind":"weather","line":272,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":273,"who":{"side":"far","index":0},"hp":{"hp":69,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":274,"who":{"side":"far","index":0},"hp":{"hp":75,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":275,"who":{"side":"near","index":3},"hp":{"hp":66,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":276,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":277,"number":22}
+{"line":278,"text":"|","reason":"spacer"}
+{"line":279,"text":"|t:|1795207201","reason":"timestamp"}
+{"kind":"switchIn","line":280,"who":{"side":"near","index":2},"replaces":{"side":"near","index":3},"dragged":false,"hp":{"hp":93,"max":100}}
+{"kind":"damage","line":281,"who":{"side":"near","index":2},"hp":{"hp":80,"max":100},"cause":{"name":"Spikes"}}
+{"kind":"move","line":282,"user":{"side":"far","index":0},"move":"Spore","target":{"side":"near","index":2}}
+{"kind":"status","line":283,"who":{"side":"near","index":2},"status":"slp","cause":{"name":"Spore","kind":"move"}}
+{"line":284,"text":"|","reason":"spacer"}
+{"kind":"weather","line":285,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":286,"who":{"side":"far","index":0},"hp":{"hp":69,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":287,"who":{"side":"near","index":2},"hp":{"hp":74,"max":100},"status":"slp","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":288,"who":{"side":"far","index":0},"hp":{"hp":75,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":289,"who":{"side":"near","index":2},"hp":{"hp":80,"max":100},"status":"slp","cause":{"name":"Leftovers","kind":"item"}}
+{"line":290,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":291,"number":23}
+{"line":292,"text":"|","reason":"spacer"}
+{"line":293,"text":"|t:|1795207206","reason":"timestamp"}
+{"kind":"singleTurn","line":294,"who":{"side":"far","index":0},"effect":{"name":"Focus Punch","kind":"move"}}
+{"kind":"cureStatus","line":295,"who":{"side":"near","index":2},"status":"slp","cause":{"name":"Natural Cure","kind":"ability"},"silent":true}
+{"kind":"switchIn","line":296,"who":{"side":"near","index":0},"replaces":{"side":"near","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":297,"who":{"side":"near","index":0},"hp":{"hp":88,"max":100},"cause":{"name":"Spikes"}}
+{"kind":"move","line":298,"user":{"side":"far","index":0},"move":"Focus Punch","target":{"side":"near","index":0}}
+{"kind":"damage","line":300,"who":{"side":"near","index":0},"hp":{"hp":29,"max":100},"effectiveness":"resisted","folded":[299]}
+{"line":301,"text":"|","reason":"spacer"}
+{"kind":"weather","line":302,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":303,"who":{"side":"near","index":0},"hp":{"hp":23,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":304,"who":{"side":"far","index":0},"hp":{"hp":69,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":305,"who":{"side":"near","index":0},"hp":{"hp":29,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":306,"who":{"side":"far","index":0},"hp":{"hp":75,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":307,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":308,"number":24}
+{"line":309,"text":"|","reason":"spacer"}
+{"line":310,"text":"|t:|1795207240","reason":"timestamp"}
+{"kind":"switchIn","line":311,"who":{"side":"far","index":3},"replaces":{"side":"far","index":0},"dragged":false,"hp":{"hp":91,"max":100}}
+{"kind":"damage","line":312,"who":{"side":"far","index":3},"hp":{"hp":78,"max":100},"cause":{"name":"Spikes"}}
+{"kind":"move","line":313,"user":{"side":"near","index":0},"move":"Ice Beam","target":{"side":"far","index":3}}
+{"kind":"damage","line":315,"who":{"side":"far","index":3},"hp":{"hp":66,"max":100},"effectiveness":"resisted","folded":[314]}
+{"kind":"status","line":316,"who":{"side":"far","index":3},"status":"frz"}
+{"line":317,"text":"|","reason":"spacer"}
+{"kind":"weather","line":318,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":319,"who":{"side":"near","index":0},"hp":{"hp":23,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":320,"who":{"side":"near","index":0},"hp":{"hp":29,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":321,"who":{"side":"far","index":3},"hp":{"hp":72,"max":100},"status":"frz","cause":{"name":"Leftovers","kind":"item"}}
+{"line":322,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":323,"number":25}
+{"line":324,"text":"|c|☆SoggyBagel64|mb","reason":"chat"}
+{"line":325,"text":"|","reason":"spacer"}
+{"line":326,"text":"|t:|1795207248","reason":"timestamp"}
+{"kind":"move","line":327,"user":{"side":"near","index":0},"move":"Rapid Spin","target":{"side":"far","index":3}}
+{"kind":"damage","line":329,"who":{"side":"far","index":3},"hp":{"hp":71,"max":100},"status":"frz","effectiveness":"resisted","folded":[328]}
+{"kind":"sideEnd","line":330,"side":"near","condition":{"name":"Spikes"},"cause":{"name":"Rapid Spin","kind":"move"},"source":{"side":"near","index":0}}
+{"kind":"cant","line":331,"who":{"side":"far","index":3},"reason":{"name":"frz"}}
+{"line":332,"text":"|","reason":"spacer"}
+{"kind":"weather","line":333,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":334,"who":{"side":"near","index":0},"hp":{"hp":23,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":335,"who":{"side":"near","index":0},"hp":{"hp":29,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":336,"who":{"side":"far","index":3},"hp":{"hp":77,"max":100},"status":"frz","cause":{"name":"Leftovers","kind":"item"}}
+{"line":337,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":338,"number":26}
+{"line":339,"text":"|","reason":"spacer"}
+{"line":340,"text":"|t:|1795207252","reason":"timestamp"}
+{"kind":"move","line":341,"user":{"side":"near","index":0},"move":"Hydro Pump","target":{"side":"far","index":3}}
+{"kind":"damage","line":342,"who":{"side":"far","index":3},"hp":{"hp":25,"max":100},"status":"frz"}
+{"kind":"cant","line":343,"who":{"side":"far","index":3},"reason":{"name":"frz"}}
+{"line":344,"text":"|","reason":"spacer"}
+{"kind":"weather","line":345,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":346,"who":{"side":"near","index":0},"hp":{"hp":23,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":347,"who":{"side":"near","index":0},"hp":{"hp":29,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":348,"who":{"side":"far","index":3},"hp":{"hp":32,"max":100},"status":"frz","cause":{"name":"Leftovers","kind":"item"}}
+{"line":349,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":350,"number":27}
+{"line":351,"text":"|","reason":"spacer"}
+{"line":352,"text":"|t:|1795207255","reason":"timestamp"}
+{"kind":"move","line":353,"user":{"side":"near","index":0},"move":"Hydro Pump","target":{"side":"far","index":3},"miss":true}
+{"kind":"miss","line":354,"user":{"side":"near","index":0},"target":{"side":"far","index":3}}
+{"kind":"cant","line":355,"who":{"side":"far","index":3},"reason":{"name":"frz"}}
+{"line":356,"text":"|","reason":"spacer"}
+{"kind":"weather","line":357,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":358,"who":{"side":"near","index":0},"hp":{"hp":23,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":359,"who":{"side":"near","index":0},"hp":{"hp":29,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":360,"who":{"side":"far","index":3},"hp":{"hp":38,"max":100},"status":"frz","cause":{"name":"Leftovers","kind":"item"}}
+{"line":361,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":362,"number":28}
+{"line":363,"text":"|","reason":"spacer"}
+{"line":364,"text":"|t:|1795207260","reason":"timestamp"}
+{"kind":"move","line":365,"user":{"side":"near","index":0},"move":"Hydro Pump","target":{"side":"far","index":3}}
+{"kind":"damage","line":366,"who":{"side":"far","index":3},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":367,"who":{"side":"far","index":3}}
+{"line":368,"text":"|","reason":"spacer"}
+{"line":369,"text":"|t:|1795207263","reason":"timestamp"}
+{"kind":"switchIn","line":370,"who":{"side":"far","index":4},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":371,"who":{"side":"far","index":4},"hp":{"hp":88,"max":100},"cause":{"name":"Spikes"}}
+{"line":372,"text":"|","reason":"spacer"}
+{"kind":"weather","line":373,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":374,"who":{"side":"near","index":0},"hp":{"hp":23,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":375,"who":{"side":"near","index":0},"hp":{"hp":29,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":376,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":377,"number":29}
+{"line":378,"text":"|","reason":"spacer"}
+{"line":379,"text":"|t:|1795207264","reason":"timestamp"}
+{"kind":"move","line":380,"user":{"side":"far","index":4},"move":"Hidden Power","target":{"side":"near","index":0}}
+{"kind":"damage","line":382,"who":{"side":"near","index":0},"hp":{"hp":0,"max":100},"effectiveness":"super","folded":[381]}
+{"kind":"faint","line":383,"who":{"side":"near","index":0}}
+{"line":384,"text":"|","reason":"spacer"}
+{"line":385,"text":"|t:|1795207266","reason":"timestamp"}
+{"kind":"switchIn","line":386,"who":{"side":"near","index":4},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"ability","line":387,"who":{"side":"near","index":4},"ability":"Intimidate","detail":"boost"}
+{"kind":"statChange","line":388,"who":{"side":"far","index":4},"stat":"atk","stages":-1}
+{"line":389,"text":"|","reason":"spacer"}
+{"kind":"weather","line":390,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":391,"who":{"side":"near","index":4},"hp":{"hp":94,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":392,"who":{"side":"near","index":4},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":393,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":394,"number":30}
+{"line":395,"text":"|","reason":"spacer"}
+{"line":396,"text":"|t:|1795207270","reason":"timestamp"}
+{"kind":"switchIn","line":397,"who":{"side":"far","index":5},"replaces":{"side":"far","index":4},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":398,"who":{"side":"far","index":5},"hp":{"hp":88,"max":100},"cause":{"name":"Spikes"}}
+{"kind":"move","line":399,"user":{"side":"near","index":4},"move":"Brick Break","target":{"side":"far","index":5}}
+{"kind":"damage","line":400,"who":{"side":"far","index":5},"hp":{"hp":71,"max":100}}
+{"line":401,"text":"|","reason":"spacer"}
+{"kind":"weather","line":402,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":403,"who":{"side":"near","index":4},"hp":{"hp":94,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":404,"who":{"side":"far","index":5},"hp":{"hp":65,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":405,"who":{"side":"near","index":4},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":406,"who":{"side":"far","index":5},"hp":{"hp":71,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":407,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":408,"number":31}
+{"line":409,"text":"|","reason":"spacer"}
+{"line":410,"text":"|t:|1795207291","reason":"timestamp"}
+{"kind":"switchIn","line":411,"who":{"side":"near","index":2},"replaces":{"side":"near","index":4},"dragged":false,"hp":{"hp":80,"max":100}}
+{"kind":"move","line":412,"user":{"side":"far","index":5},"move":"Baton Pass","target":{"side":"far","index":5}}
+{"line":413,"text":"|","reason":"spacer"}
+{"line":414,"text":"|t:|1795207294","reason":"timestamp"}
+{"kind":"switchIn","line":415,"who":{"side":"far","index":4},"replaces":{"side":"far","index":5},"dragged":false,"cause":{"name":"Baton Pass"},"hp":{"hp":88,"max":100}}
+{"kind":"damage","line":416,"who":{"side":"far","index":4},"hp":{"hp":76,"max":100},"cause":{"name":"Spikes"}}
+{"line":417,"text":"|","reason":"spacer"}
+{"kind":"weather","line":418,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":419,"who":{"side":"near","index":2},"hp":{"hp":74,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":420,"who":{"side":"near","index":2},"hp":{"hp":80,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":421,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":422,"number":32}
+{"line":423,"text":"|","reason":"spacer"}
+{"line":424,"text":"|t:|1795207296","reason":"timestamp"}
+{"kind":"move","line":425,"user":{"side":"far","index":4},"move":"Hidden Power","target":{"side":"near","index":2}}
+{"kind":"damage","line":427,"who":{"side":"near","index":2},"hp":{"hp":4,"max":100},"effectiveness":"super","folded":[426]}
+{"kind":"move","line":428,"user":{"side":"near","index":2},"move":"Hidden Power","target":{"side":"far","index":4}}
+{"kind":"damage","line":430,"who":{"side":"far","index":4},"hp":{"hp":0,"max":100},"effectiveness":"super","folded":[429]}
+{"kind":"faint","line":431,"who":{"side":"far","index":4}}
+{"line":432,"text":"|","reason":"spacer"}
+{"line":433,"text":"|t:|1795207308","reason":"timestamp"}
+{"kind":"switchIn","line":434,"who":{"side":"far","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":435,"who":{"side":"far","index":2},"hp":{"hp":88,"max":100},"cause":{"name":"Spikes"}}
+{"line":436,"text":"|","reason":"spacer"}
+{"kind":"weather","line":437,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":438,"who":{"side":"near","index":2},"hp":{"hp":0,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"faint","line":439,"who":{"side":"near","index":2}}
+{"kind":"heal","line":440,"who":{"side":"far","index":2},"hp":{"hp":94,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":441,"text":"|upkeep","reason":"upkeep"}
+{"line":442,"text":"|","reason":"spacer"}
+{"line":443,"text":"|t:|1795207312","reason":"timestamp"}
+{"kind":"switchIn","line":444,"who":{"side":"near","index":5},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"turn","line":445,"number":33}
+{"line":446,"text":"|","reason":"spacer"}
+{"line":447,"text":"|t:|1795207315","reason":"timestamp"}
+{"kind":"move","line":448,"user":{"side":"near","index":5},"move":"Earthquake","target":{"side":"far","index":2}}
+{"kind":"damage","line":450,"who":{"side":"far","index":2},"hp":{"hp":1,"max":100},"effectiveness":"super","folded":[449]}
+{"kind":"move","line":451,"user":{"side":"far","index":2},"move":"Hidden Power","target":{"side":"near","index":5}}
+{"kind":"damage","line":453,"who":{"side":"near","index":5},"hp":{"hp":0,"max":100},"effectiveness":"super","folded":[452]}
+{"kind":"faint","line":454,"who":{"side":"near","index":5}}
+{"line":455,"text":"|","reason":"spacer"}
+{"line":456,"text":"|t:|1795207320","reason":"timestamp"}
+{"kind":"switchIn","line":457,"who":{"side":"near","index":4},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"ability","line":458,"who":{"side":"near","index":4},"ability":"Intimidate","detail":"boost"}
+{"kind":"statChange","line":459,"who":{"side":"far","index":2},"stat":"atk","stages":-1}
+{"line":460,"text":"|","reason":"spacer"}
+{"kind":"weather","line":461,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":462,"who":{"side":"near","index":4},"hp":{"hp":94,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":463,"who":{"side":"near","index":4},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":464,"who":{"side":"far","index":2},"hp":{"hp":7,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":465,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":466,"number":34}
+{"line":467,"text":"|","reason":"spacer"}
+{"line":468,"text":"|t:|1795207332","reason":"timestamp"}
+{"kind":"switchIn","line":469,"who":{"side":"far","index":1},"replaces":{"side":"far","index":2},"dragged":false,"hp":{"hp":2,"max":100}}
+{"kind":"damage","line":470,"who":{"side":"far","index":1},"hp":{"hp":0,"max":100},"cause":{"name":"Spikes"}}
+{"kind":"faint","line":471,"who":{"side":"far","index":1}}
+{"line":472,"text":"|","reason":"spacer"}
+{"line":473,"text":"|t:|1795207334","reason":"timestamp"}
+{"kind":"switchIn","line":474,"who":{"side":"far","index":5},"dragged":false,"hp":{"hp":71,"max":100}}
+{"kind":"damage","line":475,"who":{"side":"far","index":5},"hp":{"hp":59,"max":100},"cause":{"name":"Spikes"}}
+{"line":476,"text":"|","reason":"spacer"}
+{"kind":"weather","line":477,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":478,"who":{"side":"near","index":4},"hp":{"hp":94,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":479,"who":{"side":"far","index":5},"hp":{"hp":53,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":480,"who":{"side":"near","index":4},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":481,"who":{"side":"far","index":5},"hp":{"hp":59,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":482,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":483,"number":35}
+{"line":484,"text":"|","reason":"spacer"}
+{"line":485,"text":"|t:|1795207345","reason":"timestamp"}
+{"kind":"switchIn","line":486,"who":{"side":"near","index":1},"replaces":{"side":"near","index":4},"dragged":false,"hp":{"hp":86,"max":100}}
+{"kind":"move","line":487,"user":{"side":"far","index":5},"move":"Ice Beam","target":{"side":"near","index":1}}
+{"kind":"damage","line":488,"who":{"side":"near","index":1},"hp":{"hp":77,"max":100}}
+{"line":489,"text":"|","reason":"spacer"}
+{"kind":"weather","line":490,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":491,"who":{"side":"far","index":5},"hp":{"hp":53,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":492,"who":{"side":"near","index":1},"hp":{"hp":71,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":493,"who":{"side":"far","index":5},"hp":{"hp":59,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":494,"who":{"side":"near","index":1},"hp":{"hp":77,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":495,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":496,"number":36}
+{"line":497,"text":"|","reason":"spacer"}
+{"line":498,"text":"|t:|1795207349","reason":"timestamp"}
+{"kind":"move","line":499,"user":{"side":"far","index":5},"move":"Wish","target":{"side":"far","index":5}}
+{"kind":"move","line":500,"user":{"side":"near","index":1},"move":"Thunder Wave","target":{"side":"far","index":5}}
+{"kind":"status","line":501,"who":{"side":"far","index":5},"status":"par"}
+{"line":502,"text":"|","reason":"spacer"}
+{"kind":"weather","line":503,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":504,"who":{"side":"near","index":1},"hp":{"hp":71,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":505,"who":{"side":"far","index":5},"hp":{"hp":53,"max":100},"status":"par","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":506,"who":{"side":"near","index":1},"hp":{"hp":77,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":507,"who":{"side":"far","index":5},"hp":{"hp":59,"max":100},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":508,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":509,"number":37}
+{"line":510,"text":"|","reason":"spacer"}
+{"line":511,"text":"|t:|1795207358","reason":"timestamp"}
+{"kind":"move","line":512,"user":{"side":"near","index":1},"move":"Wish","target":{"side":"near","index":1}}
+{"kind":"move","line":513,"user":{"side":"far","index":5},"move":"Ice Beam","target":{"side":"near","index":1}}
+{"kind":"damage","line":514,"who":{"side":"near","index":1},"hp":{"hp":68,"max":100}}
+{"line":515,"text":"|","reason":"spacer"}
+{"kind":"heal","line":516,"who":{"side":"far","index":5},"hp":{"hp":100,"max":100},"status":"par","cause":{"name":"Wish","kind":"move"},"wisher":{"side":"far","index":5}}
+{"kind":"weather","line":517,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":518,"who":{"side":"near","index":1},"hp":{"hp":61,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":519,"who":{"side":"far","index":5},"hp":{"hp":94,"max":100},"status":"par","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":520,"who":{"side":"near","index":1},"hp":{"hp":68,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":521,"who":{"side":"far","index":5},"hp":{"hp":100,"max":100},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":522,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":523,"number":38}
+{"line":524,"text":"|","reason":"spacer"}
+{"line":525,"text":"|t:|1795207368","reason":"timestamp"}
+{"kind":"move","line":526,"user":{"side":"near","index":1},"move":"Seismic Toss","target":{"side":"far","index":5}}
+{"kind":"damage","line":527,"who":{"side":"far","index":5},"hp":{"hp":79,"max":100},"status":"par"}
+{"kind":"move","line":528,"user":{"side":"far","index":5},"move":"Ice Beam","target":{"side":"near","index":1}}
+{"kind":"damage","line":529,"who":{"side":"near","index":1},"hp":{"hp":59,"max":100}}
+{"line":530,"text":"|","reason":"spacer"}
+{"kind":"heal","line":531,"who":{"side":"near","index":1},"hp":{"hp":100,"max":100},"cause":{"name":"Wish","kind":"move"},"wisher":{"side":"near","index":1}}
+{"kind":"weather","line":532,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":533,"who":{"side":"near","index":1},"hp":{"hp":94,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":534,"who":{"side":"far","index":5},"hp":{"hp":73,"max":100},"status":"par","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":535,"who":{"side":"near","index":1},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":536,"who":{"side":"far","index":5},"hp":{"hp":79,"max":100},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":537,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":538,"number":39}
+{"line":539,"text":"|","reason":"spacer"}
+{"line":540,"text":"|t:|1795207381","reason":"timestamp"}
+{"kind":"switchIn","line":541,"who":{"side":"far","index":0},"replaces":{"side":"far","index":5},"dragged":false,"hp":{"hp":75,"max":100}}
+{"kind":"damage","line":542,"who":{"side":"far","index":0},"hp":{"hp":63,"max":100},"cause":{"name":"Spikes"}}
+{"kind":"move","line":543,"user":{"side":"near","index":1},"move":"Wish","target":{"side":"near","index":1}}
+{"line":544,"text":"|","reason":"spacer"}
+{"kind":"weather","line":545,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":546,"who":{"side":"far","index":0},"hp":{"hp":57,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":547,"who":{"side":"near","index":1},"hp":{"hp":94,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":548,"who":{"side":"far","index":0},"hp":{"hp":63,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":549,"who":{"side":"near","index":1},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":550,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":551,"number":40}
+{"line":552,"text":"|","reason":"spacer"}
+{"line":553,"text":"|t:|1795207384","reason":"timestamp"}
+{"kind":"switchIn","line":554,"who":{"side":"near","index":3},"replaces":{"side":"near","index":1},"dragged":false,"hp":{"hp":66,"max":100}}
+{"kind":"move","line":555,"user":{"side":"far","index":0},"move":"Spore","target":{"side":"near","index":3}}
+{"kind":"status","line":556,"who":{"side":"near","index":3},"status":"slp","cause":{"name":"Spore","kind":"move"}}
+{"line":557,"text":"|","reason":"spacer"}
+{"kind":"heal","line":558,"who":{"side":"near","index":3},"hp":{"hp":100,"max":100},"status":"slp","cause":{"name":"Wish","kind":"move"},"wisher":{"side":"near","index":1}}
+{"kind":"weather","line":559,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":560,"who":{"side":"far","index":0},"hp":{"hp":57,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":561,"who":{"side":"far","index":0},"hp":{"hp":63,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":562,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":563,"number":41}
+{"line":564,"text":"|","reason":"spacer"}
+{"line":565,"text":"|t:|1795207388","reason":"timestamp"}
+{"kind":"switchIn","line":566,"who":{"side":"near","index":4},"replaces":{"side":"near","index":3},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"ability","line":567,"who":{"side":"near","index":4},"ability":"Intimidate","detail":"boost"}
+{"kind":"statChange","line":568,"who":{"side":"far","index":0},"stat":"atk","stages":-1}
+{"kind":"move","line":569,"user":{"side":"far","index":0},"move":"Hidden Power","target":{"side":"near","index":4}}
+{"kind":"damage","line":571,"who":{"side":"near","index":4},"hp":{"hp":61,"max":100},"effectiveness":"super","folded":[570]}
+{"line":572,"text":"|","reason":"spacer"}
+{"kind":"weather","line":573,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":574,"who":{"side":"near","index":4},"hp":{"hp":55,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":575,"who":{"side":"far","index":0},"hp":{"hp":57,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":576,"who":{"side":"near","index":4},"hp":{"hp":61,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":577,"who":{"side":"far","index":0},"hp":{"hp":63,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":578,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":579,"number":42}
+{"line":580,"text":"|","reason":"spacer"}
+{"line":581,"text":"|t:|1795207407","reason":"timestamp"}
+{"kind":"switchIn","line":582,"who":{"side":"far","index":2},"replaces":{"side":"far","index":0},"dragged":false,"hp":{"hp":7,"max":100}}
+{"kind":"damage","line":583,"who":{"side":"far","index":2},"hp":{"hp":0,"max":100},"cause":{"name":"Spikes"}}
+{"kind":"faint","line":584,"who":{"side":"far","index":2}}
+{"line":585,"text":"|","reason":"spacer"}
+{"line":586,"text":"|t:|1795207409","reason":"timestamp"}
+{"kind":"switchIn","line":587,"who":{"side":"far","index":5},"dragged":false,"hp":{"hp":79,"max":100},"status":"par"}
+{"kind":"damage","line":588,"who":{"side":"far","index":5},"hp":{"hp":67,"max":100},"status":"par","cause":{"name":"Spikes"}}
+{"line":589,"text":"|","reason":"spacer"}
+{"kind":"weather","line":590,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":591,"who":{"side":"near","index":4},"hp":{"hp":55,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":592,"who":{"side":"far","index":5},"hp":{"hp":61,"max":100},"status":"par","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":593,"who":{"side":"near","index":4},"hp":{"hp":61,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":594,"who":{"side":"far","index":5},"hp":{"hp":67,"max":100},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":595,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":596,"number":43}
+{"line":597,"text":"|","reason":"spacer"}
+{"line":598,"text":"|t:|1795207412","reason":"timestamp"}
+{"kind":"switchIn","line":599,"who":{"side":"near","index":1},"replaces":{"side":"near","index":4},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":600,"user":{"side":"far","index":5},"move":"Wish","target":{"side":"far","index":5}}
+{"line":601,"text":"|","reason":"spacer"}
+{"kind":"weather","line":602,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":603,"who":{"side":"near","index":1},"hp":{"hp":94,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":604,"who":{"side":"far","index":5},"hp":{"hp":61,"max":100},"status":"par","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":605,"who":{"side":"near","index":1},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":606,"who":{"side":"far","index":5},"hp":{"hp":67,"max":100},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":607,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":608,"number":44}
+{"line":609,"text":"|","reason":"spacer"}
+{"line":610,"text":"|t:|1795207418","reason":"timestamp"}
+{"kind":"move","line":611,"user":{"side":"near","index":1},"move":"Seismic Toss","target":{"side":"far","index":5}}
+{"kind":"damage","line":612,"who":{"side":"far","index":5},"hp":{"hp":45,"max":100},"status":"par"}
+{"kind":"cant","line":613,"who":{"side":"far","index":5},"reason":{"name":"par"}}
+{"line":614,"text":"|","reason":"spacer"}
+{"kind":"heal","line":615,"who":{"side":"far","index":5},"hp":{"hp":95,"max":100},"status":"par","cause":{"name":"Wish","kind":"move"},"wisher":{"side":"far","index":5}}
+{"kind":"weather","line":616,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":617,"who":{"side":"near","index":1},"hp":{"hp":94,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":618,"who":{"side":"far","index":5},"hp":{"hp":89,"max":100},"status":"par","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":619,"who":{"side":"near","index":1},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":620,"who":{"side":"far","index":5},"hp":{"hp":95,"max":100},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":621,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":622,"number":45}
+{"line":623,"text":"|","reason":"spacer"}
+{"line":624,"text":"|t:|1795207423","reason":"timestamp"}
+{"kind":"move","line":625,"user":{"side":"near","index":1},"move":"Wish","target":{"side":"near","index":1}}
+{"kind":"cant","line":626,"who":{"side":"far","index":5},"reason":{"name":"par"}}
+{"line":627,"text":"|","reason":"spacer"}
+{"kind":"weather","line":628,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":629,"who":{"side":"near","index":1},"hp":{"hp":94,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":630,"who":{"side":"far","index":5},"hp":{"hp":89,"max":100},"status":"par","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":631,"who":{"side":"near","index":1},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":632,"who":{"side":"far","index":5},"hp":{"hp":95,"max":100},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":633,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":634,"number":46}
+{"line":635,"text":"|","reason":"spacer"}
+{"line":636,"text":"|t:|1795207427","reason":"timestamp"}
+{"kind":"move","line":637,"user":{"side":"near","index":1},"move":"Seismic Toss","target":{"side":"far","index":5}}
+{"kind":"damage","line":638,"who":{"side":"far","index":5},"hp":{"hp":73,"max":100},"status":"par"}
+{"kind":"move","line":639,"user":{"side":"far","index":5},"move":"Ice Beam","target":{"side":"near","index":1}}
+{"kind":"damage","line":640,"who":{"side":"near","index":1},"hp":{"hp":91,"max":100}}
+{"line":641,"text":"|","reason":"spacer"}
+{"kind":"heal","line":642,"who":{"side":"near","index":1},"hp":{"hp":100,"max":100},"cause":{"name":"Wish","kind":"move"},"wisher":{"side":"near","index":1}}
+{"kind":"weather","line":643,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":644,"who":{"side":"near","index":1},"hp":{"hp":94,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":645,"who":{"side":"far","index":5},"hp":{"hp":67,"max":100},"status":"par","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":646,"who":{"side":"near","index":1},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":647,"who":{"side":"far","index":5},"hp":{"hp":73,"max":100},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":648,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":649,"number":47}
+{"line":650,"text":"|","reason":"spacer"}
+{"line":651,"text":"|t:|1795207429","reason":"timestamp"}
+{"kind":"move","line":652,"user":{"side":"near","index":1},"move":"Seismic Toss","target":{"side":"far","index":5}}
+{"kind":"damage","line":653,"who":{"side":"far","index":5},"hp":{"hp":52,"max":100},"status":"par"}
+{"kind":"move","line":654,"user":{"side":"far","index":5},"move":"Wish","target":{"side":"far","index":5}}
+{"line":655,"text":"|","reason":"spacer"}
+{"kind":"weather","line":656,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":657,"who":{"side":"near","index":1},"hp":{"hp":94,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":658,"who":{"side":"far","index":5},"hp":{"hp":46,"max":100},"status":"par","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":659,"who":{"side":"near","index":1},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":660,"who":{"side":"far","index":5},"hp":{"hp":52,"max":100},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":661,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":662,"number":48}
+{"line":663,"text":"|","reason":"spacer"}
+{"line":664,"text":"|t:|1795207437","reason":"timestamp"}
+{"kind":"move","line":665,"user":{"side":"near","index":1},"move":"Thunder Wave","target":{"side":"far","index":5}}
+{"kind":"fail","line":666,"who":{"side":"far","index":5},"effect":{"name":"par"}}
+{"kind":"move","line":667,"user":{"side":"far","index":5},"move":"Surf","target":{"side":"near","index":1}}
+{"kind":"damage","line":668,"who":{"side":"near","index":1},"hp":{"hp":87,"max":100}}
+{"line":669,"text":"|","reason":"spacer"}
+{"kind":"heal","line":670,"who":{"side":"far","index":5},"hp":{"hp":100,"max":100},"status":"par","cause":{"name":"Wish","kind":"move"},"wisher":{"side":"far","index":5}}
+{"kind":"weather","line":671,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":672,"who":{"side":"near","index":1},"hp":{"hp":80,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":673,"who":{"side":"far","index":5},"hp":{"hp":94,"max":100},"status":"par","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":674,"who":{"side":"near","index":1},"hp":{"hp":87,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":675,"who":{"side":"far","index":5},"hp":{"hp":100,"max":100},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":676,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":677,"number":49}
+{"line":678,"text":"|","reason":"spacer"}
+{"line":679,"text":"|t:|1795207443","reason":"timestamp"}
+{"kind":"move","line":680,"user":{"side":"near","index":1},"move":"Thunder Wave","target":{"side":"far","index":5}}
+{"kind":"fail","line":681,"who":{"side":"far","index":5},"effect":{"name":"par"}}
+{"kind":"cant","line":682,"who":{"side":"far","index":5},"reason":{"name":"par"}}
+{"line":683,"text":"|","reason":"spacer"}
+{"kind":"weather","line":684,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":685,"who":{"side":"near","index":1},"hp":{"hp":80,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":686,"who":{"side":"far","index":5},"hp":{"hp":94,"max":100},"status":"par","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":687,"who":{"side":"near","index":1},"hp":{"hp":87,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":688,"who":{"side":"far","index":5},"hp":{"hp":100,"max":100},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":689,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":690,"number":50}
+{"line":691,"text":"|","reason":"spacer"}
+{"line":692,"text":"|t:|1795207451","reason":"timestamp"}
+{"kind":"switchIn","line":693,"who":{"side":"near","index":3},"replaces":{"side":"near","index":1},"dragged":false,"hp":{"hp":100,"max":100},"status":"slp"}
+{"kind":"move","line":694,"user":{"side":"far","index":5},"move":"Wish","target":{"side":"far","index":5}}
+{"line":695,"text":"|","reason":"spacer"}
+{"kind":"weather","line":696,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":697,"who":{"side":"far","index":5},"hp":{"hp":94,"max":100},"status":"par","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":698,"who":{"side":"far","index":5},"hp":{"hp":100,"max":100},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":699,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":700,"number":51}
+{"line":701,"text":"|","reason":"spacer"}
+{"line":702,"text":"|t:|1795207478","reason":"timestamp"}
+{"kind":"cant","line":703,"who":{"side":"near","index":3},"reason":{"name":"slp"}}
+{"kind":"move","line":704,"user":{"side":"far","index":5},"move":"Baton Pass","target":{"side":"far","index":5}}
+{"line":705,"text":"|","reason":"spacer"}
+{"line":706,"text":"|t:|1795207481","reason":"timestamp"}
+{"kind":"switchIn","line":707,"who":{"side":"far","index":0},"replaces":{"side":"far","index":5},"dragged":false,"cause":{"name":"Baton Pass"},"hp":{"hp":63,"max":100}}
+{"kind":"damage","line":708,"who":{"side":"far","index":0},"hp":{"hp":51,"max":100},"cause":{"name":"Spikes"}}
+{"line":709,"text":"|","reason":"spacer"}
+{"kind":"heal","line":710,"who":{"side":"far","index":0},"hp":{"hp":100,"max":100},"cause":{"name":"Wish","kind":"move"},"wisher":{"side":"far","index":5}}
+{"kind":"weather","line":711,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":712,"who":{"side":"far","index":0},"hp":{"hp":95,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":713,"who":{"side":"far","index":0},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":714,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":715,"number":52}
+{"line":716,"text":"|","reason":"spacer"}
+{"line":717,"text":"|t:|1795207489","reason":"timestamp"}
+{"kind":"singleTurn","line":718,"who":{"side":"far","index":0},"effect":{"name":"Focus Punch","kind":"move"}}
+{"kind":"cureStatus","line":719,"who":{"side":"near","index":3},"status":"slp","msg":true}
+{"kind":"move","line":720,"user":{"side":"near","index":3},"move":"Drill Peck","target":{"side":"far","index":0}}
+{"kind":"damage","line":722,"who":{"side":"far","index":0},"hp":{"hp":0,"max":100},"effectiveness":"super","folded":[721]}
+{"kind":"faint","line":723,"who":{"side":"far","index":0}}
+{"line":724,"text":"|","reason":"spacer"}
+{"line":725,"text":"|t:|1795207495","reason":"timestamp"}
+{"kind":"switchIn","line":726,"who":{"side":"far","index":5},"dragged":false,"hp":{"hp":100,"max":100},"status":"par"}
+{"kind":"damage","line":727,"who":{"side":"far","index":5},"hp":{"hp":88,"max":100},"status":"par","cause":{"name":"Spikes"}}
+{"line":728,"text":"|","reason":"spacer"}
+{"kind":"weather","line":729,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":730,"who":{"side":"far","index":5},"hp":{"hp":82,"max":100},"status":"par","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":731,"who":{"side":"far","index":5},"hp":{"hp":88,"max":100},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":732,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":733,"number":53}
+{"kind":"message","line":734,"text":"Nametab forfeited."}
+{"line":735,"text":"|","reason":"spacer"}
+{"kind":"win","line":736,"side":"near","name":"SoggyBagel64"}
+{"line":737,"text":"|c|☆SoggyBagel64|ggs","reason":"chat"}
