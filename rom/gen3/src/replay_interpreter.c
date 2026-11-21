@@ -8,6 +8,7 @@
 #include "palette.h"
 #include "pokemon.h"
 #include "replay_interpreter.h"
+#include "replay_ops.h"
 #include "replay_stream.h"
 #include "test_runner.h"
 #include "text.h"
@@ -23,8 +24,6 @@
 // controller is busy, no text prints and no wait runs, it runs one step of the current op. An op that needs two
 // controller commands for one battler emits one, returns FALSE, and emits the other on its next
 // step. When an op returns TRUE, the next op starts on the next frame.
-
-typedef bool32 (*ReplayOpFunc)(const volatile u8 *operands, u32 step);
 
 struct ReplayState
 {
@@ -59,6 +58,10 @@ static const ReplayOpFunc sOps[] =
     [REPLAY_OP_PRINT]    = Op_Print,
     [REPLAY_OP_INTRO]    = Op_Intro,
     [REPLAY_OP_SEND_OUT] = Op_SendOut,
+    [REPLAY_OP_MOVE]     = Replay_OpMove,
+    [REPLAY_OP_HIT]      = Replay_OpHit,
+    [REPLAY_OP_HP]       = Replay_OpHp,
+    [REPLAY_OP_FAINT]    = Replay_OpFaint,
 };
 
 // The battle outcome of each REPLAY_OUTCOME_*. A tie and an unknown end are draws.
@@ -193,10 +196,14 @@ static bool32 Op_Turn(const volatile u8 *operands, u32 step)
     return TRUE;
 }
 
-
-static u32 GetReplayBattler(u32 side)
+u32 Replay_GetBattler(u32 side)
 {
     return GetBattlerAtPosition(sSidePositions[side]);
+}
+
+void Replay_Wait(u32 frames)
+{
+    sReplay.wait = frames;
 }
 
 // A mon takes the field: its party slot gets the stream's HP, at most its max HP, and status, and
@@ -237,7 +244,7 @@ static bool32 Op_Print(const volatile u8 *operands, u32 step)
     gBattle_BG0_X = 0;
     gBattle_BG0_Y = 0;
     BattlePutTextOnWindow(gDisplayedStringBattle, B_WIN_MSG);
-    sReplay.wait = B_WAIT_TIME_LONG;
+    Replay_Wait(B_WAIT_TIME_LONG);
     return FALSE;
 }
 
@@ -256,7 +263,7 @@ static bool32 Op_Intro(const volatile u8 *operands, u32 step)
 // for each side (BATTLE_INTRO_STATE_TRAINER_1_SEND_OUT_ANIM, _PRINT_PLAYER_1_SEND_OUT_TEXT).
 static bool32 Op_SendOut(const volatile u8 *operands, u32 step)
 {
-    u32 battler = GetReplayBattler(operands[0]);
+    u32 battler = Replay_GetBattler(operands[0]);
 
     if (step != 0)
         return TRUE;

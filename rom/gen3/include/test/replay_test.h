@@ -54,6 +54,10 @@ void ReplayStream_Turn(u32 number);
 void ReplayStream_Print(const u8 *text);
 void ReplayStream_Intro(void);
 void ReplayStream_SendOut(u32 side, u32 slot, u32 hp, u32 status);
+void ReplayStream_Move(u32 userSide, u32 targetSide, u32 move);
+void ReplayStream_Hit(u32 side, u32 effectiveness);
+void ReplayStream_Hp(u32 side, u32 hp);
+void ReplayStream_Faint(u32 side);
 // Any op with any size byte, for streams the interpreter must refuse.
 void ReplayStream_Op(u32 op, u32 size, const u8 *operands);
 // Overwrites stream bytes, for streams the interpreter must refuse.

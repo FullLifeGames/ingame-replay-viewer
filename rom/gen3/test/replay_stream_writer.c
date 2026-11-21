@@ -142,6 +142,30 @@ void ReplayStream_SendOut(u32 side, u32 slot, u32 hp, u32 status)
     ReplayStream_Op(REPLAY_OP_SEND_OUT, REPLAY_OP_SEND_OUT_SIZE, operands);
 }
 
+void ReplayStream_Move(u32 userSide, u32 targetSide, u32 move)
+{
+    const u8 operands[REPLAY_OP_MOVE_SIZE] = { userSide, targetSide, move, move >> 8 };
+    ReplayStream_Op(REPLAY_OP_MOVE, REPLAY_OP_MOVE_SIZE, operands);
+}
+
+void ReplayStream_Hit(u32 side, u32 effectiveness)
+{
+    const u8 operands[REPLAY_OP_HIT_SIZE] = { side, effectiveness };
+    ReplayStream_Op(REPLAY_OP_HIT, REPLAY_OP_HIT_SIZE, operands);
+}
+
+void ReplayStream_Hp(u32 side, u32 hp)
+{
+    const u8 operands[REPLAY_OP_HP_SIZE] = { side, hp, hp >> 8 };
+    ReplayStream_Op(REPLAY_OP_HP, REPLAY_OP_HP_SIZE, operands);
+}
+
+void ReplayStream_Faint(u32 side)
+{
+    const u8 operands[REPLAY_OP_FAINT_SIZE] = { side };
+    ReplayStream_Op(REPLAY_OP_FAINT, REPLAY_OP_FAINT_SIZE, operands);
+}
+
 const u8 *ReplayStream_Data(void)
 {
     return sStream;
