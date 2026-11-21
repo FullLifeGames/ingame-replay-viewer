@@ -51,6 +51,13 @@ export const SCREEN = {
     far: { x: 12, y: 14, width: 128, height: 32 },
   },
   screen: { x: 0, y: 0, width: 240, height: 160 },
+  // The sky of the battle background, where a weather's animation shows over the whole screen
+  // (#22): above the far healthbox, whose corner is at y 14, and left of the far mon, a 64x64
+  // sprite centred on (176, 40) (sBattlerCoords, U/src/battle_anim_mons.c:42), away from both
+  // ability pop-ups at (24, 97) and (178, 57) (sAbilityPopUpCoordsSingles,
+  // U/src/battle_interface.c:2545-2549) and from the text box. Read from the pinned coordinates;
+  // still to be measured on frames.
+  sky: { x: 0, y: 0, width: 140, height: 14 },
   // B_WIN_MSG: tilemapLeft 2, tilemapTop 15, 26x4 tiles of 8 pixels (U/src/battle_bg.c:158).
   message: { x: 16, y: 120, width: 208, height: 32 },
 } as const satisfies {
@@ -60,6 +67,7 @@ export const SCREEN = {
   healthbox: Record<Side, Region>
   message: Region
   screen: Region
+  sky: Region
 }
 
 export type Check =
@@ -68,6 +76,7 @@ export type Check =
   | { probe: 'blank'; shot: string; region: Region; colour?: number }
   | { probe: 'bar'; shot: string; bar: HpBar; filled: number }
   | { probe: 'text'; shot: string; region: Region }
+  | { probe: 'balls'; shot: string; cells: readonly Region[]; colour: number; balls: number }
 
 export interface Verdict {
   pass: boolean
@@ -146,6 +155,30 @@ function blankVerdict(frame: Frame, region: Region, colour: number | undefined):
   return { pass: false, detail: `one colour, ${hexColour(found)}, not ${hexColour(colour)}` }
 }
 
+const sameColours = (a: readonly number[], b: readonly number[]) =>
+  a.length === b.length && a.every((colour, i) => colour === b[i])
+
+/**
+ * A ball display: the cells in fill order, the first `balls` of them pixel-equal to the first cell
+ * and the rest unlike it. The first cell holds the ball's colour, so a display that is not drawn
+ * cannot pass.
+ */
+function ballsVerdict(frame: Frame, check: Extract<Check, { probe: 'balls' }>): Verdict {
+  const cells = check.cells.map((cell) => coloursIn(frame, cell))
+  const first = cells[0] ?? []
+  if (!first.includes(check.colour)) {
+    return { pass: false, detail: `no ball in the first cell: no ${hexColour(check.colour)}` }
+  }
+  const isBall = cells.map((cell) => sameColours(cell, first))
+  const count = isBall.filter(Boolean).length
+  const detail = `${String(count)} ${count === 1 ? 'ball' : 'balls'}, ${String(check.balls)} expected`
+  const gap = isBall.indexOf(false)
+  if (gap >= 0 && gap < count) {
+    return { pass: false, detail: `${detail}, with a gap at cell ${String(gap)}` }
+  }
+  return { pass: count === check.balls, detail }
+}
+
 // A message of the battle text box has far more glyph pixels than this.
 const MIN_TEXT_PIXELS = 20
 
@@ -175,6 +208,8 @@ function verdictOf(check: Check, frame: (name: string) => Frame): Verdict {
       const count = textPixels(frame(check.shot), check.region)
       return { pass: count >= MIN_TEXT_PIXELS, detail: `${String(count)} text pixels` }
     }
+    case 'balls':
+      return ballsVerdict(frame(check.shot), check)
   }
 }
 

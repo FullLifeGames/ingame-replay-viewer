@@ -15,7 +15,10 @@ describe('the scene points of a decoded instruction list (S6)', () => {
   it('finds every scene of the hand-made stream, in the order of the plan', () => {
     expect(scenesOf(handMadeStream()).map((scene) => scene.name)).toEqual([
       'intro',
+      'near-balls',
+      'far-balls',
       'send-outs',
+      'weather-start',
       'first-move',
       'first-hp',
       'first-status',
@@ -29,7 +32,10 @@ describe('the scene points of a decoded instruction list (S6)', () => {
 
   it('names each scene a stream lacks', () => {
     expect(missingScenes(streamOf([{ op: 'intro' }, { op: 'end', outcome: 'tie' }]))).toEqual([
+      'near-balls',
+      'far-balls',
       'send-outs',
+      'weather-start',
       'first-move',
       'first-hp',
       'first-status',

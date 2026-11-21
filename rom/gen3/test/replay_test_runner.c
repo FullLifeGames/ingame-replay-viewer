@@ -20,6 +20,7 @@
 
 EWRAM_DATA bool8 gReplayTestRunStream = FALSE;
 static EWRAM_DATA u16 sCheckedProgress = 0;
+static EWRAM_DATA u8 sKOAnimsAtOpStart[REPLAY_TEST_RECORDED_OPS] = {0};
 
 static void CB2_ReplayTest_Done(void);
 
@@ -34,6 +35,7 @@ static void ReplayTest_SetUp(void *data)
     STATE->battlersCount = 2;
     DATA.queuedEventsFailIndex = MAX_QUEUED_EVENTS;
     sCheckedProgress = 0;
+    memset(sKOAnimsAtOpStart, 0, sizeof(sKOAnimsAtOpStart));
     Replay_Unload();
 }
 
@@ -77,6 +79,19 @@ void ReplayTest_AtEnd(void)
     STATE->runThen = TRUE;
     InvokeReplayTest(gTestRunnerState.test->data);
     STATE->runThen = FALSE;
+}
+
+void ReplayTest_AtOpStart(u32 op)
+{
+    if (op < REPLAY_TEST_RECORDED_OPS)
+        sKOAnimsAtOpStart[op] = gBattleStruct->battlerKOAnimsRunning;
+}
+
+u32 ReplayTest_KOAnimsAtOpStart(u32 op)
+{
+    if (op >= REPLAY_TEST_RECORDED_OPS)
+        Test_ExitWithResult(TEST_RESULT_FAIL, SourceLine(0), "%s:%d: op %d is past the %d recorded ops", gTestRunnerState.test->filename, SourceLine(0), op, REPLAY_TEST_RECORDED_OPS);
+    return sKOAnimsAtOpStart[op];
 }
 
 static void CB2_ReplayTest_Done(void)

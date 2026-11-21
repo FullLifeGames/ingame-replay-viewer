@@ -40,6 +40,12 @@ extern bool8 gReplayTestRunStream;
 
 #define STREAM for (; gReplayTestRunStream; gReplayTestRunStream = FALSE)
 
+// The KO animation counter (gBattleStruct->battlerKOAnimsRunning) when the interpreter started
+// op number op of the stream, counted from 0. Recorded for the first REPLAY_TEST_RECORDED_OPS ops;
+// a later op fails the test.
+#define REPLAY_TEST_RECORDED_OPS 32
+u32 ReplayTest_KOAnimsAtOpStart(u32 op);
+
 // The stream writer (replay_stream_writer.c), a second encoder for the tests only.
 // ReplayStream_Begin starts a stream with a trainer (BRENDAN near, MAY far) and one level 100
 // Wobbuffet with 100 HP on each side; each op call appends one instruction and keeps the header's

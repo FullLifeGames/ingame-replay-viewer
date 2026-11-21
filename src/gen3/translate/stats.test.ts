@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { moveOf } from '../tables/lookup'
 import { plain, sceneOf } from '../testing'
 
 const stat = (side: 'near' | 'far', name: string, stages: number, arrows: string) => ({
@@ -42,6 +43,38 @@ describe('stat changes', () => {
       'one',
       'one',
       'one',
+    ])
+  })
+
+  // A stat at its limit, as the ladder replays gen3ou-2717395946 (Calm Mind at +6) and
+  // gen3ou-2717081342 (Charm at -6) log it. The expansion says so and plays no arrows
+  // (`battle_stat_change.c`): `IncreaseStat` "{B_SCR_NAME_WITH_PREFIX}'s {B_BUFF1} won't go any
+  // higher!" (`STRINGID_STATSWONTINCREASE`), `DecreaseStat` "… won't go any lower!"
+  // (`STRINGID_STATSWONTDECREASE`).
+  it("says a stat at +6 won't go any higher, with no arrows", () => {
+    expect(sceneOf('|-boost|p1a: Dugtrio|spa|0').map(plain)).toEqual([
+      "Dugtrio's Sp. Atk won't go any higher!",
+    ])
+  })
+
+  it("says a stat at -6 won't go any lower, with no arrows", () => {
+    expect(sceneOf('|-unboost|p2a: Tyranitar|atk|0').map(plain)).toEqual([
+      "The opposing Tyranitar's Attack won't go any lower!",
+    ])
+  })
+
+  it('plays the arrows of the stat that still rises next to one at its limit', () => {
+    const scene = sceneOf(
+      '|move|p1a: Dugtrio|Calm Mind|p1a: Dugtrio',
+      '|-boost|p1a: Dugtrio|spa|0',
+      '|-boost|p1a: Dugtrio|spd|1',
+    )
+    expect(scene.map(plain)).toEqual([
+      'Dugtrio used Calm Mind!',
+      { op: 'move', user: 'near', target: 'near', move: moveOf('Calm Mind').number },
+      "Dugtrio's Sp. Atk won't go any higher!",
+      stat('near', 'spd', 1, 'one'),
+      "Dugtrio's Sp. Def rose!",
     ])
   })
 })

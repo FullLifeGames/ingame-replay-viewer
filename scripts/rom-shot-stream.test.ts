@@ -23,6 +23,8 @@ describe('the hand-made stream of the screenshot run', () => {
     for (const op of [
       'intro',
       'sendOut',
+      'weather',
+      'anim',
       'move',
       'hit',
       'hp',

@@ -69,6 +69,7 @@ void ReplayStream_Trainer(u32 side, const u8 *name, u32 trainerPic)
     WriteName(trainer + REPLAY_TRAINER_OFFSET_NAME, name, REPLAY_TRAINER_NAME_LENGTH);
     ReplayStream_SetU16(ReplayStream_TrainerOffset(side) + REPLAY_TRAINER_OFFSET_TRAINER_PIC, trainerPic);
     trainer[REPLAY_TRAINER_OFFSET_TEAM_SIZE] = 1;
+    trainer[REPLAY_TRAINER_OFFSET_REVEALED] = 1;
 }
 
 void ReplayStream_Mon(u32 side, u32 slot, u32 species, u32 maxHp)

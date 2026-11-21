@@ -1,4 +1,4 @@
-{"length":17439,"crc32":"9e87ffb3","trainers":{"near":{"name":"Bugsileus","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Christos","trainerPic":2,"teamSize":6,"revealed":5}},"parties":{"near":[{"species":234,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Stantler"},{"species":230,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Kingdra"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":130,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gyarados"},{"species":379,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Registeel"},{"species":51,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Dugtrio"}],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"},{"species":94,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gengar"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":260,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Swampert"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"},null]}}
+{"length":17417,"crc32":"235f8323","trainers":{"near":{"name":"Bugsileus","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Christos","trainerPic":2,"teamSize":6,"revealed":5}},"parties":{"near":[{"species":234,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Stantler"},{"species":230,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Kingdra"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":130,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gyarados"},{"species":379,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Registeel"},{"species":51,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Dugtrio"}],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"},{"species":94,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gengar"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":260,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Swampert"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"},null]}}
 {"line":23,"op":"intro"}
 {"line":23,"op":"print","text":"You are challenged by Christos!"}
 {"line":25,"op":"print","text":"Christos sent out Tyranitar!"}
@@ -8,6 +8,7 @@
 {"line":26,"op":"ability","side":"far","ability":45,"show":true}
 {"line":26,"op":"weather","weather":"sand"}
 {"line":26,"op":"print","text":"A sandstorm kicked up!"}
+{"line":26,"op":"anim","side":"near","anim":"sandstormContinues"}
 {"line":26,"op":"ability","side":"far","ability":45,"show":false}
 {"line":27,"op":"ability","side":"near","ability":22,"show":true}
 {"line":28,"op":"stat","side":"far","stat":"atk","stages":-1,"arrows":"one"}
@@ -114,7 +115,6 @@
 {"line":98,"op":"move","user":"far","target":"far","move":182}
 {"line":99,"op":"print","text":"The opposing Swampert protected itself!"}
 {"line":100,"op":"print","text":"Stantler used Hypnosis!"}
-{"line":100,"op":"move","user":"near","target":"far","move":95}
 {"line":101,"op":"print","text":"The opposing Swampert protected itself!"}
 {"line":103,"op":"print","text":"Rain continues to fall."}
 {"line":103,"op":"anim","side":"near","anim":"rainContinues"}
@@ -181,7 +181,6 @@
 {"line":152,"op":"ability","side":"far","ability":29,"show":false}
 {"line":151,"op":"ability","side":"near","ability":22,"show":false}
 {"line":153,"op":"print","text":"The opposing Metagross used Earthquake!"}
-{"line":153,"op":"move","user":"far","target":"near","move":89}
 {"line":154,"op":"print","text":"It doesn't affect Gyarados…"}
 {"line":157,"op":"turn","number":12}
 {"line":161,"op":"print","text":"Christos withdrew Metagross!"}
@@ -240,7 +239,6 @@
 {"line":196,"op":"print","text":"Christos sent out Gengar!"}
 {"line":196,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"par"}
 {"line":197,"op":"print","text":"Gyarados used Double-Edge!"}
-{"line":197,"op":"move","user":"near","target":"far","move":38}
 {"line":198,"op":"print","text":"It doesn't affect the opposing Gengar…"}
 {"line":200,"op":"anim","side":"near","anim":"heldItemEffect"}
 {"line":200,"op":"hp","side":"near","hp":83}
@@ -256,6 +254,7 @@
 {"line":207,"op":"ability","side":"far","ability":45,"show":true}
 {"line":207,"op":"weather","weather":"sand"}
 {"line":207,"op":"print","text":"A sandstorm kicked up!"}
+{"line":207,"op":"anim","side":"near","anim":"sandstormContinues"}
 {"line":207,"op":"ability","side":"far","ability":45,"show":false}
 {"line":208,"op":"print","text":"Gyarados used Hidden Power!"}
 {"line":208,"op":"move","user":"near","target":"far","move":237}
@@ -467,7 +466,6 @@
 {"line":360,"op":"move","user":"far","target":"far","move":182}
 {"line":361,"op":"print","text":"The opposing Swampert protected itself!"}
 {"line":362,"op":"print","text":"Registeel used Seismic Toss!"}
-{"line":362,"op":"move","user":"near","target":"far","move":69}
 {"line":363,"op":"print","text":"The opposing Swampert protected itself!"}
 {"line":365,"op":"anim","side":"near","anim":"heldItemEffect"}
 {"line":365,"op":"hp","side":"near","hp":40}
@@ -757,7 +755,6 @@
 {"line":600,"op":"hp","side":"near","hp":39}
 {"line":600,"op":"print","text":"Dugtrio was damaged by the recoil!"}
 {"line":601,"op":"print","text":"The opposing Blissey used Thunder Wave!"}
-{"line":601,"op":"move","user":"far","target":"near","move":86}
 {"line":602,"op":"print","text":"It doesn't affect Dugtrio…"}
 {"line":604,"op":"anim","side":"far","anim":"heldItemEffect"}
 {"line":604,"op":"hp","side":"far","hp":90}

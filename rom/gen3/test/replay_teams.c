@@ -5,6 +5,7 @@
 #include "test/replay_test.h"
 #include "constants/global.h"
 #include "constants/pokemon.h"
+#include "constants/species.h"
 #include "constants/trainers.h"
 
 // The battle's trainers and teams come from the stream's tables (#6): each mon's gender and
@@ -64,5 +65,80 @@ REPLAY_TEST("Other trainer pics give the near side male and the far side female"
     {
         EXPECT_EQ(gLinkPlayers[REPLAY_SIDE_NEAR].gender, MALE);
         EXPECT_EQ(gLinkPlayers[REPLAY_SIDE_FAR].gender, FEMALE);
+    }
+}
+
+// A team size above the revealed mons gives the side unrevealed team members (#21): the intro's
+// ball display reads each party slot's species, HP and status (battle_main.c), so each unrevealed
+// member must hold a species, HP above 0 and no status to show as a ball.
+
+static void SetTeamSize(u32 side, u32 teamSize)
+{
+    ReplayStream_SetU8(ReplayStream_TrainerOffset(side) + REPLAY_TRAINER_OFFSET_TEAM_SIZE, teamSize);
+}
+
+static bool32 ShowsAsBall(struct Pokemon *mon)
+{
+    u32 species = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
+
+    return species != SPECIES_NONE
+        && species != SPECIES_EGG
+        && GetMonData(mon, MON_DATA_HP) != 0
+        && GetMonData(mon, MON_DATA_STATUS) == 0;
+}
+
+REPLAY_TEST("A team size of 6 with one revealed mon gives five unrevealed members that show as balls")
+{
+    u32 slot;
+
+    STREAM
+    {
+        SetTeamSize(REPLAY_SIDE_NEAR, 6);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    THEN
+    {
+        for (slot = 1; slot < PARTY_SIZE; slot++)
+        {
+            EXPECT(ShowsAsBall(&gParties[B_TRAINER_PLAYER][slot]));
+            EXPECT_EQ(GetMonData(&gParties[B_TRAINER_OPPONENT_A][slot], MON_DATA_SPECIES_OR_EGG), SPECIES_NONE);
+        }
+    }
+}
+
+REPLAY_TEST("A team size below the revealed mons keeps them all and adds none")
+{
+    u32 slot;
+
+    STREAM
+    {
+        ReplayStream_Mon(REPLAY_SIDE_NEAR, 1, SPECIES_DUGTRIO, 100);
+        ReplayStream_Mon(REPLAY_SIDE_NEAR, 2, SPECIES_MAGNETON, 100);
+        SetTeamSize(REPLAY_SIDE_NEAR, 1);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    THEN
+    {
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_SPECIES), SPECIES_WOBBUFFET);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][1], MON_DATA_SPECIES), SPECIES_DUGTRIO);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][2], MON_DATA_SPECIES), SPECIES_MAGNETON);
+        for (slot = 3; slot < PARTY_SIZE; slot++)
+            EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][slot], MON_DATA_SPECIES_OR_EGG), SPECIES_NONE);
+    }
+}
+
+REPLAY_TEST("A team size above six fills the party and stops there")
+{
+    u32 slot;
+
+    STREAM
+    {
+        SetTeamSize(REPLAY_SIDE_NEAR, 9);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    THEN
+    {
+        for (slot = 0; slot < PARTY_SIZE; slot++)
+            EXPECT(ShowsAsBall(&gParties[B_TRAINER_PLAYER][slot]));
     }
 }
