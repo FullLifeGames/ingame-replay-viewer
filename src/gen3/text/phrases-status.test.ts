@@ -63,6 +63,16 @@ describe('status phrases (P1)', () => {
   })
 })
 
+describe('a team cure with no cause (P1)', () => {
+  it('gets our wording and a fallback', () => {
+    const { event, mon } = sceneOf('cureTeam', '|-cureteam|p1a: Dugtrio')
+    expect(teamCured(mon(event.who), event.cause).fallback).toEqual({
+      kind: 'phrase',
+      detail: 'no game message for a team cured',
+    })
+  })
+})
+
 describe('a Pokémon that cannot move (P1)', () => {
   it.each([
     ['slp', 'Dugtrio is fast asleep.'],

@@ -30,6 +30,14 @@ describe('items (P1)', () => {
     })
   })
 
+  it('gives an item shown with no cause our wording too', () => {
+    const { event, mon } = sceneOf('item', '|-item|p1a: Dugtrio|Leftovers')
+    expect(itemShown(mon(event.who), event.item, event.cause, undefined).fallback).toEqual({
+      kind: 'phrase',
+      detail: 'no game message for an item shown',
+    })
+  })
+
   it('says Knock Off knocked an item off', () => {
     const { event, mon } = sceneOf(
       'itemEnd',
