@@ -17,9 +17,18 @@ Each command is a heavy check on devbox, so run it alone and in the background.
 - `npm run rom:repro` runs two clean builds, the second in a fresh worktree, and fails unless the ROM, patch and slot description are equal. It takes as long as two builds, about 90 minutes on devbox.
 - `npm run rom:clean` empties `build/rom/` and drops the build products from the tree. `npm run rom:clean -- --all` deletes the tree as well, so the next build clones it again.
 
+- `npm run rom:check` runs the expansion's own `make check` with our tests in the tree, filtered to the tests whose names start with `Replay`. `npm run rom:check -- <filter>` takes another filter: a name prefix, `*` and an infix, or a test file such as `test/battle/ability/intimidate.c`. The first run builds the test objects in `build/emerald-test/` of the tree, about an hour on devbox; later runs build only what changed. The log goes to `build/rom/check.log`.
+
 The build reads your US Emerald dump from `~/roms/Pokemon - Emerald Version (USA, Europe).gba`, or from the path in `IRV_BASE_ROM`, and checks its SHA1 against `build.json`. It stops when the ARM toolchain is missing, and prints the `apt-get` line that installs it. It also stops when less than 3 GiB of memory is free.
 
 The build deletes files only inside `.cache/rom/` and `build/rom/`. A script that only reads the pinned tree can take it from `IRV_EXPANSION_TREE` (an absolute path) instead.
+
+## Testing the ROM interpreter
+
+The ROM interpreter (`src/replay_interpreter.c`, `src/replay_setup.c`) plays an instruction stream (`include/replay_stream.h`) in a recorded link battle. Patch 0001 hands it the battle main loop. Its tests sit in `test/replay_*.c` and use `include/test/replay_test.h`:
+
+- `REPLAY_TEST(name)` writes a stream in its `STREAM` block with the `ReplayStream_*` writer, queues the events it expects in `SCENE` with upstream's matchers (`MESSAGE`, `HP_BAR`, `ANIMATION` and the rest), and checks the battle in `THEN`, after the stream has played.
+- A plain `TEST` whose name starts with `Replay:` checks a refusal with `Replay_Validate`, without a battle.
 
 ## Adding a patch
 
