@@ -70,19 +70,18 @@ function heal(input: RuleInput<'|-heal|'>): ScriptEvent[] {
 
 type StatKey = '|-boost|' | '|-unboost|'
 
+/** A change of 0 stages is a stat at its limit; it keeps the direction the line's kind gives. */
 function statChange({ line, args, kwArgs, battle }: RuleInput<StatKey>): ScriptEvent[] {
-  const [kind, who, stat, stages] = args
+  const [kind, ident, stat, amount] = args
+  const who = refOf(battle, ident, line)
+  const cause = kwArgs.from ? { cause: effectOf(kwArgs.from) } : {}
+  const stages = numberOf(amount, line)
+  if (stages === 0) {
+    const direction = kind === '-unboost' ? 'down' : 'up'
+    return [{ kind: 'statLimit', line, who, stat, direction, ...cause }]
+  }
   const sign = kind === '-unboost' ? -1 : 1
-  return [
-    {
-      kind: 'statChange',
-      line,
-      who: refOf(battle, who, line),
-      stat,
-      stages: sign * numberOf(stages, line),
-      ...(kwArgs.from ? { cause: effectOf(kwArgs.from) } : {}),
-    },
-  ]
+  return [{ kind: 'statChange', line, who, stat, stages: sign * stages, ...cause }]
 }
 
 export const POKEMON_RULES = {

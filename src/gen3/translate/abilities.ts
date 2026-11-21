@@ -10,7 +10,7 @@ import { abilityAsText, abilityShown } from '../text/phrases-items'
 import type { Context, EventOf, PopUp } from './context'
 
 /** The kinds an `-ability` line's pop-up stays up over. */
-const UNDER_POP_UP = new Set<ScriptEvent['kind']>(['statChange', 'fail'])
+const UNDER_POP_UP = new Set<ScriptEvent['kind']>(['statChange', 'statLimit', 'fail'])
 
 function showPopUp(
   ctx: Context,

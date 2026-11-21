@@ -12,7 +12,7 @@ import { item, itemEnd } from './items'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
 import { damage, heal } from './hp'
 import { crit, effectiveness, failure, immunity, miss, move } from './moves'
-import { statChange } from './stats'
+import { statChange, statLimit } from './stats'
 import { cant, cureStatus, cureTeam, status } from './status'
 import { faint, switchIn } from './switches'
 import { tablesOf } from './tables'
@@ -41,6 +41,7 @@ const HANDLERS = {
   cureStatus,
   cureTeam,
   statChange,
+  statLimit,
   crit,
   effectiveness,
   effectStart,

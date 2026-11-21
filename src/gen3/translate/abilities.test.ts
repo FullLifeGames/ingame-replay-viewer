@@ -55,6 +55,19 @@ describe('ability pop-ups', () => {
     ])
   })
 
+  // Intimidate on a Pokémon at -6 logs a drop of 0 (Charm at -6 does so in gen3ou-2717081342).
+  it("keeps Intimidate up over a stat that won't go any lower", () => {
+    const scene = sceneOf(
+      '|-ability|p1a: Dugtrio|Intimidate|boost',
+      '|-unboost|p2a: Tyranitar|atk|0',
+    )
+    expect(scene.map(plain)).toEqual([
+      popUp('near', 'Intimidate', true),
+      "The opposing Tyranitar's Attack won't go any lower!",
+      popUp('near', 'Intimidate', false),
+    ])
+  })
+
   it('shows an ability with its line, or alone where the game has none', () => {
     const scene = sceneOf(
       '|-ability|p2a: Tyranitar|Pressure',

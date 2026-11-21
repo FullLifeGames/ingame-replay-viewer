@@ -166,6 +166,21 @@ describe('the stat change rules', () => {
     ])
   })
 
+  // Showdown logs a stat at its limit as a change of 0: `|-boost|p2a: Jirachi|spa|0` after Calm Mind
+  // at +6 (ladder replay gen3ou-2717395946), `|-unboost|p1a: Swampert|atk|0` after Charm at -6
+  // (gen3ou-2717081342).
+  it('keeps the direction of a raise at its limit', () => {
+    expect(eventsAt(scriptOf('|-boost|p1a: Dugtrio|spa|0'), NEXT)).toEqual([
+      { kind: 'statLimit', line: NEXT, who: DUGTRIO, stat: 'spa', direction: 'up' },
+    ])
+  })
+
+  it('keeps the direction of a drop at its limit', () => {
+    expect(eventsAt(scriptOf('|-unboost|p1a: Dugtrio|atk|0'), NEXT)).toEqual([
+      { kind: 'statLimit', line: NEXT, who: DUGTRIO, stat: 'atk', direction: 'down' },
+    ])
+  })
+
   it('keeps the cause of a stat change', () => {
     const script = scriptOf('|-boost|p1a: Dugtrio|atk|1|[from] item: Liechi Berry')
 

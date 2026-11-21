@@ -107,10 +107,10 @@ describe('stat phrases (P1)', () => {
   })
 
   it('says a stat goes no further, and refuses a change of no stages', () => {
-    const { event, mon } = sceneOf('statChange', '|-boost|p1a: Dugtrio|atk|0')
+    const { event, mon } = sceneOf('statChange', '|-boost|p1a: Dugtrio|atk|1')
     const dugtrio = mon(event.who)
     expect(statWontChange(dugtrio, 'atk', 'up')).toBe("Dugtrio's Attack won't go any higher!")
     expect(statWontChange(dugtrio, 'def', 'down')).toBe("Dugtrio's Defense won't go any lower!")
-    expect(() => statChanged(dugtrio, event.stat, event.stages)).toThrow(Gen3Error)
+    expect(() => statChanged(dugtrio, event.stat, 0)).toThrow(Gen3Error)
   })
 })
