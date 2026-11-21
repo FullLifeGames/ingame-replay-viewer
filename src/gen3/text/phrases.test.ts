@@ -37,12 +37,17 @@ describe('move phrases (P1)', () => {
       '|-miss|p1a: Dugtrio|p2a: Tyranitar',
     )
     const target = event.target && mon(event.target)
-    expect(missed(mon(event.user), target)).toBe('The opposing Tyranitar avoided the attack!')
+    expect(missed(mon(event.user), target)).toEqual({
+      text: 'The opposing Tyranitar avoided the attack!',
+    })
   })
 
   it('says the attack missed when the log names no target', () => {
     const { event, mon } = sceneOf('miss', '|-miss|p2a: Tyranitar')
-    expect(missed(mon(event.user), undefined)).toBe("The opposing Tyranitar's attack missed!")
+    expect(missed(mon(event.user), undefined)).toEqual({
+      text: "The opposing Tyranitar's attack missed!",
+      fallback: { kind: 'phrase', detail: 'no game message for a miss without a target' },
+    })
   })
 
   it('names a critical hit and the effectiveness a hit carries', () => {

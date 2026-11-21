@@ -33,6 +33,18 @@ describe('moves', () => {
     ])
   })
 
+  it('says a miss without a target in our words, and lists it as a phrase fallback', () => {
+    const result = streamOfLog('|-miss|p1a: Dugtrio')
+    const prints = result.instructions.filter(({ line }) => line === NEXT)
+    expect(prints.map(({ instruction }) => plain(instruction))).toEqual([
+      "Dugtrio's attack missed!",
+      { op: 'end', outcome: 'unknown' },
+    ])
+    expect(result.fallbacks).toEqual([
+      { line: NEXT, kind: 'phrase', detail: 'no game message for a miss without a target' },
+    ])
+  })
+
   it('plays no animation for a still move or one without a target', () => {
     expect(sceneOf(`${earthquake}|[still]`).map(plain)).toEqual(['Dugtrio used Earthquake!'])
     const alone = '|move|p1a: Dugtrio|Earthquake||[notarget]'

@@ -5,7 +5,7 @@ import type { BoostID, StatusName } from '@pkmn/data'
 import type { Effect } from '../../script/types'
 import { Gen3Error } from '../errors'
 import { held, type Mon, moveName, nameAtStart, nameInside, ownerAtStart } from './names'
-import { tagged } from './template'
+import { ownPhrase, type Phrase, tagged } from './template'
 
 export const MOVE_TEMPLATES = {
   usedMove: tagged('sText_AttackerUsedX', (user: Mon, move: string) => {
@@ -70,10 +70,9 @@ export function usedMove(user: Mon, move: string): string {
 }
 
 /** The game has no "missed" line: the target avoids the attack. Without one, ours stands in. */
-export function missed(user: Mon, target: Mon | undefined): string {
-  return target === undefined
-    ? `${ownerAtStart(user)} attack missed!`
-    : MOVE_TEMPLATES.avoided.render(target)
+export function missed(user: Mon, target: Mon | undefined): Phrase {
+  if (target !== undefined) return { text: MOVE_TEMPLATES.avoided.render(target) }
+  return ownPhrase(`${ownerAtStart(user)} attack missed!`, 'a miss without a target')
 }
 
 export const critical = () => MOVE_TEMPLATES.critical.render()
