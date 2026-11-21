@@ -18,9 +18,9 @@ import { sceneOf } from './testing'
 const NBSP = '\u00a0'
 
 describe('intro and switches (P1)', () => {
-  it('opens with the far player wanting to battle (plan, Presentation v1)', () => {
+  it('opens with the far player challenging you', () => {
     const { trainer } = sceneOf('turn', '|turn|1')
-    expect(challenged(trainer('far'))).toBe('Bob would like to battle!')
+    expect(challenged(trainer('far'))).toBe('You are challenged by Bob!')
   })
 
   it('sends the far Pokémon out by its trainer and the near one with "Go!"', () => {

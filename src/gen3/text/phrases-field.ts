@@ -1,6 +1,5 @@
 // Phrases for the battle around the Pokémon (plan §5): the intro, switches, weather, conditions on
-// one side or the whole field, and the end. The near player is "you"; the intro and the win line
-// are ours (plan "Presentation (v1)", D8).
+// one side or the whole field, and the end. The near player is "you" (D8: the win line is ours).
 import type { WeatherName } from '@pkmn/client'
 import { toID } from '@pkmn/dex'
 
@@ -12,6 +11,9 @@ import { ownPhrase, type Phrase, tagged } from './template'
 type Phase = 'start' | 'upkeep' | 'end'
 
 export const FIELD_TEMPLATES = {
+  challenged: tagged('sText_LinkTrainerWantsToBattle', (far: string) => {
+    return `You are challenged by ${far}!`
+  }),
   sentOut: tagged('sText_LinkTrainerSentOutPkmn', (far: string, mon: string) => {
     return `${far} sent out ${mon}!`
   }),
@@ -71,12 +73,8 @@ export const FIELD_TEMPLATES = {
 
 const T = FIELD_TEMPLATES
 
-/**
- * The line that opens a battle, as `docs/plan.md` "Presentation (v1)" words it: the trainer intro
- * with the class left out. The pinned expansion's own line is "You are challenged by …!", so this
- * one is ours and has no tag. `far` is the far player's name for text.
- */
-export const challenged = (far: string) => `${far} would like to battle!`
+/** The far player's challenge that opens a battle (plan §13); `far` is the name for text. */
+export const challenged = (far: string) => T.challenged.render(far)
 
 /** A Pokémon sent out: by the far trainer's name, or with "Go!" on the near side. */
 export function sentOut(mon: Mon, trainer: string): string {

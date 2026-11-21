@@ -30,7 +30,7 @@ describe('buildGen3Stream', () => {
     expect(stream.parties.far).toEqual([{ ...tyranitar, nickname: 'Tyranitar' }, ...nulls(5)])
     expect(result.instructions).toEqual([
       { line: 5, instruction: { op: 'intro' } },
-      { line: 5, instruction: { op: 'print', text: 'Bob would like to battle!' } },
+      { line: 5, instruction: { op: 'print', text: 'You are challenged by Bob!' } },
       { line: 7, instruction: { op: 'print', text: 'Bob sent out Tyranitar!' } },
       { line: 7, instruction: { op: 'sendOut', side: 'far', slot: 0, hp: 100, status: 'none' } },
       { line: 6, instruction: { op: 'print', text: 'Go! Dugtrio!' } },
