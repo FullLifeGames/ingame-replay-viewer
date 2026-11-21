@@ -13,7 +13,7 @@ Decisions from the design session on 2026-11-20 that are not ADRs, plus the road
 - **Viewer controls (v1)**: play/pause, speed (1×/2×/fast), restart, and a small panel with player names and the turn number. Player 1 is always the near side.
 - **Presentation (v1)**:
   - trainer sprites picked from the Showdown avatar, falling back to a generic trainer class
-  - the "would like to battle!" intro with the Poké Ball team display
+  - the intro with the Poké Ball team display, in the expansion's wording ("You are challenged by Bob!")
   - trainer battle music
   - an outro with the winner
 - **HP display**: both sides show only the HP bar, no numbers, because replays carry percentages.

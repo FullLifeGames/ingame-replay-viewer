@@ -53,8 +53,16 @@ The replay side drawn at the bottom of the screen, with back sprites. Player 1 u
 _Avoid_: player side, own side
 
 **Far side**:
-The other replay side, drawn at the top facing the viewer. The game's text calls its Pokémon "Foe".
+The other replay side, drawn at the top facing the viewer. The game's text names its Pokémon with "The opposing", as in "The opposing Skarmory used Spikes!".
 _Avoid_: opponent, enemy
+
+**Intro**:
+The opening of a battle before the first turn: the challenge line ("You are challenged by Bob!"), both teams shown as Poké Balls, and the first send-outs.
+_Avoid_: lead-in, opening
+
+**Side condition**:
+An effect that lasts on one side of the field, such as Spikes or Reflect.
+_Avoid_: hazard (only some are), field effect
 
 ## Pipeline
 
@@ -69,6 +77,14 @@ _Avoid_: driver, port
 **Instruction stream**:
 The compact, game-specific sequence the renderer consumes.
 _Avoid_: bytecode, opcodes
+
+**Instruction**:
+One step of an instruction stream: a line of text, a move animation, an HP bar moving to a new value, a switch.
+_Avoid_: command, opcode
+
+**Team table**:
+The start of an instruction stream that names both trainers and their teams, so the renderer can set up the battle before the first instruction.
+_Avoid_: header, roster
 
 **Replay slot**:
 The reserved empty area of a built ROM image that holds one replay's instruction stream.
