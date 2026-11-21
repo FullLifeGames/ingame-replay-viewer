@@ -13,7 +13,7 @@ enum ReplayError
     REPLAY_ERROR_NONE,
     REPLAY_ERROR_EMPTY,   // a stream of no bytes, as in the replay slot of the built ROM
     REPLAY_ERROR_VERSION, // a stream version other than REPLAY_STREAM_VERSION
-    REPLAY_ERROR_HEADER,  // a header size, table entry size or instruction span of another layout
+    REPLAY_ERROR_HEADER,  // a header size, table entry size or instruction span of another layout, or a replay slot header the ROM cannot read
     REPLAY_ERROR_OP,      // an op outside format v1
     REPLAY_ERROR_SIZE,    // a size byte other than the op's own
     REPLAY_ERROR_OVERRUN, // an instruction running past the end of the instructions
@@ -41,6 +41,9 @@ struct ReplayProgress
 };
 
 extern struct ReplayProgress gReplayProgress;
+
+// The ROM's first callback (replay_boot.c, patch 0003): plays the stream in the replay slot.
+void CB2_ReplayBoot(void);
 
 // Checks a stream without playing it.
 enum ReplayError Replay_Validate(const volatile u8 *stream, u32 length);
