@@ -46,6 +46,9 @@ export function nameAtStart(mon: Mon): string {
   return mon.side === 'far' ? NAME_TEMPLATES.foePrefix.render() + mon.name : mon.name
 }
 
+/** The name with the game's "'s" at a sentence start: "The opposing Skarmory's". */
+export const ownerAtStart = (mon: Mon) => `${nameAtStart(mon)}'s`
+
 export function nameInside(mon: Mon): string {
   return mon.side === 'far' ? NAME_TEMPLATES.foePrefixInside.render() + mon.name : mon.name
 }

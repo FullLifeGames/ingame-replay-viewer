@@ -4,11 +4,8 @@ import type { BoostID, StatusName } from '@pkmn/data'
 
 import type { Effect } from '../../script/types'
 import { Gen3Error } from '../errors'
-import { held, type Mon, moveName, nameAtStart, nameInside } from './names'
+import { held, type Mon, moveName, nameAtStart, nameInside, ownerAtStart } from './names'
 import { tagged } from './template'
-
-/** The game's "'s" after a name. */
-const owner = (mon: Mon) => `${nameAtStart(mon)}'s`
 
 export const MOVE_TEMPLATES = {
   usedMove: tagged('sText_AttackerUsedX', (user: Mon, move: string) => {
@@ -37,7 +34,7 @@ export const MOVE_TEMPLATES = {
     return `${nameAtStart(who)} is already burned!`
   }),
   statsNotLowered: tagged('STRINGID_PKMNPREVENTSSTATLOSSWITH', (who: Mon) => {
-    return `${owner(who)} stats were not lowered!`
+    return `${ownerAtStart(who)} stats were not lowered!`
   }),
   fainted: tagged('STRINGID_BATTLERFAINTED', (who: Mon) => `${nameAtStart(who)} fainted!`),
 }
@@ -55,16 +52,16 @@ export const STAT_TEMPLATES = {
   harshly: tagged('STRINGID_STATHARSHLY', () => 'harshly '),
   severely: tagged('gText_severely', () => 'severely '),
   rose: tagged('STRINGID_STATROSE', (who: Mon, stat: string, how: string) => {
-    return `${owner(who)} ${stat} rose${how}!`
+    return `${ownerAtStart(who)} ${stat} rose${how}!`
   }),
   fell: tagged('STRINGID_STATFELL', (who: Mon, stat: string, how: string) => {
-    return `${owner(who)} ${stat} ${how}fell!`
+    return `${ownerAtStart(who)} ${stat} ${how}fell!`
   }),
   wontRise: tagged('STRINGID_STATSWONTINCREASE', (who: Mon, stat: string) => {
-    return `${owner(who)} ${stat} won't go any higher!`
+    return `${ownerAtStart(who)} ${stat} won't go any higher!`
   }),
   wontFall: tagged('STRINGID_STATSWONTDECREASE', (who: Mon, stat: string) => {
-    return `${owner(who)} ${stat} won't go any lower!`
+    return `${ownerAtStart(who)} ${stat} won't go any lower!`
   }),
 }
 
@@ -75,7 +72,7 @@ export function usedMove(user: Mon, move: string): string {
 /** The game has no "missed" line: the target avoids the attack. Without one, ours stands in. */
 export function missed(user: Mon, target: Mon | undefined): string {
   return target === undefined
-    ? `${owner(user)} attack missed!`
+    ? `${ownerAtStart(user)} attack missed!`
     : MOVE_TEMPLATES.avoided.render(target)
 }
 
