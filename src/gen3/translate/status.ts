@@ -103,7 +103,7 @@ function statusIn(event: ScriptEvent, ref: PokemonRef): Status | undefined {
 }
 
 /** The status of `ref` before the event in hand, by the last event that showed it. */
-export function statusOf(ctx: Context, ref: PokemonRef): Status {
+function statusOf(ctx: Context, ref: PokemonRef): Status {
   for (const event of ctx.script.events.slice(0, ctx.at).toReversed()) {
     const found = statusIn(event, ref)
     if (found !== undefined) return found
