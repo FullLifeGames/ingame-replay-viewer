@@ -133,6 +133,17 @@ describe('moves', () => {
     }
   })
 
+  // Speed Boost as Showdown logs it (`-ability` and `-boost`), here right after the limit.
+  it("plays no animation for a stat move at its limit beside another Pokémon's raise", () => {
+    const scene = sceneOf(
+      '|move|p2a: Tyranitar|Charm|p1a: Dugtrio',
+      '|-unboost|p1a: Dugtrio|atk|0',
+      '|-ability|p2a: Tyranitar|Speed Boost|boost',
+      '|-boost|p2a: Tyranitar|spe|1',
+    )
+    expect(scene).not.toContainEqual(expect.objectContaining({ op: 'move' }))
+  })
+
   it('aims a move on the user at its own side, and a far move at the near side', () => {
     const swordsDance = moveOf('Swords Dance').number
     const rockSlide = moveOf('Rock Slide').number
