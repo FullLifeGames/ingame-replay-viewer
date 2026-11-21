@@ -27,3 +27,10 @@ export interface Fallback {
   readonly kind: Noted['kind']
   readonly detail: string
 }
+
+/**
+ * Whether `fallback` stands in for content the game lacks (a phrase, a character, a form, a move,
+ * an ability, an item). A test replay may take none of these; a mechanic fallback shows nothing
+ * in either case, so it is listed and allowed.
+ */
+export const isContentGap = (fallback: Fallback): boolean => fallback.kind !== 'mechanic'
