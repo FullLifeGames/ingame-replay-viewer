@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
+import type { SlotDescription } from '../src/patch/slot.ts'
 import { ROM_DIR } from './rom-config.ts'
 
 export const SLOT_SYMBOL = 'gReplaySlot'
@@ -23,19 +24,6 @@ export interface ElfSymbol {
   name: string
   address: number
   size: number
-}
-
-export interface SlotDescription {
-  slotVersion: number
-  magic: string
-  offset: number
-  size: number
-  headerSize: number
-  lengthOffset: number
-  streamOffset: number
-  capacity: number
-  romSha1: string
-  romSize: number
 }
 
 // The GBA maps the cartridge ROM at this address, so a ROM symbol's file offset is its address minus it.

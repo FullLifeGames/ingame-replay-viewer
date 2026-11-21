@@ -14,3 +14,13 @@ export function runCli(command: string, run: () => void): void {
     process.exitCode = 1
   }
 }
+
+// The same for a command whose work is asynchronous, such as one that loads modules through Vite.
+export async function runCliAsync(command: string, run: () => Promise<void>): Promise<void> {
+  try {
+    await run()
+  } catch (error) {
+    process.stderr.write(errorText(command, error))
+    process.exitCode = 1
+  }
+}
