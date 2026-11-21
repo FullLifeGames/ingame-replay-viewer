@@ -4,6 +4,7 @@
 #include "constants/characters.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
+#include "constants/trainers.h"
 
 // The interpreter refuses a stream it cannot play before any battle starts (#6, AGENTS.md: the
 // ROM interpreter refuses a version it does not know).
@@ -131,15 +132,15 @@ TEST("Replay: a mon of 0 max HP is refused")
 }
 
 // The HP bar takes the change as an s16 and reads INSTANT_HP_BAR_DROP (0x7FFF) as "empty at once".
-TEST("Replay: a max HP of 0x7FFF or more is refused")
+TEST("Replay: a max HP of REPLAY_MON_MAX_HP_LIMIT or more is refused")
 {
     ReplayStream_Begin();
     ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
-    ReplayStream_SetU16(ReplayStream_MonOffset(REPLAY_SIDE_FAR, 0) + REPLAY_MON_OFFSET_MAX_HP, 0x7FFF);
+    ReplayStream_SetU16(ReplayStream_MonOffset(REPLAY_SIDE_FAR, 0) + REPLAY_MON_OFFSET_MAX_HP, REPLAY_MON_MAX_HP_LIMIT);
     EXPECT_EQ(Validate(), REPLAY_ERROR_TEAM);
     ReplayStream_SetU16(ReplayStream_MonOffset(REPLAY_SIDE_FAR, 0) + REPLAY_MON_OFFSET_MAX_HP, 0xFFFF);
     EXPECT_EQ(Validate(), REPLAY_ERROR_TEAM);
-    ReplayStream_SetU16(ReplayStream_MonOffset(REPLAY_SIDE_FAR, 0) + REPLAY_MON_OFFSET_MAX_HP, 0x7FFE);
+    ReplayStream_SetU16(ReplayStream_MonOffset(REPLAY_SIDE_FAR, 0) + REPLAY_MON_OFFSET_MAX_HP, REPLAY_MON_MAX_HP_LIMIT - 1);
     EXPECT_EQ(Validate(), REPLAY_ERROR_NONE);
 }
 
@@ -184,4 +185,18 @@ TEST("Replay: a side without a mon is refused")
     ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
     ReplayStream_SetU16(ReplayStream_MonOffset(REPLAY_SIDE_FAR, 0) + REPLAY_MON_OFFSET_SPECIES, SPECIES_NONE);
     EXPECT_EQ(Validate(), REPLAY_ERROR_TEAM);
+}
+
+// gTrainerPicInfo has TRAINER_PIC_COUNT entries (data.h); a pic past them reads past the table.
+TEST("Replay: a trainer pic at or above TRAINER_PIC_COUNT is refused")
+{
+    ReplayStream_Begin();
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    ReplayStream_SetU16(ReplayStream_TrainerOffset(REPLAY_SIDE_FAR) + REPLAY_TRAINER_OFFSET_TRAINER_PIC, TRAINER_PIC_COUNT);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_TEAM);
+    ReplayStream_SetU16(ReplayStream_TrainerOffset(REPLAY_SIDE_FAR) + REPLAY_TRAINER_OFFSET_TRAINER_PIC, 0xFFFF);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_TEAM);
+    ReplayStream_SetU16(ReplayStream_TrainerOffset(REPLAY_SIDE_NEAR) + REPLAY_TRAINER_OFFSET_TRAINER_PIC, TRAINER_PIC_COUNT - 1);
+    ReplayStream_SetU16(ReplayStream_TrainerOffset(REPLAY_SIDE_FAR) + REPLAY_TRAINER_OFFSET_TRAINER_PIC, TRAINER_PIC_COUNT - 1);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_NONE);
 }

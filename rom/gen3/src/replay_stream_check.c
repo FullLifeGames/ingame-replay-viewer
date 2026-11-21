@@ -9,6 +9,7 @@
 #include "constants/moves.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
+#include "constants/trainers.h"
 
 // Checking an instruction stream (replay_stream.h) for the interpreter (#6).
 // Replay_ValidateStream checks the whole stream before a battle starts: the header, the team
@@ -142,14 +143,17 @@ static enum ReplayError ValidateHeader(const volatile u8 *stream, u32 length)
     return REPLAY_ERROR_NONE;
 }
 
+// The format's limit is the pinned expansion's INSTANT_HP_BAR_DROP: an HP bar change of that value
+// empties the bar at once.
+STATIC_ASSERT(REPLAY_MON_MAX_HP_LIMIT == INSTANT_HP_BAR_DROP, ReplayMonMaxHpLimitIsInstantHpBarDrop);
+
 // A mon the game can make: a species of the expansion, a level, a max HP below
-// INSTANT_HP_BAR_DROP (an HP bar change of that value empties the bar at once), and gender,
-// shininess and nickname inside the format.
+// REPLAY_MON_MAX_HP_LIMIT, and gender, shininess and nickname inside the format.
 static bool32 IsMon(const volatile u8 *mon)
 {
     return Replay_ReadU16(mon + REPLAY_MON_OFFSET_SPECIES) < NUM_SPECIES
         && Replay_ReadU16(mon + REPLAY_MON_OFFSET_MAX_HP) != 0
-        && Replay_ReadU16(mon + REPLAY_MON_OFFSET_MAX_HP) < INSTANT_HP_BAR_DROP
+        && Replay_ReadU16(mon + REPLAY_MON_OFFSET_MAX_HP) < REPLAY_MON_MAX_HP_LIMIT
         && mon[REPLAY_MON_OFFSET_LEVEL] >= 1
         && mon[REPLAY_MON_OFFSET_LEVEL] <= MAX_LEVEL
         && mon[REPLAY_MON_OFFSET_GENDER] <= REPLAY_GENDER_NONE
@@ -164,6 +168,9 @@ static enum ReplayError ValidateTeams(const volatile u8 *stream)
     for (side = 0; side < REPLAY_STREAM_SIDE_COUNT; side++)
     {
         if (!IsName(Replay_GetTrainer(stream, side) + REPLAY_TRAINER_OFFSET_NAME, REPLAY_TRAINER_NAME_LENGTH))
+            return REPLAY_ERROR_TEAM;
+        // gTrainerPicInfo holds TRAINER_PIC_COUNT entries (data.h).
+        if (Replay_ReadU16(Replay_GetTrainer(stream, side) + REPLAY_TRAINER_OFFSET_TRAINER_PIC) >= TRAINER_PIC_COUNT)
             return REPLAY_ERROR_TEAM;
         for (mons = 0, slot = 0; slot < REPLAY_STREAM_PARTY_SIZE; slot++)
         {
