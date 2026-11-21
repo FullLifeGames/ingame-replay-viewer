@@ -1,5 +1,6 @@
-// The game's character set (plan §5): Unicode text to the pinned charmap's bytes and back. This
-// is the strict codec at the stream seam; a character outside the charmap is an error here.
+// The game's character set (plan §5): Unicode text to the pinned charmap's bytes and back. The
+// codec at the stream seam is strict; `fitCharset` makes text from outside (names, simulator
+// messages) fit first and reports what it replaced.
 import { Gen3Error } from '../errors'
 import charmap from '../tables/charmap.json'
 
@@ -43,4 +44,27 @@ export function decodeText(bytes: Iterable<number>): string {
     if (char === undefined) throw new Gen3Error(`byte ${String(byte)} is not in the game's charset`)
     return char
   }).join('')
+}
+
+/** A text that needed `?` for characters outside the charset. */
+export interface CharacterFallback {
+  readonly kind: 'character'
+  readonly detail: string
+}
+
+export interface Fitted {
+  readonly text: string
+  readonly fallback?: CharacterFallback
+}
+
+const REPLACEMENT = '?'
+
+/** `text` with each character outside the charset as `?`, and a fallback naming them. */
+export function fitCharset(text: string): Fitted {
+  const chars = Array.from(text)
+  const outside = [...new Set(chars.filter((char) => !BYTES.has(char)))]
+  if (outside.length === 0) return { text }
+  const fitted = chars.map((char) => (BYTES.has(char) ? char : REPLACEMENT)).join('')
+  const detail = `"${text}" has ${outside.join(' ')} outside the game's charset; they show as ?`
+  return { text: fitted, fallback: { kind: 'character', detail } }
 }
