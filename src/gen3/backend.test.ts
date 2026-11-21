@@ -40,6 +40,20 @@ describe('buildGen3Stream', () => {
     expect(stream.instructions).toEqual(result.instructions.map(({ instruction }) => instruction))
   })
 
+  it('sends out leads with exact full HP at 100 (#41)', () => {
+    const script = buildBattleScript(
+      ['|gen|3', '|player|p1|Alice|1|', '|player|p2|Bob|2|', '|start'].join('\n') +
+        '\n|switch|p1a: Metagross|Metagross|319/319\n|switch|p2a: Regice|Regice|364/364\n',
+    )
+    const sendOuts = buildGen3Stream(script).instructions.filter(
+      ({ instruction }) => instruction.op === 'sendOut',
+    )
+    expect(sendOuts.map(({ instruction }) => instruction)).toEqual([
+      { op: 'sendOut', side: 'far', slot: 0, hp: 100, status: 'none' },
+      { op: 'sendOut', side: 'near', slot: 0, hp: 100, status: 'none' },
+    ])
+  })
+
   it('passes the dropped lines on and lists no fallback for a plain battle', () => {
     const script = scriptOf('|', '|turn|1')
     const result = buildGen3Stream(script)
