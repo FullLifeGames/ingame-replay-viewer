@@ -28,9 +28,10 @@ function monOf(name: string, gender: StreamMon['gender']): StreamMon {
 const move = (name: string) => moveOf(name).number
 
 // One short battle with every scene the screenshot run checks: the intro, both ball displays, both
-// send-outs, a move with its hit and HP change, a status, a switch, a faint and the win line. The
-// near team has one unrevealed member, so its display shows three balls; the far one shows one ball
-// and five empty slots.
+// send-outs, a sandstorm with its animation (the weather-start scene; no ability pop-up, as
+// Skarmory has no Sand Stream), a move with its hit and HP change, a status, a switch, a faint and
+// the win line. The near team has one unrevealed member, so its display shows three balls; the
+// far one shows one ball and five empty slots.
 const INSTRUCTIONS: readonly Instruction[] = [
   { op: 'intro' },
   { op: 'print', text: 'Bob would like to battle!' },
@@ -38,6 +39,9 @@ const INSTRUCTIONS: readonly Instruction[] = [
   { op: 'print', text: 'Bob sent out Skarmory!' },
   { op: 'sendOut', side: 'near', slot: 0, hp: 100, status: 'none' },
   { op: 'print', text: 'Go! Dugtrio!' },
+  { op: 'weather', weather: 'sand' },
+  { op: 'print', text: 'A sandstorm kicked up!' },
+  { op: 'anim', side: 'near', anim: 'sandstormContinues' },
   { op: 'turn', number: 1 },
   { op: 'print', text: 'Dugtrio used Rock Slide!' },
   { op: 'move', user: 'near', target: 'far', move: move('Rock Slide') },

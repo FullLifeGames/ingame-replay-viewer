@@ -51,6 +51,13 @@ export const SCREEN = {
     far: { x: 12, y: 14, width: 128, height: 32 },
   },
   screen: { x: 0, y: 0, width: 240, height: 160 },
+  // The sky of the battle background, where a weather's animation shows over the whole screen
+  // (#22): above the far healthbox, whose corner is at y 14, and left of the far mon, a 64x64
+  // sprite centred on (176, 40) (sBattlerCoords, U/src/battle_anim_mons.c:42), away from both
+  // ability pop-ups at (24, 97) and (178, 57) (sAbilityPopUpCoordsSingles,
+  // U/src/battle_interface.c:2545-2549) and from the text box. Read from the pinned coordinates;
+  // still to be measured on frames.
+  sky: { x: 0, y: 0, width: 140, height: 14 },
   // B_WIN_MSG: tilemapLeft 2, tilemapTop 15, 26x4 tiles of 8 pixels (U/src/battle_bg.c:158).
   message: { x: 16, y: 120, width: 208, height: 32 },
 } as const satisfies {
@@ -60,6 +67,7 @@ export const SCREEN = {
   healthbox: Record<Side, Region>
   message: Region
   screen: Region
+  sky: Region
 }
 
 export type Check =

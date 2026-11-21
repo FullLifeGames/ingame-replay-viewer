@@ -9,6 +9,7 @@ import type { Side } from '../src/script/types.ts'
 import { ballScene } from './rom-shot-balls.ts'
 import { SCREEN } from './rom-shot-probes.ts'
 import type { Check, Region } from './rom-shot-probes.ts'
+import { weatherScene } from './rom-shot-weather.ts'
 
 interface Shot {
   name: string
@@ -204,6 +205,7 @@ const SCENES: readonly (readonly [string, (input: Input) => Scene | undefined])[
   ['near-balls', (input) => ballScene(input.stream, 'near')],
   ['far-balls', (input) => ballScene(input.stream, 'far')],
   ['send-outs', sendOutScene],
+  ['weather-start', (input) => weatherScene(input.stream)],
   ['first-move', moveScene],
   ['first-hp', hpScene],
   ['first-status', statusScene],
