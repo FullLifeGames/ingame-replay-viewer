@@ -13,6 +13,7 @@ import {
   SHN_ABS,
   SHN_COMMON,
   SHN_UNDEF,
+  SHT_NOBITS,
   SHT_PROGBITS,
   STB_LOCAL,
   STB_WEAK,
@@ -89,7 +90,8 @@ function dataSections(ctx: Context): ElfSection[] {
     if (section.flags & SHF_EXECINSTR) {
       throw new Error(`${ctx.source}: section ${section.name} holds code, which wasm cannot take`)
     }
-    if (section.type !== SHT_PROGBITS || Math.log2(Math.max(section.align, 1)) % 1 !== 0) {
+    const kept = section.type === SHT_PROGBITS || section.type === SHT_NOBITS
+    if (!kept || Math.log2(Math.max(section.align, 1)) % 1 !== 0) {
       throw new Error(
         `${ctx.source}: section ${section.name} has type ${String(section.type)} and alignment ${String(section.align)}`,
       )
@@ -182,7 +184,9 @@ class SectionWriter {
   private next = 0
   private readonly section: ElfSection
   private readonly labels: readonly ElfSymbol[]
+  private readonly bss: boolean
   constructor(section: ElfSection, labels: readonly ElfSymbol[]) {
+    this.bss = section.type === SHT_NOBITS
     this.section = section
     this.labels = labels
   }
@@ -201,9 +205,12 @@ class SectionWriter {
     this.emitLabels()
     while (this.cursor < target) {
       const label = this.labels[this.next]?.value ?? Infinity
-      const end = Math.min(target, label, this.cursor + BYTES_PER_LINE)
+      const end = Math.min(target, label, this.cursor + (this.bss ? Infinity : BYTES_PER_LINE))
       const run = [...this.section.bytes.subarray(this.cursor, end)]
-      this.lines.push(`\t.byte\t${run.join(', ')}`)
+      // A .bss section has no bytes in the file, only its size.
+      this.lines.push(
+        this.bss ? `\t.skip\t${String(end - this.cursor)}` : `\t.byte\t${run.join(', ')}`,
+      )
       this.cursor = end
       this.emitLabels()
     }
@@ -246,7 +253,8 @@ function emitSection(ctx: Context, section: ElfSection): string[] {
     writer.field(line, reloc, RELOCATIONS[reloc.type]?.width ?? 4, ctx.source)
   }
   writer.bytesUpTo(section.size)
-  const prefix = section.flags & SHF_WRITE ? '.data' : '.rodata'
+  const writable = section.flags & SHF_WRITE ? '.data' : '.rodata'
+  const prefix = section.type === SHT_NOBITS ? '.bss' : writable
   const segment = `${prefix}.${section.name.replace(/^\./, '').replace(/[^\w.]/g, '_')}`
   return [
     `\t.section\t${segment},"",@`,

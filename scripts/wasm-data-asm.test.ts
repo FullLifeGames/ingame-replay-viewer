@@ -117,6 +117,26 @@ describe('the data converter', () => {
     expect(out).toContain('.section .rodata.rodata,"",@')
     expect(out[out.indexOf('.section .rodata.rodata,"",@') + 1]).toBe('.p2align 2')
   })
+
+  it('reserves a .bss section with .skip, label by label', () => {
+    const { text } = convert({
+      sections: [{ name: '.bss', bytes: new Array<number>(1040).fill(0), type: 8, align: 4 }],
+      symbols: [
+        { name: 'gMPlayTrack_BGM', value: 0, section: '.bss' },
+        { name: 'gMPlayTrack_SE1', value: 800, section: '.bss' },
+      ],
+    })
+    const out = lines(text)
+    expect(out).toEqual(
+      expect.arrayContaining([
+        '.section .bss.bss,"",@',
+        '.skip 800',
+        'gMPlayTrack_SE1:',
+        '.skip 240',
+      ]),
+    )
+    expect(out.some((line) => line.startsWith('.byte'))).toBe(false)
+  })
 })
 
 describe('the data converter refuses what it cannot write', () => {
