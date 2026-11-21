@@ -221,3 +221,31 @@ REPLAY_TEST("Only the faint text prints during the KO animation; the next PRINT 
         EXPECT_EQ(ReplayTest_KOAnimsAtOpStart(6), 0);
     }
 }
+
+// An Explosion double KO (994086, 994176): the log shows no HP line for the user before its faint.
+// Ops 0-2 are INTRO and the two SEND_OUTs; op 8 is END.
+REPLAY_TEST("A mon that faints with HP left has 0 HP, and the far faint starts no KO animation for it")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        StartDugtrioVsMagneton(10, 100);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 0);
+        ReplayStream_Faint(REPLAY_SIDE_NEAR);
+        ReplayStream_Print(COMPOUND_STRING("Dugtrio fainted!"));
+        ReplayStream_Faint(REPLAY_SIDE_FAR);
+        ReplayStream_Print(COMPOUND_STRING("The opposing Magneton fainted!"));
+        ReplayStream_End(REPLAY_OUTCOME_TIE);
+    }
+    SCENE
+    {
+        MESSAGE("Dugtrio fainted!");
+        MESSAGE("The opposing Magneton fainted!");
+    }
+    THEN
+    {
+        EXPECT_EQ(nearMon->hp, 0);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_HP), 0);
+        EXPECT_EQ(ReplayTest_KOAnimsAtOpStart(8), 0);
+    }
+}
