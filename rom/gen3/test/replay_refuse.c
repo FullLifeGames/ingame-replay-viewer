@@ -130,6 +130,19 @@ TEST("Replay: a mon of 0 max HP is refused")
     EXPECT_EQ(Validate(), REPLAY_ERROR_TEAM);
 }
 
+// The HP bar takes the change as an s16 and reads INSTANT_HP_BAR_DROP (0x7FFF) as "empty at once".
+TEST("Replay: a max HP of 0x7FFF or more is refused")
+{
+    ReplayStream_Begin();
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    ReplayStream_SetU16(ReplayStream_MonOffset(REPLAY_SIDE_FAR, 0) + REPLAY_MON_OFFSET_MAX_HP, 0x7FFF);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_TEAM);
+    ReplayStream_SetU16(ReplayStream_MonOffset(REPLAY_SIDE_FAR, 0) + REPLAY_MON_OFFSET_MAX_HP, 0xFFFF);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_TEAM);
+    ReplayStream_SetU16(ReplayStream_MonOffset(REPLAY_SIDE_FAR, 0) + REPLAY_MON_OFFSET_MAX_HP, 0x7FFE);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_NONE);
+}
+
 TEST("Replay: a gender outside REPLAY_GENDER_* is refused")
 {
     EXPECT_EQ(ValidateFarMon(REPLAY_MON_OFFSET_GENDER, REPLAY_GENDER_NONE + 1), REPLAY_ERROR_TEAM);

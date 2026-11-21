@@ -1,4 +1,6 @@
 #include "global.h"
+#include "battle.h"
+#include "battle_controllers.h"
 #include "replay_interpreter.h"
 #include "replay_stream.h"
 #include "constants/abilities.h"
@@ -165,12 +167,14 @@ static enum ReplayError ValidateHeader(const volatile u8 *stream, u32 length)
     return REPLAY_ERROR_NONE;
 }
 
-// A mon the game can make: a species of the expansion, a level, HP, and gender, shininess and
-// nickname inside the format.
+// A mon the game can make: a species of the expansion, a level, a max HP below
+// INSTANT_HP_BAR_DROP (an HP bar change of that value empties the bar at once), and gender,
+// shininess and nickname inside the format.
 static bool32 IsMon(const volatile u8 *mon)
 {
     return Replay_ReadU16(mon + REPLAY_MON_OFFSET_SPECIES) < NUM_SPECIES
         && Replay_ReadU16(mon + REPLAY_MON_OFFSET_MAX_HP) != 0
+        && Replay_ReadU16(mon + REPLAY_MON_OFFSET_MAX_HP) < INSTANT_HP_BAR_DROP
         && mon[REPLAY_MON_OFFSET_LEVEL] >= 1
         && mon[REPLAY_MON_OFFSET_LEVEL] <= MAX_LEVEL
         && mon[REPLAY_MON_OFFSET_GENDER] <= REPLAY_GENDER_NONE
