@@ -39,11 +39,14 @@ The ROM interpreter (`src/replay_interpreter.c`, `src/replay_setup.c`) plays an 
 - ANIM, with its table of the game's animations: `src/replay_anims.c`
 - WEATHER, VOLATILE and ABILITY: `src/replay_ops_field.c`
 
-`src/replay_setup.c` fills both parties from the stream. A team member that the replay never reveals still gets a slot: the empty slots up to the trainer's team size, at most 6, take a copy of the side's first revealed mon, so the intro's ball display shows a ball for each team member.
+`src/replay_setup.c` fills both parties from the stream. A team member that the replay never reveals gets a slot: the empty slots up to the trainer's team size, at most 6, take a copy of the side's first revealed mon, so the intro's ball display shows a ball for each team member.
+
+After a faint the expansion plays its KO animation (`B_ANIMATE_MON_AFTER_KO`). The interpreter waits for it, as the battle script's `waitanimation` does: the faint line that follows FAINT prints while it runs, and every other op waits for its end. FAINT sets the battler's HP to 0 first, as the game's Explosion does for its user, so a later faint on the other side starts no KO animation on a fainted mon.
 
 The tests in `test/replay_*.c` use `include/test/replay_test.h`:
 
 - `REPLAY_TEST(name)` writes a stream in its `STREAM` block with the `ReplayStream_*` writer (`test/replay_stream_writer.c`), queues the events it expects in `SCENE` with upstream's matchers (`MESSAGE`, `HP_BAR`, `ANIMATION` and the rest), and checks the battle in `THEN`, after END and before the test leaves the battle, so the parties, `gBattleStruct` and the sprites are still there.
+- `ReplayTest_KOAnimsAtOpStart(op)` returns the KO animation counter at the start of op `op`, counted from 0, for the first 32 ops of the stream. The interpreter records it through the hook `ReplayTest_AtOpStart`, which exists in test builds (`TESTING`).
 - A plain `TEST` whose name starts with `Replay:` checks a refusal with `Replay_Validate`, without a battle.
 
 ## Screenshots
