@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseCharmap, parseDisplayNames, parseEnum, parseIncludes } from './gen3-parse.ts'
+import {
+  parseCharmap,
+  parseDefine,
+  parseDisplayNames,
+  parseEnum,
+  parseIncludes,
+} from './gen3-parse.ts'
 
 const MOVES = `#ifndef GUARD_CONSTANTS_MOVES_H
 enum __attribute__((packed)) Move
@@ -174,5 +180,24 @@ describe('parseCharmap (T3)', () => {
     )
     expect(() => parseCharmap(`'A' = BB\n'$' = FF\n`)).toThrow(/no "@ Hiragana" line/)
     expect(() => parseCharmap(`'A' = BB\n@ Hiragana\n`)).toThrow(/no '\$'/)
+  })
+})
+
+describe('parseDefine (T3b)', () => {
+  const text = [
+    '#define MIN_LEVEL 1',
+    '#define MAX_LEVEL  100 // the cap',
+    '// #define MAX_LEVEL 50',
+    '#define TWICE (MAX_LEVEL * 2)',
+  ].join('\n')
+
+  it('reads the number of a plain #define, comments left out', () => {
+    expect(parseDefine(text, 'MAX_LEVEL')).toBe(100)
+    expect(parseDefine('#define MASK 0x7FFF\n', 'MASK')).toBe(0x7fff)
+  })
+
+  it('refuses a define it cannot read as one number, and a missing one', () => {
+    expect(() => parseDefine(text, 'TWICE')).toThrow(/TWICE is "\(MAX_LEVEL \* 2\)", not a number/)
+    expect(() => parseDefine(text, 'MAX')).toThrow(/no #define MAX/)
   })
 })

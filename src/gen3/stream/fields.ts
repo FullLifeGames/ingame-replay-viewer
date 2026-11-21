@@ -6,10 +6,20 @@ import { STREAM } from './format'
 
 type Numbers = Readonly<Record<string, number>>
 
-/** A field's kind: a number, a flag, a party slot, one of our enums, or a text of fixed length. */
-export type Kind = Scalar | { readonly enum: Numbers } | TextField
+/**
+ * A field's kind: a number, a flag, a party slot, one of our enums, a number inside its bounds, or
+ * a text of fixed length.
+ */
+export type Kind = Scalar | { readonly enum: Numbers } | Bounded | TextField
 
 type Scalar = 'u8' | 'u16' | 's8' | 'bool' | 'slot'
+
+/** A number of `bytes` bytes from `min` to `max`: a level, a max HP, an expansion number. */
+interface Bounded {
+  readonly bytes: 1 | 2
+  readonly min: number
+  readonly max: number
+}
 
 /** A text field of `text` bytes: the text, then EOS up to the end. */
 interface TextField {
@@ -25,18 +35,40 @@ const RANGES = {
 
 export function fieldSize(kind: Kind): number {
   if (kind === 'u16') return 2
-  return typeof kind === 'object' && 'text' in kind ? kind.text : 1
+  if (typeof kind !== 'object' || 'enum' in kind) return 1
+  return 'text' in kind ? kind.text : kind.bytes
 }
 
 export function fieldBytes(kind: Kind, value: unknown, label: string): number[] {
   if (typeof kind !== 'object') return scalarBytes(kind, value, label)
-  return 'text' in kind ? textBytes(kind, value, label) : [enumNumber(kind.enum, value, label)]
+  if ('enum' in kind) return [enumNumber(kind.enum, value, label)]
+  return 'text' in kind ? textBytes(kind, value, label) : boundedBytes(kind, value, label)
 }
 
 export function readField(kind: Kind, bytes: Uint8Array, at: number, label: string): unknown {
   if (typeof kind !== 'object') return readScalar(kind, bytes, at, label)
+  if ('enum' in kind) return enumKey(kind.enum, bytes[at] as number, label)
   if ('text' in kind) return readText(bytes.subarray(at, at + kind.text), label)
-  return enumKey(kind.enum, bytes[at] as number, label)
+  const value = kind.bytes === 2 ? readScalar('u16', bytes, at, label) : bytes[at]
+  return checkBounds(kind, value, label)
+}
+
+function checkBounds(kind: Bounded, value: unknown, label: string): number {
+  if (
+    typeof value !== 'number' ||
+    !Number.isInteger(value) ||
+    value < kind.min ||
+    value > kind.max
+  ) {
+    const bounds = `${String(kind.min)} to ${String(kind.max)}`
+    throw new Gen3Error(`${label} ${String(value)} is outside ${bounds}`)
+  }
+  return value
+}
+
+function boundedBytes(kind: Bounded, value: unknown, label: string): number[] {
+  const number = checkBounds(kind, value, label)
+  return kind.bytes === 2 ? [number & 0xff, number >> 8] : [number]
 }
 
 function scalarBytes(kind: Scalar, value: unknown, label: string): number[] {

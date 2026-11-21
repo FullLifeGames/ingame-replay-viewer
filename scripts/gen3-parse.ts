@@ -76,6 +76,16 @@ export function parseEnum(text: string, name: string): Map<string, number> {
   return state.values
 }
 
+/** The number of a plain `#define NAME number`; a define with any other value is an error. */
+export function parseDefine(text: string, name: string): number {
+  const pattern = new RegExp(String.raw`^\s*#\s*define\s+${name}\s+(.*)$`, 'gm')
+  const values = [...stripComments(text).matchAll(pattern)].map((match) => (match[1] ?? '').trim())
+  if (values.length !== 1) throw new Error(`no #define ${name}, or more than one`)
+  const value = values[0] ?? ''
+  if (!NUMBER.test(value)) throw new Error(`${name} is "${value}", not a number`)
+  return Number(value)
+}
+
 /** The files a C file includes from one folder, in order. */
 export function parseIncludes(text: string, dir: string): string[] {
   const includes = stripComments(text).matchAll(/^\s*#\s*include\s+"([^"]+)"/gm)

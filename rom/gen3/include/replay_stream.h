@@ -37,7 +37,8 @@
 #define REPLAY_TRAINER_OFFSET_TEAM_SIZE   22
 #define REPLAY_TRAINER_OFFSET_REVEALED    23
 
-// A mon of a party table, indexed by side and party slot. An empty slot is all zero.
+// A mon of a party table, indexed by side and party slot. A slot whose species is 0 is empty,
+// whatever its other bytes (Replay_HoldsMon); the backend writes an empty slot as all zero.
 #define REPLAY_MON_SIZE                 24
 #define REPLAY_MON_NICKNAME_LENGTH      13
 #define REPLAY_MON_OFFSET_SPECIES       0

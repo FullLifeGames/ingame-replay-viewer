@@ -1,7 +1,9 @@
 // The instruction stream as a model (plan §2): the team tables and the instructions, with text in
 // Unicode and our enums by name. LAYOUT gives each op's operands in byte order; encode.ts and
-// decode.ts read it, so an operand's place lives here alone.
+// decode.ts read it, so an operand's place lives here alone. The bounds of the expansion's numbers
+// come from counts.json, which the generator reads from the pinned tree.
 import type { Side } from '../../script/types'
+import counts from '../tables/counts.json'
 import type { Kind } from './fields'
 import {
   ANIM,
@@ -102,6 +104,9 @@ export type Fields<T> = readonly (readonly [name: keyof T & string, kind: Kind])
 const side = { enum: SIDE } as const
 const status = { enum: STATUS } as const
 
+/** A number of the expansion below its count; the ROM's validator refuses any other. */
+const below = (count: number, min = 0) => ({ bytes: 2, min, max: count - 1 }) as const
+
 /** The operands of each op but PRINT, in byte order. */
 export const LAYOUT: { readonly [K in FixedOp]: Fields<Operands[K]> } = {
   end: [['outcome', { enum: OUTCOME }]],
@@ -123,7 +128,7 @@ export const LAYOUT: { readonly [K in FixedOp]: Fields<Operands[K]> } = {
   move: [
     ['user', side],
     ['target', side],
-    ['move', 'u16'],
+    ['move', below(counts.MOVES_COUNT_ALL)],
   ],
   hit: [
     ['side', side],
@@ -157,29 +162,29 @@ export const LAYOUT: { readonly [K in FixedOp]: Fields<Operands[K]> } = {
   ],
   ability: [
     ['side', side],
-    ['ability', 'u16'],
+    ['ability', below(counts.ABILITIES_COUNT)],
     ['show', 'bool'],
   ],
   item: [
     ['side', side],
     ['slot', 'slot'],
-    ['item', 'u16'],
+    ['item', below(counts.ITEMS_COUNT)],
   ],
 }
 
 /** A trainer's fields; their offsets are TRAINER_OFFSET's under the same names. */
 export const TRAINER_FIELDS: Fields<StreamTrainer> = [
   ['name', { text: TRAINER.nameLength }],
-  ['trainerPic', 'u16'],
+  ['trainerPic', below(counts.TRAINER_PIC_COUNT)],
   ['teamSize', 'u8'],
   ['revealed', 'u8'],
 ]
 
-/** A mon's fields; their offsets are MON_OFFSET's under the same names. */
+/** A mon's fields; their offsets are MON_OFFSET's under the same names. Species 0 is no mon. */
 export const MON_FIELDS: Fields<StreamMon> = [
-  ['species', 'u16'],
-  ['maxHp', 'u16'],
-  ['level', 'u8'],
+  ['species', below(counts.NUM_SPECIES, 1)],
+  ['maxHp', below(MON.maxHpLimit, 1)],
+  ['level', { bytes: 1, min: 1, max: counts.MAX_LEVEL }],
   ['gender', { enum: GENDER }],
   ['shiny', 'bool'],
   ['nickname', { text: MON.nicknameLength }],

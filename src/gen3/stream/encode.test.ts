@@ -62,6 +62,19 @@ describe('encodeStream', () => {
     expect(() => encodeStream({ ...stream, parties })).toThrow(/party/)
   })
 
+  it('refuses an empty side, a slot operand on an empty slot and a mon of species 0', () => {
+    const stream = streamOf([END])
+    const empty = { ...stream.parties, far: Array<null>(6).fill(null) }
+    expect(() => encodeStream({ ...stream, parties: empty })).toThrow(/far party holds no mon/)
+    const item: Instruction = { op: 'item', side: 'near', slot: 4, item: 1 }
+    expect(() => encodeStream(streamOf([item, END]))).toThrow(/item names near slot 4/)
+    const none = {
+      ...stream.parties,
+      near: [{ ...DUGTRIO, species: 0 }, ...stream.parties.near.slice(1)],
+    }
+    expect(() => encodeStream({ ...stream, parties: none })).toThrow(/species 0 is outside 1/)
+  })
+
   it('refuses a nickname over 12 glyphs and a trainer name over 19', () => {
     const stream = streamOf([END])
     const long: StreamMon = { ...DUGTRIO, nickname: 'MachinePassag' }
@@ -124,8 +137,8 @@ describe('encodeInstruction', () => {
   it('writes signed stages and a two-byte move', () => {
     const stat: Instruction = { op: 'stat', side: 'far', stat: 'atk', stages: -1, arrows: 'one' }
     expect(encodeInstruction(stat)).toEqual([0x0c, 4, 1, 1, 0xff, 1])
-    const move: Instruction = { op: 'move', user: 'near', target: 'far', move: 0x1234 }
-    expect(encodeInstruction(move)).toEqual([0x07, 4, 0, 1, 0x34, 0x12])
+    const move: Instruction = { op: 'move', user: 'near', target: 'far', move: 0x0312 }
+    expect(encodeInstruction(move)).toEqual([0x07, 4, 0, 1, 0x12, 0x03])
   })
 
   it('refuses operands out of their range', () => {
@@ -137,6 +150,8 @@ describe('encodeInstruction', () => {
       { op: 'stat', side: 'near', stat: 'def', stages: 128, arrows: 'none' },
       { op: 'weather', weather: 'fog' as 'rain' },
       { op: 'volatile', side: 'near', volatile: 'substitute', on: 1 as unknown as boolean },
+      { op: 'move', user: 'near', target: 'far', move: 0x1234 },
+      { op: 'item', side: 'far', slot: 0, item: 'Leftovers' as unknown as number },
     ]
     for (const instruction of cases) {
       expect(() => encodeInstruction(instruction), instruction.op).toThrow(Gen3Error)

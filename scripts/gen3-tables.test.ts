@@ -26,13 +26,29 @@ const TREE: Record<string, string> = {
     'SPECIES_EGG,',
     'NUM_SPECIES = SPECIES_EGG,',
   ]),
-  'include/constants/moves.h': enumOf('Move', ['MOVE_NONE = 0,', 'MOVE_POUND = 1,']),
-  'include/constants/abilities.h': enumOf('Ability', ['ABILITY_NONE = 0,', 'ABILITY_STENCH,']),
-  'include/constants/items.h': enumOf('Item', ['ITEM_NONE = 0,', 'ITEM_POKE_BALL = 4,']),
+  'include/constants/moves.h': enumOf('Move', [
+    'MOVE_NONE = 0,',
+    'MOVE_POUND = 1,',
+    'MOVES_COUNT,',
+    'FIRST_MAX_MOVE = 5,',
+    'MOVES_COUNT_ALL,',
+  ]),
+  'include/constants/abilities.h': enumOf('Ability', [
+    'ABILITY_NONE = 0,',
+    'ABILITY_STENCH,',
+    'ABILITIES_COUNT,',
+  ]),
+  'include/constants/items.h': enumOf('Item', [
+    'ITEM_NONE = 0,',
+    'ITEM_POKE_BALL = 4,',
+    'ITEMS_COUNT,',
+  ]),
   'include/constants/trainers.h': enumOf('TrainerPicID', [
     'TRAINER_PIC_NONE,',
     'TRAINER_PIC_BRENDAN,',
+    'TRAINER_PIC_COUNT,',
   ]),
+  'include/constants/pokemon.h': '#define MAX_LEVEL 100\n',
   'src/data/pokemon/species_info.h': [
     '#include "constants/abilities.h"',
     '[SPECIES_NONE] = { .speciesName = _("??????????") },',
@@ -82,12 +98,33 @@ describe('generateTables on a small tree', () => {
       SPECIES_EGG: [30, null],
     })
     expect(parsed('items.json')).toEqual({ ITEM_NONE: [0, null], ITEM_POKE_BALL: [4, 'Poké Ball'] })
-    expect(parsed('trainer-pics.json')).toEqual({ TRAINER_PIC_NONE: 0, TRAINER_PIC_BRENDAN: 1 })
+    expect(parsed('trainer-pics.json')).toEqual({
+      TRAINER_PIC_NONE: 0,
+      TRAINER_PIC_BRENDAN: 1,
+      TRAINER_PIC_COUNT: 2,
+    })
     expect(parsed('charmap.json')).toEqual({
       eos: 255,
       chars: { ' ': 0, A: 187 },
       named: { NBSP: [57] },
     })
+  })
+
+  it('writes the counts and the level cap that bound the numbers of a stream', () => {
+    expect(parsed('counts.json')).toEqual({
+      NUM_SPECIES: 30,
+      MOVES_COUNT_ALL: 6,
+      ABILITIES_COUNT: 2,
+      ITEMS_COUNT: 5,
+      TRAINER_PIC_COUNT: 2,
+      MAX_LEVEL: 100,
+    })
+  })
+
+  it('refuses a tree whose enum lacks its count', () => {
+    const read = (path: string) =>
+      path.endsWith('items.h') ? enumOf('Item', ['ITEM_NONE = 0,']) : readTree(path)
+    expect(() => generateTables(read, PIN)).toThrow(/enum Item has no ITEMS_COUNT/)
   })
 
   it('records the pin and the sha256 of each file read', () => {

@@ -1,7 +1,9 @@
 // The bytes of an instruction stream back to the stream model, for the specs and the page's
-// debug view. It refuses what the ROM interpreter refuses (a version it does not know, an unknown
-// op, a fixed op of the wrong size, a max HP the health bar cannot take) and every other byte the
-// format does not allow.
+// debug view. It refuses every stream the ROM's validator refuses (replay_stream_check.c): a
+// version it does not know, a header or an op of the wrong size, an operand outside its range, a
+// number at or above the expansion's count, a mon the game cannot make, an empty side, a slot
+// operand that names no mon. It refuses more: a byte outside the charset, a trainer pic at or above
+// its count.
 import type { Side } from '../../script/types'
 import { Gen3Error } from '../errors'
 import { decodeText, EOS } from '../text/charset'
@@ -33,6 +35,7 @@ import {
   type StreamTrainer,
   TRAINER_FIELDS,
 } from './instructions'
+import { checkTeams } from './teams'
 
 const OPS: ReadonlyMap<number, Op> = new Map(
   Object.entries(OP).map(([op, code]) => [code, op as Op]),
@@ -41,12 +44,16 @@ const OPS: ReadonlyMap<number, Op> = new Map(
 export function decodeStream(bytes: Uint8Array): Stream {
   const { offset, length } = readHeader(bytes)
   const trainer = (side: Side) =>
-    readRecord<StreamTrainer>(TRAINER_FIELDS, TRAINER_OFFSET, bytes, trainerOffset(side))
-  return {
+    readRecord<StreamTrainer>(TRAINER_FIELDS, TRAINER_OFFSET, bytes.subarray(trainerOffset(side)), {
+      label: `${side} trainer`,
+    })
+  const stream: Stream = {
     trainers: { near: trainer('near'), far: trainer('far') },
     parties: { near: readParty(bytes, 'near'), far: readParty(bytes, 'far') },
     instructions: readInstructions(bytes.subarray(offset, offset + length)),
   }
+  checkTeams(stream)
+  return stream
 }
 
 function readHeader(bytes: Uint8Array): { offset: number; length: number } {
@@ -76,30 +83,29 @@ function expectValue(name: string, value: number, expected: number): void {
   }
 }
 
+// A slot whose species is 0 holds no mon, whatever its other bytes (the ROM's Replay_HoldsMon).
 function readParty(bytes: Uint8Array, side: Side): Party {
   return Array.from({ length: STREAM.partySize }, (_, slot) => {
-    const at = monOffset(side, slot)
-    if (bytes.subarray(at, at + MON.size).every((byte) => byte === 0)) return null
-    const mon = readRecord<StreamMon>(MON_FIELDS, MON_OFFSET, bytes, at)
-    if (mon.maxHp >= MON.maxHpLimit) {
-      const limit = String(MON.maxHpLimit)
-      throw new Gen3Error(
-        `${side} mon ${String(slot)} has max HP ${String(mon.maxHp)}, not below ${limit}`,
-      )
-    }
-    return mon
+    const record = bytes.subarray(monOffset(side, slot))
+    if (readField('u16', record, MON_OFFSET.species, 'species') === 0) return null
+    return readRecord<StreamMon>(MON_FIELDS, MON_OFFSET, record, {
+      label: `${side} mon ${String(slot)}`,
+    })
   })
 }
 
+// `record` starts at the record; each field's label starts with the record's.
 function readRecord<T extends object>(
   fields: Fields<T>,
   offsets: Readonly<Record<keyof T & string, number>>,
-  bytes: Uint8Array,
-  at: number,
+  record: Uint8Array,
+  { label }: { readonly label: string },
 ): T {
-  const record: Record<string, unknown> = {}
-  for (const [name, kind] of fields) record[name] = readField(kind, bytes, at + offsets[name], name)
-  return record as T
+  const values: Record<string, unknown> = {}
+  for (const [name, kind] of fields) {
+    values[name] = readField(kind, record, offsets[name], `${label} ${name}`)
+  }
+  return values as T
 }
 
 function readInstructions(body: Uint8Array): Instruction[] {

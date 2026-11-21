@@ -27,11 +27,13 @@ import {
   type Party,
   type Stream,
 } from './instructions'
+import { checkTeams } from './teams'
 
 const SIDES = Object.keys(SIDE) as Side[]
 
 export function encodeStream(stream: Stream): Uint8Array {
   checkEnd(stream.instructions)
+  checkTeams(stream)
   const body = stream.instructions.flatMap(encodeInstruction)
   const bytes = new Uint8Array(STREAM.tablesEnd + body.length)
   bytes.set(headerBytes(body.length), 0)
