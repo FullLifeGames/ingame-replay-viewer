@@ -4,6 +4,7 @@ import type { BattleScript, ScriptEvent } from '../../script/events'
 import { Gen3Error } from '../errors'
 import type { Fallback } from '../fallbacks'
 import type { Stream } from '../stream/instructions'
+import { ability, closePopUp, inCausePopUp } from './abilities'
 import { Context, type EventOf, type Placed } from './context'
 import { message, tie, win } from './end'
 import { fieldActivate, sideEnd, sideStart, weather } from './field'
@@ -56,7 +57,7 @@ const HANDLERS = {
   fieldActivate,
   item: notYet,
   itemEnd: notYet,
-  ability: notYet,
+  ability,
 } satisfies { readonly [K in ScriptEvent['kind']]: Handler<K> }
 
 export interface Translation extends Omit<Stream, 'instructions'> {
@@ -70,10 +71,14 @@ export function translate(script: BattleScript): Translation {
   for (const [index, event] of script.events.entries()) {
     ctx.at = index
     if (event.kind !== 'switchIn') endIntro(ctx)
+    closePopUp(event, ctx)
     const handle = HANDLERS[event.kind] as (event: ScriptEvent, ctx: Context) => void
-    handle(event, ctx)
+    inCausePopUp(event, ctx, () => {
+      handle(event, ctx)
+    })
   }
   endIntro(ctx)
+  closePopUp(undefined, ctx)
   closeStream(ctx)
   const tables = tablesOf(ctx)
   const fallbacks = ctx.fallbacks.toSorted((a, b) => a.line - b.line)

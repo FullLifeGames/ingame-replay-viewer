@@ -3,7 +3,7 @@
 import { toID } from '@pkmn/dex'
 
 import type { Effect } from '../../script/types'
-import { itemName, type Mon, nameAtStart, nameInside, ownerAtStart } from './names'
+import { abilityName, itemName, type Mon, nameAtStart, nameInside, ownerAtStart } from './names'
 import { ownPhrase, type Phrase, tagged } from './template'
 
 export const ITEM_TEMPLATES = {
@@ -57,4 +57,9 @@ export function itemRemoved(
 /** The line an ability adds to its pop-up, if it has one. */
 export function abilityShown(who: Mon, ability: string): string | undefined {
   return toID(ability) === 'pressure' ? ITEM_TEMPLATES.pressure.render(who) : undefined
+}
+
+/** An ability the expansion lacks has no pop-up; this line of ours stands in for it. */
+export function abilityAsText(who: Mon, ability: string): string {
+  return `${ownerAtStart(who)} ${abilityName(ability)} took effect!`
 }

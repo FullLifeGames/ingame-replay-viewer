@@ -34,6 +34,13 @@ export type PrintText = string | { readonly text: string; readonly fallback?: No
 /** The leads' text and SEND_OUT, by side, while the intro sends them out. */
 export type Leads = Readonly<Record<Side, Placed[]>>
 
+/** An ability pop-up that is up, as ABILITY's operands name it, and the line that raised it. */
+export interface PopUp {
+  readonly line: number
+  readonly side: Side
+  readonly ability: number
+}
+
 /** A player as the header and the text show them. */
 export interface Player {
   /** For the trainer table: fitted to the charset, plain spaces. */
@@ -50,6 +57,8 @@ export class Context {
   readonly teamSizes: Partial<Record<Side, number>> = {}
   /** The leads while the intro sends them out; INTRO's handler opens it. */
   leads: Leads | undefined
+  /** The pop-up of an `-ability` line while it stays up over the events after it. */
+  popUp: PopUp | undefined
   /** The index in `script.events` of the event in hand; the walk sets it. */
   at = 0
   /** The Pokémon whose move the log shows last; its own HP loss is no hit. */
