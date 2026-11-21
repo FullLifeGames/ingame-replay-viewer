@@ -12,8 +12,9 @@ export interface PageEnvironment {
 export function environmentProblem(environment: PageEnvironment): string | undefined {
   if (!environment.isSecureContext) {
     return (
-      'This page is not a secure context, so the emulator cannot run: ' +
-      'open it at http://localhost or over HTTPS.'
+      'This page is not a secure context, so the emulator cannot run. Open it on devbox at ' +
+      'http://localhost:5177, or over the HTTPS address that tailscale serve gives it ' +
+      '(see src/web/README.md).'
     )
   }
   if (!environment.crossOriginIsolated) {

@@ -4,11 +4,13 @@ import { environmentProblem } from './environment'
 
 describe('environmentProblem', () => {
   // Opened as http://100.x.y.z:5177 over Tailscale: not a secure context, so no SharedArrayBuffer.
-  it('names localhost and HTTPS on a page that is not a secure context', () => {
+  // The user reads this line on their own phone or PC, where localhost is not devbox.
+  it('names devbox, its localhost address and the tailnet HTTPS route on an insecure page', () => {
     const line = environmentProblem({ isSecureContext: false, crossOriginIsolated: false })
     expect(line).toContain('secure context')
-    expect(line).toContain('http://localhost')
-    expect(line).toContain('HTTPS')
+    expect(line).toContain('on devbox at http://localhost:5177')
+    expect(line).toContain('tailscale serve')
+    expect(line).toContain('src/web/README.md')
   })
 
   it('names the COOP and COEP headers on a secure page that is not cross-origin isolated', () => {
