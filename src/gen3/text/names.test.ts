@@ -14,7 +14,7 @@ import {
   teamInside,
 } from './names'
 
-const NBSP = ' '
+const NBSP = '\u00a0'
 
 const member = (species: string, name = species): TeamMember => ({
   species,

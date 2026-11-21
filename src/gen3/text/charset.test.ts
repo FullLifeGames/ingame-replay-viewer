@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { Gen3Error } from '../errors'
 import { decodeText, encodeText, fitCharset } from './charset'
 
-const NBSP = ' '
+const NBSP = '\u00a0'
 
 describe('encodeText', () => {
   it('spells "The opposing Skarmory used Spikes!" in charmap bytes (C1)', () => {

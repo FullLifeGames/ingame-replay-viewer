@@ -21,8 +21,8 @@ export interface NamedMon {
 
 const NICKNAME_GLYPHS = MON.nicknameLength - 1
 
-/** The no-break space the game puts into every name it inserts (`battle_message.c`). */
-const held = (text: string) => text.replaceAll(' ', ' ')
+/** A word the game inserts gets no-break spaces for its spaces (`battle_message.c`). */
+export const held = (text: string) => text.replaceAll(' ', '\u00a0')
 
 export const NAME_TEMPLATES = {
   foePrefix: tagged('sText_FoePkmnPrefix', () => 'The opposing '),
