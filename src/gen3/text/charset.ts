@@ -2,6 +2,7 @@
 // codec at the stream seam is strict; `fitCharset` makes text from outside (names, simulator
 // messages) fit first and reports what it replaced.
 import { Gen3Error } from '../errors'
+import { PRINT_SIZE } from '../stream/format'
 import charmap from '../tables/charmap.json'
 
 /** The charmap's end of string, which ends and pads every text in the stream. */
@@ -67,4 +68,17 @@ export function fitCharset(text: string): Fitted {
   const fitted = chars.map((char) => (BYTES.has(char) ? char : REPLACEMENT)).join('')
   const detail = `"${text}" has ${outside.join(' ')} outside the game's charset; they show as ?`
   return { text: fitted, fallback: { kind: 'character', detail } }
+}
+
+/** The glyphs one PRINT holds: its largest size less EOS; every character is one byte. */
+const PRINT_GLYPHS = PRINT_SIZE.max - 1
+
+/** A text in PRINTs that each fit, split at the last space that fits (plan §5). */
+export function splitForPrint(text: string): string[] {
+  const glyphs = Array.from(text)
+  if (glyphs.length <= PRINT_GLYPHS) return [text]
+  const space = glyphs.lastIndexOf(' ', PRINT_GLYPHS)
+  const cut = space > 0 ? space : PRINT_GLYPHS
+  const rest = glyphs.slice(space > 0 ? cut + 1 : cut).join('')
+  return [glyphs.slice(0, cut).join(''), ...splitForPrint(rest)]
 }

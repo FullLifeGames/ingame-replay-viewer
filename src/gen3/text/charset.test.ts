@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { Gen3Error } from '../errors'
-import { decodeText, encodeText, fitCharset } from './charset'
+import { decodeText, encodeText, fitCharset, splitForPrint } from './charset'
 
 const NBSP = '\u00a0'
 
@@ -41,5 +41,23 @@ describe('fitCharset', () => {
       },
     })
     expect(() => encodeText(fitCharset('Wobb🦀').text)).not.toThrow()
+  })
+})
+
+describe('splitForPrint', () => {
+  it('keeps a text that fits one PRINT whole', () => {
+    expect(splitForPrint('Bob forfeited.')).toEqual(['Bob forfeited.'])
+  })
+
+  it('splits a text over 254 glyphs at the last space that fits', () => {
+    const words = Array.from({ length: 60 }, (_, index) => `w${String(index).padStart(3, '0')}`)
+    const parts = splitForPrint(words.join(' '))
+    expect(parts.join(' ')).toBe(words.join(' '))
+    expect(parts.map((part) => encodeText(part).length + 1)).toEqual([255, 45])
+  })
+
+  it('cuts a text with no space where it must', () => {
+    const parts = splitForPrint('x'.repeat(300))
+    expect(parts.map((part) => part.length)).toEqual([254, 46])
   })
 })
