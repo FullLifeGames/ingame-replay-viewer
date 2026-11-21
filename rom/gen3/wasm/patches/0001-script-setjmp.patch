@@ -1,0 +1,38 @@
+script.c breaks out of an effect analysis with __builtin_setjmp and __builtin_longjmp into
+an intptr_t[5]. clang supports neither builtin on wasm32, so the WebAssembly build uses libc's
+setjmp and longjmp with a jmp_buf, which Emscripten lowers for the link.
+
+diff --git a/src/script.c b/src/script.c
+index ff1e433..06ea905 100644
+--- a/src/script.c
++++ b/src/script.c
+@@ -14,6 +14,9 @@
+ #include "field_message_box.h"
+ 
+ #include "dexnav.h"
++#ifdef IRV_WASM
++#include <setjmp.h>
++#endif
+ 
+ #define RAM_SCRIPT_MAGIC 51
+ 
+@@ -603,10 +606,19 @@ bool8 LoadTrainerObjectScript(void)
+ 
+ struct ScriptEffectContext {
+     u32 breakOn;
++#ifdef IRV_WASM
++    jmp_buf breakTo;
++#else
+     intptr_t breakTo[5];
++#endif
+     const u8 *nextCmd;
+ };
+ 
++#ifdef IRV_WASM
++#define __builtin_setjmp(buf) setjmp(buf)
++#define __builtin_longjmp(buf, value) longjmp(buf, value)
++#endif
++
+ struct ScriptEffectContext *gScriptEffectContext = NULL;
+ 
+ static bool32 Script_IsEffectInstrumentedCommand(ScrCmdFunc func)

@@ -1,1 +1,3 @@
 # Patches against copies of upstream files in build/wasm/overlay, applied in this order.
+0001-script-setjmp.patch
+0002-script-effect-list.patch
