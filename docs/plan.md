@@ -70,5 +70,6 @@ Decisions from the design session on 2026-11-20 that are not ADRs, plus the road
    - Smogon's bot policy (2026-10-09) doesn't apply: it covers autonomous bots, and here a human plays (user's call, 2026-11-20).
 8. **Gen 5 expansion.** A Black 2/White 2 with later generations' content, built from pinned pokebw2.
    - Open: everything. First check whether a community effort on pokebw2 already exists.
+   - Candidate: Boundless Black 2 by magickappy, due on 28.11.2026 (user's pointer, 21.11.2026). The hack puts all 1,025 species into Black 2, with regional forms, the Fairy type, Megas, modern moves, abilities and items, and animated Gen 5-style sprites. Its engine is White2Upgrade (721 species and the Fairy type), expanded to 1,025. A fan site says the developer plans to open the source a few weeks after release; nobody has named a licence or the build method yet. Once the source is out, check whether it builds from pokebw2 or patches the binary, and whether its licence allows a pinned build as ADR 0007 describes.
 9. **3D (Gen 9).** Scarlet/Violet.
    - Open: everything.
