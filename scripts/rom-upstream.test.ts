@@ -145,14 +145,37 @@ describe('prepareTree', () => {
       applied: true,
       patches: ['0001-one.patch', '0002-two.patch'],
       copied: ['include/replay_slot.h', 'src/replay_slot.c'],
+      written: ['include/replay_slot.h', 'src/replay_slot.c'],
     })
   })
 
-  it('keeps the modification time of our files', () => {
+  it('gives a first copy the current time, not the time of our file', () => {
     write(join(rom, 'src/replay_slot.c'), '// ours\n')
     utimesSync(join(rom, 'src/replay_slot.c'), PAST, PAST)
-    prepareTree(options())
-    expect(statSync(join(upstream, 'src/replay_slot.c')).mtime).toEqual(PAST)
+    const before = Date.now() - 1000
+    expect(prepareTree(options()).written).toEqual(['src/replay_slot.c'])
+    expect(statSync(join(upstream, 'src/replay_slot.c')).mtimeMs).toBeGreaterThan(before)
+  })
+
+  // make compares times: an edit made while make compiled the old text must still rebuild.
+  it('writes only the files whose content changed, with the current time', () => {
+    write(join(rom, 'src/replay_a.c'), '// a\n')
+    write(join(rom, 'test/replay_b.c'), '// b\n')
+    const stampPath = join(roots.cache, 'times.json')
+    prepareTree(options({ stampPath }))
+    for (const file of ['src/replay_a.c', 'test/replay_b.c']) {
+      utimesSync(join(upstream, file), PAST, PAST)
+      utimesSync(join(rom, file), PAST, PAST)
+    }
+    write(join(rom, 'src/replay_a.c'), '// a, edited\n')
+    utimesSync(join(rom, 'src/replay_a.c'), PAST, PAST)
+    const before = Date.now() - 1000
+    const result = prepareTree(options({ stampPath }))
+    expect(result.written).toEqual(['src/replay_a.c'])
+    expect(result.copied).toEqual(['src/replay_a.c', 'test/replay_b.c'])
+    expect(read('src/replay_a.c')).toBe('// a, edited\n')
+    expect(statSync(join(upstream, 'src/replay_a.c')).mtimeMs).toBeGreaterThan(before)
+    expect(statSync(join(upstream, 'test/replay_b.c')).mtime).toEqual(PAST)
   })
 
   it('refuses to copy over a tracked file and names it', () => {
