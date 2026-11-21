@@ -22,7 +22,7 @@ import {
 type Gender = keyof typeof GENDER
 type Outcome = keyof typeof OUTCOME
 export type Status = keyof typeof STATUS
-type Weather = keyof typeof WEATHER
+export type Weather = keyof typeof WEATHER
 type Stat = keyof typeof STAT
 type Arrows = keyof typeof ARROWS
 type Effectiveness = keyof typeof EFFECTIVENESS

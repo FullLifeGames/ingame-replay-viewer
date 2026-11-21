@@ -6,6 +6,7 @@ import type { Fallback } from '../fallbacks'
 import type { Stream } from '../stream/instructions'
 import { Context, type EventOf, type Placed } from './context'
 import { message, tie, win } from './end'
+import { fieldActivate, sideEnd, sideStart, weather } from './field'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
 import { damage, heal } from './hp'
 import { crit, effectiveness, failure, immunity, miss, move } from './moves'
@@ -49,10 +50,10 @@ const HANDLERS = {
   effectEnd: notYet,
   effectActivate: notYet,
   singleTurn: notYet,
-  weather: notYet,
-  sideStart: notYet,
-  sideEnd: notYet,
-  fieldActivate: notYet,
+  weather,
+  sideStart,
+  sideEnd,
+  fieldActivate,
   item: notYet,
   itemEnd: notYet,
   ability: notYet,

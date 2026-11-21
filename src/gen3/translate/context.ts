@@ -134,6 +134,11 @@ export class Context {
     return this.script.events[this.at + offset]
   }
 
+  /** Where an animation of the whole field plays: the near Pokémon, or the far one while none. */
+  fieldSide(): Side {
+    return this.active.near === undefined && this.active.far !== undefined ? 'far' : 'near'
+  }
+
   /** The line that first sends the team member in, for what its name or form needs. */
   firstLine(ref: PokemonRef): number {
     const entry = this.script.events.find(
