@@ -14,7 +14,7 @@ The build scripts are `scripts/rom-*.ts`. The upstream tree lives in `.cache/rom
 Each command is a heavy check on devbox, so run it alone and in the background.
 
 - `npm run rom:build` clones the pinned tag into `.cache/rom/expansion/` if it is missing, applies `patches/series`, copies our files, runs make and writes the outputs to `build/rom/`: the ROM, the BPS patch against your dump, `replay-slot.json` and `build-info.json`. `npm run rom:build -- --clean` starts from a fresh tree.
-- `npm run rom:repro` runs two clean builds, the second in a fresh worktree, and fails unless the ROM, patch and slot description are equal. It takes about two full builds.
+- `npm run rom:repro` runs two clean builds, the second in a fresh worktree, and fails unless the ROM, patch and slot description are equal. It takes as long as two builds, about 90 minutes on devbox.
 - `npm run rom:clean` empties `build/rom/` and drops the build products from the tree. `npm run rom:clean -- --all` deletes the tree as well, so the next build clones it again.
 
 The build reads your US Emerald dump from `~/roms/Pokemon - Emerald Version (USA, Europe).gba`, or from the path in `IRV_BASE_ROM`, and checks its SHA1 against `build.json`. It stops when the ARM toolchain is missing, and prints the `apt-get` line that installs it. It also stops when less than 3 GiB of memory is free.

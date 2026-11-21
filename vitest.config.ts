@@ -6,8 +6,6 @@ export default defineConfig({
     environment: 'node',
     maxWorkers: 4,
     include: ['src/**/*.test.ts', 'scripts/**/*.test.ts'],
-    // Until the first spec lands; drop it then.
-    passWithNoTests: true,
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],

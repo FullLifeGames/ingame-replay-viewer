@@ -13,7 +13,8 @@ The viewer plays Pokémon Showdown replays back inside real Pokémon games. A ga
 - `src/script/`: battle log to battle script (game-neutral), plain TypeScript.
 - `src/gen3/`: the Gen 3 game backend (battle script to instruction stream), plain TypeScript.
 - `src/web/`: the pages and the emulator.
-- `rom/gen3/`: our C files and the list of changes against the pinned pokeemerald-expansion, plus the build scripts. The upstream checkout and every build output live outside the tracked tree.
+- `rom/gen3/`: our C files and the list of changes against the pinned pokeemerald-expansion. The build scripts are `scripts/rom-*`. The upstream checkout (`.cache/rom/`) and the build outputs (`build/rom/`) stay out of the tracked tree.
+- `src/patch/`: the BPS codec that the build and the page share, plain TypeScript.
 - `test/fixtures/replays/`: the test replays as Showdown's replay JSON. Unit specs sit next to their source as `*.test.ts`.
 - `docs/waves/`: one booking per wave.
 
@@ -31,7 +32,7 @@ The viewer plays Pokémon Showdown replays back inside real Pokémon games. A ga
 ## Rules for the code
 
 - Species, moves, abilities, items and rules come from the @pkmn libraries (`@pkmn/protocol`, `@pkmn/client`, `@pkmn/dex`, `@pkmn/data`). Our code reads library data and never lists names by hand. A mapping to a target game's own numbers is generated from that game's pinned sources and checked by a spec.
-- `src/script/` and `src/gen3/` import no DOM, no browser API and no emulator; the import zones in `eslint.config.js` hold it.
+- `src/script/`, `src/gen3/` and `src/patch/` import no DOM, no browser API and no emulator, and `src/patch/` imports nothing from Node; the import zones in `eslint.config.js` hold it.
 - No silent drops: every battle log line becomes events or a dropped line, and an unknown line fails the specs.
 - Formats that cross into the game carry a version: the instruction stream starts with one, and the ROM interpreter refuses a version it does not know.
 - One rule lives in one module; every other place imports it.
@@ -42,7 +43,7 @@ The viewer plays Pokémon Showdown replays back inside real Pokémon games. A ga
 ## Checks before commit and push
 
 - `npm run check` runs lint, `tsc -b`, the Prettier check, knip and the unit specs with coverage. Run it before every push; CI runs the same.
-- Coverage of `src/script/` and `src/gen3/` stays at 90 % of lines and branches or more.
+- Coverage of `src/script/`, `src/gen3/` and `src/patch/` stays at 90 % of lines and branches or more.
 - Test first: a red test that fails for the right reason, then the code.
 - lefthook runs Prettier and ESLint on staged files before each commit.
 - devbox: one heavy check at a time (the full suite, a ROM build, the expansion's `make check`, e2e, a dev server for a tester). Vitest runs with at most 4 workers. Long runs go to the background. Another session may share the machine: read `free -g` before a heavy run.
