@@ -24,6 +24,22 @@ export interface HpBar {
   empty: readonly number[]
 }
 
+// Where the probes look on the 240x160 screen of a singles battle. ESTIMATES, to be measured.
+export const SCREEN = {
+  nearHpDigits: { x: 166, y: 96, width: 56, height: 8 },
+  farHpBar: { x: 36, y: 31, width: 48, empty: [0x506858] },
+  healthbox: {
+    near: { x: 126, y: 72, width: 104, height: 32 },
+    far: { x: 12, y: 14, width: 104, height: 32 },
+  },
+  message: { x: 16, y: 120, width: 208, height: 32 },
+} as const satisfies {
+  nearHpDigits: Region
+  farHpBar: HpBar
+  healthbox: Record<'near' | 'far', Region>
+  message: Region
+}
+
 export type Check =
   | { probe: 'differs'; before: string; after: string; region?: Region }
   | { probe: 'blank'; shot: string; region: Region }

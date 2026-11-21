@@ -75,7 +75,7 @@ export function cleanOutputs(paths: BuildPaths, config: BuildConfig, all: boolea
   say(`removed ${paths.outDir} and the build products in ${paths.tree}`)
 }
 
-function nmOutput(elfPath: string): string {
+export function nmOutput(elfPath: string): string {
   const result = spawnSync('arm-none-eabi-nm', ['-P', '-t', 'x', elfPath], {
     encoding: 'utf8',
     maxBuffer: 256 * 1024 * 1024,

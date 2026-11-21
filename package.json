@@ -23,6 +23,7 @@
     "rom:check": "node scripts/rom-check.ts",
     "rom:clean": "node scripts/rom-build.ts --clean-only",
     "rom:repro": "node scripts/rom-repro.ts",
+    "rom:shots": "node scripts/rom-shot.ts",
     "gen3:tables": "node scripts/gen3-tables.ts"
   },
   "devDependencies": {
