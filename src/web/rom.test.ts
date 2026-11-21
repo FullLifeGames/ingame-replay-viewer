@@ -44,12 +44,12 @@ describe('checkBaseRom', () => {
     await expect(refusal).rejects.toThrow(RomError)
     await expect(refusal).rejects.toThrow(
       `This file is not the US Emerald dump the patch fits: its SHA1 is ${otherSha1}, ` +
-        `the dump's is ${BASE_SHA1}. Pick your US Emerald dump.`,
+        `US Emerald's is ${BASE_SHA1}. Pick your US Emerald dump.`,
     )
   })
 
   it('checks against the base ROM SHA1 in rom/gen3/build.json by default', async () => {
-    await expect(checkBaseRom(BASE)).rejects.toThrow(`the dump's is ${build.baseRom.sha1}`)
+    await expect(checkBaseRom(BASE)).rejects.toThrow(`US Emerald's is ${build.baseRom.sha1}`)
   })
 })
 
