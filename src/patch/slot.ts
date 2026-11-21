@@ -52,9 +52,14 @@ export function writeReplaySlot(
       `the stream has ${String(stream.length)} bytes, the replay slot holds ${String(description.capacity)}`,
     )
   }
-  const copy = rom.slice()
+  // A fresh array: a Node Buffer's slice would share the ROM's memory and its pool's offset.
+  const copy = new Uint8Array(rom)
   copy.fill(0, description.streamOffset, description.streamOffset + description.capacity)
   copy.set(stream, description.streamOffset)
-  new DataView(copy.buffer).setUint32(description.lengthOffset, stream.length, true)
+  new DataView(copy.buffer, copy.byteOffset).setUint32(
+    description.lengthOffset,
+    stream.length,
+    true,
+  )
   return copy
 }

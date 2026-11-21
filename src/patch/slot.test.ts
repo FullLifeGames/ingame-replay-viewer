@@ -53,6 +53,25 @@ describe('writing a stream into the replay slot', () => {
     expect(changed.every((i) => inLength(i) || inStream(i))).toBe(true)
   })
 
+  it('copies a ROM whose slice shares memory, as a Node Buffer does', () => {
+    class SharingView extends Uint8Array {
+      override slice(start?: number, end?: number): Uint8Array<ArrayBuffer> {
+        return this.subarray(start, end)
+      }
+    }
+    const before = new SharingView(emptyRom())
+    writeReplaySlot(before, DESCRIPTION, streamOf(5))
+    expect(Uint8Array.from(before)).toEqual(emptyRom())
+  })
+
+  it('writes the length at its offset in a ROM that starts inside a larger buffer', () => {
+    const buffer = new Uint8Array(DESCRIPTION.romSize + 16)
+    buffer.set(emptyRom(), 16)
+    const rom = writeReplaySlot(buffer.subarray(16), DESCRIPTION, streamOf(9))
+    expect(rom.length).toBe(DESCRIPTION.romSize)
+    expect(lengthAt(rom)).toBe(9)
+  })
+
   it('takes a stream of exactly the capacity', () => {
     const rom = writeReplaySlot(emptyRom(), DESCRIPTION, streamOf(DESCRIPTION.capacity))
     expect(lengthAt(rom)).toBe(DESCRIPTION.capacity)
