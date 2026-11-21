@@ -2,3 +2,4 @@
 0001-script-setjmp.patch
 0002-script-effect-list.patch
 0003-decompress-no-ram-code.patch
+0004-m4a-no-vcount-wait.patch
