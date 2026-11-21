@@ -169,6 +169,7 @@ REPLAY_TEST("The near mon's KO animation has ended when the op after the faint t
     }
 }
 
+// Ops 0-2 are INTRO and the two SEND_OUTs; op 5 is the near HP 0 and op 6 the near FAINT.
 REPLAY_TEST("The near mon faints only after its KO animation for the far mon has ended")
 {
     u32 nearBattler = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
@@ -190,6 +191,8 @@ REPLAY_TEST("The near mon faints only after its KO animation for the far mon has
     }
     THEN
     {
+        EXPECT_EQ(ReplayTest_KOAnimsAtOpStart(5), 0);
+        EXPECT_EQ(ReplayTest_KOAnimsAtOpStart(6), 0);
         EXPECT_EQ(KOAnimsRunning(), 0);
         EXPECT(!gSprites[gBattlerSpriteIds[nearBattler]].inUse);
         EXPECT(gSprites[gHealthboxSpriteIds[nearBattler]].invisible);
