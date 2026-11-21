@@ -87,18 +87,31 @@ function moveScene(input: Input): Scene | undefined {
   return { name: 'first-move', shots, check }
 }
 
-// The far HP bar after the first far HP change: the logged HP over the mon's max HP of 48 pixels.
-function hpScene(input: Input): Scene | undefined {
+interface HpChange {
+  at: number
+  hp: number
+  maxHp: number
+}
+
+// Each far HP change with the max HP of the far mon on the field.
+function farHpChanges(input: Input): HpChange[] {
   const { instructions, parties } = input.stream
-  const at = instructions.findIndex(
-    (instruction) => instruction.op === 'hp' && instruction.side === 'far',
-  )
-  const instruction = instructions[at]
-  const slot = input.active[at]?.far
-  if (instruction?.op !== 'hp' || slot === undefined) return undefined
-  const maxHp = parties.far[slot]?.maxHp ?? 0
-  const filled = Math.round((SCREEN.farHpBar.width * instruction.hp) / maxHp)
-  const shot = { name: 'first-hp', done: at + 1, frames: 0 }
+  return instructions.flatMap((instruction, at) => {
+    const slot = input.active[at]?.far
+    if (instruction.op !== 'hp' || instruction.side !== 'far' || slot === undefined) return []
+    return [{ at, hp: instruction.hp, maxHp: parties.far[slot]?.maxHp ?? 0 }]
+  })
+}
+
+// The far HP bar after a far HP change: the logged HP over the mon's max HP of 48 pixels. The first
+// change that leaves the bar partly filled tests the scale (a knock-out empties it, a full heal
+// fills it); a stream with none takes its first far HP change.
+function hpScene(input: Input): Scene | undefined {
+  const changes = farHpChanges(input)
+  const change = changes.find(({ hp, maxHp }) => hp > 0 && hp < maxHp) ?? changes[0]
+  if (change === undefined) return undefined
+  const filled = Math.round((SCREEN.farHpBar.width * change.hp) / change.maxHp)
+  const shot = { name: 'first-hp', done: change.at + 1, frames: 0 }
   return {
     name: shot.name,
     shots: [shot],

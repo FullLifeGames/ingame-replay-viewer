@@ -85,6 +85,35 @@ describe('the scene points of a decoded instruction list (S6)', () => {
     })
   })
 
+  it('takes the first far HP change that leaves the bar partly filled, past a knock-out', () => {
+    const scene = named(
+      [
+        { op: 'sendOut', side: 'far', slot: 0, hp: 100, status: 'none' },
+        { op: 'hp', side: 'far', hp: 0 },
+        { op: 'switchIn', side: 'far', slot: 1, hp: 100, status: 'none' },
+        { op: 'hp', side: 'far', hp: 100 },
+        { op: 'hp', side: 'far', hp: 50 },
+        { op: 'end', outcome: 'tie' },
+      ],
+      'first-hp',
+    )
+    expect(scene?.shots).toEqual([{ name: 'first-hp', done: 5, frames: 0 }])
+    expect(scene?.check).toMatchObject({ filled: 24 })
+  })
+
+  it('falls back to the first far HP change when none leaves the bar partly filled', () => {
+    const scene = named(
+      [
+        { op: 'sendOut', side: 'far', slot: 0, hp: 100, status: 'none' },
+        { op: 'hp', side: 'far', hp: 0 },
+        { op: 'end', outcome: 'tie' },
+      ],
+      'first-hp',
+    )
+    expect(scene?.shots).toEqual([{ name: 'first-hp', done: 2, frames: 0 }])
+    expect(scene?.check).toMatchObject({ filled: 0 })
+  })
+
   it('follows a switch to the mon whose max HP the bar shows', () => {
     const stream = streamOf([
       { op: 'sendOut', side: 'far', slot: 0, hp: 100, status: 'none' },
