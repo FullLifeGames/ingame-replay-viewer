@@ -6,6 +6,7 @@ import type { Fallback } from '../fallbacks'
 import type { Stream } from '../stream/instructions'
 import { ability, closePopUp, inCausePopUp } from './abilities'
 import { Context, type EventOf, type Placed } from './context'
+import { block, effectActivate, effectEnd, effectStart, singleTurn } from './effects'
 import { message, tie, win } from './end'
 import { fieldActivate, sideEnd, sideStart, weather } from './field'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
@@ -38,7 +39,7 @@ const HANDLERS = {
   miss,
   immune: immunity,
   fail: failure,
-  block: notYet,
+  block,
   damage,
   heal,
   status,
@@ -47,10 +48,10 @@ const HANDLERS = {
   statChange,
   crit,
   effectiveness,
-  effectStart: notYet,
-  effectEnd: notYet,
-  effectActivate: notYet,
-  singleTurn: notYet,
+  effectStart,
+  effectEnd,
+  effectActivate,
+  singleTurn,
   weather,
   sideStart,
   sideEnd,

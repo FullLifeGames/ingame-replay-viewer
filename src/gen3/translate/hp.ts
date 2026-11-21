@@ -52,8 +52,13 @@ function moveHit(event: DamageEvent, ctx: Context): void {
   const side = ctx.activeSide(event.who)
   ctx.emit(line, { op: 'hit', side, effectiveness: event.effectiveness ?? 'normal' })
   bar(event, ctx)
-  if (event.crit) ctx.print(line, critical())
-  if (event.effectiveness !== undefined) ctx.print(line, effective(event.effectiveness))
+  hitLines(event, ctx)
+}
+
+/** The lines after a hit: a critical hit, then the effectiveness. */
+export function hitLines(event: EventOf<'damage' | 'effectEnd' | 'effectActivate'>, ctx: Context) {
+  if (event.crit) ctx.print(event.line, critical())
+  if (event.effectiveness !== undefined) ctx.print(event.line, effective(event.effectiveness))
 }
 
 /** Leftovers and the other held items play their effect first; Wish plays and names its wisher. */

@@ -4,9 +4,23 @@ import type { Found } from './tables/lookup'
 import type { CharacterFallback } from './text/charset'
 import type { Phrase } from './text/template'
 
+/** A mechanic the stream holds no state for, on a silent line: nothing shows in its place. */
+interface MechanicFallback {
+  readonly kind: 'mechanic'
+  readonly detail: string
+}
+
 /** A fallback as a lookup or a phrase reports it, before the backend gives it its line. */
 export type Noted =
-  NonNullable<Found['fallback']> | CharacterFallback | NonNullable<Phrase['fallback']>
+  | NonNullable<Found['fallback']>
+  | CharacterFallback
+  | NonNullable<Phrase['fallback']>
+  | MechanicFallback
+
+/** `effect` at `phase` ("starting", "ending") of a silent line, which the stream cannot hold. */
+export function mechanicGap(effect: string, phase: string): MechanicFallback {
+  return { kind: 'mechanic', detail: `no state in the stream for ${effect} ${phase}` }
+}
 
 export interface Fallback {
   readonly line: number

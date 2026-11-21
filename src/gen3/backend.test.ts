@@ -97,8 +97,8 @@ describe('the team tables', () => {
 
 describe('the event kinds of step B4b', () => {
   it('fail loudly until B4b brings them', () => {
-    expect(() => streamOfLog('|-singleturn|p1a: Dugtrio|Protect')).toThrow(
-      /not yet: the singleTurn event of line 8/,
+    expect(() => streamOfLog('|-item|p1a: Dugtrio|Leftovers')).toThrow(
+      /not yet: the item event of line 8/,
     )
   })
 })

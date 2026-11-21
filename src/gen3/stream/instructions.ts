@@ -26,7 +26,7 @@ export type Weather = keyof typeof WEATHER
 type Stat = keyof typeof STAT
 type Arrows = keyof typeof ARROWS
 type Effectiveness = keyof typeof EFFECTIVENESS
-type Volatile = keyof typeof VOLATILE
+export type Volatile = keyof typeof VOLATILE
 export type Anim = keyof typeof ANIM
 
 interface OnSide {
