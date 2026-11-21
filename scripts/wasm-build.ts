@@ -7,7 +7,8 @@
 // build/wasm/platform; it writes compile.json, the .err files in build/wasm/compile and the
 // report, and fails when a file fails. `--link [report.md]` compiles the glue of rom/gen3/wasm/src
 // and links it with the objects of compile.json and build/wasm/asm (npm run wasm:convert) into
-// build/wasm/irv-emerald.js and irv-emerald.wasm. Everything it writes lies under build/wasm and
+// build/wasm/irv-emerald.js and irv-emerald.wasm, then writes the patch from the dump to the module
+// (irv-emerald-wasm.bps); `--patch [report.md]` writes that patch alone. Everything it writes lies under build/wasm and
 // .cache/wasm, apart from a report path named on the command line. The tree comes from
 // `npm run rom:build`.
 import { execFileSync } from 'node:child_process'
@@ -15,7 +16,9 @@ import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'no
 import { isAbsolute, join } from 'node:path'
 
 import { runCliAsync } from './rom-cli.ts'
+import { loadBuildConfig } from './rom-config.ts'
 import { REPO_DIR } from './rom-paths.ts'
+import { readPreflightInput } from './rom-preflight.ts'
 import { renderCensus } from './wasm-census.ts'
 import type { CensusEntry } from './wasm-census.ts'
 import { runCommands } from './wasm-census-run.ts'
@@ -34,23 +37,31 @@ import type { WasmConfig } from './wasm-config.ts'
 import { asmObjects, compiledObjects, glueSources, linkCommand, LINK_OUTPUTS } from './wasm-link.ts'
 import type { CompileRecordEntry } from './wasm-link.ts'
 import { prepareCopies } from './wasm-overlay.ts'
+import { writeModulePatch } from './wasm-outputs.ts'
 import { ensurePlatform, wasmRoots } from './wasm-platform.ts'
 
 export interface BuildArgs {
-  mode: 'census' | 'report' | 'compile' | 'link'
+  mode: 'census' | 'report' | 'compile' | 'link' | 'patch'
   out: string
 }
 
 const USAGE =
-  'usage: wasm:build --census [/abs/report.md] | --census-report [/abs/report.md] | --compile [/abs/report.md] | --link [/abs/report.md]'
+  'usage: wasm:build --census [/abs/report.md] | --census-report [/abs/report.md] | --compile [/abs/report.md] | --link [/abs/report.md] | --patch [/abs/report.md]'
 const MODES: Record<string, BuildArgs['mode']> = {
   '--census': 'census',
   '--census-report': 'report',
   '--compile': 'compile',
   '--link': 'link',
+  '--patch': 'patch',
 }
 // The record each mode writes under build/wasm, and its report beside it.
-const RECORDS = { census: 'census', report: 'census', compile: 'compile', link: 'link' } as const
+const RECORDS = {
+  census: 'census',
+  report: 'census',
+  compile: 'compile',
+  link: 'link',
+  patch: 'patch',
+} as const
 // A file that takes longer at -O0 has a problem of its own; the census names it.
 const TIMEOUT_MS = 20 * 60 * 1000
 
@@ -209,8 +220,19 @@ async function link(paths: WasmPaths, config: WasmConfig, out: string): Promise<
     (name) => `${name} ${String(statSync(join(paths.out, name)).size)} B`,
   )
   const text = `Link: ${String(objects.length)} objects, ${String(seconds)} s; ${sizes.join(', ')}.\n`
-  writeFileSync(out, text)
+  writeFileSync(out, `${text}${patch(paths)}\n`)
   say(text.trim())
+}
+
+// The patch from the dump, found by the build's rule, to the module (plan D5 (c)).
+function patch(paths: WasmPaths): string {
+  const { sha1 } = loadBuildConfig().baseRom
+  const line = writeModulePatch(paths.out, {
+    path: readPreflightInput(process.env, sha1).baseRomPath,
+    sha1,
+  })
+  say(line)
+  return `Patch: ${line}.`
 }
 
 function report(paths: WasmPaths, config: WasmConfig, mode: Run, out: string): void {
@@ -231,6 +253,7 @@ async function main(): Promise<void> {
     if (args.mode === 'census') await census(paths, config, args.out)
     else if (args.mode === 'compile') await compile(paths, config, args.out)
     else if (args.mode === 'link') await link(paths, config, args.out)
+    else if (args.mode === 'patch') writeFileSync(args.out, `${patch(paths)}\n`)
     else report(paths, config, 'census', args.out)
   })
 }

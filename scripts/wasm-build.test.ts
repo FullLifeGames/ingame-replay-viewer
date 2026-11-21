@@ -24,6 +24,13 @@ describe('the wasm:build arguments', () => {
     })
   })
 
+  it('writes the module patch from the dump on its own, its line in build/wasm by default', () => {
+    expect(parseBuildArgs(['--patch'], '/repo/build/wasm')).toEqual({
+      mode: 'patch',
+      out: '/repo/build/wasm/patch.md',
+    })
+  })
+
   it('takes a report path after the mode', () => {
     expect(parseBuildArgs(['--census-report', '/x/census.md'], '/o')).toEqual({
       mode: 'report',
