@@ -1,5 +1,6 @@
 #include "global.h"
 #include "pokemon.h"
+#include "string_util.h"
 #include "test/replay_test.h"
 #include "constants/characters.h"
 #include "constants/species.h"
@@ -119,6 +120,26 @@ void ReplayStream_Turn(u32 number)
 {
     const u8 operands[REPLAY_OP_TURN_SIZE] = { number, number >> 8 };
     ReplayStream_Op(REPLAY_OP_TURN, REPLAY_OP_TURN_SIZE, operands);
+}
+
+void ReplayStream_Print(const u8 *text)
+{
+    u32 size = StringLength(text) + 1;
+
+    if (size > REPLAY_PRINT_MAX_SIZE)
+        Test_ExitWithResult(TEST_RESULT_INVALID, SourceLine(0), "%s:%d: a PRINT text is longer than %d bytes", gTestRunnerState.test->filename, SourceLine(0), REPLAY_PRINT_MAX_SIZE);
+    ReplayStream_Op(REPLAY_OP_PRINT, size, text);
+}
+
+void ReplayStream_Intro(void)
+{
+    ReplayStream_Op(REPLAY_OP_INTRO, REPLAY_OP_INTRO_SIZE, NULL);
+}
+
+void ReplayStream_SendOut(u32 side, u32 slot, u32 hp, u32 status)
+{
+    const u8 operands[REPLAY_OP_SEND_OUT_SIZE] = { side, slot, hp, hp >> 8, status };
+    ReplayStream_Op(REPLAY_OP_SEND_OUT, REPLAY_OP_SEND_OUT_SIZE, operands);
 }
 
 const u8 *ReplayStream_Data(void)

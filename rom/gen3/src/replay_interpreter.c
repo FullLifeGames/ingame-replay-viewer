@@ -1,9 +1,18 @@
 #include "global.h"
 #include "battle.h"
+#include "battle_controllers.h"
 #include "battle_main.h"
+#include "battle_message.h"
+#include "battle_util.h"
+#include "line_break.h"
 #include "palette.h"
+#include "pokemon.h"
 #include "replay_interpreter.h"
 #include "replay_stream.h"
+#include "test_runner.h"
+#include "text.h"
+#include "constants/battle.h"
+#include "constants/characters.h"
 #include "constants/rgb.h"
 
 // The ROM interpreter (#6). Replay_Load checks the whole stream first (replay_stream.c), so a
@@ -11,7 +20,7 @@
 // checks.
 //
 // Replay_RunBattle stands in for the battle engine's gBattleMainFunc: once a frame, while no
-// controller is busy and no wait runs, it runs one step of the current op. An op that needs two
+// controller is busy, no text prints and no wait runs, it runs one step of the current op. An op that needs two
 // controller commands for one battler emits one, returns FALSE, and emits the other on its next
 // step. When an op returns TRUE, the next op starts on the next frame.
 
@@ -31,6 +40,9 @@ struct ReplayState
 
 static bool32 Op_End(const volatile u8 *operands, u32 step);
 static bool32 Op_Turn(const volatile u8 *operands, u32 step);
+static bool32 Op_Print(const volatile u8 *operands, u32 step);
+static bool32 Op_Intro(const volatile u8 *operands, u32 step);
+static bool32 Op_SendOut(const volatile u8 *operands, u32 step);
 static void Replay_RunBattle(void);
 static void Replay_Hold(void);
 
@@ -41,8 +53,11 @@ static EWRAM_DATA struct ReplayState sReplay = {0};
 // Replay_Validate refuses it.
 static const ReplayOpFunc sOps[] =
 {
-    [REPLAY_OP_END]  = Op_End,
-    [REPLAY_OP_TURN] = Op_Turn,
+    [REPLAY_OP_END]      = Op_End,
+    [REPLAY_OP_TURN]     = Op_Turn,
+    [REPLAY_OP_PRINT]    = Op_Print,
+    [REPLAY_OP_INTRO]    = Op_Intro,
+    [REPLAY_OP_SEND_OUT] = Op_SendOut,
 };
 
 // The battle outcome of each REPLAY_OUTCOME_*. A tie and an unknown end are draws.
@@ -52,6 +67,26 @@ static const u8 sOutcomes[] =
     [REPLAY_OUTCOME_FAR_WON]  = B_OUTCOME_LOST,
     [REPLAY_OUTCOME_TIE]      = B_OUTCOME_DREW,
     [REPLAY_OUTCOME_UNKNOWN]  = B_OUTCOME_DREW,
+};
+
+// The battler of each side: a singles battle has one on each.
+static const u8 sSidePositions[] =
+{
+    [REPLAY_SIDE_NEAR] = B_POSITION_PLAYER_LEFT,
+    [REPLAY_SIDE_FAR]  = B_POSITION_OPPONENT_LEFT,
+};
+
+// The status1 of each REPLAY_STATUS_*. The stream gives no sleep turns, and the status icon shows
+// sleep only while turns are left, so a sleeping mon gets three.
+static const u32 sStatus1[] =
+{
+    [REPLAY_STATUS_NONE] = 0,
+    [REPLAY_STATUS_SLP]  = STATUS1_SLEEP_TURN(3),
+    [REPLAY_STATUS_PSN]  = STATUS1_POISON,
+    [REPLAY_STATUS_BRN]  = STATUS1_BURN,
+    [REPLAY_STATUS_FRZ]  = STATUS1_FREEZE,
+    [REPLAY_STATUS_PAR]  = STATUS1_PARALYSIS,
+    [REPLAY_STATUS_TOX]  = STATUS1_TOXIC_POISON,
 };
 
 bool32 Replay_PlaysOp(u32 op)
@@ -100,7 +135,7 @@ static void Replay_RunBattle(void)
 {
     const volatile u8 *instruction;
 
-    if (gBattleControllerExecFlags)
+    if (gBattleControllerExecFlags || IsTextPrinterActiveOnWindow(B_WIN_MSG))
         return;
     if (sReplay.wait != 0)
     {
@@ -144,4 +179,77 @@ static bool32 Op_Turn(const volatile u8 *operands, u32 step)
 {
     gReplayProgress.turn = Replay_ReadU16(operands);
     return TRUE;
+}
+
+
+static u32 GetReplayBattler(u32 side)
+{
+    return GetBattlerAtPosition(sSidePositions[side]);
+}
+
+// A mon takes the field: its party slot gets the stream's HP, at most its max HP, and status, and
+// the battler's battle mon is made from it, as the engine does when a mon enters.
+static void PutMonOnField(u32 battler, u32 slot, u32 hp, u32 status)
+{
+    struct Pokemon *mon = &GetBattlerParty(battler)[slot];
+    u32 status1 = sStatus1[status];
+
+    hp = min(hp, GetMonData(mon, MON_DATA_MAX_HP));
+    SetMonData(mon, MON_DATA_HP, &hp);
+    SetMonData(mon, MON_DATA_STATUS, &status1);
+    gBattlerPartyIndexes[battler] = slot;
+    PokemonToBattleMon(mon, &gBattleMons[battler]);
+}
+
+// PRINT: the backend's finished text, broken into the text box's lines with scroll prompts as
+// BattleStringExpandPlaceholders breaks the engine's messages. The test runner records it, as
+// BtlController_HandlePrintString does, and headless tests skip the window. A recorded battle
+// scrolls the text by itself; the op ends once the printer is done and B_WAIT_TIME_LONG frames
+// have passed, as after a battle script's waitmessage.
+static bool32 Op_Print(const volatile u8 *operands, u32 step)
+{
+    u32 i;
+
+    if (step != 0)
+        return TRUE;
+    for (i = 0; operands[i] != EOS; i++)
+        gDisplayedStringBattle[i] = operands[i];
+    gDisplayedStringBattle[i] = EOS;
+    BreakStringAutomatic(gDisplayedStringBattle, BATTLE_MSG_MAX_WIDTH, BATTLE_MSG_MAX_LINES, FONT_NORMAL, SHOW_SCROLL_PROMPT);
+    if (gTestRunnerEnabled)
+    {
+        TestRunner_Battle_RecordMessage(gDisplayedStringBattle);
+        if (gTestRunnerHeadless)
+            return TRUE;
+    }
+    gBattle_BG0_X = 0;
+    gBattle_BG0_Y = 0;
+    BattlePutTextOnWindow(gDisplayedStringBattle, B_WIN_MSG);
+    sReplay.wait = B_WAIT_TIME_LONG;
+    return FALSE;
+}
+
+// INTRO: the game's own intro (DoBattleIntro, saved by Replay_TakeOverBattleMain) up to its first
+// text. It loads the battle mons, slides the scene in, and draws both trainers and their party
+// summaries; the texts and send-outs after it come as PRINT and SEND_OUT.
+static bool32 Op_Intro(const volatile u8 *operands, u32 step)
+{
+    if (gBattleStruct->eventState.battleIntro >= BATTLE_INTRO_STATE_INTRO_TEXT)
+        return TRUE;
+    sReplay.upstreamIntro();
+    return FALSE;
+}
+
+// SEND_OUT: the trainer throws the mon's ball at the start of the battle, as DoBattleIntro does
+// for each side (BATTLE_INTRO_STATE_TRAINER_1_SEND_OUT_ANIM, _PRINT_PLAYER_1_SEND_OUT_TEXT).
+static bool32 Op_SendOut(const volatile u8 *operands, u32 step)
+{
+    u32 battler = GetReplayBattler(operands[0]);
+
+    if (step != 0)
+        return TRUE;
+    PutMonOnField(battler, operands[1], Replay_ReadU16(operands + 2), operands[4]);
+    BtlController_EmitIntroTrainerBallThrow(battler, B_COMM_TO_CONTROLLER);
+    MarkBattlerForControllerExec(battler);
+    return FALSE;
 }

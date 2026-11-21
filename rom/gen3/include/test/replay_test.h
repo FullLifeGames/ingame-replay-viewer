@@ -48,8 +48,12 @@ void ReplayStream_Begin(void);
 void ReplayStream_Trainer(u32 side, const u8 *name, u32 trainerPic);
 // A level 100 male mon, not shiny, named as its species.
 void ReplayStream_Mon(u32 side, u32 slot, u32 species, u32 maxHp);
-void ReplayStream_Turn(u32 number);
 void ReplayStream_End(u32 outcome);
+void ReplayStream_Turn(u32 number);
+// text is in the game's charset and ends with EOS, as COMPOUND_STRING("...") gives it.
+void ReplayStream_Print(const u8 *text);
+void ReplayStream_Intro(void);
+void ReplayStream_SendOut(u32 side, u32 slot, u32 hp, u32 status);
 // Any op with any size byte, for streams the interpreter must refuse.
 void ReplayStream_Op(u32 op, u32 size, const u8 *operands);
 // Overwrites stream bytes, for streams the interpreter must refuse.
