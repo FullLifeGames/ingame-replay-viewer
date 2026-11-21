@@ -1,0 +1,462 @@
+{"length":8346,"crc32":"c1ccff5d","trainers":{"near":{"name":"A Welcome Guest","trainerPic":1,"teamSize":6,"revealed":5},"far":{"name":"xXEricXx","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":51,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Dugtrio"},{"species":145,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zapdos"},{"species":245,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Suicune"},{"species":344,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Claydol"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},null],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"},{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":142,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Aerodactyl"}]}}
+{"line":23,"op":"intro"}
+{"line":23,"op":"print","text":"You are challenged by xXEricXx!"}
+{"line":25,"op":"print","text":"xXEricXx sent out Tyranitar!"}
+{"line":25,"op":"sendOut","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":24,"op":"print","text":"Go! Dugtrio!"}
+{"line":24,"op":"sendOut","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":26,"op":"ability","side":"far","ability":45,"show":true}
+{"line":26,"op":"weather","weather":"sand"}
+{"line":26,"op":"print","text":"A sandstorm kicked up!"}
+{"line":26,"op":"ability","side":"far","ability":45,"show":false}
+{"line":27,"op":"turn","number":1}
+{"line":32,"op":"print","text":"Dugtrio used Earthquake!"}
+{"line":32,"op":"move","user":"near","target":"far","move":89}
+{"line":34,"op":"hit","side":"far","effectiveness":"super"}
+{"line":34,"op":"hp","side":"far","hp":0}
+{"line":34,"op":"print","text":"It's super effective!"}
+{"line":35,"op":"faint","side":"far"}
+{"line":35,"op":"print","text":"The opposing Tyranitar fainted!"}
+{"line":38,"op":"print","text":"xXEricXx sent out Skarmory!"}
+{"line":38,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":40,"op":"print","text":"The sandstorm is raging."}
+{"line":40,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":42,"op":"turn","number":2}
+{"line":45,"op":"print","text":"Dugtrio, come back!"}
+{"line":45,"op":"withdraw","side":"near"}
+{"line":45,"op":"print","text":"Go! Zapdos!"}
+{"line":45,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":46,"op":"print","text":"The opposing Skarmory used Spikes!"}
+{"line":46,"op":"move","user":"far","target":"near","move":191}
+{"line":47,"op":"print","text":"Spikes were scattered on the ground all around your side!"}
+{"line":49,"op":"print","text":"The sandstorm is raging."}
+{"line":49,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":50,"op":"print","text":"Zapdos is buffeted by the sandstorm!"}
+{"line":50,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":50,"op":"hp","side":"near","hp":94}
+{"line":51,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":51,"op":"hp","side":"near","hp":100}
+{"line":51,"op":"print","text":"Zapdos restored a little HP using its Leftovers!"}
+{"line":53,"op":"turn","number":3}
+{"line":56,"op":"print","text":"xXEricXx withdrew Skarmory!"}
+{"line":56,"op":"withdraw","side":"far"}
+{"line":56,"op":"print","text":"xXEricXx sent out Celebi!"}
+{"line":56,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":57,"op":"print","text":"Zapdos used Substitute!"}
+{"line":57,"op":"move","user":"near","target":"near","move":164}
+{"line":58,"op":"volatile","side":"near","volatile":"substitute","on":true}
+{"line":59,"op":"hp","side":"near","hp":76}
+{"line":58,"op":"print","text":"Zapdos put in a substitute!"}
+{"line":61,"op":"print","text":"The sandstorm is raging."}
+{"line":61,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":62,"op":"print","text":"The opposing Celebi is buffeted by the sandstorm!"}
+{"line":62,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":62,"op":"hp","side":"far","hp":94}
+{"line":63,"op":"print","text":"Zapdos is buffeted by the sandstorm!"}
+{"line":63,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":63,"op":"hp","side":"near","hp":70}
+{"line":64,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":64,"op":"hp","side":"far","hp":100}
+{"line":64,"op":"print","text":"The opposing Celebi restored a little HP using its Leftovers!"}
+{"line":65,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":65,"op":"hp","side":"near","hp":76}
+{"line":65,"op":"print","text":"Zapdos restored a little HP using its Leftovers!"}
+{"line":67,"op":"turn","number":4}
+{"line":70,"op":"print","text":"The opposing Celebi used Psychic!"}
+{"line":70,"op":"move","user":"far","target":"near","move":94}
+{"line":71,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":71,"op":"print","text":"The substitute took damage for Zapdos!"}
+{"line":72,"op":"print","text":"Zapdos used Baton Pass!"}
+{"line":72,"op":"move","user":"near","target":"near","move":226}
+{"line":75,"op":"withdraw","side":"near"}
+{"line":75,"op":"print","text":"Go! Dugtrio!"}
+{"line":75,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":76,"op":"hp","side":"near","hp":88}
+{"line":76,"op":"print","text":"Dugtrio was hurt by the spikes!"}
+{"line":78,"op":"print","text":"The sandstorm is raging."}
+{"line":78,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":79,"op":"print","text":"The opposing Celebi is buffeted by the sandstorm!"}
+{"line":79,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":79,"op":"hp","side":"far","hp":94}
+{"line":80,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":80,"op":"hp","side":"far","hp":100}
+{"line":80,"op":"print","text":"The opposing Celebi restored a little HP using its Leftovers!"}
+{"line":82,"op":"turn","number":5}
+{"line":85,"op":"print","text":"Dugtrio used Hidden Power!"}
+{"line":85,"op":"move","user":"near","target":"far","move":237}
+{"line":87,"op":"hit","side":"far","effectiveness":"super"}
+{"line":87,"op":"hp","side":"far","hp":8}
+{"line":87,"op":"print","text":"It's super effective!"}
+{"line":88,"op":"print","text":"The opposing Celebi used Psychic!"}
+{"line":88,"op":"move","user":"far","target":"near","move":94}
+{"line":89,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":89,"op":"print","text":"The substitute took damage for Dugtrio!"}
+{"line":89,"op":"anim","side":"near","anim":"substituteFade"}
+{"line":89,"op":"print","text":"Dugtrio's substitute faded!"}
+{"line":89,"op":"volatile","side":"near","volatile":"substitute","on":false}
+{"line":91,"op":"print","text":"The sandstorm is raging."}
+{"line":91,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":92,"op":"print","text":"The opposing Celebi is buffeted by the sandstorm!"}
+{"line":92,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":92,"op":"hp","side":"far","hp":2}
+{"line":93,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":93,"op":"hp","side":"far","hp":8}
+{"line":93,"op":"print","text":"The opposing Celebi restored a little HP using its Leftovers!"}
+{"line":95,"op":"turn","number":6}
+{"line":98,"op":"print","text":"Dugtrio used Hidden Power!"}
+{"line":98,"op":"move","user":"near","target":"far","move":237}
+{"line":100,"op":"hit","side":"far","effectiveness":"super"}
+{"line":100,"op":"hp","side":"far","hp":0}
+{"line":100,"op":"print","text":"It's super effective!"}
+{"line":101,"op":"faint","side":"far"}
+{"line":101,"op":"print","text":"The opposing Celebi fainted!"}
+{"line":104,"op":"print","text":"xXEricXx sent out Metagross!"}
+{"line":104,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":106,"op":"print","text":"The sandstorm is raging."}
+{"line":106,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":108,"op":"turn","number":7}
+{"line":111,"op":"print","text":"Dugtrio, come back!"}
+{"line":111,"op":"withdraw","side":"near"}
+{"line":111,"op":"print","text":"Go! Zapdos!"}
+{"line":111,"op":"switchIn","side":"near","slot":1,"hp":76,"status":"none"}
+{"line":112,"op":"print","text":"The opposing Metagross used Meteor Mash!"}
+{"line":112,"op":"move","user":"far","target":"near","move":309}
+{"line":114,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":114,"op":"hp","side":"near","hp":46}
+{"line":114,"op":"print","text":"It's not very effective…"}
+{"line":116,"op":"print","text":"The sandstorm is raging."}
+{"line":116,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":117,"op":"print","text":"Zapdos is buffeted by the sandstorm!"}
+{"line":117,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":117,"op":"hp","side":"near","hp":40}
+{"line":118,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":118,"op":"hp","side":"near","hp":46}
+{"line":118,"op":"print","text":"Zapdos restored a little HP using its Leftovers!"}
+{"line":120,"op":"turn","number":8}
+{"line":123,"op":"print","text":"Zapdos used Thunderbolt!"}
+{"line":123,"op":"move","user":"near","target":"far","move":85}
+{"line":125,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":125,"op":"hp","side":"far","hp":20}
+{"line":125,"op":"print","text":"A critical hit!"}
+{"line":126,"op":"print","text":"The opposing Metagross used Agility!"}
+{"line":126,"op":"move","user":"far","target":"far","move":97}
+{"line":127,"op":"stat","side":"far","stat":"spe","stages":2,"arrows":"one"}
+{"line":127,"op":"print","text":"The opposing Metagross's Speed rose sharply!"}
+{"line":129,"op":"print","text":"The sandstorm is raging."}
+{"line":129,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":130,"op":"print","text":"Zapdos is buffeted by the sandstorm!"}
+{"line":130,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":130,"op":"hp","side":"near","hp":40}
+{"line":131,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":131,"op":"hp","side":"far","hp":26}
+{"line":131,"op":"print","text":"The opposing Metagross restored a little HP using its Leftovers!"}
+{"line":132,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":132,"op":"hp","side":"near","hp":46}
+{"line":132,"op":"print","text":"Zapdos restored a little HP using its Leftovers!"}
+{"line":134,"op":"turn","number":9}
+{"line":138,"op":"print","text":"The opposing Metagross used Rock Slide!"}
+{"line":138,"op":"move","user":"far","target":"near","move":157}
+{"line":140,"op":"hit","side":"near","effectiveness":"super"}
+{"line":140,"op":"hp","side":"near","hp":0}
+{"line":140,"op":"print","text":"It's super effective!"}
+{"line":141,"op":"faint","side":"near"}
+{"line":141,"op":"print","text":"Zapdos fainted!"}
+{"line":144,"op":"print","text":"Go! Suicune!"}
+{"line":144,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":145,"op":"hp","side":"near","hp":88}
+{"line":145,"op":"print","text":"Suicune was hurt by the spikes!"}
+{"line":147,"op":"print","text":"The sandstorm is raging."}
+{"line":147,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":148,"op":"print","text":"Suicune is buffeted by the sandstorm!"}
+{"line":148,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":148,"op":"hp","side":"near","hp":82}
+{"line":149,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":149,"op":"hp","side":"far","hp":32}
+{"line":149,"op":"print","text":"The opposing Metagross restored a little HP using its Leftovers!"}
+{"line":150,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":150,"op":"hp","side":"near","hp":88}
+{"line":150,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
+{"line":152,"op":"turn","number":10}
+{"line":156,"op":"print","text":"The opposing Metagross used Rock Slide!"}
+{"line":156,"op":"move","user":"far","target":"near","move":157}
+{"line":157,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":157,"op":"hp","side":"near","hp":73}
+{"line":158,"op":"print","text":"Suicune flinched and couldn't move!"}
+{"line":160,"op":"print","text":"The sandstorm is raging."}
+{"line":160,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":161,"op":"print","text":"Suicune is buffeted by the sandstorm!"}
+{"line":161,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":161,"op":"hp","side":"near","hp":67}
+{"line":162,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":162,"op":"hp","side":"far","hp":38}
+{"line":162,"op":"print","text":"The opposing Metagross restored a little HP using its Leftovers!"}
+{"line":163,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":163,"op":"hp","side":"near","hp":73}
+{"line":163,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
+{"line":165,"op":"turn","number":11}
+{"line":169,"op":"print","text":"The opposing Metagross used Rock Slide!"}
+{"line":169,"op":"move","user":"far","target":"near","move":157}
+{"line":170,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":170,"op":"hp","side":"near","hp":55}
+{"line":171,"op":"print","text":"Suicune used Surf!"}
+{"line":171,"op":"move","user":"near","target":"far","move":57}
+{"line":172,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":172,"op":"hp","side":"far","hp":5}
+{"line":174,"op":"print","text":"The sandstorm is raging."}
+{"line":174,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":175,"op":"print","text":"Suicune is buffeted by the sandstorm!"}
+{"line":175,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":175,"op":"hp","side":"near","hp":49}
+{"line":176,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":176,"op":"hp","side":"far","hp":11}
+{"line":176,"op":"print","text":"The opposing Metagross restored a little HP using its Leftovers!"}
+{"line":177,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":177,"op":"hp","side":"near","hp":55}
+{"line":177,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
+{"line":179,"op":"turn","number":12}
+{"line":183,"op":"print","text":"xXEricXx withdrew Metagross!"}
+{"line":183,"op":"withdraw","side":"far"}
+{"line":183,"op":"print","text":"xXEricXx sent out Skarmory!"}
+{"line":183,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":184,"op":"print","text":"Suicune used Surf!"}
+{"line":184,"op":"move","user":"near","target":"far","move":57}
+{"line":185,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":185,"op":"hp","side":"far","hp":71}
+{"line":187,"op":"print","text":"The sandstorm is raging."}
+{"line":187,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":188,"op":"print","text":"Suicune is buffeted by the sandstorm!"}
+{"line":188,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":188,"op":"hp","side":"near","hp":49}
+{"line":189,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":189,"op":"hp","side":"near","hp":55}
+{"line":189,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
+{"line":190,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":190,"op":"hp","side":"far","hp":77}
+{"line":190,"op":"print","text":"The opposing Skarmory restored a little HP using its Leftovers!"}
+{"line":192,"op":"turn","number":13}
+{"line":196,"op":"print","text":"Suicune used Surf!"}
+{"line":196,"op":"move","user":"near","target":"far","move":57}
+{"line":197,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":197,"op":"hp","side":"far","hp":49}
+{"line":198,"op":"print","text":"The opposing Skarmory used Spikes!"}
+{"line":198,"op":"move","user":"far","target":"near","move":191}
+{"line":199,"op":"print","text":"Spikes were scattered on the ground all around your side!"}
+{"line":201,"op":"print","text":"The sandstorm is raging."}
+{"line":201,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":202,"op":"print","text":"Suicune is buffeted by the sandstorm!"}
+{"line":202,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":202,"op":"hp","side":"near","hp":49}
+{"line":203,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":203,"op":"hp","side":"near","hp":55}
+{"line":203,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
+{"line":204,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":204,"op":"hp","side":"far","hp":55}
+{"line":204,"op":"print","text":"The opposing Skarmory restored a little HP using its Leftovers!"}
+{"line":206,"op":"turn","number":14}
+{"line":209,"op":"print","text":"Suicune used Rest!"}
+{"line":209,"op":"move","user":"near","target":"near","move":156}
+{"line":210,"op":"print","text":"Suicune slept and restored its HP!"}
+{"line":210,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":211,"op":"hp","side":"near","hp":100}
+{"line":212,"op":"print","text":"The opposing Skarmory used Roar!"}
+{"line":212,"op":"move","user":"far","target":"near","move":46}
+{"line":213,"op":"withdraw","side":"near"}
+{"line":213,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":213,"op":"print","text":"Claydol was dragged out!"}
+{"line":215,"op":"print","text":"The sandstorm is raging."}
+{"line":215,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":216,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":216,"op":"hp","side":"far","hp":61}
+{"line":216,"op":"print","text":"The opposing Skarmory restored a little HP using its Leftovers!"}
+{"line":218,"op":"turn","number":15}
+{"line":221,"op":"print","text":"The opposing Skarmory used Toxic!"}
+{"line":222,"op":"print","text":"Claydol avoided the attack!"}
+{"line":223,"op":"print","text":"Claydol used Rain Dance!"}
+{"line":223,"op":"move","user":"near","target":"near","move":240}
+{"line":224,"op":"weather","weather":"rain"}
+{"line":224,"op":"print","text":"It started to rain!"}
+{"line":226,"op":"print","text":"Rain continues to fall."}
+{"line":226,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":227,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":227,"op":"hp","side":"far","hp":67}
+{"line":227,"op":"print","text":"The opposing Skarmory restored a little HP using its Leftovers!"}
+{"line":229,"op":"turn","number":16}
+{"line":232,"op":"print","text":"The opposing Skarmory used Toxic!"}
+{"line":232,"op":"move","user":"far","target":"near","move":92}
+{"line":233,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":233,"op":"print","text":"Claydol was badly poisoned!"}
+{"line":233,"op":"status","side":"near","slot":3,"status":"tox"}
+{"line":234,"op":"print","text":"Claydol used Rapid Spin!"}
+{"line":234,"op":"move","user":"near","target":"far","move":229}
+{"line":236,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":236,"op":"hp","side":"far","hp":66}
+{"line":236,"op":"print","text":"It's not very effective…"}
+{"line":237,"op":"print","text":"Claydol blew away Spikes!"}
+{"line":239,"op":"print","text":"Rain continues to fall."}
+{"line":239,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":240,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":240,"op":"hp","side":"far","hp":72}
+{"line":240,"op":"print","text":"The opposing Skarmory restored a little HP using its Leftovers!"}
+{"line":241,"op":"print","text":"Claydol was hurt by its poisoning!"}
+{"line":241,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":241,"op":"hp","side":"near","hp":94}
+{"line":243,"op":"turn","number":17}
+{"line":246,"op":"print","text":"Claydol, come back!"}
+{"line":246,"op":"withdraw","side":"near"}
+{"line":246,"op":"print","text":"Go! Blissey!"}
+{"line":246,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":247,"op":"print","text":"The opposing Skarmory used Spikes!"}
+{"line":247,"op":"move","user":"far","target":"near","move":191}
+{"line":248,"op":"print","text":"Spikes were scattered on the ground all around your side!"}
+{"line":250,"op":"print","text":"Rain continues to fall."}
+{"line":250,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":251,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":251,"op":"hp","side":"far","hp":78}
+{"line":251,"op":"print","text":"The opposing Skarmory restored a little HP using its Leftovers!"}
+{"line":253,"op":"turn","number":18}
+{"line":256,"op":"print","text":"The opposing Skarmory used Toxic!"}
+{"line":257,"op":"print","text":"Blissey avoided the attack!"}
+{"line":258,"op":"print","text":"Blissey used Thunder Wave!"}
+{"line":258,"op":"move","user":"near","target":"far","move":86}
+{"line":259,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":259,"op":"print","text":"The opposing Skarmory is paralyzed, so it may be unable to move!"}
+{"line":259,"op":"status","side":"far","slot":1,"status":"par"}
+{"line":261,"op":"print","text":"Rain continues to fall."}
+{"line":261,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":262,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":262,"op":"hp","side":"far","hp":84}
+{"line":262,"op":"print","text":"The opposing Skarmory restored a little HP using its Leftovers!"}
+{"line":264,"op":"turn","number":19}
+{"line":268,"op":"print","text":"Blissey used Seismic Toss!"}
+{"line":268,"op":"move","user":"near","target":"far","move":69}
+{"line":269,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":269,"op":"hp","side":"far","hp":54}
+{"line":270,"op":"print","text":"The opposing Skarmory couldn't move because it's paralyzed!"}
+{"line":270,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":272,"op":"weather","weather":"none"}
+{"line":272,"op":"print","text":"The rain stopped."}
+{"line":273,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":273,"op":"hp","side":"far","hp":60}
+{"line":273,"op":"print","text":"The opposing Skarmory restored a little HP using its Leftovers!"}
+{"line":275,"op":"turn","number":20}
+{"line":279,"op":"print","text":"Blissey used Seismic Toss!"}
+{"line":279,"op":"move","user":"near","target":"far","move":69}
+{"line":280,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":280,"op":"hp","side":"far","hp":30}
+{"line":281,"op":"print","text":"The opposing Skarmory couldn't move because it's paralyzed!"}
+{"line":281,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":283,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":283,"op":"hp","side":"far","hp":36}
+{"line":283,"op":"print","text":"The opposing Skarmory restored a little HP using its Leftovers!"}
+{"line":285,"op":"turn","number":21}
+{"line":288,"op":"print","text":"xXEricXx withdrew Skarmory!"}
+{"line":288,"op":"withdraw","side":"far"}
+{"line":288,"op":"print","text":"xXEricXx sent out Starmie!"}
+{"line":288,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":289,"op":"print","text":"Blissey used Aromatherapy!"}
+{"line":289,"op":"move","user":"near","target":"near","move":312}
+{"line":290,"op":"print","text":"A soothing aroma wafted through the area!"}
+{"line":290,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":290,"op":"status","side":"near","slot":3,"status":"none"}
+{"line":293,"op":"turn","number":22}
+{"line":296,"op":"print","text":"The opposing Starmie used Thunder Wave!"}
+{"line":296,"op":"move","user":"far","target":"near","move":86}
+{"line":297,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":297,"op":"print","text":"Blissey is paralyzed, so it may be unable to move!"}
+{"line":297,"op":"status","side":"near","slot":4,"status":"par"}
+{"line":298,"op":"print","text":"Blissey couldn't move because it's paralyzed!"}
+{"line":298,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":301,"op":"turn","number":23}
+{"line":304,"op":"print","text":"The opposing Starmie used Surf!"}
+{"line":304,"op":"move","user":"far","target":"near","move":57}
+{"line":305,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":305,"op":"hp","side":"near","hp":88}
+{"line":306,"op":"print","text":"Blissey used Seismic Toss!"}
+{"line":306,"op":"move","user":"near","target":"far","move":69}
+{"line":307,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":307,"op":"hp","side":"far","hp":70}
+{"line":309,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":309,"op":"hp","side":"far","hp":76}
+{"line":309,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
+{"line":310,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":310,"op":"hp","side":"near","hp":94}
+{"line":310,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":312,"op":"turn","number":24}
+{"line":315,"op":"print","text":"The opposing Starmie used Thunder Wave!"}
+{"line":315,"op":"move","user":"far","target":"near","move":86}
+{"line":316,"op":"print","text":"Blissey is already paralyzed!"}
+{"line":317,"op":"print","text":"Blissey used Thunder Wave!"}
+{"line":317,"op":"move","user":"near","target":"far","move":86}
+{"line":318,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":318,"op":"print","text":"The opposing Starmie is paralyzed, so it may be unable to move!"}
+{"line":318,"op":"status","side":"far","slot":4,"status":"par"}
+{"line":320,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":320,"op":"hp","side":"far","hp":82}
+{"line":320,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
+{"line":321,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":321,"op":"hp","side":"near","hp":99}
+{"line":321,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":323,"op":"turn","number":25}
+{"line":326,"op":"status","side":"near","slot":4,"status":"none"}
+{"line":327,"op":"print","text":"Blissey, come back!"}
+{"line":327,"op":"withdraw","side":"near"}
+{"line":327,"op":"print","text":"Go! Suicune!"}
+{"line":327,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":328,"op":"hp","side":"near","hp":88}
+{"line":328,"op":"print","text":"Suicune was hurt by the spikes!"}
+{"line":329,"op":"print","text":"The opposing Starmie couldn't move because it's paralyzed!"}
+{"line":329,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":331,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":331,"op":"hp","side":"near","hp":94}
+{"line":331,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
+{"line":332,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":332,"op":"hp","side":"far","hp":88}
+{"line":332,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
+{"line":334,"op":"turn","number":26}
+{"line":337,"op":"print","text":"Suicune used Calm Mind!"}
+{"line":337,"op":"move","user":"near","target":"near","move":347}
+{"line":338,"op":"stat","side":"near","stat":"spa","stages":1,"arrows":"several"}
+{"line":338,"op":"print","text":"Suicune's Sp. Atk rose!"}
+{"line":339,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
+{"line":339,"op":"print","text":"Suicune's Sp. Def rose!"}
+{"line":340,"op":"print","text":"The opposing Starmie used Thunder Wave!"}
+{"line":340,"op":"move","user":"far","target":"near","move":86}
+{"line":341,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":341,"op":"print","text":"Suicune is paralyzed, so it may be unable to move!"}
+{"line":341,"op":"status","side":"near","slot":2,"status":"par"}
+{"line":343,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":343,"op":"hp","side":"far","hp":94}
+{"line":343,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
+{"line":344,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":344,"op":"hp","side":"near","hp":100}
+{"line":344,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
+{"line":346,"op":"turn","number":27}
+{"line":349,"op":"status","side":"far","slot":4,"status":"none"}
+{"line":350,"op":"print","text":"xXEricXx withdrew Starmie!"}
+{"line":350,"op":"withdraw","side":"far"}
+{"line":350,"op":"print","text":"xXEricXx sent out Metagross!"}
+{"line":350,"op":"switchIn","side":"far","slot":3,"hp":11,"status":"none"}
+{"line":351,"op":"print","text":"Suicune used Surf!"}
+{"line":351,"op":"move","user":"near","target":"far","move":57}
+{"line":353,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":353,"op":"hp","side":"far","hp":0}
+{"line":353,"op":"print","text":"A critical hit!"}
+{"line":354,"op":"faint","side":"far"}
+{"line":354,"op":"print","text":"The opposing Metagross fainted!"}
+{"line":357,"op":"print","text":"xXEricXx sent out Aerodactyl!"}
+{"line":357,"op":"switchIn","side":"far","slot":5,"hp":100,"status":"none"}
+{"line":360,"op":"turn","number":28}
+{"line":363,"op":"print","text":"The opposing Aerodactyl used Double-Edge!"}
+{"line":363,"op":"move","user":"far","target":"near","move":38}
+{"line":364,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":364,"op":"hp","side":"near","hp":71}
+{"line":365,"op":"print","text":"Suicune used Surf!"}
+{"line":365,"op":"move","user":"near","target":"far","move":57}
+{"line":367,"op":"hit","side":"far","effectiveness":"super"}
+{"line":367,"op":"hp","side":"far","hp":0}
+{"line":367,"op":"print","text":"It's super effective!"}
+{"line":368,"op":"faint","side":"far"}
+{"line":368,"op":"print","text":"The opposing Aerodactyl fainted!"}
+{"line":370,"op":"print","text":"xXEricXx forfeited."}
+{"line":372,"op":"print","text":"A Welcome Guest won the battle!"}
+{"line":372,"op":"end","outcome":"nearWon"}

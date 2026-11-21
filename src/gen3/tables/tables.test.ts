@@ -1,0 +1,100 @@
+// The committed tables against the pin and against @pkmn's data. These run in CI, which has no
+// checkout of the expansion; scripts/gen3-tables.test.ts regenerates the tables on devbox.
+import { Generations } from '@pkmn/data'
+import { Dex } from '@pkmn/dex'
+import { describe, expect, it } from 'vitest'
+
+import build from '../../../rom/gen3/build.json'
+import { REPLAYS, replayScript } from '../../script/testing'
+import { abilityOf, itemOf, moveOf, speciesOf } from './lookup'
+import type { Found } from './lookup'
+import meta from './meta.json'
+
+type GenerationsDex = ConstructorParameters<typeof Generations>[0]
+const gens = new Generations(Dex as GenerationsDex)
+const GENS = [1, 2, 3] as const
+
+const names = (list: Iterable<{ readonly name: string }>) => [...list].map((entry) => entry.name)
+const misses = (list: string[], lookup: (name: string) => Found) =>
+  list.filter((name) => lookup(name).fallback !== undefined)
+
+describe('meta.json (T4)', () => {
+  it('records the commit and tag of rom/gen3/build.json', () => {
+    expect(meta.commit).toBe(build.upstream.commit)
+    expect(meta.tag).toBe(build.upstream.tag)
+  })
+})
+
+describe('Gen 1 to 3 per @pkmn/data (T5)', () => {
+  it.each(GENS)('maps every species, move and ability of Gen %i', (gen) => {
+    const data = gens.get(gen)
+    expect(misses(names(data.species), speciesOf)).toEqual([])
+    expect(misses(names(data.moves), moveOf)).toEqual([])
+    expect(misses(names(data.abilities), abilityOf)).toEqual([])
+  })
+
+  // The expansion has every item that a generation from 3 on has, except the plain Mail: it has
+  // the Gen 3 mails by their own names. Of the items @pkmn keeps in Gen 2 alone, it carries
+  // Berserk Gene (ITEM_BERSERK_GENE) and none of the others.
+  const EXPANSION_KEEPS = ['Berserk Gene']
+  it.each(GENS)(
+    'misses only the Gen 2 items no later generation kept, and Mail, in Gen %i',
+    (gen) => {
+      const later = [3, 4, 5, 6, 7, 8, 9].map((number) => gens.get(number))
+      const items = names(gens.get(gen).items)
+      const gen2Only = (name: string) => later.every((data) => data.items.get(name) === undefined)
+      const expected = items.filter(
+        (name) => name === 'Mail' || (gen2Only(name) && !EXPANSION_KEEPS.includes(name)),
+      )
+      expect(misses(items, itemOf)).toEqual(expected)
+    },
+  )
+
+  it('has at least one miss to compare, so the rule above is not empty', () => {
+    expect(misses(names(gens.get(2).items), itemOf)).toContain('Mail')
+    expect(misses(names(gens.get(2).items), itemOf).length).toBeGreaterThan(1)
+  })
+})
+
+type Kind = 'species' | 'moves' | 'abilities' | 'items'
+type Named = Record<Kind, Set<string>>
+
+// The field that carries a name, and the `kind` of an effect, to the list it belongs in.
+const FIELDS: ReadonlyMap<unknown, Kind> = new Map([
+  ['species', 'species'],
+  ['move', 'moves'],
+  ['ability', 'abilities'],
+  ['item', 'items'],
+])
+
+// Every name a battle script carries: team species, the moves, items and abilities of its
+// events, and the effects (`[from] item: Leftovers`) behind them.
+function collect(value: unknown, into: Named): void {
+  if (typeof value !== 'object' || value === null) return
+  const record = value as Record<string, unknown>
+  for (const [key, item] of Object.entries(record)) {
+    const kind = FIELDS.get(key)
+    if (typeof item === 'string' && kind !== undefined) into[kind].add(item)
+    collect(item, into)
+  }
+  const effect = FIELDS.get(record.kind)
+  if (typeof record.name === 'string' && effect !== undefined) into[effect].add(record.name)
+}
+
+describe('the test replays (T6)', () => {
+  it.each(REPLAYS.map((replay) => replay.id))('%s maps with no fallback', (id) => {
+    const named: Named = {
+      species: new Set(),
+      moves: new Set(),
+      abilities: new Set(),
+      items: new Set(),
+    }
+    collect(replayScript(id), named)
+    expect(named.species.size).toBeGreaterThan(0)
+    expect(named.moves.size).toBeGreaterThan(0)
+    expect(misses([...named.species], speciesOf)).toEqual([])
+    expect(misses([...named.moves], moveOf)).toEqual([])
+    expect(misses([...named.abilities], abilityOf)).toEqual([])
+    expect(misses([...named.items], itemOf)).toEqual([])
+  })
+})
