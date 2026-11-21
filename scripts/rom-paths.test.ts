@@ -17,7 +17,14 @@ import { fileURLToPath } from 'node:url'
 import { afterAll, describe, expect, it } from 'vitest'
 
 import { ROM_DIR } from './rom-config.ts'
-import { buildPaths, emptyInside, REPO_DIR, removeInside, romRoots } from './rom-paths.ts'
+import {
+  buildPaths,
+  emptyInside,
+  readerTree,
+  REPO_DIR,
+  removeInside,
+  romRoots,
+} from './rom-paths.ts'
 import type { RomRoots } from './rom-paths.ts'
 
 const scratch = mkdtempSync(join(tmpdir(), 'irv-paths-'))
@@ -63,6 +70,21 @@ describe('the build paths', () => {
   it('default to this checkout', () => {
     expect(REPO_DIR).toBe(join(ROM_DIR, '..', '..'))
     expect(buildPaths().tree).toBe(join(realpathSync(REPO_DIR), '.cache', 'rom', 'expansion'))
+  })
+})
+
+describe('the tree for readers', () => {
+  it('is the pinned tree of this checkout by default', () => {
+    expect(readerTree({})).toBe(join(REPO_DIR, '.cache', 'rom', 'expansion'))
+  })
+
+  it('comes from IRV_EXPANSION_TREE when that is set', () => {
+    expect(readerTree({ IRV_EXPANSION_TREE: '/srv/expansion' })).toBe('/srv/expansion')
+  })
+
+  it('refuses an empty or a relative IRV_EXPANSION_TREE', () => {
+    expect(() => readerTree({ IRV_EXPANSION_TREE: '' })).toThrow(/IRV_EXPANSION_TREE/)
+    expect(() => readerTree({ IRV_EXPANSION_TREE: 'expansion' })).toThrow(/absolute/)
   })
 })
 
@@ -186,5 +208,16 @@ describe('the scripts', () => {
       ),
     )
     expect(deleting).toEqual([])
+  })
+
+  it('build, clean and repro never take the tree for readers', () => {
+    const here = dirname(fileURLToPath(import.meta.url))
+    const users = readdirSync(here)
+      .filter((name) => /^rom-.*\.ts$/.test(name) && !name.endsWith('.test.ts'))
+      .filter((name) => name !== 'rom-paths.ts')
+      .filter((name) =>
+        /\b(?:readerTree|IRV_EXPANSION_TREE)\b/.test(readFileSync(join(here, name), 'utf8')),
+      )
+    expect(users).toEqual([])
   })
 })

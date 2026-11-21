@@ -35,6 +35,18 @@ export function buildPaths(repoDir: string = REPO_DIR): BuildPaths {
   }
 }
 
+// For scripts that only read the pinned tree, such as a table generator in another worktree:
+// IRV_EXPANSION_TREE names that tree. Nothing that resets, cleans or deletes calls this; the build
+// keeps its fixed paths behind the guard.
+export function readerTree(env: NodeJS.ProcessEnv = process.env): string {
+  const named = env.IRV_EXPANSION_TREE
+  if (named === undefined) return join(REPO_DIR, '.cache', 'rom', 'expansion')
+  if (named === '' || !isAbsolute(named)) {
+    throw new Error(`IRV_EXPANSION_TREE must be an absolute path, not "${named}"`)
+  }
+  return named
+}
+
 function strictlyInside(root: string, path: string): boolean {
   const rel = relative(root, path)
   return rel !== '' && rel !== '..' && !rel.startsWith(`..${sep}`) && !isAbsolute(rel)
