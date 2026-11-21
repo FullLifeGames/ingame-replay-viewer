@@ -4,7 +4,7 @@ import type { Instruction } from '../src/gen3/stream/instructions.ts'
 import { DUGTRIO, streamOf } from '../src/gen3/stream/testing.ts'
 
 import { SCREEN } from './rom-shot-probes.ts'
-import { refusalScenes, scenesOf, shotArgs } from './rom-shot-scenes.ts'
+import { missingScenes, refusalScenes, scenesOf, shotArgs } from './rom-shot-scenes.ts'
 import { handMadeStream } from './rom-shot-stream.ts'
 
 const scenesFor = (instructions: readonly Instruction[]) => scenesOf(streamOf(instructions))
@@ -22,19 +22,39 @@ describe('the scene points of a decoded instruction list (S6)', () => {
       'first-switch',
       'first-faint',
       'win',
+      'held',
+    ])
+    expect(missingScenes(handMadeStream())).toEqual([])
+  })
+
+  it('names each scene a stream lacks', () => {
+    expect(missingScenes(streamOf([{ op: 'intro' }, { op: 'end', outcome: 'tie' }]))).toEqual([
+      'send-outs',
+      'first-move',
+      'first-hp',
+      'first-status',
+      'first-switch',
+      'first-faint',
+      'win',
+      'held',
     ])
   })
 
-  it('shoots the intro on the frames before and after the INTRO op', () => {
+  it('shoots the slide 32 frames into the INTRO op, drawn, and the frame after the op', () => {
     const scene = named(
       [{ op: 'turn', number: 1 }, { op: 'intro' }, { op: 'end', outcome: 'tie' }],
       'intro',
     )
     expect(scene?.shots).toEqual([
-      { name: 'intro-before', done: 1, frames: 0 },
+      { name: 'intro-before', done: 1, frames: 32 },
       { name: 'intro', done: 2, frames: 0 },
     ])
-    expect(scene?.check).toEqual({ probe: 'differs', before: 'intro-before', after: 'intro' })
+    expect(scene?.check).toEqual({
+      probe: 'differs',
+      before: 'intro-before',
+      after: 'intro',
+      beforeDrawn: true,
+    })
   })
 
   it('checks the near HP digits after the second SEND_OUT', () => {
@@ -48,7 +68,12 @@ describe('the scene points of a decoded instruction list (S6)', () => {
       'send-outs',
     )
     expect(scene?.shots).toEqual([{ name: 'send-outs', done: 3, frames: 0 }])
-    expect(scene?.check).toEqual({ probe: 'blank', shot: 'send-outs', region: SCREEN.nearHpDigits })
+    expect(scene?.check).toEqual({
+      probe: 'blank',
+      shot: 'send-outs',
+      region: SCREEN.nearHpDigits,
+      colour: 0xffffde,
+    })
   })
 
   it('shoots the first move 20 frames into its animation', () => {
@@ -183,6 +208,23 @@ describe('the scene points of a decoded instruction list (S6)', () => {
     expect(scene?.check).toEqual({ probe: 'text', shot: 'win', region: SCREEN.message })
   })
 
+  it('shoots the text box 600 frames after END and expects the win frame there', () => {
+    const scene = named(
+      [
+        { op: 'print', text: 'Alice won the battle!' },
+        { op: 'end', outcome: 'nearWon' },
+      ],
+      'held',
+    )
+    expect(scene?.shots).toEqual([{ name: 'held', done: 2, frames: 600 }])
+    expect(scene?.check).toEqual({
+      probe: 'same',
+      before: 'win',
+      after: 'held',
+      region: SCREEN.message,
+    })
+  })
+
   it('leaves out the scenes a stream lacks', () => {
     expect(scenesFor([{ op: 'end', outcome: 'tie' }])).toEqual([])
     expect(
@@ -198,7 +240,7 @@ describe('the scene points of a decoded instruction list (S6)', () => {
 
   it('gives the shot tool one argument per shot', () => {
     expect(shotArgs(scenesFor([{ op: 'intro' }, { op: 'end', outcome: 'tie' }]))).toEqual([
-      'intro-before:0:0',
+      'intro-before:0:32',
       'intro:1:0',
     ])
   })

@@ -39,6 +39,7 @@ struct ReplayProgress
     u16 turn;  // the number of the last TURN
     u8 error;  // enum ReplayError
     u8 finished;
+    u8 playing; // the interpreter runs the battle: from the frame BeginBattleIntro hands it gBattleMainFunc
 };
 
 STATIC_ASSERT(offsetof(struct ReplayProgress, done) == REPLAY_PROGRESS_OFFSET_DONE, ReplayProgressDoneOffset);
@@ -46,6 +47,7 @@ STATIC_ASSERT(offsetof(struct ReplayProgress, total) == REPLAY_PROGRESS_OFFSET_T
 STATIC_ASSERT(offsetof(struct ReplayProgress, turn) == REPLAY_PROGRESS_OFFSET_TURN, ReplayProgressTurnOffset);
 STATIC_ASSERT(offsetof(struct ReplayProgress, error) == REPLAY_PROGRESS_OFFSET_ERROR, ReplayProgressErrorOffset);
 STATIC_ASSERT(offsetof(struct ReplayProgress, finished) == REPLAY_PROGRESS_OFFSET_FINISHED, ReplayProgressFinishedOffset);
+STATIC_ASSERT(offsetof(struct ReplayProgress, playing) == REPLAY_PROGRESS_OFFSET_PLAYING, ReplayProgressPlayingOffset);
 STATIC_ASSERT(sizeof(struct ReplayProgress) == REPLAY_PROGRESS_SIZE, ReplayProgressSize);
 
 extern struct ReplayProgress gReplayProgress;

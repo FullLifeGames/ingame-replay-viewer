@@ -147,6 +147,7 @@ void Replay_TakeOverBattleMain(void)
     sReplay.upstreamIntro = gBattleMainFunc;
     gBattleMainFunc = Replay_RunBattle;
     gCurrentMove = MOVE_NONE;
+    gReplayProgress.playing = TRUE;
 }
 
 static void Replay_RunBattle(void)

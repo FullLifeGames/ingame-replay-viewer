@@ -26,18 +26,24 @@ export interface HpBar {
 }
 
 // Where the probes look on the 240x160 screen of a singles battle. Lines are of the pinned tree's
-// own files (U = .cache/rom/expansion, 79dd436); the HP bar row was measured once on the first-hp
-// frame of the hand-made run (B6a).
+// own files (U = .cache/rom/expansion, 79dd436); the far HP bar and the healthbox background were
+// measured on frames, as their comments say.
 export const SCREEN = {
   // PrintHpOnHealthbox clears (xOffset + 40, yOffset + 8, 56, 8) before it prints the numbers
   // (U/src/battle_interface.c:935), called with xOffset 0 and yOffset 16 for the near side (:1092).
   // The near healthbox is a 64x32 sprite (:217) centred on (158, 88) (:845), so its corner is
   // (126, 72).
   nearHpDigits: { x: 166, y: 96, width: 56, height: 8 },
-  // The far healthbox is centred on (44, 30) (:846), its corner (12, 14); the healthbar sprite sits
-  // 16 pixels right of it (:741). Measured: the bar's upper fill row is y 33, x 52 to 99, and its
-  // empty part shows 0x4a425a of the healthbar palette (gBattleInterface_BallDisplayPal,
-  // U/src/battle_gfx_sfx_util.c:87).
+  // The colour of that area with no digits in it, the healthbox background. Measured on the
+  // send-outs frame of 994052 (fix step): all 448 pixels of the area show it.
+  healthboxBackground: 0xffffde,
+  // The far healthbox is centred on (44, 30) (:846). Measured only, on the first-hp frames of the
+  // hand-made run (B6a) and of 994052 (fix step): in row 33 a full bar fills x 52 to 99, 48 pixels
+  // (B_HEALTHBAR_PIXELS), and a partly filled bar ends in 0x4a425a of the healthbar palette
+  // (gBattleInterface_BallDisplayPal, U/src/battle_gfx_sfx_util.c:87) up to x 99. The pinned lines
+  // place the bar only roughly: the healthbar sprite sits 16 pixels right of the healthbox (:741),
+  // its bar tiles start at its third tile (MoveBattleBarGraphically, :2238-2246), and the sprite
+  // engine's corner offsets put it on the screen.
   farHpBar: { x: 52, y: 33, width: 48, empty: [0x4a425a] },
   // Each healthbox is two 64x32 sprites side by side from its corner, cut at the screen's edge.
   healthbox: {
@@ -49,6 +55,7 @@ export const SCREEN = {
   message: { x: 16, y: 120, width: 208, height: 32 },
 } as const satisfies {
   nearHpDigits: Region
+  healthboxBackground: number
   farHpBar: HpBar
   healthbox: Record<Side, Region>
   message: Region
@@ -56,7 +63,8 @@ export const SCREEN = {
 }
 
 export type Check =
-  | { probe: 'differs'; before: string; after: string; region?: Region }
+  | { probe: 'differs'; before: string; after: string; region?: Region; beforeDrawn?: boolean }
+  | { probe: 'same'; before: string; after: string; region: Region }
   | { probe: 'blank'; shot: string; region: Region; colour?: number }
   | { probe: 'bar'; shot: string; bar: HpBar; filled: number }
   | { probe: 'text'; shot: string; region: Region }
@@ -144,8 +152,17 @@ const MIN_TEXT_PIXELS = 20
 function verdictOf(check: Check, frame: (name: string) => Frame): Verdict {
   switch (check.probe) {
     case 'differs': {
+      const before = frame(check.before)
+      const count = differingPixels(before, frame(check.after), check.region)
+      const detail = `${String(count)} pixels differ`
+      if (check.beforeDrawn === true && isBlank(before, wholeFrame(before))) {
+        return { pass: false, detail: `${detail}, but the frame before is one colour` }
+      }
+      return { pass: count > 0, detail }
+    }
+    case 'same': {
       const count = differingPixels(frame(check.before), frame(check.after), check.region)
-      return { pass: count > 0, detail: `${String(count)} pixels differ` }
+      return { pass: count === 0, detail: `${String(count)} pixels differ` }
     }
     case 'blank':
       return blankVerdict(frame(check.shot), check.region, check.colour)

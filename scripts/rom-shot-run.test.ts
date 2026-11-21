@@ -43,7 +43,7 @@ describe('the names of the interpreter errors', () => {
 describe('the layout the shot tool reads', () => {
   it('comes from replay_progress.h: the size of struct ReplayProgress and the refusal colour', () => {
     expect(readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))).toEqual({
-      size: 8,
+      size: 12,
       refusedColour: 0x630000,
     })
   })
@@ -123,6 +123,21 @@ describe('judging a run', () => {
     expect(
       judgeRun({ expect: 'finished', output: finished, scenes: passing, errors: ERRORS }),
     ).toEqual([])
+  })
+
+  it('fails a replay that lacks a scene it must have', () => {
+    expect(
+      judgeRun({
+        expect: 'finished',
+        output: finished,
+        scenes: passing,
+        errors: ERRORS,
+        missing: ['first-faint', 'held'],
+      }),
+    ).toEqual([
+      'missing scene first-faint: the stream has none',
+      'missing scene held: the stream has none',
+    ])
   })
 
   it('names a stall, a failed scene and an unfinished count', () => {

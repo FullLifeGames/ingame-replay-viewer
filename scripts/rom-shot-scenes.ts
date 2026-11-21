@@ -1,7 +1,8 @@
 // The named scenes of a screenshot run (plan section 7): where in a stream each scene lies, which
 // frames the shot tool takes for it, and what its probe expects. A shot is taken `frames` frames
-// after the first frame on which gReplayProgress.done equals `done`: the frame between op `done - 1`
-// and op `done`, or `frames` into op `done`.
+// after the first frame on which the interpreter plays (gReplayProgress.playing) and
+// gReplayProgress.done equals `done`: the frame between op `done - 1` and op `done`, or `frames`
+// into op `done`.
 import type { Instruction, Stream } from '../src/gen3/stream/instructions.ts'
 import type { Side } from '../src/script/types.ts'
 
@@ -56,9 +57,26 @@ function changeAt(name: string, at: number, region?: Region): Scene {
 const firstOf = (input: Input, op: Instruction['op']) =>
   input.stream.instructions.findIndex((instruction) => instruction.op === op)
 
+// The screen fades in from black while the slide starts: measured on the hand-made run (fix step),
+// the first 20 frames after the interpreter takes over show one colour, frame 24 three and frame
+// 32 thirteen, with the scene drawn and still sliding. The frame after INTRO has both trainers in
+// place.
+const INTRO_SLIDE_FRAMES = 32
+
 function introScene(input: Input): Scene | undefined {
   const at = firstOf(input, 'intro')
-  return at < 0 ? undefined : changeAt('intro', at)
+  if (at < 0) return undefined
+  const shots = [
+    { name: 'intro-before', done: at, frames: INTRO_SLIDE_FRAMES },
+    { name: 'intro', done: at + 1, frames: 0 },
+  ]
+  const check: Check = {
+    probe: 'differs',
+    before: 'intro-before',
+    after: 'intro',
+    beforeDrawn: true,
+  }
+  return { name: 'intro', shots, check }
 }
 
 // After both send-outs the near healthbox is drawn; its HP numbers stay hidden (patch 0002).
@@ -72,7 +90,12 @@ function sendOutScene(input: Input): Scene | undefined {
   return {
     name: shot.name,
     shots: [shot],
-    check: { probe: 'blank', shot: shot.name, region: SCREEN.nearHpDigits },
+    check: {
+      probe: 'blank',
+      shot: shot.name,
+      region: SCREEN.nearHpDigits,
+      colour: SCREEN.healthboxBackground,
+    },
   }
 }
 
@@ -161,21 +184,44 @@ function winScene(input: Input): Scene | undefined {
   }
 }
 
-const SCENES = [
-  introScene,
-  sendOutScene,
-  moveScene,
-  hpScene,
-  statusScene,
-  switchScene,
-  faintScene,
-  winScene,
+// After END the ROM holds the last scene (Replay_Hold): 600 frames on, the text box still shows
+// the win line as the win frame does.
+const HELD_FRAMES = 600
+
+function heldScene(input: Input): Scene | undefined {
+  if (winScene(input) === undefined) return undefined
+  const shot = { name: 'held', done: input.stream.instructions.length, frames: HELD_FRAMES }
+  return {
+    name: shot.name,
+    shots: [shot],
+    check: { probe: 'same', before: 'win', after: shot.name, region: SCREEN.message },
+  }
+}
+
+const SCENES: readonly (readonly [string, (input: Input) => Scene | undefined])[] = [
+  ['intro', introScene],
+  ['send-outs', sendOutScene],
+  ['first-move', moveScene],
+  ['first-hp', hpScene],
+  ['first-status', statusScene],
+  ['first-switch', switchScene],
+  ['first-faint', faintScene],
+  ['win', winScene],
+  ['held', heldScene],
 ]
+
+const inputOf = (stream: Stream): Input => ({ stream, active: activeSlots(stream.instructions) })
 
 /** The scenes the stream holds, in the order of the plan; a scene it lacks is left out. */
 export function scenesOf(stream: Stream): Scene[] {
-  const input = { stream, active: activeSlots(stream.instructions) }
-  return SCENES.flatMap((scene) => scene(input) ?? [])
+  const input = inputOf(stream)
+  return SCENES.flatMap(([, scene]) => scene(input) ?? [])
+}
+
+/** The names of the scenes the stream lacks, in the order of the plan. */
+export function missingScenes(stream: Stream): string[] {
+  const input = inputOf(stream)
+  return SCENES.filter(([, scene]) => scene(input) === undefined).map(([name]) => name)
 }
 
 /**

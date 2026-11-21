@@ -102,6 +102,35 @@ describe('checking the shots of a scene', () => {
     })
   })
 
+  it('takes two frames that agree in a region and counts the pixels where they do not', () => {
+    const region = { x: 0, y: 0, width: 4, height: 4 }
+    expect(
+      checkShots({ probe: 'same', before: 'before', after: 'before', region }, frames),
+    ).toEqual({
+      pass: true,
+      detail: '0 pixels differ',
+    })
+    expect(checkShots({ probe: 'same', before: 'before', after: 'after', region }, frames)).toEqual(
+      {
+        pass: false,
+        detail: '4 pixels differ',
+      },
+    )
+  })
+
+  it('fails a change from a frame of one colour when the scene needs that frame drawn', () => {
+    const check = { probe: 'differs', before: 'before', after: 'after', beforeDrawn: true } as const
+    expect(checkShots(check, frames)).toEqual({
+      pass: false,
+      detail: '4 pixels differ, but the frame before is one colour',
+    })
+    const drawn = new Map([
+      ['before', changed],
+      ['after', black],
+    ])
+    expect(checkShots(check, drawn)).toEqual({ pass: true, detail: '4 pixels differ' })
+  })
+
   it('fails a scene whose frames show nothing new', () => {
     expect(checkShots({ probe: 'differs', before: 'before', after: 'before' }, frames)).toEqual({
       pass: false,

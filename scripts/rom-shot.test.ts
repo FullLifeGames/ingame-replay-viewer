@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseShotArgs, replayFile } from './rom-shot.ts'
+import { parseShotArgs, replayFile, requiresEveryScene } from './rom-shot.ts'
 
 describe('the arguments of rom:shots', () => {
   it('plays test replay 994052 when it gets no name', () => {
@@ -47,5 +47,16 @@ describe('the file of a test replay', () => {
     expect(() => replayFile('994000', files)).toThrow(
       'no test replay 994000 in test/fixtures/replays/; there are 994052, 994086',
     )
+  })
+})
+
+describe('the scenes a run must have', () => {
+  it('are all of them for the default runs, 994052 and hand-made', () => {
+    expect(requiresEveryScene('994052')).toBe(true)
+    expect(requiresEveryScene('hand-made')).toBe(true)
+  })
+
+  it('are those the stream holds for another test replay', () => {
+    expect(requiresEveryScene('994086')).toBe(false)
   })
 })

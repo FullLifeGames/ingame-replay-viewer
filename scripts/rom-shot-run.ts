@@ -159,6 +159,8 @@ export interface Judged {
   output: ToolOutput
   scenes: readonly SceneVerdict[]
   errors: readonly string[]
+  /** The scenes the run must have and its stream lacks. */
+  missing?: readonly string[]
 }
 
 const errorName = (errors: readonly string[], error: number) =>
@@ -183,7 +185,8 @@ function judgeReplay(run: Judged): string[] {
     problems.push(`${String(status.done)} of ${String(status.total)} instructions done`)
   }
   if (status.error !== 0) problems.push(`error ${errorName(run.errors, status.error)}`)
-  return [...problems, ...sceneProblems(run.scenes)]
+  const missing = (run.missing ?? []).map((name) => `missing scene ${name}: the stream has none`)
+  return [...problems, ...missing, ...sceneProblems(run.scenes)]
 }
 
 /** What went wrong in a run; an empty list is a pass. */

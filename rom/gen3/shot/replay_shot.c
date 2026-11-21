@@ -8,7 +8,8 @@
 // It loads the ROM with no save file and no BIOS file, so mGBA keeps the save in memory and runs
 // its own BIOS, and runs frames as fast as it can. After each frame it reads gReplayProgress
 // (rom/gen3/include/replay_interpreter.h) at the given address. A shot <name>:<done>:<frames> is
-// taken <frames> frames after the first frame on which `done` equals <done>, and goes to
+// taken <frames> frames after the first frame on which the interpreter plays and `done` equals
+// <done>, and goes to
 // <frame dir>/<name>.ppm (binary PPM, 240x160). The run stops when the replay has finished and no
 // shot it reached is still due, ERROR_FRAMES frames after the interpreter reports an error (so the
 // refusal screen is up), or when `done` has not changed for STALL_FRAMES frames: the viewer presses
@@ -48,6 +49,7 @@ struct Progress
     unsigned turn;
     unsigned error;
     bool finished;
+    bool playing;
 };
 
 struct Shot
@@ -125,6 +127,7 @@ static struct Progress ReadProgress(struct Run *run)
     progress.turn = core->busRead16(core, at + REPLAY_PROGRESS_OFFSET_TURN);
     progress.error = core->busRead8(core, at + REPLAY_PROGRESS_OFFSET_ERROR);
     progress.finished = core->busRead8(core, at + REPLAY_PROGRESS_OFFSET_FINISHED) != 0;
+    progress.playing = core->busRead8(core, at + REPLAY_PROGRESS_OFFSET_PLAYING) != 0;
     return progress;
 }
 
@@ -151,8 +154,9 @@ static bool WriteFrame(struct Run *run, const char *name)
     return fclose(file) == 0 && ok;
 }
 
-// Arms each shot on the first frame its `done` is reached and writes it when its frames are up.
-// Returns false when a frame could not be written.
+// Arms each shot on the first frame its `done` is reached while the interpreter plays (so a shot at
+// done 0 starts with the battle, not with the boot) and writes it when its frames are up. Returns
+// false when a frame could not be written.
 static bool TakeShots(struct Run *run, struct Progress progress, unsigned long frame)
 {
     int i;
@@ -161,7 +165,7 @@ static bool TakeShots(struct Run *run, struct Progress progress, unsigned long f
     {
         struct Shot *shot = &run->shots[i];
 
-        if (!shot->armed && progress.done == shot->done)
+        if (!shot->armed && progress.playing && progress.done == shot->done)
         {
             shot->armed = true;
             shot->due = frame + shot->frames;

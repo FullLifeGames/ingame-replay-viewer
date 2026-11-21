@@ -32,7 +32,7 @@ import {
 } from './rom-shot-run.ts'
 import type { ProgressLayout } from './rom-shot-run.ts'
 import type { Expected, SceneVerdict, ToolOutput } from './rom-shot-run.ts'
-import { refusalScenes, scenesOf, shotArgs } from './rom-shot-scenes.ts'
+import { missingScenes, refusalScenes, scenesOf, shotArgs } from './rom-shot-scenes.ts'
 import type { Scene } from './rom-shot-scenes.ts'
 import type * as ShotStream from './rom-shot-stream.ts'
 
@@ -56,6 +56,11 @@ export function parseShotArgs(argv: string[]): string[] {
   return positionals.length > 0 ? positionals : [DEFAULT_REPLAY]
 }
 
+/** The default runs must show every scene; another test replay may lack some, and the report names them. */
+export function requiresEveryScene(name: string): boolean {
+  return name === DEFAULT_REPLAY || name === HAND_MADE
+}
+
 /** The file in test/fixtures/replays/ of the test replay with this id. */
 export function replayFile(id: string, files: readonly string[]): string {
   const file = files.find((name) => name.endsWith(`-${id}.json`))
@@ -71,6 +76,8 @@ interface RunPlan {
   /** The ROM bytes, or undefined for the built ROM as it is. */
   rom: Uint8Array | undefined
   scenes: Scene[]
+  /** The scenes the stream lacks. */
+  missing: string[]
   expect: Expected
 }
 
@@ -80,6 +87,7 @@ interface RunReport {
   seconds: number
   status: ToolOutput['status']
   scenes: SceneVerdict[]
+  missing: string[]
   problems: string[]
 }
 
@@ -124,17 +132,24 @@ async function planRuns(
   const { rom, description } = readBuiltRom(paths)
   const plays = names.map((name): RunPlan => {
     const bytes = streamBytes(shot, name)
-    const scenes = scenesOf(shot.decodeStream(bytes))
-    return { name, rom: writeReplaySlot(rom, description, bytes), scenes, expect: 'finished' }
+    const stream = shot.decodeStream(bytes)
+    return {
+      name,
+      rom: writeReplaySlot(rom, description, bytes),
+      scenes: scenesOf(stream),
+      missing: missingScenes(stream),
+      expect: 'finished',
+    }
   })
   const refused = refusalScenes(layout.refusedColour)
   return [
     ...plays,
-    { name: 'empty-slot', rom: undefined, scenes: refused, expect: 'EMPTY' },
+    { name: 'empty-slot', rom: undefined, scenes: refused, missing: [], expect: 'EMPTY' },
     {
       name: 'version-2',
       rom: writeReplaySlot(rom, description, shot.withVersion(shot.handMadeBytes(), 2)),
       scenes: refused,
+      missing: [],
       expect: 'VERSION',
     },
   ]
@@ -177,8 +192,16 @@ function playRun(context: Context, plan: RunPlan): RunReport {
     name: scene.name,
     ...checkShots(scene.check, frames),
   }))
-  const problems = judgeRun({ expect: plan.expect, output, scenes, errors: context.errors })
-  return { name: plan.name, expect: plan.expect, seconds, status: output.status, scenes, problems }
+  const { missing } = plan
+  const problems = judgeRun({
+    expect: plan.expect,
+    output,
+    scenes,
+    errors: context.errors,
+    missing: requiresEveryScene(plan.name) ? missing : [],
+  })
+  const { name, expect } = plan
+  return { name, expect, seconds, status: output.status, scenes, missing, problems }
 }
 
 function sayRun(report: RunReport): void {
@@ -190,10 +213,10 @@ function sayRun(report: RunReport): void {
   for (const scene of report.scenes) {
     say(`  ${scene.pass ? 'pass' : 'FAIL'} ${scene.name}: ${scene.detail}`)
   }
-  // A failed scene is listed above already.
-  for (const problem of report.problems.filter((line) => !line.startsWith('scene '))) {
-    say(`  ${problem}`)
-  }
+  for (const name of report.missing) say(`  missing ${name}: the stream has none`)
+  // A failed or missing scene is listed above already.
+  const listed = (line: string) => line.startsWith('scene ') || line.startsWith('missing scene ')
+  for (const problem of report.problems.filter((line) => !listed(line))) say(`  ${problem}`)
 }
 
 async function runShots(names: readonly string[]): Promise<void> {
@@ -201,6 +224,7 @@ async function runShots(names: readonly string[]): Promise<void> {
   const shotsDir = join(paths.outDir, 'shots')
   const tool = join(paths.outDir, 'shot', 'replay_shot')
   buildTool(tool)
+  const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
   const context: Context = {
     paths,
     shotsDir,
@@ -223,7 +247,6 @@ async function runShots(names: readonly string[]): Promise<void> {
   say(`all ${String(reports.length)} runs passed; frames and report.json in ${shotsDir}`)
 }
 
-const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
 async function main(): Promise<void> {
   await runCliAsync('rom:shots', async () => {
     await runShots(parseShotArgs(process.argv.slice(2)))

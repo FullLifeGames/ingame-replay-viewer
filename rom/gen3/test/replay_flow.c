@@ -20,6 +20,23 @@ REPLAY_TEST("END alone ends the battle as a win of the near side")
     }
 }
 
+// The screenshot tool arms its shots from the frame the interpreter takes over the battle, so a shot
+// at done 0 shows the battle scene and not the boot.
+TEST("Replay: the progress does not say playing before the battle starts")
+{
+    ReplayStream_Begin();
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    EXPECT_EQ(Replay_Load(ReplayStream_Data(), ReplayStream_Length(), REPLAY_EXIT_AT_END), REPLAY_ERROR_NONE);
+    EXPECT(!gReplayProgress.playing);
+    Replay_Unload();
+}
+
+REPLAY_TEST("The progress says playing once the interpreter runs the battle")
+{
+    STREAM { ReplayStream_End(REPLAY_OUTCOME_NEAR_WON); }
+    THEN { EXPECT(gReplayProgress.playing); }
+}
+
 REPLAY_TEST("END of a far win ends the battle as lost")
 {
     STREAM { ReplayStream_End(REPLAY_OUTCOME_FAR_WON); }
