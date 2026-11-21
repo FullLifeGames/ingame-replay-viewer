@@ -12,9 +12,15 @@ import {
   readProgressLayout,
   readToolOutput,
   toolBuildArgs,
+  widenChannel,
 } from './rom-shot-run.ts'
 import { ROM_DIR } from './rom-config.ts'
 import type { ToolOutput } from './rom-shot-run.ts'
+
+// The offset defines a test header needs besides the size and the colour.
+const OFFSETS = ['DONE', 'TOTAL', 'TURN', 'ERROR', 'FINISHED', 'PLAYING']
+  .map((name, i) => `#define REPLAY_PROGRESS_OFFSET_${name} ${String(i)}\n`)
+  .join('')
 
 const ERRORS = readErrorNames(readFileSync(INTERPRETER_HEADER_PATH, 'utf8'))
 
@@ -41,26 +47,36 @@ describe('the names of the interpreter errors', () => {
 })
 
 describe('the layout the shot tool reads', () => {
-  it('comes from replay_progress.h: the size of struct ReplayProgress and the refusal colour', () => {
+  it('comes from replay_progress.h: the size and offsets of struct ReplayProgress and the refusal colour', () => {
     expect(readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))).toEqual({
       size: 12,
+      offsets: { done: 0, total: 2, turn: 4, error: 6, finished: 7, playing: 8 },
       refusedColour: 0x630000,
     })
   })
 
+  it('widens a five-bit channel as mGBA does: the five bits, then their top three', () => {
+    expect([0, 1, 12, 31].map(widenChannel)).toEqual([0, 0x08, 0x63, 0xff])
+  })
+
   it('widens the five bits of the red channel to eight, as mGBA does', () => {
     const header = (red: string) =>
-      `#define REPLAY_PROGRESS_SIZE 8\n#define REPLAY_REFUSED_RED ${red} // the backdrop\n`
+      `${OFFSETS}#define REPLAY_PROGRESS_SIZE 8\n#define REPLAY_REFUSED_RED ${red} // the backdrop\n`
     expect(readProgressLayout(header('31')).refusedColour).toBe(0xff0000)
     expect(readProgressLayout(header('0x01')).refusedColour).toBe(0x080000)
   })
 
   it('refuses a define that is missing or no plain number', () => {
-    expect(() => readProgressLayout('#define REPLAY_REFUSED_RED 12\n')).toThrow(
+    expect(() => readProgressLayout(`${OFFSETS}#define REPLAY_REFUSED_RED 12\n`)).toThrow(
       'replay_progress.h: REPLAY_PROGRESS_SIZE missing',
     )
     expect(() =>
-      readProgressLayout('#define REPLAY_PROGRESS_SIZE 8\n#define REPLAY_REFUSED_RED (6 * 2)\n'),
+      readProgressLayout('#define REPLAY_PROGRESS_SIZE 8\n#define REPLAY_REFUSED_RED 12\n'),
+    ).toThrow('replay_progress.h: REPLAY_PROGRESS_OFFSET_DONE missing')
+    expect(() =>
+      readProgressLayout(
+        `${OFFSETS}#define REPLAY_PROGRESS_SIZE 8\n#define REPLAY_REFUSED_RED (6 * 2)\n`,
+      ),
     ).toThrow('replay_progress.h: REPLAY_REFUSED_RED is "(6 * 2)", not a plain number')
   })
 })

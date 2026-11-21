@@ -15,9 +15,20 @@ export const PROGRESS_HEADER_PATH = join(INCLUDE_DIR, 'replay_progress.h')
 
 const PROGRESS_SYMBOL = 'gReplayProgress'
 
+/** The byte offsets of the fields of struct ReplayProgress. */
+interface ProgressOffsets {
+  done: number
+  total: number
+  turn: number
+  error: number
+  finished: number
+  playing: number
+}
+
 export interface ProgressLayout {
   /** sizeof(struct ReplayProgress). */
   size: number
+  offsets: ProgressOffsets
   /** The refusal screen's backdrop as the tool's frames show it, 0xRRGGBB. */
   refusedColour: number
 }
@@ -31,13 +42,24 @@ function readNumberDefine(headerText: string, name: string): number {
   return Number(text)
 }
 
-// mGBA widens each five-bit channel of a GBA colour to eight bits: the five bits, then their top three.
-const widen = (channel: number) => (channel << 3) | (channel >> 2)
+/** mGBA widens each five-bit channel of a GBA colour to eight bits: the five bits, then their top three. */
+export const widenChannel = (channel: number) => (channel << 3) | (channel >> 2)
+
+const offset = (headerText: string, field: string) =>
+  readNumberDefine(headerText, `REPLAY_PROGRESS_OFFSET_${field}`)
 
 export function readProgressLayout(headerText: string): ProgressLayout {
+  const offsets: ProgressOffsets = {
+    done: offset(headerText, 'DONE'),
+    total: offset(headerText, 'TOTAL'),
+    turn: offset(headerText, 'TURN'),
+    error: offset(headerText, 'ERROR'),
+    finished: offset(headerText, 'FINISHED'),
+    playing: offset(headerText, 'PLAYING'),
+  }
   const size = readNumberDefine(headerText, 'REPLAY_PROGRESS_SIZE')
   const red = readNumberDefine(headerText, 'REPLAY_REFUSED_RED')
-  return { size, refusedColour: widen(red) << 16 }
+  return { size, offsets, refusedColour: widenChannel(red) << 16 }
 }
 
 interface ShotLine {
