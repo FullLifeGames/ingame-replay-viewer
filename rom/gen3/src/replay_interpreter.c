@@ -164,9 +164,12 @@ void Replay_TakeOverBattleMain(void)
 // and Cmd_waitanimation (src/battle_script_commands.c) returns while
 //     gBattleControllerExecFlags != 0 || gBattleStruct->battlerKOAnimsRunning != 0
 // So the PRINT right after a FAINT, the faint text, starts during the animation, and every other op
-// waits for its end, a later PRINT such as the next send-out text included. The faint handler runs
-// on two frames and starts the animation on both, so after a faint the counter is 2; both
-// animations end on the same frame.
+// waits for its end, a later PRINT such as the next send-out text included. The faint handler
+// (BtlController_HandleFaintAnimation in battle_controllers.c) starts the animation on each frame
+// it runs. A mon in the open takes two frames, so after its faint the counter is 2 and both
+// animations end on the same frame. A mon behind a substitute takes one frame more for each frame
+// of B_ANIM_SUBSTITUTE_TO_MON, and the counter is a 3-bit field (battlerKOAnimsRunning:3 in
+// include/battle.h), so there the count wraps and does not say how many animations run.
 static bool32 Replay_WaitsForKOAnimation(u32 op, u32 step)
 {
     if (step != 0 || gBattleStruct->battlerKOAnimsRunning == 0)
