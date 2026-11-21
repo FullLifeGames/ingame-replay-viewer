@@ -1,15 +1,17 @@
 import { execFileSync } from 'node:child_process'
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 
+import type { BuildConfig } from './rom-config.ts'
 import { OUTPUT_NAMES } from './rom-outputs.ts'
 import { buildPaths } from './rom-paths.ts'
 import type { BuildPaths } from './rom-paths.ts'
 import {
   addWorktree,
+  buildTwice,
   compareOutputs,
   firstDifference,
   removeWorktree,
@@ -179,6 +181,14 @@ function layout(): { paths: BuildPaths; commit: string } {
 
 const listed = (repo: string) => sh(repo, 'worktree', 'list', '--porcelain')
 
+const commitOf = (paths: BuildPaths) => sh(paths.tree, 'rev-parse', 'HEAD').trim()
+
+const configFor = (commit: string): BuildConfig => ({
+  upstream: { repository: 'https://example.invalid/expansion', tag: 'v1', commit },
+  baseRom: { sha1: '0'.repeat(40) },
+  make: { jobs: 1 },
+})
+
 describe('the fresh worktree', () => {
   let paths: BuildPaths
   let commit: string
@@ -224,5 +234,40 @@ describe('the fresh worktree', () => {
       removeWorktree({ ...paths, tree: join(outside, 'expansion') })
     }).toThrow(/may not delete/)
     expect(existsSync(join(outside, 'repro', 'expansion', 'keep.txt'))).toBe(true)
+  })
+})
+
+describe('the two builds', () => {
+  const ROM = 'rom\n'
+  const writeOutputs = (paths: BuildPaths) => {
+    mkdirSync(paths.outDir, { recursive: true })
+    writeFileSync(join(paths.outDir, OUTPUT_NAMES.rom), ROM)
+  }
+
+  it('builds A, then B in the fresh worktree, and removes the worktree again', () => {
+    const { paths } = layout()
+    const trees: string[] = []
+    buildTwice(paths, configFor(commitOf(paths)), (built) => {
+      trees.push(built.tree)
+      writeOutputs(built)
+    })
+    expect(trees).toEqual([paths.tree, reproPaths(paths).tree])
+    expect(readFileSync(join(reproPaths(paths).outDir, OUTPUT_NAMES.rom), 'utf8')).toBe(ROM)
+    expect(existsSync(dirname(reproPaths(paths).tree))).toBe(false)
+  })
+
+  it('removes the worktree and its folder when build B fails, and keeps A', () => {
+    const { paths, commit } = layout()
+    const config = configFor(commit)
+    expect(() => {
+      buildTwice(paths, config, (built) => {
+        if (built.tree !== paths.tree) throw new Error('make failed in B')
+        writeOutputs(built)
+      })
+    }).toThrow(/make failed in B/)
+    expect(existsSync(dirname(reproPaths(paths).tree))).toBe(false)
+    expect(listed(paths.tree)).not.toContain(reproPaths(paths).tree)
+    expect(existsSync(join(paths.tree, 'main.c'))).toBe(true)
+    expect(existsSync(join(paths.outDir, OUTPUT_NAMES.rom))).toBe(true)
   })
 })

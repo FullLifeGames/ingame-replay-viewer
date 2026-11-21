@@ -154,28 +154,46 @@ function describeResult(result: ReproComparison): string {
   return `fail: ${sha}; ${result.differing.join(', ')} differ${at}; both builds stay in build/rom`
 }
 
-function timedBuild(paths: BuildPaths, config: BuildConfig, seconds: Record<string, number>): void {
-  const key = seconds.a === undefined ? 'a' : 'b'
-  say(`build ${key} in ${paths.tree}`)
+export type BuildStep = (paths: BuildPaths, config: BuildConfig) => void
+
+function timed(seconds: Record<string, number>, key: string, run: () => void): void {
   const start = performance.now()
-  buildRom(paths, config, true)
+  run()
   seconds[key] = Math.round((performance.now() - start) / 1000)
+}
+
+// Build A, then B in a fresh worktree of A's tree. B's worktree and its folder under .cache/rom go
+// again whether B passes or throws.
+export function buildTwice(
+  a: BuildPaths,
+  config: BuildConfig,
+  build: BuildStep,
+): Record<string, number> {
+  const b = reproPaths(a)
+  const seconds: Record<string, number> = {}
+  say(`build a in ${a.tree}`)
+  timed(seconds, 'a', () => {
+    build(a, config)
+  })
+  try {
+    addWorktree(a, config.upstream.commit)
+    say(`build b in ${b.tree}`)
+    timed(seconds, 'b', () => {
+      build(b, config)
+    })
+  } finally {
+    removeWorktree(a)
+    removeInside(a.roots, dirname(b.tree))
+    say(`removed the worktree ${b.tree}`)
+  }
+  return seconds
 }
 
 function repro(): ReproComparison {
   const config = loadBuildConfig()
   const a = buildPaths()
   const b = reproPaths(a)
-  const seconds: Record<string, number> = {}
-  timedBuild(a, config, seconds)
-  try {
-    addWorktree(a, config.upstream.commit)
-    timedBuild(b, config, seconds)
-  } finally {
-    removeWorktree(a)
-    removeInside(a.roots, dirname(b.tree))
-    say(`removed the worktree ${b.tree}`)
-  }
+  const seconds = buildTwice(a, config, (paths, pinned) => buildRom(paths, pinned, true))
   const result = compareOutputs(a.outDir, b.outDir)
   const record = { ...result, trees: { a: a.tree, b: b.tree }, outDirs: [a.outDir, b.outDir] }
   writeFileSync(
