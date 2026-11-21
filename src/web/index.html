@@ -4,8 +4,47 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ingame Replay Viewer</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+      }
+      #screen {
+        display: block;
+        width: min(720px, 100%);
+        aspect-ratio: 3 / 2;
+        image-rendering: pixelated;
+        background: #000;
+      }
+    </style>
   </head>
   <body>
+    <h1>Ingame Replay Viewer</h1>
+    <p id="environment" hidden></p>
+    <div id="app">
+      <p>
+        <label for="dump">Your US Emerald (stays in this tab)</label>
+        <input id="dump" type="file" accept=".gba" />
+      </p>
+      <p>
+        <label for="test-replay">Test replay</label>
+        <select id="test-replay"></select>
+      </p>
+      <form id="replay-form">
+        <label for="replay-input">Replay link or ID</label>
+        <input id="replay-input" type="text" placeholder="smogtours-gen3ou-994052" />
+        <button type="submit">Load</button>
+      </form>
+      <p>
+        <button id="start" type="button">Start</button>
+        <button id="restart" type="button" disabled>Restart</button>
+      </p>
+      <p id="status" role="status"></p>
+      <canvas id="screen" width="240" height="160"></canvas>
+      <p id="replay-summary"></p>
+      <h2 id="not-shown">Not shown in the game (0)</h2>
+      <ul id="not-shown-counts"></ul>
+      <ol id="not-shown-rows"></ol>
+    </div>
     <script type="module" src="./main.ts"></script>
   </body>
 </html>

@@ -137,7 +137,7 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
   {
-    files: ['*.config.ts', 'scripts/**/*.ts'],
+    files: ['*.config.ts', 'scripts/**/*.ts', 'e2e/**/*.ts'],
     languageOptions: { globals: globals.node },
   },
   pureZone,
