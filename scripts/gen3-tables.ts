@@ -6,7 +6,13 @@ import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { parseCharmap, parseDisplayNames, parseEnum, parseIncludes } from './gen3-parse.ts'
+import {
+  parseCharmap,
+  parseDefine,
+  parseDisplayNames,
+  parseEnum,
+  parseIncludes,
+} from './gen3-parse.ts'
 import { runCli } from './rom-cli.ts'
 import { loadBuildConfig } from './rom-config.ts'
 import type { UpstreamPin } from './rom-config.ts'
@@ -25,6 +31,8 @@ interface ContentTable {
   readonly prefix: string
   readonly field: string
   readonly data: (read: ReadTree) => string[]
+  /** The enum's entry that counts its constants; the ROM's validator bounds numbers by it. */
+  readonly count: string
 }
 
 const SPECIES_INFO = 'src/data/pokemon/species_info.h'
@@ -43,6 +51,7 @@ const CONTENT: readonly ContentTable[] = [
     prefix: 'SPECIES',
     field: 'speciesName',
     data: speciesFiles,
+    count: 'NUM_SPECIES',
   },
   {
     table: 'moves',
@@ -51,6 +60,7 @@ const CONTENT: readonly ContentTable[] = [
     prefix: 'MOVE',
     field: 'name',
     data: () => ['src/data/moves_info.h'],
+    count: 'MOVES_COUNT_ALL',
   },
   {
     table: 'abilities',
@@ -59,6 +69,7 @@ const CONTENT: readonly ContentTable[] = [
     prefix: 'ABILITY',
     field: 'name',
     data: () => ['src/data/abilities.h'],
+    count: 'ABILITIES_COUNT',
   },
   {
     table: 'items',
@@ -67,14 +78,22 @@ const CONTENT: readonly ContentTable[] = [
     prefix: 'ITEM',
     field: 'name',
     data: () => ['src/data/items.h'],
+    count: 'ITEMS_COUNT',
   },
 ]
 
-const TRAINER_PICS = { header: 'include/constants/trainers.h', enumName: 'TrainerPicID' }
+const TRAINER_PICS = {
+  header: 'include/constants/trainers.h',
+  enumName: 'TrainerPicID',
+  count: 'TRAINER_PIC_COUNT',
+}
+
+const LEVEL_CAP = { header: 'include/constants/pokemon.h', define: 'MAX_LEVEL' }
 
 export const TABLE_FILES = [
   ...CONTENT.map((content) => `${content.table}.json`),
   'trainer-pics.json',
+  'counts.json',
   'charmap.json',
   'meta.json',
 ] as const
@@ -144,6 +163,19 @@ function trainerPics(read: ReadTree): object {
   return Object.fromEntries([...values].filter(([constant]) => constant.startsWith('TRAINER_PIC_')))
 }
 
+// The bounds of a stream's numbers, by the expansion's own names: each content enum's count, the
+// trainer pics' count and the level cap.
+function counts(read: ReadTree): Record<string, number> {
+  const found: Record<string, number> = {}
+  for (const { header, enumName, count } of [...CONTENT, TRAINER_PICS]) {
+    const value = parseEnum(read(header), enumName).get(count)
+    if (value === undefined) throw new Error(`${header}: enum ${enumName} has no ${count}`)
+    found[count] = value
+  }
+  found[LEVEL_CAP.define] = parseDefine(read(LEVEL_CAP.header), LEVEL_CAP.define)
+  return found
+}
+
 export interface GeneratedTables {
   /** File name in src/gen3/tables/ to its text. */
   readonly files: Record<string, string>
@@ -164,6 +196,7 @@ export function generateTables(read: ReadTree, pin: UpstreamPin): GeneratedTable
     files[`${content.table}.json`] = jsonText(contentTable(recorded, content, notes))
   }
   files['trainer-pics.json'] = jsonText(trainerPics(recorded))
+  files['counts.json'] = jsonText(counts(recorded))
   files['charmap.json'] = jsonText(parseCharmap(recorded('charmap.txt')))
   const sorted = [...hashes].sort(([a], [b]) => (a < b ? -1 : 1))
   files['meta.json'] = jsonText({

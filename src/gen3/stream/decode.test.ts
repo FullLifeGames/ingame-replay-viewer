@@ -1,13 +1,25 @@
 import { describe, expect, it } from 'vitest'
 
 import { Gen3Error } from '../errors'
+import counts from '../tables/counts.json'
 import { decodeStream } from './decode'
 import { encodeStream } from './encode'
-import { monOffset, STREAM, STREAM_OFFSET, trainerOffset } from './format'
+import {
+  MON,
+  MON_OFFSET,
+  monOffset,
+  STREAM,
+  STREAM_OFFSET,
+  TRAINER_OFFSET,
+  trainerOffset,
+} from './format'
 import type { Instruction } from './instructions'
 import { EACH_OP, streamOf } from './testing'
 
 const END: Instruction = { op: 'end', outcome: 'tie' }
+
+/** A u16 as its two bytes, little-endian. */
+const u16 = (value: number) => [value & 0xff, value >> 8]
 
 /** Decoding a stream with `instructions` whose bytes from `at` are set to `values`. */
 function patched(instructions: readonly Instruction[], at: number, values: readonly number[]) {
@@ -96,6 +108,78 @@ describe('decodeStream', () => {
     expect(patched([status, END], operands + 2, [7])).toThrow(/enum/)
     expect(patched([status, END], operands + 1, [6])).toThrow(/slot/)
     expect(patched([ability, END], operands + 3, [2])).toThrow(/flag/)
+  })
+
+  it('refuses a max HP the game bar cannot drop to, as the ROM does (0x7FFF and up)', () => {
+    const maxHp = monOffset('far', 2) + MON_OFFSET.maxHp
+    expect(patched([END], maxHp, [0xfe, 0x7f])().parties.far[2]?.maxHp).toBe(0x7ffe)
+    expect(patched([END], maxHp, [0xff, 0x7f])).toThrow(/maxHp 32767/)
+    expect(patched([END], maxHp, [0xff, 0xff])).toThrow(/maxHp 65535/)
+    expect(MON.maxHpLimit).toBe(0x7fff)
+  })
+
+  it('refuses a max HP of 0 and a level outside 1 to MAX_LEVEL, as the ROM does', () => {
+    const mon = monOffset('far', 2)
+    expect(patched([END], mon + MON_OFFSET.maxHp, [0, 0])).toThrow(/far mon 2 maxHp 0/)
+    expect(patched([END], mon + MON_OFFSET.level, [0])).toThrow(/level 0/)
+    expect(patched([END], mon + MON_OFFSET.level, [counts.MAX_LEVEL + 1])).toThrow(/level 101/)
+    expect(patched([END], mon + MON_OFFSET.level, [200])).toThrow(/level 200/)
+    expect(patched([END], mon + MON_OFFSET.level, [1])().parties.far[2]?.level).toBe(1)
+  })
+
+  it('refuses a species at or above NUM_SPECIES and a trainer pic at or above its count', () => {
+    const species = monOffset('near', 0) + MON_OFFSET.species
+    const last = counts.NUM_SPECIES - 1
+    expect(patched([END], species, u16(last))().parties.near[0]?.species).toBe(last)
+    expect(patched([END], species, u16(counts.NUM_SPECIES))).toThrow(/species 1573/)
+    expect(patched([END], species, [0xff, 0xff])).toThrow(/species 65535/)
+    const pic = trainerOffset('far') + TRAINER_OFFSET.trainerPic
+    expect(patched([END], pic, u16(counts.TRAINER_PIC_COUNT))).toThrow(/trainerPic 158/)
+  })
+
+  it('reads a slot with species 0 as empty, whatever its other bytes, as the ROM does', () => {
+    const decoded = patched([END], monOffset('far', 3) + MON_OFFSET.species, [0, 0])()
+    expect(decoded.parties.far[3]).toBeNull()
+    expect(decoded.parties.far[4]).not.toBeNull()
+  })
+
+  it('refuses a side whose party holds no mon', () => {
+    const empty = Array<number>(STREAM.partySize * MON.size).fill(0)
+    expect(patched([END], monOffset('near', 0), empty)).toThrow(/the near party holds no mon/)
+  })
+
+  it('refuses a slot operand that names an empty slot', () => {
+    const operands = STREAM.tablesEnd + 2
+    const ops: readonly Instruction[] = [
+      { op: 'sendOut', side: 'near', slot: 0, hp: 100, status: 'none' },
+      { op: 'switchIn', side: 'near', slot: 1, hp: 100, status: 'none' },
+      { op: 'status', side: 'near', slot: 0, status: 'brn' },
+      { op: 'item', side: 'near', slot: 1, item: 1 },
+    ]
+    for (const instruction of ops) {
+      expect(patched([instruction, END], operands + 1, [2]), instruction.op).toThrow(
+        new RegExp(`${instruction.op} names near slot 2, which holds no mon`),
+      )
+    }
+    const far = patched([{ ...ops[2], side: 'far' } as Instruction, END], operands + 1, [5])
+    expect(far().instructions[0]).toEqual({ op: 'status', side: 'far', slot: 5, status: 'brn' })
+  })
+
+  it('refuses a move, ability or item number at or above its count, as the ROM does', () => {
+    const operands = STREAM.tablesEnd + 2
+    const move: Instruction = { op: 'move', user: 'far', target: 'near', move: 1 }
+    const ability: Instruction = { op: 'ability', side: 'near', ability: 1, show: true }
+    const item: Instruction = { op: 'item', side: 'far', slot: 0, item: 1 }
+    const cases: [Instruction, number, number, RegExp][] = [
+      [move, 2, counts.MOVES_COUNT_ALL, /move move 935/],
+      [ability, 1, counts.ABILITIES_COUNT, /ability ability 320/],
+      [item, 2, counts.ITEMS_COUNT, /item item 874/],
+    ]
+    for (const [instruction, at, count, message] of cases) {
+      expect(patched([instruction, END], operands + at, u16(count))).toThrow(message)
+      const decoded = patched([instruction, END], operands + at, u16(count - 1))()
+      expect(decoded.instructions[0], instruction.op).toMatchObject({ op: instruction.op })
+    }
   })
 
   it('refuses a name without EOS and a byte outside the charset', () => {

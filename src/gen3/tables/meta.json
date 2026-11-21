@@ -6,6 +6,7 @@
     "include/constants/abilities.h": "fd296941d87fc5f1acd4d1b96b25b5304ff41ed7808836287bee0ec6ca2fa6f2",
     "include/constants/items.h": "2d37d71fd294fbfc148cace384c08cecd23d81c21300d28862176bf9bf75cb56",
     "include/constants/moves.h": "d86e4d5d5b94b838625a9d1c5c5bbce2e57556a171d66028eab1993f4fa44200",
+    "include/constants/pokemon.h": "40315054a7b79c6b1fbf33aa2e86242410c307fac68af35c0062cc83be92ffa3",
     "include/constants/species.h": "cd07f8773c77b41b9821ac030cbc3e0ef82cc6f0740efc7608afbf5ffe78ceaf",
     "include/constants/trainers.h": "ecc47245a6806fb9573db30c39eb43115a7c695ae60d8c515f264d483a0204d3",
     "src/data/abilities.h": "c3b041279967171e55b55b8bd5fcd7d3c904cdf93120736cb98d211d331c97be",
