@@ -52,6 +52,14 @@ describe('damage with a cause', () => {
     ])
   })
 
+  it('says a trapping move first, then moves the bar', () => {
+    const scene = sceneOf('|-damage|p2a: Tyranitar|94/100|[from] move: Fire Spin')
+    expect(scene.map(plain)).toEqual([
+      'The opposing Tyranitar is hurt by Fire Spin!',
+      hp('far', 94),
+    ])
+  })
+
   it('drains a seeded Pokémon with the seed animation, bar, then the line', () => {
     const scene = sceneOf(
       '|-damage|p2a: Tyranitar|88/100|[from] Leech Seed|[of] p1a: Dugtrio',

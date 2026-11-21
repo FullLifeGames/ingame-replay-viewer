@@ -54,6 +54,16 @@ describe('moves', () => {
     ])
   })
 
+  it("aims a move the log gives no target at its user's side", () => {
+    const scene = sceneOf('|move|p1a: Dugtrio|Haze|')
+    expect(scene[1]).toEqual({
+      op: 'move',
+      user: 'near',
+      target: 'near',
+      move: moveOf('Haze').number,
+    })
+  })
+
   it('lists a move the expansion lacks with the move it plays', () => {
     const result = streamOfLog('|move|p2a: Tyranitar|Paleo Wave|p1a: Dugtrio')
     expect(result.fallbacks).toEqual([{ line: NEXT, ...moveOf('Paleo Wave').fallback }])
