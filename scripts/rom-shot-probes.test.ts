@@ -187,6 +187,13 @@ describe('checking the shots of a scene', () => {
       expect(checkShots(check(6), display([0, 1, 2, 3, 4, 5])).pass).toBe(true)
     })
 
+    it('counts a single ball in the singular', () => {
+      expect(checkShots(check(1), display([0]))).toEqual({
+        pass: true,
+        detail: '1 ball, 1 expected',
+      })
+    })
+
     it('fails a missing ball and an extra ball, with the count', () => {
       expect(checkShots(check(6), display([0, 1, 2, 3, 4]))).toEqual({
         pass: false,

@@ -163,7 +163,7 @@ function ballsVerdict(frame: Frame, check: Extract<Check, { probe: 'balls' }>): 
   }
   const isBall = cells.map((cell) => sameColours(cell, first))
   const count = isBall.filter(Boolean).length
-  const detail = `${String(count)} balls, ${String(check.balls)} expected`
+  const detail = `${String(count)} ${count === 1 ? 'ball' : 'balls'}, ${String(check.balls)} expected`
   const gap = isBall.indexOf(false)
   if (gap >= 0 && gap < count) {
     return { pass: false, detail: `${detail}, with a gap at cell ${String(gap)}` }
