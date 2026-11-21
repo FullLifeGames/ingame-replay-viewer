@@ -22,10 +22,6 @@ export const replayLine = ({
 }: Pick<ReplaySummary, 'id' | 'instructions' | 'streamBytes'>): string =>
   `${id}: ${String(instructions)} instructions, ${String(streamBytes)} bytes of instruction stream.`
 
-/** A failure as the status line shows it: the error's message, or the thrown value's text. */
-export const errorLine = (error: unknown): string =>
-  error instanceof Error ? error.message : String(error)
-
 export const notShownHeading = (rows: number): string => `Not shown in the game (${String(rows)})`
 
 export const countText = ({ what, count }: NotShownCount): string => `${what} (${String(count)})`

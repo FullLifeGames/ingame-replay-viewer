@@ -3,6 +3,7 @@
 import { loadEmulator } from './emulator'
 import { environmentProblem } from './environment'
 import { fetchBytes, fetchJson } from './fetch'
+import { messageOf } from './message'
 import { FIRST_REPLAY, TEST_REPLAYS } from './replays'
 import { createSession, type ReplaySummary, type Session } from './session'
 import * as say from './status'
@@ -13,7 +14,7 @@ function act(view: View, work: () => unknown): void {
   Promise.resolve()
     .then(work)
     .catch((error: unknown) => {
-      view.status(say.errorLine(error))
+      view.status(messageOf(error))
     })
 }
 

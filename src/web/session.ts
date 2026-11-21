@@ -5,6 +5,7 @@
 // the step and keeps the module's own words.
 import { type SlotDescription, writeReplaySlot } from '../patch/slot'
 import { type Emulator, EmulatorError, NOT_STARTED_LINE } from './emulator'
+import { messageOf } from './message'
 import { replayJsonUrl } from './replay-input'
 import type { TestReplay } from './replays'
 import { patchBaseRom, readSlotDescription } from './rom'
@@ -70,9 +71,6 @@ export interface Session {
 
 const PICK_DUMP = 'Pick your US Emerald dump first, then press Start.'
 const PICK_REPLAY = 'Pick a replay first, then press Start.'
-
-const messageOf = (error: unknown): string =>
-  error instanceof Error ? error.message : String(error)
 
 const failed = (step: string, error: unknown): SessionError =>
   new SessionError(`${step}: ${messageOf(error)}`, { cause: error })

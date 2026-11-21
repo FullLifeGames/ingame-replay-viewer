@@ -1,6 +1,7 @@
 // The page's GETs: the build outputs from its own server and a replay JSON from Showdown. A failed
 // request or an answer other than 2xx becomes one line that names the URL and keeps the server's
 // own words, so the dev server's "run npm run rom:build" reaches the status line.
+import { messageOf } from './message'
 
 /** A request that failed, or an answer the page cannot use. */
 export class FetchError extends Error {
@@ -14,9 +15,6 @@ const browserFetch: Fetcher = (url) => fetch(url)
 
 /** An error page's first line, short enough for the status line. */
 const LONGEST_BODY = 200
-
-const messageOf = (error: unknown): string =>
-  error instanceof Error ? error.message : String(error)
 
 async function refusal(url: string, response: Response): Promise<FetchError> {
   const [line = ''] = (await response.text()).trim().split('\n')

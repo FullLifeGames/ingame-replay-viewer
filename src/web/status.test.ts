@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { SessionError } from './session'
 import {
   countText,
   dumpLine,
-  errorLine,
   notShownHeading,
   READY_LINE,
   replayLine,
@@ -45,15 +43,6 @@ describe('the status lines', () => {
     expect(replayLine({ id: ID, instructions: 461, streamBytes: 8346 })).toBe(
       `${ID}: 461 instructions, 8346 bytes of instruction stream.`,
     )
-  })
-
-  it('shows a failed step in its own words', () => {
-    const error = new SessionError('Could not fetch the patch: rom/irv-emerald.bps answered 404')
-    expect(errorLine(error)).toBe('Could not fetch the patch: rom/irv-emerald.bps answered 404')
-  })
-
-  it('shows a thrown value that is not an Error by its text', () => {
-    expect(errorLine('worker gone')).toBe('worker gone')
   })
 })
 
