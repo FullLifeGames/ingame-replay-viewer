@@ -1,5 +1,6 @@
 #include "global.h"
 #include "battle.h"
+#include "pokemon.h"
 #include "test/replay_test.h"
 #include "constants/battle.h"
 
@@ -42,5 +43,22 @@ REPLAY_TEST("TURN 300 then END")
     {
         EXPECT_EQ(gReplayProgress.turn, 300);
         EXPECT_EQ(gReplayProgress.done, 2);
+    }
+}
+
+REPLAY_TEST("THEN sees the battle before END leaves it")
+{
+    STREAM
+    {
+        ReplayStream_Intro();
+        ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 71, REPLAY_STATUS_NONE);
+        ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    THEN
+    {
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_HP), 71);
+        EXPECT(gBattleStruct != NULL);
+        EXPECT_EQ(gReplayProgress.done, 4);
     }
 }

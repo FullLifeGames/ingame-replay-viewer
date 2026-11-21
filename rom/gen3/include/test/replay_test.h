@@ -8,7 +8,7 @@
 // Tests of the ROM interpreter (#7) in the expansion's make check. A REPLAY_TEST writes an
 // instruction stream in its STREAM block, queues the events it expects in SCENE with upstream's
 // matchers (MESSAGE, HP_BAR, ANIMATION, ABILITY_POPUP, STATUS_ICON, EFFECTIVENESS_SE, NOT), and
-// checks the battle in THEN after the stream has played:
+// checks the battle in THEN after the stream has played, while the battle is still up:
 //
 //     REPLAY_TEST("TURN sets the turn")
 //     {

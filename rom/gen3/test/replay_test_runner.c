@@ -11,8 +11,9 @@
 // The runner of REPLAY_TEST (#7). It borrows upstream's event queue and matchers: SCENE queues
 // into gBattleTestRunnerState, and the recorders in test_runner_battle.c match each message, HP
 // change, animation, ability pop-up, status icon and effectiveness sound against it. The battle
-// itself is ours: Replay_Start sets it up from the stream, and END leaves it through
-// CB2_QuitRecordedBattle into CB2_ReplayTest_Done.
+// itself is ours: Replay_Start sets it up from the stream. After END the interpreter calls
+// ReplayTest_AtEnd, which runs THEN while the battle is still up, and then leaves the battle
+// through CB2_QuitRecordedBattle into CB2_ReplayTest_Done.
 
 #define STATE gBattleTestRunnerState
 #define DATA gBattleTestRunnerState->data
@@ -69,12 +70,17 @@ static void CheckQueuedEvents(void)
     Test_ExitWithResult(TEST_RESULT_FAIL, line, "%s:%d: Unmatched event of type %d", gTestRunnerState.test->filename, line, event->type);
 }
 
-static void CB2_ReplayTest_Done(void)
+// After END, while the battle is still up: the SCENE events, then the THEN block.
+void ReplayTest_AtEnd(void)
 {
     CheckQueuedEvents();
     STATE->runThen = TRUE;
     InvokeReplayTest(gTestRunnerState.test->data);
     STATE->runThen = FALSE;
+}
+
+static void CB2_ReplayTest_Done(void)
+{
     Replay_Unload();
     SetMainCallback2(CB2_TestRunner);
 }

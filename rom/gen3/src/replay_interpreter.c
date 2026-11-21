@@ -45,6 +45,7 @@ static bool32 Op_Intro(const volatile u8 *operands, u32 step);
 static bool32 Op_SendOut(const volatile u8 *operands, u32 step);
 static void Replay_RunBattle(void);
 static void Replay_Hold(void);
+static void Replay_Exit(void);
 
 EWRAM_DATA struct ReplayProgress gReplayProgress = {0};
 static EWRAM_DATA struct ReplayState sReplay = {0};
@@ -158,19 +159,30 @@ static void Replay_Hold(void)
 {
 }
 
-// END: gBattleOutcome, then hold the scene or leave the battle as a B press does in a recorded
-// battle (BattleMainCB2). gMain.savedCallback runs after CB2_QuitRecordedBattle.
+// After END in the tests: the test runner checks the battle while it is still up, then the battle
+// is left as a B press leaves a recorded battle (BattleMainCB2). gMain.savedCallback runs after
+// CB2_QuitRecordedBattle.
+static void Replay_Exit(void)
+{
+#if TESTING
+    ReplayTest_AtEnd();
+#endif
+    gBattleMainFunc = Replay_Hold;
+    ResetPaletteFadeControl();
+    BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
+    SetMainCallback2(CB2_QuitRecordedBattle);
+}
+
+// END: gBattleOutcome, then hold the scene or, on the next frame, once END counts as done, leave
+// the battle.
 static bool32 Op_End(const volatile u8 *operands, u32 step)
 {
     gBattleOutcome = sOutcomes[operands[0]];
     gReplayProgress.finished = TRUE;
-    gBattleMainFunc = Replay_Hold;
     if (sReplay.end == REPLAY_EXIT_AT_END)
-    {
-        ResetPaletteFadeControl();
-        BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
-        SetMainCallback2(CB2_QuitRecordedBattle);
-    }
+        gBattleMainFunc = Replay_Exit;
+    else
+        gBattleMainFunc = Replay_Hold;
     return TRUE;
 }
 

@@ -55,6 +55,12 @@ void Replay_TakeOverBattleMain(void);
 
 bool32 Replay_IsLoaded(void);
 
+#if TESTING
+// Defined by the test runner (test/replay_test_runner.c): with REPLAY_EXIT_AT_END, the interpreter
+// calls it after END, while the battle is still up and before it is left.
+void ReplayTest_AtEnd(void);
+#endif
+
 // Forgets the loaded replay; gReplayProgress stays readable.
 void Replay_Unload(void);
 
