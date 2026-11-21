@@ -1,6 +1,6 @@
 # rom/gen3
 
-What we add to pokeemerald-expansion and what we change in it, without a fork (ADR 0007).
+This folder holds what we add to pokeemerald-expansion and the changes we make to it, without a fork (ADR 0007).
 
 - `build.json`: the pinned upstream (repository, tag, commit), the SHA1 of the US Emerald dump that the BPS patch starts from, and the cap on make jobs.
 - `src/`, `include/`, `test/`: our own C files. The build copies them into the same folders of the upstream tree, where the Makefile's wildcards find them. Their names start with `replay_`. A file that upstream already tracks is an error.
@@ -17,7 +17,6 @@ Each command is a heavy check on devbox, so run it alone and in the background.
 - `npm run rom:build` clones the pinned tag into `.cache/rom/expansion/` if it is missing, applies `patches/series`, copies our files, runs make and writes the outputs to `build/rom/`: the ROM, the BPS patch against your dump, `replay-slot.json` and `build-info.json`. `npm run rom:build -- --clean` starts from a fresh tree.
 - `npm run rom:repro` runs two clean builds, the second in a fresh worktree, and fails unless the ROM, patch and slot description are equal. It takes as long as two builds, about 90 minutes on devbox.
 - `npm run rom:clean` empties `build/rom/` and drops the build products from the tree. `npm run rom:clean -- --all` deletes the tree as well, so the next build clones it again.
-
 - `npm run rom:check` runs the expansion's own `make check` with our tests in the tree, filtered to the tests whose names start with `Replay`. `npm run rom:check -- <filter>` takes another filter: a name prefix, `*` and an infix, or a test file such as `test/battle/ability/intimidate.c`. The first run builds the test objects in `build/emerald-test/` of the tree, about 20 minutes on devbox; later runs build only what changed. The log goes to `build/rom/check.log`.
 
 The build reads your US Emerald dump from `~/roms/Pokemon - Emerald Version (USA, Europe).gba`, or from the path in `IRV_BASE_ROM`, and checks its SHA1 against `build.json`. It stops when the ARM toolchain is missing, and prints the `apt-get` line that installs it. It also stops when less than 3 GiB of memory is free.
@@ -26,9 +25,23 @@ The build deletes files only inside `.cache/rom/` and `build/rom/`. A script tha
 
 ## Testing the ROM interpreter
 
-The ROM interpreter (`src/replay_interpreter.c`, `src/replay_setup.c`) plays an instruction stream (`include/replay_stream.h`) in a recorded link battle. Patch 0003 makes the ROM boot straight into it: `src/replay_boot.c` starts the stream in the replay slot with no save file and no button press, and shows a dark red screen when the interpreter refuses the stream. Patch 0001 hands it the battle main loop, and patch 0002 hides the near side's HP numbers while a replay runs. MOVE, HIT, HP and FAINT live in `src/replay_ops_damage.c`, WITHDRAW and SWITCH_IN in `src/replay_ops_switch.c`, STATUS, STAT and ITEM in `src/replay_ops_state.c`, ANIM with its table of the game's animations in `src/replay_anims.c`, and WEATHER, VOLATILE and ABILITY in `src/replay_ops_field.c`. They share `include/replay_ops.h` with the main loop. `src/replay_stream.c` reads the stream, and `src/replay_stream_check.c` checks all of it before a battle starts. The tests sit in `test/replay_*.c` and use `include/test/replay_test.h`:
+The ROM interpreter (`src/replay_interpreter.c`, `src/replay_setup.c`) plays an instruction stream (`include/replay_stream.h`) in a recorded link battle. Three patches hook it in:
 
-- `REPLAY_TEST(name)` writes a stream in its `STREAM` block with the `ReplayStream_*` writer (`test/replay_stream_writer.c`), queues the events it expects in `SCENE` with upstream's matchers (`MESSAGE`, `HP_BAR`, `ANIMATION` and the rest), and checks the battle in `THEN`, after END and before the battle is left, so the parties, `gBattleStruct` and the sprites are still there.
+- 0001 hands it the battle main loop.
+- 0002 hides the near side's HP numbers while a replay runs.
+- 0003 makes the ROM boot straight into it. `src/replay_boot.c` starts the stream in the replay slot with no save file and no button press, and shows a dark red screen when the interpreter refuses the stream.
+
+`src/replay_stream_check.c` checks the whole stream before a battle starts, and `src/replay_stream.c` reads it. The ops share `include/replay_ops.h` with the main loop:
+
+- MOVE, HIT, HP and FAINT: `src/replay_ops_damage.c`
+- WITHDRAW and SWITCH_IN: `src/replay_ops_switch.c`
+- STATUS, STAT and ITEM: `src/replay_ops_state.c`
+- ANIM, with its table of the game's animations: `src/replay_anims.c`
+- WEATHER, VOLATILE and ABILITY: `src/replay_ops_field.c`
+
+The tests in `test/replay_*.c` use `include/test/replay_test.h`:
+
+- `REPLAY_TEST(name)` writes a stream in its `STREAM` block with the `ReplayStream_*` writer (`test/replay_stream_writer.c`), queues the events it expects in `SCENE` with upstream's matchers (`MESSAGE`, `HP_BAR`, `ANIMATION` and the rest), and checks the battle in `THEN`, after END and before the test leaves the battle, so the parties, `gBattleStruct` and the sprites are still there.
 - A plain `TEST` whose name starts with `Replay:` checks a refusal with `Replay_Validate`, without a battle.
 
 ## Screenshots
@@ -37,7 +50,7 @@ The ROM interpreter (`src/replay_interpreter.c`, `src/replay_setup.c`) plays an 
 
 With no name it plays test replay 994052 through the battle script and the Gen 3 game backend. `npm run rom:shots -- 994086 hand-made` plays the named streams instead: a test replay by its id, or `hand-made`, a short battle written with the stream encoder (the intro, both send-outs, a move, an HP change, a status, a switch, a faint and the win line). Two refusals follow each time. The built ROM's empty slot is refused as `EMPTY`, and the hand-made battle with stream version 2 is refused as `VERSION`.
 
-The tool takes a frame at each scene of `scripts/rom-shot-scenes.ts`, and `scripts/rom-shot-probes.ts` checks it with numbers: two frames differ, the near HP digit area shows only the healthbox background, the far HP bar fills the pixels the engine fills for the logged HP, the text box holds the win line and still shows it 600 frames after END. The run fails when a scene fails, when an op waits 3600 frames, or when the replay stops short of END. 994052 and `hand-made` must show every scene; for another replay the output and `report.json` list each scene its stream lacks. The frames (PPM), the ROMs with their streams and `report.json` go to `build/rom/shots/`. Git ignores that folder, and no frame enters the tree.
+The tool takes a frame at each scene of `scripts/rom-shot-scenes.ts`, and `scripts/rom-shot-probes.ts` checks it with numbers: two frames differ, the near HP digit area shows only the healthbox background, the far HP bar fills the pixels the engine fills for the logged HP, the text box holds the win line and still shows it 600 frames after END. The run fails when a scene fails, when an op waits 3600 frames, or when the replay stops short of END. 994052 and `hand-made` must show every scene; for another replay the output and `report.json` list each scene its stream lacks. The tool reads the interpreter's progress at the offsets in `include/replay_progress.h`, which also holds the refusal screen's colour. The frames (PPM), the ROMs with their streams and `report.json` go to `build/rom/shots/`. Git ignores that folder, and the tree spec refuses a frame anywhere in the tree.
 
 ## Adding a patch
 
