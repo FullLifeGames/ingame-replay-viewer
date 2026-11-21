@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/emscripten": "^1.41.6",
     "@types/node": "^26.6.6",
     "@vitest/coverage-v8": "^5.1.1",
     "eslint": "^10.15.0",
@@ -45,6 +46,7 @@
     "@pkmn/client": "^0.7.4",
     "@pkmn/data": "^0.11.0",
     "@pkmn/dex": "^0.11.0",
-    "@pkmn/protocol": "^0.7.4"
+    "@pkmn/protocol": "^0.7.4",
+    "@thenick775/mgba-wasm": "^2.6.0"
   }
 }
