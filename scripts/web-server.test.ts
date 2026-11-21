@@ -10,8 +10,11 @@ import type { Plugin, PreviewServer, ViteDevServer } from 'vite'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { ROM_FILES } from '../src/web/rom-files.ts'
+import { WASM_FILES } from '../src/web/wasm/files.ts'
 import { OUTPUT_NAMES } from './rom-outputs.ts'
 import { REPO_DIR } from './rom-paths.ts'
+import { LINK_OUTPUTS } from './wasm-link.ts'
+import { WASM_OUTPUT_NAMES } from './wasm-outputs.ts'
 import { FS_DENY, romServer } from './web-server.ts'
 
 type Middleware = (req: IncomingMessage, res: ServerResponse, next: () => void) => void
@@ -19,6 +22,7 @@ type Middleware = (req: IncomingMessage, res: ServerResponse, next: () => void) 
 const PATCH = new Uint8Array([0x42, 0x50, 0x53, 0x31, 0, 1, 2, 3, 0xff])
 const SLOT_JSON = '{"slotVersion":1}\n'
 const MISSING_TAIL = 'irv-emerald.bps is missing: run npm run rom:build'
+const GLUE = 'export default async function factory() {}\n'
 
 // The hooks as Vite calls them: a server object whose middlewares collect what the plugin adds.
 function installed(plugin: Plugin, hook: 'configureServer' | 'configurePreviewServer') {
@@ -59,8 +63,8 @@ const servers: Server[] = []
 let fullBase = ''
 let emptyBase = ''
 
-async function start(dir: string): Promise<string> {
-  const server = await listen(installed(romServer(dir), 'configureServer'))
+async function start(dir: string, wasmDir: string = join(dir, 'wasm')): Promise<string> {
+  const server = await listen(installed(romServer(dir, wasmDir), 'configureServer'))
   servers.push(server)
   return `http://127.0.0.1:${String((server.address() as AddressInfo).port)}`
 }
@@ -72,6 +76,12 @@ beforeAll(async () => {
   writeFileSync(join(full, OUTPUT_NAMES.slot), SLOT_JSON)
   for (const name of [OUTPUT_NAMES.rom, OUTPUT_NAMES.elf, OUTPUT_NAMES.map, OUTPUT_NAMES.info]) {
     writeFileSync(join(full, name), 'ROM-derived')
+  }
+  mkdirSync(join(full, 'wasm'))
+  writeFileSync(join(full, 'wasm', LINK_OUTPUTS.js), GLUE)
+  writeFileSync(join(full, 'wasm', WASM_OUTPUT_NAMES.patch), PATCH)
+  for (const name of [LINK_OUTPUTS.wasm, 'link.md', 'compile.json']) {
+    writeFileSync(join(full, 'wasm', name), 'ROM-derived')
   }
   fullBase = await start(full)
   emptyBase = await start(empty)
@@ -97,8 +107,8 @@ describe('the dev server plugin', () => {
 
   it('installs the same middlewares in dev and in preview', () => {
     const plugin = romServer(full)
-    expect(installed(plugin, 'configureServer')).toHaveLength(2)
-    expect(installed(plugin, 'configurePreviewServer')).toHaveLength(2)
+    expect(installed(plugin, 'configureServer')).toHaveLength(3)
+    expect(installed(plugin, 'configurePreviewServer')).toHaveLength(3)
   })
 
   it('serves the patch from the build folder, uncached', async () => {
@@ -184,6 +194,57 @@ describe('the dev server plugin', () => {
     const response = await fetch(`${fullBase}/index.html`)
     expect(await response.text()).toBe('next')
     expectIsolated(response)
+  })
+})
+
+describe('the WebAssembly spike files', () => {
+  it('names the routes after the build outputs', () => {
+    expect(WASM_FILES).toEqual({
+      glue: `wasm/${LINK_OUTPUTS.js}`,
+      patch: `wasm/${WASM_OUTPUT_NAMES.patch}`,
+    })
+  })
+
+  it('serves the glue as JavaScript and the module patch from build/wasm, uncached', async () => {
+    const glue = await fetch(`${fullBase}/${WASM_FILES.glue}`)
+    expect(glue.status).toBe(200)
+    expect(glue.headers.get('content-type')).toBe('text/javascript')
+    expect(glue.headers.get('cache-control')).toBe('no-store')
+    expect(await glue.text()).toBe(GLUE)
+    expectIsolated(glue)
+    const patch = await fetch(`${fullBase}/${WASM_FILES.patch}`)
+    expect(patch.headers.get('content-type')).toBe('application/octet-stream')
+    expect(new Uint8Array(await patch.arrayBuffer())).toEqual(PATCH)
+  })
+
+  it('refuses the module itself and every other file of build/wasm', async () => {
+    for (const name of [LINK_OUTPUTS.wasm, 'link.md', 'compile.json', 'no-such-file']) {
+      const response = await fetch(`${fullBase}/wasm/${name}`)
+      expect(response.status, name).toBe(404)
+      expect(await response.text()).toBe(
+        `/wasm/${name} is not served: only /${WASM_FILES.glue} and /${WASM_FILES.patch}\n`,
+      )
+      expectIsolated(response)
+    }
+  })
+
+  // In dev, Vite serves the page's own modules of src/web/wasm/ under the same /wasm/ prefix.
+  it("passes the spike page's own modules on to Vite", async () => {
+    for (const name of ['main.ts', 'worker.ts?worker_file&type=module', 'protocol.ts']) {
+      const response = await fetch(`${fullBase}/wasm/${name}`)
+      expect(await response.text(), name).toBe('next')
+    }
+    const climbing = await fetch(`${fullBase}/wasm/..%2fmain.ts`)
+    expect(climbing.status).toBe(404)
+    expect(await climbing.text()).not.toBe('next')
+  })
+
+  it('names the link when the glue or the patch is missing', async () => {
+    const response = await fetch(`${emptyBase}/${WASM_FILES.glue}`)
+    expect(response.status).toBe(404)
+    expect(await response.text()).toBe(
+      `${join(empty, 'wasm', LINK_OUTPUTS.js)} is missing: run npm run wasm:build -- --link\n`,
+    )
   })
 })
 
