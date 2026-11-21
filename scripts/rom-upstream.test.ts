@@ -250,6 +250,17 @@ describe('prepareTree', () => {
     expect(read('src/main.c')).toBe(MAIN_C.replace('return 0', 'return 1'))
   })
 
+  it('applies a changed series in a tree that holds our copies', () => {
+    writeTwoPatches()
+    write(join(rom, 'src/replay_a.c'), '// a\n')
+    const stampPath = join(roots.cache, 'copies.json')
+    prepareTree(options({ stampPath }))
+    write(join(rom, 'patches/series'), '0001-one.patch\n')
+    expect(prepareTree(options({ stampPath })).applied).toBe(true)
+    expect(read('src/main.c')).toBe(MAIN_C.replace('return 0', 'return 1'))
+    expect(read('src/replay_a.c')).toBe('// a\n')
+  })
+
   it('refuses a stamp outside the build folders before it resets anything', () => {
     const stampPath = join(scratch, 'outside.json')
     writeFileSync(stampPath, '{}\n')

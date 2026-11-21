@@ -112,14 +112,21 @@ function readStamp(path: string): Stamp | undefined {
 
 const diffHash = (tree: string) => sha256(git(tree, ['diff', '--binary', 'HEAD']))
 
+const untracked = (tree: string) =>
+  git(tree, ['ls-files', '--others', '--exclude-standard'])
+    .split('\n')
+    .filter((path) => path !== '')
+
+// Our copies from an earlier run are untracked too; git apply refuses to create a file that is
+// there, so what is new after the patch is what the patch added.
 function applyPatch(tree: string, patch: Patch): void {
+  const before = new Set(untracked(tree))
   try {
     git(tree, ['apply', patch.path])
   } catch (error) {
     throw new Error(`patch ${patch.name} does not apply`, { cause: error })
   }
-  const added = git(tree, ['ls-files', '--others', '--exclude-standard']).split('\n')
-  const first = added.find((path) => path !== '')
+  const first = untracked(tree).find((path) => !before.has(path))
   if (first !== undefined) {
     throw new Error(
       `patch ${patch.name} adds ${first}; new files belong in rom/gen3/src, include or test`,
