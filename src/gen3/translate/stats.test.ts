@@ -48,8 +48,9 @@ describe('stat changes', () => {
 
   // A stat at its limit, as the ladder replays gen3ou-2717395946 (Calm Mind at +6) and
   // gen3ou-2717081342 (Charm at -6) log it. The expansion says so and plays no arrows
-  // (`IncreaseStat`, `battle_stat_change.c`): "{B_SCR_NAME_WITH_PREFIX}'s {B_BUFF1} won't go any
-  // higher!" (`STRINGID_STATSWONTINCREASE`) and "… won't go any lower!" (`STRINGID_STATSWONTDECREASE`).
+  // (`battle_stat_change.c`): `IncreaseStat` "{B_SCR_NAME_WITH_PREFIX}'s {B_BUFF1} won't go any
+  // higher!" (`STRINGID_STATSWONTINCREASE`), `DecreaseStat` "… won't go any lower!"
+  // (`STRINGID_STATSWONTDECREASE`).
   it("says a stat at +6 won't go any higher, with no arrows", () => {
     expect(sceneOf('|-boost|p1a: Dugtrio|spa|0').map(plain)).toEqual([
       "Dugtrio's Sp. Atk won't go any higher!",
