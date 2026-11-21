@@ -90,13 +90,26 @@ bool32 Replay_OpHp(const volatile u8 *operands, u32 step)
 
 // FAINT: the mon's faint cry and a pause, then it leaves the field with the faint animation, as
 // BattleScript_FaintBattler plays them (playfaintcry, pause, dofaintanimation).
+//
+// First the mon gets 0 HP. A log can faint a mon with HP left: Showdown gives the user of
+// Explosion no HP line. The game's Explosion sets the user's HP to 0 before its faint
+// (BattleScript_Explosion in data/battle_scripts_1.s):
+//     tryexplosion
+//     setatkhptozero
+// and Cmd_setatkhptozero (src/battle_script_commands.c):
+//     gBattleMons[gBattlerAttacker].hp = 0;
+// With HP left, IsBattlerAlive holds, so a later faint on the other side would start a KO
+// animation (AnimateMonAfterKnockout) on this mon's freed sprite, which never ends.
 bool32 Replay_OpFaint(const volatile u8 *operands, u32 step)
 {
     u32 battler = Replay_GetBattler(operands[0]);
+    u32 hp = 0;
 
     switch (step)
     {
     case 0:
+        SetMonData(GetBattlerMon(battler), MON_DATA_HP, &hp);
+        gBattleMons[battler].hp = hp;
         BtlController_EmitFaintingCry(battler, B_COMM_TO_CONTROLLER);
         Replay_Wait(B_WAIT_TIME_LONG);
         break;

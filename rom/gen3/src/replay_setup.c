@@ -61,6 +61,36 @@ static void CreateReplayMon(struct Pokemon *mon, const volatile u8 *entry)
     SetMonData(mon, MON_DATA_HP, &hp);
 }
 
+// The unrevealed team members of a side (#21): the mons of its team size that the battle log never
+// names. The intro's ball display reads each party slot, and a slot of SPECIES_NONE shows as an
+// empty circle (DoBattleIntro, BATTLE_INTRO_STATE_DRAW_PARTY_SUMMARY, in battle_main.c). Each
+// empty slot up to the team size, at most PARTY_SIZE, gets a copy of the side's first revealed
+// mon, with full HP and no status, so it shows as a ball. It never reaches the field:
+// Replay_Validate refuses a slot operand whose stream slot holds no mon.
+static void FillUnrevealedTeamMembers(struct Pokemon *party, const volatile u8 *stream, u32 side)
+{
+    u32 slot, mons = 0;
+    u32 teamSize = min(Replay_GetTrainer(stream, side)[REPLAY_TRAINER_OFFSET_TEAM_SIZE], PARTY_SIZE);
+    const volatile u8 *firstMon = NULL;
+
+    for (slot = 0; slot < REPLAY_STREAM_PARTY_SIZE; slot++)
+    {
+        if (!Replay_HoldsMon(stream, side, slot))
+            continue;
+        if (firstMon == NULL)
+            firstMon = Replay_GetMon(stream, side, slot);
+        mons++;
+    }
+    // Replay_Validate refuses a side without a mon, so firstMon is set here.
+    for (slot = 0; slot < REPLAY_STREAM_PARTY_SIZE && mons < teamSize; slot++)
+    {
+        if (Replay_HoldsMon(stream, side, slot))
+            continue;
+        CreateReplayMon(&party[slot], firstMon);
+        mons++;
+    }
+}
+
 static void FillParties(struct RecordedBattleSave *save, const volatile u8 *stream)
 {
     u32 side, slot;
@@ -72,6 +102,7 @@ static void FillParties(struct RecordedBattleSave *save, const volatile u8 *stre
             if (Replay_HoldsMon(stream, side, slot))
                 CreateReplayMon(&save->parties[side][slot], Replay_GetMon(stream, side, slot));
         }
+        FillUnrevealedTeamMembers(save->parties[side], stream, side);
     }
 }
 
