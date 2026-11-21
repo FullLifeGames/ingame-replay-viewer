@@ -4,6 +4,7 @@ import {
   countText,
   dumpLine,
   notShownHeading,
+  pickedLine,
   READY_LINE,
   replayLine,
   restartLine,
@@ -25,14 +26,20 @@ describe('the status lines', () => {
     )
   })
 
-  it('names the replay, its stream in bytes and the ROM it runs in', () => {
-    expect(startLine({ id: ID, romSha1: ROM_SHA1, streamBytes: 8346 })).toBe(
-      `Running ${ID}: 8346 bytes of instruction stream in the ROM with SHA1 ${ROM_SHA1}.`,
+  // The running ROM holds the stream, so the patched ROM's SHA1 (the dump line's) is not its own.
+  it('names the replay and its stream in bytes, and no SHA1', () => {
+    expect(startLine({ id: ID, streamBytes: 8346 })).toBe(
+      `Running ${ID}: 8346 bytes of instruction stream.`,
     )
   })
 
+  // A new pick or a Load changes nothing in the running game until the next Start.
+  it('asks for Start after a new replay is picked or loaded', () => {
+    expect(pickedLine(ID)).toBe(`Picked ${ID}. Press Start to play it.`)
+  })
+
   it('writes large byte counts without separators, as the specs and the snapshot do', () => {
-    expect(startLine({ id: ID, romSha1: ROM_SHA1, streamBytes: 30914 })).toContain('30914 bytes')
+    expect(startLine({ id: ID, streamBytes: 30914 })).toContain('30914 bytes')
   })
 
   it('says a Restart plays the replay from the start', () => {
@@ -59,6 +66,12 @@ describe('the list of what the game does not show', () => {
   it('gives each row its line, what happened and the log line', () => {
     const row = { line: 12, what: 'dropped: upkeep', text: '|upkeep', standIn: false }
     expect(rowText(row)).toBe('Line 12, dropped: upkeep: |upkeep')
+  })
+
+  // Showdown's "|" spacer lines have no text after the bar.
+  it('ends a row with an empty log line after what happened', () => {
+    const row = { line: 5, what: 'dropped: spacer', text: '', standIn: false }
+    expect(rowText(row)).toBe('Line 5, dropped: spacer')
   })
 
   it('says when the game shows a stand-in for a fallback, and adds the detail', () => {

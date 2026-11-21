@@ -52,7 +52,6 @@ export interface ReplaySummary {
 
 export interface StartSummary {
   readonly id: string
-  readonly romSha1: string
   readonly streamBytes: number
 }
 
@@ -193,7 +192,7 @@ export function createSession(deps: SessionDeps): Session {
       running.run(rom)
     })
     const { id, streamBytes } = chosen.summary
-    return { id, romSha1: dump.description.romSha1, streamBytes }
+    return { id, streamBytes }
   }
 
   return {

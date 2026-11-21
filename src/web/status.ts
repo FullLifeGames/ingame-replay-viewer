@@ -10,8 +10,11 @@ export const STARTING_LINE = 'Starting the emulator.'
 export const dumpLine = ({ romSha1 }: DumpSummary): string =>
   `Your dump is US Emerald and is patched (ROM SHA1 ${romSha1}). Press Start.`
 
-export const startLine = ({ id, romSha1, streamBytes }: StartSummary): string =>
-  `Running ${id}: ${String(streamBytes)} bytes of instruction stream in the ROM with SHA1 ${romSha1}.`
+export const startLine = ({ id, streamBytes }: StartSummary): string =>
+  `Running ${id}: ${String(streamBytes)} bytes of instruction stream.`
+
+/** After the user picks or loads a replay: the running game, if any, keeps its own. */
+export const pickedLine = (id: string): string => `Picked ${id}. Press Start to play it.`
 
 export const restartLine = (id: string): string => `Restarted ${id} from the beginning.`
 
@@ -29,5 +32,6 @@ export const countText = ({ what, count }: NotShownCount): string => `${what} ($
 /** One row of the list: its 1-based line, what happened, the log line and any detail. */
 export function rowText({ line, what, text, detail, standIn }: NotShownRow): string {
   const shown = standIn ? `${what}, a stand-in shows` : what
-  return `Line ${String(line)}, ${shown}: ${text}${detail === undefined ? '' : `; ${detail}`}`
+  const logLine = text === '' ? '' : `: ${text}`
+  return `Line ${String(line)}, ${shown}${logLine}${detail === undefined ? '' : `; ${detail}`}`
 }

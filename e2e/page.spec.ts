@@ -105,7 +105,6 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
   await expect(status).toHaveText(new RegExp(`Running ${FIRST}.*${String(streamBytes)} bytes`), {
     timeout: 60_000,
   })
-  await expect(status).toHaveText(new RegExp(romSha1))
   expect(await notShownCount(page)).toBeGreaterThan(0)
   // 240×160 scaled three times; mGBA sets the canvas's own size, the page's CSS its shown size.
   expect(await page.locator('canvas').boundingBox()).toMatchObject({ width: 720, height: 480 })

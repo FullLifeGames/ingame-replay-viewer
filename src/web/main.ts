@@ -19,22 +19,31 @@ function act(view: View, work: () => unknown): void {
 }
 
 function wireReplays(session: Session, view: View): void {
-  const show = (pending: Promise<ReplaySummary | undefined>): void => {
+  type Then = (summary: ReplaySummary) => void
+  const show = (pending: Promise<ReplaySummary | undefined>, then?: Then): void => {
     act(view, async () => {
       const summary = await pending
-      if (summary !== undefined) view.showReplay(summary)
+      if (summary === undefined) return
+      view.showReplay(summary)
+      then?.(summary)
     })
   }
-  const pick = (id: string): void => {
+  const picked: Then = (summary) => {
+    view.status(say.pickedLine(summary.id))
+  }
+  const pick = (id: string, then?: Then): void => {
     const replay = TEST_REPLAYS.find((test) => test.id === id)
-    if (replay !== undefined) show(session.pickTestReplay(replay))
+    if (replay !== undefined) show(session.pickTestReplay(replay), then)
   }
   view.testReplay.addEventListener('change', () => {
-    pick(view.testReplay.value)
+    pick(view.testReplay.value, picked)
   })
   view.replayForm.addEventListener('submit', (event) => {
     event.preventDefault()
-    show(session.loadReplay(view.replayInput.value))
+    show(session.loadReplay(view.replayInput.value), (summary) => {
+      view.testReplay.selectedIndex = -1
+      picked(summary)
+    })
   })
   view.offer(
     TEST_REPLAYS.map((test) => test.id),

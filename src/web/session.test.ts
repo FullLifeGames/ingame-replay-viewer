@@ -52,7 +52,6 @@ describe('the full flow', () => {
     await session.pickTestReplay(REPLAY_994052)
     expect(await session.start()).toEqual({
       id: 'smogtours-gen3ou-994052',
-      romSha1: DESCRIPTION.romSha1,
       streamBytes: STREAM_994052.length,
     })
     expect(runs).toHaveLength(1)

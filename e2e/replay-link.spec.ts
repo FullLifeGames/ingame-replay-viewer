@@ -52,3 +52,25 @@ test('a replay loaded by its link fills the list, and only Showdown is asked', a
   await expect(page.locator('#not-shown-rows li')).toHaveCount(count)
   expect(notSameOriginGets).toEqual([`GET ${SHOWDOWN}`])
 })
+
+test('after a new pick or a Load the page asks for Start and shows which replay is in', async ({
+  page,
+  baseURL,
+}) => {
+  await guardRequests(page, baseURL)
+  await routeShowdown(page)
+  await page.goto('/')
+  const status = page.getByRole('status')
+  const testReplay = page.getByLabel('Test replay')
+  await expect(status).toHaveText(/^Pick your US Emerald dump/)
+
+  await testReplay.selectOption('smogtours-gen3ou-994086')
+  await expect(status).toHaveText(/^Picked smogtours-gen3ou-994086\. Press Start/)
+
+  await load(page, LINKED)
+  await expect(status).toHaveText(new RegExp(`^Picked ${LINKED}\\. Press Start`))
+  await expect(testReplay).toHaveValue('')
+
+  await testReplay.selectOption(FIRST)
+  await expect(status).toHaveText(new RegExp(`^Picked ${FIRST}\\. Press Start`))
+})
