@@ -45,6 +45,13 @@ export const SCREEN = {
   // its bar tiles start at its third tile (MoveBattleBarGraphically, :2238-2246), and the sprite
   // engine's corner offsets put it on the screen.
   farHpBar: { x: 52, y: 33, width: 48, empty: [0x4a425a] },
+  // UpdateLvlInHealthbox prints "Lv" (CHAR_EXTRA_SYMBOL, CHAR_LV_2) and the level so that the text
+  // ends at x 24 of the far healthbox's second sprite (U/src/battle_interface.c:890-907), whose
+  // corner is (76, 14): at x 100. In FONT_SMALL the "Lv" glyph is 8 pixels wide and each digit 5
+  // (gFontSmallLatinGlyphWidths, U/src/fonts.c:40, entries 0x105 and 0xA1-0xAA), with no letter
+  // spacing. Measured on the send-outs frame of the hand-made run on mGBA: the glyph's pixels lie in
+  // rows 21 to 28.
+  farLevel: { end: 100, y: 21, height: 8, lvWidth: 8, digitWidth: 5 },
   // Each healthbox is two 64x32 sprites side by side from its corner, cut at the screen's edge.
   healthbox: {
     near: { x: 126, y: 72, width: 114, height: 32 },
@@ -64,6 +71,7 @@ export const SCREEN = {
   nearHpDigits: Region
   healthboxBackground: number
   farHpBar: HpBar
+  farLevel: { end: number; y: number; height: number; lvWidth: number; digitWidth: number }
   healthbox: Record<Side, Region>
   message: Region
   screen: Region
