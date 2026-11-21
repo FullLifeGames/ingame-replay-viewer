@@ -2,16 +2,8 @@
 import type { ScriptEvent } from '../../script/events'
 import { NEXT, scriptOf } from '../../script/testing'
 import type { PokemonRef, Side } from '../../script/types'
+import type { EventOf } from '../translate/context'
 import { type Mon, nameMon, nameTrainer } from './names'
-
-// By kind, also where one event type carries two kinds (`sideStart | sideEnd`).
-type EventOf<K extends ScriptEvent['kind']> = ScriptEvent extends infer E
-  ? E extends { readonly kind: infer Kinds }
-    ? K extends Kinds
-      ? E
-      : never
-    : never
-  : never
 
 interface Scene<K extends ScriptEvent['kind']> {
   /** The first event of the kind after the intro and the leads. */
