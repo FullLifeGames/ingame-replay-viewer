@@ -8,6 +8,8 @@
 #include "replay_stream.h"
 #include "constants/battle.h"
 #include "constants/characters.h"
+#include "constants/global.h"
+#include "constants/pokemon.h"
 #include "constants/trainers.h"
 
 // The battle a replay plays in (#6): a recorded link battle, as the expansion's own singles tests
@@ -25,13 +27,34 @@ static void CopyString(u8 *dest, const volatile u8 *src, u32 length)
     dest[length] = EOS;
 }
 
-// A mon of a team table: species and level, the nickname, and HP on the battle log's scale.
+// GetMonPersonality's gender of each REPLAY_GENDER_*. It gives a species of one gender, or of
+// none, its own.
+static const u8 sGenders[] =
+{
+    [REPLAY_GENDER_MALE]   = MON_MALE,
+    [REPLAY_GENDER_FEMALE] = MON_FEMALE,
+    [REPLAY_GENDER_NONE]   = MON_GENDERLESS,
+};
+
+// A side's link player gender when its trainer pic is neither BRENDAN nor MAY (S3a D9).
+static const u8 sDefaultGenders[] =
+{
+    [REPLAY_SIDE_NEAR] = MALE,
+    [REPLAY_SIDE_FAR]  = FEMALE,
+};
+
+// A mon of a team table: species, level, gender and shininess, the nickname, and HP on the battle
+// log's scale. Only the gender comes from the personality, so the rest of it stays random.
 static void CreateReplayMon(struct Pokemon *mon, const volatile u8 *entry)
 {
     u8 nickname[REPLAY_MON_NICKNAME_LENGTH];
+    u32 species = Replay_ReadU16(entry + REPLAY_MON_OFFSET_SPECIES);
     u32 hp = Replay_ReadU16(entry + REPLAY_MON_OFFSET_MAX_HP);
+    u32 personality = GetMonPersonality(species, sGenders[entry[REPLAY_MON_OFFSET_GENDER]], NATURE_RANDOM, RANDOM_UNOWN_LETTER);
+    u8 shiny = entry[REPLAY_MON_OFFSET_SHINY];
 
-    CreateMon(mon, Replay_ReadU16(entry + REPLAY_MON_OFFSET_SPECIES), entry[REPLAY_MON_OFFSET_LEVEL], 0, OTID_STRUCT_PRESET(0));
+    CreateMon(mon, species, entry[REPLAY_MON_OFFSET_LEVEL], personality, OTID_STRUCT_PRESET(0));
+    SetMonData(mon, MON_DATA_IS_SHINY, &shiny);
     CopyString(nickname, entry + REPLAY_MON_OFFSET_NICKNAME, POKEMON_NAME_LENGTH);
     SetMonData(mon, MON_DATA_NICKNAME, nickname);
     SetMonData(mon, MON_DATA_MAX_HP, &hp);
@@ -52,6 +75,20 @@ static void FillParties(struct RecordedBattleSave *save, const volatile u8 *stre
     }
 }
 
+// The recorded controllers draw BRENDAN for a male link player and MAY for a female one.
+static u32 GetLinkPlayerGender(const volatile u8 *stream, u32 side)
+{
+    switch (Replay_ReadU16(Replay_GetTrainer(stream, side) + REPLAY_TRAINER_OFFSET_TRAINER_PIC))
+    {
+    case TRAINER_PIC_BRENDAN:
+        return MALE;
+    case TRAINER_PIC_MAY:
+        return FEMALE;
+    default:
+        return sDefaultGenders[side];
+    }
+}
+
 // The link players are the two trainers, near side first. Their names are cut to the length of
 // a link player's name; the stream's PRINT texts carry the full names.
 static void FillLinkPlayers(struct RecordedBattleSave *save, const volatile u8 *stream)
@@ -61,9 +98,14 @@ static void FillLinkPlayers(struct RecordedBattleSave *save, const volatile u8 *
     for (i = 0; i < MAX_LINK_PLAYERS; i++)
     {
         if (i < REPLAY_STREAM_SIDE_COUNT)
+        {
             CopyString(save->playersName[i], Replay_GetTrainer(stream, i) + REPLAY_TRAINER_OFFSET_NAME, PLAYER_NAME_LENGTH);
+            save->playersGender |= GetLinkPlayerGender(stream, i) << i;
+        }
         else
+        {
             save->playersName[i][0] = EOS;
+        }
         save->playersLanguage[i] = GAME_LANGUAGE;
         save->playersBattlers |= (i << (2 * (i >> 1) + 4 * (i & BIT_SIDE)));
     }
