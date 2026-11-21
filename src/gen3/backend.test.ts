@@ -95,12 +95,4 @@ describe('the team tables', () => {
   })
 })
 
-describe('the event kinds of step B4b', () => {
-  it('fail loudly until B4b brings them', () => {
-    expect(() => streamOfLog('|-item|p1a: Dugtrio|Leftovers')).toThrow(
-      /not yet: the item event of line 8/,
-    )
-  })
-})
-
 const nulls = (count: number) => Array.from({ length: count }, () => null)

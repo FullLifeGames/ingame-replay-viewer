@@ -11,6 +11,7 @@ import type { PokemonRef } from '../../script/types'
 import type { Anim, Status } from '../stream/instructions'
 import {
   cant as heldBack,
+  itemCured,
   rested,
   statusCured,
   statusGiven,
@@ -49,8 +50,18 @@ export function status(event: EventOf<'status'>, ctx: Context): void {
 /** A silent cure, such as Natural Cure on the way out, clears the status without a word. */
 export function cureStatus(event: EventOf<'cureStatus'>, ctx: Context): void {
   const { who, line } = event
-  if (!event.silent) ctx.print(line, statusCured(ctx.mon(who), event.status))
+  if (!event.silent) ctx.print(line, cureText(event, ctx))
   ctx.emit(line, { op: 'status', side: who.side, slot: who.index, status: 'none' })
+}
+
+/** A cure by a berry eaten on the line before, or by an item the log names, names the item. */
+function cureText(event: EventOf<'cureStatus'>, ctx: Context): string {
+  const { who, status, cause } = event
+  const before = ctx.near(-1)
+  const eaten = before?.kind === 'itemEnd' && before.eaten && sameMon(before.who, who)
+  const item = eaten ? before.item : cause?.kind === 'item' ? cause.name : undefined
+  const mon = ctx.mon(who)
+  return item === undefined ? statusCured(mon, status) : itemCured(mon, item, status)
 }
 
 /** Heal Bell and Aromatherapy: the line, then each member with a status is cleared. */

@@ -23,6 +23,10 @@ export const ITEM_TEMPLATES = {
 
 const STEALS = new Set(['thief', 'covet'])
 
+/** Thief and Covet take the item of the Pokémon of `[of]`. */
+export const isSteal = (cause: Effect | undefined) =>
+  cause !== undefined && STEALS.has(toID(cause.name))
+
 /** An item `who` now holds or shows; `source` is the Pokémon it came from. */
 export function itemShown(
   who: Mon,
@@ -32,7 +36,7 @@ export function itemShown(
 ): Phrase {
   const id = cause && toID(cause.name)
   const name = itemName(item)
-  if (id !== undefined && STEALS.has(id) && source !== undefined) {
+  if (isSteal(cause) && source !== undefined) {
     return { text: ITEM_TEMPLATES.stole.render(who, source, name) }
   }
   if (id === 'trick') return { text: ITEM_TEMPLATES.obtained.render(who, name) }

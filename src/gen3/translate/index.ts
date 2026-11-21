@@ -1,7 +1,6 @@
 // The battle script to the stream model (plan §6): one handler per event kind, in a table that
 // tsc holds complete, so a new kind in the battle script fails the build until it has one.
 import type { BattleScript, ScriptEvent } from '../../script/events'
-import { Gen3Error } from '../errors'
 import type { Fallback } from '../fallbacks'
 import type { Stream } from '../stream/instructions'
 import { ability, closePopUp, inCausePopUp } from './abilities'
@@ -9,6 +8,7 @@ import { Context, type EventOf, type Placed } from './context'
 import { block, effectActivate, effectEnd, effectStart, singleTurn } from './effects'
 import { message, tie, win } from './end'
 import { fieldActivate, sideEnd, sideStart, weather } from './field'
+import { item, itemEnd } from './items'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
 import { damage, heal } from './hp'
 import { crit, effectiveness, failure, immunity, miss, move } from './moves'
@@ -18,11 +18,6 @@ import { faint, switchIn } from './switches'
 import { tablesOf } from './tables'
 
 type Handler<K extends ScriptEvent['kind']> = (event: EventOf<K>, ctx: Context) => void
-
-// Kinds of step B4b (status, stats, field, effects, items, abilities, end) until it brings them.
-const notYet = (event: ScriptEvent) => {
-  throw new Gen3Error(`not yet: the ${event.kind} event of line ${String(event.line)}`)
-}
 
 const HANDLERS = {
   player,
@@ -56,8 +51,8 @@ const HANDLERS = {
   sideStart,
   sideEnd,
   fieldActivate,
-  item: notYet,
-  itemEnd: notYet,
+  item,
+  itemEnd,
   ability,
 } satisfies { readonly [K in ScriptEvent['kind']]: Handler<K> }
 
