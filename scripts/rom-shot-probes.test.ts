@@ -109,7 +109,7 @@ describe('checking the shots of a scene', () => {
     })
   })
 
-  it('takes a bar within one pixel of the expected fill', () => {
+  it('takes a bar filled to the pixel and fails one pixel off', () => {
     const bar = paint(
       paint(frameOf(0), { ...BAR, height: 1 }, EMPTY),
       { x: 0, y: 4, width: 11, height: 1 },
@@ -118,8 +118,9 @@ describe('checking the shots of a scene', () => {
     const shots = new Map([['hp', bar]])
     const check = (filled: number) =>
       checkShots({ probe: 'bar', shot: 'hp', bar: BAR, filled }, shots)
-    expect(check(10)).toEqual({ pass: true, detail: '11 of 20 pixels filled, 10 expected' })
-    expect(check(13).pass).toBe(false)
+    expect(check(11)).toEqual({ pass: true, detail: '11 of 20 pixels filled, 11 expected' })
+    expect(check(10)).toEqual({ pass: false, detail: '11 of 20 pixels filled, 10 expected' })
+    expect(check(12).pass).toBe(false)
   })
 
   it('takes a blank screen of the expected colour and names another colour', () => {

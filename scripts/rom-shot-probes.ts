@@ -152,7 +152,7 @@ function verdictOf(check: Check, frame: (name: string) => Frame): Verdict {
     case 'bar': {
       const filled = filledBarPixels(frame(check.shot), check.bar)
       const detail = `${String(filled)} of ${String(check.bar.width)} pixels filled, ${String(check.filled)} expected`
-      return { pass: Math.abs(filled - check.filled) <= 1, detail }
+      return { pass: filled === check.filled, detail }
     }
     case 'text': {
       const count = textPixels(frame(check.shot), check.region)

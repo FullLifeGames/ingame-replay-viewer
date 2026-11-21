@@ -85,6 +85,23 @@ describe('the scene points of a decoded instruction list (S6)', () => {
     })
   })
 
+  it.each([
+    [99, 47],
+    [50, 24],
+    [3, 1],
+    [1, 1],
+  ])('fills the bar as the engine does: %i of 100 HP is %i pixels', (hp, filled) => {
+    const scene = named(
+      [
+        { op: 'sendOut', side: 'far', slot: 0, hp: 100, status: 'none' },
+        { op: 'hp', side: 'far', hp },
+        { op: 'end', outcome: 'tie' },
+      ],
+      'first-hp',
+    )
+    expect(scene?.check).toMatchObject({ filled })
+  })
+
   it('takes the first far HP change that leaves the bar partly filled, past a knock-out', () => {
     const scene = named(
       [

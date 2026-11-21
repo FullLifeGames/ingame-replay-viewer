@@ -103,14 +103,23 @@ function farHpChanges(input: Input): HpChange[] {
   })
 }
 
-// The far HP bar after a far HP change: the logged HP over the mon's max HP of 48 pixels. The first
-// change that leaves the bar partly filled tests the scale (a knock-out empties it, a full heal
-// fills it); a stream with none takes its first far HP change.
+// The pixels an HP bar fills once it has moved to the new HP, as the engine counts them: the HP
+// times the bar's width over the max HP, rounded down, and one pixel for a mon that has HP left
+// (CalcBarFilledPixels, U/src/battle_interface.c:2359-2370, and GetScaledHPFraction, :2407-2414;
+// U = .cache/rom/expansion at 79dd436).
+function barPixels(hp: number, maxHp: number, width: number): number {
+  if (hp <= 0) return 0
+  return Math.max(1, Math.floor((hp * width) / maxHp))
+}
+
+// The far HP bar after a far HP change. The first change that leaves the bar partly filled tests
+// the scale (a knock-out empties it, a full heal fills it); a stream with none takes its first far
+// HP change.
 function hpScene(input: Input): Scene | undefined {
   const changes = farHpChanges(input)
   const change = changes.find(({ hp, maxHp }) => hp > 0 && hp < maxHp) ?? changes[0]
   if (change === undefined) return undefined
-  const filled = Math.round((SCREEN.farHpBar.width * change.hp) / change.maxHp)
+  const filled = barPixels(change.hp, change.maxHp, SCREEN.farHpBar.width)
   const shot = { name: 'first-hp', done: change.at + 1, frames: 0 }
   return {
     name: shot.name,
