@@ -21,6 +21,25 @@ describe('scaleHp (D5)', () => {
     expect(scaleHp({ hp: 300, max: 300 })).toBe(100)
     expect(scaleHp({ hp: 71, max: 100 })).toBe(71)
   })
+
+  it('puts exact full HP at 100, where floating point would land past it (#41)', () => {
+    expect(scaleHp({ hp: 319, max: 319 })).toBe(100)
+    expect(scaleHp({ hp: 364, max: 364 })).toBe(100)
+  })
+
+  it('gives a whole number from 0 to 100 for every maximum up to 999', () => {
+    for (let max = 1; max <= 999; max++) {
+      for (const value of [0, 1, max - 1, max]) {
+        const scaled = scaleHp({ hp: value, max })
+        expect(
+          Number.isInteger(scaled),
+          `${String(value)}/${String(max)} gives ${String(scaled)}`,
+        ).toBe(true)
+        expect(scaled).toBeGreaterThanOrEqual(0)
+        expect(scaled).toBeLessThanOrEqual(100)
+      }
+    }
+  })
 })
 
 describe('damage with a cause', () => {
