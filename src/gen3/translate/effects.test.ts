@@ -50,7 +50,30 @@ describe('Substitute (X12)', () => {
   })
 })
 
+describe('Substitute without its usual lines', () => {
+  it('sets a silent substitute alone, and plays a plain hit that breaks it as one', () => {
+    const scene = sceneOf(
+      '|-start|p1a: Dugtrio|Substitute|[silent]',
+      '|-end|p1a: Dugtrio|Substitute',
+    )
+    expect(scene.map(plain)).toEqual([
+      substitute(true),
+      { op: 'hit', side: 'near', effectiveness: 'normal' },
+      'The substitute took damage for Dugtrio!',
+      { op: 'anim', side: 'near', anim: 'substituteFade' },
+      "Dugtrio's substitute faded!",
+      substitute(false),
+    ])
+  })
+})
+
 describe('other effects on one Pokémon', () => {
+  it("names Curse's user from the log's source", () => {
+    expect(sceneOf('|-start|p2a: Tyranitar|Curse|[of] p1a: Dugtrio').map(plain)).toEqual([
+      'Dugtrio cut its own HP and put a curse on the opposing Tyranitar!',
+    ])
+  })
+
   it('says the effects that start, act and end with their lines', () => {
     const scene = sceneOf(
       '|-start|p2a: Tyranitar|move: Leech Seed',

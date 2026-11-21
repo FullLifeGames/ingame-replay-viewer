@@ -70,6 +70,15 @@ describe('a status cured', () => {
     expect(scene.slice(-2).map(plain)).toEqual(['A bell chimed!', status('near', 'none', 0)])
   })
 
+  it('leaves a status cured before the team line alone', () => {
+    const scene = sceneOf(
+      '|-status|p1a: Dugtrio|par',
+      '|-curestatus|p1a: Dugtrio|par|[msg]',
+      '|-cureteam|p1a: Dugtrio|[from] move: Heal Bell',
+    )
+    expect(scene.slice(-1).map(plain)).toEqual(['A bell chimed!'])
+  })
+
   it('remembers a status a switch or an HP line shows', () => {
     const scene = sceneOf(
       '|switch|p1a: Zapdos|Zapdos|100/100 brn',
