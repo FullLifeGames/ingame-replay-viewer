@@ -8,7 +8,7 @@ export const CHECKING_LINE = 'Checking your dump and patching it. This takes a f
 export const STARTING_LINE = 'Starting the emulator.'
 
 export const dumpLine = ({ romSha1 }: DumpSummary): string =>
-  `Your dump is US Emerald and is patched (ROM SHA1 ${romSha1}). Press Start.`
+  `Your dump is US Emerald, and the page patched it (ROM SHA1 ${romSha1}). Press Start.`
 
 export const startLine = ({ id, streamBytes }: StartSummary): string =>
   `Running ${id}: ${String(streamBytes)} bytes of instruction stream.`

@@ -14,7 +14,7 @@ npm run dev -- --port 5177 --strictPort
 
 The dev server serves two files from `build/rom/` and nothing else from there: `/rom/irv-emerald.bps` and `/rom/replay-slot.json`. It never copies them. Any other `/rom/` name answers 404, and `/@fs/` refuses `build/`, `.cache/` and ROM files. When a file is missing, the page shows the server's line: `build/rom/irv-emerald.bps is missing: run npm run rom:build`.
 
-Every response carries `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`. The plugin in `scripts/web-server.ts` sets them.
+The plugin in `scripts/web-server.ts` puts `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp` on every response.
 
 ## The preview
 
@@ -28,18 +28,18 @@ The preview uses the same plugin, so it sends the same headers and serves the sa
 
 mGBA runs its threads on `SharedArrayBuffer`. A browser grants it only on a secure context (HTTPS or `localhost`) that is cross-origin isolated (the two headers above). The dump's SHA1 needs `crypto.subtle`, which also needs a secure context.
 
-So `http://<tailscale ip>:5177` does not work: it is plain HTTP, and the page shows one line that says what is missing. Open `http://localhost:5177` on devbox, or reach the page over the tailnet with HTTPS.
+`http://<tailscale ip>:5177` is plain HTTP, so the emulator cannot run there, and the page shows one line that names what is missing. Open `http://localhost:5177` on devbox, or reach the page over the tailnet with HTTPS.
 
 ## Reaching the page over the tailnet
 
 `tailscale serve` puts the dev server behind a tailnet-only HTTPS address with a real certificate:
 
-1. Turn on HTTPS certificates in the tailnet's admin console (DNS, HTTPS Certificates). This is a one-time setting.
+1. Turn on HTTPS certificates in the tailnet's admin console (DNS, HTTPS Certificates). You set it once.
 2. Start the dev server on 127.0.0.1: `npm run dev -- --host 127.0.0.1 --port 5177 --strictPort`. Without `--host`, Vite listens on `::1` only on devbox, and `tailscale serve` below forwards to 127.0.0.1.
 3. Run `tailscale serve --bg --https=8443 http://127.0.0.1:5177` on devbox.
 4. Open `https://devbox.<tailnet>.ts.net:8443` on the phone or PC.
 
-Vite accepts the `.ts.net` host name (`server.allowedHosts` in `vite.config.ts`). Nothing is opened to the internet. `tailscale serve --https=8443 off` ends it.
+Vite accepts the `.ts.net` host name (`server.allowedHosts` in `vite.config.ts`). `tailscale serve` opens nothing to the internet. `tailscale serve --https=8443 off` ends it.
 
 ## Your dump
 
@@ -57,6 +57,6 @@ Playwright drives the page in Chromium on its own dev server at port 5178. It ru
 
 Five tests need neither the dump nor `npm run rom:build`: the headers and the replay list, the environment line on a page without the headers, the refusal of a file that is not US Emerald, and two tests of a replay by link (`e2e/replay-link.spec.ts`). There a route answers for Showdown from the test fixture, so no request leaves devbox.
 
-The emulator test plays 994052, then 994086 after a second Start. It reads your dump by the build's rule: `~/roms/Pokemon - Emerald Version (USA, Europe).gba`, or the path in `IRV_BASE_ROM`. Without the dump or without `build/rom/irv-emerald.bps`, it skips and names what is missing. It fails when `build/rom/build-info.json` lacks part of `rom/gen3/patches/series` or `src/replay_boot.c`. It shows that the emulator runs the replay's ROM and that frames change after Restart; that the replay plays to its end, and that Restart starts it over, is the tester's to check.
+The emulator test plays 994052, then 994086 after a second Start. It reads your dump by the build's rule: `~/roms/Pokemon - Emerald Version (USA, Europe).gba`, or the path in `IRV_BASE_ROM`. Without the dump or without `build/rom/irv-emerald.bps`, it skips and names what is missing. It fails when `build/rom/build-info.json` lacks part of `rom/gen3/patches/series` or `src/replay_boot.c`. It shows that the emulator runs the replay's ROM and that the frames change after Restart. The tester checks that the replay plays to its end and that Restart starts it over.
 
 The game's frames come from the ROM, so no frame leaves memory. The e2e writes no screenshot, video or trace. It compares frames in memory (`e2e/frames.ts`), and only counts and yes-or-no answers leave it.

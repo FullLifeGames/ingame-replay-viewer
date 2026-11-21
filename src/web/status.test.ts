@@ -22,7 +22,7 @@ describe('the status lines', () => {
 
   it('names the patched ROM by its SHA1 once the dump passed', () => {
     expect(dumpLine({ romSha1: ROM_SHA1 })).toBe(
-      `Your dump is US Emerald and is patched (ROM SHA1 ${ROM_SHA1}). Press Start.`,
+      `Your dump is US Emerald, and the page patched it (ROM SHA1 ${ROM_SHA1}). Press Start.`,
     )
   })
 
