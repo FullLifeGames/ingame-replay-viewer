@@ -36,7 +36,15 @@ describe('the WebAssembly build config', () => {
     expect(config.flags['src/ow_abilities.c']).toEqual([
       '-Wno-error=incompatible-function-pointer-types',
     ])
-    expect(config.platform.defines).toEqual(['IRV_WASM_PLATFORM', 'RENDERER_EASY_DRAW'])
+    // PORTABLE turns on the sound files' hand-off to the host and their PSG synthesis.
+    expect(config.platform.defines).toEqual(['IRV_WASM_PLATFORM', 'RENDERER_EASY_DRAW', 'PORTABLE'])
+    expect(config.platform.files).toEqual(
+      expect.arrayContaining([
+        'src/music_player.c',
+        'src/sound_mixer.c',
+        'src/platform/cgb_audio.c',
+      ]),
+    )
     expect(config.jobs).toBe(2)
   })
 

@@ -13,6 +13,17 @@
 #define DBGPRINTF(...)
 #endif
 
+// The platform's sound files: the port's gba/types.h adds the fast integer types.
+#ifdef IRV_WASM_PLATFORM
+#include <stdint.h>
+typedef int_fast8_t sf8;
+typedef uint_fast8_t uf8;
+typedef int_fast16_t sf16;
+typedef uint_fast16_t uf16;
+typedef int_fast32_t sf32;
+typedef uint_fast32_t uf32;
+#endif
+
 // src/random.c: Random32 is Thumb assembly in a naked function. wasm.json renames it, and this
 // empties its body, so the C version of the glue can take the name.
 #ifdef IRV_WASM_NO_ASM
