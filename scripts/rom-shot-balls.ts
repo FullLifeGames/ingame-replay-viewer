@@ -12,8 +12,9 @@ import type { Scene } from './rom-shot-scenes.ts'
 // A ball is an 8x8 sprite, 10 pixels from the next (CreatePartyStatusSummarySprites,
 // U/src/battle_interface.c:1299). Near: bar_X 136 and bar_Y 96 (:1313-1318), the balls at
 // bar_Y - 4 (:1376) and x + 10i + 24 (:1391). Far: bar_X 104 and bar_Y 40 (:1327-1329), the balls
-// at x - 10(5 - i) - 24 (:1397). Corners measured on the frame before the first SEND_OUT of 994052
-// (plan step 0, frame balls-d2): near cells at (156 + 10i, 88), far cells at (26 + 10i, 32).
+// at x - 10(5 - i) - 24 (:1397). Corners measured in 994052 on the first frame of op 2, the PRINT
+// "xXEricXx sent out Tyranitar!" before the first SEND_OUT (op 3): near cells at (156 + 10i, 88),
+// far cells at (26 + 10i, 32).
 const CELL = 8
 const PITCH = 10
 const FIRST_CELL: Readonly<Record<Side, { x: number; y: number }>> = {
