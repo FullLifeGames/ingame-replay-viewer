@@ -3,7 +3,7 @@
 // emcc in place of the ARM tools. Every command runs in the tree; its object lands in build/wasm.
 import { readdirSync } from 'node:fs'
 import { homedir } from 'node:os'
-import { isAbsolute, join, normalize, relative, sep } from 'node:path'
+import { basename, isAbsolute, join, normalize, relative, sep } from 'node:path'
 
 import type { WasmConfig } from './wasm-config.ts'
 
@@ -79,7 +79,7 @@ export function checkNamedSources(config: WasmConfig, sources: readonly string[]
   }
 }
 
-function objectPath(paths: WasmPaths, source: string): string {
+export function objectPath(paths: WasmPaths, source: string): string {
   const object = join(paths.obj, normalize(source).replace(/\.c$/, '.o'))
   const rel = relative(paths.obj, object)
   if (isAbsolute(source) || rel.startsWith(`..${sep}`) || rel === '..') {
@@ -162,6 +162,28 @@ export function platformCommands(
       }
       return command(paths, unit, options)
     })
+}
+
+// The glue's own C files (rom/gen3/wasm/src), given as absolute paths. They include
+// platform/dma.h as the platform files do, but compile as files of the game, so the platform
+// defines stay off.
+export function glueCommands(
+  paths: WasmPaths,
+  sources: readonly string[],
+  options: CompileOptions = { optimise: '-O2' },
+): CompileCommand[] {
+  return sources.map((input) => {
+    const source = `glue/${basename(input)}`
+    const unit = {
+      source,
+      input,
+      object: objectPath(paths, source),
+      defines: [],
+      flags: [],
+      after: [join(paths.platform, 'include')],
+    }
+    return command(paths, unit, options)
+  })
 }
 
 const quote = (arg: string) => `'${arg.replaceAll("'", "'\\''")}'`

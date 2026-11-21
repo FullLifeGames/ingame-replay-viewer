@@ -5,10 +5,13 @@
 // the build links at -O2: the files of the tree that wasm.json keeps, the patched copies of
 // build/wasm/overlay and the platform files, fetched into .cache/wasm/platform and patched in
 // build/wasm/platform; it writes compile.json, the .err files in build/wasm/compile and the
-// report, and fails when a file fails. Everything it writes lies under build/wasm and .cache/wasm,
-// apart from a report path named on the command line. The tree comes from `npm run rom:build`.
+// report, and fails when a file fails. `--link [report.md]` compiles the glue of rom/gen3/wasm/src
+// and links it with the objects of compile.json and build/wasm/asm (npm run wasm:convert) into
+// build/wasm/irv-emerald.js and irv-emerald.wasm. Everything it writes lies under build/wasm and
+// .cache/wasm, apart from a report path named on the command line. The tree comes from
+// `npm run rom:build`.
 import { execFileSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { isAbsolute, join } from 'node:path'
 
 import { runCliAsync } from './rom-cli.ts'
@@ -20,6 +23,7 @@ import type { CensusResult } from './wasm-census-run.ts'
 import {
   checkNamedSources,
   compileCommands,
+  glueCommands,
   platformCommands,
   treeSources,
   wasmPaths,
@@ -27,23 +31,26 @@ import {
 import type { CompileCommand, CompileOptions, WasmPaths } from './wasm-compile.ts'
 import { loadWasmConfig, WASM_DIR } from './wasm-config.ts'
 import type { WasmConfig } from './wasm-config.ts'
+import { asmObjects, compiledObjects, glueSources, linkCommand, LINK_OUTPUTS } from './wasm-link.ts'
+import type { CompileRecordEntry } from './wasm-link.ts'
 import { prepareCopies } from './wasm-overlay.ts'
 import { ensurePlatform, wasmRoots } from './wasm-platform.ts'
 
 export interface BuildArgs {
-  mode: 'census' | 'report' | 'compile'
+  mode: 'census' | 'report' | 'compile' | 'link'
   out: string
 }
 
 const USAGE =
-  'usage: wasm:build --census [/abs/report.md] | --census-report [/abs/report.md] | --compile [/abs/report.md]'
+  'usage: wasm:build --census [/abs/report.md] | --census-report [/abs/report.md] | --compile [/abs/report.md] | --link [/abs/report.md]'
 const MODES: Record<string, BuildArgs['mode']> = {
   '--census': 'census',
   '--census-report': 'report',
   '--compile': 'compile',
+  '--link': 'link',
 }
 // The record each mode writes under build/wasm, and its report beside it.
-const RECORDS = { census: 'census', report: 'census', compile: 'compile' } as const
+const RECORDS = { census: 'census', report: 'census', compile: 'compile', link: 'link' } as const
 // A file that takes longer at -O0 has a problem of its own; the census names it.
 const TIMEOUT_MS = 20 * 60 * 1000
 
@@ -87,6 +94,7 @@ function checkToolchain(paths: WasmPaths, config: WasmConfig): void {
 const SCOPE = {
   census: 'every C file of the tree, excluded ones included',
   compile: 'the files the build keeps, the overlay copies and the platform files',
+  glue: 'the glue of rom/gen3/wasm/src',
 }
 
 function heading(config: WasmConfig, mode: Run, seconds: number): string {
@@ -95,7 +103,7 @@ function heading(config: WasmConfig, mode: Run, seconds: number): string {
   return `Run ${date} UTC: emcc ${config.emscripten.version}, ${optimise}, ${String(config.jobs)} jobs, ${SCOPE[mode]}; wall time ${String(Math.round(seconds))} s.`
 }
 
-type Run = 'census' | 'compile'
+type Run = 'census' | 'compile' | 'glue'
 
 function writeErrors(paths: WasmPaths, mode: Run, results: readonly CensusResult[]): void {
   const dir = join(paths.out, mode)
@@ -169,9 +177,40 @@ async function compile(paths: WasmPaths, config: WasmConfig, out: string): Promi
   ]
   const entries = await runAll(paths, config, 'compile', commands)
   report(paths, config, 'compile', out)
+  failIfAny(entries)
+}
+
+function failIfAny(entries: readonly CensusEntry[]): void {
   const failed = entries.filter((entry) => !entry.ok).map((entry) => entry.source)
   if (failed.length > 0)
     throw new Error(`${String(failed.length)} files failed: ${failed.join(', ')}`)
+}
+
+// The glue compiles at -O2 like the rest; the link itself runs at -O0 first, so wasm-opt does
+// little and the spike measures the link alone (plan B3).
+async function link(paths: WasmPaths, config: WasmConfig, out: string): Promise<void> {
+  checkToolchain(paths, config)
+  const record = JSON.parse(readFileSync(join(paths.out, 'compile.json'), 'utf8')) as {
+    entries: CompileRecordEntry[]
+  }
+  const glue = glueCommands(paths, glueSources())
+  failIfAny(await runAll(paths, config, 'glue', glue))
+  const objects = [
+    ...compiledObjects(record.entries, paths),
+    ...glue.map((command) => command.object),
+    ...asmObjects(join(paths.out, 'asm')),
+  ]
+  const argv = linkCommand(paths, objects)
+  say(`linking ${String(objects.length)} objects`)
+  const start = performance.now()
+  execFileSync(argv[0] as string, argv.slice(1), { cwd: paths.out, stdio: 'inherit' })
+  const seconds = Math.round((performance.now() - start) / 1000)
+  const sizes = Object.values(LINK_OUTPUTS).map(
+    (name) => `${name} ${String(statSync(join(paths.out, name)).size)} B`,
+  )
+  const text = `Link: ${String(objects.length)} objects, ${String(seconds)} s; ${sizes.join(', ')}.\n`
+  writeFileSync(out, text)
+  say(text.trim())
 }
 
 function report(paths: WasmPaths, config: WasmConfig, mode: Run, out: string): void {
@@ -191,6 +230,7 @@ async function main(): Promise<void> {
     const config = loadWasmConfig()
     if (args.mode === 'census') await census(paths, config, args.out)
     else if (args.mode === 'compile') await compile(paths, config, args.out)
+    else if (args.mode === 'link') await link(paths, config, args.out)
     else report(paths, config, 'census', args.out)
   })
 }

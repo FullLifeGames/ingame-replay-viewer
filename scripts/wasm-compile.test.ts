@@ -7,6 +7,7 @@ import { afterAll, describe, expect, it } from 'vitest'
 import {
   checkNamedSources,
   compileCommands,
+  glueCommands,
   pipelineScript,
   platformCommands,
   treeSources,
@@ -188,6 +189,25 @@ describe('the platform commands', () => {
       'include',
       `${paths.platform}/include`,
     ])
+  })
+})
+
+describe('the glue commands', () => {
+  const glue = ['/repo/rom/gen3/wasm/src/irv_wasm_frame.c']
+
+  it('compile each C file of the glue into build/wasm/obj/glue, without the platform defines', () => {
+    const command = only(glueCommands(paths, glue))
+    expect(command.source).toBe('glue/irv_wasm_frame.c')
+    expect(command.object).toBe('/repo/build/wasm/obj/glue/irv_wasm_frame.o')
+    expect(command.preprocess.at(-1)).toBe(glue[0])
+    expect(command.preprocess).toContain('-DIRV_WASM')
+    expect(command.preprocess).not.toContain('-DIRV_WASM_PLATFORM')
+    expect(command.compile).toContain('-O2')
+  })
+
+  it('reach the platform headers after the tree include, as the platform files do', () => {
+    const { preprocess } = only(glueCommands(paths, glue))
+    expect(pairs(preprocess, '-iquote').at(-1)).toBe(`${paths.platform}/include`)
   })
 })
 

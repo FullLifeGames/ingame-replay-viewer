@@ -17,6 +17,13 @@ describe('the wasm:build arguments', () => {
     })
   })
 
+  it('links the glue and the compiled objects with its report in build/wasm by default', () => {
+    expect(parseBuildArgs(['--link'], '/repo/build/wasm')).toEqual({
+      mode: 'link',
+      out: '/repo/build/wasm/link.md',
+    })
+  })
+
   it('takes a report path after the mode', () => {
     expect(parseBuildArgs(['--census-report', '/x/census.md'], '/o')).toEqual({
       mode: 'report',
@@ -24,7 +31,7 @@ describe('the wasm:build arguments', () => {
     })
   })
 
-  it.each([[[]], [['--link']], [['--census', 'relative.md']], [['--census', '/a', '/b']]])(
+  it.each([[[]], [['--census', 'relative.md']], [['--census', '/a', '/b']]])(
     'refuses %j',
     (args) => {
       expect(() => parseBuildArgs(args, '/o')).toThrow(/usage/)
