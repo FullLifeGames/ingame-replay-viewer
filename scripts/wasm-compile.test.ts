@@ -1,6 +1,16 @@
-import { describe, expect, it } from 'vitest'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { dirname, join } from 'node:path'
 
-import { checkNamedSources, compileCommands, wasmPaths } from './wasm-compile.ts'
+import { afterAll, describe, expect, it } from 'vitest'
+
+import {
+  checkNamedSources,
+  compileCommands,
+  pipelineScript,
+  treeSources,
+  wasmPaths,
+} from './wasm-compile.ts'
 import type { CompileCommand, WasmPaths } from './wasm-compile.ts'
 import { loadWasmConfig } from './wasm-config.ts'
 import type { WasmConfig } from './wasm-config.ts'
@@ -111,6 +121,37 @@ describe('the compile commands', () => {
   it('finds the tree, the outputs, the shadow headers and emcc from the repo and EMSDK', () => {
     expect(wasmPaths('/repo', { EMSDK: '/opt/emsdk' }, '/home/u')).toEqual(pathsFor('/opt/emsdk'))
     expect(wasmPaths('/repo', {}, '/home/u')).toEqual(pathsFor('/home/u/tools/emsdk'))
+  })
+})
+
+describe('the pipeline script', () => {
+  it('joins the three stages with pipes and quotes every argument for the shell', () => {
+    const script = pipelineScript({
+      source: 'src/a.c',
+      object: '/o/a.o',
+      preprocess: ['emcc', '-E', "-DNAME=it's", 'src/a.c'],
+      preproc: ['preproc', '-i'],
+      compile: ['emcc', '-o', '/o dir/a.o', '-'],
+    })
+    expect(script).toBe(
+      "'emcc' '-E' '-DNAME=it'\\''s' 'src/a.c' | 'preproc' '-i' | 'emcc' '-o' '/o dir/a.o' '-'",
+    )
+  })
+})
+
+describe('the sources of the tree', () => {
+  const tree = mkdtempSync(join(tmpdir(), 'irv-wasm-tree-'))
+  afterAll(() => {
+    rmSync(tree, { recursive: true, force: true })
+  })
+  const files = ['src/b.c', 'src/a.c', 'src/x/y.c', 'src/x/y/z.c', 'src/x/y/z/deep.c']
+  for (const file of [...files, 'src/data.inc.c', 'src/notes.h']) {
+    mkdirSync(dirname(join(tree, file)), { recursive: true })
+    writeFileSync(join(tree, file), '')
+  }
+
+  it('lists src/*.c down to three levels, sorted, without .inc.c, as the Makefile does', () => {
+    expect(treeSources(tree)).toEqual(['src/a.c', 'src/b.c', 'src/x/y.c', 'src/x/y/z.c'])
   })
 })
 

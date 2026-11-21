@@ -25,6 +25,8 @@
     "rom:clean": "node scripts/rom-build.ts --clean-only",
     "rom:repro": "node scripts/rom-repro.ts",
     "rom:shots": "node scripts/rom-shot.ts",
+    "wasm:build": "node scripts/wasm-build.ts",
+    "wasm:census": "node scripts/wasm-build.ts --census",
     "gen3:tables": "node scripts/gen3-tables.ts"
   },
   "devDependencies": {

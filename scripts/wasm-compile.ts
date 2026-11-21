@@ -1,6 +1,7 @@
 // One command line per C file of the WebAssembly build (#35), as the expansion's Makefile compiles
 // it (`$(CPP) $(CPPFLAGS) $< | $(PREPROC) -i -g $(ASSETS_DIR_NAME) $< charmap.txt | $(CC1)`), with
 // emcc in place of the ARM tools. Every command runs in the tree; its object lands in build/wasm.
+import { readdirSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { isAbsolute, join, normalize, relative, sep } from 'node:path'
 
@@ -97,4 +98,22 @@ export function compileCommands(
   return sources
     .filter((source) => !excluded.has(source))
     .map((source) => command(config, paths, source, options))
+}
+
+const quote = (arg: string) => `'${arg.replaceAll("'", "'\\''")}'`
+
+// For `bash -o pipefail -c`, so a failure in any of the three stages fails the file.
+export function pipelineScript(command: CompileCommand): string {
+  return [command.preprocess, command.preproc, command.compile]
+    .map((argv) => argv.map(quote).join(' '))
+    .join(' | ')
+}
+
+// The Makefile's C_SRCS: src/*.c, src/*/*.c and src/*/*/*.c, without the .inc.c files.
+export function treeSources(tree: string): string[] {
+  return readdirSync(join(tree, 'src'), { recursive: true, encoding: 'utf8' })
+    .map((name) => `src/${name.split(sep).join('/')}`)
+    .filter((name) => name.endsWith('.c') && !name.endsWith('.inc.c'))
+    .filter((name) => name.split('/').length <= 4)
+    .sort()
 }
