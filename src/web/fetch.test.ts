@@ -52,6 +52,15 @@ describe('fetchBytes', () => {
     )
   })
 
+  it('names a failure that is not an Error by its text', async () => {
+    // A script may reject with any value; the line still names it.
+    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors -- the case under test
+    const fetcher = (): Promise<Response> => Promise.reject('offline')
+    await expect(fetchBytes('rom/irv-emerald.bps', fetcher)).rejects.toThrow(
+      new FetchError('rom/irv-emerald.bps could not be fetched: offline'),
+    )
+  })
+
   it("uses the browser's fetch by default", async () => {
     await expect(fetchBytes('http://127.0.0.1:1/rom/irv-emerald.bps')).rejects.toThrow(
       /^http:\/\/127\.0\.0\.1:1\/rom\/irv-emerald\.bps could not be fetched: /,
