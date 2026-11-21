@@ -6,7 +6,9 @@ import type { ScriptEvent } from './events'
 import type { PokemonRef } from './types'
 
 type Modifier = Extract<ScriptEvent, { kind: 'crit' | 'effectiveness' }>
-type HitEvent = Extract<ScriptEvent, { kind: 'damage' | 'effectActivate' | 'effectEnd' }>
+type HitEvent = Extract<ScriptEvent, { kind: 'damage' | 'effectActivate' | 'effectEnd' }> & {
+  readonly who: PokemonRef
+}
 
 /** Events that close the window in which a modifier waits for its hit. */
 const WINDOW_ENDS: ReadonlySet<ScriptEvent['kind']> = new Set(['move', 'switchIn', 'turn'])
@@ -26,7 +28,10 @@ function isHit(event: ScriptEvent): event is HitEvent {
     return event.effect.name === SUBSTITUTE
   }
   return (
-    event.kind === 'effectActivate' && event.effect.name === SUBSTITUTE && event.damage === true
+    event.kind === 'effectActivate' &&
+    event.effect.name === SUBSTITUTE &&
+    event.damage === true &&
+    event.who !== undefined
   )
 }
 

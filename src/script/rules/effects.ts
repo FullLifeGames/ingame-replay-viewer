@@ -1,7 +1,7 @@
 // Rules for the effects on one Pokémon: volatile effects such as Substitute, the effects of a
 // single turn, items and abilities.
 
-import { causeOf, effectOf, flagsOf, refOf } from '../refs'
+import { causeOf, effectOf, flagsOf, refIfAny, refOf } from '../refs'
 import type { Rules } from './index'
 
 export const EFFECT_RULES = {
@@ -36,15 +36,18 @@ export const EFFECT_RULES = {
   '|-activate|': {
     arity: 2,
     reads: ['damage'],
-    build: ({ line, args: [, who, effect], kwArgs, battle }) => [
-      {
-        kind: 'effectActivate',
-        line,
-        who: refOf(battle, who, line),
-        effect: effectOf(effect),
-        ...flagsOf(kwArgs, ['damage']),
-      },
-    ],
+    build: ({ line, args: [, ident, effect], kwArgs, battle }) => {
+      const who = refIfAny(battle, ident, line)
+      return [
+        {
+          kind: 'effectActivate',
+          line,
+          ...(who ? { who } : {}),
+          effect: effectOf(effect),
+          ...flagsOf(kwArgs, ['damage']),
+        },
+      ]
+    },
   },
   '|-singleturn|': {
     arity: 2,

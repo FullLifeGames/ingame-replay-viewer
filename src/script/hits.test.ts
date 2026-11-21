@@ -137,6 +137,16 @@ describe('a modifier that no hit takes', () => {
     ])
   })
 
+  it('folds nothing into a Substitute hit on no Pokémon', () => {
+    const script = scriptOf('|-crit|p2a: Tyranitar', '|-activate||Substitute|[damage]', '|turn|2')
+
+    expect(eventsFrom(script, NEXT)).toEqual([
+      { kind: 'crit', line: NEXT, who: TYRANITAR },
+      { kind: 'effectActivate', line: NEXT + 1, effect: { name: 'Substitute' }, damage: true },
+      { kind: 'turn', line: NEXT + 2, number: 2 },
+    ])
+  })
+
   it('leaves an effect ending that is no Substitute alone', () => {
     const script = scriptOf('|-supereffective|p2a: Tyranitar', '|-end|p2a: Tyranitar|Leech Seed')
 

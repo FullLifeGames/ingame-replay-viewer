@@ -106,6 +106,21 @@ describe('the effect rules of a Pokémon', () => {
     ])
   })
 
+  it('shows Splash, which the parser reads as an effect on no Pokémon', () => {
+    const script = scriptOf('|move|p1a: Dugtrio|Splash|p1a: Dugtrio', '|-nothing')
+
+    expect(eventsAt(script, NEXT + 1)).toEqual([
+      { kind: 'effectActivate', line: NEXT + 1, effect: { name: 'Splash', kind: 'move' } },
+    ])
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
+
+  it('shows an effect with an empty ident on no Pokémon', () => {
+    expect(eventsAt(scriptOf('|-activate||move: Splash'), NEXT)).toEqual([
+      { kind: 'effectActivate', line: NEXT, effect: { name: 'Splash', kind: 'move' } },
+    ])
+  })
+
   it('keeps the cause of an effect that ends', () => {
     const script = scriptOf(
       '|-start|p1a: Dugtrio|move: Leech Seed',

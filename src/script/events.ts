@@ -231,11 +231,14 @@ interface EffectEndEvent extends Caused, Hit {
   readonly silent?: true
 }
 
-/** A Substitute that takes a hit is one (`[damage]`). */
+/**
+ * A Substitute that takes a hit is one (`[damage]`). Splash's `|-nothing` is one on no Pokémon:
+ * the parser reads it as `-activate||move: Splash`, and the game says "But nothing happened!".
+ */
 interface EffectActivateEvent extends Hit {
   readonly kind: 'effectActivate'
   readonly line: number
-  readonly who: PokemonRef
+  readonly who?: PokemonRef
   readonly effect: Effect
   readonly damage?: true
 }
