@@ -1,0 +1,21 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+test-results/
+playwright-report/
+.vite/
+.waves/
+/.claude/*
+!/.claude/agents/
+.DS_Store
+
+# ROM builds and anything that comes from a ROM (ADR 0002)
+/build/
+/.cache/
+*.gba
+*.nds
+*.sav
+*.bps
+*.ss[0-9]
+*.state

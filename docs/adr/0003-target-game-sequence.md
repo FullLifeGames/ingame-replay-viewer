@@ -1,6 +1,7 @@
 # Target games: Gen 3 expansion first, then Gen 5, Gen 9 3D later
 
 The first target game is pokeemerald-expansion (Gen 3, GBA). It's a product of its own, not a stepping stone:
+
 - It already contains later generations' species, moves, mechanics, sprites and animations, so every generation's formats can be rendered without borrowed slots or third-party sprites.
 - GBA emulation runs comfortably in a phone browser.
 - A ROM built from it can start straight into the viewer, with no savestate.

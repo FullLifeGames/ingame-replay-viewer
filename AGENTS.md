@@ -1,0 +1,86 @@
+# AGENTS.md
+
+Rules for agents working on the Ingame Replay Viewer. Claude Code reads this file through `CLAUDE.md`.
+
+- `GLOSSARY.md` names every concept.
+- `docs/adr/` holds the decisions, and `docs/plan.md` holds the other decisions and the roadmap.
+- Every task is a GitHub issue. The milestones are the roadmap steps, and the board "Ingame Replay Viewer" (project 3) carries the wave in hand.
+
+## The project
+
+The viewer plays Pokémon Showdown replays back inside real Pokémon games. A game backend turns each replay into an instruction stream that the target game plays: pokeemerald-expansion first, then Black 2/White 2.
+
+- `src/script/`: battle log to battle script (game-neutral), plain TypeScript.
+- `src/gen3/`: the Gen 3 game backend (battle script to instruction stream), plain TypeScript.
+- `src/web/`: the pages and the emulator.
+- `rom/gen3/`: our C files and the list of changes against the pinned pokeemerald-expansion, plus the build scripts. The upstream checkout and every build output live outside the tracked tree.
+- `test/fixtures/replays/`: the test replays as Showdown's replay JSON. Unit specs sit next to their source as `*.test.ts`.
+- `docs/waves/`: one booking per wave.
+
+## Working with the user
+
+- The user writes in English and often dictates, so a word can arrive misheard. Confirm an odd name or an answer that reads two ways before acting on it.
+- Code, comments, docs, commit messages, issues and pull requests are in English.
+- Gates: numbered questions, a short scene per question, options a/b/c in one or two sentences each, the recommendation marked, answer format "1a 2a 3a".
+- Detail questions do not stop a wave. The integrator decides them by the recommendation and records each in the booking's section "Decided without the user": the scene, the options, the choice and what a reversal costs. A blocker that no recommendation settles goes to the user.
+- Tracked documents and every user-facing string go through the `stop-slop` skill. Exceptions: technical invariants with "never" or "always", and quotes of program output.
+- Commits: English, imperative, no attribution lines (no Co-Authored-By, no "Generated with"). The same holds for issues, pull requests and comments. Write messages with quotes to a file and use `git commit -F <file>`.
+- The repository is public. Pushing wave and lane branches and opening their pull requests is part of this workflow (user, 20.11.2026). A merge into `master` needs the user's okay, and an okay covers the named state only. Deleting branches or files you did not create, and any release or deploy, each need an okay of their own.
+- Never commit a ROM, a savestate, a built ROM, a patch, or anything extracted from a ROM (ADR 0002). The user's dumps live in `~/roms/`.
+
+## Rules for the code
+
+- Species, moves, abilities, items and rules come from the @pkmn libraries (`@pkmn/protocol`, `@pkmn/client`, `@pkmn/dex`, `@pkmn/data`). Our code reads library data and never lists names by hand. A mapping to a target game's own numbers is generated from that game's pinned sources and checked by a spec.
+- `src/script/` and `src/gen3/` import no DOM, no browser API and no emulator; the import zones in `eslint.config.js` hold it.
+- No silent drops: every battle log line becomes events or a dropped line, and an unknown line fails the specs.
+- Formats that cross into the game carry a version: the instruction stream starts with one, and the ROM interpreter refuses a version it does not know.
+- One rule lives in one module; every other place imports it.
+- Ceilings for TypeScript: 300 lines per file, 60 per function, complexity 10, depth 3, 4 parameters. Split a file instead of exempting it. Specs keep the file ceiling and drop the function ceiling.
+- C code in `rom/gen3/` follows the expansion's own style. Changes to upstream files stay as few and small as the work allows; new behaviour goes into our own files.
+- Dependencies track their latest registry versions. Exception: TypeScript stays on 6.0 until typescript-eslint admits 7.x. A package joins `package.json` with the first code that uses it, because knip rejects unused ones.
+
+## Checks before commit and push
+
+- `npm run check` runs lint, `tsc -b`, the Prettier check, knip and the unit specs with coverage. Run it before every push; CI runs the same.
+- Coverage of `src/script/` and `src/gen3/` stays at 90 % of lines and branches or more.
+- Test first: a red test that fails for the right reason, then the code.
+- lefthook runs Prettier and ESLint on staged files before each commit.
+- devbox: one heavy check at a time (the full suite, a ROM build, the expansion's `make check`, e2e, a dev server for a tester). Vitest runs with at most 4 workers. Long runs go to the background. Another session may share the machine: read `free -g` before a heavy run.
+
+## Change classes
+
+Every change gets a class before work starts: the integrator proposes it, and the user can move it.
+
+| Class      | What it is                                             | Process                                                             |
+| ---------- | ------------------------------------------------------ | ------------------------------------------------------------------- |
+| Small fix  | A bug or small task with a known cause and a local fix | Red test, fix, green; collected in a batch wave                     |
+| Larger bug | The cause is unclear or spans modules                  | A written diagnosis first, then its issue, then the fix, test first |
+| Feature    | New behaviour for the viewer                           | An issue inside a wave                                              |
+
+## Issues and the board
+
+- Every task is an issue with acceptance criteria. Its labels give its status (`approved`; `parked` with its trigger in the text; `needs triage`), its class (`small fix`, `larger bug`, `feature`) and its area (`area: script`, `area: gen3`, `area: rom`, `area: web`, `area: tooling`, `area: docs`). Its milestone names the roadmap step.
+- The board gives each issue its Status (Approved, In wave, Gate, Done), its Wave and its Lane.
+- A new issue needs the user's approval at a gate. A report from elsewhere stays at `needs triage` until a gate rules on it.
+
+## Waves
+
+- A wave runs as stages with no gate between them. A stage holds at most two lanes side by side; a stage that the rest depends on holds one. Each lane owns one issue or a few, its own branch, worktree and files, and runs planner, builders, reviewer and fixes before it merges.
+- Branches: `wave/NN` from `master`. A stage's lanes branch from it as `wave/NN-s<k>a` and `wave/NN-s<k>b`, in the worktrees `~/code/ingame-replay-viewer-wa` and `-wb`, each with its own `node_modules`.
+- A lane merges into the wave branch after its review. Each stage reaches `master` through a pull request of the wave branch that closes the stage's issues (`Closes #N`); CI runs on it.
+- The integrator queues heavy checks and runs one at a time.
+- A wave ends with one gate: a table over its stages and lanes, the decisions taken without the user, and, once there is a page, a preview link on devbox over Tailscale (`tailscale ip -4`).
+- Booking: `docs/waves/wave-NN.md` (goal, delivered, evidence, decided without the user, gate, rests). Documentation moves with the change in the same pull request.
+- Rests become issue proposals at the gate; only approved ones become issues.
+
+## Agents
+
+- Roles in `.claude/agents/`:
+  - `wave-planner`: plans a step that needs judgment; no commit.
+  - `wave-builder`: builds one step, test first.
+  - `wave-reviewer`: checks claims against the code.
+  - `wave-scout`: finds and counts.
+  - `wave-tester`: tries a page in a real browser.
+- One fresh agent per step. It starts from the wave's brief, the lane's plan and ledger, and `git log`, and writes its step into the ledger before it stops.
+- Briefs, plans and ledgers live in `.waves/NN/`, which is gitignored; the booking in `docs/waves/` keeps what lasts.
+- Never sleep or poll for a result; a background task or a monitor reports the end.

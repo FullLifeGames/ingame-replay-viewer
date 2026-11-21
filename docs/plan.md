@@ -25,6 +25,7 @@ Decisions from the design session on 2026-11-20 that are not ADRs, plus the road
   - anything else becomes a text line
 
   Every fallback is listed next to the dropped lines.
+
 - **Test replays**: real public replays saved as JSON in the repo, picked by hand or through Showdown's replay search, never from the MatchChecker crawl data. Each gets a snapshot test of its battle script and a check that every line is either shown or dropped.
 - **Gen 3 emulator**: `@thenick775/mgba-wasm` in the browser, unchanged. Native headless mGBA (`mgba-rom-test`, which the expansion's `make check` already uses) for tests on devbox. Milestone 1b decides whether a WebAssembly build of the expansion replaces the emulator before going public. Gen 5 stays on an emulator either way, because BW2 draws its battles with the DS's 3D chip and runs its sound on a second processor.
 - **Testing inside the ROM**: the expansion's own headless test runner (`make check`) feeds instruction streams to the ROM interpreter and checks what was shown. A few headless-emulator screenshot checks cover the whole pipeline. These are heavy checks on devbox and run one at a time.
@@ -52,6 +53,7 @@ Decisions from the design session on 2026-11-20 that are not ADRs, plus the road
    - If it works, milestone 2 ships the WebAssembly build. Nintendo's assets then come from the user's ROM (ADR 0002 amended), and the page hands the instruction stream to the game directly instead of through the replay slot (ADR 0008 replaced).
    - If it doesn't, milestone 2 ships the emulator plus a patch.
    - Reference only: tripplyons/pokeemerald-wasm (vanilla, no license file).
+
 2. **Gen 3 web tool v1.** Public on fulllifegames.com/Tools/, with replay URL and upload, the v1 controls and presentation, and Gen 1–3 singles formats.
    - Open: how it is deployed to vserver, including the COOP/COEP headers the emulator needs.
 3. **Newer formats on Gen 3.** Gen 4–9 singles, including Tera, Mega Evolution, Z-Moves and Dynamax.
