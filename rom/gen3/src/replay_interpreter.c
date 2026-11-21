@@ -53,15 +53,21 @@ static EWRAM_DATA struct ReplayState sReplay = {0};
 // Replay_Validate refuses it.
 static const ReplayOpFunc sOps[] =
 {
-    [REPLAY_OP_END]      = Op_End,
-    [REPLAY_OP_TURN]     = Op_Turn,
-    [REPLAY_OP_PRINT]    = Op_Print,
-    [REPLAY_OP_INTRO]    = Op_Intro,
-    [REPLAY_OP_SEND_OUT] = Op_SendOut,
-    [REPLAY_OP_MOVE]     = Replay_OpMove,
-    [REPLAY_OP_HIT]      = Replay_OpHit,
-    [REPLAY_OP_HP]       = Replay_OpHp,
-    [REPLAY_OP_FAINT]    = Replay_OpFaint,
+    [REPLAY_OP_END]       = Op_End,
+    [REPLAY_OP_TURN]      = Op_Turn,
+    [REPLAY_OP_PRINT]     = Op_Print,
+    [REPLAY_OP_INTRO]     = Op_Intro,
+    [REPLAY_OP_SEND_OUT]  = Op_SendOut,
+    [REPLAY_OP_MOVE]      = Replay_OpMove,
+    [REPLAY_OP_HIT]       = Replay_OpHit,
+    [REPLAY_OP_HP]        = Replay_OpHp,
+    [REPLAY_OP_FAINT]     = Replay_OpFaint,
+    [REPLAY_OP_WITHDRAW]  = Replay_OpWithdraw,
+    [REPLAY_OP_SWITCH_IN] = Replay_OpSwitchIn,
+    [REPLAY_OP_STATUS]    = Replay_OpStatus,
+    [REPLAY_OP_STAT]      = Replay_OpStat,
+    [REPLAY_OP_ANIM]      = Replay_OpAnim,
+    [REPLAY_OP_ITEM]      = Replay_OpItem,
 };
 
 // The battle outcome of each REPLAY_OUTCOME_*. A tie and an unknown end are draws.
@@ -206,9 +212,13 @@ void Replay_Wait(u32 frames)
     sReplay.wait = frames;
 }
 
-// A mon takes the field: its party slot gets the stream's HP, at most its max HP, and status, and
-// the battler's battle mon is made from it, as the engine does when a mon enters.
-static void PutMonOnField(u32 battler, u32 slot, u32 hp, u32 status)
+u32 Replay_GetStatus1(u32 status)
+{
+    return sStatus1[status];
+}
+
+// As the engine does when a mon enters: the battle mon is a copy of the party mon.
+void Replay_PutMonOnField(u32 battler, u32 slot, u32 hp, u32 status)
 {
     struct Pokemon *mon = &GetBattlerParty(battler)[slot];
     u32 status1 = sStatus1[status];
@@ -267,7 +277,7 @@ static bool32 Op_SendOut(const volatile u8 *operands, u32 step)
 
     if (step != 0)
         return TRUE;
-    PutMonOnField(battler, operands[1], Replay_ReadU16(operands + 2), operands[4]);
+    Replay_PutMonOnField(battler, operands[1], Replay_ReadU16(operands + 2), operands[4]);
     BtlController_EmitIntroTrainerBallThrow(battler, B_COMM_TO_CONTROLLER);
     MarkBattlerForControllerExec(battler);
     return FALSE;

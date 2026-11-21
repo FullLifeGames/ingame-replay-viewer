@@ -166,6 +166,42 @@ void ReplayStream_Faint(u32 side)
     ReplayStream_Op(REPLAY_OP_FAINT, REPLAY_OP_FAINT_SIZE, operands);
 }
 
+void ReplayStream_Withdraw(u32 side)
+{
+    const u8 operands[REPLAY_OP_WITHDRAW_SIZE] = { side };
+    ReplayStream_Op(REPLAY_OP_WITHDRAW, REPLAY_OP_WITHDRAW_SIZE, operands);
+}
+
+void ReplayStream_SwitchIn(u32 side, u32 slot, u32 hp, u32 status)
+{
+    const u8 operands[REPLAY_OP_SWITCH_IN_SIZE] = { side, slot, hp, hp >> 8, status };
+    ReplayStream_Op(REPLAY_OP_SWITCH_IN, REPLAY_OP_SWITCH_IN_SIZE, operands);
+}
+
+void ReplayStream_Status(u32 side, u32 slot, u32 status)
+{
+    const u8 operands[REPLAY_OP_STATUS_SIZE] = { side, slot, status };
+    ReplayStream_Op(REPLAY_OP_STATUS, REPLAY_OP_STATUS_SIZE, operands);
+}
+
+void ReplayStream_Stat(u32 side, u32 stat, s32 stages, u32 arrows)
+{
+    const u8 operands[REPLAY_OP_STAT_SIZE] = { side, stat, (u8)stages, arrows };
+    ReplayStream_Op(REPLAY_OP_STAT, REPLAY_OP_STAT_SIZE, operands);
+}
+
+void ReplayStream_Anim(u32 side, u32 anim)
+{
+    const u8 operands[REPLAY_OP_ANIM_SIZE] = { side, anim };
+    ReplayStream_Op(REPLAY_OP_ANIM, REPLAY_OP_ANIM_SIZE, operands);
+}
+
+void ReplayStream_Item(u32 side, u32 slot, u32 item)
+{
+    const u8 operands[REPLAY_OP_ITEM_SIZE] = { side, slot, item, item >> 8 };
+    ReplayStream_Op(REPLAY_OP_ITEM, REPLAY_OP_ITEM_SIZE, operands);
+}
+
 const u8 *ReplayStream_Data(void)
 {
     return sStream;

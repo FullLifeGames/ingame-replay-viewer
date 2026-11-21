@@ -58,6 +58,13 @@ void ReplayStream_Move(u32 userSide, u32 targetSide, u32 move);
 void ReplayStream_Hit(u32 side, u32 effectiveness);
 void ReplayStream_Hp(u32 side, u32 hp);
 void ReplayStream_Faint(u32 side);
+void ReplayStream_Withdraw(u32 side);
+void ReplayStream_SwitchIn(u32 side, u32 slot, u32 hp, u32 status);
+void ReplayStream_Status(u32 side, u32 slot, u32 status);
+// stages is the change, as Showdown's -boost and -unboost give it.
+void ReplayStream_Stat(u32 side, u32 stat, s32 stages, u32 arrows);
+void ReplayStream_Anim(u32 side, u32 anim);
+void ReplayStream_Item(u32 side, u32 slot, u32 item);
 // Any op with any size byte, for streams the interpreter must refuse.
 void ReplayStream_Op(u32 op, u32 size, const u8 *operands);
 // Overwrites stream bytes, for streams the interpreter must refuse.

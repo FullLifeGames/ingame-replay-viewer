@@ -25,7 +25,7 @@ The build deletes files only inside `.cache/rom/` and `build/rom/`. A script tha
 
 ## Testing the ROM interpreter
 
-The ROM interpreter (`src/replay_interpreter.c`, `src/replay_setup.c`) plays an instruction stream (`include/replay_stream.h`) in a recorded link battle. Patch 0001 hands it the battle main loop. MOVE, HIT, HP and FAINT live in `src/replay_ops_damage.c`, which shares `include/replay_ops.h` with the main loop. `src/replay_stream.c` reads the stream and checks all of it before a battle starts. The tests sit in `test/replay_*.c` and use `include/test/replay_test.h`:
+The ROM interpreter (`src/replay_interpreter.c`, `src/replay_setup.c`) plays an instruction stream (`include/replay_stream.h`) in a recorded link battle. Patch 0001 hands it the battle main loop. MOVE, HIT, HP and FAINT live in `src/replay_ops_damage.c`, WITHDRAW and SWITCH_IN in `src/replay_ops_switch.c`, STATUS, STAT and ITEM in `src/replay_ops_state.c`, and ANIM with its table of the game's animations in `src/replay_anims.c`. They share `include/replay_ops.h` with the main loop. `src/replay_stream.c` reads the stream and checks all of it before a battle starts. The tests sit in `test/replay_*.c` and use `include/test/replay_test.h`:
 
 - `REPLAY_TEST(name)` writes a stream in its `STREAM` block with the `ReplayStream_*` writer (`test/replay_stream_writer.c`), queues the events it expects in `SCENE` with upstream's matchers (`MESSAGE`, `HP_BAR`, `ANIMATION` and the rest), and checks the battle in `THEN`, after END and before the battle is left, so the parties, `gBattleStruct` and the sprites are still there.
 - A plain `TEST` whose name starts with `Replay:` checks a refusal with `Replay_Validate`, without a battle.
