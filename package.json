@@ -17,6 +17,7 @@
     "knip": "knip",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
     "check": "npm run lint && npm run typecheck && npm run format:check && npm run knip && npm run test:coverage",
     "prepare": "lefthook install",
     "rom:build": "node scripts/rom-build.ts",
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.1",
     "@types/emscripten": "^1.41.6",
     "@types/node": "^26.6.6",
     "@vitest/coverage-v8": "^5.1.1",
