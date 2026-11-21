@@ -5,7 +5,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { expect, type Page, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 import { builtSeriesProblems } from '../scripts/build-series.ts'
 import { loadBuildConfig, ROM_DIR } from '../scripts/rom-config.ts'
@@ -14,8 +14,11 @@ import { buildPaths, REPO_DIR } from '../scripts/rom-paths.ts'
 import { readPreflightInput } from '../scripts/rom-preflight.ts'
 import { readSeries } from '../scripts/rom-upstream.ts'
 import { differ, frame } from './frames.ts'
+import { notShownCount } from './page-text.ts'
+import { guardRequests } from './requests.ts'
 
 const FIRST = 'smogtours-gen3ou-994052'
+const SECOND = 'smogtours-gen3ou-994086'
 const BASE_SHA1 = loadBuildConfig().baseRom.sha1
 const DUMP = readPreflightInput(process.env, BASE_SHA1).baseRomPath
 const PATCH = join(buildPaths().outDir, OUTPUT_NAMES.patch)
@@ -36,11 +39,6 @@ function snapshotLength(): number {
   const snapshot = join(REPO_DIR, 'src', 'gen3', '__snapshots__', `${FIRST}.jsonl`)
   const [head = ''] = readFileSync(snapshot, 'utf8').split('\n', 1)
   return (JSON.parse(head) as { length: number }).length
-}
-
-const notShownCount = async (page: Page): Promise<number> => {
-  const heading = await page.getByRole('heading', { name: /^Not shown in the game/ }).innerText()
-  return Number(/\((\d+)\)/.exec(heading)?.[1] ?? Number.NaN)
 }
 
 test('the page is cross-origin isolated and offers 994052 first', async ({ page }) => {
@@ -83,7 +81,7 @@ test('a file that is not US Emerald is refused before the patch is fetched', asy
   expect(romRequests).toEqual([])
 })
 
-test('994052 starts in the emulator', async ({ page }) => {
+test('994052 starts in the emulator, and a second Start runs 994086', async ({ page, baseURL }) => {
   const missing = [
     existsSync(DUMP) ? undefined : `no US Emerald dump at ${DUMP}; set IRV_BASE_ROM to it`,
     existsSync(PATCH) ? undefined : `no ${PATCH}; run npm run rom:build`,
@@ -96,6 +94,7 @@ test('994052 starts in the emulator', async ({ page }) => {
   const streamBytes = snapshotLength()
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
+  const notSameOriginGets = await guardRequests(page, baseURL)
 
   await page.goto('/')
   const status = page.getByRole('status')
@@ -124,6 +123,20 @@ test('994052 starts in the emulator', async ({ page }) => {
     await expect.poll(async () => differ(later, await frame(page)), { timeout: 30_000 }).toBe(true)
   })
 
+  // A new image for the same emulator: quitGame, the old file removed, loadGame again.
+  await test.step('a second Start runs another test replay', async () => {
+    const before = await frame(page)
+    await page.getByLabel('Test replay').selectOption(SECOND)
+    await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${SECOND}: `))
+    await page.getByRole('button', { name: 'Start', exact: true }).click()
+    await expect(status).toHaveText(new RegExp(`^Running ${SECOND}: `), { timeout: 60_000 })
+    await expect.poll(async () => differ(before, await frame(page)), { timeout: 30_000 }).toBe(true)
+    await expect
+      .poll(async () => (await frame(page)).colours, { timeout: 30_000 })
+      .toBeGreaterThan(1)
+  })
+
   expect(await page.evaluate('indexedDB.databases().then((found) => found.length)')).toBe(0)
   expect(errors).toEqual([])
+  expect(notSameOriginGets).toEqual([])
 })
