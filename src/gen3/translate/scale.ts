@@ -12,6 +12,5 @@ export const HP_SCALE = 100
 export function scaleHp({ hp, max }: HpFraction): number {
   if (hp <= 0) return 0
   if (hp >= max) return HP_SCALE
-  if (max === HP_SCALE) return hp
   return Math.min(HP_SCALE - 1, Math.max(1, Math.round((hp * HP_SCALE) / max)))
 }

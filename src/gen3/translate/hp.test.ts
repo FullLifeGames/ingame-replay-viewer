@@ -27,6 +27,11 @@ describe('scaleHp (D5)', () => {
     expect(scaleHp({ hp: 364, max: 364 })).toBe(100)
   })
 
+  it('rounds a fractional HP out of 100 to a whole number (#41)', () => {
+    expect(scaleHp({ hp: 0.5, max: 100 })).toBe(1)
+    expect(scaleHp({ hp: 33.3, max: 100 })).toBe(33)
+  })
+
   it('gives a whole number from 0 to 100 for every maximum up to 999', () => {
     for (let max = 1; max <= 999; max++) {
       for (const value of [0, 1, max - 1, max]) {
