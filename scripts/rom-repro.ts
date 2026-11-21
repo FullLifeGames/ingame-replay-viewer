@@ -3,14 +3,15 @@
 // again when the run ends, pass or fail; both builds' outputs stay in build/rom/ for a look.
 // A heavy check on devbox: about two full builds, alone and in the background (AGENTS.md).
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 
-import { buildPaths, buildRom } from './rom-build.ts'
-import type { BuildPaths } from './rom-build.ts'
+import { buildRom } from './rom-build.ts'
 import { loadBuildConfig } from './rom-config.ts'
 import type { BuildConfig } from './rom-config.ts'
 import { OUTPUT_NAMES } from './rom-outputs.ts'
+import { buildPaths, checkRemovable, removeInside } from './rom-paths.ts'
+import type { BuildPaths } from './rom-paths.ts'
 import { GBA_ROM_BASE } from './rom-slot.ts'
 import { git } from './rom-upstream.ts'
 
@@ -41,6 +42,7 @@ const sha1 = (bytes: Uint8Array) => createHash('sha1').update(bytes).digest('hex
 export function reproPaths(paths: BuildPaths): BuildPaths {
   const cacheDir = join(dirname(paths.tree), 'repro')
   return {
+    roots: paths.roots,
     outDir: join(paths.outDir, 'repro'),
     tree: join(cacheDir, 'expansion'),
     stampPath: join(cacheDir, 'applied.json'),
@@ -120,20 +122,24 @@ export function compareOutputs(dirA: string, dirB: string): ReproComparison {
   return result
 }
 
-// A worktree holds a .git file; anything else at the path is a leftover folder.
-export function removeWorktree(repo: string, path: string): void {
+// B's worktree of A's tree. A worktree holds a .git file; anything else at the path is a leftover
+// folder. The guard decides before git or rm touch it.
+export function removeWorktree(a: BuildPaths): void {
+  const path = reproPaths(a).tree
+  checkRemovable(a.roots, path)
   const dotGit = join(path, '.git')
   if (existsSync(dotGit) && statSync(dotGit).isFile()) {
-    git(repo, ['worktree', 'remove', '--force', '--force', path])
+    git(a.tree, ['worktree', 'remove', '--force', '--force', path])
   }
-  rmSync(path, { recursive: true, force: true })
-  git(repo, ['worktree', 'prune'])
+  removeInside(a.roots, path)
+  git(a.tree, ['worktree', 'prune'])
 }
 
-export function addWorktree(repo: string, path: string, commit: string): void {
-  removeWorktree(repo, path)
+export function addWorktree(a: BuildPaths, commit: string): void {
+  const path = reproPaths(a).tree
+  removeWorktree(a)
   mkdirSync(dirname(path), { recursive: true })
-  git(repo, ['worktree', 'add', '--quiet', '--detach', path, commit])
+  git(a.tree, ['worktree', 'add', '--quiet', '--detach', path, commit])
 }
 
 const say = (line: string) => process.stdout.write(`rom:repro: ${line}\n`)
@@ -158,16 +164,16 @@ function timedBuild(paths: BuildPaths, config: BuildConfig, seconds: Record<stri
 
 function repro(): ReproComparison {
   const config = loadBuildConfig()
-  const a = buildPaths(process.env)
+  const a = buildPaths()
   const b = reproPaths(a)
   const seconds: Record<string, number> = {}
   timedBuild(a, config, seconds)
   try {
-    addWorktree(a.tree, b.tree, config.upstream.commit)
+    addWorktree(a, config.upstream.commit)
     timedBuild(b, config, seconds)
   } finally {
-    removeWorktree(a.tree, b.tree)
-    rmSync(dirname(b.tree), { recursive: true, force: true })
+    removeWorktree(a)
+    removeInside(a.roots, dirname(b.tree))
     say(`removed the worktree ${b.tree}`)
   }
   const result = compareOutputs(a.outDir, b.outDir)

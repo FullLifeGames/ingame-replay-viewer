@@ -1,11 +1,13 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { OUTPUT_NAMES } from './rom-outputs.ts'
+import { buildPaths } from './rom-paths.ts'
+import type { BuildPaths } from './rom-paths.ts'
 import {
   addWorktree,
   compareOutputs,
@@ -44,15 +46,18 @@ const MAP = [
 
 describe('the paths of the second build', () => {
   it('puts the fresh worktree, its stamp and its outputs beside the first build', () => {
+    const roots = { cache: '/repo/.cache/rom', out: '/repo/build/rom' }
     const paths = {
+      roots,
       outDir: '/repo/build/rom',
-      tree: '/cache/rom/expansion',
-      stampPath: '/cache/rom/applied.json',
+      tree: '/repo/.cache/rom/expansion',
+      stampPath: '/repo/.cache/rom/applied.json',
     }
     expect(reproPaths(paths)).toEqual({
+      roots,
       outDir: '/repo/build/rom/repro',
-      tree: '/cache/rom/repro/expansion',
-      stampPath: '/cache/rom/repro/applied.json',
+      tree: '/repo/.cache/rom/repro/expansion',
+      stampPath: '/repo/.cache/rom/repro/applied.json',
     })
   })
 })
@@ -159,48 +164,65 @@ describe('the comparison of two builds', () => {
   })
 })
 
+// A folder laid out like the repo with A's tree at .cache/rom/expansion, one commit in it.
+function layout(): { paths: BuildPaths; commit: string } {
+  const repo = join(mkdtempSync(join(scratch, 'case-')), 'repo')
+  mkdirSync(repo)
+  const paths = buildPaths(repo)
+  mkdirSync(paths.tree, { recursive: true })
+  sh(paths.tree, 'init', '-q', '-b', 'master')
+  writeFileSync(join(paths.tree, 'main.c'), 'int main(void) { return 0; }\n')
+  sh(paths.tree, 'add', '-A')
+  sh(paths.tree, 'commit', '-q', '-m', 'one')
+  return { paths, commit: sh(paths.tree, 'rev-parse', 'HEAD').trim() }
+}
+
+const listed = (repo: string) => sh(repo, 'worktree', 'list', '--porcelain')
+
 describe('the fresh worktree', () => {
-  let repo: string
+  let paths: BuildPaths
   let commit: string
+  let path: string
 
   beforeEach(() => {
-    repo = mkdtempSync(join(scratch, 'repo-'))
-    sh(repo, 'init', '-q', '-b', 'master')
-    writeFileSync(join(repo, 'main.c'), 'int main(void) { return 0; }\n')
-    sh(repo, 'add', '-A')
-    sh(repo, 'commit', '-q', '-m', 'one')
-    commit = sh(repo, 'rev-parse', 'HEAD').trim()
+    ;({ paths, commit } = layout())
+    path = reproPaths(paths).tree
   })
 
-  const listed = () => sh(repo, 'worktree', 'list', '--porcelain')
-
   it('checks the commit out detached at another path and removes it again', () => {
-    const path = join(scratch, `wt-${String(Date.now())}`, 'expansion')
-    addWorktree(repo, path, commit)
+    addWorktree(paths, commit)
     expect(sh(path, 'rev-parse', 'HEAD').trim()).toBe(commit)
     expect(sh(path, 'rev-parse', '--abbrev-ref', 'HEAD').trim()).toBe('HEAD')
-    expect(listed()).toContain(path)
+    expect(listed(paths.tree)).toContain(path)
     writeFileSync(join(path, 'main.o'), 'built\n')
-    removeWorktree(repo, path)
+    removeWorktree(paths)
     expect(existsSync(path)).toBe(false)
-    expect(listed()).not.toContain(path)
+    expect(listed(paths.tree)).not.toContain(path)
   })
 
   it('replaces a worktree that an earlier run left behind', () => {
-    const path = join(scratch, `stale-${String(Date.now())}`, 'expansion')
-    addWorktree(repo, path, commit)
+    addWorktree(paths, commit)
     writeFileSync(join(path, 'main.c'), 'stale\n')
-    addWorktree(repo, path, commit)
+    addWorktree(paths, commit)
     expect(sh(path, 'status', '--porcelain')).toBe('')
-    removeWorktree(repo, path)
+    removeWorktree(paths)
   })
 
-  it('replaces a leftover folder that git no longer knows', () => {
-    const path = join(scratch, `left-${String(Date.now())}`, 'expansion')
+  it('replaces a leftover folder inside .cache/rom that git no longer knows', () => {
     mkdirSync(path, { recursive: true })
     writeFileSync(join(path, 'junk'), 'x\n')
-    addWorktree(repo, path, commit)
+    addWorktree(paths, commit)
     expect(existsSync(join(path, 'junk'))).toBe(false)
-    removeWorktree(repo, path)
+    removeWorktree(paths)
+  })
+
+  it('refuses a worktree path outside .cache/rom and leaves it', () => {
+    const outside = join(dirname(dirname(paths.roots.cache)), '..', 'outside')
+    mkdirSync(join(outside, 'repro', 'expansion'), { recursive: true })
+    writeFileSync(join(outside, 'repro', 'expansion', 'keep.txt'), 'keep\n')
+    expect(() => {
+      removeWorktree({ ...paths, tree: join(outside, 'expansion') })
+    }).toThrow(/may not delete/)
+    expect(existsSync(join(outside, 'repro', 'expansion', 'keep.txt'))).toBe(true)
   })
 })

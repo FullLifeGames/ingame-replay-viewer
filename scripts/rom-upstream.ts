@@ -10,17 +10,19 @@ import {
   readdirSync,
   readFileSync,
   realpathSync,
-  rmSync,
   writeFileSync,
 } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 
 import type { UpstreamPin } from './rom-config.ts'
+import { removeInside } from './rom-paths.ts'
+import type { RomRoots } from './rom-paths.ts'
 
 export interface TreeOptions {
   tree: string
   romDir: string
   pin: UpstreamPin
+  roots: RomRoots
   stampPath: string
   clean?: boolean
 }
@@ -169,14 +171,14 @@ function copyOurFiles(tree: string, romDir: string): string[] {
 // Reset, clean, patches, stamp, copy. Cleaning without -x drops the last run's copies and keeps the
 // ignored build products; `clean` adds -x, which equals a fresh checkout.
 export function prepareTree(options: TreeOptions): TreeResult {
-  const { tree, romDir, pin, stampPath, clean = false } = options
+  const { tree, romDir, pin, roots, stampPath, clean = false } = options
   checkPin(tree, pin)
   const { seriesText, patches } = loadPatches(romDir)
   const patchSet = patchSetHash(seriesText, patches)
   const stamp = readStamp(stampPath)
   const applied = clean || stamp?.patchSet !== patchSet || stamp.diff !== diffHash(tree)
   if (applied) {
-    rmSync(stampPath, { force: true })
+    removeInside(roots, stampPath)
     git(tree, ['reset', '--hard', '-q', pin.commit])
   }
   git(tree, ['clean', clean ? '-fdxq' : '-fdq'])

@@ -3,14 +3,15 @@
 // A heavy check on devbox: run it alone and in the background (AGENTS.md).
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 
 import { loadBuildConfig, ROM_DIR } from './rom-config.ts'
 import type { BuildConfig } from './rom-config.ts'
 import { packageVersions, readRomUsage, runMake, toolVersions } from './rom-make.ts'
+import { buildPaths, emptyInside, removeInside } from './rom-paths.ts'
+import type { BuildPaths } from './rom-paths.ts'
 import { makeOutputs, OUTPUT_NAMES, writeOutputs } from './rom-outputs.ts'
 import type { RomOutputs } from './rom-outputs.ts'
 import { APT_PACKAGES, preflightProblems, readPreflightInput } from './rom-preflight.ts'
@@ -18,18 +19,10 @@ import { loadSlotLayout } from './rom-slot.ts'
 import { cleanTree, ensureCheckout, prepareTree } from './rom-upstream.ts'
 import type { TreeResult } from './rom-upstream.ts'
 
-export const REPO_DIR = fileURLToPath(new URL('..', import.meta.url)).replace(/\/$/, '')
-
 export interface BuildArgs {
   clean: boolean
   cleanOnly: boolean
   all: boolean
-}
-
-export interface BuildPaths {
-  outDir: string
-  tree: string
-  stampPath: string
 }
 
 // What upstream's plain `make` writes at the top of the tree (Makefile:29, 99-107).
@@ -54,25 +47,17 @@ export function parseBuildArgs(argv: string[]): BuildArgs {
   return { clean: values.clean, cleanOnly: values['clean-only'], all: values.all }
 }
 
-export function buildPaths(env: NodeJS.ProcessEnv): BuildPaths {
-  const cacheDir = env.IRV_ROM_CACHE ?? join(REPO_DIR, '.cache', 'rom')
-  return {
-    outDir: join(REPO_DIR, 'build', 'rom'),
-    tree: join(cacheDir, 'expansion'),
-    stampPath: join(cacheDir, 'applied.json'),
-  }
-}
-
 const say = (line: string) => process.stdout.write(`rom:build: ${line}\n`)
 
 const sha256File = (path: string) => createHash('sha256').update(readFileSync(path)).digest('hex')
 
-// --all deletes only what the build made in the cache folder, never the folder IRV_ROM_CACHE names.
+// Every delete goes through the guard of rom-paths.ts; --all deletes the tree and the stamp, never
+// the cache folder that holds them.
 function cleanOutputs(paths: BuildPaths, config: BuildConfig, all: boolean): void {
-  rmSync(paths.outDir, { recursive: true, force: true })
-  rmSync(paths.stampPath, { force: true })
+  emptyInside(paths.roots, paths.outDir)
+  removeInside(paths.roots, paths.stampPath)
   if (all) {
-    rmSync(paths.tree, { recursive: true, force: true })
+    removeInside(paths.roots, paths.tree)
     say(`removed ${paths.outDir} and ${paths.tree}`)
     return
   }
@@ -154,16 +139,16 @@ export function buildRom(paths: BuildPaths, config: BuildConfig, clean: boolean)
   const input = readPreflightInput(process.env, config.baseRom.sha1)
   const problems = preflightProblems(input)
   if (problems.length > 0) throw new Error(problems.join('\n'))
-  rmSync(paths.outDir, { recursive: true, force: true })
+  emptyInside(paths.roots, paths.outDir)
   mkdirSync(paths.outDir, { recursive: true })
   const seconds: Record<string, number> = {}
   const makeLog = join(paths.outDir, OUTPUT_NAMES.makeLog)
   timed(seconds, 'checkout', () => {
     ensureCheckout(paths.tree, config.upstream)
   })
-  const options = { tree: paths.tree, romDir: ROM_DIR, pin: config.upstream, clean }
+  const options = { tree: paths.tree, romDir: ROM_DIR, pin: config.upstream, roots: paths.roots }
   const tree = timed(seconds, 'prepare', () =>
-    prepareTree({ ...options, stampPath: paths.stampPath }),
+    prepareTree({ ...options, stampPath: paths.stampPath, clean }),
   )
   timed(seconds, 'make', () => {
     runMake({ tree: paths.tree, jobs: config.make.jobs, logPath: makeLog, env: process.env })
@@ -179,7 +164,7 @@ export function buildRom(paths: BuildPaths, config: BuildConfig, clean: boolean)
 function main(): void {
   try {
     const args = parseBuildArgs(process.argv.slice(2))
-    const paths = buildPaths(process.env)
+    const paths = buildPaths()
     const config = loadBuildConfig()
     if (args.cleanOnly) cleanOutputs(paths, config, args.all)
     else buildRom(paths, config, args.clean)

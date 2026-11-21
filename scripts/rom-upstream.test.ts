@@ -16,6 +16,7 @@ import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { ROM_DIR } from './rom-config.ts'
 import type { UpstreamPin } from './rom-config.ts'
+import { romRoots } from './rom-paths.ts'
 import { cleanTree, ensureCheckout, prepareTree, readSeries } from './rom-upstream.ts'
 import type { TreeOptions } from './rom-upstream.ts'
 
@@ -23,6 +24,11 @@ const scratch = mkdtempSync(join(tmpdir(), 'irv-upstream-'))
 afterAll(() => {
   rmSync(scratch, { recursive: true, force: true })
 })
+
+// The stamps sit in a folder laid out like the repo's .cache/rom, where the delete guard lets
+// prepareTree replace them.
+mkdirSync(join(scratch, 'repo', '.cache', 'rom'), { recursive: true })
+const roots = romRoots(join(scratch, 'repo'))
 
 const sh = (dir: string, ...args: string[]) =>
   execFileSync('git', ['-C', dir, '-c', 'user.name=t', '-c', 'user.email=t@t', ...args], {
@@ -74,7 +80,8 @@ const options = (changes: Partial<TreeOptions> = {}): TreeOptions => ({
   tree: upstream,
   romDir: rom,
   pin,
-  stampPath: join(scratch, `${String(Date.now())}-${String(Math.random())}.json`),
+  roots,
+  stampPath: join(roots.cache, `${String(Date.now())}-${String(Math.random())}.json`),
   ...changes,
 })
 
@@ -183,7 +190,7 @@ describe('prepareTree', () => {
 
   it('removes a stale copy on the next run but keeps the build products', () => {
     write(join(rom, 'src/replay_old.c'), '// old\n')
-    const stampPath = join(scratch, 'stale.json')
+    const stampPath = join(roots.cache, 'stale.json')
     prepareTree(options({ stampPath }))
     write(join(upstream, 'src/a.o'), 'object')
     rmSync(join(rom, 'src/replay_old.c'))
@@ -194,7 +201,7 @@ describe('prepareTree', () => {
 
   it('skips the reset and the patches when the stamp matches', () => {
     writeTwoPatches()
-    const stampPath = join(scratch, 'skip.json')
+    const stampPath = join(roots.cache, 'skip.json')
     expect(prepareTree(options({ stampPath })).applied).toBe(true)
     utimesSync(join(upstream, 'src/main.c'), PAST, PAST)
     expect(prepareTree(options({ stampPath })).applied).toBe(false)
@@ -203,7 +210,7 @@ describe('prepareTree', () => {
 
   it('resets a hand edit in the tree and applies again', () => {
     writeTwoPatches()
-    const stampPath = join(scratch, 'edit.json')
+    const stampPath = join(roots.cache, 'edit.json')
     prepareTree(options({ stampPath }))
     write(join(upstream, 'include/main.h'), '#define MAIN 2\n')
     expect(prepareTree(options({ stampPath })).applied).toBe(true)
@@ -213,15 +220,24 @@ describe('prepareTree', () => {
 
   it('applies again when a patch changes', () => {
     writeTwoPatches()
-    const stampPath = join(scratch, 'change.json')
+    const stampPath = join(roots.cache, 'change.json')
     prepareTree(options({ stampPath }))
     write(join(rom, 'patches/series'), '0001-one.patch\n')
     expect(prepareTree(options({ stampPath })).applied).toBe(true)
     expect(read('src/main.c')).toBe(MAIN_C.replace('return 0', 'return 1'))
   })
 
+  it('refuses a stamp outside the build folders before it resets anything', () => {
+    const stampPath = join(scratch, 'outside.json')
+    writeFileSync(stampPath, '{}\n')
+    write(join(upstream, 'src/main.c'), 'edited\n')
+    expect(() => prepareTree(options({ stampPath }))).toThrow(/may not delete/)
+    expect(readFileSync(join(upstream, 'src/main.c'), 'utf8')).toBe('edited\n')
+    expect(existsSync(stampPath)).toBe(true)
+  })
+
   it('removes the build products too with clean', () => {
-    const stampPath = join(scratch, 'clean.json')
+    const stampPath = join(roots.cache, 'clean.json')
     prepareTree(options({ stampPath }))
     write(join(upstream, 'src/a.o'), 'object')
     expect(prepareTree(options({ stampPath, clean: true })).applied).toBe(true)
