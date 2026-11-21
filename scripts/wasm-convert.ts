@@ -37,6 +37,7 @@ interface ConvertResult {
   asmBytes: number
   wasmBytes: number
   functions: number
+  effects: number
   undefined: string[]
   assembled: boolean
   stderr: string
@@ -89,6 +90,7 @@ function convertOne(target: ConvertTarget, lookup: SymbolLookup, emcc: string): 
     asmBytes: Buffer.byteLength(converted.text),
     wasmBytes: assembled ? statSync(target.wasm).size : 0,
     functions: converted.functions.length,
+    effects: converted.effects.length,
     undefined: converted.undefined,
     assembled,
     stderr: run.stderr.trim(),
@@ -101,7 +103,14 @@ function convertOrRefuse(target: ConvertTarget, lookup: SymbolLookup, emcc: stri
     return convertOne(target, lookup, emcc)
   } catch (error) {
     const stderr = error instanceof Error ? error.message : String(error)
-    const empty = { elfBytes: 0, asmBytes: 0, wasmBytes: 0, functions: 0, undefined: [] }
+    const empty = {
+      elfBytes: 0,
+      asmBytes: 0,
+      wasmBytes: 0,
+      functions: 0,
+      effects: 0,
+      undefined: [],
+    }
     return { object: target.object, ...empty, assembled: false, stderr }
   }
 }
@@ -120,7 +129,7 @@ function main(): void {
       const result = convertOrRefuse(target, lookup, paths.emcc)
       const state = result.assembled ? 'assembled' : `FAILED\n${result.stderr}`
       say(
-        `${result.object}: ${String(result.elfBytes)} B ELF, ${String(result.asmBytes)} B asm, ${String(result.wasmBytes)} B wasm, ${String(result.functions)} functions, ${String(result.undefined.length)} undefined; ${state}`,
+        `${result.object}: ${String(result.elfBytes)} B ELF, ${String(result.asmBytes)} B asm, ${String(result.wasmBytes)} B wasm, ${String(result.functions)} functions, ${String(result.effects)} effect functions, ${String(result.undefined.length)} undefined; ${state}`,
       )
       return result
     })

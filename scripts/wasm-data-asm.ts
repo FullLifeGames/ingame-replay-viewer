@@ -22,6 +22,7 @@ import {
   globalDefinitions,
 } from './wasm-elf.ts'
 import type { ElfObject, ElfRelocation, ElfSection, ElfSymbol } from './wasm-elf.ts'
+import { EFFECT_ADDEND, effectList } from './wasm-effects.ts'
 import type { WasmLookup } from './wasm-signatures.ts'
 
 export interface SymbolLookup {
@@ -39,6 +40,8 @@ export interface Converted {
   functions: string[]
   // Data targets that no C object and no data object defines.
   undefined: string[]
+  // Functions marked `+ROM_SIZE` as requesting effects (wasm-effects.ts), each once, by name.
+  effects: string[]
 }
 
 const RELOCATIONS: Record<number, { name: string; width: 1 | 2 | 4 }> = {
@@ -77,6 +80,7 @@ interface Context {
   source: string
   functions: Set<string>
   undefined: Set<string>
+  effects: Set<string>
 }
 
 const hex = (value: number) => `0x${value.toString(16)}`
@@ -148,7 +152,8 @@ function reference(ctx: Context, symbol: ElfSymbol, addend: number): string {
   if (symbol.section === SHN_COMMON) throw new Error(`${ctx.source}: common symbol ${symbol.name}`)
   if (symbol.section !== SHN_UNDEF) return plus(symbol.name, addend)
   if (ctx.lookup.functions.has(symbol.name)) {
-    if (addend !== 0) {
+    if (addend === EFFECT_ADDEND) ctx.effects.add(symbol.name)
+    else if (addend !== 0) {
       throw new Error(`${ctx.source}: function ${plus(symbol.name, addend)} has an addend`)
     }
     ctx.functions.add(symbol.name)
@@ -267,12 +272,17 @@ function emitSection(ctx: Context, section: ElfSection): string[] {
 }
 
 export function convertElf(elf: ElfObject, lookup: SymbolLookup, source: string): Converted {
-  const ctx: Context = { elf, lookup, source, functions: new Set(), undefined: new Set() }
+  const ctx: Context = {
+    ...{ elf, lookup, source },
+    ...{ functions: new Set(), undefined: new Set(), effects: new Set() },
+  }
   const body = dataSections(ctx).flatMap((section) => emitSection(ctx, section))
+  const effects = [...ctx.effects].sort()
   const functions = [...ctx.functions].sort()
   const declarations = functions.map(
     (name) => `\t.functype\t${name} ${lookup.functions.get(name) ?? ''}`,
   )
-  const text = [`# ${source}, converted by scripts/wasm-data-asm.ts`, ...declarations, ...body, '']
-  return { text: text.join('\n'), functions, undefined: [...ctx.undefined].sort() }
+  const heading = `# ${source}, converted by scripts/wasm-data-asm.ts`
+  const text = [heading, ...declarations, ...body, ...effectList(effects), '']
+  return { text: text.join('\n'), functions, undefined: [...ctx.undefined].sort(), effects }
 }

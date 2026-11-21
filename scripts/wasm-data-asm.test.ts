@@ -17,6 +17,8 @@ const lines = (text: string) => text.split('\n').map((line) => line.trim().repla
 
 const bytes = (count: number) => Array.from({ length: count }, (_, i) => i + 1)
 
+const le32 = (value: number) => new Uint8Array(new Uint32Array([value]).buffer)
+
 describe('the data converter', () => {
   it('gives two global symbols two labels, each with its .size', () => {
     const { text } = convert({
@@ -166,6 +168,59 @@ describe('the data converter refuses what it cannot write', () => {
       relocations: [{ section: 'script_data', offset: 0, type: R_ARM_ABS32, symbol: 'BS_Foo' }],
     }
     expect(() => convert(fixture, lookup)).toThrow(/BS_Foo\+1/)
+  })
+
+  // asm/macros/event.inc writes `func + ROM_SIZE` for a command or native that requests effects.
+  const flagged = (addends: number[]) => ({
+    sections: [{ name: 'script_data', bytes: addends.flatMap((a) => [...le32(a)]) }],
+    symbols: [
+      { name: 'ScrCmd_B', section: 'UND' },
+      { name: 'ScrCmd_A', section: 'UND' },
+    ],
+    relocations: addends.map((_, i) => ({
+      section: 'script_data',
+      offset: i * 4,
+      type: R_ARM_ABS32,
+      symbol: i % 2 === 0 ? 'ScrCmd_B' : 'ScrCmd_A',
+    })),
+  })
+  const scrCmds = {
+    ...none,
+    functions: new Map([
+      ['ScrCmd_A', '(i32) -> (i32)'],
+      ['ScrCmd_B', '(i32) -> (i32)'],
+    ]),
+  }
+
+  it('writes a function flagged with +ROM_SIZE as its plain index and lists it once', () => {
+    const { text, effects } = convert(flagged([0x02000000, 0x02000000, 0x02000000, 0]), scrCmds)
+    const out = lines(text)
+    const list = out.indexOf('gIrvWasmEffectFunctions:')
+    expect(out.slice(0, list).filter((line) => line === '.int32 ScrCmd_B')).toHaveLength(2)
+    expect(effects).toEqual(['ScrCmd_A', 'ScrCmd_B'])
+    expect(out.slice(list - 1, list + 3)).toEqual([
+      '.globl gIrvWasmEffectFunctions',
+      'gIrvWasmEffectFunctions:',
+      '.int32 ScrCmd_A',
+      '.int32 ScrCmd_B',
+    ])
+    expect(out).toEqual(
+      expect.arrayContaining([
+        '.size gIrvWasmEffectFunctions, 8',
+        'gIrvWasmEffectFunctionCount:',
+        '.int32 2',
+      ]),
+    )
+  })
+
+  it('writes no list when no function is flagged', () => {
+    const { text, effects } = convert(flagged([0, 0]), scrCmds)
+    expect(effects).toEqual([])
+    expect(text).not.toContain('gIrvWasmEffect')
+  })
+
+  it('refuses a flagged function with a further addend', () => {
+    expect(() => convert(flagged([0x02000004]), scrCmds)).toThrow(/ScrCmd_B\+33554436/)
   })
 
   it('refuses code in a data object', () => {
