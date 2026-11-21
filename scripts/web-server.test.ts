@@ -5,7 +5,7 @@ import type { AddressInfo } from 'node:net'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { resolveConfig } from 'vite'
+import { isFileLoadingAllowed, resolveConfig } from 'vite'
 import type { Plugin, PreviewServer, ViteDevServer } from 'vite'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
@@ -193,17 +193,21 @@ describe('the file guard for /@fs/', () => {
     expect(FS_DENY).toEqual(expect.arrayContaining(defaults.server.fs.deny))
   })
 
-  it('denies the build, the pinned tree and ROM files', () => {
+  // The @pkmn packages ship their code in build/; only the repository's own build/ is ROM-derived.
+  it("denies the repository's build and pinned tree, and lets node_modules' build/ through", async () => {
+    const config = await resolveConfig({ logLevel: 'silent' }, 'serve')
+    const allowed = (path: string) => isFileLoadingAllowed(config, join(REPO_DIR, path))
+    expect(allowed('build/rom/irv-emerald.bps')).toBe(false)
+    expect(allowed('build/rom/replay-slot.json')).toBe(false)
+    expect(allowed('.cache/rom/expansion/graphics/pokemon/zapdos/front.png')).toBe(false)
+    expect(allowed('node_modules/@pkmn/dex/build/index.mjs')).toBe(true)
+    expect(allowed('node_modules/@pkmn/protocol/build/index.mjs')).toBe(true)
+    expect(allowed('src/web/main.ts')).toBe(true)
+  })
+
+  it('denies ROM files anywhere', () => {
     expect(FS_DENY).toEqual(
-      expect.arrayContaining([
-        '**/build/**',
-        '**/.cache/**',
-        '**/*.gba',
-        '**/*.elf',
-        '**/*.sav',
-        '**/*.ss[0-9]',
-        '**/*.bps',
-      ]),
+      expect.arrayContaining(['**/*.gba', '**/*.elf', '**/*.sav', '**/*.ss[0-9]', '**/*.bps']),
     )
   })
 

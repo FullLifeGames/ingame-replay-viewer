@@ -15,6 +15,7 @@ type Middleware = (req: IncomingMessage, res: ServerResponse, next: () => void) 
 
 // Vite's own list (server.fs.deny replaces it, so it is repeated; a spec holds it complete) and
 // what /@fs/ must never reach: the build outputs, the pinned tree, ROMs, saves and savestates.
+// build/ and .cache/ are the repository's own; the @pkmn packages ship their code in a build/.
 export const FS_DENY = [
   '.env',
   '.env.*',
@@ -22,8 +23,8 @@ export const FS_DENY = [
   '.npmrc',
   '.yarnrc.yml',
   '**/.git/**',
-  '**/build/**',
-  '**/.cache/**',
+  `${REPO_DIR}/build/**`,
+  `${REPO_DIR}/.cache/**`,
   '**/*.gba',
   '**/*.elf',
   '**/*.sav',
