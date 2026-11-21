@@ -2,7 +2,7 @@
 // message, instantiates the module the page compiled, writes the stream into the slot and calls
 // AgbMain, which never returns. Each frame goes through the frame hook (game.ts), which blocks
 // with Atomics.wait until the page allows the next one. The page ends a run by terminating the
-// worker. No DOM; the coverage leaves it out, like the page's other wiring.
+// worker. No DOM; the e2e covers it, as it covers the page's other wiring.
 import header from '../../../rom/gen3/include/replay_progress.h?raw'
 import { messageOf } from '../message'
 import { frameHandler, type GameModule, type ModuleHooks, writeStream } from './game'
