@@ -5,8 +5,8 @@ Issues #1 to #8 of milestone M1, built in issue order (user, 20.11.2026: "build 
 - #9 (S1, merge 2002665, 21.11.2026, closes #1)
 - #10 (S2, 692773a, 21.11.2026, closes #2, #3, #4)
 - #11 (S3, 55ff879, 21.11.2026, closes #5)
-- #12 (S4, open at the gate, closes #6, #7)
-- #13 (S5, open at the gate, closes #8)
+- #12 (S4, merge 1144628, 21.11.2026, closes #6, #7)
+- #13 (S5, merge 539f662, 21.11.2026, closes #8)
 
 `wave/01` started from `master` at ec8d645 (the design docs) on 20.11.2026. The working files sit under `.waves/01/` (gitignored); this booking keeps what lasts.
 
@@ -133,42 +133,48 @@ Each entry gives the scene, the options, the choice and what a reversal costs.
 
 ## Gate
 
-At the gate on 21.11.2026:
+After the gate on 21.11.2026:
 
-| Stage | Lane | Issues | Pull request | State at the gate    |
+| Stage | Lane | Issues | Pull request | State after the gate |
 | ----- | ---- | ------ | ------------ | -------------------- |
 | S1    | a    | #1     | #9           | merged, 2002665      |
 | S2    | a    | #2, #3 | #10          | merged, 692773a      |
 | S2    | b    | #4     | #10          | merged, 692773a      |
 | S3    | a    | #5     | #11          | merged, 55ff879      |
-| S4    | b    | #6, #7 | #12          | open, waits for okay |
-| S5    | b    | #8     | #13          | open, waits for okay |
+| S4    | b    | #6, #7 | #12          | merged, 1144628      |
+| S5    | b    | #8     | #13          | merged, 539f662      |
 
 The preview needs HTTPS or `localhost`, because mGBA runs on `SharedArrayBuffer`. The user chose `tailscale serve` (D1 (a), 21.11.2026). The tailnet had no HTTPS certificates at the gate, so the preview ran at `localhost` on devbox only.
 
-The gate asks the user to merge #12 and #13, to pick the preview route, to rule on the rests and to settle R19.
+The gate asked the user to merge #12 and #13, to pick the preview route, to rule on the rests and to settle R19. The user answered "1a 2a 3a 4a 5a" on 21.11.2026:
+
+1. #12 merged at a0ab9a0 (merge 1144628).
+2. #13 merged at fc06a2d (merge 539f662). Milestone M1 has no open issue left.
+3. The user turns on HTTPS Certificates in the tailnet. Then the dev page runs behind `tailscale serve` for the user's own look.
+4. The rests became issues: R1 to R7 and R13 to R17 approved for M2 (R16 as a larger bug), and R8 to R12, R18 and R20 parked with their triggers. The list below names each issue.
+5. R19: the game keeps Showdown's "xXEricXx forfeited.", which names who forfeited. No issue.
 
 ## Rests
 
-Proposals for issues; only the ones the user approves at the gate become issues.
+Proposals for issues, ruled at the gate (answer 4a). Each line names its issue.
 
-- R1 (high, M2): a stat boost already at +6 (Calm Mind, Curse) makes Showdown log a zero-stage boost, and the backend fails the whole replay. Common in Gen 3 OU; none of the five test replays has one.
-- R2 (M2): multi-hit moves (`-hitcount`: Rock Blast, Double Kick) show one unsupported line each.
-- R3 (M2): Wrap and Fire Spin damage (`[partiallytrapped]`) is dropped as unsupported.
-- R4 (M2): the patch is 18.4 MB (14.7 MB with xz): the public tool's download size.
-- R5 (M2): order rules for the instruction stream; today a stream that moves before its send-out passes both validators. The backend never writes one.
-- R6 (M2): an item pop-up op, so Leftovers shows as the expansion shows it.
-- R7 (M2): trainer pictures from the Showdown avatar, a battle background, victory music and an outro.
-- R8 (low): the script's `-activate` guard for a third argument; `lockedmove` in `calledBy`; `-formechange`.
-- R9 (low): a print after the win line, and an empty `|-message|`, fail the replay loudly; a drop check per event instead of per line.
-- R10 (low): the tree spec does not look inside zipped dumps; a pre-commit hook for it.
-- R11 (low): glossary words for team list, hit folding and weather phase.
-- R12 (low): a refusal screen with text in the ROM; the B button quits a held replay to a black screen in the emulator (the page turns the keyboard off).
-- R13 (M2): the intro's ball display shows a Pokémon the log never revealed as an empty slot (994052: `teamsize` 6, five revealed). The ROM sets up only the revealed Pokémon.
-- R14 (M2): weather that an ability starts (Sand Stream, Drizzle) shows its pop-up and line but no weather animation; the expansion plays one after the text.
-- R15 (M2): a move that fails at once (`-fail` after `move`: Thunder Wave on a paralyzed target) still plays its animation; the game skips it.
-- R16 (M2, larger bug): Suicune turns solid blue for about 2 s during the faint line after a Surf KO (994052 lines 355 and 369). Cause unknown.
-- R17 (M2): after the win line the status still says "Running …"; the page could read the ROM's progress and say the replay ended.
-- R18 (low): a chat line's raw HTML shows as written in the "Not shown" list (994086, row 268).
-- R19 (question): "xXEricXx forfeited." is Showdown's own `-message` line, which the game prints as written; the expansion's line is "The match was forfeited." (S3-1 chose the expansion's wording for lines it has).
-- R20 (low): when a test replay's file fails to load, the select stays on the failed replay while the summary shows the earlier one.
+- R1 (#14, high, M2): a stat boost already at +6 (Calm Mind, Curse) makes Showdown log a zero-stage boost, and the backend fails the whole replay. Common in Gen 3 OU; none of the five test replays has one.
+- R2 (#15, M2): multi-hit moves (`-hitcount`: Rock Blast, Double Kick) show one unsupported line each.
+- R3 (#16, M2): Wrap and Fire Spin damage (`[partiallytrapped]`) is dropped as unsupported.
+- R4 (#17, M2): the patch is 18.4 MB (14.7 MB with xz): the public tool's download size.
+- R5 (#18, M2): order rules for the instruction stream; today a stream that moves before its send-out passes both validators. The backend never writes one.
+- R6 (#19, M2): an item pop-up op, so Leftovers shows as the expansion shows it.
+- R7 (#20, M2): trainer pictures from the Showdown avatar, a battle background, victory music and an outro.
+- R8 (#26, low): the script's `-activate` guard for a third argument; `lockedmove` in `calledBy`; `-formechange`.
+- R9 (#27, low): a print after the win line, and an empty `|-message|`, fail the replay loudly; a drop check per event instead of per line.
+- R10 (#28, low): the tree spec does not look inside zipped dumps; a pre-commit hook for it.
+- R11 (#29, low): glossary words for team list, hit folding and weather phase.
+- R12 (#30, low): a refusal screen with text in the ROM; the B button quits a held replay to a black screen in the emulator (the page turns the keyboard off).
+- R13 (#21, M2): the intro's ball display shows a Pokémon the log never revealed as an empty slot (994052: `teamsize` 6, five revealed). The ROM sets up only the revealed Pokémon.
+- R14 (#22, M2): weather that an ability starts (Sand Stream, Drizzle) shows its pop-up and line but no weather animation; the expansion plays one after the text.
+- R15 (#23, M2): a move that fails at once (`-fail` after `move`: Thunder Wave on a paralyzed target) still plays its animation; the game skips it.
+- R16 (#24, M2, larger bug): Suicune turns solid blue for about 2 s during the faint line after a Surf KO (994052 lines 355 and 369). Cause unknown.
+- R17 (#25, M2): after the win line the status still says "Running …"; the page could read the ROM's progress and say the replay ended.
+- R18 (#31, low): a chat line's raw HTML shows as written in the "Not shown" list (994086, row 268).
+- R19 (question, settled by answer 5a: kept): "xXEricXx forfeited." is Showdown's own `-message` line, which the game prints as written; the expansion's line is "The match was forfeited." (S3-1 chose the expansion's wording for lines it has).
+- R20 (#32, low): when a test replay's file fails to load, the select stays on the failed replay while the summary shows the earlier one.
