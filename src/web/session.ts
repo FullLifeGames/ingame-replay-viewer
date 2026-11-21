@@ -8,7 +8,7 @@ import { type Emulator, EmulatorError, NOT_STARTED_LINE } from './emulator'
 import { messageOf } from './message'
 import { replayJsonUrl } from './replay-input'
 import type { TestReplay } from './replays'
-import { patchBaseRom, readSlotDescription } from './rom'
+import { checkBaseRom, patchBaseRom, readSlotDescription } from './rom'
 import { ROM_FILES } from './rom-files'
 import {
   notShown,
@@ -147,6 +147,7 @@ function choose(json: unknown): Chosen {
 }
 
 const STREAM_STEP = 'Could not turn the replay into a stream'
+const PATCH_STEP = 'Could not patch your dump'
 
 async function chooseTestReplay(replay: TestReplay): Promise<Chosen> {
   const json = await step(`Could not load the test replay ${replay.id}`, replay.load)
@@ -172,10 +173,9 @@ export function createSession(deps: SessionDeps): Session {
   })
 
   const patched = async (bytes: Uint8Array): Promise<Dump> => {
+    await step(PATCH_STEP, () => checkBaseRom(bytes, deps.baseSha1))
     const { patch, description } = await buildFiles()
-    const rom = await step('Could not patch your dump', () =>
-      patchBaseRom(bytes, patch, description, deps.baseSha1),
-    )
+    const rom = await step(PATCH_STEP, () => patchBaseRom(bytes, patch, description))
     return { rom, description }
   }
   const summaryOf = async (pick: Promise<Chosen | undefined>) => (await pick)?.summary

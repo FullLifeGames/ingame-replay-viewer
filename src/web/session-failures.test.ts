@@ -137,6 +137,15 @@ describe('a step that fails', () => {
     )
   })
 
+  // A wrong file costs no download of the 18 MB patch, and the refusal needs no build.
+  it('refuses a dump that is not US Emerald before it fetches anything', async () => {
+    const { session, fetched } = world()
+    await expect(session.pickDump(OTHER_DUMP)).rejects.toThrow(
+      /^Could not patch your dump: This file is not the US Emerald dump/,
+    )
+    expect(fetched).toEqual([])
+  })
+
   it('keeps the cause of a refusal', async () => {
     const { session } = world()
     const refusal = await session.pickDump(OTHER_DUMP).catch((error: unknown) => error)

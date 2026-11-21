@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import build from '../../rom/gen3/build.json'
 import { createBps } from '../patch/bps-create'
 import type { SlotDescription } from '../patch/slot'
-import { patchBaseRom, readSlotDescription, RomError } from './rom'
+import { checkBaseRom, patchBaseRom, readSlotDescription, RomError } from './rom'
 import { sha1Hex } from './sha1'
 
 // Synthetic bytes only: a small "base ROM" and a "built ROM" that differs in a few places.
@@ -31,16 +31,16 @@ const DESCRIPTION: SlotDescription = {
   romSize: TARGET.length,
 }
 
-describe('patchBaseRom', () => {
-  it('gives the built ROM for the right dump', async () => {
-    expect(await patchBaseRom(BASE, PATCH, DESCRIPTION, BASE_SHA1)).toEqual(TARGET)
+describe('checkBaseRom', () => {
+  it('passes the dump the patch was made from', async () => {
+    await expect(checkBaseRom(BASE, BASE_SHA1)).resolves.toBeUndefined()
   })
 
   // The user picks a European Emerald, or any other file: its SHA1 is not the build's.
   it('refuses a dump with another SHA1 and names both SHA1s', async () => {
     const other = synthetic(0x400, 8)
     const otherSha1 = await sha1Hex(other)
-    const refusal = patchBaseRom(other, PATCH, DESCRIPTION, BASE_SHA1)
+    const refusal = checkBaseRom(other, BASE_SHA1)
     await expect(refusal).rejects.toThrow(RomError)
     await expect(refusal).rejects.toThrow(
       `This file is not the US Emerald dump the patch was made from: its SHA1 is ${otherSha1}, ` +
@@ -49,15 +49,19 @@ describe('patchBaseRom', () => {
   })
 
   it('checks against the base ROM SHA1 in rom/gen3/build.json by default', async () => {
-    await expect(patchBaseRom(BASE, PATCH, DESCRIPTION)).rejects.toThrow(
-      `the patch needs ${build.baseRom.sha1}`,
-    )
+    await expect(checkBaseRom(BASE)).rejects.toThrow(`the patch needs ${build.baseRom.sha1}`)
+  })
+})
+
+describe('patchBaseRom', () => {
+  it('gives the built ROM for the right dump', async () => {
+    expect(await patchBaseRom(BASE, PATCH, DESCRIPTION)).toEqual(TARGET)
   })
 
   // build/rom/ holds a patch from another build than replay-slot.json.
   it('refuses a result whose SHA1 is not the one replay-slot.json names', async () => {
     const stale = { ...DESCRIPTION, romSha1: BASE_SHA1 }
-    const refusal = patchBaseRom(BASE, PATCH, stale, BASE_SHA1)
+    const refusal = patchBaseRom(BASE, PATCH, stale)
     await expect(refusal).rejects.toThrow(RomError)
     await expect(refusal).rejects.toThrow(
       `The patched ROM's SHA1 is ${DESCRIPTION.romSha1}, replay-slot.json names ${BASE_SHA1}: ` +
@@ -68,7 +72,7 @@ describe('patchBaseRom', () => {
   it('lets the patch codec refuse a damaged patch', async () => {
     const damaged = new Uint8Array(PATCH)
     damaged[8] = (damaged[8] ?? 0) ^ 0xff
-    await expect(patchBaseRom(BASE, damaged, DESCRIPTION, BASE_SHA1)).rejects.toThrow(/^BPS: /)
+    await expect(patchBaseRom(BASE, damaged, DESCRIPTION)).rejects.toThrow(/^BPS: /)
   })
 })
 

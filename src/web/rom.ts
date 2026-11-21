@@ -57,15 +57,13 @@ export function readSlotDescription(json: unknown): SlotDescription {
 }
 
 /**
- * The built ROM: `base` patched with `patch`, refused unless `base` has the SHA1 the patch was
- * made from (rom/gen3/build.json's by default) and the result the SHA1 that `description` names.
+ * Refuses `base` unless it has the SHA1 the patch was made from (rom/gen3/build.json's by
+ * default). The page runs it before it fetches the patch, so a wrong file costs no download.
  */
-export async function patchBaseRom(
+export async function checkBaseRom(
   base: Uint8Array,
-  patch: Uint8Array,
-  description: SlotDescription,
   baseSha1: string = build.baseRom.sha1,
-): Promise<Uint8Array> {
+): Promise<void> {
   const found = await sha1Hex(base)
   if (found !== baseSha1) {
     throw new RomError(
@@ -73,6 +71,17 @@ export async function patchBaseRom(
         `the patch needs ${baseSha1}. Pick your US Emerald dump.`,
     )
   }
+}
+
+/**
+ * The built ROM: `base`, which checkBaseRom passed, patched with `patch`, and refused unless the
+ * result has the SHA1 that `description` names.
+ */
+export async function patchBaseRom(
+  base: Uint8Array,
+  patch: Uint8Array,
+  description: SlotDescription,
+): Promise<Uint8Array> {
   const rom = applyBps(patch, base)
   const built = await sha1Hex(rom)
   if (built !== description.romSha1) {

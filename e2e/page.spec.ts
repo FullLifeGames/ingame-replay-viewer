@@ -53,7 +53,11 @@ test('a page without COOP and COEP shows only the environment line', async ({ pa
   await expect(page.getByRole('button', { name: 'Start', exact: true })).toBeHidden()
 })
 
-test('a file that is not US Emerald is refused', async ({ page }) => {
+test('a file that is not US Emerald is refused before the patch is fetched', async ({ page }) => {
+  const romRequests: string[] = []
+  page.on('request', (request) => {
+    if (new URL(request.url()).pathname.startsWith('/rom/')) romRequests.push(request.url())
+  })
   await page.goto('/')
   await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles({
     name: 'not-emerald.gba',
@@ -62,6 +66,7 @@ test('a file that is not US Emerald is refused', async ({ page }) => {
   })
   await expect(page.getByRole('status')).toHaveText(new RegExp(BASE_SHA1), { timeout: 60_000 })
   await expect(page.getByRole('button', { name: 'Restart' })).toBeDisabled()
+  expect(romRequests).toEqual([])
 })
 
 test('994052 starts in the emulator', async ({ page }) => {

@@ -55,6 +55,6 @@ npm run test:e2e
 
 Playwright drives the page in Chromium on its own dev server at port 5178. It runs on devbox only, never in CI, and it is a heavy check. The first run needs `npx playwright install chromium`.
 
-Three tests need no dump: the headers and the replay list, the environment line on a page without the headers, and the refusal of a file that is not US Emerald. The fourth plays 994052 in the emulator. It reads your dump by the build's rule: `~/roms/Pokemon - Emerald Version (USA, Europe).gba`, or the path in `IRV_BASE_ROM`. Without the dump or without `build/rom/irv-emerald.bps`, it skips and names what is missing.
+Three tests need neither the dump nor `npm run rom:build`: the headers and the replay list, the environment line on a page without the headers, and the refusal of a file that is not US Emerald. The fourth plays 994052 in the emulator. It reads your dump by the build's rule: `~/roms/Pokemon - Emerald Version (USA, Europe).gba`, or the path in `IRV_BASE_ROM`. Without the dump or without `build/rom/irv-emerald.bps`, it skips and names what is missing.
 
 The game's frames come from the ROM, so no frame leaves memory. The e2e writes no screenshot, video or trace. It compares frames in memory (`e2e/frames.ts`), and only counts and yes-or-no answers leave it.
