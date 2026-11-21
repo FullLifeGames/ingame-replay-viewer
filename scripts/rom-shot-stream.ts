@@ -27,8 +27,10 @@ function monOf(name: string, gender: StreamMon['gender']): StreamMon {
 
 const move = (name: string) => moveOf(name).number
 
-// One short battle with every scene the screenshot run checks: the intro, both send-outs, a
-// move with its hit and HP change, a status, a switch, a faint and the win line.
+// One short battle with every scene the screenshot run checks: the intro, both ball displays, both
+// send-outs, a move with its hit and HP change, a status, a switch, a faint and the win line. The
+// near team has one unrevealed member, so its display shows three balls; the far one shows one ball
+// and five empty slots.
 const INSTRUCTIONS: readonly Instruction[] = [
   { op: 'intro' },
   { op: 'print', text: 'Bob would like to battle!' },
@@ -69,7 +71,7 @@ export function handMadeStream(): Stream {
       near: {
         name: 'Alice',
         trainerPic: trainerPics.TRAINER_PIC_BRENDAN,
-        teamSize: 2,
+        teamSize: 3,
         revealed: 2,
       },
       far: { name: 'Bob', trainerPic: trainerPics.TRAINER_PIC_MAY, teamSize: 1, revealed: 1 },

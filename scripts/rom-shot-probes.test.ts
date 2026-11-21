@@ -164,6 +164,56 @@ describe('checking the shots of a scene', () => {
     expect(check('white')).toEqual({ pass: false, detail: 'one colour, 0xffffff, not 0x630000' })
   })
 
+  describe('the ball display', () => {
+    const BALL = 0xf79473
+    const EMPTY_CIRCLE = 0x4a425a
+    const cells = [0, 4, 8, 12, 16, 20].map((x) => ({ x, y: 2, width: 3, height: 3 }))
+    function display(balls: readonly number[]) {
+      const frame = frameOf(0xf7f7ff)
+      for (const [i, cell] of cells.entries()) {
+        paint(frame, cell, EMPTY_CIRCLE)
+        if (balls.includes(i)) paint(frame, { ...cell, width: 2 }, BALL)
+      }
+      return new Map([['balls', frame]])
+    }
+    const check = (balls: number) =>
+      ({ probe: 'balls', shot: 'balls', cells, colour: BALL, balls }) as const
+
+    it('passes when the first cells show the same ball and the others do not', () => {
+      expect(checkShots(check(3), display([0, 1, 2]))).toEqual({
+        pass: true,
+        detail: '3 balls, 3 expected',
+      })
+      expect(checkShots(check(6), display([0, 1, 2, 3, 4, 5])).pass).toBe(true)
+    })
+
+    it('fails a missing ball and an extra ball, with the count', () => {
+      expect(checkShots(check(6), display([0, 1, 2, 3, 4]))).toEqual({
+        pass: false,
+        detail: '5 balls, 6 expected',
+      })
+      expect(checkShots(check(2), display([0, 1, 2]))).toEqual({
+        pass: false,
+        detail: '3 balls, 2 expected',
+      })
+    })
+
+    it('fails a ball after an empty slot', () => {
+      expect(checkShots(check(3), display([0, 1, 3]))).toEqual({
+        pass: false,
+        detail: '3 balls, 3 expected, with a gap at cell 2',
+      })
+    })
+
+    it('fails a display that is not drawn, though its cells are all alike', () => {
+      const blank = new Map([['balls', frameOf(0xf7f7ff)]])
+      expect(checkShots(check(6), blank)).toEqual({
+        pass: false,
+        detail: 'no ball in the first cell: no 0xf79473',
+      })
+    })
+  })
+
   it('fails a scene whose shot the tool never took', () => {
     const region = { x: 0, y: 0, width: 2, height: 2 }
     expect(checkShots({ probe: 'text', shot: 'win', region }, frames)).toEqual({
