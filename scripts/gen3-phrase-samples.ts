@@ -86,7 +86,6 @@ export const SAMPLES: Readonly<Record<string, Sample>> = {
   'status.itemSleep': lumBerry,
   'cant.taunt': rockSlide,
   'cant.disabled': rockSlide,
-  'field.challenged': withValue('B_LINK_OPPONENT1_NAME', ERIC),
   'field.sentOut': {
     args: [ERIC, FAR.name],
     fill: { B_LINK_OPPONENT1_NAME: ERIC, B_BUFF1: FAR.name },
