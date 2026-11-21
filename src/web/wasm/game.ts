@@ -15,13 +15,21 @@ export interface GameModule {
   _IrvWasm_Progress(): number
 }
 
-/** The imports the module calls: the frame (irv_wasm_frame.c) and its two print lines. */
+/**
+ * The imports the module calls: the frame (irv_wasm_frame.c), the frame's sound
+ * (irv_wasm_sound.c) and its two print lines.
+ */
 export interface ModuleHooks {
   /**
    * Gets the address of the frame's 240x160 BGR555 words. It may return, block, or throw an
    * object; never a number, which Emscripten's setjmp support reads as a longjmp.
    */
   irvFrame(pixels: number): void
+  /**
+   * Gets the address of `count` floats, the frame's sound as left and right pairs mixed at
+   * `rate`. It returns before the game goes on, so a host copies what it keeps.
+   */
+  irvAudio(samples: number, count: number, rate: number): void
   print(line: string): void
   printErr(line: string): void
 }

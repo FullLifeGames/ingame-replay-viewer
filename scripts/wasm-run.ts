@@ -11,6 +11,7 @@ import { basename, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 import { writeReplaySlot } from '../src/patch/slot.ts'
+import { AudioMeter } from '../src/web/wasm/audio.ts'
 import { FRAME_HEIGHT, FRAME_WIDTH, widenFrame } from '../src/web/wasm/frame.ts'
 import type { GameModule, ModuleHooks } from '../src/web/wasm/game.ts'
 import { readProgress } from '../src/web/wasm/progress.ts'
@@ -139,6 +140,8 @@ export interface PlayResult {
   frames: Map<string, Frame>
   /** The first frame on which the interpreter reported `finished`. */
   finishedAt: number | undefined
+  /** The game's sound over the run: its samples, left and right counted apart, and their RMS. */
+  audio: AudioMeter
 }
 
 const say = (line: string) => process.stderr.write(`wasm:run: ${line}\n`)
@@ -150,7 +153,11 @@ export async function playModule(
 ): Promise<PlayResult> {
   const watch = new Watch(request.scenes.flatMap((scene) => scene.shots))
   let status: Status | undefined
+  const audio = new AudioMeter()
   const game: GameModule = await factory({
+    irvAudio: (samples, count) => {
+      audio.add(new Float32Array(game.HEAPU8.buffer, game.HEAPU8.byteOffset + samples, count))
+    },
     irvFrame: (pixels) => {
       const memory = game.HEAPU8
       const progress = readProgress(memory, game._IrvWasm_Progress(), request.layout)
@@ -176,7 +183,7 @@ export async function playModule(
       })
     }
     const output = { shots: watch.lines, status }
-    return { output, frames: watch.frames, finishedAt: watch.finishedAt }
+    return { output, frames: watch.frames, finishedAt: watch.finishedAt, audio }
   }
   throw new Error(`AgbMain returned after ${String(watch.frame)} frames`)
 }
@@ -207,6 +214,11 @@ async function playDir(dir: string): Promise<void> {
   const run = await playModule(factory, { stream, scenes, layout })
   for (const [name, frame] of run.frames) writeFileSync(join(dir, `${name}.ppm`), ppm(frame))
   say(`${basename(dir)}: finished first at frame ${String(run.finishedAt ?? 'none')}`)
+  const { samples, rms } = run.audio
+  const perFrame = samples / run.output.status.frame
+  say(
+    `${basename(dir)}: sound ${String(samples)} samples, ${perFrame.toFixed(1)} per frame, rms ${rms.toFixed(4)}`,
+  )
   const lines = [...run.output.shots, run.output.status]
   process.stdout.write(lines.map((line) => `${JSON.stringify(line)}\n`).join(''))
 }

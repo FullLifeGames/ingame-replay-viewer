@@ -8,6 +8,7 @@ import type { ProgressLayout } from './rom-shot-run.ts'
 import { refusalScenes } from './rom-shot-scenes.ts'
 import type { Scene } from './rom-shot-scenes.ts'
 import { GBA_ROM_BASE, loadSlotLayout } from './rom-slot.ts'
+import { MIXER_RATE } from '../src/web/wasm/protocol.ts'
 import { playCommand, playModule, STALL_FRAMES } from './wasm-run.ts'
 import type { GameModule, ModuleHooks } from './wasm-run.ts'
 
@@ -22,6 +23,9 @@ const SLOT = GBA_ROM_BASE + 0x1000
 const PROGRESS = GBA_ROM_BASE + 0x22000
 const PIXELS = GBA_ROM_BASE + 0x24000
 const PIXEL_COUNT = 240 * 160
+// One frame of the fake's sound: two left and right pairs at half volume.
+const AUDIO = GBA_ROM_BASE + 0x38000
+const AUDIO_SAMPLES = [0.5, -0.5, -0.5, 0.5]
 
 interface Progress {
   done: number
@@ -65,6 +69,7 @@ function fakeModule(script: Script, layout = LAYOUT, limit = 20000): Fake {
   const memory = new Uint8Array(GBA_ROM_BASE + 0x40000)
   const words = new Uint16Array(memory.buffer)
   emptySlot(memory)
+  new Float32Array(memory.buffer, AUDIO, AUDIO_SAMPLES.length).set(AUDIO_SAMPLES)
   let slotAtStart: Uint8Array | undefined
   const factory = (hooks: ModuleHooks) =>
     Promise.resolve<GameModule>({
@@ -78,6 +83,7 @@ function fakeModule(script: Script, layout = LAYOUT, limit = 20000): Fake {
           const { progress, colour } = script(frame)
           writeProgress(memory, layout, progress)
           words.fill(colour, PIXELS >> 1, (PIXELS >> 1) + PIXEL_COUNT)
+          hooks.irvAudio(AUDIO, AUDIO_SAMPLES.length, MIXER_RATE)
           hooks.irvFrame(PIXELS)
         }
       },
@@ -182,6 +188,14 @@ describe('playing a stream in the module', () => {
       pass: true,
       detail: 'one colour, 0x630000',
     })
+  })
+
+  it("counts the game's samples and measures their loudness", async () => {
+    const end = { ...playing(34), finished: true }
+    const fake = fakeModule((frame) => ({ progress: frame < 30 ? playing(1) : end, colour: 0 }))
+    const run = await playModule(fake.factory, { stream: undefined, scenes: [], layout: LAYOUT })
+    expect(run.audio.samples).toBe(run.output.status.frame * AUDIO_SAMPLES.length)
+    expect(run.audio.rms).toBeCloseTo(0.5)
   })
 
   it('fails when AgbMain returns, which the game never does', async () => {
