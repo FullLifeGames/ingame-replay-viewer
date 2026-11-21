@@ -1,9 +1,11 @@
 #include "global.h"
 #include "battle.h"
+#include "battle_anim.h"
 #include "pokemon.h"
 #include "sprite.h"
 #include "test/replay_test.h"
 #include "constants/battle.h"
+#include "constants/battle_anim.h"
 #include "constants/moves.h"
 #include "constants/songs.h"
 #include "constants/species.h"
@@ -250,5 +252,37 @@ REPLAY_TEST("A mon that faints with HP left has 0 HP, and the far faint starts n
         EXPECT_EQ(nearMon->hp, 0);
         EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_HP), 0);
         EXPECT_EQ(ReplayTest_KOAnimsAtOpStart(8), 0);
+    }
+}
+
+// A faint behind a substitute: the faint handler first plays B_ANIM_SUBSTITUTE_TO_MON and starts a
+// KO animation on each of its frames, and the 3-bit counter wraps (replay_interpreter.c). Ops 0-2
+// are INTRO and the two SEND_OUTs; op 9 is the second PRINT.
+REPLAY_TEST("A faint behind a substitute: the PRINT after the faint text starts with no KO animation left")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        StartDugtrioVsMagneton(100, 100);
+        ReplayStream_Move(REPLAY_SIDE_FAR, REPLAY_SIDE_FAR, MOVE_SUBSTITUTE);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 75);
+        ReplayStream_Volatile(REPLAY_SIDE_FAR, REPLAY_VOLATILE_SUBSTITUTE, TRUE);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 0);
+        ReplayStream_Faint(REPLAY_SIDE_FAR);
+        ReplayStream_Print(COMPOUND_STRING("The opposing Magneton fainted!"));
+        ReplayStream_Print(COMPOUND_STRING("May sent out Magneton!"));
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SUBSTITUTE, farMon);
+        ANIMATION(ANIM_TYPE_SPECIAL, B_ANIM_SUBSTITUTE_TO_MON, farMon);
+        MESSAGE("The opposing Magneton fainted!");
+        MESSAGE("May sent out Magneton!");
+    }
+    THEN
+    {
+        EXPECT_EQ(ReplayTest_KOAnimsAtOpStart(9), 0);
+        EXPECT_EQ(KOAnimsRunning(), 0);
     }
 }
