@@ -27,7 +27,7 @@ export interface DroppedLine {
   readonly detail?: string
 }
 
-/** Player 1 is the near side; a flipped view would change only `sideOf` in `refs.ts`. */
+/** Player 1 is the near side; a flipped view would change only `PLAYERS` in `refs.ts`. */
 export type Side = 'near' | 'far'
 
 /** A Pokémon as an index into `teams[side]`, in order of first appearance. */

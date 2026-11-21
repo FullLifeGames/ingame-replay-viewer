@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import { newBattle } from './client'
 import { ScriptError } from './errors'
-import { effectOf, healthOf, refOf, sideOf } from './refs'
+import { bySide, effectOf, healthOf, refOf, sideOf } from './refs'
 
 function battleAfter(log: string): Battle {
   const battle = newBattle()
@@ -22,6 +22,27 @@ describe('sideOf', () => {
   it('refuses a third player with the line number', () => {
     expect(() => sideOf('p3', 7)).toThrow(ScriptError)
     expect(() => sideOf('p3', 7)).toThrow(/^line 7: /)
+  })
+})
+
+describe('bySide', () => {
+  it('reads player 1 for the near side and player 2 for the far side', () => {
+    const battle = battleAfter('|player|p1|Alice|1|\n|player|p2|Bob|2|')
+
+    expect(bySide(battle, (side) => side.name)).toEqual({ near: 'Alice', far: 'Bob' })
+  })
+})
+
+/** Source files other than refs.ts, which must not pick a client side by its player. */
+const sources = import.meta.glob(['./**/*.ts', '!./**/*.test.ts', '!./refs.ts'], {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+})
+
+describe('the near side rule', () => {
+  it.each(Object.keys(sources))('lives in refs.ts, not in %s', (path) => {
+    expect(String(sources[path])).not.toMatch(/\.p[12]\b|\[['"]p[12]['"]\]/)
   })
 })
 

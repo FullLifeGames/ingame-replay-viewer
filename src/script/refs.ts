@@ -8,7 +8,10 @@ import { Protocol } from '@pkmn/protocol'
 import { ScriptError } from './errors'
 import type { Effect, HpFraction, PokemonRef, Side } from './types'
 
-const SIDES: Partial<Record<string, Side>> = { p1: 'near', p2: 'far' }
+/** The player each side shows; a flipped view would change only this table. */
+const PLAYERS = { near: 'p1', far: 'p2' } as const satisfies Record<Side, string>
+
+const SIDES: Partial<Record<string, Side>> = { [PLAYERS.near]: 'near', [PLAYERS.far]: 'far' }
 
 /** The side of a player (`p1`, `p2`) at log line `at`. */
 export function sideOf(player: string, at: number): Side {
@@ -22,6 +25,11 @@ export function sideOf(player: string, at: number): Side {
 /** The side of a side the client tracks; `n` counts players from 0, `id` holds a name. */
 function sideOfClient(side: ClientSide, at: number): Side {
   return sideOf(`p${String(side.n + 1)}`, at)
+}
+
+/** One value per side, read from the client's side of that side's player. */
+export function bySide<T>(battle: Battle, read: (side: ClientSide) => T): Record<Side, T> {
+  return { near: read(battle[PLAYERS.near]), far: read(battle[PLAYERS.far]) }
 }
 
 /** A Pokémon the client tracks, as its side and team index. */

@@ -9,6 +9,7 @@ import { dropReasonOf } from './drops'
 import { ScriptError } from './errors'
 import { HitFolder } from './hits'
 import { readLines } from './lines'
+import { bySide } from './refs'
 import type { LogLine } from './lines'
 import { eventsOf, ruleFor, unreadPart } from './rules/index'
 import type { Before } from './rules/index'
@@ -37,7 +38,7 @@ function refuseGameType(line: LogLine): void {
 }
 
 function beforeOf({ battle, players }: Build): Before {
-  const active = { near: battle.p1.active[0] ?? null, far: battle.p2.active[0] ?? null }
+  const active = bySide(battle, (side) => side.active[0] ?? null)
   return { active, weather: battle.field.weather, players: { ...players } }
 }
 
@@ -107,7 +108,7 @@ export function buildBattleScript(log: string): BattleScript {
   return {
     gen: battle.gen.num,
     format: battle.tier,
-    teams: { near: battle.p1.team.map(memberOf), far: battle.p2.team.map(memberOf) },
+    teams: bySide(battle, (side) => side.team.map(memberOf)),
     events,
     dropped,
   }
