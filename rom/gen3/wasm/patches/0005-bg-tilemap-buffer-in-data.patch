@@ -1,0 +1,24 @@
+IsTileMapOutsideWram treats every tilemap buffer above IWRAM_END as VRAM. In the WebAssembly
+build static data and the heap lie from ROM_START on (plan D2), so every buffer counts as
+outside, and CopyToBgTilemapBuffer, FillBgTilemapBufferRect and the rest skip their writes:
+the battle text box and every window on a background stay empty. Under IRV_WASM only the
+addresses between IWRAM_END and ROM_START, VRAM among them, are outside.
+
+diff --git a/src/bg.c b/src/bg.c
+--- a/src/bg.c
++++ b/src/bg.c
+@@ -1202,8 +1202,14 @@
+ 
+ bool32 IsTileMapOutsideWram(u32 bg)
+ {
++#ifdef IRV_WASM
++    // Static data and the heap lie from ROM_START on in the WebAssembly build, so only VRAM is outside.
++    if (sGpuBgConfigs2[bg].tilemap > (void *)IWRAM_END && sGpuBgConfigs2[bg].tilemap < (void *)ROM_START)
++        return TRUE;
++#else
+     if (sGpuBgConfigs2[bg].tilemap > (void *)IWRAM_END)
+         return TRUE;
++#endif
+     else if (sGpuBgConfigs2[bg].tilemap == NULL)
+         return TRUE;
+     else

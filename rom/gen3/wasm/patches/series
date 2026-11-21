@@ -3,3 +3,4 @@
 0002-script-effect-list.patch
 0003-decompress-no-ram-code.patch
 0004-m4a-no-vcount-wait.patch
+0005-bg-tilemap-buffer-in-data.patch
