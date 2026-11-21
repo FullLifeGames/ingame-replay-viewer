@@ -50,7 +50,7 @@ function gitEnv(): NodeJS.ProcessEnv {
   return Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_')))
 }
 
-function git(dir: string, args: string[]): string {
+export function git(dir: string, args: string[]): string {
   const result = spawnSync('git', ['-C', dir, ...args], {
     encoding: 'utf8',
     env: gitEnv(),

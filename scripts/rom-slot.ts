@@ -39,7 +39,7 @@ export interface SlotDescription {
 }
 
 // The GBA maps the cartridge ROM at this address, so a ROM symbol's file offset is its address minus it.
-const GBA_ROM_BASE = 0x08000000
+export const GBA_ROM_BASE = 0x08000000
 
 const hex = (value: number) => `0x${value.toString(16)}`
 

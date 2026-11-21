@@ -150,7 +150,7 @@ function collect(paths: BuildPaths, baseRomPath: string): RomOutputs {
   return outputs
 }
 
-function build(paths: BuildPaths, config: BuildConfig, clean: boolean): void {
+export function buildRom(paths: BuildPaths, config: BuildConfig, clean: boolean): RomOutputs {
   const input = readPreflightInput(process.env, config.baseRom.sha1)
   const problems = preflightProblems(input)
   if (problems.length > 0) throw new Error(problems.join('\n'))
@@ -173,6 +173,7 @@ function build(paths: BuildPaths, config: BuildConfig, clean: boolean): void {
   writeFileSync(join(paths.outDir, OUTPUT_NAMES.info), `${JSON.stringify(info, null, 2)}\n`)
   say(`ROM SHA1 ${outputs.sha1.rom}, replay slot at 0x${outputs.description.offset.toString(16)}`)
   say(`patch ${String(outputs.patch.length)} bytes, round trip passed; outputs in ${paths.outDir}`)
+  return outputs
 }
 
 function main(): void {
@@ -181,7 +182,7 @@ function main(): void {
     const paths = buildPaths(process.env)
     const config = loadBuildConfig()
     if (args.cleanOnly) cleanOutputs(paths, config, args.all)
-    else build(paths, config, args.clean)
+    else buildRom(paths, config, args.clean)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     const cause = error instanceof Error && error.cause instanceof Error ? error.cause.message : ''
