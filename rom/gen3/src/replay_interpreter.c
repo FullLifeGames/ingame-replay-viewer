@@ -16,7 +16,7 @@
 #include "constants/characters.h"
 #include "constants/rgb.h"
 
-// The ROM interpreter (#6). Replay_Load checks the whole stream first (replay_stream.c), so a
+// The ROM interpreter (#6). Replay_Load checks the whole stream first (replay_stream_check.c), so a
 // refusal never starts a battle and the step functions below can read their operands without
 // checks.
 //

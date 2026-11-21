@@ -67,10 +67,10 @@ void Replay_Unload(void);
 // For replay_setup.c: checks the stream and loads it into the interpreter.
 enum ReplayError Replay_Load(const volatile u8 *stream, u32 length, enum ReplayEnd end);
 
-// For the interpreter: Replay_Validate, which also counts the instructions.
+// For the interpreter: Replay_Validate, which also counts the instructions (replay_stream_check.c).
 enum ReplayError Replay_ValidateStream(const volatile u8 *stream, u32 length, u16 *count);
 
-// For replay_stream.c: whether this interpreter plays an op of the format.
+// For replay_stream_check.c: whether this interpreter plays an op of the format.
 bool32 Replay_PlaysOp(u32 op);
 
 // Reads from a stream, which may lie in ROM (replay_stream.c). Numbers are little-endian.
