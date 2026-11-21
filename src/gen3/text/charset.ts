@@ -16,11 +16,12 @@ function nbspByte(): number {
 }
 
 const BYTES: ReadonlyMap<string, number> = new Map([
-  ...Object.entries(charmap.chars),
   [NBSP, nbspByte()],
+  ...Object.entries(charmap.chars),
 ])
 
-// Where several characters share a byte (`’` and `'`), the charmap's first one reads back.
+// Where several characters share a byte (`’` and `'`), the charmap's first one reads back; NBSP
+// goes first, so its byte reads back as NBSP and not as the charmap's `~`.
 const CHARS: ReadonlyMap<number, string> = new Map(
   [...BYTES].reverse().map(([char, byte]) => [byte, char]),
 )

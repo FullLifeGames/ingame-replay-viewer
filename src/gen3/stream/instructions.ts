@@ -19,7 +19,7 @@ import {
   type Op,
 } from './format'
 
-export type Gender = keyof typeof GENDER
+type Gender = keyof typeof GENDER
 type Outcome = keyof typeof OUTCOME
 type Status = keyof typeof STATUS
 type Weather = keyof typeof WEATHER

@@ -69,6 +69,9 @@ describe('encodeStream', () => {
     expect(() => encodeStream({ ...stream, parties })).toThrow(/nickname/)
     const trainers = { ...stream.trainers, near: { ...stream.trainers.near, name: 'A'.repeat(20) } }
     expect(() => encodeStream({ ...stream, trainers })).toThrow(/name/)
+    const unnamed = { ...DUGTRIO, nickname: 7 as unknown as string }
+    const blank = { ...stream.parties, near: [unnamed, null, null, null, null, null] }
+    expect(() => encodeStream({ ...stream, parties: blank })).toThrow(/nickname is not a text/)
   })
 })
 
