@@ -156,6 +156,21 @@ export function scenesOf(stream: Stream): Scene[] {
   return SCENES.flatMap((scene) => scene(input) ?? [])
 }
 
+// CB2_ReplayRefused (rom/gen3/src/replay_boot.c) shows RGB(12, 0, 0) alone; mGBA widens the five
+// bits of each channel to eight.
+const REFUSED_COLOUR = 0x630000
+
+/** A refused stream: the tool's last frame shows the refusal screen, one colour. */
+export function refusalScenes(): Scene[] {
+  const check: Check = {
+    probe: 'blank',
+    shot: 'final',
+    region: SCREEN.screen,
+    colour: REFUSED_COLOUR,
+  }
+  return [{ name: 'refused', shots: [], check }]
+}
+
 /** The shot tool's arguments `<name>:<done>:<frames>`, one per shot. */
 export function shotArgs(scenes: readonly Scene[]): string[] {
   return scenes.flatMap((scene) =>

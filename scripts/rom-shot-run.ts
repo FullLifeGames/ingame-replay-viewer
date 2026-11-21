@@ -134,12 +134,15 @@ export interface Judged {
 const errorName = (errors: readonly string[], error: number) =>
   errors[error] ?? `number ${String(error)}`
 
+const sceneProblems = (scenes: readonly SceneVerdict[]) =>
+  scenes.filter((scene) => !scene.pass).map((scene) => `scene ${scene.name}: ${scene.detail}`)
+
 function judgeRefusal(run: Judged): string[] {
   const { status } = run.output
   const name = errorName(run.errors, status.error)
-  if (status.status === 'error' && name === run.expect) return []
+  if (status.status === 'error' && name === run.expect) return sceneProblems(run.scenes)
   const found = status.status === 'error' ? `error ${name}` : `status ${status.status}`
-  return [`${found}, expected ${run.expect}`]
+  return [`${found}, expected ${run.expect}`, ...sceneProblems(run.scenes)]
 }
 
 function judgeReplay(run: Judged): string[] {
@@ -150,10 +153,7 @@ function judgeReplay(run: Judged): string[] {
     problems.push(`${String(status.done)} of ${String(status.total)} instructions done`)
   }
   if (status.error !== 0) problems.push(`error ${errorName(run.errors, status.error)}`)
-  for (const scene of run.scenes) {
-    if (!scene.pass) problems.push(`scene ${scene.name}: ${scene.detail}`)
-  }
-  return problems
+  return [...problems, ...sceneProblems(run.scenes)]
 }
 
 /** What went wrong in a run; an empty list is a pass. */

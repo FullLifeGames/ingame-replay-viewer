@@ -1,6 +1,7 @@
 // The probes of the screenshot run (plan section 7): numbers read from the frames that
 // rom/gen3/shot/replay_shot.c writes, never images kept in the tree. Each probe asks one question
 // of a frame or a pair of frames; checkShots answers a scene's question from its named frames.
+import type { Side } from '../src/script/types.ts'
 
 export interface Frame {
   width: number
@@ -24,25 +25,39 @@ export interface HpBar {
   empty: readonly number[]
 }
 
-// Where the probes look on the 240x160 screen of a singles battle. ESTIMATES, to be measured.
+// Where the probes look on the 240x160 screen of a singles battle. Lines are of the pinned tree's
+// own files (U = .cache/rom/expansion, 79dd436); the HP bar row was measured once on the first-hp
+// frame of the hand-made run (B6a).
 export const SCREEN = {
+  // PrintHpOnHealthbox clears (xOffset + 40, yOffset + 8, 56, 8) before it prints the numbers
+  // (U/src/battle_interface.c:935), called with xOffset 0 and yOffset 16 for the near side (:1092).
+  // The near healthbox is a 64x32 sprite (:217) centred on (158, 88) (:845), so its corner is
+  // (126, 72).
   nearHpDigits: { x: 166, y: 96, width: 56, height: 8 },
-  farHpBar: { x: 36, y: 31, width: 48, empty: [0x506858] },
+  // The far healthbox is centred on (44, 30) (:846), its corner (12, 14); the healthbar sprite sits
+  // 16 pixels right of it (:741). Measured: the bar's upper fill row is y 33, x 52 to 99, and its
+  // empty part shows 0x4a425a of the healthbar palette (gBattleInterface_BallDisplayPal,
+  // U/src/battle_gfx_sfx_util.c:87).
+  farHpBar: { x: 52, y: 33, width: 48, empty: [0x4a425a] },
+  // Each healthbox is two 64x32 sprites side by side from its corner, cut at the screen's edge.
   healthbox: {
-    near: { x: 126, y: 72, width: 104, height: 32 },
-    far: { x: 12, y: 14, width: 104, height: 32 },
+    near: { x: 126, y: 72, width: 114, height: 32 },
+    far: { x: 12, y: 14, width: 128, height: 32 },
   },
+  screen: { x: 0, y: 0, width: 240, height: 160 },
+  // B_WIN_MSG: tilemapLeft 2, tilemapTop 15, 26x4 tiles of 8 pixels (U/src/battle_bg.c:158).
   message: { x: 16, y: 120, width: 208, height: 32 },
 } as const satisfies {
   nearHpDigits: Region
   farHpBar: HpBar
-  healthbox: Record<'near' | 'far', Region>
+  healthbox: Record<Side, Region>
   message: Region
+  screen: Region
 }
 
 export type Check =
   | { probe: 'differs'; before: string; after: string; region?: Region }
-  | { probe: 'blank'; shot: string; region: Region }
+  | { probe: 'blank'; shot: string; region: Region; colour?: number }
   | { probe: 'bar'; shot: string; bar: HpBar; filled: number }
   | { probe: 'text'; shot: string; region: Region }
 
@@ -113,6 +128,16 @@ export function textPixels(frame: Frame, region: Region): number {
   return colours.length - Math.max(...counts.values())
 }
 
+const hexColour = (colour: number) => `0x${colour.toString(16).padStart(6, '0')}`
+
+function blankVerdict(frame: Frame, region: Region, colour: number | undefined): Verdict {
+  if (!isBlank(frame, region)) return { pass: false, detail: 'more than one colour' }
+  if (colour === undefined) return { pass: true, detail: 'one colour' }
+  const found = colourAt(frame, region.x, region.y)
+  if (found === colour) return { pass: true, detail: `one colour, ${hexColour(colour)}` }
+  return { pass: false, detail: `one colour, ${hexColour(found)}, not ${hexColour(colour)}` }
+}
+
 // A message of the battle text box has far more glyph pixels than this.
 const MIN_TEXT_PIXELS = 20
 
@@ -122,10 +147,8 @@ function verdictOf(check: Check, frame: (name: string) => Frame): Verdict {
       const count = differingPixels(frame(check.before), frame(check.after), check.region)
       return { pass: count > 0, detail: `${String(count)} pixels differ` }
     }
-    case 'blank': {
-      const blank = isBlank(frame(check.shot), check.region)
-      return { pass: blank, detail: blank ? 'one colour' : 'more than one colour' }
-    }
+    case 'blank':
+      return blankVerdict(frame(check.shot), check.region, check.colour)
     case 'bar': {
       const filled = filledBarPixels(frame(check.shot), check.bar)
       const detail = `${String(filled)} of ${String(check.bar.width)} pixels filled, ${String(check.filled)} expected`

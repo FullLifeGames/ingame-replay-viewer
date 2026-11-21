@@ -117,4 +117,15 @@ describe('judging a run', () => {
       'error EMPTY, expected VERSION',
     ])
   })
+
+  it('fails a refusal whose last frame is not the refusal screen', () => {
+    const output: ToolOutput = {
+      shots: [],
+      status: { status: 'error', frame: 44, done: 0, total: 0, turn: 0, error: 2 },
+    }
+    const scenes = [{ name: 'refused', pass: false, detail: 'one colour, 0xffffff, not 0x630000' }]
+    expect(judgeRun({ expect: 'VERSION', output, scenes, errors: ERRORS })).toEqual([
+      'scene refused: one colour, 0xffffff, not 0x630000',
+    ])
+  })
 })

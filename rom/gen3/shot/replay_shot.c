@@ -10,9 +10,10 @@
 // (rom/gen3/include/replay_interpreter.h) at the given address. A shot <name>:<done>:<frames> is
 // taken <frames> frames after the first frame on which `done` equals <done>, and goes to
 // <frame dir>/<name>.ppm (binary PPM, 240x160). The run stops when the replay has finished and no
-// shot it reached is still due, when the interpreter reports an error, or when `done` has not
-// changed for STALL_FRAMES frames: the viewer presses no button, so an op that waits for one stalls.
-// The frame it stops on goes to <frame dir>/final.ppm.
+// shot it reached is still due, ERROR_FRAMES frames after the interpreter reports an error (so the
+// refusal screen is up), or when `done` has not changed for STALL_FRAMES frames: the viewer presses
+// no button, so an op that waits for one stalls. The frame it stops on goes to
+// <frame dir>/final.ppm.
 //
 // Output on stdout, one JSON object per line: {"shot":...} for each shot, then {"status":...}.
 // Exit code 0 when the run reached a status, 2 on a usage or emulator error.
@@ -31,6 +32,7 @@
 #include <string.h>
 
 #define STALL_FRAMES 3600
+#define ERROR_FRAMES 30
 #define MAX_SHOTS 64
 #define MAX_NAME 32
 
@@ -199,7 +201,7 @@ static void DropAudio(struct mCore *core)
 static const char *Play(struct Run *run, unsigned long *frame, struct Progress *progress)
 {
     unsigned lastDone = 0;
-    unsigned long lastChange = 0;
+    unsigned long lastChange = 0, errorFrame = 0;
 
     for (*frame = 1;; (*frame)++)
     {
@@ -208,7 +210,9 @@ static const char *Play(struct Run *run, unsigned long *frame, struct Progress *
         *progress = ReadProgress(run);
         if (!TakeShots(run, *progress, *frame))
             return NULL;
-        if (progress->error != 0)
+        if (progress->error != 0 && errorFrame == 0)
+            errorFrame = *frame;
+        if (errorFrame != 0 && *frame - errorFrame >= ERROR_FRAMES)
             return "error";
         if (progress->finished && !ShotsDue(run))
             return "finished";

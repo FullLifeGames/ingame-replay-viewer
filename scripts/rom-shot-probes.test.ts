@@ -122,6 +122,18 @@ describe('checking the shots of a scene', () => {
     expect(check(13).pass).toBe(false)
   })
 
+  it('takes a blank screen of the expected colour and names another colour', () => {
+    const screen = { x: 0, y: 0, width: WIDTH, height: HEIGHT }
+    const shots = new Map([
+      ['red', frameOf(0x630000)],
+      ['white', frameOf(0xffffff)],
+    ])
+    const check = (shot: string) =>
+      checkShots({ probe: 'blank', shot, region: screen, colour: 0x630000 }, shots)
+    expect(check('red')).toEqual({ pass: true, detail: 'one colour, 0x630000' })
+    expect(check('white')).toEqual({ pass: false, detail: 'one colour, 0xffffff, not 0x630000' })
+  })
+
   it('fails a scene whose shot the tool never took', () => {
     const region = { x: 0, y: 0, width: 2, height: 2 }
     expect(checkShots({ probe: 'text', shot: 'win', region }, frames)).toEqual({

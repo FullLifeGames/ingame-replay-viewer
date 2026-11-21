@@ -4,7 +4,7 @@ import type { Instruction } from '../src/gen3/stream/instructions.ts'
 import { DUGTRIO, streamOf } from '../src/gen3/stream/testing.ts'
 
 import { SCREEN } from './rom-shot-probes.ts'
-import { scenesOf, shotArgs } from './rom-shot-scenes.ts'
+import { refusalScenes, scenesOf, shotArgs } from './rom-shot-scenes.ts'
 import { handMadeStream } from './rom-shot-stream.ts'
 
 const scenesFor = (instructions: readonly Instruction[]) => scenesOf(streamOf(instructions))
@@ -154,6 +154,16 @@ describe('the scene points of a decoded instruction list (S6)', () => {
     expect(shotArgs(scenesFor([{ op: 'intro' }, { op: 'end', outcome: 'tie' }]))).toEqual([
       'intro-before:0:0',
       'intro:1:0',
+    ])
+  })
+
+  it('checks a refused stream on the last frame: the whole screen in the refusal colour', () => {
+    expect(refusalScenes()).toEqual([
+      {
+        name: 'refused',
+        shots: [],
+        check: { probe: 'blank', shot: 'final', region: SCREEN.screen, colour: 0x630000 },
+      },
     ])
   })
 })

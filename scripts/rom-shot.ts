@@ -28,7 +28,7 @@ import {
   runTool,
 } from './rom-shot-run.ts'
 import type { Expected, SceneVerdict, ToolOutput } from './rom-shot-run.ts'
-import { scenesOf, shotArgs } from './rom-shot-scenes.ts'
+import { refusalScenes, scenesOf, shotArgs } from './rom-shot-scenes.ts'
 import type { Scene } from './rom-shot-scenes.ts'
 import type * as ShotStream from './rom-shot-stream.ts'
 
@@ -96,11 +96,11 @@ async function planRuns(paths: BuildPaths): Promise<RunPlan[]> {
       scenes,
       expect: 'finished',
     },
-    { name: 'empty-slot', rom: undefined, scenes: [], expect: 'EMPTY' },
+    { name: 'empty-slot', rom: undefined, scenes: refusalScenes(), expect: 'EMPTY' },
     {
       name: 'version-2',
       rom: writeReplaySlot(rom, description, shot.withVersion(bytes, 2)),
-      scenes: [],
+      scenes: refusalScenes(),
       expect: 'VERSION',
     },
   ]
@@ -156,7 +156,10 @@ function sayRun(report: RunReport): void {
   for (const scene of report.scenes) {
     say(`  ${scene.pass ? 'pass' : 'FAIL'} ${scene.name}: ${scene.detail}`)
   }
-  for (const problem of report.problems) say(`  ${problem}`)
+  // A failed scene is listed above already.
+  for (const problem of report.problems.filter((line) => !line.startsWith('scene '))) {
+    say(`  ${problem}`)
+  }
 }
 
 async function runShots(): Promise<void> {
