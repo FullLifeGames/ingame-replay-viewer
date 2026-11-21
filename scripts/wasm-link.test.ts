@@ -115,10 +115,11 @@ describe('the link command', () => {
     expect(argv).toContain(flag)
   })
 
-  it('links at -O0 unless asked for -O2', () => {
-    expect(argv).toContain('-O0')
-    expect(linkCommand(paths, objects, '-O2')).toContain('-O2')
-    expect(linkCommand(paths, objects, '-O2')).not.toContain('-O0')
+  it('links at -O2 unless asked for -O0', () => {
+    expect(argv).toContain('-O2')
+    expect(argv).not.toContain('-O0')
+    expect(linkCommand(paths, objects, '-O0')).toContain('-O0')
+    expect(linkCommand(paths, objects, '-O0')).not.toContain('-O2')
   })
 
   it('puts static data at the cartridge address, above every GBA memory range', () => {

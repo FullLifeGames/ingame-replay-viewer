@@ -76,7 +76,7 @@ function checkInside(out: string, objects: readonly string[]): void {
 export function linkCommand(
   paths: WasmPaths,
   objects: readonly string[],
-  optimise: CompileOptions['optimise'] = '-O0',
+  optimise: CompileOptions['optimise'] = '-O2',
 ): string[] {
   checkInside(paths.out, objects)
   const { globalBase, initialMemory, stackSize } = linkSettings()
