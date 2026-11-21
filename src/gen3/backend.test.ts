@@ -97,7 +97,9 @@ describe('the team tables', () => {
 
 describe('the event kinds of step B4b', () => {
   it('fail loudly until B4b brings them', () => {
-    expect(() => streamOfLog('|win|Alice')).toThrow(/not yet: the win event of line 8/)
+    expect(() => streamOfLog('|-status|p2a: Tyranitar|tox')).toThrow(
+      /not yet: the status event of line 8/,
+    )
   })
 })
 

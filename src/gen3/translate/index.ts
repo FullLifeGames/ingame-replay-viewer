@@ -5,6 +5,7 @@ import { Gen3Error } from '../errors'
 import type { Fallback } from '../fallbacks'
 import type { Stream } from '../stream/instructions'
 import { Context, type EventOf, type Placed } from './context'
+import { message, tie, win } from './end'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
 import { damage, heal } from './hp'
 import { crit, effectiveness, failure, immunity, miss, move } from './moves'
@@ -25,9 +26,9 @@ const HANDLERS = {
   turn,
   switchIn,
   faint,
-  message: notYet,
-  win: notYet,
-  tie: notYet,
+  message,
+  win,
+  tie,
   move,
   cant: notYet,
   miss,
