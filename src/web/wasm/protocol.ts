@@ -52,6 +52,15 @@ export class TickClock {
   }
 }
 
+/**
+ * The rate of the game's mixer (IRV_WASM_MIXER_RATE in rom/gen3/wasm/include/irv_wasm_sound.h):
+ * 704 samples per frame, left and right each. The module passes its rate with every frame's
+ * samples, and the worker refuses another.
+ */
+export const MIXER_RATE = 42_048
+
+const PACES: Record<Speed, number> = { '1x': 1, '2x': 2, fast: 0 }
+
 /** The control words: what the page allows, and what the worker reports after each frame. */
 export const CONTROL = {
   allowed: 0,
@@ -64,14 +73,28 @@ export const CONTROL = {
   error: 7,
   finished: 8,
   playing: 9,
+  pace: 10,
 } as const
+
+/**
+ * The page's side: how the worker hands on the game's sound at `speed`. 1x plays it, 2x plays it
+ * at double pace, and fast, where the worker runs uncapped, keeps it silent.
+ */
+export function writePace(control: Int32Array, speed: Speed): void {
+  Atomics.store(control, CONTROL.pace, PACES[speed])
+}
+
+/** The worker's side: 1 or 2 frames of the game's sound per frame played, or 0 for none. */
+export function readPace(control: Int32Array): number {
+  return Atomics.load(control, CONTROL.pace)
+}
 
 export interface SharedBuffers {
   /** Int32 words at the indexes of CONTROL. */
   readonly control: SharedArrayBuffer
   /** The newest frame as RGBA. */
   readonly frame: SharedArrayBuffer
-  /** The audio ring (AudioRing); unused until the game has sound. */
+  /** The audio ring (AudioRing): the game's sound, left and right interleaved. */
   readonly audio: SharedArrayBuffer
 }
 
@@ -156,7 +179,11 @@ export function readStatus(control: Int32Array): RunStatus {
   }
 }
 
-/** A ring of float samples from one writer (the worker) to one reader (the audio thread). */
+/**
+ * A ring of float samples from one writer (the worker) to one reader (the audio thread). The
+ * game's sound goes in as left and right pairs; with an even capacity, every push and pull of
+ * whole pairs keeps them whole.
+ */
 export class AudioRing {
   readonly capacity: number
   private readonly header: Int32Array
@@ -170,6 +197,27 @@ export class AudioRing {
 
   get overruns(): number {
     return Atomics.load(this.header, RING.overruns)
+  }
+
+  /** The samples written since the ring was made. */
+  get totalWritten(): number {
+    return Atomics.load(this.header, RING.written)
+  }
+
+  /** The samples read since the ring was made. */
+  get totalRead(): number {
+    return Atomics.load(this.header, RING.read)
+  }
+
+  /** Copies the newest samples written into the end of `out`, read or not; returns how many. */
+  recent(out: Float32Array): number {
+    const written = this.totalWritten
+    const count = Math.min(out.length, written, this.capacity)
+    const start = out.length - count
+    for (let i = 0; i < count; i++) {
+      out[start + i] = this.samples[(written - count + i) % this.capacity] ?? 0
+    }
+    return count
   }
 
   /** Writes what fits; returns the samples it dropped, and counts an overrun when it dropped some. */

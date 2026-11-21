@@ -7,11 +7,14 @@ import {
   createShared,
   GBA_FRAMES_PER_SECOND,
   grant,
+  MIXER_RATE,
+  readPace,
   readStatus,
   SPEEDS,
   TickClock,
   ticksPerSecond,
   waitForTick,
+  writePace,
   writeStatus,
 } from './protocol'
 
@@ -116,9 +119,38 @@ describe('the audio ring', () => {
     expect([...out]).toEqual([1, 2, 3, 4])
   })
 
+  it('counts what went in and out, and shows the newest samples without reading them', () => {
+    const ring = new AudioRing(createShared(4).audio)
+    ring.push(Float32Array.of(1, 2, 3))
+    ring.pull(new Float32Array(2))
+    ring.push(Float32Array.of(4, 5))
+    expect([ring.totalWritten, ring.totalRead]).toEqual([5, 2])
+    const out = new Float32Array(3)
+    expect(ring.recent(out)).toBe(3)
+    expect([...out]).toEqual([3, 4, 5])
+    expect(ring.totalRead).toBe(2)
+    expect(ring.recent(new Float32Array(9))).toBe(4)
+  })
+
   it('refuses a capacity that is not a positive whole number', () => {
     expect(() => createShared(0)).toThrow(
       'the audio ring needs a capacity of 1 or more samples, not 0',
     )
+  })
+})
+
+describe('the audio pace', () => {
+  it('plays at 1x and 2x and goes silent at fast', () => {
+    const control = new Int32Array(createShared(4).control)
+    const paces = SPEEDS.map((speed) => {
+      writePace(control, speed)
+      return readPace(control)
+    })
+    expect(paces).toEqual([1, 2, 0])
+  })
+
+  it('takes the mixer rate of 704 samples per GBA frame', () => {
+    expect(MIXER_RATE).toBe(42048)
+    expect(Math.round(MIXER_RATE / GBA_FRAMES_PER_SECOND)).toBe(704)
   })
 })
