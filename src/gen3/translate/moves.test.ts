@@ -95,6 +95,33 @@ describe('moves', () => {
     ])
   })
 
+  // gen3ou-2717081342: Snorlax's Charm into Swampert at -6, then the end of the turn.
+  it('plays no animation for a stat move at its limit, whatever the end of the turn shows', () => {
+    const scene = sceneOf(
+      '|move|p2a: Tyranitar|Charm|p1a: Dugtrio',
+      '|-unboost|p1a: Dugtrio|atk|0',
+      '|',
+      '|-heal|p2a: Tyranitar|100/100|[from] item: Leftovers',
+    )
+    expect(scene).not.toContainEqual(expect.objectContaining({ op: 'move' }))
+  })
+
+  // Swagger and Flatter still confuse a target at the limit, and the game plays them.
+  it('plays the animation of a Swagger or Flatter that confuses a target at the limit', () => {
+    for (const [move, stat] of [
+      ['Swagger', 'atk'],
+      ['Flatter', 'spa'],
+    ] as const) {
+      const scene = sceneOf(
+        `|move|p2a: Tyranitar|${move}|p1a: Dugtrio`,
+        `|-boost|p1a: Dugtrio|${stat}|0`,
+        '|-start|p1a: Dugtrio|confusion',
+      )
+      const number = moveOf(move).number
+      expect(scene).toContainEqual({ op: 'move', user: 'far', target: 'near', move: number })
+    }
+  })
+
   it('aims a move on the user at its own side, and a far move at the near side', () => {
     const swordsDance = moveOf('Swords Dance').number
     const rockSlide = moveOf('Rock Slide').number
