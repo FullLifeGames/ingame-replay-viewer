@@ -144,6 +144,22 @@ describe('moves', () => {
     expect(scene).not.toContainEqual(expect.objectContaining({ op: 'move' }))
   })
 
+  // Showdown logs Memento's drops of 0 and then the user's faint (`selfdestruct: 'ifHit'`); the
+  // expansion plays it whatever the stats do (`EFFECT_MEMENTO` calls `BattleScript_Memento`,
+  // `setatkhptozero`, `attackanimation`; src/battle_move_resolution.c, data/battle_scripts_1.s).
+  it('plays the animation of a Memento into a target at -6/-6', () => {
+    const scene = sceneOf(
+      '|move|p1a: Dugtrio|Memento|p2a: Tyranitar',
+      '|-unboost|p2a: Tyranitar|atk|0',
+      '|-unboost|p2a: Tyranitar|spa|0',
+      '|faint|p1a: Dugtrio',
+    )
+    expect(scene.map(plain).slice(0, 2)).toEqual([
+      'Dugtrio used Memento!',
+      { op: 'move', user: 'near', target: 'far', move: moveOf('Memento').number },
+    ])
+  })
+
   it('aims a move on the user at its own side, and a far move at the near side', () => {
     const swordsDance = moveOf('Swords Dance').number
     const rockSlide = moveOf('Rock Slide').number

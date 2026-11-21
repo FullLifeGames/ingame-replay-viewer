@@ -1,7 +1,8 @@
 // Stat changes (plan §6): the expansion plays one arrow animation for the stats a move raises or
 // lowers together (`TryPlayStatChangeAnimation`, `battle_stat_change.c`), then says each change.
 // A run is the stat changes of one Pokémon in one direction, one right after the other.
-// A stat at its limit plays no arrows and says so (`B_MSG_STAT_WONT_CHANGE`):
+// A stat at its limit plays no arrows and says so, one line per stat, as `TryStatChange` walks
+// the queue one stat at a time (`B_MSG_STAT_WONT_CHANGE`):
 // `IncreaseStat` picks `STRINGID_STATSWONTINCREASE` "{B_SCR_NAME_WITH_PREFIX}'s {B_BUFF1} won't go
 // any higher!" and `DecreaseStat` `STRINGID_STATSWONTDECREASE` "… won't go any lower!"
 // (`battle_stat_change.c`, `battle_message.c`).
