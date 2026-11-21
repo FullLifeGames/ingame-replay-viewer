@@ -68,7 +68,7 @@ export async function checkBaseRom(
   if (found !== baseSha1) {
     throw new RomError(
       `This file is not the US Emerald dump the patch fits: its SHA1 is ${found}, ` +
-        `the dump's is ${baseSha1}. Pick your US Emerald dump.`,
+        `US Emerald's is ${baseSha1}. Pick your US Emerald dump.`,
     )
   }
 }

@@ -49,6 +49,13 @@ test('the page is cross-origin isolated and offers 994052 first', async ({ page 
   await expect(page.getByLabel('Test replay')).toHaveValue(FIRST)
   await expect(page.getByRole('heading', { name: /^Not shown in the game \(\d+\)/ })).toBeVisible()
   expect(await notShownCount(page)).toBeGreaterThan(0)
+  await test.step('a phone-wide page shows the whole screen at 3:2', async () => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    expect(await page.evaluate('document.documentElement.scrollWidth')).toBeLessThanOrEqual(390)
+    const { width = 0, height = 0 } = (await page.locator('canvas').boundingBox()) ?? {}
+    expect(width).toBeGreaterThan(0)
+    expect(width / height).toBeCloseTo(3 / 2, 2)
+  })
 })
 
 test('a page without COOP and COEP shows only the environment line', async ({ page }) => {

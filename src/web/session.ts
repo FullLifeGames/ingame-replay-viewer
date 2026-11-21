@@ -57,7 +57,9 @@ export interface StartSummary {
 
 /**
  * The page's actions. A pick resolves to `undefined` when a newer pick of its kind replaced it,
- * and the newest pick of each kind is what the next Start runs.
+ * and the newest pick of each kind is what the next Start runs. A replay pick that fails leaves
+ * the replay picked before it, which the page still shows; a refused dump stays the dump pick,
+ * so Start repeats its refusal while the file input shows that file.
  */
 export interface Session {
   pickDump(bytes: Uint8Array): Promise<DumpSummary | undefined>
@@ -95,18 +97,23 @@ function once<T>(make: () => Promise<T>): () => Promise<T> {
   }
 }
 
-/** The newest pick of one kind; an older pick that settles later counts for nothing. */
-function newest<T>() {
-  let current: Promise<T> | undefined
+/**
+ * The newest pick of one kind; an older pick that settles later counts for nothing. With
+ * `keepEarlier`, a pick that fails hands the next Start the pick before it, or `undefined`.
+ */
+function newest<T>(keepEarlier: boolean) {
+  let current: Promise<T | undefined> | undefined
   return {
     get: () => current,
     pick: async (work: Promise<T>): Promise<T | undefined> => {
-      current = work
+      const earlier = current
+      const held = keepEarlier ? work.catch(() => earlier) : work
+      current = held
       try {
         const value = await work
-        return current === work ? value : undefined
+        return current === held ? value : undefined
       } catch (error) {
-        if (current === work) throw error
+        if (current === held) throw error
         return undefined
       }
     },
@@ -161,8 +168,8 @@ async function chooseShowdownReplay(deps: SessionDeps, input: string): Promise<C
 
 export function createSession(deps: SessionDeps): Session {
   const buildFiles = once(() => fetchBuildFiles(deps))
-  const dumps = newest<Dump>()
-  const replays = newest<Chosen>()
+  const dumps = newest<Dump>(false)
+  const replays = newest<Chosen>(true)
   let loaded: Emulator | undefined
   const emulator = once(async () => {
     const ready = await step('Could not start the emulator', deps.loadEmulator)
@@ -180,10 +187,9 @@ export function createSession(deps: SessionDeps): Session {
   const summaryOf = async (pick: Promise<Chosen | undefined>) => (await pick)?.summary
 
   const start = async (): Promise<StartSummary> => {
-    const [dumpPick, replayPick] = [dumps.get(), replays.get()]
-    if (dumpPick === undefined) throw new SessionError(PICK_DUMP)
-    if (replayPick === undefined) throw new SessionError(PICK_REPLAY)
-    const [dump, chosen] = await Promise.all([dumpPick, replayPick])
+    const [dump, chosen] = await Promise.all([dumps.get(), replays.get()])
+    if (dump === undefined) throw new SessionError(PICK_DUMP)
+    if (chosen === undefined) throw new SessionError(PICK_REPLAY)
     const rom = await step('Could not write the replay into the ROM', () =>
       writeReplaySlot(dump.rom, dump.description, chosen.bytes),
     )
