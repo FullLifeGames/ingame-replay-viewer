@@ -9,7 +9,8 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
-      exclude: ['src/**/*.test.ts', 'src/web/main.ts'],
+      // main.ts and view.ts are the page's DOM wiring; the e2e covers them, no Node spec can load them.
+      exclude: ['src/**/*.test.ts', 'src/web/main.ts', 'src/web/view.ts'],
       reporter: ['text-summary', 'html'],
       thresholds: {
         'src/script/**': { lines: 90, branches: 90 },
