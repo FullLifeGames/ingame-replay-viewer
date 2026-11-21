@@ -88,7 +88,9 @@ const HURT_BY: Readonly<Record<string, (who: Mon) => string>> = {
   nightmare: HP_TEMPLATES.nightmare.render,
 }
 
-const isTrapping = (name: string) => Dex.moves.get(name).volatileStatus === 'partiallytrapped'
+/** Wrap, Fire Spin and the other moves that trap and hurt each turn, by @pkmn's data. */
+export const isTrapping = (name: string) =>
+  Dex.moves.get(name).volatileStatus === 'partiallytrapped'
 
 function hurtByKind(who: Mon, cause: Effect, source: Mon | undefined): string | undefined {
   if (cause.kind === 'item') return HP_TEMPLATES.item.render(who, itemName(cause.name))
