@@ -1,14 +1,18 @@
 // The dev page in Chromium (plan S5b §5). Tests 1 to 3 need no dump; test 4 reads the user's
-// US Emerald by the build's own rule and skips without it or without the built patch.
+// US Emerald by the build's own rule and skips without it or without the built patch, and fails
+// on a build that lacks part of the patch series. It shows that the emulator runs the replay's
+// ROM; that the replay plays to its end, and that Restart starts it over, is the tester's.
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { expect, type Page, test } from '@playwright/test'
 
-import { loadBuildConfig } from '../scripts/rom-config.ts'
+import { builtSeriesProblems } from '../scripts/build-series.ts'
+import { loadBuildConfig, ROM_DIR } from '../scripts/rom-config.ts'
 import { OUTPUT_NAMES } from '../scripts/rom-outputs.ts'
 import { buildPaths, REPO_DIR } from '../scripts/rom-paths.ts'
 import { readPreflightInput } from '../scripts/rom-preflight.ts'
+import { readSeries } from '../scripts/rom-upstream.ts'
 import { differ, frame } from './frames.ts'
 
 const FIRST = 'smogtours-gen3ou-994052'
@@ -16,6 +20,16 @@ const BASE_SHA1 = loadBuildConfig().baseRom.sha1
 const DUMP = readPreflightInput(process.env, BASE_SHA1).baseRomPath
 const PATCH = join(buildPaths().outDir, OUTPUT_NAMES.patch)
 const SLOT = join(buildPaths().outDir, OUTPUT_NAMES.slot)
+const INFO = join(buildPaths().outDir, OUTPUT_NAMES.info)
+
+/** What build/rom/ lacks of the patch series and the boot file; empty for a whole build. */
+function buildProblems(): string[] {
+  const info: unknown = JSON.parse(readFileSync(INFO, 'utf8'))
+  return builtSeriesProblems(
+    info,
+    readSeries(readFileSync(join(ROM_DIR, 'patches', 'series'), 'utf8')),
+  )
+}
 
 /** The stream's length that src/gen3's snapshot of 994052 holds (its spec keeps it true). */
 function snapshotLength(): number {
@@ -76,6 +90,7 @@ test('994052 starts in the emulator', async ({ page }) => {
   ].filter((problem) => problem !== undefined)
   test.skip(missing.length > 0, missing.join(' and '))
   test.setTimeout(240_000)
+  expect(buildProblems(), 'build/rom/ holds a build that does not boot into the replay').toEqual([])
 
   const { romSha1 } = JSON.parse(readFileSync(SLOT, 'utf8')) as { romSha1: string }
   const streamBytes = snapshotLength()
@@ -103,9 +118,11 @@ test('994052 starts in the emulator', async ({ page }) => {
   expect(later.colours).toBeGreaterThan(1)
   expect(differ(first, later)).toBe(true)
 
-  await page.getByRole('button', { name: 'Restart' }).click()
-  await expect(status).toHaveText(new RegExp(`Restarted ${FIRST}`))
-  await expect.poll(async () => differ(later, await frame(page)), { timeout: 30_000 }).toBe(true)
+  await test.step('frames change after Restart', async () => {
+    await page.getByRole('button', { name: 'Restart' }).click()
+    await expect(status).toHaveText(new RegExp(`Restarted ${FIRST}`))
+    await expect.poll(async () => differ(later, await frame(page)), { timeout: 30_000 }).toBe(true)
+  })
 
   expect(await page.evaluate('indexedDB.databases().then((found) => found.length)')).toBe(0)
   expect(errors).toEqual([])
