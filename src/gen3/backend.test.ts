@@ -97,9 +97,7 @@ describe('the team tables', () => {
 
 describe('the event kinds of step B4b', () => {
   it('fail loudly until B4b brings them', () => {
-    expect(() => streamOfLog('|-boost|p2a: Tyranitar|atk|1')).toThrow(
-      /not yet: the statChange event of line 8/,
-    )
+    expect(() => streamOfLog('|-weather|RainDance')).toThrow(/not yet: the weather event of line 8/)
   })
 })
 

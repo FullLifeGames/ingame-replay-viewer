@@ -9,6 +9,7 @@ import { message, tie, win } from './end'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
 import { damage, heal } from './hp'
 import { crit, effectiveness, failure, immunity, miss, move } from './moves'
+import { statChange } from './stats'
 import { cant, cureStatus, cureTeam, status } from './status'
 import { faint, switchIn } from './switches'
 import { tablesOf } from './tables'
@@ -41,7 +42,7 @@ const HANDLERS = {
   status,
   cureStatus,
   cureTeam,
-  statChange: notYet,
+  statChange,
   crit,
   effectiveness,
   effectStart: notYet,
