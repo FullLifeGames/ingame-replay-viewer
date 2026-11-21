@@ -1,8 +1,9 @@
-// npm run rom:shots (#7, plan section 7): plays streams in the built ROM from boot to END in
-// headless mGBA and checks named scenes in its frames. Three runs: the hand-made stream with every
-// scene, the built ROM's empty slot (refused as EMPTY) and the hand-made stream with version 2
-// (refused as VERSION). Frames, the ROMs and report.json go to build/rom/shots/. Needs a ROM
-// from npm run rom:build and libmgba-dev. A replay id needs the Gen 3 game backend (B6b).
+// npm run rom:shots [-- <name>...] (#7, plan section 7): plays streams in the built ROM from boot
+// to END in headless mGBA and checks named scenes in its frames. A name is a test replay id (its
+// stream comes from the Gen 3 game backend; 994052 when no name is given, S2a D5) or hand-made (a
+// short battle written with the stream encoder). Two refusal runs follow: the built ROM's empty
+// slot (refused as EMPTY) and the hand-made stream with version 2 (refused as VERSION). Frames, the
+// ROMs and report.json go to build/rom/shots/. Needs a ROM from npm run rom:build and libmgba-dev.
 import { createHash } from 'node:crypto'
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -32,13 +33,34 @@ import { refusalScenes, scenesOf, shotArgs } from './rom-shot-scenes.ts'
 import type { Scene } from './rom-shot-scenes.ts'
 import type * as ShotStream from './rom-shot-stream.ts'
 
-export function parseShotArgs(argv: string[]): void {
+const HAND_MADE = 'hand-made'
+const DEFAULT_REPLAY = '994052'
+const REPLAY_DIR = join(REPO_DIR, 'test', 'fixtures', 'replays')
+
+/** The streams to play, by name: test replay ids and hand-made. */
+export function parseShotArgs(argv: string[]): string[] {
   const { positionals } = parseArgs({ args: argv, options: {}, allowPositionals: true })
-  if (positionals.length > 0) {
-    throw new Error(
-      `a replay id ("${positionals.join(' ')}") needs the Gen 3 game backend, which is not on this branch yet; npm run rom:shots without an id plays the hand-made stream`,
-    )
+  positionals.forEach((name, i) => {
+    if (name !== HAND_MADE && !/^\d+$/.test(name)) {
+      throw new Error(
+        `"${name}" is neither a test replay id (its digits, such as ${DEFAULT_REPLAY}) nor ${HAND_MADE}`,
+      )
+    }
+    if (positionals.indexOf(name) !== i) {
+      throw new Error(`"${name}" is named twice; each stream writes its frames into its own folder`)
+    }
+  })
+  return positionals.length > 0 ? positionals : [DEFAULT_REPLAY]
+}
+
+/** The file in test/fixtures/replays/ of the test replay with this id. */
+export function replayFile(id: string, files: readonly string[]): string {
+  const file = files.find((name) => name.endsWith(`-${id}.json`))
+  if (file === undefined) {
+    const ids = files.flatMap((name) => /-(\d+)\.json$/.exec(name)?.[1] ?? [])
+    throw new Error(`no test replay ${id} in test/fixtures/replays/; there are ${ids.join(', ')}`)
   }
+  return file
 }
 
 interface RunPlan {
@@ -84,22 +106,26 @@ function readBuiltRom(paths: BuildPaths): { rom: Uint8Array; description: SlotDe
   return { rom, description }
 }
 
-async function planRuns(paths: BuildPaths): Promise<RunPlan[]> {
+function streamBytes(shot: typeof ShotStream, name: string): Uint8Array {
+  if (name === HAND_MADE) return shot.handMadeBytes()
+  const file = join(REPLAY_DIR, replayFile(name, readdirSync(REPLAY_DIR)))
+  return shot.replayBytes(JSON.parse(readFileSync(file, 'utf8')))
+}
+
+async function planRuns(paths: BuildPaths, names: readonly string[]): Promise<RunPlan[]> {
   const shot = await loadShotStream()
   const { rom, description } = readBuiltRom(paths)
-  const bytes = shot.handMadeBytes()
-  const scenes = scenesOf(shot.decodeStream(bytes))
+  const plays = names.map((name): RunPlan => {
+    const bytes = streamBytes(shot, name)
+    const scenes = scenesOf(shot.decodeStream(bytes))
+    return { name, rom: writeReplaySlot(rom, description, bytes), scenes, expect: 'finished' }
+  })
   return [
-    {
-      name: 'hand-made',
-      rom: writeReplaySlot(rom, description, bytes),
-      scenes,
-      expect: 'finished',
-    },
+    ...plays,
     { name: 'empty-slot', rom: undefined, scenes: refusalScenes(), expect: 'EMPTY' },
     {
       name: 'version-2',
-      rom: writeReplaySlot(rom, description, shot.withVersion(bytes, 2)),
+      rom: writeReplaySlot(rom, description, shot.withVersion(shot.handMadeBytes(), 2)),
       scenes: refusalScenes(),
       expect: 'VERSION',
     },
@@ -162,7 +188,7 @@ function sayRun(report: RunReport): void {
   }
 }
 
-async function runShots(): Promise<void> {
+async function runShots(names: readonly string[]): Promise<void> {
   const paths = buildPaths()
   const shotsDir = join(paths.outDir, 'shots')
   const tool = join(paths.outDir, 'shot', 'replay_shot')
@@ -174,7 +200,7 @@ async function runShots(): Promise<void> {
     address: progressAddress(nmOutput(join(paths.outDir, OUTPUT_NAMES.elf))),
     errors: readErrorNames(readFileSync(INTERPRETER_HEADER_PATH, 'utf8')),
   }
-  const plans = await planRuns(paths)
+  const plans = await planRuns(paths, names)
   emptyInside(paths.roots, shotsDir)
   mkdirSync(shotsDir, { recursive: true })
   const reports = plans.map((plan) => playRun(context, plan))
@@ -191,8 +217,7 @@ async function runShots(): Promise<void> {
 
 async function main(): Promise<void> {
   await runCliAsync('rom:shots', async () => {
-    parseShotArgs(process.argv.slice(2))
-    await runShots()
+    await runShots(parseShotArgs(process.argv.slice(2)))
   })
 }
 

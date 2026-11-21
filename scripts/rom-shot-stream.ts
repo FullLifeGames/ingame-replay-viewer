@@ -1,16 +1,24 @@
-// The streams of the screenshot run while the Gen 3 game backend is not on this branch (plan
-// section 12, B6a): a hand-made battle written with the stream encoder, the same stream with
-// version 2, and the decoder that turns the bytes back into instructions for the scene points.
-// src/gen3/ imports without file extensions and imports JSON, as the page's bundler resolves them,
-// so scripts/rom-shot.ts loads this module through Vite's module runner, not with plain Node.
+// The streams of the screenshot run: a test replay's stream from the Gen 3 game backend, a
+// hand-made battle written with the stream encoder, the same stream with version 2, and the decoder
+// that turns the bytes back into instructions for the scene points. src/gen3/ imports without file
+// extensions and imports JSON, as the page's bundler resolves them, so scripts/rom-shot.ts loads
+// this module through Vite's module runner, not with plain Node.
+import { buildGen3Stream } from '../src/gen3/backend.ts'
 import { decodeStream } from '../src/gen3/stream/decode.ts'
 import { encodeStream } from '../src/gen3/stream/encode.ts'
 import { STREAM_OFFSET } from '../src/gen3/stream/format.ts'
 import type { Instruction, Stream, StreamMon } from '../src/gen3/stream/instructions.ts'
 import { moveOf, speciesOf } from '../src/gen3/tables/lookup.ts'
 import trainerPics from '../src/gen3/tables/trainer-pics.json'
+import { buildBattleScript } from '../src/script/build.ts'
+import { readReplay } from '../src/script/replay.ts'
 
 export { decodeStream }
+
+/** The stream of a replay as Showdown saves it, through the battle script and the game backend. */
+export function replayBytes(json: unknown): Uint8Array {
+  return buildGen3Stream(buildBattleScript(readReplay(json).log)).bytes
+}
 
 function monOf(name: string, gender: StreamMon['gender']): StreamMon {
   const species = speciesOf(name)
