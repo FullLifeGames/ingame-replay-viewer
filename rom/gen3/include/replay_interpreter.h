@@ -76,6 +76,8 @@ bool32 Replay_HidesHpNumbers(void);
 // Defined by the test runner (test/replay_test_runner.c): with REPLAY_EXIT_AT_END, the interpreter
 // calls it after END, while the battle is still up and before it is left.
 void ReplayTest_AtEnd(void);
+// Called when op number op (counted from 0) starts, after every wait before it.
+void ReplayTest_AtOpStart(u32 op);
 #endif
 
 // Forgets the loaded replay; gReplayProgress stays readable.

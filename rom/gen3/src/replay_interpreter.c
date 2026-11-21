@@ -34,6 +34,7 @@ struct ReplayState
     void (*upstreamIntro)(void);
     u16 wait;
     u8 step;
+    u8 lastOp; // the op that ended last, REPLAY_OP_END (0) before the first
     u8 end; // enum ReplayEnd
     bool8 loaded;
 };
@@ -162,12 +163,15 @@ void Replay_TakeOverBattleMain(void)
 //     waitanimation
 // and Cmd_waitanimation (src/battle_script_commands.c) returns while
 //     gBattleControllerExecFlags != 0 || gBattleStruct->battlerKOAnimsRunning != 0
-// So a PRINT starts during the animation, and every other op waits for its end. The faint handler
-// runs on two frames and starts the animation on both, so after a faint the counter is 2; both
+// So the PRINT right after a FAINT, the faint text, starts during the animation, and every other op
+// waits for its end, a later PRINT such as the next send-out text included. The faint handler runs
+// on two frames and starts the animation on both, so after a faint the counter is 2; both
 // animations end on the same frame.
 static bool32 Replay_WaitsForKOAnimation(u32 op, u32 step)
 {
-    return step == 0 && op != REPLAY_OP_PRINT && gBattleStruct->battlerKOAnimsRunning != 0;
+    if (step != 0 || gBattleStruct->battlerKOAnimsRunning == 0)
+        return FALSE;
+    return op != REPLAY_OP_PRINT || sReplay.lastOp != REPLAY_OP_FAINT;
 }
 
 static void Replay_RunBattle(void)
@@ -184,12 +188,17 @@ static void Replay_RunBattle(void)
     instruction = sReplay.instructions + sReplay.at;
     if (Replay_WaitsForKOAnimation(instruction[0], sReplay.step))
         return;
+#if TESTING
+    if (sReplay.step == 0)
+        ReplayTest_AtOpStart(gReplayProgress.done);
+#endif
     if (!sOps[instruction[0]](instruction + REPLAY_INSTRUCTION_HEADER_SIZE, sReplay.step))
     {
         sReplay.step++;
         return;
     }
     gReplayProgress.done++;
+    sReplay.lastOp = instruction[0];
     sReplay.step = 0;
     sReplay.at += REPLAY_INSTRUCTION_HEADER_SIZE + instruction[1];
 }

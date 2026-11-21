@@ -196,3 +196,28 @@ REPLAY_TEST("The near mon faints only after its KO animation for the far mon has
         EXPECT(gBattleStruct->battlerState[nearBattler].notOnField);
     }
 }
+
+// Ops 0-2 are INTRO and the two SEND_OUTs of StartDugtrioVsMagneton.
+REPLAY_TEST("Only the faint text prints during the KO animation; the next PRINT waits for its end")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        StartDugtrioVsMagneton(100, 100);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 0);
+        ReplayStream_Faint(REPLAY_SIDE_FAR);
+        ReplayStream_Print(COMPOUND_STRING("The opposing Magneton fainted!"));
+        ReplayStream_Print(COMPOUND_STRING("May sent out Magneton!"));
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        MESSAGE("The opposing Magneton fainted!");
+        MESSAGE("May sent out Magneton!");
+    }
+    THEN
+    {
+        EXPECT_NE(ReplayTest_KOAnimsAtOpStart(5), 0);
+        EXPECT_EQ(ReplayTest_KOAnimsAtOpStart(6), 0);
+    }
+}
