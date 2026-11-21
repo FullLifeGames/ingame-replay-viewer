@@ -46,6 +46,16 @@ export const MON_OFFSET = {
   reservedTail: 21,
 } as const
 
+/** Where a side's trainer sits in the stream. */
+export function trainerOffset(side: Side): number {
+  return STREAM.trainersOffset + SIDE[side] * TRAINER.size
+}
+
+/** Where a mon of a side's party table sits in the stream. */
+export function monOffset(side: Side, slot: number): number {
+  return STREAM.monsOffset + (SIDE[side] * STREAM.partySize + slot) * MON.size
+}
+
 /** Each instruction is `u8 op, u8 size`, then `size` bytes of operands. */
 export const INSTRUCTION = { headerSize: 2 } as const
 
