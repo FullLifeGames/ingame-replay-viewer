@@ -28,6 +28,7 @@
     "wasm:build": "node scripts/wasm-build.ts",
     "wasm:census": "node scripts/wasm-build.ts --census",
     "wasm:convert": "node scripts/wasm-convert.ts",
+    "wasm:run": "node scripts/wasm-run.ts",
     "gen3:tables": "node scripts/gen3-tables.ts"
   },
   "devDependencies": {
