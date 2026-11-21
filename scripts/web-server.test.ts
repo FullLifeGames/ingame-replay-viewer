@@ -153,6 +153,20 @@ describe('the dev server plugin', () => {
     expectIsolated(response)
   })
 
+  // rom:build empties build/rom/ at its start: the stat passes, the read fails. A folder in the
+  // patch's place does the same, and the server has to answer instead of crashing.
+  it('answers 404 with the build command when the file cannot be read after its stat', async () => {
+    const broken = join(scratch, 'broken')
+    mkdirSync(join(broken, OUTPUT_NAMES.patch), { recursive: true })
+    const base = await start(broken)
+    const response = await fetch(`${base}/${ROM_FILES.patch}`)
+    expect(response.status).toBe(404)
+    expect(response.headers.get('content-type')).toBe('text/plain; charset=utf-8')
+    expect(await response.text()).toBe(`${join(broken, MISSING_TAIL)}\n`)
+    expectIsolated(response)
+    expect((await fetch(`${fullBase}/${ROM_FILES.slot}`)).status).toBe(200)
+  })
+
   it('names a folder inside the repository by its repository path', async () => {
     const inside = await start(join(REPO_DIR, 'build', 'no-such-folder'))
     const response = await fetch(`${inside}/${ROM_FILES.slot}`)

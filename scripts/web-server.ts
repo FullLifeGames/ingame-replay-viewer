@@ -53,10 +53,27 @@ function answer(res: ServerResponse, status: number, line: string): void {
   res.end(`${line}\n`)
 }
 
+const missing = (path: string): string => `${shown(path)} is missing: run npm run rom:build`
+
+// pipe() does not pass a read error on, and an unhandled one would end the server. Before the
+// first byte the answer is still the 404 line; after it, the response can only be cut off.
+function stream(res: ServerResponse, path: string): void {
+  createReadStream(path)
+    .on('error', (error) => {
+      if (res.headersSent) {
+        res.destroy(error)
+        return
+      }
+      res.removeHeader('Content-Length')
+      answer(res, 404, missing(path))
+    })
+    .pipe(res)
+}
+
 function sendFile(req: IncomingMessage, res: ServerResponse, path: string, type: string): void {
   const size = statSync(path, { throwIfNoEntry: false })?.size
   if (size === undefined) {
-    answer(res, 404, `${shown(path)} is missing: run npm run rom:build`)
+    answer(res, 404, missing(path))
     return
   }
   res.statusCode = 200
@@ -64,7 +81,7 @@ function sendFile(req: IncomingMessage, res: ServerResponse, path: string, type:
   res.setHeader('Content-Length', size)
   res.setHeader('Cache-Control', 'no-store')
   if (req.method === 'HEAD') res.end()
-  else createReadStream(path).pipe(res)
+  else stream(res, path)
 }
 
 function romFiles(dir: string): Middleware {
