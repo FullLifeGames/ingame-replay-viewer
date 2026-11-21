@@ -133,6 +133,8 @@ interface FailEvent extends Caused {
   readonly effect?: Effect
   /** The stat an `unboost` failure kept, as @pkmn/protocol gives it (`atk`). */
   readonly stat?: string
+  /** Too little HP for the move (`[weak]`); in Gen 3, a Substitute's failure. */
+  readonly weak?: true
 }
 
 interface BlockEvent {
@@ -194,8 +196,18 @@ interface StatChangeEvent {
   readonly line: number
   readonly who: PokemonRef
   readonly stat: BoostID
-  /** Signed: a raise is positive, a drop negative. */
+  /** Signed and never 0: a raise is positive, a drop negative. */
   readonly stages: number
+  readonly cause?: Effect
+}
+
+/** A raise at +6 or a drop at -6: the log's change of 0 stages, with its direction kept. */
+interface StatLimitEvent {
+  readonly kind: 'statLimit'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly stat: BoostID
+  readonly direction: 'up' | 'down'
   readonly cause?: Effect
 }
 
@@ -320,6 +332,7 @@ export type ScriptEvent =
   | CureStatusEvent
   | CureTeamEvent
   | StatChangeEvent
+  | StatLimitEvent
   | CritEvent
   | EffectivenessEvent
   | EffectStartEvent

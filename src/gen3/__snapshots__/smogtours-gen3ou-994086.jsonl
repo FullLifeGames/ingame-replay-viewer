@@ -1,4 +1,4 @@
-{"length":19591,"crc32":"7aa19f49","trainers":{"near":{"name":"dataexpunged","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Halbert Simpson","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"},{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":344,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Claydol"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"}],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Fantasy Mead"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Machine Pass"},{"species":260,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Checker Knig"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Beanstalk Pa"},{"species":146,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Magma Flows"},{"species":142,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Sky Sands"}]}}
+{"length":19565,"crc32":"42974d21","trainers":{"near":{"name":"dataexpunged","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Halbert Simpson","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"},{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":344,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Claydol"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"}],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Fantasy Mead"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Machine Pass"},{"species":260,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Checker Knig"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Beanstalk Pa"},{"species":146,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Magma Flows"},{"species":142,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Sky Sands"}]}}
 {"line":23,"op":"intro"}
 {"line":23,"op":"print","text":"You are challenged by Halbert Simpson!"}
 {"line":25,"op":"print","text":"Halbert Simpson sent out Fantasy Meadow!"}
@@ -8,6 +8,7 @@
 {"line":26,"op":"ability","side":"far","ability":45,"show":true}
 {"line":26,"op":"weather","weather":"sand"}
 {"line":26,"op":"print","text":"A sandstorm kicked up!"}
+{"line":26,"op":"anim","side":"near","anim":"sandstormContinues"}
 {"line":26,"op":"ability","side":"far","ability":45,"show":false}
 {"line":27,"op":"turn","number":1}
 {"line":35,"op":"anim","side":"near","anim":"focusPunchSetup"}
@@ -45,7 +46,6 @@
 {"line":59,"op":"move","user":"far","target":"far","move":182}
 {"line":60,"op":"print","text":"The opposing Machine Passage protected itself!"}
 {"line":61,"op":"print","text":"Tyranitar used Rock Slide!"}
-{"line":61,"op":"move","user":"near","target":"far","move":157}
 {"line":62,"op":"print","text":"The opposing Machine Passage protected itself!"}
 {"line":64,"op":"print","text":"The sandstorm is raging."}
 {"line":64,"op":"anim","side":"near","anim":"sandstormContinues"}
@@ -689,7 +689,6 @@
 {"line":472,"op":"move","user":"far","target":"far","move":182}
 {"line":473,"op":"print","text":"The opposing Checker Knights protected itself!"}
 {"line":474,"op":"print","text":"Skarmory used Drill Peck!"}
-{"line":474,"op":"move","user":"near","target":"far","move":65}
 {"line":475,"op":"print","text":"The opposing Checker Knights protected itself!"}
 {"line":477,"op":"print","text":"The sandstorm is raging."}
 {"line":477,"op":"anim","side":"near","anim":"sandstormContinues"}
@@ -715,7 +714,6 @@
 {"line":494,"op":"move","user":"far","target":"far","move":182}
 {"line":495,"op":"print","text":"The opposing Checker Knights protected itself!"}
 {"line":496,"op":"print","text":"Skarmory used Drill Peck!"}
-{"line":496,"op":"move","user":"near","target":"far","move":65}
 {"line":497,"op":"print","text":"The opposing Checker Knights protected itself!"}
 {"line":499,"op":"print","text":"The sandstorm is raging."}
 {"line":499,"op":"anim","side":"near","anim":"sandstormContinues"}
@@ -792,7 +790,6 @@
 {"line":551,"op":"move","user":"far","target":"far","move":182}
 {"line":552,"op":"print","text":"The opposing Checker Knights protected itself!"}
 {"line":553,"op":"print","text":"Metagross used Earthquake!"}
-{"line":553,"op":"move","user":"near","target":"far","move":89}
 {"line":554,"op":"print","text":"The opposing Checker Knights protected itself!"}
 {"line":556,"op":"print","text":"The sandstorm is raging."}
 {"line":556,"op":"anim","side":"near","anim":"sandstormContinues"}
@@ -854,7 +851,6 @@
 {"line":596,"op":"move","user":"far","target":"far","move":182}
 {"line":597,"op":"print","text":"The opposing Magma Flows protected itself!"}
 {"line":598,"op":"print","text":"Tyranitar used Rock Slide!"}
-{"line":598,"op":"move","user":"near","target":"far","move":157}
 {"line":599,"op":"print","text":"The opposing Magma Flows protected itself!"}
 {"line":601,"op":"print","text":"The sandstorm is raging."}
 {"line":601,"op":"anim","side":"near","anim":"sandstormContinues"}

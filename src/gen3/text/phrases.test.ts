@@ -16,6 +16,8 @@ import {
 import { sceneOf } from './testing'
 
 const NBSP = '\u00a0'
+// STRINGID_TOOWEAKFORSUBSTITUTE, src/battle_message.c.
+const SUBSTITUTE_WEAK = 'But it does not have enough HP left to make a substitute!'
 
 describe('move phrases (P1)', () => {
   it('says who used which move, a far user with its prefix (C1)', () => {
@@ -80,9 +82,10 @@ describe('move phrases (P1)', () => {
       '|-fail|p2a: Tyranitar|unboost|Attack|[from] ability: Clear Body|[of] p2a: Tyranitar',
       "The opposing Tyranitar's stats were not lowered!",
     ],
+    ['|-fail|p1a: Dugtrio|move: Substitute|[weak]', SUBSTITUTE_WEAK],
   ])('words the failure %s', (line, text) => {
     const { event, mon } = sceneOf('fail', line)
-    expect(failed(mon(event.who), event.effect)).toBe(text)
+    expect(failed(mon(event.who), event.effect, event.weak)).toBe(text)
   })
 
   it('says a Pokémon fainted', () => {
@@ -107,10 +110,10 @@ describe('stat phrases (P1)', () => {
   })
 
   it('says a stat goes no further, and refuses a change of no stages', () => {
-    const { event, mon } = sceneOf('statChange', '|-boost|p1a: Dugtrio|atk|0')
+    const { event, mon } = sceneOf('statChange', '|-boost|p1a: Dugtrio|atk|1')
     const dugtrio = mon(event.who)
     expect(statWontChange(dugtrio, 'atk', 'up')).toBe("Dugtrio's Attack won't go any higher!")
     expect(statWontChange(dugtrio, 'def', 'down')).toBe("Dugtrio's Defense won't go any lower!")
-    expect(() => statChanged(dugtrio, event.stat, event.stages)).toThrow(Gen3Error)
+    expect(() => statChanged(dugtrio, event.stat, 0)).toThrow(Gen3Error)
   })
 })

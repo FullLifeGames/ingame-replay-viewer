@@ -14,7 +14,7 @@ const popUp = (side: Side, name: string, show: boolean) => ({
 })
 
 describe('ability pop-ups', () => {
-  it('sends the leads out, then raises Sand Stream with its pop-up (X10)', () => {
+  it('sends the leads out, then raises and plays Sand Stream inside its pop-up (X10)', () => {
     const result = streamOfLog(
       '|-weather|Sandstorm|[from] ability: Sand Stream|[of] p2a: Tyranitar',
     )
@@ -25,6 +25,7 @@ describe('ability pop-ups', () => {
       popUp('far', 'Sand Stream', true),
       { op: 'weather', weather: 'sand' },
       'A sandstorm kicked up!',
+      { op: 'anim', side: 'near', anim: 'sandstormContinues' },
       popUp('far', 'Sand Stream', false),
       { op: 'end', outcome: 'unknown' },
     ])
@@ -51,6 +52,19 @@ describe('ability pop-ups', () => {
       popUp('far', 'Clear Body', true),
       "The opposing Metagross's stats were not lowered!",
       popUp('far', 'Clear Body', false),
+      popUp('near', 'Intimidate', false),
+    ])
+  })
+
+  // Intimidate on a Pokémon at -6 logs a drop of 0 (Charm at -6 does so in gen3ou-2717081342).
+  it("keeps Intimidate up over a stat that won't go any lower", () => {
+    const scene = sceneOf(
+      '|-ability|p1a: Dugtrio|Intimidate|boost',
+      '|-unboost|p2a: Tyranitar|atk|0',
+    )
+    expect(scene.map(plain)).toEqual([
+      popUp('near', 'Intimidate', true),
+      "The opposing Tyranitar's Attack won't go any lower!",
       popUp('near', 'Intimidate', false),
     ])
   })

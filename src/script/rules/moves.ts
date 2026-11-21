@@ -49,7 +49,7 @@ export const MOVE_RULES = {
   },
   '|-fail|': {
     arity: 3,
-    reads: ['from', 'of'],
+    reads: ['from', 'of', 'weak'],
     build: ({ line, args: [, who, effect, stat], kwArgs, battle }) => [
       {
         kind: 'fail',
@@ -57,6 +57,7 @@ export const MOVE_RULES = {
         who: refOf(battle, who, line),
         ...(effect ? { effect: effectOf(effect) } : {}),
         ...(stat ? { stat } : {}),
+        ...flagsOf(kwArgs, ['weak']),
         ...causeOf(kwArgs, battle, line),
       },
     ],
