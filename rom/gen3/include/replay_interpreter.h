@@ -40,6 +40,7 @@ struct ReplayProgress
     u8 error;  // enum ReplayError
     u8 finished;
     u8 playing; // the interpreter runs the battle: from the frame BeginBattleIntro hands it gBattleMainFunc
+    u8 padding[3]; // the 12 bytes the GBA build's -mabi=apcs-gnu gives the struct, spelt out for the WebAssembly build
 };
 
 STATIC_ASSERT(offsetof(struct ReplayProgress, done) == REPLAY_PROGRESS_OFFSET_DONE, ReplayProgressDoneOffset);
