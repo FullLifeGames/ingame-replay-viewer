@@ -32,8 +32,12 @@ export const TRAINER = { size: 24, nameLength: 20 } as const
 
 export const TRAINER_OFFSET = { name: 0, trainerPic: 20, teamSize: 22, revealed: 23 } as const
 
-/** A Pokémon of a party table; an empty slot is all zero. */
-export const MON = { size: 24, nicknameLength: 13 } as const
+/**
+ * A Pokémon of a party table. `maxHpLimit` is the lowest max HP a mon may not have: the
+ * expansion's `INSTANT_HP_BAR_DROP` (`battle_controllers.h`), which the health bar reads as "empty
+ * the bar at once". The ROM's validator refuses a mon at or above it, and so does the decoder.
+ */
+export const MON = { size: 24, nicknameLength: 13, maxHpLimit: 0x7fff } as const
 
 export const MON_OFFSET = {
   species: 0,
@@ -45,13 +49,6 @@ export const MON_OFFSET = {
   nickname: 8,
   reservedTail: 21,
 } as const
-
-/**
- * The lowest max HP a stream may not hold: the expansion's `INSTANT_HP_BAR_DROP`
- * (`battle_controllers.h`), which the health bar reads as "drop at once". The ROM's validator
- * refuses a mon at or above it, and so does the decoder.
- */
-export const MAX_HP_LIMIT = 0x7fff
 
 /** Where a side's trainer sits in the stream. */
 export function trainerOffset(side: Side): number {

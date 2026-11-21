@@ -49,6 +49,10 @@
 #define REPLAY_MON_OFFSET_NICKNAME      8
 #define REPLAY_MON_OFFSET_RESERVED_TAIL 21
 
+// The lowest max HP a mon may not have: the expansion's INSTANT_HP_BAR_DROP
+// (battle_controllers.h), which the health bar reads as "empty the bar at once".
+#define REPLAY_MON_MAX_HP_LIMIT 0x7FFF
+
 // An instruction: u8 op, u8 size, then size bytes of operands. In the operands, side is a
 // REPLAY_SIDE_*, slot a party index, and HP is on the battle log's scale (maxHp of its mon).
 #define REPLAY_INSTRUCTION_HEADER_SIZE 2

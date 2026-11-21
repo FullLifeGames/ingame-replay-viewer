@@ -8,7 +8,6 @@ import { decodeText, EOS } from '../text/charset'
 import { fieldSize, readField } from './fields'
 import {
   INSTRUCTION,
-  MAX_HP_LIMIT,
   MON,
   MON_OFFSET,
   monOffset,
@@ -82,8 +81,8 @@ function readParty(bytes: Uint8Array, side: Side): Party {
     const at = monOffset(side, slot)
     if (bytes.subarray(at, at + MON.size).every((byte) => byte === 0)) return null
     const mon = readRecord<StreamMon>(MON_FIELDS, MON_OFFSET, bytes, at)
-    if (mon.maxHp >= MAX_HP_LIMIT) {
-      const limit = String(MAX_HP_LIMIT)
+    if (mon.maxHp >= MON.maxHpLimit) {
+      const limit = String(MON.maxHpLimit)
       throw new Gen3Error(
         `${side} mon ${String(slot)} has max HP ${String(mon.maxHp)}, not below ${limit}`,
       )
