@@ -13,10 +13,10 @@ import { MOVE_TEMPLATES, STAT_TEMPLATES } from '../src/gen3/text/phrases.ts'
 import { NAME_TEMPLATES } from '../src/gen3/text/names.ts'
 
 /** What the game puts into a name it inserts: no-break spaces. Written here on its own. */
-export const nb = (text: string) => text.replaceAll(' ', ' ')
+const nb = (text: string) => text.replaceAll(' ', ' ')
 
 export const FAR: Mon = { side: 'far', name: nb('Machine Passage') }
-export const NEAR: Mon = { side: 'near', name: 'Dugtrio' }
+const NEAR: Mon = { side: 'near', name: 'Dugtrio' }
 
 const FAR_START = `The opposing ${nb('Machine Passage')}`
 const FAR_INSIDE = `the opposing ${nb('Machine Passage')}`

@@ -22,7 +22,7 @@ export function tagged<A extends readonly unknown[]>(
 }
 
 /** A scene the game has no message for: our wording stands in, and the backend lists it. */
-export interface PhraseFallback {
+interface PhraseFallback {
   readonly kind: 'phrase'
   readonly detail: string
 }
