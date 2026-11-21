@@ -54,6 +54,16 @@ static u32 GetStatAnimId(u32 stat, s32 stages, u32 arrows)
     return stat + (byTwo ? STAT_ANIM_PLUS2 : STAT_ANIM_PLUS1);
 }
 
+// The format's stats stand for enum Stat (constants/pokemon.h), so STAT indexes statStages and
+// builds the arrows' id with them as they are.
+STATIC_ASSERT(REPLAY_STAT_ATK == STAT_ATK, ReplayStatAtkIsStatAtk);
+STATIC_ASSERT(REPLAY_STAT_DEF == STAT_DEF, ReplayStatDefIsStatDef);
+STATIC_ASSERT(REPLAY_STAT_SPE == STAT_SPEED, ReplayStatSpeIsStatSpeed);
+STATIC_ASSERT(REPLAY_STAT_SPA == STAT_SPATK, ReplayStatSpaIsStatSpatk);
+STATIC_ASSERT(REPLAY_STAT_SPD == STAT_SPDEF, ReplayStatSpdIsStatSpdef);
+STATIC_ASSERT(REPLAY_STAT_ACCURACY == STAT_ACC, ReplayStatAccuracyIsStatAcc);
+STATIC_ASSERT(REPLAY_STAT_EVASION == STAT_EVASION, ReplayStatEvasionIsStatEvasion);
+
 // STAT: the stage changes by the stream's stages, kept to MIN_STAT_STAGE..MAX_STAT_STAGE. The
 // first STAT of a run plays the arrows for the whole run, as the engine plays one animation per
 // stat change; the others come with REPLAY_ARROWS_NONE. A change of 0 plays none: the engine
