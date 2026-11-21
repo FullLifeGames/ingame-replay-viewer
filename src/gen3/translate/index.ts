@@ -6,7 +6,7 @@ import type { Fallback } from '../fallbacks'
 import type { Stream } from '../stream/instructions'
 import { Context, type EventOf, type Placed } from './context'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
-import { switchIn } from './switches'
+import { faint, switchIn } from './switches'
 import { tablesOf } from './tables'
 
 type Handler<K extends ScriptEvent['kind']> = (event: EventOf<K>, ctx: Context) => void
@@ -22,7 +22,7 @@ const HANDLERS = {
   battleStart,
   turn,
   switchIn,
-  faint: notYet,
+  faint,
   message: notYet,
   win: notYet,
   tie: notYet,
