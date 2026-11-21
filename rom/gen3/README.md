@@ -39,9 +39,14 @@ The ROM interpreter (`src/replay_interpreter.c`, `src/replay_setup.c`) plays an 
 - ANIM, with its table of the game's animations: `src/replay_anims.c`
 - WEATHER, VOLATILE and ABILITY: `src/replay_ops_field.c`
 
+`src/replay_setup.c` fills both parties from the stream. A team member that the replay never reveals gets a slot: the empty slots up to the trainer's team size, at most 6, take a copy of the side's first revealed mon, so the intro's ball display shows a ball for each team member.
+
+After a faint the expansion plays its KO animation (`B_ANIMATE_MON_AFTER_KO`). The interpreter waits for it, as the battle script's `waitanimation` does: the faint line that follows FAINT prints while it runs, and every other op waits for its end. FAINT sets the battler's HP to 0 first, as the game's Explosion does for its user, so a later faint on the other side starts no KO animation on a fainted mon.
+
 The tests in `test/replay_*.c` use `include/test/replay_test.h`:
 
 - `REPLAY_TEST(name)` writes a stream in its `STREAM` block with the `ReplayStream_*` writer (`test/replay_stream_writer.c`), queues the events it expects in `SCENE` with upstream's matchers (`MESSAGE`, `HP_BAR`, `ANIMATION` and the rest), and checks the battle in `THEN`, after END and before the test leaves the battle, so the parties, `gBattleStruct` and the sprites are still there.
+- `ReplayTest_KOAnimsAtOpStart(op)` returns the KO animation counter at the start of op `op`, counted from 0, for the first 32 ops of the stream. The interpreter records it through the hook `ReplayTest_AtOpStart`, which exists in test builds (`TESTING`).
 - A plain `TEST` whose name starts with `Replay:` checks a refusal with `Replay_Validate`, without a battle.
 
 ## Screenshots
@@ -50,7 +55,7 @@ The tests in `test/replay_*.c` use `include/test/replay_test.h`:
 
 With no name it plays test replay 994052 through the battle script and the Gen 3 game backend. `npm run rom:shots -- 994086 hand-made` plays the named streams instead: a test replay by its id, or `hand-made`, a short battle written with the stream encoder (the intro, both send-outs, a move, an HP change, a status, a switch, a faint and the win line). Two refusals follow each time. The built ROM's empty slot is refused as `EMPTY`, and the hand-made battle with stream version 2 is refused as `VERSION`.
 
-The tool takes a frame at each scene of `scripts/rom-shot-scenes.ts`, and `scripts/rom-shot-probes.ts` checks it with numbers: two frames differ, the near HP digit area shows only the healthbox background, the far HP bar fills the pixels the engine fills for the logged HP, the text box holds the win line and still shows it 600 frames after END. The run fails when a scene fails, when an op waits 3600 frames, or when the replay stops short of END. 994052 and `hand-made` must show every scene; for another replay the output and `report.json` list each scene its stream lacks. The tool reads the interpreter's progress at the offsets in `include/replay_progress.h`, which also holds the refusal screen's colour. The frames (PPM), the ROMs with their streams and `report.json` go to `build/rom/shots/`. Git ignores that folder, and the tree spec refuses a frame anywhere in the tree.
+The tool takes a frame at each scene of `scripts/rom-shot-scenes.ts`, and `scripts/rom-shot-probes.ts` checks it with numbers: two frames differ, the near HP digit area shows only the healthbox background, the far HP bar fills the pixels the engine fills for the logged HP, the text box holds the win line and still shows it 600 frames after END, and each side's ball display in the intro shows one ball per team member, up to 6, with no empty cell between them. The run fails when a scene fails, when an op waits 3600 frames, or when the replay stops short of END. 994052 and `hand-made` must show every scene; for another replay the output and `report.json` list each scene its stream lacks. The tool reads the interpreter's progress at the offsets in `include/replay_progress.h`, which also holds the refusal screen's colour. The frames (PPM), the ROMs with their streams and `report.json` go to `build/rom/shots/`. Git ignores that folder, and the tree spec refuses a frame anywhere in the tree.
 
 ## Adding a patch
 

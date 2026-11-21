@@ -34,6 +34,7 @@ struct ReplayState
     void (*upstreamIntro)(void);
     u16 wait;
     u8 step;
+    u8 lastOp; // the op that ended last, REPLAY_OP_END (0) before the first
     u8 end; // enum ReplayEnd
     bool8 loaded;
 };
@@ -150,6 +151,32 @@ void Replay_TakeOverBattleMain(void)
     gReplayProgress.playing = TRUE;
 }
 
+// The KO animation (#24). When a mon faints, the faint handler starts the animation of the mon
+// that stays (AnimateMonAfterKnockout in battle_controllers.c, B_ANIMATE_MON_AFTER_KO), and the
+// faint text prints while it runs. BattleScript_FaintBattler (data/battle_scripts_1.s) waits for
+// it before its next step:
+//     dofaintanimation BS_FAINTED
+//     ...
+//     printstring STRINGID_BATTLERFAINTED
+//     ...
+//     flushtextbox
+//     waitanimation
+// and Cmd_waitanimation (src/battle_script_commands.c) returns while
+//     gBattleControllerExecFlags != 0 || gBattleStruct->battlerKOAnimsRunning != 0
+// So the PRINT right after a FAINT, the faint text, starts during the animation, and every other op
+// waits for its end, a later PRINT such as the next send-out text included. The faint handler
+// (BtlController_HandleFaintAnimation in battle_controllers.c) starts the animation on each frame
+// it runs. A mon in the open takes two frames, so after its faint the counter is 2 and both
+// animations end on the same frame. A mon behind a substitute takes one frame more for each frame
+// of B_ANIM_SUBSTITUTE_TO_MON, and the counter is a 3-bit field (battlerKOAnimsRunning:3 in
+// include/battle.h), so there the count wraps and does not say how many animations run.
+static bool32 Replay_WaitsForKOAnimation(u32 op, u32 step)
+{
+    if (step != 0 || gBattleStruct->battlerKOAnimsRunning == 0)
+        return FALSE;
+    return op != REPLAY_OP_PRINT || sReplay.lastOp != REPLAY_OP_FAINT;
+}
+
 static void Replay_RunBattle(void)
 {
     const volatile u8 *instruction;
@@ -162,12 +189,19 @@ static void Replay_RunBattle(void)
         return;
     }
     instruction = sReplay.instructions + sReplay.at;
+    if (Replay_WaitsForKOAnimation(instruction[0], sReplay.step))
+        return;
+#if TESTING
+    if (sReplay.step == 0)
+        ReplayTest_AtOpStart(gReplayProgress.done);
+#endif
     if (!sOps[instruction[0]](instruction + REPLAY_INSTRUCTION_HEADER_SIZE, sReplay.step))
     {
         sReplay.step++;
         return;
     }
     gReplayProgress.done++;
+    sReplay.lastOp = instruction[0];
     sReplay.step = 0;
     sReplay.at += REPLAY_INSTRUCTION_HEADER_SIZE + instruction[1];
 }

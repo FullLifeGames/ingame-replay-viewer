@@ -1,9 +1,11 @@
 #include "global.h"
 #include "battle.h"
+#include "battle_anim.h"
 #include "pokemon.h"
 #include "sprite.h"
 #include "test/replay_test.h"
 #include "constants/battle.h"
+#include "constants/battle_anim.h"
 #include "constants/moves.h"
 #include "constants/songs.h"
 #include "constants/species.h"
@@ -134,5 +136,153 @@ REPLAY_TEST("FAINT after HP 0 takes the mon off the field on both sides")
         EXPECT(!gSprites[gBattlerSpriteIds[nearBattler]].inUse);
         EXPECT(gSprites[gHealthboxSpriteIds[nearBattler]].invisible);
         EXPECT(gBattleStruct->battlerState[nearBattler].notOnField);
+    }
+}
+
+// The KO animation (#24): when a mon faints, the expansion plays the back or front animation of the
+// mon that stays (B_ANIMATE_MON_AFTER_KO, AnimateMonAfterKnockout in battle_controllers.c) while
+// the faint text prints, and its faint script waits for it (waitanimation). Headless tests skip
+// the animation unless FORCE_MOVE_ANIM is set.
+
+// battlerKOAnimsRunning is a bit-field, which EXPECT_EQ cannot take.
+static u32 KOAnimsRunning(void)
+{
+    return gBattleStruct->battlerKOAnimsRunning;
+}
+
+REPLAY_TEST("The near mon's KO animation has ended when the op after the faint text starts")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        StartDugtrioVsMagneton(100, 100);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 0);
+        ReplayStream_Faint(REPLAY_SIDE_FAR);
+        ReplayStream_Print(COMPOUND_STRING("The opposing Magneton fainted!"));
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        MESSAGE("The opposing Magneton fainted!");
+    }
+    THEN
+    {
+        EXPECT_EQ(KOAnimsRunning(), 0);
+    }
+}
+
+// Ops 0-2 are INTRO and the two SEND_OUTs; op 5 is the near HP 0 and op 6 the near FAINT.
+REPLAY_TEST("The near mon faints only after its KO animation for the far mon has ended")
+{
+    u32 nearBattler = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
+
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        StartDugtrioVsMagneton(100, 100);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 0);
+        ReplayStream_Faint(REPLAY_SIDE_FAR);
+        ReplayStream_Hp(REPLAY_SIDE_NEAR, 0);
+        ReplayStream_Faint(REPLAY_SIDE_NEAR);
+        ReplayStream_End(REPLAY_OUTCOME_TIE);
+    }
+    SCENE
+    {
+        HP_BAR(farMon, hp: 0);
+        HP_BAR(nearMon, hp: 0);
+    }
+    THEN
+    {
+        EXPECT_EQ(ReplayTest_KOAnimsAtOpStart(5), 0);
+        EXPECT_EQ(ReplayTest_KOAnimsAtOpStart(6), 0);
+        EXPECT_EQ(KOAnimsRunning(), 0);
+        EXPECT(!gSprites[gBattlerSpriteIds[nearBattler]].inUse);
+        EXPECT(gSprites[gHealthboxSpriteIds[nearBattler]].invisible);
+        EXPECT(gBattleStruct->battlerState[nearBattler].notOnField);
+    }
+}
+
+// Ops 0-2 are INTRO and the two SEND_OUTs of StartDugtrioVsMagneton.
+REPLAY_TEST("Only the faint text prints during the KO animation; the next PRINT waits for its end")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        StartDugtrioVsMagneton(100, 100);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 0);
+        ReplayStream_Faint(REPLAY_SIDE_FAR);
+        ReplayStream_Print(COMPOUND_STRING("The opposing Magneton fainted!"));
+        ReplayStream_Print(COMPOUND_STRING("May sent out Magneton!"));
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        MESSAGE("The opposing Magneton fainted!");
+        MESSAGE("May sent out Magneton!");
+    }
+    THEN
+    {
+        EXPECT_NE(ReplayTest_KOAnimsAtOpStart(5), 0);
+        EXPECT_EQ(ReplayTest_KOAnimsAtOpStart(6), 0);
+    }
+}
+
+// An Explosion double KO (994086, 994176): the log shows no HP line for the user before its faint.
+// Ops 0-2 are INTRO and the two SEND_OUTs; op 8 is END.
+REPLAY_TEST("A mon that faints with HP left has 0 HP, and the far faint starts no KO animation for it")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        StartDugtrioVsMagneton(10, 100);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 0);
+        ReplayStream_Faint(REPLAY_SIDE_NEAR);
+        ReplayStream_Print(COMPOUND_STRING("Dugtrio fainted!"));
+        ReplayStream_Faint(REPLAY_SIDE_FAR);
+        ReplayStream_Print(COMPOUND_STRING("The opposing Magneton fainted!"));
+        ReplayStream_End(REPLAY_OUTCOME_TIE);
+    }
+    SCENE
+    {
+        MESSAGE("Dugtrio fainted!");
+        MESSAGE("The opposing Magneton fainted!");
+    }
+    THEN
+    {
+        EXPECT_EQ(nearMon->hp, 0);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_HP), 0);
+        EXPECT_EQ(ReplayTest_KOAnimsAtOpStart(8), 0);
+    }
+}
+
+// A faint behind a substitute: the faint handler first plays B_ANIM_SUBSTITUTE_TO_MON and starts a
+// KO animation on each of its frames, and the 3-bit counter wraps (replay_interpreter.c). Ops 0-2
+// are INTRO and the two SEND_OUTs; op 9 is the second PRINT.
+REPLAY_TEST("A faint behind a substitute: the PRINT after the faint text starts with no KO animation left")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        StartDugtrioVsMagneton(100, 100);
+        ReplayStream_Move(REPLAY_SIDE_FAR, REPLAY_SIDE_FAR, MOVE_SUBSTITUTE);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 75);
+        ReplayStream_Volatile(REPLAY_SIDE_FAR, REPLAY_VOLATILE_SUBSTITUTE, TRUE);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 0);
+        ReplayStream_Faint(REPLAY_SIDE_FAR);
+        ReplayStream_Print(COMPOUND_STRING("The opposing Magneton fainted!"));
+        ReplayStream_Print(COMPOUND_STRING("May sent out Magneton!"));
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SUBSTITUTE, farMon);
+        ANIMATION(ANIM_TYPE_SPECIAL, B_ANIM_SUBSTITUTE_TO_MON, farMon);
+        MESSAGE("The opposing Magneton fainted!");
+        MESSAGE("May sent out Magneton!");
+    }
+    THEN
+    {
+        EXPECT_EQ(ReplayTest_KOAnimsAtOpStart(9), 0);
+        EXPECT_EQ(KOAnimsRunning(), 0);
     }
 }
