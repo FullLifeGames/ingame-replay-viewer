@@ -10,7 +10,16 @@ export default defineConfig({
       provider: 'v8',
       include: ['src/**/*.ts'],
       // main.ts and view.ts are the page's DOM wiring; the e2e covers them, no Node spec can load them.
-      exclude: ['src/**/*.test.ts', 'src/web/main.ts', 'src/web/view.ts'],
+      // The same holds for the WebAssembly spike page's wiring, its worker and its audio worklet.
+      exclude: [
+        'src/**/*.test.ts',
+        'src/web/main.ts',
+        'src/web/view.ts',
+        'src/web/wasm/main.ts',
+        'src/web/wasm/view.ts',
+        'src/web/wasm/worker.ts',
+        'src/web/wasm/audio-worklet.ts',
+      ],
       reporter: ['text-summary', 'html'],
       thresholds: {
         'src/script/**': { lines: 90, branches: 90 },
