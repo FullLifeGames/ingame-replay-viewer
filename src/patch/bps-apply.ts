@@ -35,21 +35,16 @@ const MIN_PATCH_SIZE = BPS_MAGIC.length + 3 + BPS_FOOTER_SIZE
 
 const truncated = () => new BpsError('BPS: truncated patch: it ends before its last command')
 
-function readHeader(patch: Uint8Array): Header {
-  if (!BPS_MAGIC.every((byte, index) => patch[index] === byte)) {
-    throw new BpsError('BPS: not a BPS1 patch')
-  }
-  if (patch.length < MIN_PATCH_SIZE) throw truncated()
-  const reader = new PatchReader(patch, patch.length - BPS_FOOTER_SIZE)
+const corrupt = () => new BpsError('BPS: corrupt patch: its checksum differs')
+
+// The header up to `end`: the whole file to judge a damaged patch, else the start of the footer.
+function readHeader(patch: Uint8Array, end: number): Header {
+  const reader = new PatchReader(patch, end)
   reader.offset = BPS_MAGIC.length
-  try {
-    const sourceSize = reader.number()
-    const targetSize = reader.number()
-    reader.take(reader.number())
-    return { sourceSize, targetSize, commandsStart: reader.offset, commandsEnd: reader.end }
-  } catch {
-    throw truncated()
-  }
+  const sourceSize = reader.number()
+  const targetSize = reader.number()
+  reader.take(reader.number())
+  return { sourceSize, targetSize, commandsStart: reader.offset, commandsEnd: end }
 }
 
 function commandsOf(patch: Uint8Array, header: Header): PatchReader {
@@ -69,23 +64,28 @@ function readOffset(reader: PatchReader): number {
   return data % 2 === 1 ? -size : size
 }
 
-// A patch whose checksum fails is truncated when its commands stop short of the target, and
-// corrupt otherwise.
-function damage(patch: Uint8Array, header: Header): BpsError {
+// Where the commands end when read over the whole file until they fill the target.
+function commandsEnd(patch: Uint8Array): number {
+  const header = readHeader(patch, patch.length)
   const reader = commandsOf(patch, header)
   let written = 0
+  while (written < header.targetSize) {
+    const { action, length } = readCommand(reader)
+    if (action === BpsAction.TargetRead) reader.take(length)
+    if (action === BpsAction.SourceCopy || action === BpsAction.TargetCopy) reader.number()
+    written += length
+  }
+  return reader.offset
+}
+
+// Runs once the patch checksum has failed: the patch is truncated when the file ends before its
+// commands fill the target or before the footer after them, and corrupt otherwise.
+function damage(patch: Uint8Array): BpsError {
   try {
-    while (reader.offset < reader.end) {
-      const { action, length } = readCommand(reader)
-      if (action === BpsAction.TargetRead) reader.take(length)
-      if (action === BpsAction.SourceCopy || action === BpsAction.TargetCopy) reader.number()
-      written += length
-    }
+    return commandsEnd(patch) + BPS_FOOTER_SIZE > patch.length ? truncated() : corrupt()
   } catch {
     return truncated()
   }
-  if (written < header.targetSize) return truncated()
-  return new BpsError('BPS: corrupt patch: its checksum differs')
 }
 
 function sourceRead(cursor: Cursor, length: number): void {
@@ -155,12 +155,18 @@ function run(patch: Uint8Array, header: Header, source: Uint8Array): Uint8Array 
   return target
 }
 
+// The patch checksum comes first, so the header and the commands are read only from an intact
+// patch, and a damaged one is told apart before any of them can fail.
 export function applyBps(patch: Uint8Array, source: Uint8Array): Uint8Array {
-  const header = readHeader(patch)
+  if (!BPS_MAGIC.every((byte, index) => patch[index] === byte)) {
+    throw new BpsError('BPS: not a BPS1 patch')
+  }
+  if (patch.length < MIN_PATCH_SIZE) throw truncated()
   const footer = patch.length - BPS_FOOTER_SIZE
   if (crc32(patch.subarray(0, patch.length - 4)) !== readUint32(patch, footer + 8)) {
-    throw damage(patch, header)
+    throw damage(patch)
   }
+  const header = readHeader(patch, footer)
   if (source.length !== header.sourceSize) {
     const sizes = `it has ${String(source.length)} bytes, the patch expects ${String(header.sourceSize)}`
     throw new BpsError(`BPS: wrong source: ${sizes}`)

@@ -83,6 +83,21 @@ describe('applyBps', () => {
     expect(() => applyBps(patch, SOURCE)).toThrow(/corrupt patch/)
   })
 
+  it('calls a patch corrupt when a flipped bit makes a length swallow the next command', () => {
+    const target = ascii('ABCDEFGHabcdef')
+    // SourceRead of 8 (0x9c), then TargetRead of 6 (0x95) with "abcdef".
+    const patch = seal({
+      targetSize: target.length,
+      commands: [0x9c, 0x95, ...ascii('abcdef')],
+      targetCrc: crc32(target),
+    })
+    expect(applyBps(patch, SOURCE)).toEqual(target)
+    // Without its end bit the SourceRead takes 0x95 into its length, fills the target at once, and
+    // what follows no longer reads as commands.
+    patch[patch.indexOf(0x9c, 4)] = 0x1c
+    expect(() => applyBps(patch, SOURCE)).toThrow(/corrupt patch/)
+  })
+
   it.each([1, 4, 13])('calls a patch missing its last %i bytes truncated', (cut) => {
     const patch = handPatch().subarray(0, handPatch().length - cut)
     expect(() => applyBps(patch, SOURCE)).toThrow(/truncated patch/)
