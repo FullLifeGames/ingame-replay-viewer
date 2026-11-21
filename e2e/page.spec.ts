@@ -1,4 +1,4 @@
-// The dev page in Chromium (plan S5b §5). Tests 1, 2 and 4 need no dump; test 3 reads the user's
+// The dev page in Chromium (plan S5b §5). Tests 1 to 3 need no dump; test 4 reads the user's
 // US Emerald by the build's own rule and skips without it or without the built patch.
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
