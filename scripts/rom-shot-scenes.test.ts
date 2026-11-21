@@ -204,7 +204,7 @@ describe('the scene points of a decoded instruction list (S6)', () => {
   })
 
   it('checks a refused stream on the last frame: the whole screen in the refusal colour', () => {
-    expect(refusalScenes()).toEqual([
+    expect(refusalScenes(0x630000)).toEqual([
       {
         name: 'refused',
         shots: [],

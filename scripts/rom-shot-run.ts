@@ -8,11 +8,37 @@ import { ROM_DIR } from './rom-config.ts'
 import { findSymbol } from './rom-slot.ts'
 
 const TOOL_SOURCE = join(ROM_DIR, 'shot', 'replay_shot.c')
-export const INTERPRETER_HEADER_PATH = join(ROM_DIR, 'include', 'replay_interpreter.h')
+const INCLUDE_DIR = join(ROM_DIR, 'include')
+export const INTERPRETER_HEADER_PATH = join(INCLUDE_DIR, 'replay_interpreter.h')
+// The layout the tool reads; it includes this header too, and the ROM checks it against the struct.
+export const PROGRESS_HEADER_PATH = join(INCLUDE_DIR, 'replay_progress.h')
 
 const PROGRESS_SYMBOL = 'gReplayProgress'
-// sizeof(struct ReplayProgress): the offsets the tool reads (PROGRESS_* in replay_shot.c).
-const PROGRESS_SIZE = 8
+
+export interface ProgressLayout {
+  /** sizeof(struct ReplayProgress). */
+  size: number
+  /** The refusal screen's backdrop as the tool's frames show it, 0xRRGGBB. */
+  refusedColour: number
+}
+
+function readNumberDefine(headerText: string, name: string): number {
+  const text = new RegExp(`^#define\\s+${name}\\s+(.+?)\\s*(?://.*)?$`, 'm').exec(headerText)?.[1]
+  if (text === undefined) throw new Error(`replay_progress.h: ${name} missing`)
+  if (!/^(?:0x[0-9a-f]+|\d+)$/i.test(text)) {
+    throw new Error(`replay_progress.h: ${name} is "${text}", not a plain number`)
+  }
+  return Number(text)
+}
+
+// mGBA widens each five-bit channel of a GBA colour to eight bits: the five bits, then their top three.
+const widen = (channel: number) => (channel << 3) | (channel >> 2)
+
+export function readProgressLayout(headerText: string): ProgressLayout {
+  const size = readNumberDefine(headerText, 'REPLAY_PROGRESS_SIZE')
+  const red = readNumberDefine(headerText, 'REPLAY_REFUSED_RED')
+  return { size, refusedColour: widen(red) << 16 }
+}
 
 interface ShotLine {
   shot: string
@@ -58,7 +84,7 @@ export function readErrorNames(headerText: string): string[] {
   return names
 }
 
-export function progressAddress(nmOutput: string): number {
+export function progressAddress(nmOutput: string, size: number): number {
   let symbol
   try {
     symbol = findSymbol(nmOutput, PROGRESS_SYMBOL)
@@ -67,21 +93,25 @@ export function progressAddress(nmOutput: string): number {
       cause: error,
     })
   }
-  if (symbol.size !== PROGRESS_SIZE) {
+  if (symbol.size !== size) {
     throw new Error(
-      `${PROGRESS_SYMBOL} has ${String(symbol.size)} bytes, the shot tool reads ${String(PROGRESS_SIZE)}`,
+      `${PROGRESS_SYMBOL} has ${String(symbol.size)} bytes, the shot tool reads ${String(size)}`,
     )
   }
   return symbol.address
 }
 
 export function toolBuildArgs(source: string, output: string): string[] {
-  return ['-std=gnu11', '-O2', '-Wall', '-Wextra', '-Werror', '-o', output, source, '-lmgba']
+  const warnings = ['-Wall', '-Wextra', '-Werror']
+  return ['-std=gnu11', '-O2', ...warnings, '-I', INCLUDE_DIR, '-o', output, source, '-lmgba']
 }
 
-/** Builds the tool when it is missing or older than its source. */
+/** Builds the tool when it is missing or older than its source or the header it reads. */
 export function buildTool(output: string): void {
-  if (existsSync(output) && statSync(output).mtimeMs >= statSync(TOOL_SOURCE).mtimeMs) return
+  const newest = Math.max(
+    ...[TOOL_SOURCE, PROGRESS_HEADER_PATH].map((path) => statSync(path).mtimeMs),
+  )
+  if (existsSync(output) && statSync(output).mtimeMs >= newest) return
   mkdirSync(dirname(output), { recursive: true })
   // CC names another C compiler, as make has it.
   const compiler = process.env.CC ?? 'cc'

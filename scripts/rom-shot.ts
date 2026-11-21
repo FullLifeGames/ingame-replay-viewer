@@ -24,10 +24,13 @@ import {
   buildTool,
   INTERPRETER_HEADER_PATH,
   judgeRun,
+  PROGRESS_HEADER_PATH,
   progressAddress,
   readErrorNames,
+  readProgressLayout,
   runTool,
 } from './rom-shot-run.ts'
+import type { ProgressLayout } from './rom-shot-run.ts'
 import type { Expected, SceneVerdict, ToolOutput } from './rom-shot-run.ts'
 import { refusalScenes, scenesOf, shotArgs } from './rom-shot-scenes.ts'
 import type { Scene } from './rom-shot-scenes.ts'
@@ -112,7 +115,11 @@ function streamBytes(shot: typeof ShotStream, name: string): Uint8Array {
   return shot.replayBytes(JSON.parse(readFileSync(file, 'utf8')))
 }
 
-async function planRuns(paths: BuildPaths, names: readonly string[]): Promise<RunPlan[]> {
+async function planRuns(
+  paths: BuildPaths,
+  names: readonly string[],
+  layout: ProgressLayout,
+): Promise<RunPlan[]> {
   const shot = await loadShotStream()
   const { rom, description } = readBuiltRom(paths)
   const plays = names.map((name): RunPlan => {
@@ -120,13 +127,14 @@ async function planRuns(paths: BuildPaths, names: readonly string[]): Promise<Ru
     const scenes = scenesOf(shot.decodeStream(bytes))
     return { name, rom: writeReplaySlot(rom, description, bytes), scenes, expect: 'finished' }
   })
+  const refused = refusalScenes(layout.refusedColour)
   return [
     ...plays,
-    { name: 'empty-slot', rom: undefined, scenes: refusalScenes(), expect: 'EMPTY' },
+    { name: 'empty-slot', rom: undefined, scenes: refused, expect: 'EMPTY' },
     {
       name: 'version-2',
       rom: writeReplaySlot(rom, description, shot.withVersion(shot.handMadeBytes(), 2)),
-      scenes: refusalScenes(),
+      scenes: refused,
       expect: 'VERSION',
     },
   ]
@@ -197,10 +205,10 @@ async function runShots(names: readonly string[]): Promise<void> {
     paths,
     shotsDir,
     tool,
-    address: progressAddress(nmOutput(join(paths.outDir, OUTPUT_NAMES.elf))),
+    address: progressAddress(nmOutput(join(paths.outDir, OUTPUT_NAMES.elf)), layout.size),
     errors: readErrorNames(readFileSync(INTERPRETER_HEADER_PATH, 'utf8')),
   }
-  const plans = await planRuns(paths, names)
+  const plans = await planRuns(paths, names, layout)
   emptyInside(paths.roots, shotsDir)
   mkdirSync(shotsDir, { recursive: true })
   const reports = plans.map((plan) => playRun(context, plan))
@@ -215,6 +223,7 @@ async function runShots(names: readonly string[]): Promise<void> {
   say(`all ${String(reports.length)} runs passed; frames and report.json in ${shotsDir}`)
 }
 
+const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
 async function main(): Promise<void> {
   await runCliAsync('rom:shots', async () => {
     await runShots(parseShotArgs(process.argv.slice(2)))

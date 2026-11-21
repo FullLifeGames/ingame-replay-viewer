@@ -31,18 +31,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+// The offsets of struct ReplayProgress, which the ROM checks against the struct. scripts/rom-shot.ts
+// checks the symbol's size against REPLAY_PROGRESS_SIZE before it runs this tool.
+#include "replay_progress.h"
+
 #define STALL_FRAMES 3600
 #define ERROR_FRAMES 30
 #define MAX_SHOTS 64
 #define MAX_NAME 32
 
-// struct ReplayProgress in replay_interpreter.h: u16 done, u16 total, u16 turn, u8 error,
-// u8 finished. scripts/rom-shot.ts checks the symbol's size before it runs this tool.
-#define PROGRESS_DONE 0
-#define PROGRESS_TOTAL 2
-#define PROGRESS_TURN 4
-#define PROGRESS_ERROR 6
-#define PROGRESS_FINISHED 7
 
 struct Progress
 {
@@ -123,11 +120,11 @@ static struct Progress ReadProgress(struct Run *run)
     uint32_t at = run->progressAddress;
     struct Progress progress;
 
-    progress.done = core->busRead16(core, at + PROGRESS_DONE);
-    progress.total = core->busRead16(core, at + PROGRESS_TOTAL);
-    progress.turn = core->busRead16(core, at + PROGRESS_TURN);
-    progress.error = core->busRead8(core, at + PROGRESS_ERROR);
-    progress.finished = core->busRead8(core, at + PROGRESS_FINISHED) != 0;
+    progress.done = core->busRead16(core, at + REPLAY_PROGRESS_OFFSET_DONE);
+    progress.total = core->busRead16(core, at + REPLAY_PROGRESS_OFFSET_TOTAL);
+    progress.turn = core->busRead16(core, at + REPLAY_PROGRESS_OFFSET_TURN);
+    progress.error = core->busRead8(core, at + REPLAY_PROGRESS_OFFSET_ERROR);
+    progress.finished = core->busRead8(core, at + REPLAY_PROGRESS_OFFSET_FINISHED) != 0;
     return progress;
 }
 

@@ -1,15 +1,19 @@
 import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
 import {
   INTERPRETER_HEADER_PATH,
   judgeRun,
+  PROGRESS_HEADER_PATH,
   progressAddress,
   readErrorNames,
+  readProgressLayout,
   readToolOutput,
   toolBuildArgs,
 } from './rom-shot-run.ts'
+import { ROM_DIR } from './rom-config.ts'
 import type { ToolOutput } from './rom-shot-run.ts'
 
 const ERRORS = readErrorNames(readFileSync(INTERPRETER_HEADER_PATH, 'utf8'))
@@ -36,32 +40,59 @@ describe('the names of the interpreter errors', () => {
   })
 })
 
+describe('the layout the shot tool reads', () => {
+  it('comes from replay_progress.h: the size of struct ReplayProgress and the refusal colour', () => {
+    expect(readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))).toEqual({
+      size: 8,
+      refusedColour: 0x630000,
+    })
+  })
+
+  it('widens the five bits of the red channel to eight, as mGBA does', () => {
+    const header = (red: string) =>
+      `#define REPLAY_PROGRESS_SIZE 8\n#define REPLAY_REFUSED_RED ${red} // the backdrop\n`
+    expect(readProgressLayout(header('31')).refusedColour).toBe(0xff0000)
+    expect(readProgressLayout(header('0x01')).refusedColour).toBe(0x080000)
+  })
+
+  it('refuses a define that is missing or no plain number', () => {
+    expect(() => readProgressLayout('#define REPLAY_REFUSED_RED 12\n')).toThrow(
+      'replay_progress.h: REPLAY_PROGRESS_SIZE missing',
+    )
+    expect(() =>
+      readProgressLayout('#define REPLAY_PROGRESS_SIZE 8\n#define REPLAY_REFUSED_RED (6 * 2)\n'),
+    ).toThrow('replay_progress.h: REPLAY_REFUSED_RED is "(6 * 2)", not a plain number')
+  })
+})
+
 describe('the address of gReplayProgress', () => {
   it('comes from nm with the size of struct ReplayProgress', () => {
-    expect(progressAddress('gReplayProgress b 0203f2a0 00000008\n')).toBe(0x0203f2a0)
+    expect(progressAddress('gReplayProgress b 0203f2a0 00000008\n', 8)).toBe(0x0203f2a0)
   })
 
   it('refuses a symbol of another size', () => {
-    expect(() => progressAddress('gReplayProgress b 0203f2a0 0000000a\n')).toThrow(
+    expect(() => progressAddress('gReplayProgress b 0203f2a0 0000000a\n', 8)).toThrow(
       'gReplayProgress has 10 bytes, the shot tool reads 8',
     )
   })
 
   it('says the ROM has no replay boot when the symbol is missing', () => {
-    expect(() => progressAddress('gReplaySlot T 08003000 00020000\n')).toThrow(
+    expect(() => progressAddress('gReplaySlot T 08003000 00020000\n', 8)).toThrow(
       'gReplayProgress not in the ELF',
     )
   })
 })
 
 describe('the shot tool', () => {
-  it('is built from its one C file against libmgba', () => {
+  it('is built from its one C file and our headers against libmgba', () => {
     expect(toolBuildArgs('/src/replay_shot.c', '/out/replay_shot')).toEqual([
       '-std=gnu11',
       '-O2',
       '-Wall',
       '-Wextra',
       '-Werror',
+      '-I',
+      join(ROM_DIR, 'include'),
       '-o',
       '/out/replay_shot',
       '/src/replay_shot.c',

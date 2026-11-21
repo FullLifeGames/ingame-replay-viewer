@@ -2,6 +2,7 @@
 #define GUARD_REPLAY_INTERPRETER_H
 
 #include "main.h"
+#include "replay_progress.h"
 
 // The ROM interpreter (#6): our stand-in for the battle engine. It plays an instruction stream
 // (replay_stream.h) in a recorded link battle: BeginBattleIntro hands the battle main loop to it
@@ -39,6 +40,13 @@ struct ReplayProgress
     u8 error;  // enum ReplayError
     u8 finished;
 };
+
+STATIC_ASSERT(offsetof(struct ReplayProgress, done) == REPLAY_PROGRESS_OFFSET_DONE, ReplayProgressDoneOffset);
+STATIC_ASSERT(offsetof(struct ReplayProgress, total) == REPLAY_PROGRESS_OFFSET_TOTAL, ReplayProgressTotalOffset);
+STATIC_ASSERT(offsetof(struct ReplayProgress, turn) == REPLAY_PROGRESS_OFFSET_TURN, ReplayProgressTurnOffset);
+STATIC_ASSERT(offsetof(struct ReplayProgress, error) == REPLAY_PROGRESS_OFFSET_ERROR, ReplayProgressErrorOffset);
+STATIC_ASSERT(offsetof(struct ReplayProgress, finished) == REPLAY_PROGRESS_OFFSET_FINISHED, ReplayProgressFinishedOffset);
+STATIC_ASSERT(sizeof(struct ReplayProgress) == REPLAY_PROGRESS_SIZE, ReplayProgressSize);
 
 extern struct ReplayProgress gReplayProgress;
 

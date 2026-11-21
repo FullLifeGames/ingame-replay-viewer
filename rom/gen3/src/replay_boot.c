@@ -80,7 +80,7 @@ static void CB2_ReplayRefused(void)
 {
     SetVBlankCallback(NULL);
     SetGpuReg(REG_OFFSET_DISPCNT, 0);
-    *(vu16 *)PLTT = RGB(12, 0, 0);
+    *(vu16 *)PLTT = RGB(REPLAY_REFUSED_RED, 0, 0);
     DebugPrintf("replay refused: error %d", gReplayProgress.error);
     SetMainCallback2(CB2_ReplayStopped);
 }
