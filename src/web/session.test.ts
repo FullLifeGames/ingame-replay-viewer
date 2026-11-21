@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import replay994052 from '../../test/fixtures/replays/smogtours-gen3ou-994052.json'
 import { NOT_STARTED_LINE } from './emulator'
+import type { TestReplay } from './replays'
 import { ROM_FILES } from './rom-files'
 import { SessionError } from './session'
 import {
@@ -158,5 +159,55 @@ describe('a new pick after Start', () => {
     const second = session.pickDump(BASE)
     expect(await first).toBeUndefined()
     expect(await second).toEqual({ romSha1: DESCRIPTION.romSha1 })
+  })
+})
+
+describe('a replay pick that fails', () => {
+  it('leaves the earlier pick for the next Start', async () => {
+    const { session, runs } = world()
+    await session.pickDump(BASE)
+    await session.pickTestReplay(REPLAY_994086)
+    await expect(session.loadReplay('xz abc')).rejects.toThrow(/^Could not read the replay link: /)
+    expect((await session.start()).id).toBe('smogtours-gen3ou-994086')
+    expect(runs).toHaveLength(1)
+  })
+
+  it('leaves the earlier pick for a Start that waits on the failing one', async () => {
+    const { session } = world()
+    await ready(session)
+    let fail: (error: Error) => void = () => undefined
+    const broken: TestReplay = {
+      id: 'broken',
+      load: () => new Promise((_, reject) => (fail = reject)),
+    }
+    const failing = session.pickTestReplay(broken).catch((error: unknown) => error)
+    const started = session.start()
+    fail(new Error('chunk gone'))
+    expect(await failing).toBeInstanceOf(SessionError)
+    expect((await started).id).toBe('smogtours-gen3ou-994052')
+  })
+
+  it('counts for nothing when it fails after a newer pick', async () => {
+    const { session } = world()
+    await session.pickDump(BASE)
+    let fail: (error: Error) => void = () => undefined
+    const broken: TestReplay = {
+      id: 'broken',
+      load: () => new Promise((_, reject) => (fail = reject)),
+    }
+    const failing = session.pickTestReplay(broken)
+    expect((await session.pickTestReplay(REPLAY_994086))?.id).toBe('smogtours-gen3ou-994086')
+    fail(new Error('chunk gone'))
+    expect(await failing).toBeUndefined()
+    expect((await session.start()).id).toBe('smogtours-gen3ou-994086')
+  })
+
+  it('asks for a replay when no earlier pick is left', async () => {
+    const { session } = world()
+    await session.pickDump(BASE)
+    await expect(session.loadReplay('xz abc')).rejects.toThrow(SessionError)
+    await expect(session.start()).rejects.toThrow(
+      new SessionError('Pick a replay first, then press Start.'),
+    )
   })
 })
