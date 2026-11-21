@@ -46,6 +46,13 @@ export const MON_OFFSET = {
   reservedTail: 21,
 } as const
 
+/**
+ * The lowest max HP a stream may not hold: the expansion's `INSTANT_HP_BAR_DROP`
+ * (`battle_controllers.h`), which the health bar reads as "drop at once". The ROM's validator
+ * refuses a mon at or above it, and so does the decoder.
+ */
+export const MAX_HP_LIMIT = 0x7fff
+
 /** Where a side's trainer sits in the stream. */
 export function trainerOffset(side: Side): number {
   return STREAM.trainersOffset + SIDE[side] * TRAINER.size

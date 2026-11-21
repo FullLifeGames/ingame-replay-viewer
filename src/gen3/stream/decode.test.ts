@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { Gen3Error } from '../errors'
 import { decodeStream } from './decode'
 import { encodeStream } from './encode'
-import { monOffset, STREAM, STREAM_OFFSET, trainerOffset } from './format'
+import { MON_OFFSET, monOffset, STREAM, STREAM_OFFSET, trainerOffset } from './format'
 import type { Instruction } from './instructions'
 import { EACH_OP, streamOf } from './testing'
 
@@ -96,6 +96,13 @@ describe('decodeStream', () => {
     expect(patched([status, END], operands + 2, [7])).toThrow(/enum/)
     expect(patched([status, END], operands + 1, [6])).toThrow(/slot/)
     expect(patched([ability, END], operands + 3, [2])).toThrow(/flag/)
+  })
+
+  it('refuses a max HP the game bar cannot drop to, as the ROM does (0x7FFF and up)', () => {
+    const maxHp = monOffset('far', 2) + MON_OFFSET.maxHp
+    expect(patched([END], maxHp, [0xfe, 0x7f])().parties.far[2]?.maxHp).toBe(0x7ffe)
+    expect(patched([END], maxHp, [0xff, 0x7f])).toThrow(/max HP 32767/)
+    expect(patched([END], maxHp, [0xff, 0xff])).toThrow(/max HP 65535/)
   })
 
   it('refuses a name without EOS and a byte outside the charset', () => {

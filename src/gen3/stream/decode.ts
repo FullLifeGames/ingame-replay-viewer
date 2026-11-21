@@ -1,12 +1,14 @@
 // The bytes of an instruction stream back to the stream model, for the specs and the page's
 // debug view. It refuses what the ROM interpreter refuses (a version it does not know, an unknown
-// op, a fixed op of the wrong size) and every other byte the format does not allow.
+// op, a fixed op of the wrong size, a max HP the health bar cannot take) and every other byte the
+// format does not allow.
 import type { Side } from '../../script/types'
 import { Gen3Error } from '../errors'
 import { decodeText, EOS } from '../text/charset'
 import { fieldSize, readField } from './fields'
 import {
   INSTRUCTION,
+  MAX_HP_LIMIT,
   MON,
   MON_OFFSET,
   monOffset,
@@ -79,7 +81,14 @@ function readParty(bytes: Uint8Array, side: Side): Party {
   return Array.from({ length: STREAM.partySize }, (_, slot) => {
     const at = monOffset(side, slot)
     if (bytes.subarray(at, at + MON.size).every((byte) => byte === 0)) return null
-    return readRecord<StreamMon>(MON_FIELDS, MON_OFFSET, bytes, at)
+    const mon = readRecord<StreamMon>(MON_FIELDS, MON_OFFSET, bytes, at)
+    if (mon.maxHp >= MAX_HP_LIMIT) {
+      const limit = String(MAX_HP_LIMIT)
+      throw new Gen3Error(
+        `${side} mon ${String(slot)} has max HP ${String(mon.maxHp)}, not below ${limit}`,
+      )
+    }
+    return mon
   })
 }
 
