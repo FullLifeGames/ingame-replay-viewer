@@ -35,14 +35,14 @@ struct ObjContext
     const uint8_t *vram;
     const uint16_t *palette;
     bool mapping1D;
-    bool bitmapMode;
     struct IrvObjLine *out;
 };
 
 // GBATEK "LCD OBJ - VRAM Character (Tile) Mapping": with 2D mapping the tiles form a matrix of 32
 // per row; with 1D mapping a row of the OBJ follows the one before it. Tile numbers count steps of
 // 32 bytes, so an 8 bpp tile takes two. "LCD OBJ - OAM Attributes": in 2D mapping the low bit of
-// an 8 bpp tile number is ignored, and in the bitmap modes tiles 0-511 are not displayed.
+// an 8 bpp tile number is ignored. OBJs draw only in the tile modes (irv_render.c), so the bitmap
+// modes' rule for tiles 0-511 has no place here.
 static uint32_t ObjTexel(const struct ObjContext *context, const struct Obj *obj, uint32_t x, uint32_t y)
 {
     bool colors256 = (obj->attr0 & 0x2000) != 0;
@@ -54,8 +54,6 @@ static uint32_t ObjTexel(const struct ObjContext *context, const struct Obj *obj
     if (colors256 && !context->mapping1D)
         base &= ~1u;
     tile = (base + (y >> 3) * stride + (x >> 3) * unit) & 0x3FF;
-    if (context->bitmapMode && tile < 512)
-        return 0;
     if (colors256)
         return context->vram[OBJ_TILES + tile * 32 + (y & 7) * 8 + (x & 7)];
     return (context->vram[OBJ_TILES + tile * 32 + (y & 7) * 4 + (x & 7) / 2] >> ((x & 1) * 4)) & 0xF;
@@ -203,7 +201,6 @@ void IrvRender_ObjLine(uint32_t line, struct IrvObjLine *out)
     context.vram = IRV_PTR(IRV_VRAM);
     context.palette = IRV_PTR(IRV_PRAM);
     context.mapping1D = (dispcnt & IRV_DISPCNT_OBJ_1D) != 0;
-    context.bitmapMode = (dispcnt & IRV_DISPCNT_MODE) >= 3;
     context.out = out;
     memset(out->priority, IRV_OBJ_PRIORITY_NONE, sizeof(out->priority));
     memset(out->window, 0, sizeof(out->window));
