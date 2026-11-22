@@ -20,6 +20,7 @@ export const wordBytes = (values: readonly number[]) =>
   Array.from(new Uint8Array(Uint32Array.from(values).buffer))
 export const asHalves = (bytes: Uint8Array) => Array.from(new Uint16Array(bytes.slice().buffer))
 export const asWords = (bytes: Uint8Array) => Array.from(new Uint32Array(bytes.slice().buffer))
+export const asFloats = (bytes: Uint8Array) => Array.from(new Float32Array(bytes.slice().buffer))
 
 export const load = (address: number, bytes: ArrayLike<number>): Op => [
   1,
@@ -56,6 +57,12 @@ export const FRAME_BYTES = FRAME_WIDTH * FRAME_HEIGHT * 2
 export const traceFrame: Op = [10]
 const TRACE_ENTRY = 8
 export const TRACE_BYTES = FRAME_WIDTH * FRAME_HEIGHT * TRACE_ENTRY
+
+/** IrvPsg_Reset(rate): the PSG anew, its output at `rate` pairs per second. */
+export const psgReset = (rate: number): Op => [11, rate]
+/** IrvPsg_Frame: reads the sound registers once and appends `count` pairs of 32-bit floats. */
+export const psgFrame = (count: number): Op => [12, count]
+export const PSG_PAIR_BYTES = 8
 
 /** Appends the first `max` calls of the IRQ handler as a flag and VCOUNT each, zeros after them. */
 export const irqLog = (max: number): Op => [9, max]

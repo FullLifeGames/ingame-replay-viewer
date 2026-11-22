@@ -16,6 +16,8 @@
 //                                       flag and VCOUNT each, zeros after the last)
 //  10 trace                            (a frame as 8 does, then its trace: struct IrvPixelTrace
 //                                       per pixel, irv_render.h)
+//  11 psgreset rate                    (IrvPsg_Reset)
+//  12 psgframe count                   (IrvPsg_Frame; appends its count pairs of floats)
 // The result holds the handler's calls in its upper half and the OR of their flags in its lower.
 #include <stdlib.h>
 #include <string.h>
@@ -24,6 +26,7 @@
 #include "irv_gba.h"
 #include "irv_irq.h"
 #include "irv_layer_host.h"
+#include "irv_psg.h"
 #include "irv_render.h"
 
 uint8_t *gIrvHostMemory;
@@ -150,6 +153,21 @@ static void TraceFrame(struct Script *script, struct HostCall *call)
     Append(script, call, sTrace, sizeof(sTrace));
 }
 
+static void PsgFrame(struct Script *script, struct HostCall *call)
+{
+    uint32_t count = NextWord(script);
+    float *pairs;
+
+    if (count > call->destLength / (2 * sizeof(float)))
+        Fail("a PSG frame of more pairs than the destination holds");
+    pairs = malloc(count * 2 * sizeof(float));
+    if (pairs == NULL)
+        Fail("out of memory");
+    IrvPsg_Frame(pairs, count);
+    Append(script, call, pairs, count * 2 * sizeof(float));
+    free(pairs);
+}
+
 static void Log(struct Script *script, struct HostCall *call)
 {
     uint32_t max = NextWord(script);
@@ -217,6 +235,12 @@ static void RunOperation(struct Script *script, struct HostCall *call)
         break;
     case 10:
         TraceFrame(script, call);
+        break;
+    case 11:
+        IrvPsg_Reset(NextWord(script));
+        break;
+    case 12:
+        PsgFrame(script, call);
         break;
     default:
         Fail("an unknown operation in the script");
