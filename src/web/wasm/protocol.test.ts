@@ -10,6 +10,7 @@ import {
   readPace,
   readStatus,
   SPEEDS,
+  speedAtEnd,
   TickClock,
   ticksPerSecond,
   waitForTick,
@@ -58,6 +59,11 @@ describe('the tick rule', () => {
     expect(walk(clock, 5000, 6000)).toBe(1234 + 119)
     clock.change('1x', 6000, 1300)
     expect(walk(clock, 6000, 7000)).toBe(1300 + 59)
+  })
+
+  // After END the game plays on; at fast that would keep a core busy until Restart.
+  it('leaves fast for 1x at END and keeps 1x and 2x', () => {
+    expect(SPEEDS.map(speedAtEnd)).toEqual(['1x', '2x', '1x'])
   })
 
   // A hidden tab gets no animation frame, so the page grants nothing and the game pauses. When

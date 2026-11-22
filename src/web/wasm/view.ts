@@ -26,6 +26,11 @@ export function findSpikeView() {
     restart: element('restart', HTMLButtonElement),
     canvas: element('screen', HTMLCanvasElement),
     speed: checkedSpeed,
+    /** Checks the radio of `speed`, as when the page leaves fast at END; fires no change. */
+    showSpeed: (speed: Speed): void => {
+      const radio = speeds.querySelector<HTMLInputElement>(`input[value="${speed}"]`)
+      if (radio !== null) radio.checked = true
+    },
     onSpeed: (handler: (speed: Speed) => void): void => {
       speeds.addEventListener('change', () => {
         handler(checkedSpeed())

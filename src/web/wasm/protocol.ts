@@ -22,6 +22,9 @@ export function ticksPerSecond(speed: Speed): number | undefined {
   return factor === undefined ? undefined : GBA_FRAMES_PER_SECOND * factor
 }
 
+/** The speed after END: the game plays on, and fast gives way to 1x, so no core spins. */
+export const speedAtEnd = (speed: Speed): Speed => (speed === 'fast' ? '1x' : speed)
+
 // A gap between two asks longer than this is a pause (a hidden tab gets no animation frame).
 const PAUSE_MS = 250
 
