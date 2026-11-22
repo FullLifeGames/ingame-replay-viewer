@@ -7,8 +7,9 @@
 // The WebAssembly build (#35): what the GBA build takes from assembly or from its linker script,
 // and the two addresses the host needs.
 
-// random.c's Random32 is Thumb assembly, renamed away by wasm.json. It steps gRngValue on stream
-// 1, which is what _SFC32_Next does: its counter steps by one.
+// random.c's Random32 is Thumb assembly, which overlay patch 0009 leaves out. This one takes its
+// place for random.c's own callers too. It steps gRngValue on stream 1, which is what _SFC32_Next
+// does: its counter steps by one.
 u32 Random32(void)
 {
     return _SFC32_Next(&gRngValue);

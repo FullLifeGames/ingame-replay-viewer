@@ -1,0 +1,26 @@
+Random32 is Thumb assembly in a naked function, which clang cannot compile for wasm32. Under
+IRV_WASM the function goes, and the glue's C Random32 (rom/gen3/wasm/src/irv_wasm_replace.c)
+takes its place at link time. Every other function of the file stays, so Random(),
+RandomUniform, the Shuffle functions and AdvanceRandom call the glue's Random32 and step
+gRngValue as on the GBA.
+
+diff --git a/src/random.c b/src/random.c
+index 16de435..8ee1249 100644
+--- a/src/random.c
++++ b/src/random.c
+@@ -42,6 +42,7 @@ static void SFC32_Seed(struct Sfc32State *state, u32 seed, u8 stream)
+ /*This ASM implementation uses some shortcuts and is generally faster on the GBA.
+ * It's not necessarily faster if inlined, or on other platforms.
+ * In addition, it's extremely non-portable. */
++#ifndef IRV_WASM
+ u32 NAKED Random32(void)
+ {
+     asm(".thumb\n\
+@@ -69,6 +70,7 @@ u32 NAKED Random32(void)
+     .ltorg"
+     );
+ }
++#endif
+ 
+ u32 Random2_32(void)
+ {

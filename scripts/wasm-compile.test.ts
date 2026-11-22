@@ -35,7 +35,7 @@ const config: WasmConfig = {
     defines: ['RENDERER_EASY_DRAW'],
   },
   exclude: ['src/agb_flash.c'],
-  defines: { 'src/random.c': ['Random32=IrvWasm_UnusedRandom32'] },
+  defines: { 'src/recorded_battle.c': ['IRV_WASM_NO_SAVE_SIZE_ASSERTS'] },
   flags: { 'src/ow_abilities.c': ['-Wno-error=incompatible-function-pointer-types'] },
   jobs: 2,
 }
@@ -65,15 +65,25 @@ describe('the compile commands', () => {
 
   it('accepts a config whose every name is a source of the tree', () => {
     expect(() => {
-      checkNamedSources(config, ['src/agb_flash.c', 'src/ow_abilities.c', 'src/random.c'])
+      checkNamedSources(config, ['src/agb_flash.c', 'src/ow_abilities.c', 'src/recorded_battle.c'])
     }).not.toThrow()
   })
 
-  it('renames Random32 in src/random.c, as wasm.json asks', () => {
-    const random = only(compileCommands(loadWasmConfig(), ['src/random.c'], paths))
-    expect(random.preprocess).toContain('-DRandom32=IrvWasm_UnusedRandom32')
+  it('gives the defines of wasm.json to their file only', () => {
+    const define = '-DIRV_WASM_NO_SAVE_SIZE_ASSERTS'
+    const recorded = only(compileCommands(loadWasmConfig(), ['src/recorded_battle.c'], paths))
+    expect(recorded.preprocess).toContain(define)
     const main = only(compileCommands(loadWasmConfig(), ['src/main.c'], paths))
-    expect(main.preprocess).not.toContain('-DRandom32=IrvWasm_UnusedRandom32')
+    expect(main.preprocess).not.toContain(define)
+  })
+
+  it('compiles src/random.c from its overlay copy, with no define of its own', () => {
+    const options = { optimise: '-O2', overlay: ['src/random.c'] } as const
+    const random = only(compileCommands(loadWasmConfig(), ['src/random.c'], paths, options))
+    expect(random.preprocess).toContain(`${paths.overlay}/src/random.c`)
+    const main = only(compileCommands(loadWasmConfig(), ['src/main.c'], paths))
+    const defines = (argv: string[]) => argv.filter((arg) => arg.startsWith('-D'))
+    expect(defines(random.preprocess)).toEqual(defines(main.preprocess))
   })
 
   it('adds the flags of wasm.json to the compile step of that file only', () => {

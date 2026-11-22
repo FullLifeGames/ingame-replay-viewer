@@ -14,7 +14,7 @@ const valid = {
     defines: ['RENDERER_EASY_DRAW'],
   },
   exclude: ['src/agb_flash.c'],
-  defines: { 'src/random.c': ['Random32=IrvWasm_UnusedRandom32'] },
+  defines: { 'src/recorded_battle.c': ['IRV_WASM_NO_SAVE_SIZE_ASSERTS', 'LEVEL=2'] },
   flags: { 'src/ow_abilities.c': ['-Wno-error=incompatible-function-pointer-types'] },
   jobs: 2,
 }
@@ -29,10 +29,8 @@ describe('the WebAssembly build config', () => {
     const config = loadWasmConfig()
     expect(config.emscripten.version).toBe('7.0.0')
     expect(config.platform.commit).toBe('db1cab3d2dc9f0e0a9f4a3d67983e5acf30a9a46')
-    expect(config.defines['src/random.c']).toEqual([
-      'Random32=IrvWasm_UnusedRandom32',
-      'IRV_WASM_NO_ASM',
-    ])
+    // random.c compiles from its overlay copy (patch 0009), with no define of its own.
+    expect(config.defines).toEqual({ 'src/recorded_battle.c': ['IRV_WASM_NO_SAVE_SIZE_ASSERTS'] })
     expect(config.flags['src/ow_abilities.c']).toEqual([
       '-Wno-error=incompatible-function-pointer-types',
     ])
@@ -64,6 +62,9 @@ describe('the WebAssembly build config', () => {
     ['an excluded file outside src', { ...valid, exclude: ['../x.c'] }, /exclude/],
     ['an exclude that is no list', { ...valid, exclude: 'src/x.c' }, /exclude/],
     ['a define with a space', { ...valid, defines: { 'src/x.c': ['A B'] } }, /defines/],
+    // -DRandom32=Other renames the file's own calls too (review W1): patch the file instead.
+    ['a define that renames', { ...valid, defines: { 'src/x.c': ['A=B'] } }, /renames A to B/],
+    ['a platform define that renames', platform({ defines: ['A=_b1'] }), /renames A to _b1/],
     ['defines for a file outside src', { ...valid, defines: { 'x.c': ['A'] } }, /defines/],
     ['a platform file that is no C file or header', platform({ files: ['src/a.s'] }), /files/],
     ['a platform define with a space', platform({ defines: ['A B'] }), /platform\.defines/],

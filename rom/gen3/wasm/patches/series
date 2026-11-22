@@ -7,3 +7,4 @@
 0006-text-glyph-copy-shift-by-32.patch
 0007-m4a-internal-float-mixer.patch
 0008-m4a-platform-mixer.patch
+0009-random-no-naked-asm.patch

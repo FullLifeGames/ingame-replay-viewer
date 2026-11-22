@@ -2,7 +2,7 @@
 #define GUARD_IRV_WASM_GLOBAL_H
 
 // The WebAssembly build (#35) reaches the expansion's global.h through this shadow, which comes
-// first on -iquote. It changes two files of the tree and the platform files, each through a
+// first on -iquote. It changes one file of the tree and the platform files, each through a
 // define of its own in wasm.json.
 #include_next "global.h"
 
@@ -22,15 +22,6 @@ typedef int_fast16_t sf16;
 typedef uint_fast16_t uf16;
 typedef int_fast32_t sf32;
 typedef uint_fast32_t uf32;
-#endif
-
-// src/random.c: Random32 is Thumb assembly in a naked function. wasm.json renames it, and this
-// empties its body, so the C version of the glue can take the name.
-#ifdef IRV_WASM_NO_ASM
-#undef asm
-#define asm(...)
-#undef NAKED
-#define NAKED
 #endif
 
 // src/recorded_battle.c: wasm32 aligns a u64 to 8, so struct RecordedBattleSave outgrows its save

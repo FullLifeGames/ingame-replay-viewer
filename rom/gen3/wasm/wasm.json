@@ -36,7 +36,6 @@
     "src/siirtc.c"
   ],
   "defines": {
-    "src/random.c": ["Random32=IrvWasm_UnusedRandom32", "IRV_WASM_NO_ASM"],
     "src/recorded_battle.c": ["IRV_WASM_NO_SAVE_SIZE_ASSERTS"]
   },
   "flags": {
