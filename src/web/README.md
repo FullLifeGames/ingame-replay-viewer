@@ -4,7 +4,7 @@ The dev page. You pick your US Emerald dump and a replay, press Start, and the r
 
 The Start tap opens the page's audio context and hands it to mGBA, which loads seconds later. Firefox opens audio only while a tap lasts, so a context opened after the load stays silent there. If the browser refuses the context, the replay plays without sound. Each Start opens a new context, because mGBA closes its audio when it quits the last game.
 
-The DOM-free modules (`session.ts`, `fetch.ts`, `rom.ts`, `stream.ts` and the rest) have specs in Node. `main.ts` and `view.ts` hold the DOM wiring; the e2e covers them, and coverage leaves them out.
+The DOM-free modules (`session.ts`, `replay-choice.ts`, `fetch.ts`, `rom.ts`, `stream.ts` and the rest) have specs in Node. `main.ts`, `view.ts` and `replay-view.ts` hold the DOM wiring; the e2e covers them, and coverage leaves them out.
 
 ## Starting the page
 
@@ -22,13 +22,33 @@ The plugin in `scripts/web-server.ts` puts `Cross-Origin-Opener-Policy: same-ori
 
 `wasm.html` is a test page for the WebAssembly spike (#35). It sits beside the emulator page, which stays the viewer. Open `http://localhost:5177/wasm.html`; the emulator page links to it.
 
-The page runs the game without an emulator. The build compiles the expansion to WebAssembly (`npm run wasm:build`), and the page rebuilds that module from your dump with a BPS patch, as it rebuilds the ROM. You pick the same dump and a test replay, then press Start. The game runs in a worker, and the page allows its frames at 1x, 2x or fast. The game's sound plays at 1x, and at 2x at double pace and pitch. At fast it stays silent, and at END the page leaves fast for 1x. The sound starts with Start, because a browser opens audio only after a click. If the page cannot open its audio, the game plays without sound, the status line says why, and the next Start tries again.
+The page runs the game without an emulator. The build compiles the expansion to WebAssembly (`npm run wasm:build`), and the page rebuilds that module from your dump with a BPS patch, as it rebuilds the ROM. You pick the same dump and a test replay, or load a replay by link or ID, then press Start. Both pages share the replay controls (`replay-view.ts`) and the choice (`replay-choice.ts`), so the list under the game gives the same counts on both, and Start plays the replay the list describes. The game runs in a worker, and the page allows its frames at 1x, 2x or fast. The speed switch works while a replay runs: the new pace counts from the frame the game is at, with no Restart. The worker draws each frame into one of two buffers and the page copies the other, so the page never shows a half-drawn frame. The game's sound plays at 1x, and at 2x at double pace and pitch: a half-band filter (`half-band.ts`) cuts what the halved rate cannot hold before the worker keeps one pair of each two. The worklet waits until two frames of sound sit in the ring, at the start and after each dry spell, and the progress line counts the samples it skipped and the times it ran out of sound. At fast it stays silent, and at END the page leaves fast for 1x. The sound starts with Start, because a browser opens audio only after a click. If the page cannot open its audio, the game plays without sound, the status line says why, and the next Start tries again.
 
 It needs `npm run rom:build`, `npm run wasm:build -- --compile`, `npm run wasm:convert` and `npm run wasm:build -- --link`, in that order, all heavy checks. The link writes `build/wasm/irv-emerald-wasm.bps` from your dump by the build's rule (`~/roms/` or `IRV_BASE_ROM`); `npm run wasm:build -- --patch` writes it alone.
 
 The dev server serves two files from `build/wasm/`: `/wasm/irv-emerald.js` (the Emscripten glue) and `/wasm/irv-emerald-wasm.bps`. Any other `/wasm/` name answers 404, the module `irv-emerald.wasm` included. The page's own modules in `src/web/wasm/` pass through to Vite under the same prefix. The page also fetches `/rom/replay-slot.json`, since the module's replay slot has the ROM's layout.
 
-`e2e/wasm-spike.spec.ts` plays the hand-made battle at 1x and 994052 at fast, and checks the pace at 1x and 2x. It also counts the samples that pass the audio ring, reports the worklet's skips and underruns, and measures how loud the sound is. Two Start presses during the build must start one run. A game that fails stops the test with its line. It skips without the dump or the build outputs and names what is missing. Only numbers leave it.
+`e2e/wasm-spike.spec.ts` plays the hand-made battle at 1x, switches it to 2x and back while it runs, and plays it to END. It then plays it again from Restart at 2x to END, and 994052 at fast, and checks the pace and the sound written at 1x and 2x. It also counts the samples that pass the audio ring, reports the worklet's skips and underruns, finds their counts on the progress line, and measures how loud the sound is. Two Start presses during the build must start one run. A game that fails stops the test with its line. It skips without the dump or the build outputs and names what is missing. Only numbers leave it.
+
+`e2e/wasm-page.spec.ts` loads a replay by link on the page and checks its list against the emulator page's. With the dump and the build outputs, it also starts that replay at fast and waits until the game has played some of its instructions.
+
+## Phones
+
+Issue #49 asks the WebAssembly page to play a replay to its end on Android in Firefox and in Chrome, and on iOS in Safari. Each browser needs the same five things, and the page names what it lacks:
+
+- A secure context: HTTPS, which `tailscale serve` gives the page (see "Reaching the page over the tailnet"). Plain `http://<tailscale ip>` gets the secure-context line.
+- Cross-origin isolation, from the two headers of the dev server and the preview. Without it the browser grants no `SharedArrayBuffer`, which the worker and the page share for the frames, the sound and the pace. The page shows the isolation line instead of its controls.
+- Module workers: Firefox 114, Chrome 80, Safari 15 and their later versions. The page asks the `Worker` constructor before it shows its controls, and an older browser gets a line that names these versions.
+- The audio worklet (`AudioWorkletNode`). Without it the game plays without sound, and the status line says why.
+- 256 MB of memory for the module, fixed at instantiation and never grown. A phone that refuses it gets the line "This browser did not give the game the 256 MB of memory it needs", with the browser's own words, after Start. Each Start tries again with the picked dump. The build before it, the patch applied to the dump and the compile, can run out of memory too; that gets the line "This browser ran out of memory while it built the game from your dump", and a reload with the dump picked again tries once more. `src/web/wasm/failures.ts` holds both lines and the number, and the web server's spec holds it equal to the link's (`scripts/wasm-link.ts`).
+
+On 22.11.2026 the user played the spike page on an Android phone in Firefox over `tailscale serve`, with sound. The runs at the end of wave 4's stage 4 fill this table: a replay at 1x and at 2x to its end on each phone, with the counts of the progress line.
+
+| Phone and browser | Replay | 1x to the end | 2x to the end | Samples skipped | Ran out of sound | What the browser lacks |
+| ----------------- | ------ | ------------- | ------------- | --------------- | ---------------- | ---------------------- |
+| Android, Firefox  |        |               |               |                 |                  |                        |
+| Android, Chrome   |        |               |               |                 |                  |                        |
+| iOS, Safari       |        |               |               |                 |                  |                        |
 
 ## The preview
 

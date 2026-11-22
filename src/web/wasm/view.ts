@@ -1,11 +1,12 @@
 // The DOM of the WebAssembly spike page: the elements of wasm.html and what main.ts shows in them.
+// The replay controls and the list come from replay-view.ts, as on the emulator page.
+import { element as pageElement, findReplayView } from '../replay-view'
 import { SPEEDS, type Speed } from './protocol'
 
-function element<T extends HTMLElement>(id: string, type: new () => T): T {
-  const found = document.getElementById(id)
-  if (!(found instanceof type)) throw new Error(`wasm.html lacks the ${type.name} #${id}`)
-  return found
-}
+const PAGE = 'wasm.html'
+
+const element = <T extends HTMLElement>(id: string, type: new () => T): T =>
+  pageElement(PAGE, id, type)
 
 const isSpeed = (value: string): value is Speed => (SPEEDS as readonly string[]).includes(value)
 
@@ -13,15 +14,14 @@ const isSpeed = (value: string): value is Speed => (SPEEDS as readonly string[])
 export function findSpikeView() {
   const status = element('status', HTMLParagraphElement)
   const progress = element('progress', HTMLParagraphElement)
-  const testReplay = element('test-replay', HTMLSelectElement)
   const speeds = element('speed', HTMLFieldSetElement)
   const checkedSpeed = (): Speed => {
     const value = speeds.querySelector<HTMLInputElement>('input:checked')?.value ?? '1x'
     return isSpeed(value) ? value : '1x'
   }
   return {
+    ...findReplayView(PAGE),
     dump: element('dump', HTMLInputElement),
-    testReplay,
     start: element('start', HTMLButtonElement),
     restart: element('restart', HTMLButtonElement),
     canvas: element('screen', HTMLCanvasElement),
@@ -48,9 +48,6 @@ export function findSpikeView() {
     },
     progress: (line: string): void => {
       if (progress.textContent !== line) progress.textContent = line
-    },
-    offer: (ids: readonly string[], first: string): void => {
-      testReplay.replaceChildren(...ids.map((id) => new Option(id, id, false, id === first)))
     },
   }
 }

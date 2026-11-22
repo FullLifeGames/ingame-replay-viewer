@@ -1,6 +1,7 @@
 // The page's own words: the status line after each step, and the texts of the "Not shown in the
-// game" list. The failures keep the words of the step that failed (session.ts).
-import type { DumpSummary, ReplaySummary, StartSummary } from './session'
+// game" list. The failures keep the words of the step that failed (replay-choice.ts, session.ts).
+import type { ReplaySummary } from './replay-choice'
+import type { DumpSummary, StartSummary } from './session'
 import type { NotShownCount, NotShownRow } from './stream'
 
 export const READY_LINE = 'Pick your US Emerald dump, then press Start.'

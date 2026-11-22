@@ -4,8 +4,8 @@ import { type AudioHandOver, audioHandOver, loadEmulator } from './emulator'
 import { environmentProblem } from './environment'
 import { fetchBytes, fetchJson } from './fetch'
 import { messageOf } from './message'
-import { FIRST_REPLAY, TEST_REPLAYS } from './replays'
-import { createSession, type ReplaySummary, type Session } from './session'
+import { wireReplays } from './replay-view'
+import { createSession, type Session } from './session'
 import * as say from './status'
 import { findView, type View } from './view'
 
@@ -16,40 +16,6 @@ function act(view: View, work: () => unknown): void {
     .catch((error: unknown) => {
       view.status(messageOf(error))
     })
-}
-
-function wireReplays(session: Session, view: View): void {
-  type Then = (summary: ReplaySummary) => void
-  const show = (pending: Promise<ReplaySummary | undefined>, then?: Then): void => {
-    act(view, async () => {
-      const summary = await pending
-      if (summary === undefined) return
-      view.showReplay(summary)
-      then?.(summary)
-    })
-  }
-  const picked: Then = (summary) => {
-    view.status(say.pickedLine(summary.id))
-  }
-  const pick = (id: string, then?: Then): void => {
-    const replay = TEST_REPLAYS.find((test) => test.id === id)
-    if (replay !== undefined) show(session.pickTestReplay(replay), then)
-  }
-  view.testReplay.addEventListener('change', () => {
-    pick(view.testReplay.value, picked)
-  })
-  view.replayForm.addEventListener('submit', (event) => {
-    event.preventDefault()
-    show(session.loadReplay(view.replayInput.value), (summary) => {
-      view.testReplay.selectedIndex = -1
-      picked(summary)
-    })
-  })
-  view.offer(
-    TEST_REPLAYS.map((test) => test.id),
-    FIRST_REPLAY,
-  )
-  pick(FIRST_REPLAY)
 }
 
 function wireRun(session: Session, view: View, audio: AudioHandOver): void {
