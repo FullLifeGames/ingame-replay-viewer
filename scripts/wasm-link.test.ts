@@ -28,15 +28,26 @@ const touch = (path: string) => {
 }
 
 describe('the objects of the link', () => {
-  it('takes one object per file that compile.json records, platform files included', () => {
+  it('takes one object per file that compile.json records', () => {
+    const entries = [
+      { source: 'src/main.c', ok: true },
+      { source: 'src/m4a.c', ok: true },
+    ]
+    expect(compiledObjects(entries, paths)).toEqual([
+      '/repo/build/wasm/obj/src/main.o',
+      '/repo/build/wasm/obj/src/m4a.o',
+    ])
+  })
+
+  // The borrowed platform files left the build (#43, B9); a record from before still names them.
+  it('refuses a compile record that names a platform file and asks for a new compile', () => {
     const entries = [
       { source: 'src/main.c', ok: true },
       { source: 'platform/src/platform/bios.c', ok: true },
     ]
-    expect(compiledObjects(entries, paths)).toEqual([
-      '/repo/build/wasm/obj/src/main.o',
-      '/repo/build/wasm/obj/platform/src/platform/bios.o',
-    ])
+    expect(() => compiledObjects(entries, paths)).toThrow(
+      /platform\/src\/platform\/bios\.c.*npm run wasm:build -- --compile/,
+    )
   })
 
   it('refuses a compile record with a failed file and names it', () => {

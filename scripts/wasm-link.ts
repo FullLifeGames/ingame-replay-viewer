@@ -52,6 +52,13 @@ export function compiledObjects(
       `build/wasm/${record} records failed files: ${failed.join(', ')}; run npm run wasm:build -- --compile`,
     )
   }
+  // The borrowed platform files left the build (#43); a record from before still names them.
+  const borrowed = entries.filter((entry) => entry.source.startsWith('platform/'))
+  if (borrowed.length > 0) {
+    throw new Error(
+      `build/wasm/${record} records platform files, which no longer build: ${borrowed.map((entry) => entry.source).join(', ')}; run npm run wasm:build -- --compile`,
+    )
+  }
   return entries.map((entry) => objectPath(paths, entry.source))
 }
 
