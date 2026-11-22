@@ -65,7 +65,7 @@ void CB2_ReplayBoot(void)
         SetMainCallback2(CB2_ReplayRefused);
         return;
     }
-    error = Replay_Start(slot->stream, slot->header.streamLength, REPLAY_HOLD_AT_END, CB2_ReplayLeft);
+    error = Replay_Start(slot->stream, slot->header.streamLength, REPLAY_OUTRO_THEN_HOLD, CB2_ReplayLeft);
     if (error != REPLAY_ERROR_NONE)
     {
         SetMainCallback2(CB2_ReplayRefused);

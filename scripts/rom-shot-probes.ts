@@ -79,7 +79,19 @@ export const SCREEN = {
 }
 
 export type Check =
-  | { probe: 'differs'; before: string; after: string; region?: Region; beforeDrawn?: boolean }
+  | {
+      probe: 'differs'
+      before: string
+      after: string
+      region?: Region
+      /** The frame before must show more than one colour: drawn, not faded in yet. */
+      beforeDrawn?: boolean
+      /**
+       * A region the frame after must show as the frame before does. A palette fade changes every
+       * colour but black, so a frame on its way to black or black fails.
+       */
+      kept?: Region
+    }
   | { probe: 'same'; before: string; after: string; region: Region }
   | { probe: 'blank'; shot: string; region: Region; colour?: number }
   | { probe: 'bar'; shot: string; bar: HpBar; filled: number }
@@ -187,20 +199,33 @@ function ballsVerdict(frame: Frame, check: Extract<Check, { probe: 'balls' }>): 
   return { pass: count === check.balls, detail }
 }
 
+function differsVerdict(
+  before: Frame,
+  after: Frame,
+  check: Extract<Check, { probe: 'differs' }>,
+): Verdict {
+  const count = differingPixels(before, after, check.region)
+  const detail = `${String(count)} pixels differ`
+  if (check.beforeDrawn === true && isBlank(before, wholeFrame(before))) {
+    return { pass: false, detail: `${detail}, but the frame before is one colour` }
+  }
+  const lost = check.kept === undefined ? 0 : differingPixels(before, after, check.kept)
+  if (lost > 0) {
+    return {
+      pass: false,
+      detail: `${detail}, but ${String(lost)} pixels of the kept region differ too`,
+    }
+  }
+  return { pass: count > 0, detail }
+}
+
 // A message of the battle text box has far more glyph pixels than this.
 const MIN_TEXT_PIXELS = 20
 
 function verdictOf(check: Check, frame: (name: string) => Frame): Verdict {
   switch (check.probe) {
-    case 'differs': {
-      const before = frame(check.before)
-      const count = differingPixels(before, frame(check.after), check.region)
-      const detail = `${String(count)} pixels differ`
-      if (check.beforeDrawn === true && isBlank(before, wholeFrame(before))) {
-        return { pass: false, detail: `${detail}, but the frame before is one colour` }
-      }
-      return { pass: count > 0, detail }
-    }
+    case 'differs':
+      return differsVerdict(frame(check.before), frame(check.after), check)
     case 'same': {
       const count = differingPixels(frame(check.before), frame(check.after), check.region)
       return { pass: count === 0, detail: `${String(count)} pixels differ` }

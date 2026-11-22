@@ -46,8 +46,23 @@ const TREE: Record<string, string> = {
   'include/constants/trainers.h': enumOf('TrainerPicID', [
     'TRAINER_PIC_NONE,',
     'TRAINER_PIC_BRENDAN,',
+    'TRAINER_PIC_HIKER,',
     'TRAINER_PIC_COUNT,',
   ]),
+  // Front and back pics count only inside gTrainerPicInfo, and a commented field is no field.
+  'src/data/graphics/trainers.h': [
+    'const struct X sOther[] = { [TRAINER_PIC_HIKER] = { .backPic = 0 } };',
+    'const struct TrainerPicInfo gTrainerPicInfo[TRAINER_PIC_COUNT] =',
+    '{',
+    '    [TRAINER_PIC_NONE] = { .backPic = TRAINER_BACK_PIC(1, a, b, c) },',
+    '    [TRAINER_PIC_BRENDAN] =',
+    '    {',
+    '        .frontPic = TRAINER_FRONT_PIC(d, e),',
+    '        .backPic = TRAINER_BACK_PIC(4, f, g, h),',
+    '    },',
+    '    [TRAINER_PIC_HIKER] = { .frontPic = TRAINER_FRONT_PIC(i, j), /* .backPic = k */ },',
+    '};',
+  ].join('\n'),
   'include/constants/pokemon.h': '#define MAX_LEVEL 100\n',
   'src/data/pokemon/species_info.h': [
     '#include "constants/abilities.h"',
@@ -101,7 +116,16 @@ describe('generateTables on a small tree', () => {
     expect(parsed('trainer-pics.json')).toEqual({
       TRAINER_PIC_NONE: 0,
       TRAINER_PIC_BRENDAN: 1,
-      TRAINER_PIC_COUNT: 2,
+      TRAINER_PIC_HIKER: 2,
+      TRAINER_PIC_COUNT: 3,
+    })
+    expect(parsed('trainer-back-pics.json')).toEqual({
+      TRAINER_PIC_NONE: 0,
+      TRAINER_PIC_BRENDAN: 1,
+    })
+    expect(parsed('trainer-front-pics.json')).toEqual({
+      TRAINER_PIC_BRENDAN: 1,
+      TRAINER_PIC_HIKER: 2,
     })
     expect(parsed('charmap.json')).toEqual({
       eos: 255,
@@ -116,7 +140,7 @@ describe('generateTables on a small tree', () => {
       MOVES_COUNT_ALL: 6,
       ABILITIES_COUNT: 2,
       ITEMS_COUNT: 5,
-      TRAINER_PIC_COUNT: 2,
+      TRAINER_PIC_COUNT: 3,
       MAX_LEVEL: 100,
     })
   })
@@ -125,6 +149,16 @@ describe('generateTables on a small tree', () => {
     const read = (path: string) =>
       path.endsWith('items.h') ? enumOf('Item', ['ITEM_NONE = 0,']) : readTree(path)
     expect(() => generateTables(read, PIN)).toThrow(/enum Item has no ITEMS_COUNT/)
+  })
+
+  it('refuses a back pic outside the trainer pic enum and a tree without gTrainerPicInfo', () => {
+    const outside = (path: string) =>
+      path.endsWith('graphics/trainers.h')
+        ? 'gTrainerPicInfo[] = { [TRAINER_PIC_LEAF] = { .backPic = x } };'
+        : readTree(path)
+    expect(() => generateTables(outside, PIN)).toThrow(/TRAINER_PIC_LEAF, which enum TrainerPicID/)
+    const missing = (path: string) => (path.endsWith('graphics/trainers.h') ? '' : readTree(path))
+    expect(() => generateTables(missing, PIN)).toThrow(/trainers.h has no gTrainerPicInfo/)
   })
 
   it('records the pin and the sha256 of each file read', () => {

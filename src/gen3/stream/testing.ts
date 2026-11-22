@@ -1,4 +1,6 @@
 // Spec helpers: a stream model with full team tables around the instructions under test.
+import { encodeInstruction, encodeStream } from './encode'
+import { STREAM, STREAM_OFFSET } from './format'
 import type { Instruction, Party, Stream, StreamMon } from './instructions'
 
 export const DUGTRIO: StreamMon = {
@@ -36,18 +38,46 @@ export function streamOf(instructions: readonly Instruction[]): Stream {
   }
 }
 
-/** One instruction of each op, in op order. */
+/** INTRO and both leads out, near slot 0 and far slot 0: what the order rules ask before a MOVE. */
+export const LEADS: readonly Instruction[] = [
+  { op: 'intro' },
+  { op: 'sendOut', side: 'near', slot: 0, hp: 100, status: 'none' },
+  { op: 'sendOut', side: 'far', slot: 0, hp: 100, status: 'none' },
+]
+
+/** Where the first instruction after LEADS starts in the stream's bytes. */
+export const AFTER_LEADS = STREAM.tablesEnd + LEADS.flatMap(encodeInstruction).length
+
+/** A stream with LEADS, then the given instructions. */
+export const streamWithLeads = (instructions: readonly Instruction[]): Stream =>
+  streamOf([...LEADS, ...instructions])
+
+/**
+ * The bytes of `streamOf(instructions)` without the encoder's checks of END, the teams and the
+ * order rules: a stream the decoder must refuse.
+ */
+export function rawBytes(instructions: readonly Instruction[]): Uint8Array {
+  const tables = encodeStream(streamOf([{ op: 'end', outcome: 'tie' }]))
+  const body = instructions.flatMap(encodeInstruction)
+  const bytes = new Uint8Array(STREAM.tablesEnd + body.length)
+  bytes.set(tables.subarray(0, STREAM.tablesEnd))
+  bytes.set(body, STREAM.tablesEnd)
+  new DataView(bytes.buffer).setUint32(STREAM_OFFSET.instructionsLength, body.length, true)
+  return bytes
+}
+
+/** Each op at least once, in an order the order rules allow. */
 export const EACH_OP: readonly Instruction[] = [
-  { op: 'turn', number: 300 },
-  { op: 'print', text: 'Go! Dugtrio!' },
   { op: 'intro' },
   { op: 'sendOut', side: 'far', slot: 5, hp: 100, status: 'tox' },
+  { op: 'sendOut', side: 'near', slot: 0, hp: 100, status: 'none' },
+  { op: 'turn', number: 300 },
+  { op: 'print', text: 'Go! Dugtrio!' },
   { op: 'withdraw', side: 'near' },
   { op: 'switchIn', side: 'near', slot: 1, hp: 71, status: 'par' },
   { op: 'move', user: 'far', target: 'near', move: 191 },
   { op: 'hit', side: 'near', effectiveness: 'super' },
   { op: 'hp', side: 'near', hp: 0 },
-  { op: 'faint', side: 'near' },
   { op: 'status', side: 'far', slot: 0, status: 'slp' },
   { op: 'stat', side: 'far', stat: 'evasion', stages: -2, arrows: 'several' },
   { op: 'anim', side: 'near', anim: 'statusFrz' },
@@ -57,6 +87,7 @@ export const EACH_OP: readonly Instruction[] = [
   { op: 'item', side: 'far', slot: 3, item: 234 },
   { op: 'itemPopUp', side: 'near', item: 234 },
   { op: 'trapTurn', side: 'far', move: 83 },
+  { op: 'faint', side: 'near' },
   { op: 'flushTextBox' },
   { op: 'end', outcome: 'farWon' },
 ]

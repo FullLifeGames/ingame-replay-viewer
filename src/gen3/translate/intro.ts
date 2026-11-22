@@ -1,5 +1,6 @@
-// The intro (plan §6): the players and team sizes go into the header, the battle start becomes
-// INTRO and the far player's line, and the leads are sent out far first, as `DoBattleIntro` does.
+// The intro (plan §6): the players, their avatars and team sizes go into the header, the battle
+// start becomes INTRO and the far player's line, and the leads are sent out far first, as
+// `DoBattleIntro` does.
 import { fitCharset } from '../text/charset'
 import { nameTrainer } from '../text/names'
 import { challenged, sentOut } from '../text/phrases-field'
@@ -9,7 +10,11 @@ import { scaleHp } from './scale'
 export function player(event: EventOf<'player'>, ctx: Context): void {
   const text = nameTrainer(event.name)
   ctx.note(event.line, text.fallback)
-  ctx.players[event.side] = { header: fitCharset(event.name).text, text: text.text }
+  ctx.players[event.side] = {
+    header: fitCharset(event.name).text,
+    text: text.text,
+    avatar: event.avatar,
+  }
 }
 
 export function teamSize(event: EventOf<'teamSize'>, ctx: Context): void {

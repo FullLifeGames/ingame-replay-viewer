@@ -12,6 +12,20 @@ import { streamOfLog } from './testing'
 const full = { maxHp: 100, level: 100, shiny: false } as const
 
 describe('buildGen3Stream', () => {
+  it('takes each trainer pic from the avatar on the player line (#20)', () => {
+    const log = [
+      '|gen|3',
+      '|player|p1|Alice|steven|',
+      '|player|p2|Bob|red|',
+      '|start',
+      '|switch|p1a: Dugtrio|Dugtrio, M|100/100',
+      '|switch|p2a: Tyranitar|Tyranitar, M|100/100',
+    ]
+    const { trainers } = decodeStream(buildGen3Stream(buildBattleScript(log.join('\n'))).bytes)
+    expect(trainers.near.trainerPic).toBe(trainerPics.TRAINER_PIC_STEVEN)
+    expect(trainers.far.trainerPic).toBe(trainerPics.TRAINER_PIC_RED)
+  })
+
   it('opens with the trainers, the teams, INTRO and the leads far first (X1)', () => {
     const result = streamOfLog()
     const stream = decodeStream(result.bytes)

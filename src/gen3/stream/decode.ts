@@ -2,8 +2,8 @@
 // debug view. It refuses every stream the ROM's validator refuses (replay_stream_check.c): a
 // version it does not know, a header or an op of the wrong size, an operand outside its range, a
 // number at or above the expansion's count, a mon the game cannot make, an empty side, a slot
-// operand that names no mon. It refuses more: a byte outside the charset, a trainer pic at or above
-// its count.
+// operand that names no mon, an instruction that breaks the order rules (order.ts). It refuses
+// more: a byte outside the charset, a trainer pic at or above its count.
 import type { Side } from '../../script/types'
 import { Gen3Error } from '../errors'
 import { decodeText, EOS } from '../text/charset'
@@ -35,6 +35,7 @@ import {
   type StreamTrainer,
   TRAINER_FIELDS,
 } from './instructions'
+import { checkOrder } from './order'
 import { checkTeams } from './teams'
 
 const OPS: ReadonlyMap<number, Op> = new Map(
@@ -53,6 +54,7 @@ export function decodeStream(bytes: Uint8Array): Stream {
     instructions: readInstructions(bytes.subarray(offset, offset + length)),
   }
   checkTeams(stream)
+  checkOrder(stream.instructions)
   return stream
 }
 

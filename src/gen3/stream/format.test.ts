@@ -30,6 +30,7 @@ const GROUPS: readonly (readonly [Numbers, string, string])[] = [
   [format.EFFECTIVENESS, 'REPLAY_EFFECTIVENESS_', ''],
   [format.VOLATILE, 'REPLAY_VOLATILE_', ''],
   [format.ANIM, 'REPLAY_ANIM_', ''],
+  [format.ORDER, 'REPLAY_ORDER_', ''],
 ]
 
 function tsDefines(): Map<string, number> {

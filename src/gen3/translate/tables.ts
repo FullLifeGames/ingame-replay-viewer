@@ -1,19 +1,14 @@
 // The header's trainer and party tables (plan §2) from what the walk learnt: the players, their
-// team sizes and the revealed team members.
+// trainer pics (from the avatars, `tables/avatars.ts`), their team sizes and the revealed team
+// members.
 import type { Side, TeamMember } from '../../script/types'
 import { Gen3Error } from '../errors'
 import { STREAM } from '../stream/format'
 import type { Party, Stream, StreamMon, StreamTrainer } from '../stream/instructions'
 import { speciesOf } from '../tables/lookup'
-import trainerPics from '../tables/trainer-pics.json'
+import { trainerPicOf } from '../tables/avatars'
 import type { Context } from './context'
 import { HP_SCALE } from './scale'
-
-/** D9: fixed trainer pics in M1, Showdown avatars come later. */
-const PICS: Readonly<Record<Side, number>> = {
-  near: trainerPics.TRAINER_PIC_BRENDAN,
-  far: trainerPics.TRAINER_PIC_MAY,
-}
 
 const GENDERS = { M: 'male', F: 'female' } as const
 
@@ -28,7 +23,7 @@ function trainerOf(ctx: Context, side: Side): StreamTrainer {
   const revealed = ctx.script.teams[side].length
   return {
     name: ctx.player(side).header,
-    trainerPic: PICS[side],
+    trainerPic: trainerPicOf(side, ctx.player(side).avatar),
     teamSize: ctx.teamSizes[side] ?? revealed,
     revealed,
   }

@@ -13,6 +13,9 @@ export const dumpLine = ({ romSha1 }: DumpSummary): string =>
 export const startLine = ({ id, streamBytes }: StartSummary): string =>
   `Running ${id}: ${String(streamBytes)} bytes of instruction stream.`
 
+/** Once the game reached END, at the win or tie line; the outro that follows belongs to no line. */
+export const endedLine = (id: string): string => `Played ${id} to the end of the battle.`
+
 /** After the user picks or loads a replay: the running game, if any, keeps its own. */
 export const pickedLine = (id: string): string => `Picked ${id}. Press Start to play it.`
 

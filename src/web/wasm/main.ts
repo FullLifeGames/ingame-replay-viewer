@@ -7,6 +7,7 @@
 import { environmentProblem } from '../environment'
 import { messageOf } from '../message'
 import { FIRST_REPLAY, TEST_REPLAYS } from '../replays'
+import { endedLine } from '../status'
 import { streamOfReplay } from '../stream'
 import { FRAME_HEIGHT, FRAME_WIDTH } from './frame'
 import { grant, readStatus, type Speed, writePace } from './protocol'
@@ -28,8 +29,15 @@ import {
 import { Runs } from './runs'
 import { findSpikeView, type SpikeView } from './view'
 
+/** A run with the id of the replay it plays, for the status line at END. */
+type NamedRun = Run & { readonly id: string }
+
 /** The animation-frame loop: grants the run its frames, draws the newest and shows the progress. */
-function drawLoop(view: SpikeView, runs: Runs<Run>, changeSpeed: (speed: Speed) => void): void {
+function drawLoop(
+  view: SpikeView,
+  runs: Runs<NamedRun>,
+  changeSpeed: (speed: Speed) => void,
+): void {
   const context = view.canvas.getContext('2d')
   const image = new ImageData(FRAME_WIDTH, FRAME_HEIGHT)
   const draw = (now: number) => {
@@ -41,6 +49,8 @@ function drawLoop(view: SpikeView, runs: Runs<Run>, changeSpeed: (speed: Speed) 
     if (status.finished && run.finishedMs === undefined) {
       // At END fast gives way to 1x (speedAtEnd), and the speed control shows it.
       const speed = reachEnd(run, now)
+      // The draw loop looks at the current run only, so a later Start never gets this line.
+      view.status(endedLine(run.id))
       if (speed !== run.clock.speed) {
         changeSpeed(speed)
         view.showSpeed(speed)
@@ -62,7 +72,7 @@ function createSpike(view: SpikeView) {
   let built: Promise<Built> | undefined
   let picked: Promise<Picked> | undefined
   let last: Picked | undefined
-  const runs = new Runs<Run>(stopRun)
+  const runs = new Runs<NamedRun>(stopRun)
   const audio = new AudioOpener()
 
   const changeSpeed = (speed: Speed) => {
@@ -74,7 +84,7 @@ function createSpike(view: SpikeView) {
   drawLoop(view, runs, changeSpeed)
 
   const begin = (module: Built, chosen: Picked, sound: Sound): Run => {
-    const run = startRun(module, chosen, view.speed(), sound)
+    const run = Object.assign(startRun(module, chosen, view.speed(), sound), { id: chosen.id })
     watchRun(run, (line) => {
       if (runs.current === run) view.status(line)
     })

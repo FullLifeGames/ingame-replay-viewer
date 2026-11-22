@@ -18,6 +18,13 @@
 
 #define REPLAY_BATTLE_FLAGS (BATTLE_TYPE_IS_MASTER | BATTLE_TYPE_RECORDED_IS_MASTER | BATTLE_TYPE_RECORDED_LINK | BATTLE_TYPE_TRAINER)
 
+// Each side's trainer pic from the stream, for the recorded controllers (patch 0004). A side is
+// the battler's side: REPLAY_SIDE_NEAR stands at B_POSITION_PLAYER_LEFT.
+static EWRAM_DATA u16 sTrainerPics[REPLAY_STREAM_SIDE_COUNT] = {0};
+
+STATIC_ASSERT(REPLAY_SIDE_NEAR == B_SIDE_PLAYER, ReplaySideNearIsPlayerSide);
+STATIC_ASSERT(REPLAY_SIDE_FAR == B_SIDE_OPPONENT, ReplaySideFarIsOpponentSide);
+
 static void CopyString(u8 *dest, const volatile u8 *src, u32 length)
 {
     u32 i;
@@ -142,6 +149,23 @@ static void FillLinkPlayers(struct RecordedBattleSave *save, const volatile u8 *
     }
 }
 
+// Replay_Validate refused a pic the side cannot draw (ValidateTeams), so the controllers draw each
+// one as it is.
+static void KeepTrainerPics(const volatile u8 *stream)
+{
+    u32 side;
+
+    for (side = 0; side < REPLAY_STREAM_SIDE_COUNT; side++)
+        sTrainerPics[side] = Replay_ReadU16(Replay_GetTrainer(stream, side) + REPLAY_TRAINER_OFFSET_TRAINER_PIC);
+}
+
+u32 Replay_GetTrainerPic(u32 battler, u32 fallback)
+{
+    if (!Replay_IsLoaded())
+        return fallback;
+    return sTrainerPics[GetBattlerSide(battler)];
+}
+
 enum ReplayError Replay_Start(const volatile u8 *stream, u32 length, enum ReplayEnd end, MainCallback afterBattle)
 {
     struct RecordedBattleSave *save;
@@ -152,6 +176,7 @@ enum ReplayError Replay_Start(const volatile u8 *stream, u32 length, enum Replay
     save = AllocZeroed(sizeof(*save));
     FillParties(save, stream);
     FillLinkPlayers(save, stream);
+    KeepTrainerPics(stream);
     save->battleFlags = REPLAY_BATTLE_FLAGS;
     save->opponentA = TRAINER_LINK_OPPONENT;
     save->textSpeed = OPTIONS_TEXT_SPEED_FAST;

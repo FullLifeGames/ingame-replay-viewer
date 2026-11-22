@@ -11,12 +11,16 @@
 
 #define U16(value) ((value) & 0xFF), ((value) >> 8)
 
-// The error of a stream with one op of these operands, then END.
+// The error of a stream with one op of these operands after INTRO and both send-outs, so the op
+// keeps the order rules, then END.
 #define CHECK_OP(op, ...) ValidateOp(op, sizeof((const u8[]) { __VA_ARGS__ }), (const u8[]) { __VA_ARGS__ })
 
 static enum ReplayError ValidateOp(u32 op, u32 size, const u8 *operands)
 {
     ReplayStream_Begin();
+    ReplayStream_Intro();
+    ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+    ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
     ReplayStream_Op(op, size, operands);
     ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
     return Replay_Validate(ReplayStream_Data(), ReplayStream_Length());

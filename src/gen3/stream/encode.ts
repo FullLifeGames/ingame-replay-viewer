@@ -1,5 +1,6 @@
 // The stream model to the bytes of the replay slot's stream (plan §2): the header, the trainer and
-// party tables, then the instructions. A value the format cannot carry is a Gen3Error, never cut.
+// party tables, then the instructions. A value the format cannot carry is a Gen3Error, never cut,
+// and so is a stream that breaks the order rules (order.ts).
 import type { Side } from '../../script/types'
 import { Gen3Error } from '../errors'
 import { encodeText, EOS } from '../text/charset'
@@ -27,6 +28,7 @@ import {
   type Party,
   type Stream,
 } from './instructions'
+import { checkOrder } from './order'
 import { checkTeams } from './teams'
 
 const SIDES = Object.keys(SIDE) as Side[]
@@ -34,6 +36,7 @@ const SIDES = Object.keys(SIDE) as Side[]
 export function encodeStream(stream: Stream): Uint8Array {
   checkEnd(stream.instructions)
   checkTeams(stream)
+  checkOrder(stream.instructions)
   const body = stream.instructions.flatMap(encodeInstruction)
   const bytes = new Uint8Array(STREAM.tablesEnd + body.length)
   bytes.set(headerBytes(body.length), 0)
