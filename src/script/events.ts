@@ -228,6 +228,14 @@ interface EffectivenessEvent {
   readonly effectiveness: Effectiveness
 }
 
+/** Showdown's `-hitcount` after a multi-hit move's last hit; `who` is the move's target. */
+interface HitCountEvent {
+  readonly kind: 'hitCount'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly hits: number
+}
+
 interface EffectStartEvent extends Caused {
   readonly kind: 'effectStart'
   readonly line: number
@@ -337,6 +345,7 @@ export type ScriptEvent =
   | StatLimitEvent
   | CritEvent
   | EffectivenessEvent
+  | HitCountEvent
   | EffectStartEvent
   | EffectEndEvent
   | EffectActivateEvent

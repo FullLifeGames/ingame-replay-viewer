@@ -10,6 +10,7 @@ import { message, tie, win } from './end'
 import { fieldActivate, sideEnd, sideStart, weather } from './field'
 import { item, itemEnd } from './items'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
+import { hitCount } from './hits'
 import { damage, heal } from './hp'
 import { crit, effectiveness, failure, immunity, miss, move } from './moves'
 import { statChange, statLimit } from './stats'
@@ -55,6 +56,7 @@ const HANDLERS = {
   item,
   itemEnd,
   ability,
+  hitCount,
 } satisfies { readonly [K in ScriptEvent['kind']]: Handler<K> }
 
 export interface Translation extends Omit<Stream, 'instructions'> {

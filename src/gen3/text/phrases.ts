@@ -18,6 +18,11 @@ export const MOVE_TEMPLATES = {
   critical: tagged('STRINGID_CRITICALHIT', () => 'A critical hit!'),
   superEffective: tagged('STRINGID_SUPEREFFECTIVE', () => "It's super effective!"),
   notVeryEffective: tagged('STRINGID_NOTVERYEFFECTIVE', () => "It's not very effective…"),
+  // `BattleScript_MultiHitPrintStrings` (data/battle_scripts_1.s); `BS_MultiHitPlurality`
+  // (src/battle_script_commands.c) gives B_BUFF2 "" for one hit and "s" for more.
+  hitCount: tagged('STRINGID_HITXTIMES', (hits: number) => {
+    return `The Pokémon was hit ${String(hits)} time${hits === 1 ? '' : 's'}!`
+  }),
   doesntAffect: tagged('STRINGID_ITDOESNTAFFECT', (who: Mon) => {
     return `It doesn't affect ${nameInside(who)}…`
   }),
@@ -96,6 +101,9 @@ export function effective(effectiveness: 'super' | 'resisted'): string {
   const template = effectiveness === 'super' ? 'superEffective' : 'notVeryEffective'
   return MOVE_TEMPLATES[template].render()
 }
+
+/** The count line after a multi-hit move's last hit. */
+export const hitCount = (hits: number) => MOVE_TEMPLATES.hitCount.render(hits)
 
 /** An immunity the log names confusion for has its own line (Own Tempo's); any other has none. */
 export function immune(who: Mon, effect?: Effect): string {

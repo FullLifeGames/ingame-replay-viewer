@@ -61,6 +61,7 @@ const rockSlide = withValue('B_CURRENT_MOVE', nb('Rock Slide'), FAR)
 
 export const SAMPLES: Readonly<Record<string, Sample>> = {
   'moves.usedMove': withValue('B_BUFF3', nb('Rock Slide'), FAR),
+  'moves.hitCount': { args: [3], fill: { B_BUFF1: '3', B_BUFF2: 's' } },
   'stats.rose': {
     args: [FAR, nb('Sp. Atk'), nb(' sharply')],
     fill: { B_BUFF1: nb('Sp. Atk'), B_BUFF2: nb(' sharply') },

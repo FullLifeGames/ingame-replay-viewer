@@ -1,0 +1,259 @@
+{"gen":3,"format":"[Gen 3] OU","teams":{"near":[{"species":"Ninetales","name":"Ninetales","gender":"F","level":100,"shiny":false},{"species":"Celebi","name":"Celebi","level":100,"shiny":false},{"species":"Porygon2","name":"Porygon2","level":100,"shiny":false},{"species":"Sceptile","name":"Sceptile","gender":"F","level":100,"shiny":false},{"species":"Swampert","name":"Swampert","gender":"F","level":100,"shiny":false},{"species":"Hitmontop","name":"Hitmontop","gender":"M","level":100,"shiny":false}],"far":[{"species":"Armaldo","name":"Jumbo Shrimp","gender":"F","level":100,"shiny":true},{"species":"Swampert","name":"Fent Cart","gender":"M","level":100,"shiny":false},{"species":"Heracross","name":"Come on and Slam","gender":"M","level":100,"shiny":true}]}}
+{"line":0,"text":"|j|☆chronosxsonorhc","reason":"chat"}
+{"line":1,"text":"|j|☆oldsmellybastard","reason":"chat"}
+{"line":2,"text":"|t:|1795297210","reason":"timestamp"}
+{"line":3,"text":"|gametype|singles","reason":"metadata"}
+{"kind":"player","line":4,"side":"near","name":"chronosxsonorhc","avatar":"265","rating":1111}
+{"kind":"player","line":5,"side":"far","name":"oldsmellybastard","avatar":"hoopster","rating":1198}
+{"line":6,"text":"|gen|3","reason":"metadata"}
+{"line":7,"text":"|tier|[Gen 3] OU","reason":"metadata"}
+{"line":8,"text":"|rated|","reason":"metadata"}
+{"line":9,"text":"|rule|HP Percentage Mod: HP is shown in percentages","reason":"rule"}
+{"line":10,"text":"|rule|Beat Up Nicknames Mod: Beat Up will not reveal any party members","reason":"rule"}
+{"line":11,"text":"|rule|Endless Battle Clause: Forcing endless battles is banned","reason":"rule"}
+{"line":12,"text":"|rule|Sleep Clause Mod: Limit one foe put to sleep","reason":"rule"}
+{"line":13,"text":"|rule|Switch Priority Clause Mod: Faster Pokemon switch first","reason":"rule"}
+{"line":14,"text":"|rule|Species Clause: Limit one of each Pokemon","reason":"rule"}
+{"line":15,"text":"|rule|OHKO Clause: OHKO moves are banned","reason":"rule"}
+{"line":16,"text":"|rule|Evasion Items Clause: Evasion items are banned","reason":"rule"}
+{"line":17,"text":"|rule|Evasion Moves Clause: Evasion moves are banned","reason":"rule"}
+{"line":18,"text":"|rule|One Boost Passer Clause: Limit one Baton Passer that has a way to boost its stats","reason":"rule"}
+{"line":19,"text":"|rule|Freeze Clause Mod: Limit one foe frozen","reason":"rule"}
+{"line":20,"text":"|rule|Baton Pass Stat Clause: No Baton Passer may have a way to boost its Speed","reason":"rule"}
+{"line":21,"text":"|","reason":"spacer"}
+{"line":22,"text":"|t:|1795297210","reason":"timestamp"}
+{"kind":"teamSize","line":23,"side":"near","size":6}
+{"kind":"teamSize","line":24,"side":"far","size":6}
+{"kind":"battleStart","line":25}
+{"kind":"switchIn","line":26,"who":{"side":"near","index":0},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"switchIn","line":27,"who":{"side":"far","index":0},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"turn","line":28,"number":1}
+{"line":29,"text":"|inactive|Battle timer is ON: inactive players will automatically lose when time's up. (requested by oldsmellybastard)","reason":"timer"}
+{"line":30,"text":"|","reason":"spacer"}
+{"line":31,"text":"|t:|1795297217","reason":"timestamp"}
+{"kind":"move","line":32,"user":{"side":"near","index":0},"move":"Will-O-Wisp","target":{"side":"far","index":0},"miss":true}
+{"kind":"miss","line":33,"user":{"side":"near","index":0},"target":{"side":"far","index":0}}
+{"kind":"move","line":34,"user":{"side":"far","index":0},"move":"Rock Blast","target":{"side":"near","index":0}}
+{"kind":"damage","line":36,"who":{"side":"near","index":0},"hp":{"hp":76,"max":100},"effectiveness":"super","folded":[35]}
+{"kind":"damage","line":38,"who":{"side":"near","index":0},"hp":{"hp":48,"max":100},"effectiveness":"super","folded":[37]}
+{"kind":"hitCount","line":39,"who":{"side":"near","index":0},"hits":2}
+{"line":40,"text":"|","reason":"spacer"}
+{"kind":"heal","line":41,"who":{"side":"near","index":0},"hp":{"hp":54,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":42,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":43,"number":2}
+{"line":44,"text":"|","reason":"spacer"}
+{"line":45,"text":"|t:|1795297225","reason":"timestamp"}
+{"kind":"move","line":46,"user":{"side":"near","index":0},"move":"Charm","target":{"side":"far","index":0}}
+{"kind":"statChange","line":47,"who":{"side":"far","index":0},"stat":"atk","stages":-2}
+{"kind":"move","line":48,"user":{"side":"far","index":0},"move":"Rock Blast","target":{"side":"near","index":0},"miss":true}
+{"kind":"miss","line":49,"user":{"side":"far","index":0},"target":{"side":"near","index":0}}
+{"line":50,"text":"|","reason":"spacer"}
+{"kind":"heal","line":51,"who":{"side":"near","index":0},"hp":{"hp":60,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":52,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":53,"number":3}
+{"line":54,"text":"|","reason":"spacer"}
+{"line":55,"text":"|t:|1795297232","reason":"timestamp"}
+{"kind":"switchIn","line":56,"who":{"side":"far","index":1},"replaces":{"side":"far","index":0},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":57,"user":{"side":"near","index":0},"move":"Will-O-Wisp","target":{"side":"far","index":1}}
+{"kind":"status","line":58,"who":{"side":"far","index":1},"status":"brn"}
+{"line":59,"text":"|","reason":"spacer"}
+{"kind":"heal","line":60,"who":{"side":"near","index":0},"hp":{"hp":66,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"damage","line":61,"who":{"side":"far","index":1},"hp":{"hp":88,"max":100},"status":"brn","cause":{"name":"brn"}}
+{"line":62,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":63,"number":4}
+{"line":64,"text":"|","reason":"spacer"}
+{"line":65,"text":"|t:|1795297241","reason":"timestamp"}
+{"kind":"switchIn","line":66,"who":{"side":"near","index":1},"replaces":{"side":"near","index":0},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":67,"user":{"side":"far","index":1},"move":"Surf","target":{"side":"near","index":1}}
+{"kind":"damage","line":69,"who":{"side":"near","index":1},"hp":{"hp":86,"max":100},"effectiveness":"resisted","folded":[68]}
+{"line":70,"text":"|","reason":"spacer"}
+{"kind":"heal","line":71,"who":{"side":"near","index":1},"hp":{"hp":92,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":72,"who":{"side":"far","index":1},"hp":{"hp":94,"max":100},"status":"brn","cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"damage","line":73,"who":{"side":"far","index":1},"hp":{"hp":82,"max":100},"status":"brn","cause":{"name":"brn"}}
+{"line":74,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":75,"number":5}
+{"line":76,"text":"|","reason":"spacer"}
+{"line":77,"text":"|t:|1795297249","reason":"timestamp"}
+{"kind":"switchIn","line":78,"who":{"side":"near","index":2},"replaces":{"side":"near","index":1},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"ability","line":79,"who":{"side":"near","index":2},"ability":"Torrent","detail":"Trace","cause":{"name":"Trace","kind":"ability"},"source":{"side":"far","index":1}}
+{"kind":"move","line":80,"user":{"side":"far","index":1},"move":"Ice Beam","target":{"side":"near","index":2}}
+{"kind":"damage","line":81,"who":{"side":"near","index":2},"hp":{"hp":80,"max":100}}
+{"line":82,"text":"|","reason":"spacer"}
+{"kind":"heal","line":83,"who":{"side":"near","index":2},"hp":{"hp":87,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":84,"who":{"side":"far","index":1},"hp":{"hp":88,"max":100},"status":"brn","cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"damage","line":85,"who":{"side":"far","index":1},"hp":{"hp":76,"max":100},"status":"brn","cause":{"name":"brn"}}
+{"line":86,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":87,"number":6}
+{"line":88,"text":"|","reason":"spacer"}
+{"line":89,"text":"|t:|1795297260","reason":"timestamp"}
+{"kind":"switchIn","line":90,"who":{"side":"far","index":0},"replaces":{"side":"far","index":1},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":91,"user":{"side":"near","index":2},"move":"Ice Beam","target":{"side":"far","index":0}}
+{"kind":"damage","line":92,"who":{"side":"far","index":0},"hp":{"hp":72,"max":100}}
+{"line":93,"text":"|","reason":"spacer"}
+{"kind":"heal","line":94,"who":{"side":"near","index":2},"hp":{"hp":93,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":95,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":96,"number":7}
+{"line":97,"text":"|","reason":"spacer"}
+{"line":98,"text":"|t:|1795297267","reason":"timestamp"}
+{"kind":"move","line":99,"user":{"side":"near","index":2},"move":"Toxic","target":{"side":"far","index":0}}
+{"kind":"status","line":100,"who":{"side":"far","index":0},"status":"tox"}
+{"kind":"itemEnd","line":101,"who":{"side":"far","index":0},"item":"Lum Berry","eaten":true}
+{"kind":"cureStatus","line":102,"who":{"side":"far","index":0},"status":"tox","msg":true}
+{"kind":"move","line":103,"user":{"side":"far","index":0},"move":"Hidden Power","target":{"side":"near","index":2}}
+{"kind":"damage","line":104,"who":{"side":"near","index":2},"hp":{"hp":57,"max":100}}
+{"line":105,"text":"|","reason":"spacer"}
+{"kind":"heal","line":106,"who":{"side":"near","index":2},"hp":{"hp":63,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":107,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":108,"number":8}
+{"line":109,"text":"|","reason":"spacer"}
+{"line":110,"text":"|t:|1795297275","reason":"timestamp"}
+{"kind":"move","line":111,"user":{"side":"near","index":2},"move":"Ice Beam","target":{"side":"far","index":0}}
+{"kind":"damage","line":112,"who":{"side":"far","index":0},"hp":{"hp":40,"max":100}}
+{"kind":"move","line":113,"user":{"side":"far","index":0},"move":"Hidden Power","target":{"side":"near","index":2}}
+{"kind":"damage","line":114,"who":{"side":"near","index":2},"hp":{"hp":25,"max":100}}
+{"line":115,"text":"|","reason":"spacer"}
+{"kind":"heal","line":116,"who":{"side":"near","index":2},"hp":{"hp":31,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":117,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":118,"number":9}
+{"line":119,"text":"|","reason":"spacer"}
+{"line":120,"text":"|t:|1795297282","reason":"timestamp"}
+{"kind":"move","line":121,"user":{"side":"near","index":2},"move":"Recover","target":{"side":"near","index":2}}
+{"kind":"heal","line":122,"who":{"side":"near","index":2},"hp":{"hp":81,"max":100}}
+{"kind":"move","line":123,"user":{"side":"far","index":0},"move":"Hidden Power","target":{"side":"near","index":2}}
+{"kind":"damage","line":124,"who":{"side":"near","index":2},"hp":{"hp":45,"max":100}}
+{"line":125,"text":"|","reason":"spacer"}
+{"kind":"heal","line":126,"who":{"side":"near","index":2},"hp":{"hp":52,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":127,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":128,"number":10}
+{"line":129,"text":"|","reason":"spacer"}
+{"line":130,"text":"|t:|1795297290","reason":"timestamp"}
+{"kind":"move","line":131,"user":{"side":"near","index":2},"move":"Ice Beam","target":{"side":"far","index":0}}
+{"kind":"damage","line":132,"who":{"side":"far","index":0},"hp":{"hp":12,"max":100}}
+{"kind":"move","line":133,"user":{"side":"far","index":0},"move":"Hidden Power","target":{"side":"near","index":2}}
+{"kind":"damage","line":134,"who":{"side":"near","index":2},"hp":{"hp":19,"max":100}}
+{"line":135,"text":"|","reason":"spacer"}
+{"kind":"heal","line":136,"who":{"side":"near","index":2},"hp":{"hp":25,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":137,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":138,"number":11}
+{"line":139,"text":"|","reason":"spacer"}
+{"line":140,"text":"|t:|1795297297","reason":"timestamp"}
+{"kind":"move","line":141,"user":{"side":"near","index":2},"move":"Recover","target":{"side":"near","index":2}}
+{"kind":"heal","line":142,"who":{"side":"near","index":2},"hp":{"hp":75,"max":100}}
+{"kind":"move","line":143,"user":{"side":"far","index":0},"move":"Hidden Power","target":{"side":"near","index":2}}
+{"kind":"damage","line":144,"who":{"side":"near","index":2},"hp":{"hp":41,"max":100}}
+{"line":145,"text":"|","reason":"spacer"}
+{"kind":"heal","line":146,"who":{"side":"near","index":2},"hp":{"hp":48,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":147,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":148,"number":12}
+{"line":149,"text":"|","reason":"spacer"}
+{"line":150,"text":"|t:|1795297304","reason":"timestamp"}
+{"kind":"move","line":151,"user":{"side":"near","index":2},"move":"Ice Beam","target":{"side":"far","index":0}}
+{"kind":"damage","line":152,"who":{"side":"far","index":0},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":153,"who":{"side":"far","index":0}}
+{"line":154,"text":"|","reason":"spacer"}
+{"line":155,"text":"|t:|1795297307","reason":"timestamp"}
+{"kind":"switchIn","line":156,"who":{"side":"far","index":1},"dragged":false,"hp":{"hp":76,"max":100},"status":"brn"}
+{"line":157,"text":"|","reason":"spacer"}
+{"kind":"heal","line":158,"who":{"side":"near","index":2},"hp":{"hp":54,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":159,"who":{"side":"far","index":1},"hp":{"hp":82,"max":100},"status":"brn","cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"damage","line":160,"who":{"side":"far","index":1},"hp":{"hp":70,"max":100},"status":"brn","cause":{"name":"brn"}}
+{"line":161,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":162,"number":13}
+{"line":163,"text":"|","reason":"spacer"}
+{"line":164,"text":"|t:|1795297313","reason":"timestamp"}
+{"kind":"move","line":165,"user":{"side":"near","index":2},"move":"Recover","target":{"side":"near","index":2}}
+{"kind":"heal","line":166,"who":{"side":"near","index":2},"hp":{"hp":100,"max":100}}
+{"kind":"move","line":167,"user":{"side":"far","index":1},"move":"Rain Dance","target":{"side":"far","index":1}}
+{"kind":"weather","line":168,"weather":"Rain","phase":"start"}
+{"line":169,"text":"|","reason":"spacer"}
+{"kind":"weather","line":170,"weather":"Rain","phase":"upkeep"}
+{"kind":"heal","line":171,"who":{"side":"far","index":1},"hp":{"hp":76,"max":100},"status":"brn","cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"damage","line":172,"who":{"side":"far","index":1},"hp":{"hp":63,"max":100},"status":"brn","cause":{"name":"brn"}}
+{"line":173,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":174,"number":14}
+{"line":175,"text":"|","reason":"spacer"}
+{"line":176,"text":"|t:|1795297321","reason":"timestamp"}
+{"kind":"switchIn","line":177,"who":{"side":"near","index":3},"replaces":{"side":"near","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":178,"user":{"side":"far","index":1},"move":"Surf","target":{"side":"near","index":3}}
+{"kind":"damage","line":180,"who":{"side":"near","index":3},"hp":{"hp":65,"max":100},"effectiveness":"resisted","folded":[179]}
+{"line":181,"text":"|","reason":"spacer"}
+{"kind":"weather","line":182,"weather":"Rain","phase":"upkeep"}
+{"kind":"heal","line":183,"who":{"side":"near","index":3},"hp":{"hp":71,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"heal","line":184,"who":{"side":"far","index":1},"hp":{"hp":70,"max":100},"status":"brn","cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"damage","line":185,"who":{"side":"far","index":1},"hp":{"hp":57,"max":100},"status":"brn","cause":{"name":"brn"}}
+{"line":186,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":187,"number":15}
+{"line":188,"text":"|","reason":"spacer"}
+{"line":189,"text":"|t:|1795297330","reason":"timestamp"}
+{"kind":"switchIn","line":190,"who":{"side":"near","index":4},"replaces":{"side":"near","index":3},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"switchIn","line":191,"who":{"side":"far","index":2},"replaces":{"side":"far","index":1},"dragged":false,"hp":{"hp":100,"max":100}}
+{"line":192,"text":"|","reason":"spacer"}
+{"kind":"weather","line":193,"weather":"Rain","phase":"upkeep"}
+{"line":194,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":195,"number":16}
+{"line":196,"text":"|","reason":"spacer"}
+{"line":197,"text":"|t:|1795297338","reason":"timestamp"}
+{"kind":"move","line":198,"user":{"side":"far","index":2},"move":"Swords Dance","target":{"side":"far","index":2}}
+{"kind":"statChange","line":199,"who":{"side":"far","index":2},"stat":"atk","stages":2}
+{"kind":"move","line":200,"user":{"side":"near","index":4},"move":"Ice Beam","target":{"side":"far","index":2}}
+{"kind":"damage","line":201,"who":{"side":"far","index":2},"hp":{"hp":79,"max":100}}
+{"line":202,"text":"|","reason":"spacer"}
+{"kind":"weather","line":203,"weather":"Rain","phase":"upkeep"}
+{"line":204,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":205,"number":17}
+{"line":206,"text":"|","reason":"spacer"}
+{"line":207,"text":"|t:|1795297345","reason":"timestamp"}
+{"kind":"switchIn","line":208,"who":{"side":"near","index":5},"replaces":{"side":"near","index":4},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"ability","line":209,"who":{"side":"near","index":5},"ability":"Intimidate","detail":"boost"}
+{"kind":"statChange","line":210,"who":{"side":"far","index":2},"stat":"atk","stages":-1}
+{"kind":"move","line":211,"user":{"side":"far","index":2},"move":"Swords Dance","target":{"side":"far","index":2}}
+{"kind":"statChange","line":212,"who":{"side":"far","index":2},"stat":"atk","stages":2}
+{"line":213,"text":"|","reason":"spacer"}
+{"kind":"weather","line":214,"weather":"Rain","phase":"end"}
+{"line":215,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":216,"number":18}
+{"line":217,"text":"|","reason":"spacer"}
+{"line":218,"text":"|t:|1795297357","reason":"timestamp"}
+{"kind":"move","line":219,"user":{"side":"far","index":2},"move":"Megahorn","target":{"side":"near","index":5}}
+{"kind":"damage","line":221,"who":{"side":"near","index":5},"hp":{"hp":0,"max":100},"effectiveness":"resisted","folded":[220]}
+{"kind":"faint","line":222,"who":{"side":"near","index":5}}
+{"line":223,"text":"|","reason":"spacer"}
+{"line":224,"text":"|t:|1795297371","reason":"timestamp"}
+{"kind":"switchIn","line":225,"who":{"side":"near","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"ability","line":226,"who":{"side":"near","index":2},"ability":"Guts","detail":"Trace","cause":{"name":"Trace","kind":"ability"},"source":{"side":"far","index":2}}
+{"line":227,"text":"|","reason":"spacer"}
+{"line":228,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":229,"number":19}
+{"line":230,"text":"|","reason":"spacer"}
+{"line":231,"text":"|t:|1795297376","reason":"timestamp"}
+{"kind":"move","line":232,"user":{"side":"near","index":2},"move":"Protect","target":{"side":"near","index":2}}
+{"kind":"singleTurn","line":233,"who":{"side":"near","index":2},"effect":{"name":"Protect"}}
+{"kind":"move","line":234,"user":{"side":"far","index":2},"move":"Megahorn","target":{"side":"near","index":2},"miss":true}
+{"kind":"miss","line":235,"user":{"side":"far","index":2},"target":{"side":"near","index":2}}
+{"line":236,"text":"|","reason":"spacer"}
+{"line":237,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":238,"number":20}
+{"line":239,"text":"|","reason":"spacer"}
+{"line":240,"text":"|t:|1795297382","reason":"timestamp"}
+{"kind":"move","line":241,"user":{"side":"far","index":2},"move":"Megahorn","target":{"side":"near","index":2}}
+{"kind":"damage","line":242,"who":{"side":"near","index":2},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":243,"who":{"side":"near","index":2}}
+{"line":244,"text":"|","reason":"spacer"}
+{"line":245,"text":"|t:|1795297387","reason":"timestamp"}
+{"kind":"switchIn","line":246,"who":{"side":"near","index":4},"dragged":false,"hp":{"hp":100,"max":100}}
+{"line":247,"text":"|","reason":"spacer"}
+{"line":248,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":249,"number":21}
+{"line":250,"text":"|","reason":"spacer"}
+{"line":251,"text":"|t:|1795297394","reason":"timestamp"}
+{"kind":"move","line":252,"user":{"side":"far","index":2},"move":"Megahorn","target":{"side":"near","index":4}}
+{"kind":"damage","line":253,"who":{"side":"near","index":4},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":254,"who":{"side":"near","index":4}}
+{"kind":"message","line":255,"text":"chronosxsonorhc forfeited."}
+{"line":256,"text":"|","reason":"spacer"}
+{"kind":"win","line":257,"side":"far","name":"oldsmellybastard"}
+{"line":258,"text":"|raw|chronosxsonorhc's rating: 1111 &rarr; <strong>1092</strong><br />(-19 for losing)","reason":"room"}
+{"line":259,"text":"|raw|oldsmellybastard's rating: 1198 &rarr; <strong>1217</strong><br />(+19 for winning)","reason":"room"}
+{"line":260,"text":"|l|☆chronosxsonorhc","reason":"chat"}
+{"line":261,"text":"|player|p1|","reason":"room"}
+{"line":262,"text":"|c|☆oldsmellybastard|gg","reason":"chat"}

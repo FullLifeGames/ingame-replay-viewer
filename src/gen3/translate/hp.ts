@@ -8,9 +8,9 @@ import { toID } from '@pkmn/dex'
 import type { ScriptEvent } from '../../script/events'
 import type { PokemonRef } from '../../script/types'
 import type { Anim } from '../stream/instructions'
-import { critical, effective } from '../text/phrases'
 import { healed, hurt, isTrapping, wishCameTrue } from '../text/phrases-hp'
 import { type Context, type EventOf, type PrintText, sameMon } from './context'
+import { hit, hitLines } from './hits'
 import { scaleHp } from './scale'
 import { STATUS_ANIM } from './status'
 
@@ -67,17 +67,9 @@ export function damage(event: DamageEvent, ctx: Context): void {
 }
 
 function moveHit(event: DamageEvent, ctx: Context): void {
-  const { line } = event
-  const side = ctx.activeSide(event.who)
-  ctx.emit(line, { op: 'hit', side, effectiveness: event.effectiveness ?? 'normal' })
+  hit(event.line, ctx.activeSide(event.who), event.effectiveness, ctx)
   bar(event, ctx)
   hitLines(event, ctx)
-}
-
-/** The lines after a hit: a critical hit, then the effectiveness. */
-export function hitLines(event: EventOf<'damage' | 'effectEnd' | 'effectActivate'>, ctx: Context) {
-  if (event.crit) ctx.print(event.line, critical())
-  if (event.effectiveness !== undefined) ctx.print(event.line, effective(event.effectiveness))
 }
 
 /** Leftovers and the other held items play their effect first; Wish plays and names its wisher. */
