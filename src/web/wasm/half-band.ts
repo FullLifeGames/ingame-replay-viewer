@@ -4,7 +4,7 @@
 // down first. Its history runs across frames, so a frame boundary leaves no step. DOM-free.
 
 // 19 taps of a windowed sinc cut at a quarter of the rate. Every other tap but the middle one is
-// zero, so each output pair costs ten products per channel. With a Hamming window it keeps
+// zero, so each output pair costs eleven products per channel. With a Hamming window it keeps
 // 0 to 6 kHz within 0.1 dB and takes 14 kHz and up down by 38 dB or more.
 const TAPS = 19
 
