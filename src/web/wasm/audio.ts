@@ -1,8 +1,9 @@
 // The game's sound on its way out of the WebAssembly spike page (#35): the worker's hook takes
-// each frame's samples from the module's memory into the audio ring (protocol.ts), and the
+// each frame's samples from the module's memory into the audio ring (ring.ts), and the
 // audio worklet resamples them from the mixer's rate to the audio context's. DOM-free, so the
 // worker, the worklet and the Node harness share it.
-import { AudioRing, MIXER_RATE, readPace, type SharedBuffers } from './protocol.ts'
+import { MIXER_RATE, readPace, type SharedBuffers } from './protocol.ts'
+import { AudioRing } from './ring.ts'
 
 /** The name the audio worklet registers its processor under. */
 export const AUDIO_PROCESSOR = 'irv-audio'

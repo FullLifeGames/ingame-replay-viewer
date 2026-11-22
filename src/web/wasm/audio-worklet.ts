@@ -2,7 +2,7 @@
 // ring, resampled from the mixer's rate to the audio context's (audio.ts). It runs on the audio
 // thread and reads the ring the worker fills. The e2e covers it, as it covers the page's wiring.
 import { AUDIO_PROCESSOR, type AudioProcessorOptions, Resampler } from './audio'
-import { AudioRing } from './protocol'
+import { AudioRing } from './ring'
 
 // The names of the AudioWorkletGlobalScope, which TypeScript's DOM library leaves out.
 declare const sampleRate: number

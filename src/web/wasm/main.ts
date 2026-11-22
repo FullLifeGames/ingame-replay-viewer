@@ -19,7 +19,6 @@ import { WASM_FILES } from './files'
 import { FRAME_HEIGHT, FRAME_WIDTH } from './frame'
 import type { StartMessage, WorkerReport } from './messages'
 import {
-  AudioRing,
   createShared,
   grant,
   MIXER_RATE,
@@ -29,6 +28,7 @@ import {
   TickClock,
   writePace,
 } from './protocol'
+import { AudioRing } from './ring'
 import { findSpikeView, type SpikeView } from './view'
 
 // One second of the game's sound, left and right; an even capacity keeps the pairs whole.

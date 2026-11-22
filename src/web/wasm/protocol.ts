@@ -6,6 +6,7 @@
 // holds the two messages.
 import { FRAME_BYTES } from './frame.ts'
 import type { Progress } from './progress.ts'
+import { ringBytes } from './ring.ts'
 
 export type Speed = '1x' | '2x' | 'fast'
 export const SPEEDS: readonly Speed[] = ['1x', '2x', 'fast']
@@ -94,25 +95,16 @@ export interface SharedBuffers {
   readonly control: SharedArrayBuffer
   /** The newest frame as RGBA. */
   readonly frame: SharedArrayBuffer
-  /** The audio ring (AudioRing): the game's sound, left and right interleaved. */
+  /** The audio ring (ring.ts): the game's sound, left and right interleaved. */
   readonly audio: SharedArrayBuffer
 }
 
-// The audio ring's header: the samples written and read so far, and the overruns.
-const RING = { written: 0, read: 1, overruns: 2 } as const
-const RING_HEADER_BYTES = 4 * Object.keys(RING).length
-
 /** Fresh buffers for one run, with an audio ring of `audioCapacity` samples. */
 export function createShared(audioCapacity: number): SharedBuffers {
-  if (!Number.isSafeInteger(audioCapacity) || audioCapacity < 1) {
-    throw new Error(
-      `the audio ring needs a capacity of 1 or more samples, not ${String(audioCapacity)}`,
-    )
-  }
   return {
     control: new SharedArrayBuffer(4 * Object.keys(CONTROL).length),
     frame: new SharedArrayBuffer(FRAME_BYTES),
-    audio: new SharedArrayBuffer(RING_HEADER_BYTES + 4 * audioCapacity),
+    audio: new SharedArrayBuffer(ringBytes(audioCapacity)),
   }
 }
 
@@ -176,68 +168,5 @@ export function readStatus(control: Int32Array): RunStatus {
     error: word('error'),
     finished: word('finished') !== 0,
     playing: word('playing') !== 0,
-  }
-}
-
-/**
- * A ring of float samples from one writer (the worker) to one reader (the audio thread). The
- * game's sound goes in as left and right pairs; with an even capacity, every push and pull of
- * whole pairs keeps them whole.
- */
-export class AudioRing {
-  readonly capacity: number
-  private readonly header: Int32Array
-  private readonly samples: Float32Array
-
-  constructor(buffer: SharedArrayBuffer) {
-    this.header = new Int32Array(buffer, 0, Object.keys(RING).length)
-    this.samples = new Float32Array(buffer, RING_HEADER_BYTES)
-    this.capacity = this.samples.length
-  }
-
-  get overruns(): number {
-    return Atomics.load(this.header, RING.overruns)
-  }
-
-  /** The samples written since the ring was made. */
-  get totalWritten(): number {
-    return Atomics.load(this.header, RING.written)
-  }
-
-  /** The samples read since the ring was made. */
-  get totalRead(): number {
-    return Atomics.load(this.header, RING.read)
-  }
-
-  /** Copies the newest samples written into the end of `out`, read or not; returns how many. */
-  recent(out: Float32Array): number {
-    const written = this.totalWritten
-    const count = Math.min(out.length, written, this.capacity)
-    const start = out.length - count
-    for (let i = 0; i < count; i++) {
-      out[start + i] = this.samples[(written - count + i) % this.capacity] ?? 0
-    }
-    return count
-  }
-
-  /** Writes what fits; returns the samples it dropped, and counts an overrun when it dropped some. */
-  push(input: Float32Array): number {
-    const written = Atomics.load(this.header, RING.written)
-    const free = this.capacity - (written - Atomics.load(this.header, RING.read))
-    const count = Math.min(free, input.length)
-    for (let i = 0; i < count; i++) this.samples[(written + i) % this.capacity] = input[i] ?? 0
-    Atomics.store(this.header, RING.written, written + count)
-    const dropped = input.length - count
-    if (dropped > 0) Atomics.add(this.header, RING.overruns, 1)
-    return dropped
-  }
-
-  /** Reads up to `out.length` samples into `out`; returns how many. */
-  pull(out: Float32Array): number {
-    const read = Atomics.load(this.header, RING.read)
-    const count = Math.min(out.length, Atomics.load(this.header, RING.written) - read)
-    for (let i = 0; i < count; i++) out[i] = this.samples[(read + i) % this.capacity] ?? 0
-    Atomics.store(this.header, RING.read, read + count)
-    return count
   }
 }

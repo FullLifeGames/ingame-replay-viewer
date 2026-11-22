@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { AudioMeter, audioHandler, paceSamples, Resampler } from './audio'
-import { AudioRing, createShared, MIXER_RATE, writePace } from './protocol'
+import { createShared, MIXER_RATE, writePace } from './protocol'
+import { AudioRing } from './ring'
 
 const stereo = (...frames: [number, number][]) => Float32Array.from(frames.flat())
 
