@@ -1,22 +1,14 @@
 #include "global.h"
 #include "main.h"
-#include "irv_dma.h"
+#include "irv_frame.h"
 #include "irv_irq.h"
 #include <emscripten/em_js.h>
 
 // The WebAssembly build (#35): the end of each frame. On the GBA, AgbMainLoop waits in the BIOS
 // call VBlankIntrWait while the display draws, and the VBlank interrupt runs at line 160. Here the
-// same call draws the frame through the platform's renderer, which raises the VCount and HBlank
-// interrupts line by line and runs the HBlank DMAs, then raises VBlank as the port's sdl2.c does,
-// and hands the frame to the host. Our platform layer (#43) runs the DMAs and raises the
-// interrupts it owns through the dispatch below.
-
-// The port's VDraw leaves VCOUNT here, inside the VBlank lines, so SetGpuReg in the main loop
-// writes the registers at once, as on a GBA whose frame work ends before line 226.
-#define VCOUNT_IN_VBLANK (DISPLAY_HEIGHT + 1)
-
-// gba_easy_draw.c: draws lines 0 to 159 as BGR555, one u16 per pixel.
-void DrawFrame(u16 *pixels);
+// same call runs our platform layer's frame driver (#43), which draws the frame line by line,
+// raises the VCount, HBlank and VBlank interrupts through the dispatch below, runs the HBlank and
+// VBlank DMAs and returns in line 161; then the frame goes to the host.
 
 static u16 sFrame[DISPLAY_WIDTH * DISPLAY_HEIGHT];
 
@@ -57,17 +49,8 @@ EM_JS(void, IrvWasm_HandOverFrame, (const u16 *pixels), {
     Module.irvFrame(pixels);
 });
 
-// GBATEK "BIOS Halt Functions": VBlankIntrWait runs IntrWait, which sets IME to 1. "LCD I/O
-// Interrupts and Status": the VBlank request needs DISPSTAT bit 3.
 void VBlankIntrWait(void)
 {
-    REG_IME = 1;
-    DrawFrame(sFrame);
-    REG_VCOUNT = VCOUNT_IN_VBLANK;
-    REG_DISPSTAT |= DISPSTAT_VBLANK;
-    RunDMAs(IRV_DMA_TIMING_VBLANK);
-    if (REG_DISPSTAT & DISPSTAT_VBLANK_INTR)
-        IrvLayer_RaiseIrq(INTR_FLAG_VBLANK);
-    REG_DISPSTAT &= ~DISPSTAT_VBLANK;
+    IrvLayer_RunFrame(sFrame);
     IrvWasm_HandOverFrame(sFrame);
 }
