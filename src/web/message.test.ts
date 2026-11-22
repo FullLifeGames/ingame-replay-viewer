@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { messageOf } from './message'
-import { SessionError } from './session'
+import { SessionError } from './replay-choice'
 
 describe('messageOf', () => {
   it('gives an Error by its message', () => {
