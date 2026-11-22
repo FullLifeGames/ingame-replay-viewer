@@ -94,9 +94,11 @@ export const POKEMON_RULES = {
       { kind: 'faint', line, who: refOf(battle, ident, line) },
     ],
   },
+  // `[partiallytrapped]` marks a partial trap's damage each turn and maps to nothing: the `[from]`
+  // cause already names the trapping move.
   '|-damage|': {
     arity: 2,
-    reads: ['from', 'of', 'silent'],
+    reads: ['from', 'of', 'silent', 'partiallytrapped'],
     build: (input) => [{ kind: 'damage', ...hpChange(input) }],
   },
   '|-heal|': { arity: 2, reads: ['from', 'of', 'silent', 'wisher'], build: heal },

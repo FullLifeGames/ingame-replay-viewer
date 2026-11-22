@@ -10,6 +10,7 @@ import {
   handMadeBytes,
   handMadeStream,
   replayBytes,
+  UNKNOWN_VERSION,
   withVersion,
 } from './rom-shot-stream.ts'
 
@@ -47,12 +48,11 @@ describe('the hand-made stream of the screenshot run', () => {
     })
   })
 
-  it('gives a copy with another version that the decoder refuses', () => {
+  it('gives a copy with the first unknown version, which the decoder refuses', () => {
     const bytes = handMadeBytes()
-    const two = withVersion(bytes, 2)
-    expect(two[0]).toBe(2)
-    expect(bytes[0]).toBe(1)
-    expect(() => decodeStream(two)).toThrow('stream version 2 is unknown')
+    const unknown = withVersion(bytes, UNKNOWN_VERSION)
+    expect([UNKNOWN_VERSION, unknown[0], bytes[0]]).toEqual([3, 3, 2])
+    expect(() => decodeStream(unknown)).toThrow('stream version 3 is unknown')
   })
 })
 

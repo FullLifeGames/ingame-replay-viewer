@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { Gen3Error } from '../errors'
+import counts from '../tables/counts.json'
 import { encodeInstruction, encodeStream } from './encode'
 import { fieldSize } from './fields'
 import { MON, MON_OFFSET, OP_SIZE, STREAM, TRAINER, TRAINER_OFFSET } from './format'
@@ -19,9 +20,9 @@ const u16 = (bytes: Uint8Array, at: number) => (bytes[at] ?? 0) | ((bytes[at + 1
 const u32 = (bytes: Uint8Array, at: number) => u16(bytes, at) + u16(bytes, at + 2) * 0x10000
 
 describe('encodeStream', () => {
-  it('starts a stream of END alone with version 1 and header size 16 (F1)', () => {
+  it('starts a stream of END alone with version 2 and header size 16 (F1)', () => {
     const bytes = encodeStream(streamOf([END]))
-    expect([...bytes.subarray(0, 4)]).toEqual([0x01, 0x00, 0x10, 0x00])
+    expect([...bytes.subarray(0, 4)]).toEqual([0x02, 0x00, 0x10, 0x00])
     expect([bytes[4], bytes[5], u16(bytes, 6)]).toEqual([24, 24, 0])
     expect([u32(bytes, 8), u32(bytes, 12)]).toEqual([STREAM.tablesEnd, 3])
     expect([...bytes.subarray(STREAM.tablesEnd)]).toEqual([0x00, 0x01, 0x00])
@@ -141,6 +142,25 @@ describe('encodeInstruction', () => {
     expect(encodeInstruction(move)).toEqual([0x07, 4, 0, 1, 0x12, 0x03])
   })
 
+  it('encodes the ops of version 2: ITEM_POPUP, TRAP_TURN, FLUSH_TEXT_BOX, ANIM SIMPLE_HEAL', () => {
+    const popUp: Instruction = { op: 'itemPopUp', side: 'far', item: 0x0123 }
+    expect(encodeInstruction(popUp)).toEqual([0x12, 3, 1, 0x23, 0x01])
+    const trap: Instruction = { op: 'trapTurn', side: 'near', move: 83 }
+    expect(encodeInstruction(trap)).toEqual([0x13, 3, 0, 83, 0])
+    expect(encodeInstruction({ op: 'flushTextBox' })).toEqual([0x14, 0])
+    const heal: Instruction = { op: 'anim', side: 'far', anim: 'simpleHeal' }
+    expect(encodeInstruction(heal)).toEqual([0x0d, 2, 1, 17])
+  })
+
+  it('takes the last item and move of the expansion and refuses the next', () => {
+    const item = (number: number): Instruction => ({ op: 'itemPopUp', side: 'near', item: number })
+    const move = (number: number): Instruction => ({ op: 'trapTurn', side: 'far', move: number })
+    expect(encodeInstruction(item(counts.ITEMS_COUNT - 1))).toHaveLength(5)
+    expect(encodeInstruction(move(counts.MOVES_COUNT_ALL - 1))).toHaveLength(5)
+    expect(() => encodeInstruction(item(counts.ITEMS_COUNT))).toThrow(Gen3Error)
+    expect(() => encodeInstruction(move(counts.MOVES_COUNT_ALL))).toThrow(Gen3Error)
+  })
+
   it('refuses operands out of their range', () => {
     const cases: Instruction[] = [
       { op: 'turn', number: 0x10000 },
@@ -152,6 +172,9 @@ describe('encodeInstruction', () => {
       { op: 'volatile', side: 'near', volatile: 'substitute', on: 1 as unknown as boolean },
       { op: 'move', user: 'near', target: 'far', move: 0x1234 },
       { op: 'item', side: 'far', slot: 0, item: 'Leftovers' as unknown as number },
+      { op: 'itemPopUp', side: 'far', item: 1.5 },
+      { op: 'trapTurn', side: 'top' as 'near', move: 83 },
+      { op: 'anim', side: 'near', anim: 'simpleHeal2' as 'simpleHeal' },
     ]
     for (const instruction of cases) {
       expect(() => encodeInstruction(instruction), instruction.op).toThrow(Gen3Error)

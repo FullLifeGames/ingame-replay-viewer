@@ -145,6 +145,39 @@ describe('the effect rules of a Pokémon', () => {
     ])
   })
 
+  it('starts a partial trap with its trapper, as the parser turns its activation into a start', () => {
+    const script = scriptOf('|-activate|p2a: Tyranitar|move: Fire Spin|[of] p1a: Dugtrio')
+
+    expect(eventsAt(script, NEXT)).toEqual([
+      {
+        kind: 'effectStart',
+        line: NEXT,
+        who: TYRANITAR,
+        effect: { name: 'Fire Spin', kind: 'move' },
+        source: DUGTRIO,
+      },
+    ])
+  })
+
+  it('ends a partial trap, and silently when its trapper has left', () => {
+    const script = scriptOf(
+      '|-end|p2a: Tyranitar|Fire Spin|[partiallytrapped]',
+      '|-end|p2a: Tyranitar|Wrap|[partiallytrapped]|[silent]',
+    )
+
+    expect(eventsFrom(script, NEXT)).toEqual([
+      { kind: 'effectEnd', line: NEXT, who: TYRANITAR, effect: { name: 'Fire Spin' } },
+      {
+        kind: 'effectEnd',
+        line: NEXT + 1,
+        who: TYRANITAR,
+        effect: { name: 'Wrap' },
+        silent: true,
+      },
+    ])
+    expect(script.dropped.filter((drop) => drop.line >= NEXT)).toEqual([])
+  })
+
   it('tightens Focus Punch for the turn', () => {
     const script = REPLAY_994086
 

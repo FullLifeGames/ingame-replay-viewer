@@ -63,7 +63,9 @@ function readHeader(bytes: Uint8Array): { offset: number; length: number } {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
   const version = view.getUint16(STREAM_OFFSET.version, true)
   if (version !== STREAM.version) {
-    throw new Gen3Error(`stream version ${String(version)} is unknown; this reads version 1`)
+    throw new Gen3Error(
+      `stream version ${String(version)} is unknown; this reads version ${String(STREAM.version)}`,
+    )
   }
   expectValue('header size', view.getUint16(STREAM_OFFSET.headerSize, true), STREAM.headerSize)
   expectValue('trainer size', view.getUint8(STREAM_OFFSET.trainerSize), TRAINER.size)
@@ -79,7 +81,9 @@ function readHeader(bytes: Uint8Array): { offset: number; length: number } {
 
 function expectValue(name: string, value: number, expected: number): void {
   if (value !== expected) {
-    throw new Gen3Error(`stream ${name} is ${String(value)}, version 1 has ${String(expected)}`)
+    throw new Gen3Error(
+      `stream ${name} is ${String(value)}, version ${String(STREAM.version)} has ${String(expected)}`,
+    )
   }
 }
 

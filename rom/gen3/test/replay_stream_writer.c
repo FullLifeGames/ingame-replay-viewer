@@ -221,6 +221,23 @@ void ReplayStream_Item(u32 side, u32 slot, u32 item)
     ReplayStream_Op(REPLAY_OP_ITEM, REPLAY_OP_ITEM_SIZE, operands);
 }
 
+void ReplayStream_ItemPopUp(u32 side, u32 item)
+{
+    const u8 operands[REPLAY_OP_ITEM_POP_UP_SIZE] = { side, item, item >> 8 };
+    ReplayStream_Op(REPLAY_OP_ITEM_POP_UP, REPLAY_OP_ITEM_POP_UP_SIZE, operands);
+}
+
+void ReplayStream_TrapTurn(u32 side, u32 move)
+{
+    const u8 operands[REPLAY_OP_TRAP_TURN_SIZE] = { side, move, move >> 8 };
+    ReplayStream_Op(REPLAY_OP_TRAP_TURN, REPLAY_OP_TRAP_TURN_SIZE, operands);
+}
+
+void ReplayStream_FlushTextBox(void)
+{
+    ReplayStream_Op(REPLAY_OP_FLUSH_TEXT_BOX, REPLAY_OP_FLUSH_TEXT_BOX_SIZE, NULL);
+}
+
 const u8 *ReplayStream_Data(void)
 {
     return sStream;

@@ -22,9 +22,11 @@
 // which sets MOVE_RESULT_FAILED. Showdown logs it as a heal of the target by its ability right
 // after the move, or an `-immune` at full HP. The rule reads no ability names.
 import type { ScriptEvent } from '../../script/events'
+import type { Instruction } from '../stream/instructions'
 import { moveOf } from '../tables/lookup'
 import { critical, effective, failed, immune, missed, usedMove } from '../text/phrases'
 import { type Context, type EventOf, sameMon } from './context'
+import { startMove } from './hits'
 
 /** The events right after a move that mean it did nothing: MISSED is the move's own `miss` flag. */
 const NO_EFFECT: ReadonlySet<ScriptEvent['kind']> = new Set(['fail', 'immune', 'block'])
@@ -85,9 +87,13 @@ export function move(event: EventOf<'move'>, ctx: Context): void {
   ctx.note(line, found.fallback)
   ctx.print(line, usedMove(ctx.mon(user), event.move))
   ctx.mover = user
-  if (event.miss || event.still || event.notarget || didNothing(event, ctx)) return
-  const side = ctx.activeSide(user)
-  ctx.emit(line, { op: 'move', user: side, target: target?.side ?? side, move: found.number })
+  let played: Instruction | undefined
+  if (!(event.miss || event.still || event.notarget || didNothing(event, ctx))) {
+    const side = ctx.activeSide(user)
+    played = { op: 'move', user: side, target: target?.side ?? side, move: found.number }
+    ctx.emit(line, played)
+  }
+  startMove(eventsOfMove(ctx, event), played, ctx)
 }
 
 export function miss({ user, target, line }: EventOf<'miss'>, ctx: Context): void {

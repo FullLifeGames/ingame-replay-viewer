@@ -59,13 +59,19 @@ describe('the HP rules', () => {
     ])
   })
 
-  it('lists a partial trap as unsupported and names it', () => {
-    expect(scriptOf('|-damage|p1a: Dugtrio|50/100|[partiallytrapped]').dropped.at(-1)).toEqual({
-      line: NEXT,
-      text: '|-damage|p1a: Dugtrio|50/100|[partiallytrapped]',
-      reason: 'unsupported',
-      detail: 'keyword argument [partiallytrapped]',
-    })
+  it('reads the damage of a partial trap, whose cause names the trapping move', () => {
+    const script = scriptOf('|-damage|p1a: Dugtrio|50/100|[from] move: Wrap|[partiallytrapped]')
+
+    expect(eventsAt(script, NEXT)).toEqual([
+      {
+        kind: 'damage',
+        line: NEXT,
+        who: DUGTRIO,
+        hp: { hp: 50, max: 100 },
+        cause: { name: 'Wrap', kind: 'move' },
+      },
+    ])
+    expect(script.dropped.filter((drop) => drop.line >= NEXT)).toEqual([])
   })
 })
 

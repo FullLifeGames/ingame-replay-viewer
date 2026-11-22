@@ -40,6 +40,8 @@ Decisions from the design session on 2026-11-20 that are not ADRs, plus the road
 
 ## Roadmap
 
+Order after milestone 2 (user, 22.11.2026): milestone 3 starts first, and Gen 5 (milestone 6) follows beside it, since the two touch different games and can run as separate lanes.
+
 1. **First replay.** One real ADV OU singles replay plays start to finish in the expansion ROM, watched on a bare page served from devbox over Tailscale:
    - intro and send-outs
    - move animations and their text

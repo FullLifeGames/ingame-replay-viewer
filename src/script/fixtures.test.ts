@@ -26,6 +26,7 @@ const COVERED_KINDS = [
   ['entry hazards', '-sidestart'],
   ['a critical hit', '-crit'],
   ['a miss', '-miss'],
+  ['a multi-hit move', '-hitcount'],
 ] as const
 
 function kindOf(line: string): string | undefined {
@@ -35,13 +36,15 @@ function kindOf(line: string): string | undefined {
 const kinds = new Set(replays.flatMap(({ replay }) => replay.log.split('\n').map(kindOf)))
 
 describe('the test replays', () => {
-  it('are about five', () => {
-    expect(replays).toHaveLength(5)
+  // Five from Smogon tournaments (#2), and a ladder replay with a multi-hit move (#15).
+  it('are five tournament replays and one from the ladder', () => {
+    expect(replays.filter(({ file }) => file.startsWith('smogtours-'))).toHaveLength(5)
+    expect(replays).toHaveLength(6)
   })
 
-  it.each(replays)('$file is a saved ADV OU tournament replay', ({ file, replay }) => {
+  it.each(replays)('$file is a saved ADV OU replay', ({ file, replay }) => {
     expect(replay.id).toBe(file)
-    expect(replay.id).toMatch(/^smogtours-gen3ou-\d+$/)
+    expect(replay.id).toMatch(/^(smogtours-)?gen3ou-\d+$/)
     expect(replay.formatid).toBe('gen3ou')
     expect(replay.log.split('\n')).toContain('|gametype|singles')
   })
