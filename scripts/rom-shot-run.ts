@@ -120,6 +120,13 @@ export function readToolOutput(text: string): ToolOutput {
   return { shots, status }
 }
 
+/**
+ * The cartridge clock the tool gives mGBA, in seconds since 1970 UTC: noon on 1 January 2000, the
+ * time the module's clock stub holds (sFixedTime in rom/gen3/wasm/src/irv_wasm_stubs.c). With the
+ * host's clock two runs of one stream parted at frame 10 (#43, step B4).
+ */
+export const TOOL_CLOCK = Date.UTC(2000, 0, 1, 12) / 1000
+
 export interface ToolRun {
   tool: string
   rom: string
@@ -132,7 +139,8 @@ export interface ToolRun {
 
 export function toolArgs(run: ToolRun): string[] {
   const states = run.stateEvery === undefined ? [] : ['--state-every', String(run.stateEvery)]
-  return [run.rom, `0x${run.address.toString(16)}`, run.frameDir, ...states, ...run.shots]
+  const clock = ['--clock', String(TOOL_CLOCK)]
+  return [run.rom, `0x${run.address.toString(16)}`, run.frameDir, ...clock, ...states, ...run.shots]
 }
 
 export function runTool(run: ToolRun): ToolOutput {
