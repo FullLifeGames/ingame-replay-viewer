@@ -203,18 +203,31 @@ function winScene(input: Input): Scene | undefined {
   }
 }
 
-// After END the ROM holds the last scene (Replay_Hold): 600 frames on, the text box still shows
-// the win line as the win frame does.
-const HELD_FRAMES = 600
+// After END the outro (rom/gen3/src/replay_outro.c) returns the mons still out, slides the
+// winner's trainer in and holds the scene for 120 frames before it fades to black; 150 frames
+// after END lie in that hold. BtlController_HandleTrainerSlide ends the trainer's 64x64 sprite
+// centred on (80, 80) near and on (176 + 32, 40) far (U/src/battle_controllers.c:2516-2546), where
+// the win frame shows the field. A tie or an unknown end has no winner: the outro holds the last
+// line in the text box as the win frame shows it.
+const OUTRO_FRAMES = 150
+const TRAINER_REGIONS: Readonly<Record<Side, Region>> = {
+  near: { x: 48, y: 48, width: 64, height: 64 },
+  far: { x: 176, y: 8, width: 64, height: 64 },
+}
+type Outcome = Extract<Instruction, { op: 'end' }>['outcome']
+const WINNERS: Readonly<Partial<Record<Outcome, Side>>> = { nearWon: 'near', farWon: 'far' }
 
-function heldScene(input: Input): Scene | undefined {
-  if (winScene(input) === undefined) return undefined
-  const shot = { name: 'held', done: input.stream.instructions.length, frames: HELD_FRAMES }
-  return {
-    name: shot.name,
-    shots: [shot],
-    check: { probe: 'same', before: 'win', after: shot.name, region: SCREEN.message },
-  }
+function outroScene(input: Input): Scene | undefined {
+  const { instructions } = input.stream
+  const end = instructions.at(-1)
+  if (winScene(input) === undefined || end?.op !== 'end') return undefined
+  const winner = WINNERS[end.outcome]
+  const shot = { name: 'outro', done: instructions.length, frames: OUTRO_FRAMES }
+  const check: Check =
+    winner === undefined
+      ? { probe: 'same', before: 'win', after: shot.name, region: SCREEN.message }
+      : { probe: 'differs', before: 'win', after: shot.name, region: TRAINER_REGIONS[winner] }
+  return { name: shot.name, shots: [shot], check }
 }
 
 const SCENES: readonly (readonly [string, (input: Input) => Scene | undefined])[] = [
@@ -230,7 +243,7 @@ const SCENES: readonly (readonly [string, (input: Input) => Scene | undefined])[
   ['first-switch', switchScene],
   ['first-faint', faintScene],
   ['win', winScene],
-  ['held', heldScene],
+  ['outro', outroScene],
 ]
 
 const inputOf = (stream: Stream): Input => ({ stream, active: activeSlots(stream.instructions) })

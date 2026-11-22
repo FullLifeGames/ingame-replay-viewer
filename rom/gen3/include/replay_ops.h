@@ -55,4 +55,15 @@ bool32 Replay_OpWeather(const volatile u8 *operands, u32 step);
 bool32 Replay_OpVolatile(const volatile u8 *operands, u32 step);
 bool32 Replay_OpAbility(const volatile u8 *operands, u32 step);
 
+// replay_outro.c, the end of a replay (#20).
+// Called by the PRINT right before END with END's outcome (REPLAY_OUTCOME_*): a win of either side
+// starts the victory music.
+void Replay_StartVictoryMusic(u32 outcome);
+// Called by END: from the next frame the outro is gBattleMainFunc. sidesOut has a bit for each
+// REPLAY_SIDE_* whose battler is out.
+void Replay_StartOutro(u32 outcome, u32 sidesOut);
+// For the outro, once the screen is black: the interpreter holds it or leaves the battle, as
+// Replay_Load's end says.
+void Replay_EndOutro(void);
+
 #endif // GUARD_REPLAY_OPS_H

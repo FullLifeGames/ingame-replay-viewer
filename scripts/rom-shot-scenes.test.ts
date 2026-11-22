@@ -26,7 +26,7 @@ describe('the scene points of a decoded instruction list (S6)', () => {
       'first-switch',
       'first-faint',
       'win',
-      'held',
+      'outro',
     ])
     expect(missingScenes(handMadeStream())).toEqual([])
   })
@@ -44,7 +44,7 @@ describe('the scene points of a decoded instruction list (S6)', () => {
       'first-switch',
       'first-faint',
       'win',
-      'held',
+      'outro',
     ])
   })
 
@@ -263,21 +263,28 @@ describe('the scene points of a decoded instruction list (S6)', () => {
     expect(scene?.check).toEqual({ probe: 'text', shot: 'win', region: SCREEN.message })
   })
 
-  it('shoots the text box 600 frames after END and expects the win frame there', () => {
-    const scene = named(
-      [
-        { op: 'print', text: 'Alice won the battle!' },
-        { op: 'end', outcome: 'nearWon' },
-      ],
-      'held',
-    )
-    expect(scene?.shots).toEqual([{ name: 'held', done: 2, frames: 600 }])
-    expect(scene?.check).toEqual({
-      probe: 'same',
-      before: 'win',
-      after: 'held',
-      region: SCREEN.message,
+  it("shoots the outro 150 frames after END and expects the winner's trainer or the last line", () => {
+    const outro = (outcome: 'nearWon' | 'farWon' | 'tie' | 'unknown') =>
+      named(
+        [
+          { op: 'print', text: 'Alice won!' },
+          { op: 'end', outcome },
+        ],
+        'outro',
+      )
+    const compared = { probe: 'differs', before: 'win', after: 'outro' }
+    expect(outro('farWon')?.shots).toEqual([{ name: 'outro', done: 2, frames: 150 }])
+    expect(outro('farWon')?.check).toEqual({
+      ...compared,
+      region: { x: 176, y: 8, width: 64, height: 64 },
     })
+    expect(outro('nearWon')?.check).toEqual({
+      ...compared,
+      region: { x: 48, y: 48, width: 64, height: 64 },
+    })
+    for (const outcome of ['tie', 'unknown'] as const) {
+      expect(outro(outcome)?.check).toEqual({ ...compared, probe: 'same', region: SCREEN.message })
+    }
   })
 
   it('leaves out the scenes a stream lacks', () => {

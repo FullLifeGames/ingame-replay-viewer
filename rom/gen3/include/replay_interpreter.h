@@ -24,12 +24,14 @@ enum ReplayError
     REPLAY_ERROR_ORDER,   // an instruction that breaks the order rules (replay_stream.h)
 };
 
-// What the interpreter does after END: the ROM holds the last scene, the tests leave the battle
-// through CB2_QuitRecordedBattle.
+// What the interpreter does after END. The ROM plays the outro (replay_outro.c) and then holds
+// the black screen; the tests leave the battle through CB2_QuitRecordedBattle at once, or after
+// the outro.
 enum ReplayEnd
 {
-    REPLAY_HOLD_AT_END,
+    REPLAY_OUTRO_THEN_HOLD,
     REPLAY_EXIT_AT_END,
+    REPLAY_OUTRO_THEN_EXIT,
 };
 
 // How far the replay is. The tests read it, and the screenshot tool finds it by its symbol.
@@ -80,11 +82,13 @@ u32 Replay_GetTrainerPic(u32 battler, u32 fallback);
 bool32 Replay_HidesHpNumbers(void);
 
 #if TESTING
-// Defined by the test runner (test/replay_test_runner.c): with REPLAY_EXIT_AT_END, the interpreter
-// calls it after END, while the battle is still up and before it is left.
+// Defined by the test runner (test/replay_test_runner.c): the interpreter calls it once it leaves
+// the battle, after END or after the outro, while the battle is still up.
 void ReplayTest_AtEnd(void);
 // Called when op number op (counted from 0) starts, after every wait before it.
 void ReplayTest_AtOpStart(u32 op);
+// Called on the outro's first frame, the frame after END.
+void ReplayTest_AtOutroStart(void);
 #endif
 
 // Forgets the loaded replay; gReplayProgress stays readable.

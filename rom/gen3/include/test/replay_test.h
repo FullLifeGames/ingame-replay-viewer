@@ -58,6 +58,13 @@ struct ReplayTestTrainerSprite
 };
 const struct ReplayTestTrainerSprite *ReplayTest_TrainerSpriteAtOpStart(u32 op, u32 side);
 
+// Called in STREAM: the interpreter plays the outro after END (REPLAY_OUTRO_THEN_EXIT), and THEN
+// runs once the outro has faded the screen to black.
+void ReplayTest_PlayOutro(void);
+
+// The progress on the outro's first frame, the frame after END. All zero if no outro started.
+const struct ReplayProgress *ReplayTest_ProgressAtOutroStart(void);
+
 // The stream writer (replay_stream_writer.c), a second encoder for the tests only.
 // ReplayStream_Begin starts a stream with a trainer (BRENDAN near, MAY far) and one level 100
 // Wobbuffet with 100 HP on each side; each op call appends one instruction and keeps the header's

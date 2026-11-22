@@ -13,9 +13,10 @@
 // The runner of REPLAY_TEST (#7). It borrows upstream's event queue and matchers: SCENE queues
 // into gBattleTestRunnerState, and the recorders in test_runner_battle.c match each message, HP
 // change, animation, ability pop-up, status icon and effectiveness sound against it. The battle
-// itself is ours: Replay_Start sets it up from the stream. After END the interpreter calls
-// ReplayTest_AtEnd, which runs THEN while the battle is still up, and then leaves the battle
-// through CB2_QuitRecordedBattle into CB2_ReplayTest_Done.
+// itself is ours: Replay_Start sets it up from the stream. After END, or after the outro of a test
+// that calls ReplayTest_PlayOutro, the interpreter calls ReplayTest_AtEnd, which runs THEN while
+// the battle is still up, and then leaves the battle through CB2_QuitRecordedBattle into
+// CB2_ReplayTest_Done.
 
 #define STATE gBattleTestRunnerState
 #define DATA gBattleTestRunnerState->data
@@ -24,6 +25,8 @@ EWRAM_DATA bool8 gReplayTestRunStream = FALSE;
 static EWRAM_DATA u16 sCheckedProgress = 0;
 static EWRAM_DATA u8 sKOAnimsAtOpStart[REPLAY_TEST_RECORDED_OPS] = {0};
 static EWRAM_DATA struct ReplayTestTrainerSprite sTrainerSpritesAtOpStart[REPLAY_TEST_RECORDED_OPS][REPLAY_STREAM_SIDE_COUNT] = {0};
+static EWRAM_DATA bool8 sPlayOutro = FALSE;
+static EWRAM_DATA struct ReplayProgress sProgressAtOutroStart = {0};
 
 static void CB2_ReplayTest_Done(void);
 
@@ -40,6 +43,8 @@ static void ReplayTest_SetUp(void *data)
     sCheckedProgress = 0;
     memset(sKOAnimsAtOpStart, 0, sizeof(sKOAnimsAtOpStart));
     memset(sTrainerSpritesAtOpStart, 0, sizeof(sTrainerSpritesAtOpStart));
+    sPlayOutro = FALSE;
+    memset(&sProgressAtOutroStart, 0, sizeof(sProgressAtOutroStart));
     Replay_Unload();
 }
 
@@ -53,7 +58,7 @@ static void ReplayTest_Run(void *data)
     InvokeReplayTest(data);
     gReplayTestRunStream = FALSE;
     STATE->runScene = FALSE;
-    error = Replay_Start(ReplayStream_Data(), ReplayStream_Length(), REPLAY_EXIT_AT_END, CB2_ReplayTest_Done);
+    error = Replay_Start(ReplayStream_Data(), ReplayStream_Length(), sPlayOutro ? REPLAY_OUTRO_THEN_EXIT : REPLAY_EXIT_AT_END, CB2_ReplayTest_Done);
     if (error != REPLAY_ERROR_NONE)
         Test_ExitWithResult(TEST_RESULT_FAIL, SourceLine(0), "%s:%d: the interpreter refused the stream with error %d", gTestRunnerState.test->filename, SourceLine(0), error);
 }
@@ -106,6 +111,21 @@ void ReplayTest_AtOpStart(u32 op)
         return;
     sKOAnimsAtOpStart[op] = gBattleStruct->battlerKOAnimsRunning;
     RecordTrainerSprites(sTrainerSpritesAtOpStart[op]);
+}
+
+void ReplayTest_PlayOutro(void)
+{
+    sPlayOutro = TRUE;
+}
+
+void ReplayTest_AtOutroStart(void)
+{
+    sProgressAtOutroStart = gReplayProgress;
+}
+
+const struct ReplayProgress *ReplayTest_ProgressAtOutroStart(void)
+{
+    return &sProgressAtOutroStart;
 }
 
 static void CheckRecordedOp(u32 op)
