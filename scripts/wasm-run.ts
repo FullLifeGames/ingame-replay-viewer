@@ -32,7 +32,7 @@ import type { Scene } from './rom-shot-scenes.ts'
 import { finishRuns, parseShotArgs, planStreams, readFrames, reportRun } from './rom-shot.ts'
 import type { RunReport, StreamPlan } from './rom-shot.ts'
 import { describeSlot, GBA_ROM_BASE, loadSlotLayout, SLOT_SYMBOL } from './rom-slot.ts'
-import { wasmPaths } from './wasm-compile.ts'
+import { wasmPaths, wasmRoots } from './wasm-compile.ts'
 import {
   HashLog,
   parseRunArgs,
@@ -43,7 +43,6 @@ import {
 } from './wasm-hashes.ts'
 import type { RunArgs, RunHashes } from './wasm-hashes.ts'
 import { LINK_OUTPUTS } from './wasm-link.ts'
-import { wasmRoots } from './wasm-platform.ts'
 import { SoundLog } from './wasm-run-sound.ts'
 
 // The module's shape lives in src/web/wasm, which the page's worker shares.

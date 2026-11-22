@@ -1,22 +1,14 @@
 // rom/gen3/wasm/wasm.json: the WebAssembly build of the expansion (#35). It pins the Emscripten
-// release, the platform layer borrowed at build time and never committed (plan D7) with the
-// defines its files compile under, the upstream files our glue replaces, the per-file defines and
-// compiler flags, and the job cap (2: one clang per job, beside another session on devbox's 12 GB).
+// release, the upstream files our glue replaces, the per-file defines and compiler flags, and the
+// job cap (2: one clang per job, beside another session on devbox's 12 GB). Our platform layer
+// (rom/gen3/wasm/layer, #43) took the place of the borrowed platform files the config once pinned.
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { ROM_DIR } from './rom-config.ts'
 
-interface PlatformPin {
-  repository: string
-  commit: string
-  files: string[]
-  defines: string[]
-}
-
 export interface WasmConfig {
   emscripten: { version: string }
-  platform: PlatformPin
   exclude: string[]
   defines: Record<string, string[]>
   flags: Record<string, string[]>
@@ -25,12 +17,9 @@ export interface WasmConfig {
 
 export const WASM_DIR = join(ROM_DIR, 'wasm')
 
-const FULL_SHA1 = /^[0-9a-f]{40}$/
 const VERSION = /^\d+\.\d+\.\d+$/
-const NO_SPACE = /^\S+$/
 // A source of the tree, named from its root: src/x.c or deeper, never with a step up.
 const TREE_SOURCE = /^src\/(?:[\w-]+\/)*[\w-]+\.c$/
-const RELATIVE_FILE = /^(?:[\w-]+\/)*[\w-]+\.[ch]$/
 const DEFINE = /^[A-Za-z_]\w*(?:=\S*)?$/
 const FLAG = /^-[A-Za-z][\w=,.+-]*$/
 // NAME=other_name: the preprocessor renames every use in the file, the file's own calls among
@@ -75,11 +64,6 @@ function defines(found: unknown, path: string): string[] {
   return list
 }
 
-function nonEmpty(list: string[], path: string): string[] {
-  if (list.length === 0) fail(path, 'must name at least one file')
-  return list
-}
-
 // defines and flags: a source of the tree to its list.
 function perSource(
   value: unknown,
@@ -106,19 +90,20 @@ function positiveInteger(value: unknown, path: string): number {
   return found
 }
 
+// A field the build does not read would change nothing, silently.
+const FIELDS = new Set(['emscripten', 'exclude', 'defines', 'flags', 'jobs'])
+
+function checkFields(value: unknown): void {
+  if (typeof value !== 'object' || value === null) return
+  const unknown = Object.keys(value).find((key) => !FIELDS.has(key))
+  if (unknown !== undefined) fail(unknown, 'is no field of the build')
+}
+
 export function readWasmConfig(text: string): WasmConfig {
   const value: unknown = JSON.parse(text)
+  checkFields(value)
   return {
     emscripten: { version: field(value, 'emscripten.version', VERSION) },
-    platform: {
-      repository: field(value, 'platform.repository', NO_SPACE),
-      commit: field(value, 'platform.commit', FULL_SHA1),
-      files: nonEmpty(
-        strings(lookup(value, 'platform.files'), 'platform.files', RELATIVE_FILE),
-        'platform.files',
-      ),
-      defines: defines(lookup(value, 'platform.defines'), 'platform.defines'),
-    },
     exclude: strings(lookup(value, 'exclude'), 'exclude', TREE_SOURCE),
     defines: perSource(value, 'defines', defines),
     flags: perSource(value, 'flags', (list, at) => strings(list, at, FLAG)),

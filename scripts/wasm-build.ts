@@ -2,9 +2,9 @@
 // every C file of the tree once at -O0, excluded ones included, and writes the report,
 // build/wasm/census.json and one .err file per failure in build/wasm/census; `--census-report
 // [report.md]` renders the report again from census.json. `--compile [report.md]` compiles what
-// the build links at -O2: the files of the tree that wasm.json keeps, the patched copies of
-// build/wasm/overlay and the platform files, fetched into .cache/wasm/platform and patched in
-// build/wasm/platform, then the glue of rom/gen3/wasm/src; it writes compile.json, glue.json,
+// the build links at -O2: the files of the tree that wasm.json keeps and the patched copies of
+// build/wasm/overlay, then the glue of rom/gen3/wasm/src and our platform layer of
+// rom/gen3/wasm/layer; it writes compile.json, glue.json,
 // the .err files in build/wasm/compile and the report, and fails when a file fails. `--link
 // [report.md]` compiles the glue again and links it with the objects of compile.json and build/wasm/asm (npm run wasm:convert) into
 // build/wasm/irv-emerald.js and irv-emerald.wasm, then writes the patch from the dump to the module
@@ -27,9 +27,9 @@ import {
   checkNamedSources,
   compileCommands,
   glueCommands,
-  platformCommands,
   treeSources,
   wasmPaths,
+  wasmRoots,
 } from './wasm-compile.ts'
 import type { CompileCommand, CompileOptions, WasmPaths } from './wasm-compile.ts'
 import { loadWasmConfig, WASM_DIR } from './wasm-config.ts'
@@ -38,7 +38,6 @@ import { asmObjects, compiledObjects, glueSources, linkCommand, LINK_OUTPUTS } f
 import type { CompileRecordEntry } from './wasm-link.ts'
 import { prepareCopies } from './wasm-overlay.ts'
 import { writeModulePatch } from './wasm-outputs.ts'
-import { ensurePlatform, wasmRoots } from './wasm-platform.ts'
 
 export interface BuildArgs {
   mode: 'census' | 'report' | 'compile' | 'link' | 'patch'
@@ -104,7 +103,7 @@ function checkToolchain(paths: WasmPaths, config: WasmConfig): void {
 
 const SCOPE = {
   census: 'every C file of the tree, excluded ones included',
-  compile: 'the files the build keeps, the overlay copies and the platform files',
+  compile: 'the files the build keeps and the overlay copies',
   glue: 'the glue of rom/gen3/wasm/src',
 }
 
@@ -160,20 +159,14 @@ async function census(paths: WasmPaths, config: WasmConfig, out: string): Promis
   report(paths, config, 'census', out)
 }
 
-// The patched copies: upstream files under build/wasm/overlay, platform files under
-// build/wasm/platform. Returns the overlay's C files, which compile from their copies.
-function prepare(paths: WasmPaths, config: WasmConfig): string[] {
-  const roots = wasmRoots(REPO_DIR)
-  ensurePlatform(roots.platform, config.platform)
+// The patched copies of upstream files under build/wasm/overlay. Returns their C files, which
+// compile from their copies.
+function prepare(paths: WasmPaths): string[] {
   const overlay = prepareCopies({
-    ...{ from: paths.tree, to: paths.overlay, roots, files: 'patched' },
+    ...{ from: paths.tree, to: paths.overlay, roots: wasmRoots(REPO_DIR), files: 'patched' },
     patches: join(WASM_DIR, 'patches'),
   })
-  const platform = prepareCopies({
-    ...{ from: roots.platform, to: paths.platform, roots, files: config.platform.files },
-    patches: join(WASM_DIR, 'platform-patches'),
-  })
-  say(`${String(overlay.length)} overlay copies, ${String(platform.length)} platform files`)
+  say(`${String(overlay.length)} overlay copies`)
   return overlay.filter((file) => file.startsWith('src/') && file.endsWith('.c'))
 }
 
@@ -181,11 +174,8 @@ async function compile(paths: WasmPaths, config: WasmConfig, out: string): Promi
   checkToolchain(paths, config)
   const sources = treeSources(paths.tree)
   checkNamedSources(config, sources)
-  const options: CompileOptions = { optimise: '-O2', overlay: prepare(paths, config) }
-  const commands = [
-    ...compileCommands(config, sources, paths, options),
-    ...platformCommands(config, paths, options),
-  ]
+  const options: CompileOptions = { optimise: '-O2', overlay: prepare(paths) }
+  const commands = compileCommands(config, sources, paths, options)
   const entries = await runAll(paths, config, 'compile', commands)
   report(paths, config, 'compile', out)
   failIfAny(entries)

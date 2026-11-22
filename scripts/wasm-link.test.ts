@@ -13,7 +13,6 @@ const paths: WasmPaths = {
   obj: '/repo/build/wasm/obj',
   shadow: '/repo/rom/gen3/wasm/include',
   overlay: '/repo/build/wasm/overlay',
-  platform: '/repo/build/wasm/platform',
   emcc: '/tools/emsdk/upstream/emscripten/emcc',
 }
 
