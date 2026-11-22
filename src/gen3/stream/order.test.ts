@@ -231,38 +231,60 @@ describe('ORDER', () => {
   })
 })
 
-// A TEST of replay_refuse_order.c: its name, the ops its stream writes and the error it expects.
+// A TEST of replay_refuse_order.c: the ops its stream writes, each with its side operands in
+// order, and the error it expects.
 interface CTest {
   readonly ops: readonly string[]
   readonly errors: readonly string[]
 }
 
+const sidesOf = (values: readonly unknown[]) =>
+  values.filter((value) => value === 'near' || value === 'far')
+
 function parseCTests(text: string): Map<string, CTest> {
   const tests = new Map<string, CTest>()
   for (const match of text.matchAll(/^TEST\("Replay: order: ([^"]+)"\)\n\{\n([\s\S]*?)^\}/gm)) {
     const [, name, body] = match as unknown as [string, string, string]
-    const calls = [...body.matchAll(/ReplayStream_(\w+)\(/g)].map((call) => call[1] ?? '')
-    const ops = calls
-      .filter((call) => !['Begin', 'Mon', 'Data', 'Length'].includes(call))
-      .map((call) => call.charAt(0).toLowerCase() + call.slice(1))
+    const ops = [...body.matchAll(/ReplayStream_(\w+)\(([^)]*)\)/g)]
+      .filter(([, call = '']) => !['Begin', 'Mon', 'Data', 'Length'].includes(call))
+      .map(([, call = '', args = '']) => {
+        const sides = sidesOf(
+          args.split(', ').map((arg) => arg.replace('REPLAY_SIDE_', '').toLowerCase()),
+        )
+        return [call.charAt(0).toLowerCase() + call.slice(1), ...sides].join(' ')
+      })
     const errors = [...body.matchAll(/REPLAY_ERROR_\w+/g)].map((error) => error[0])
     tests.set(name, { ops, errors })
   }
   return tests
 }
 
-describe('the order cases in TypeScript and in replay_refuse_order.c (I5)', () => {
-  const c = parseCTests(cTests)
+// The cases whose TEST is missing or writes other ops, sides or verdicts.
+function mismatches(text: string): string[] {
+  const c = parseCTests(text)
+  return CASES.filter(({ name, instructions, refused }) => {
+    const errors = [refused === undefined ? 'REPLAY_ERROR_NONE' : 'REPLAY_ERROR_ORDER']
+    const ops = [...instructions, END].map((i) => [i.op, ...sidesOf(Object.values(i))].join(' '))
+    return JSON.stringify(c.get(name)) !== JSON.stringify({ ops, errors })
+  }).map(({ name }) => name)
+}
 
-  it('gives every case its TEST with the same ops and the same verdict', () => {
-    for (const { name, instructions, refused } of CASES) {
-      const error = refused === undefined ? 'REPLAY_ERROR_NONE' : 'REPLAY_ERROR_ORDER'
-      const ops = [...instructions, END].map(({ op }) => op)
-      expect([name, c.get(name)]).toEqual([name, { ops, errors: [error] }])
-    }
+describe('the order cases in TypeScript and in replay_refuse_order.c (I5)', () => {
+  it('gives every case its TEST with the same ops, sides and verdict', () => {
+    expect(mismatches(cTests)).toEqual([])
+  })
+
+  it('fails a TEST whose MOVE swaps its sides', () => {
+    const swapped = cTests.replace(
+      'Move(REPLAY_SIDE_NEAR, REPLAY_SIDE_FAR',
+      'Move(REPLAY_SIDE_FAR, REPLAY_SIDE_NEAR',
+    )
+    expect(swapped).not.toBe(cTests)
+    expect(mismatches(swapped)).toEqual(['a MOVE before any SEND_OUT is refused'])
   })
 
   it('gives every TEST its case', () => {
+    const c = parseCTests(cTests)
     const names = new Set(CASES.map(({ name }) => name))
     for (const name of c.keys()) expect(names.has(name), `${name} has no case`).toBe(true)
     expect(c.size).toBe(CASES.length)

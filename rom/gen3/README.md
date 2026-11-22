@@ -51,7 +51,7 @@ The tests in `test/replay_*.c` use `include/test/replay_test.h`:
 
 - `REPLAY_TEST(name)` writes a stream in its `STREAM` block with the `ReplayStream_*` writer (`test/replay_stream_writer.c`), queues the events it expects in `SCENE` with upstream's matchers (`MESSAGE`, `HP_BAR`, `ANIMATION` and the rest), and checks the battle in `THEN`, after END and before the test leaves the battle, so the parties, `gBattleStruct` and the sprites are still there. A test that calls `ReplayTest_PlayOutro()` in `STREAM` runs `THEN` after the outro instead, and `ReplayTest_ProgressAtOutroStart()` gives the progress on the outro's first frame.
 - `ReplayTest_KOAnimsAtOpStart(op)` returns the KO animation counter at the start of op `op`, counted from 0, for the first 32 ops of the stream. The interpreter records it through the hook `ReplayTest_AtOpStart`, which exists in test builds (`TESTING`). `ReplayTest_TrainerSpriteAtOpStart(op, side)` returns a side's trainer sprite at the same moment: its images, pic and palette tag. A SEND_OUT frees that sprite, so a test reads it at the start of the first SEND_OUT.
-- A plain `TEST` whose name starts with `Replay:` checks a refusal with `Replay_Validate`, without a battle. The order cases in `test/replay_refuse_order.c` start with `Replay: order:`. `src/gen3/stream/order.test.ts` holds the same cases with the same ops and verdicts, and fails when a case is on one side only.
+- A plain `TEST` whose name starts with `Replay:` checks a refusal with `Replay_Validate`, without a battle. The order cases in `test/replay_refuse_order.c` start with `Replay: order:`. `src/gen3/stream/order.test.ts` holds the same cases with the same ops, side operands and verdicts, and fails when a case is on one side only.
 
 ## Screenshots
 
