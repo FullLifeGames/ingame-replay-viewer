@@ -6,6 +6,7 @@ import { homedir } from 'node:os'
 import { basename, isAbsolute, join, normalize, relative, sep } from 'node:path'
 
 import type { WasmConfig } from './wasm-config.ts'
+import { LAYER_DIR } from './wasm-layer.ts'
 
 export interface WasmPaths {
   tree: string
@@ -164,9 +165,10 @@ export function platformCommands(
     })
 }
 
-// The glue's own C files (rom/gen3/wasm/src), given as absolute paths. They include
-// platform/dma.h as the platform files do, but compile as files of the game, so the platform
-// defines stay off.
+// The glue's own C files (rom/gen3/wasm/src) and our platform layer's (rom/gen3/wasm/layer),
+// given as absolute paths. They include platform/dma.h as the platform files do, but compile as
+// files of the game, so the platform defines stay off. The layer's headers come before the
+// borrowed ones, so the glue reaches our layer first.
 export function glueCommands(
   paths: WasmPaths,
   sources: readonly string[],
@@ -180,7 +182,7 @@ export function glueCommands(
       object: objectPath(paths, source),
       defines: [],
       flags: [],
-      after: [join(paths.platform, 'include')],
+      after: [LAYER_DIR, join(paths.platform, 'include')],
     }
     return command(paths, unit, options)
   })

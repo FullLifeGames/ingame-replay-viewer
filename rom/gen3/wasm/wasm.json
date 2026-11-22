@@ -14,7 +14,6 @@
       "include/platform/dma.h",
       "include/sound_mixer.h",
       "src/music_player.c",
-      "src/platform/bios.c",
       "src/platform/cgb_audio.c",
       "src/platform/dma.c",
       "src/platform/gba_easy_draw.c",

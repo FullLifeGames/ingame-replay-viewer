@@ -150,9 +150,8 @@ export function parseRunArgs(argv: string[]): RunArgs {
   return { mode, names: positionals }
 }
 
-export const baselineDir = (out: string) => join(out, 'baseline')
-export const baselineHashes = (out: string, stream: string) =>
-  join(baselineDir(out), `${stream}.crc`)
+const baselineDir = (out: string) => join(out, 'baseline')
+const baselineHashes = (out: string, stream: string) => join(baselineDir(out), `${stream}.crc`)
 
 /** Copies the module of build/wasm into build/wasm/baseline; a baseline is never overwritten. */
 export function saveBaseline(out: string): string {
