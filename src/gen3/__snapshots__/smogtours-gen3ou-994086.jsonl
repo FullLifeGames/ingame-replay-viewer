@@ -1,4 +1,4 @@
-{"length":19565,"crc32":"bc1c8ef3","trainers":{"near":{"name":"dataexpunged","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Halbert Simpson","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"},{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":344,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Claydol"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"}],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Fantasy Mead"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Machine Pass"},{"species":260,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Checker Knig"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Beanstalk Pa"},{"species":146,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Magma Flows"},{"species":142,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Sky Sands"}]}}
+{"length":15508,"crc32":"90ae1a39","trainers":{"near":{"name":"dataexpunged","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Halbert Simpson","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"},{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":344,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Claydol"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"}],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Fantasy Mead"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Machine Pass"},{"species":260,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Checker Knig"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Beanstalk Pa"},{"species":146,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Magma Flows"},{"species":142,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Sky Sands"}]}}
 {"line":23,"op":"intro"}
 {"line":23,"op":"print","text":"You are challenged by Halbert Simpson!"}
 {"line":25,"op":"print","text":"Halbert Simpson sent out Fantasy Meadow!"}
@@ -23,9 +23,10 @@
 {"line":38,"op":"hp","side":"far","hp":56}
 {"line":40,"op":"print","text":"The sandstorm is raging."}
 {"line":40,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":41,"op":"itemPopUp","side":"far","item":472}
 {"line":41,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":41,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":41,"op":"hp","side":"far","hp":62}
-{"line":41,"op":"print","text":"The opposing Machine Passage restored a little HP using its Leftovers!"}
 {"line":43,"op":"turn","number":2}
 {"line":46,"op":"anim","side":"near","anim":"focusPunchSetup"}
 {"line":46,"op":"print","text":"Tyranitar is tightening its focus!"}
@@ -38,9 +39,10 @@
 {"line":50,"op":"hp","side":"far","hp":19}
 {"line":52,"op":"print","text":"The sandstorm is raging."}
 {"line":52,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":53,"op":"itemPopUp","side":"far","item":472}
 {"line":53,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":53,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":53,"op":"hp","side":"far","hp":25}
-{"line":53,"op":"print","text":"The opposing Machine Passage restored a little HP using its Leftovers!"}
 {"line":55,"op":"turn","number":3}
 {"line":59,"op":"print","text":"The opposing Machine Passage used Protect!"}
 {"line":59,"op":"move","user":"far","target":"far","move":182}
@@ -49,9 +51,10 @@
 {"line":62,"op":"print","text":"The opposing Machine Passage protected itself!"}
 {"line":64,"op":"print","text":"The sandstorm is raging."}
 {"line":64,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":65,"op":"itemPopUp","side":"far","item":472}
 {"line":65,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":65,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":65,"op":"hp","side":"far","hp":31}
-{"line":65,"op":"print","text":"The opposing Machine Passage restored a little HP using its Leftovers!"}
 {"line":67,"op":"turn","number":4}
 {"line":70,"op":"anim","side":"near","anim":"focusPunchSetup"}
 {"line":70,"op":"print","text":"Tyranitar is tightening its focus!"}
@@ -90,9 +93,10 @@
 {"line":93,"op":"print","text":"Starmie is buffeted by the sandstorm!"}
 {"line":93,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":93,"op":"hp","side":"near","hp":67}
+{"line":94,"op":"itemPopUp","side":"near","item":472}
 {"line":94,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":94,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":94,"op":"hp","side":"near","hp":74}
-{"line":94,"op":"print","text":"Starmie restored a little HP using its Leftovers!"}
 {"line":96,"op":"turn","number":6}
 {"line":99,"op":"print","text":"Halbert Simpson withdrew Checker Knights!"}
 {"line":99,"op":"withdraw","side":"far"}
@@ -111,12 +115,14 @@
 {"line":106,"op":"print","text":"The opposing Beanstalk Park is buffeted by the sandstorm!"}
 {"line":106,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":106,"op":"hp","side":"far","hp":79}
+{"line":107,"op":"itemPopUp","side":"near","item":472}
 {"line":107,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":107,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":107,"op":"hp","side":"near","hp":74}
-{"line":107,"op":"print","text":"Starmie restored a little HP using its Leftovers!"}
+{"line":108,"op":"itemPopUp","side":"far","item":472}
 {"line":108,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":108,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":108,"op":"hp","side":"far","hp":85}
-{"line":108,"op":"print","text":"The opposing Beanstalk Park restored a little HP using its Leftovers!"}
 {"line":110,"op":"turn","number":7}
 {"line":113,"op":"print","text":"Starmie, come back!"}
 {"line":113,"op":"withdraw","side":"near"}
@@ -132,9 +138,10 @@
 {"line":119,"op":"print","text":"The opposing Beanstalk Park is buffeted by the sandstorm!"}
 {"line":119,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":119,"op":"hp","side":"far","hp":79}
+{"line":120,"op":"itemPopUp","side":"far","item":472}
 {"line":120,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":120,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":120,"op":"hp","side":"far","hp":85}
-{"line":120,"op":"print","text":"The opposing Beanstalk Park restored a little HP using its Leftovers!"}
 {"line":122,"op":"turn","number":8}
 {"line":125,"op":"print","text":"Halbert Simpson withdrew Beanstalk Park!"}
 {"line":125,"op":"withdraw","side":"far"}
@@ -148,9 +155,10 @@
 {"line":130,"op":"print","text":"The opposing Magma Flows is buffeted by the sandstorm!"}
 {"line":130,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":130,"op":"hp","side":"far","hp":94}
+{"line":131,"op":"itemPopUp","side":"far","item":472}
 {"line":131,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":131,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":131,"op":"hp","side":"far","hp":100}
-{"line":131,"op":"print","text":"The opposing Magma Flows restored a little HP using its Leftovers!"}
 {"line":133,"op":"turn","number":9}
 {"line":136,"op":"print","text":"Skarmory, come back!"}
 {"line":136,"op":"withdraw","side":"near"}
@@ -170,12 +178,14 @@
 {"line":143,"op":"print","text":"Blissey is buffeted by the sandstorm!"}
 {"line":143,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":143,"op":"hp","side":"near","hp":61}
+{"line":144,"op":"itemPopUp","side":"far","item":472}
 {"line":144,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":144,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":144,"op":"hp","side":"far","hp":100}
-{"line":144,"op":"print","text":"The opposing Magma Flows restored a little HP using its Leftovers!"}
+{"line":145,"op":"itemPopUp","side":"near","item":472}
 {"line":145,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":145,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":145,"op":"hp","side":"near","hp":68}
-{"line":145,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":147,"op":"turn","number":10}
 {"line":150,"op":"print","text":"Halbert Simpson withdrew Magma Flows!"}
 {"line":150,"op":"withdraw","side":"far"}
@@ -193,12 +203,14 @@
 {"line":156,"op":"print","text":"Blissey is buffeted by the sandstorm!"}
 {"line":156,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":156,"op":"hp","side":"near","hp":61}
+{"line":157,"op":"itemPopUp","side":"far","item":472}
 {"line":157,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":157,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":157,"op":"hp","side":"far","hp":94}
-{"line":157,"op":"print","text":"The opposing Fantasy Meadow restored a little HP using its Leftovers!"}
+{"line":158,"op":"itemPopUp","side":"near","item":472}
 {"line":158,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":158,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":158,"op":"hp","side":"near","hp":68}
-{"line":158,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":160,"op":"turn","number":11}
 {"line":164,"op":"print","text":"Halbert Simpson withdrew Fantasy Meadow!"}
 {"line":164,"op":"withdraw","side":"far"}
@@ -222,9 +234,10 @@
 {"line":176,"op":"print","text":"It's not very effective…"}
 {"line":178,"op":"print","text":"The sandstorm is raging."}
 {"line":178,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":179,"op":"itemPopUp","side":"near","item":472}
 {"line":179,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":179,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":179,"op":"hp","side":"near","hp":80}
-{"line":179,"op":"print","text":"Claydol restored a little HP using its Leftovers!"}
 {"line":181,"op":"turn","number":13}
 {"line":184,"op":"print","text":"Halbert Simpson withdrew Sky Sands!"}
 {"line":184,"op":"withdraw","side":"far"}
@@ -239,12 +252,14 @@
 {"line":188,"op":"print","text":"Claydol blew away Spikes!"}
 {"line":190,"op":"print","text":"The sandstorm is raging."}
 {"line":190,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":191,"op":"itemPopUp","side":"near","item":472}
 {"line":191,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":191,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":191,"op":"hp","side":"near","hp":87}
-{"line":191,"op":"print","text":"Claydol restored a little HP using its Leftovers!"}
+{"line":192,"op":"itemPopUp","side":"far","item":472}
 {"line":192,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":192,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":192,"op":"hp","side":"far","hp":91}
-{"line":192,"op":"print","text":"The opposing Checker Knights restored a little HP using its Leftovers!"}
 {"line":194,"op":"turn","number":14}
 {"line":197,"op":"print","text":"Claydol, come back!"}
 {"line":197,"op":"withdraw","side":"near"}
@@ -259,9 +274,10 @@
 {"line":201,"op":"print","text":"Starmie is buffeted by the sandstorm!"}
 {"line":201,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":201,"op":"hp","side":"near","hp":67}
+{"line":202,"op":"itemPopUp","side":"near","item":472}
 {"line":202,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":202,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":202,"op":"hp","side":"near","hp":74}
-{"line":202,"op":"print","text":"Starmie restored a little HP using its Leftovers!"}
 {"line":204,"op":"turn","number":15}
 {"line":207,"op":"print","text":"Starmie, come back!"}
 {"line":207,"op":"withdraw","side":"near"}
@@ -287,9 +303,10 @@
 {"line":222,"op":"print","text":"The opposing Magma Flows is buffeted by the sandstorm!"}
 {"line":222,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":222,"op":"hp","side":"far","hp":94}
+{"line":223,"op":"itemPopUp","side":"far","item":472}
 {"line":223,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":223,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":223,"op":"hp","side":"far","hp":100}
-{"line":223,"op":"print","text":"The opposing Magma Flows restored a little HP using its Leftovers!"}
 {"line":225,"op":"turn","number":17}
 {"line":228,"op":"print","text":"Skarmory, come back!"}
 {"line":228,"op":"withdraw","side":"near"}
@@ -308,12 +325,14 @@
 {"line":234,"op":"print","text":"Blissey is buffeted by the sandstorm!"}
 {"line":234,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":234,"op":"hp","side":"near","hp":61}
+{"line":235,"op":"itemPopUp","side":"far","item":472}
 {"line":235,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":235,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":235,"op":"hp","side":"far","hp":100}
-{"line":235,"op":"print","text":"The opposing Magma Flows restored a little HP using its Leftovers!"}
+{"line":236,"op":"itemPopUp","side":"near","item":472}
 {"line":236,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":236,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":236,"op":"hp","side":"near","hp":68}
-{"line":236,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":237,"op":"print","text":"Blissey was hurt by its poisoning!"}
 {"line":237,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":237,"op":"hp","side":"near","hp":61}
@@ -334,12 +353,14 @@
 {"line":249,"op":"print","text":"Blissey is buffeted by the sandstorm!"}
 {"line":249,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":249,"op":"hp","side":"near","hp":85}
+{"line":250,"op":"itemPopUp","side":"far","item":472}
 {"line":250,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":250,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":250,"op":"hp","side":"far","hp":100}
-{"line":250,"op":"print","text":"The opposing Magma Flows restored a little HP using its Leftovers!"}
+{"line":251,"op":"itemPopUp","side":"near","item":472}
 {"line":251,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":251,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":251,"op":"hp","side":"near","hp":92}
-{"line":251,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":252,"op":"print","text":"Blissey was hurt by its poisoning!"}
 {"line":252,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":252,"op":"hp","side":"near","hp":79}
@@ -362,15 +383,17 @@
 {"line":264,"op":"print","text":"The opposing Magma Flows is buffeted by the sandstorm!"}
 {"line":264,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":264,"op":"hp","side":"far","hp":94}
+{"line":265,"op":"itemPopUp","side":"near","item":472}
 {"line":265,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":265,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":265,"op":"hp","side":"near","hp":74}
-{"line":265,"op":"print","text":"Starmie restored a little HP using its Leftovers!"}
 {"line":266,"op":"print","text":"Starmie was hurt by its poisoning!"}
 {"line":266,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":266,"op":"hp","side":"near","hp":67}
+{"line":267,"op":"itemPopUp","side":"far","item":472}
 {"line":267,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":267,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":267,"op":"hp","side":"far","hp":100}
-{"line":267,"op":"print","text":"The opposing Magma Flows restored a little HP using its Leftovers!"}
 {"line":269,"op":"turn","number":20}
 {"line":272,"op":"print","text":"Starmie used Ice Beam!"}
 {"line":272,"op":"move","user":"near","target":"far","move":58}
@@ -389,15 +412,17 @@
 {"line":280,"op":"print","text":"The opposing Magma Flows is buffeted by the sandstorm!"}
 {"line":280,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":280,"op":"hp","side":"far","hp":63}
+{"line":281,"op":"itemPopUp","side":"near","item":472}
 {"line":281,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":281,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":281,"op":"hp","side":"near","hp":28}
-{"line":281,"op":"print","text":"Starmie restored a little HP using its Leftovers!"}
 {"line":282,"op":"print","text":"Starmie was hurt by its poisoning!"}
 {"line":282,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":282,"op":"hp","side":"near","hp":16}
+{"line":283,"op":"itemPopUp","side":"far","item":472}
 {"line":283,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":283,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":283,"op":"hp","side":"far","hp":69}
-{"line":283,"op":"print","text":"The opposing Magma Flows restored a little HP using its Leftovers!"}
 {"line":285,"op":"turn","number":21}
 {"line":288,"op":"status","side":"near","slot":1,"status":"none"}
 {"line":289,"op":"print","text":"Starmie, come back!"}
@@ -416,12 +441,14 @@
 {"line":295,"op":"print","text":"Blissey is buffeted by the sandstorm!"}
 {"line":295,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":295,"op":"hp","side":"near","hp":53}
+{"line":296,"op":"itemPopUp","side":"far","item":472}
 {"line":296,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":296,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":296,"op":"hp","side":"far","hp":69}
-{"line":296,"op":"print","text":"The opposing Magma Flows restored a little HP using its Leftovers!"}
+{"line":297,"op":"itemPopUp","side":"near","item":472}
 {"line":297,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":297,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":297,"op":"hp","side":"near","hp":60}
-{"line":297,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":299,"op":"turn","number":22}
 {"line":302,"op":"print","text":"Halbert Simpson withdrew Magma Flows!"}
 {"line":302,"op":"withdraw","side":"far"}
@@ -441,12 +468,14 @@
 {"line":309,"op":"print","text":"Blissey is buffeted by the sandstorm!"}
 {"line":309,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":309,"op":"hp","side":"near","hp":94}
+{"line":310,"op":"itemPopUp","side":"far","item":472}
 {"line":310,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":310,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":310,"op":"hp","side":"far","hp":69}
-{"line":310,"op":"print","text":"The opposing Beanstalk Park restored a little HP using its Leftovers!"}
+{"line":311,"op":"itemPopUp","side":"near","item":472}
 {"line":311,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":311,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":311,"op":"hp","side":"near","hp":100}
-{"line":311,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":313,"op":"turn","number":23}
 {"line":316,"op":"print","text":"The opposing Beanstalk Park used Leech Seed!"}
 {"line":316,"op":"move","user":"far","target":"near","move":73}
@@ -464,12 +493,14 @@
 {"line":324,"op":"print","text":"Blissey is buffeted by the sandstorm!"}
 {"line":324,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":324,"op":"hp","side":"near","hp":94}
+{"line":325,"op":"itemPopUp","side":"far","item":472}
 {"line":325,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":325,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":325,"op":"hp","side":"far","hp":28}
-{"line":325,"op":"print","text":"The opposing Beanstalk Park restored a little HP using its Leftovers!"}
+{"line":326,"op":"itemPopUp","side":"near","item":472}
 {"line":326,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":326,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":326,"op":"hp","side":"near","hp":100}
-{"line":326,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":327,"op":"anim","side":"near","anim":"leechSeedDrain"}
 {"line":327,"op":"hp","side":"near","hp":88}
 {"line":327,"op":"print","text":"Blissey's health is sapped by Leech Seed!"}
@@ -488,9 +519,10 @@
 {"line":338,"op":"print","text":"The opposing Beanstalk Park is buffeted by the sandstorm!"}
 {"line":338,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":338,"op":"hp","side":"far","hp":92}
+{"line":339,"op":"itemPopUp","side":"far","item":472}
 {"line":339,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":339,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":339,"op":"hp","side":"far","hp":98}
-{"line":339,"op":"print","text":"The opposing Beanstalk Park restored a little HP using its Leftovers!"}
 {"line":341,"op":"turn","number":25}
 {"line":344,"op":"print","text":"Halbert Simpson withdrew Beanstalk Park!"}
 {"line":344,"op":"withdraw","side":"far"}
@@ -518,9 +550,10 @@
 {"line":359,"op":"print","text":"It's not very effective…"}
 {"line":361,"op":"print","text":"The sandstorm is raging."}
 {"line":361,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":362,"op":"itemPopUp","side":"near","item":472}
 {"line":362,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":362,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":362,"op":"hp","side":"near","hp":73}
-{"line":362,"op":"print","text":"Claydol restored a little HP using its Leftovers!"}
 {"line":364,"op":"turn","number":27}
 {"line":367,"op":"print","text":"Halbert Simpson withdrew Sky Sands!"}
 {"line":367,"op":"withdraw","side":"far"}
@@ -537,9 +570,10 @@
 {"line":372,"op":"print","text":"The opposing Beanstalk Park is buffeted by the sandstorm!"}
 {"line":372,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":372,"op":"hp","side":"far","hp":75}
+{"line":373,"op":"itemPopUp","side":"far","item":472}
 {"line":373,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":373,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":373,"op":"hp","side":"far","hp":81}
-{"line":373,"op":"print","text":"The opposing Beanstalk Park restored a little HP using its Leftovers!"}
 {"line":375,"op":"turn","number":28}
 {"line":378,"op":"print","text":"Halbert Simpson withdrew Beanstalk Park!"}
 {"line":378,"op":"withdraw","side":"far"}
@@ -552,9 +586,10 @@
 {"line":381,"op":"print","text":"Spikes were scattered on the ground all around the opposing side!"}
 {"line":383,"op":"print","text":"The sandstorm is raging."}
 {"line":383,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":384,"op":"itemPopUp","side":"far","item":472}
 {"line":384,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":384,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":384,"op":"hp","side":"far","hp":84}
-{"line":384,"op":"print","text":"The opposing Fantasy Meadow restored a little HP using its Leftovers!"}
 {"line":386,"op":"turn","number":29}
 {"line":389,"op":"print","text":"Skarmory, come back!"}
 {"line":389,"op":"withdraw","side":"near"}
@@ -564,9 +599,10 @@
 {"line":390,"op":"anim","side":"far","anim":"statusSlp"}
 {"line":392,"op":"print","text":"The sandstorm is raging."}
 {"line":392,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":393,"op":"itemPopUp","side":"far","item":472}
 {"line":393,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":393,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":393,"op":"hp","side":"far","hp":90}
-{"line":393,"op":"print","text":"The opposing Fantasy Meadow restored a little HP using its Leftovers!"}
 {"line":395,"op":"turn","number":30}
 {"line":398,"op":"print","text":"Halbert Simpson withdrew Fantasy Meadow!"}
 {"line":398,"op":"withdraw","side":"far"}
@@ -582,9 +618,10 @@
 {"line":404,"op":"print","text":"The opposing Magma Flows is buffeted by the sandstorm!"}
 {"line":404,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":404,"op":"hp","side":"far","hp":31}
+{"line":405,"op":"itemPopUp","side":"far","item":472}
 {"line":405,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":405,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":405,"op":"hp","side":"far","hp":37}
-{"line":405,"op":"print","text":"The opposing Magma Flows restored a little HP using its Leftovers!"}
 {"line":407,"op":"turn","number":31}
 {"line":410,"op":"print","text":"Metagross, come back!"}
 {"line":410,"op":"withdraw","side":"near"}
@@ -602,12 +639,14 @@
 {"line":416,"op":"print","text":"Blissey is buffeted by the sandstorm!"}
 {"line":416,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":416,"op":"hp","side":"near","hp":61}
+{"line":417,"op":"itemPopUp","side":"far","item":472}
 {"line":417,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":417,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":417,"op":"hp","side":"far","hp":37}
-{"line":417,"op":"print","text":"The opposing Magma Flows restored a little HP using its Leftovers!"}
+{"line":418,"op":"itemPopUp","side":"near","item":472}
 {"line":418,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":418,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":418,"op":"hp","side":"near","hp":67}
-{"line":418,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":420,"op":"turn","number":32}
 {"line":423,"op":"print","text":"Halbert Simpson withdrew Magma Flows!"}
 {"line":423,"op":"withdraw","side":"far"}
@@ -624,12 +663,14 @@
 {"line":429,"op":"print","text":"Blissey is buffeted by the sandstorm!"}
 {"line":429,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":429,"op":"hp","side":"near","hp":61}
+{"line":430,"op":"itemPopUp","side":"far","item":472}
 {"line":430,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":430,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":430,"op":"hp","side":"far","hp":47}
-{"line":430,"op":"print","text":"The opposing Fantasy Meadow restored a little HP using its Leftovers!"}
+{"line":431,"op":"itemPopUp","side":"near","item":472}
 {"line":431,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":431,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":431,"op":"hp","side":"near","hp":67}
-{"line":431,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":433,"op":"turn","number":33}
 {"line":436,"op":"print","text":"Blissey, come back!"}
 {"line":436,"op":"withdraw","side":"near"}
@@ -644,12 +685,14 @@
 {"line":440,"op":"print","text":"It's not very effective…"}
 {"line":442,"op":"print","text":"The sandstorm is raging."}
 {"line":442,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":443,"op":"itemPopUp","side":"far","item":472}
 {"line":443,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":443,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":443,"op":"hp","side":"far","hp":53}
-{"line":443,"op":"print","text":"The opposing Fantasy Meadow restored a little HP using its Leftovers!"}
+{"line":444,"op":"itemPopUp","side":"near","item":472}
 {"line":444,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":444,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":444,"op":"hp","side":"near","hp":91}
-{"line":444,"op":"print","text":"Metagross restored a little HP using its Leftovers!"}
 {"line":446,"op":"turn","number":34}
 {"line":449,"op":"print","text":"Halbert Simpson withdrew Fantasy Meadow!"}
 {"line":449,"op":"withdraw","side":"far"}
@@ -664,12 +707,14 @@
 {"line":453,"op":"print","text":"It's not very effective…"}
 {"line":455,"op":"print","text":"The sandstorm is raging."}
 {"line":455,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":456,"op":"itemPopUp","side":"far","item":472}
 {"line":456,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":456,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":456,"op":"hp","side":"far","hp":53}
-{"line":456,"op":"print","text":"The opposing Checker Knights restored a little HP using its Leftovers!"}
+{"line":457,"op":"itemPopUp","side":"near","item":472}
 {"line":457,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":457,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":457,"op":"hp","side":"near","hp":97}
-{"line":457,"op":"print","text":"Metagross restored a little HP using its Leftovers!"}
 {"line":459,"op":"turn","number":35}
 {"line":462,"op":"print","text":"Metagross, come back!"}
 {"line":462,"op":"withdraw","side":"near"}
@@ -681,9 +726,10 @@
 {"line":464,"op":"hp","side":"near","hp":40}
 {"line":466,"op":"print","text":"The sandstorm is raging."}
 {"line":466,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":467,"op":"itemPopUp","side":"far","item":472}
 {"line":467,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":467,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":467,"op":"hp","side":"far","hp":60}
-{"line":467,"op":"print","text":"The opposing Checker Knights restored a little HP using its Leftovers!"}
 {"line":469,"op":"turn","number":36}
 {"line":472,"op":"print","text":"The opposing Checker Knights used Protect!"}
 {"line":472,"op":"move","user":"far","target":"far","move":182}
@@ -692,9 +738,10 @@
 {"line":475,"op":"print","text":"The opposing Checker Knights protected itself!"}
 {"line":477,"op":"print","text":"The sandstorm is raging."}
 {"line":477,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":478,"op":"itemPopUp","side":"far","item":472}
 {"line":478,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":478,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":478,"op":"hp","side":"far","hp":66}
-{"line":478,"op":"print","text":"The opposing Checker Knights restored a little HP using its Leftovers!"}
 {"line":480,"op":"turn","number":37}
 {"line":483,"op":"print","text":"Skarmory used Drill Peck!"}
 {"line":483,"op":"move","user":"near","target":"far","move":65}
@@ -706,9 +753,10 @@
 {"line":486,"op":"hp","side":"near","hp":5}
 {"line":488,"op":"print","text":"The sandstorm is raging."}
 {"line":488,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":489,"op":"itemPopUp","side":"far","item":472}
 {"line":489,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":489,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":489,"op":"hp","side":"far","hp":48}
-{"line":489,"op":"print","text":"The opposing Checker Knights restored a little HP using its Leftovers!"}
 {"line":491,"op":"turn","number":38}
 {"line":494,"op":"print","text":"The opposing Checker Knights used Protect!"}
 {"line":494,"op":"move","user":"far","target":"far","move":182}
@@ -717,9 +765,10 @@
 {"line":497,"op":"print","text":"The opposing Checker Knights protected itself!"}
 {"line":499,"op":"print","text":"The sandstorm is raging."}
 {"line":499,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":500,"op":"itemPopUp","side":"far","item":472}
 {"line":500,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":500,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":500,"op":"hp","side":"far","hp":54}
-{"line":500,"op":"print","text":"The opposing Checker Knights restored a little HP using its Leftovers!"}
 {"line":502,"op":"turn","number":39}
 {"line":505,"op":"print","text":"Skarmory used Drill Peck!"}
 {"line":505,"op":"move","user":"near","target":"far","move":65}
@@ -738,12 +787,14 @@
 {"line":515,"op":"print","text":"Starmie is buffeted by the sandstorm!"}
 {"line":515,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":515,"op":"hp","side":"near","hp":10}
+{"line":516,"op":"itemPopUp","side":"near","item":472}
 {"line":516,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":516,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":516,"op":"hp","side":"near","hp":16}
-{"line":516,"op":"print","text":"Starmie restored a little HP using its Leftovers!"}
+{"line":517,"op":"itemPopUp","side":"far","item":472}
 {"line":517,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":517,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":517,"op":"hp","side":"far","hp":36}
-{"line":517,"op":"print","text":"The opposing Checker Knights restored a little HP using its Leftovers!"}
 {"line":519,"op":"turn","number":40}
 {"line":522,"op":"print","text":"Starmie used Recover!"}
 {"line":522,"op":"move","user":"near","target":"near","move":105}
@@ -758,12 +809,14 @@
 {"line":528,"op":"print","text":"Starmie is buffeted by the sandstorm!"}
 {"line":528,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":528,"op":"hp","side":"near","hp":5}
+{"line":529,"op":"itemPopUp","side":"near","item":472}
 {"line":529,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":529,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":529,"op":"hp","side":"near","hp":11}
-{"line":529,"op":"print","text":"Starmie restored a little HP using its Leftovers!"}
+{"line":530,"op":"itemPopUp","side":"far","item":472}
 {"line":530,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":530,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":530,"op":"hp","side":"far","hp":42}
-{"line":530,"op":"print","text":"The opposing Checker Knights restored a little HP using its Leftovers!"}
 {"line":532,"op":"turn","number":41}
 {"line":535,"op":"print","text":"Starmie used Surf!"}
 {"line":535,"op":"move","user":"near","target":"far","move":57}
@@ -779,12 +832,14 @@
 {"line":542,"op":"switchIn","side":"near","slot":5,"hp":97,"status":"none"}
 {"line":544,"op":"print","text":"The sandstorm is raging."}
 {"line":544,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":545,"op":"itemPopUp","side":"far","item":472}
 {"line":545,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":545,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":545,"op":"hp","side":"far","hp":9}
-{"line":545,"op":"print","text":"The opposing Checker Knights restored a little HP using its Leftovers!"}
+{"line":546,"op":"itemPopUp","side":"near","item":472}
 {"line":546,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":546,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":546,"op":"hp","side":"near","hp":100}
-{"line":546,"op":"print","text":"Metagross restored a little HP using its Leftovers!"}
 {"line":548,"op":"turn","number":42}
 {"line":551,"op":"print","text":"The opposing Checker Knights used Protect!"}
 {"line":551,"op":"move","user":"far","target":"far","move":182}
@@ -793,9 +848,10 @@
 {"line":554,"op":"print","text":"The opposing Checker Knights protected itself!"}
 {"line":556,"op":"print","text":"The sandstorm is raging."}
 {"line":556,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":557,"op":"itemPopUp","side":"far","item":472}
 {"line":557,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":557,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":557,"op":"hp","side":"far","hp":15}
-{"line":557,"op":"print","text":"The opposing Checker Knights restored a little HP using its Leftovers!"}
 {"line":559,"op":"turn","number":43}
 {"line":562,"op":"print","text":"The opposing Checker Knights used Earthquake!"}
 {"line":562,"op":"move","user":"far","target":"near","move":89}
@@ -816,12 +872,14 @@
 {"line":575,"op":"print","text":"The opposing Magma Flows is buffeted by the sandstorm!"}
 {"line":575,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":575,"op":"hp","side":"far","hp":31}
+{"line":576,"op":"itemPopUp","side":"far","item":472}
 {"line":576,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":576,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":576,"op":"hp","side":"far","hp":37}
-{"line":576,"op":"print","text":"The opposing Magma Flows restored a little HP using its Leftovers!"}
+{"line":577,"op":"itemPopUp","side":"near","item":472}
 {"line":577,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":577,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":577,"op":"hp","side":"near","hp":49}
-{"line":577,"op":"print","text":"Metagross restored a little HP using its Leftovers!"}
 {"line":579,"op":"turn","number":44}
 {"line":582,"op":"print","text":"Metagross, come back!"}
 {"line":582,"op":"withdraw","side":"near"}
@@ -837,12 +895,14 @@
 {"line":588,"op":"print","text":"The opposing Magma Flows is buffeted by the sandstorm!"}
 {"line":588,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":588,"op":"hp","side":"far","hp":31}
+{"line":589,"op":"itemPopUp","side":"far","item":472}
 {"line":589,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":589,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":589,"op":"hp","side":"far","hp":37}
-{"line":589,"op":"print","text":"The opposing Magma Flows restored a little HP using its Leftovers!"}
+{"line":590,"op":"itemPopUp","side":"near","item":472}
 {"line":590,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":590,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":590,"op":"hp","side":"near","hp":80}
-{"line":590,"op":"print","text":"Tyranitar restored a little HP using its Leftovers!"}
 {"line":591,"op":"print","text":"Tyranitar was hurt by its poisoning!"}
 {"line":591,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":591,"op":"hp","side":"near","hp":74}
@@ -857,12 +917,14 @@
 {"line":602,"op":"print","text":"The opposing Magma Flows is buffeted by the sandstorm!"}
 {"line":602,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":602,"op":"hp","side":"far","hp":31}
+{"line":603,"op":"itemPopUp","side":"far","item":472}
 {"line":603,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":603,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":603,"op":"hp","side":"far","hp":37}
-{"line":603,"op":"print","text":"The opposing Magma Flows restored a little HP using its Leftovers!"}
+{"line":604,"op":"itemPopUp","side":"near","item":472}
 {"line":604,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":604,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":604,"op":"hp","side":"near","hp":80}
-{"line":604,"op":"print","text":"Tyranitar restored a little HP using its Leftovers!"}
 {"line":605,"op":"print","text":"Tyranitar was hurt by its poisoning!"}
 {"line":605,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":605,"op":"hp","side":"near","hp":68}
@@ -882,12 +944,14 @@
 {"line":618,"op":"print","text":"The opposing Beanstalk Park is buffeted by the sandstorm!"}
 {"line":618,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":618,"op":"hp","side":"far","hp":18}
+{"line":619,"op":"itemPopUp","side":"far","item":472}
 {"line":619,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":619,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":619,"op":"hp","side":"far","hp":24}
-{"line":619,"op":"print","text":"The opposing Beanstalk Park restored a little HP using its Leftovers!"}
+{"line":620,"op":"itemPopUp","side":"near","item":472}
 {"line":620,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":620,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":620,"op":"hp","side":"near","hp":74}
-{"line":620,"op":"print","text":"Tyranitar restored a little HP using its Leftovers!"}
 {"line":621,"op":"print","text":"Tyranitar was hurt by its poisoning!"}
 {"line":621,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":621,"op":"hp","side":"near","hp":56}
@@ -908,9 +972,10 @@
 {"line":633,"op":"hp","side":"far","hp":0}
 {"line":634,"op":"faint","side":"far"}
 {"line":634,"op":"print","text":"The opposing Beanstalk Park fainted!"}
+{"line":635,"op":"itemPopUp","side":"near","item":472}
 {"line":635,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":635,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":635,"op":"hp","side":"near","hp":62}
-{"line":635,"op":"print","text":"Tyranitar restored a little HP using its Leftovers!"}
 {"line":636,"op":"print","text":"Tyranitar was hurt by its poisoning!"}
 {"line":636,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":636,"op":"hp","side":"near","hp":38}
@@ -928,9 +993,10 @@
 {"line":650,"op":"switchIn","side":"near","slot":4,"hp":73,"status":"none"}
 {"line":652,"op":"print","text":"The sandstorm is raging."}
 {"line":652,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":653,"op":"itemPopUp","side":"near","item":472}
 {"line":653,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":653,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":653,"op":"hp","side":"near","hp":79}
-{"line":653,"op":"print","text":"Claydol restored a little HP using its Leftovers!"}
 {"line":655,"op":"turn","number":49}
 {"line":658,"op":"print","text":"The opposing Sky Sands used Double-Edge!"}
 {"line":658,"op":"move","user":"far","target":"near","move":38}
@@ -942,9 +1008,10 @@
 {"line":661,"op":"hp","side":"far","hp":63}
 {"line":663,"op":"print","text":"The sandstorm is raging."}
 {"line":663,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":664,"op":"itemPopUp","side":"near","item":472}
 {"line":664,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":664,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":664,"op":"hp","side":"near","hp":48}
-{"line":664,"op":"print","text":"Claydol restored a little HP using its Leftovers!"}
 {"line":666,"op":"turn","number":50}
 {"line":669,"op":"print","text":"The opposing Sky Sands used Double-Edge!"}
 {"line":669,"op":"move","user":"far","target":"near","move":38}
@@ -967,12 +1034,14 @@
 {"line":680,"op":"switchIn","side":"near","slot":5,"hp":49,"status":"none"}
 {"line":682,"op":"print","text":"The sandstorm is raging."}
 {"line":682,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":683,"op":"itemPopUp","side":"far","item":472}
 {"line":683,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":683,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":683,"op":"hp","side":"far","hp":34}
-{"line":683,"op":"print","text":"The opposing Fantasy Meadow restored a little HP using its Leftovers!"}
+{"line":684,"op":"itemPopUp","side":"near","item":472}
 {"line":684,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":684,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":684,"op":"hp","side":"near","hp":55}
-{"line":684,"op":"print","text":"Metagross restored a little HP using its Leftovers!"}
 {"line":686,"op":"turn","number":51}
 {"line":689,"op":"print","text":"The opposing Fantasy Meadow used Earthquake!"}
 {"line":689,"op":"move","user":"far","target":"near","move":89}
@@ -988,12 +1057,14 @@
 {"line":698,"op":"print","text":"Blissey is buffeted by the sandstorm!"}
 {"line":698,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":698,"op":"hp","side":"near","hp":61}
+{"line":699,"op":"itemPopUp","side":"far","item":472}
 {"line":699,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":699,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":699,"op":"hp","side":"far","hp":40}
-{"line":699,"op":"print","text":"The opposing Fantasy Meadow restored a little HP using its Leftovers!"}
+{"line":700,"op":"itemPopUp","side":"near","item":472}
 {"line":700,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":700,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":700,"op":"hp","side":"near","hp":67}
-{"line":700,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":702,"op":"turn","number":52}
 {"line":705,"op":"print","text":"The opposing Fantasy Meadow used Rock Slide!"}
 {"line":706,"op":"print","text":"Blissey avoided the attack!"}
@@ -1004,12 +1075,14 @@
 {"line":711,"op":"print","text":"Blissey is buffeted by the sandstorm!"}
 {"line":711,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":711,"op":"hp","side":"near","hp":61}
+{"line":712,"op":"itemPopUp","side":"far","item":472}
 {"line":712,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":712,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":712,"op":"hp","side":"far","hp":46}
-{"line":712,"op":"print","text":"The opposing Fantasy Meadow restored a little HP using its Leftovers!"}
+{"line":713,"op":"itemPopUp","side":"near","item":472}
 {"line":713,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":713,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":713,"op":"hp","side":"near","hp":67}
-{"line":713,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":715,"op":"turn","number":53}
 {"line":718,"op":"print","text":"The opposing Fantasy Meadow used Rock Slide!"}
 {"line":718,"op":"move","user":"far","target":"near","move":157}
@@ -1021,12 +1094,14 @@
 {"line":723,"op":"print","text":"Blissey is buffeted by the sandstorm!"}
 {"line":723,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":723,"op":"hp","side":"near","hp":13}
+{"line":724,"op":"itemPopUp","side":"far","item":472}
 {"line":724,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":724,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":724,"op":"hp","side":"far","hp":52}
-{"line":724,"op":"print","text":"The opposing Fantasy Meadow restored a little HP using its Leftovers!"}
+{"line":725,"op":"itemPopUp","side":"near","item":472}
 {"line":725,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":725,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":725,"op":"hp","side":"near","hp":19}
-{"line":725,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":727,"op":"turn","number":54}
 {"line":730,"op":"print","text":"The opposing Fantasy Meadow used Earthquake!"}
 {"line":730,"op":"move","user":"far","target":"near","move":89}

@@ -2,7 +2,8 @@
 // hit animation, moves the bar, then says a critical hit and the effectiveness. Damage with a
 // cause follows the cause's script (`battle_scripts_1.s`): weather and confusion say it, hit and
 // move the bar; poison and burn say it, play the status animation and move the bar; Leech Seed
-// drains first; hazards, recoil, items and abilities move the bar before the line.
+// drains first; hazards, recoil, items and abilities move the bar before the line. A held item's
+// heal shows its pop-up and says nothing (`BattleScript_ItemHealHP_Ret`).
 import { toID } from '@pkmn/dex'
 
 import type { ScriptEvent } from '../../script/events'
@@ -11,6 +12,7 @@ import type { Anim } from '../stream/instructions'
 import { healed, hurt, isTrapping, wishCameTrue } from '../text/phrases-hp'
 import { type Context, type EventOf, type PrintText, sameMon } from './context'
 import { hit, hitLines } from './hits'
+import { itemPopUp, shownBefore } from './items'
 import { scaleHp } from './scale'
 import { STATUS_ANIM } from './status'
 
@@ -72,7 +74,7 @@ function moveHit(event: DamageEvent, ctx: Context): void {
   hitLines(event, ctx)
 }
 
-/** Leftovers and the other held items play their effect first; Wish plays and names its wisher. */
+/** A held item heals as `itemHeal` says; Wish plays and names its wisher. */
 export function heal(event: HealEvent, ctx: Context): void {
   const { who, cause, wisher } = event
   if (event.silent) {
@@ -84,8 +86,20 @@ export function heal(event: HealEvent, ctx: Context): void {
     play(['wishHeal', 'say', 'bar'], event, ctx, wishCameTrue(ctx.mon(wisher)))
     ctx.print(event.line, text)
   } else {
-    play(cause?.kind === 'item' ? ['heldItemEffect', 'bar', 'say'] : BAR_SAY, event, ctx, text)
+    play(cause?.kind === 'item' ? itemHeal(event, cause.name, ctx) : BAR_SAY, event, ctx, text)
   }
+}
+
+/**
+ * A held item's heal says nothing in the expansion: Leftovers and Shell Bell show the pop-up and
+ * play the held item effect (`BattleScript_ItemHealHP_Ret`), a berry already shown and played by
+ * its `-enditem` heals alone (`BattleScript_ItemHealHP_RemoveBerry`). An item without a pop-up
+ * keeps our line as its stand-in.
+ */
+function itemHeal(event: HealEvent, item: string, ctx: Context): readonly Step[] {
+  if (shownBefore(event.who, item, ctx)) return ['simpleHeal', 'bar']
+  if (itemPopUp(event.who, item, event.line, ctx)) return ['heldItemEffect', 'simpleHeal', 'bar']
+  return ['heldItemEffect', 'bar', 'say']
 }
 
 /** The steps of one HP change; `say` prints `text`. */

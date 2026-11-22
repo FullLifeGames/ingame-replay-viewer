@@ -1,4 +1,4 @@
-{"length":5294,"crc32":"52ffb6d8","trainers":{"near":{"name":"chronosxsonorhc","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"oldsmellybastard","trainerPic":2,"teamSize":6,"revealed":3}},"parties":{"near":[{"species":38,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ninetales"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":233,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Porygon2"},{"species":254,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Sceptile"},{"species":260,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Swampert"},{"species":237,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Hitmontop"}],"far":[{"species":348,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Jumbo Shrimp"},{"species":260,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Fent Cart"},{"species":214,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Come on and "},null,null,null]}}
+{"length":4436,"crc32":"4ddfc681","trainers":{"near":{"name":"chronosxsonorhc","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"oldsmellybastard","trainerPic":2,"teamSize":6,"revealed":3}},"parties":{"near":[{"species":38,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ninetales"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":233,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Porygon2"},{"species":254,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Sceptile"},{"species":260,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Swampert"},{"species":237,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Hitmontop"}],"far":[{"species":348,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Jumbo Shrimp"},{"species":260,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Fent Cart"},{"species":214,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Come on and "},null,null,null]}}
 {"line":25,"op":"intro"}
 {"line":25,"op":"print","text":"You are challenged by oldsmellybastard!"}
 {"line":27,"op":"print","text":"oldsmellybastard sent out Jumbo Shrimp!"}
@@ -17,9 +17,10 @@
 {"line":38,"op":"hp","side":"near","hp":48}
 {"line":39,"op":"print","text":"It's super effective!"}
 {"line":39,"op":"print","text":"The Pokémon was hit 2 times!"}
+{"line":41,"op":"itemPopUp","side":"near","item":472}
 {"line":41,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":41,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":41,"op":"hp","side":"near","hp":54}
-{"line":41,"op":"print","text":"Ninetales restored a little HP using its Leftovers!"}
 {"line":43,"op":"turn","number":2}
 {"line":46,"op":"print","text":"Ninetales used Charm!"}
 {"line":46,"op":"move","user":"near","target":"far","move":204}
@@ -27,9 +28,10 @@
 {"line":47,"op":"print","text":"The opposing Jumbo Shrimp's Attack harshly fell!"}
 {"line":48,"op":"print","text":"The opposing Jumbo Shrimp used Rock Blast!"}
 {"line":49,"op":"print","text":"Ninetales avoided the attack!"}
+{"line":51,"op":"itemPopUp","side":"near","item":472}
 {"line":51,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":51,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":51,"op":"hp","side":"near","hp":60}
-{"line":51,"op":"print","text":"Ninetales restored a little HP using its Leftovers!"}
 {"line":53,"op":"turn","number":3}
 {"line":56,"op":"print","text":"oldsmellybastard withdrew Jumbo Shrimp!"}
 {"line":56,"op":"withdraw","side":"far"}
@@ -40,9 +42,10 @@
 {"line":58,"op":"anim","side":"far","anim":"statusBrn"}
 {"line":58,"op":"print","text":"The opposing Fent Cart was burned!"}
 {"line":58,"op":"status","side":"far","slot":1,"status":"brn"}
+{"line":60,"op":"itemPopUp","side":"near","item":472}
 {"line":60,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":60,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":60,"op":"hp","side":"near","hp":66}
-{"line":60,"op":"print","text":"Ninetales restored a little HP using its Leftovers!"}
 {"line":61,"op":"print","text":"The opposing Fent Cart was hurt by its burn!"}
 {"line":61,"op":"anim","side":"far","anim":"statusBrn"}
 {"line":61,"op":"hp","side":"far","hp":88}
@@ -56,12 +59,14 @@
 {"line":69,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":69,"op":"hp","side":"near","hp":86}
 {"line":69,"op":"print","text":"It's not very effective…"}
+{"line":71,"op":"itemPopUp","side":"near","item":472}
 {"line":71,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":71,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":71,"op":"hp","side":"near","hp":92}
-{"line":71,"op":"print","text":"Celebi restored a little HP using its Leftovers!"}
+{"line":72,"op":"itemPopUp","side":"far","item":472}
 {"line":72,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":72,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":72,"op":"hp","side":"far","hp":94}
-{"line":72,"op":"print","text":"The opposing Fent Cart restored a little HP using its Leftovers!"}
 {"line":73,"op":"print","text":"The opposing Fent Cart was hurt by its burn!"}
 {"line":73,"op":"anim","side":"far","anim":"statusBrn"}
 {"line":73,"op":"hp","side":"far","hp":82}
@@ -76,12 +81,14 @@
 {"line":80,"op":"move","user":"far","target":"near","move":58}
 {"line":81,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":81,"op":"hp","side":"near","hp":80}
+{"line":83,"op":"itemPopUp","side":"near","item":472}
 {"line":83,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":83,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":83,"op":"hp","side":"near","hp":87}
-{"line":83,"op":"print","text":"Porygon2 restored a little HP using its Leftovers!"}
+{"line":84,"op":"itemPopUp","side":"far","item":472}
 {"line":84,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":84,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":84,"op":"hp","side":"far","hp":88}
-{"line":84,"op":"print","text":"The opposing Fent Cart restored a little HP using its Leftovers!"}
 {"line":85,"op":"print","text":"The opposing Fent Cart was hurt by its burn!"}
 {"line":85,"op":"anim","side":"far","anim":"statusBrn"}
 {"line":85,"op":"hp","side":"far","hp":76}
@@ -94,15 +101,17 @@
 {"line":91,"op":"move","user":"near","target":"far","move":58}
 {"line":92,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":92,"op":"hp","side":"far","hp":72}
+{"line":94,"op":"itemPopUp","side":"near","item":472}
 {"line":94,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":94,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":94,"op":"hp","side":"near","hp":93}
-{"line":94,"op":"print","text":"Porygon2 restored a little HP using its Leftovers!"}
 {"line":96,"op":"turn","number":7}
 {"line":99,"op":"print","text":"Porygon2 used Toxic!"}
 {"line":99,"op":"move","user":"near","target":"far","move":92}
 {"line":100,"op":"anim","side":"far","anim":"statusPsn"}
 {"line":100,"op":"print","text":"The opposing Jumbo Shrimp was badly poisoned!"}
 {"line":100,"op":"status","side":"far","slot":0,"status":"tox"}
+{"line":101,"op":"itemPopUp","side":"far","item":522}
 {"line":101,"op":"anim","side":"far","anim":"heldItemBerry"}
 {"line":101,"op":"item","side":"far","slot":0,"item":0}
 {"line":102,"op":"print","text":"The opposing Jumbo Shrimp's Lum Berry cured its poison!"}
@@ -111,9 +120,10 @@
 {"line":103,"op":"move","user":"far","target":"near","move":237}
 {"line":104,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":104,"op":"hp","side":"near","hp":57}
+{"line":106,"op":"itemPopUp","side":"near","item":472}
 {"line":106,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":106,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":106,"op":"hp","side":"near","hp":63}
-{"line":106,"op":"print","text":"Porygon2 restored a little HP using its Leftovers!"}
 {"line":108,"op":"turn","number":8}
 {"line":111,"op":"print","text":"Porygon2 used Ice Beam!"}
 {"line":111,"op":"move","user":"near","target":"far","move":58}
@@ -123,9 +133,10 @@
 {"line":113,"op":"move","user":"far","target":"near","move":237}
 {"line":114,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":114,"op":"hp","side":"near","hp":25}
+{"line":116,"op":"itemPopUp","side":"near","item":472}
 {"line":116,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":116,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":116,"op":"hp","side":"near","hp":31}
-{"line":116,"op":"print","text":"Porygon2 restored a little HP using its Leftovers!"}
 {"line":118,"op":"turn","number":9}
 {"line":121,"op":"print","text":"Porygon2 used Recover!"}
 {"line":121,"op":"move","user":"near","target":"near","move":105}
@@ -135,9 +146,10 @@
 {"line":123,"op":"move","user":"far","target":"near","move":237}
 {"line":124,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":124,"op":"hp","side":"near","hp":45}
+{"line":126,"op":"itemPopUp","side":"near","item":472}
 {"line":126,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":126,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":126,"op":"hp","side":"near","hp":52}
-{"line":126,"op":"print","text":"Porygon2 restored a little HP using its Leftovers!"}
 {"line":128,"op":"turn","number":10}
 {"line":131,"op":"print","text":"Porygon2 used Ice Beam!"}
 {"line":131,"op":"move","user":"near","target":"far","move":58}
@@ -147,9 +159,10 @@
 {"line":133,"op":"move","user":"far","target":"near","move":237}
 {"line":134,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":134,"op":"hp","side":"near","hp":19}
+{"line":136,"op":"itemPopUp","side":"near","item":472}
 {"line":136,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":136,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":136,"op":"hp","side":"near","hp":25}
-{"line":136,"op":"print","text":"Porygon2 restored a little HP using its Leftovers!"}
 {"line":138,"op":"turn","number":11}
 {"line":141,"op":"print","text":"Porygon2 used Recover!"}
 {"line":141,"op":"move","user":"near","target":"near","move":105}
@@ -159,9 +172,10 @@
 {"line":143,"op":"move","user":"far","target":"near","move":237}
 {"line":144,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":144,"op":"hp","side":"near","hp":41}
+{"line":146,"op":"itemPopUp","side":"near","item":472}
 {"line":146,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":146,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":146,"op":"hp","side":"near","hp":48}
-{"line":146,"op":"print","text":"Porygon2 restored a little HP using its Leftovers!"}
 {"line":148,"op":"turn","number":12}
 {"line":151,"op":"print","text":"Porygon2 used Ice Beam!"}
 {"line":151,"op":"move","user":"near","target":"far","move":58}
@@ -171,12 +185,14 @@
 {"line":153,"op":"print","text":"The opposing Jumbo Shrimp fainted!"}
 {"line":156,"op":"print","text":"oldsmellybastard sent out Fent Cart!"}
 {"line":156,"op":"switchIn","side":"far","slot":1,"hp":76,"status":"brn"}
+{"line":158,"op":"itemPopUp","side":"near","item":472}
 {"line":158,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":158,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":158,"op":"hp","side":"near","hp":54}
-{"line":158,"op":"print","text":"Porygon2 restored a little HP using its Leftovers!"}
+{"line":159,"op":"itemPopUp","side":"far","item":472}
 {"line":159,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":159,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":159,"op":"hp","side":"far","hp":82}
-{"line":159,"op":"print","text":"The opposing Fent Cart restored a little HP using its Leftovers!"}
 {"line":160,"op":"print","text":"The opposing Fent Cart was hurt by its burn!"}
 {"line":160,"op":"anim","side":"far","anim":"statusBrn"}
 {"line":160,"op":"hp","side":"far","hp":70}
@@ -191,9 +207,10 @@
 {"line":168,"op":"print","text":"It started to rain!"}
 {"line":170,"op":"print","text":"Rain continues to fall."}
 {"line":170,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":171,"op":"itemPopUp","side":"far","item":472}
 {"line":171,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":171,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":171,"op":"hp","side":"far","hp":76}
-{"line":171,"op":"print","text":"The opposing Fent Cart restored a little HP using its Leftovers!"}
 {"line":172,"op":"print","text":"The opposing Fent Cart was hurt by its burn!"}
 {"line":172,"op":"anim","side":"far","anim":"statusBrn"}
 {"line":172,"op":"hp","side":"far","hp":63}
@@ -209,12 +226,14 @@
 {"line":180,"op":"print","text":"It's not very effective…"}
 {"line":182,"op":"print","text":"Rain continues to fall."}
 {"line":182,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":183,"op":"itemPopUp","side":"near","item":472}
 {"line":183,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":183,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":183,"op":"hp","side":"near","hp":71}
-{"line":183,"op":"print","text":"Sceptile restored a little HP using its Leftovers!"}
+{"line":184,"op":"itemPopUp","side":"far","item":472}
 {"line":184,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":184,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":184,"op":"hp","side":"far","hp":70}
-{"line":184,"op":"print","text":"The opposing Fent Cart restored a little HP using its Leftovers!"}
 {"line":185,"op":"print","text":"The opposing Fent Cart was hurt by its burn!"}
 {"line":185,"op":"anim","side":"far","anim":"statusBrn"}
 {"line":185,"op":"hp","side":"far","hp":57}

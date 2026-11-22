@@ -18,6 +18,7 @@ import {
   teamCured,
 } from '../text/phrases-status'
 import { type Context, type EventOf, sameMon } from './context'
+import { eatenBefore } from './items'
 
 /** Each status's animation; a status given, one held back and one that hurts all play it. */
 export const STATUS_ANIM: Readonly<Record<StatusName, Anim>> = {
@@ -58,9 +59,7 @@ export function cureStatus(event: EventOf<'cureStatus'>, ctx: Context): void {
 /** A cure by a berry eaten on the line before, or by an item the log names, names the item. */
 function cureText(event: EventOf<'cureStatus'>, ctx: Context): string {
   const { who, status, cause } = event
-  const before = ctx.near(-1)
-  const eaten = before?.kind === 'itemEnd' && before.eaten && sameMon(before.who, who)
-  const item = eaten ? before.item : cause?.kind === 'item' ? cause.name : undefined
+  const item = eatenBefore(who, ctx) ?? (cause?.kind === 'item' ? cause.name : undefined)
   const mon = ctx.mon(who)
   return item === undefined ? statusCured(mon, status) : itemCured(mon, item, status)
 }

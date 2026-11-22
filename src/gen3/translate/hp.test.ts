@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
+import { itemOf } from '../tables/lookup'
 import { plain, sceneOf, streamOfLog } from '../testing'
 import { scaleHp } from './scale'
 import { STATUS_ANIM } from './status'
@@ -143,11 +144,12 @@ describe('damage with no cause', () => {
 })
 
 describe('heals', () => {
-  it('plays the held item effect, moves the bar, then names the item', () => {
+  it('shows the item pop-up, plays the held item effect and the heal, then moves the bar', () => {
     expect(sceneOf('|-heal|p1a: Dugtrio|56/100|[from] item: Leftovers').map(plain)).toEqual([
+      { op: 'itemPopUp', side: 'near', item: itemOf('Leftovers').number },
       { op: 'anim', side: 'near', anim: 'heldItemEffect' },
+      { op: 'anim', side: 'near', anim: 'simpleHeal' },
       hp('near', 56),
-      'Dugtrio restored a little HP using its Leftovers!',
     ])
   })
 

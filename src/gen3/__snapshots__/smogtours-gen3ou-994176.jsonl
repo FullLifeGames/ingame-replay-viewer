@@ -1,4 +1,4 @@
-{"length":30918,"crc32":"07bc2bf9","trainers":{"near":{"name":"Mindnight","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"KeshBa45","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":245,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Suicune"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"},{"species":6,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Charizard"},{"species":91,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Cloyster"},{"species":135,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Jolteon"},{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"}],"far":[{"species":373,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Salamence"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"}]}}
+{"length":24850,"crc32":"093fcf90","trainers":{"near":{"name":"Mindnight","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"KeshBa45","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":245,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Suicune"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"},{"species":6,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Charizard"},{"species":91,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Cloyster"},{"species":135,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Jolteon"},{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"}],"far":[{"species":373,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Salamence"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"}]}}
 {"line":23,"op":"intro"}
 {"line":23,"op":"print","text":"You are challenged by KeshBa45!"}
 {"line":25,"op":"print","text":"KeshBa45 sent out Salamence!"}
@@ -30,9 +30,10 @@
 {"line":47,"op":"move","user":"far","target":"near","move":69}
 {"line":48,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":48,"op":"print","text":"The substitute took damage for Suicune!"}
+{"line":50,"op":"itemPopUp","side":"near","item":472}
 {"line":50,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":50,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":50,"op":"hp","side":"near","hp":82}
-{"line":50,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":52,"op":"turn","number":3}
 {"line":55,"op":"print","text":"KeshBa45 withdrew Blissey!"}
 {"line":55,"op":"withdraw","side":"far"}
@@ -44,9 +45,10 @@
 {"line":57,"op":"print","text":"Suicune's Sp. Atk rose!"}
 {"line":58,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
 {"line":58,"op":"print","text":"Suicune's Sp. Def rose!"}
+{"line":60,"op":"itemPopUp","side":"near","item":472}
 {"line":60,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":60,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":60,"op":"hp","side":"near","hp":88}
-{"line":60,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":62,"op":"turn","number":4}
 {"line":65,"op":"print","text":"The opposing Celebi used Perish Song!"}
 {"line":65,"op":"move","user":"far","target":"far","move":195}
@@ -57,9 +59,10 @@
 {"line":70,"op":"print","text":"Suicune's Sp. Atk rose!"}
 {"line":71,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
 {"line":71,"op":"print","text":"Suicune's Sp. Def rose!"}
+{"line":73,"op":"itemPopUp","side":"near","item":472}
 {"line":73,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":73,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":73,"op":"hp","side":"near","hp":94}
-{"line":73,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":74,"op":"print","text":"The opposing Celebi's perish count fell to 3!"}
 {"line":75,"op":"print","text":"Suicune's perish count fell to 3!"}
 {"line":77,"op":"turn","number":5}
@@ -71,12 +74,14 @@
 {"line":81,"op":"move","user":"near","target":"far","move":57}
 {"line":82,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":82,"op":"hp","side":"far","hp":69}
+{"line":84,"op":"itemPopUp","side":"near","item":472}
 {"line":84,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":84,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":84,"op":"hp","side":"near","hp":99}
-{"line":84,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
+{"line":85,"op":"itemPopUp","side":"far","item":472}
 {"line":85,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":85,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":85,"op":"hp","side":"far","hp":75}
-{"line":85,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":86,"op":"print","text":"Suicune's perish count fell to 2!"}
 {"line":88,"op":"turn","number":6}
 {"line":91,"op":"print","text":"Suicune, come back!"}
@@ -116,9 +121,10 @@
 {"line":119,"op":"volatile","side":"near","volatile":"substitute","on":true}
 {"line":120,"op":"hp","side":"near","hp":76}
 {"line":119,"op":"print","text":"Charizard put in a substitute!"}
+{"line":122,"op":"itemPopUp","side":"near","item":472}
 {"line":122,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":122,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":122,"op":"hp","side":"near","hp":82}
-{"line":122,"op":"print","text":"Charizard restored a little HP using its Leftovers!"}
 {"line":124,"op":"turn","number":10}
 {"line":127,"op":"print","text":"Charizard used Fire Blast!"}
 {"line":127,"op":"move","user":"near","target":"far","move":126}
@@ -132,12 +138,14 @@
 {"line":131,"op":"anim","side":"near","anim":"substituteFade"}
 {"line":131,"op":"print","text":"Charizard's substitute faded!"}
 {"line":131,"op":"volatile","side":"near","volatile":"substitute","on":false}
+{"line":133,"op":"itemPopUp","side":"near","item":472}
 {"line":133,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":133,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":133,"op":"hp","side":"near","hp":88}
-{"line":133,"op":"print","text":"Charizard restored a little HP using its Leftovers!"}
+{"line":134,"op":"itemPopUp","side":"far","item":472}
 {"line":134,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":134,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":134,"op":"hp","side":"far","hp":68}
-{"line":134,"op":"print","text":"The opposing Salamence restored a little HP using its Leftovers!"}
 {"line":136,"op":"turn","number":11}
 {"line":139,"op":"print","text":"Charizard, come back!"}
 {"line":139,"op":"withdraw","side":"near"}
@@ -149,12 +157,14 @@
 {"line":141,"op":"move","user":"far","target":"near","move":337}
 {"line":142,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":142,"op":"hp","side":"near","hp":58}
+{"line":144,"op":"itemPopUp","side":"far","item":472}
 {"line":144,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":144,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":144,"op":"hp","side":"far","hp":74}
-{"line":144,"op":"print","text":"The opposing Salamence restored a little HP using its Leftovers!"}
+{"line":145,"op":"itemPopUp","side":"near","item":472}
 {"line":145,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":145,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":145,"op":"hp","side":"near","hp":65}
-{"line":145,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":147,"op":"turn","number":12}
 {"line":150,"op":"print","text":"KeshBa45 withdrew Salamence!"}
 {"line":150,"op":"withdraw","side":"far"}
@@ -166,9 +176,10 @@
 {"line":152,"op":"print","text":"Suicune's Sp. Atk rose!"}
 {"line":153,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
 {"line":153,"op":"print","text":"Suicune's Sp. Def rose!"}
+{"line":155,"op":"itemPopUp","side":"near","item":472}
 {"line":155,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":155,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":155,"op":"hp","side":"near","hp":71}
-{"line":155,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":157,"op":"turn","number":13}
 {"line":160,"op":"print","text":"Suicune, come back!"}
 {"line":160,"op":"withdraw","side":"near"}
@@ -177,9 +188,10 @@
 {"line":161,"op":"print","text":"The opposing Celebi used Perish Song!"}
 {"line":161,"op":"move","user":"far","target":"far","move":195}
 {"line":164,"op":"print","text":"All Pokémon that heard the song will faint in three turns!"}
+{"line":166,"op":"itemPopUp","side":"near","item":472}
 {"line":166,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":166,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":166,"op":"hp","side":"near","hp":94}
-{"line":166,"op":"print","text":"Charizard restored a little HP using its Leftovers!"}
 {"line":167,"op":"print","text":"Charizard's perish count fell to 3!"}
 {"line":168,"op":"print","text":"The opposing Celebi's perish count fell to 3!"}
 {"line":170,"op":"turn","number":14}
@@ -194,12 +206,14 @@
 {"line":177,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":177,"op":"hp","side":"far","hp":84}
 {"line":177,"op":"print","text":"It's not very effective…"}
+{"line":179,"op":"itemPopUp","side":"far","item":472}
 {"line":179,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":179,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":179,"op":"hp","side":"far","hp":90}
-{"line":179,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
+{"line":180,"op":"itemPopUp","side":"near","item":472}
 {"line":180,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":180,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":180,"op":"hp","side":"near","hp":99}
-{"line":180,"op":"print","text":"Charizard restored a little HP using its Leftovers!"}
 {"line":181,"op":"print","text":"Charizard's perish count fell to 2!"}
 {"line":183,"op":"turn","number":15}
 {"line":186,"op":"print","text":"Charizard, come back!"}
@@ -213,12 +227,14 @@
 {"line":189,"op":"anim","side":"near","anim":"statusPrz"}
 {"line":189,"op":"print","text":"Suicune is paralyzed, so it may be unable to move!"}
 {"line":189,"op":"status","side":"near","slot":0,"status":"par"}
+{"line":191,"op":"itemPopUp","side":"far","item":472}
 {"line":191,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":191,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":191,"op":"hp","side":"far","hp":96}
-{"line":191,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
+{"line":192,"op":"itemPopUp","side":"near","item":472}
 {"line":192,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":192,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":192,"op":"hp","side":"near","hp":65}
-{"line":192,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":194,"op":"turn","number":16}
 {"line":197,"op":"print","text":"KeshBa45 withdrew Starmie!"}
 {"line":197,"op":"withdraw","side":"far"}
@@ -244,9 +260,10 @@
 {"line":214,"op":"print","text":"The opposing Skarmory used Spikes!"}
 {"line":214,"op":"move","user":"far","target":"near","move":191}
 {"line":215,"op":"print","text":"Spikes were scattered on the ground all around your side!"}
+{"line":217,"op":"itemPopUp","side":"near","item":472}
 {"line":217,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":217,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":217,"op":"hp","side":"near","hp":100}
-{"line":217,"op":"print","text":"Charizard restored a little HP using its Leftovers!"}
 {"line":219,"op":"turn","number":19}
 {"line":223,"op":"print","text":"KeshBa45 withdrew Skarmory!"}
 {"line":223,"op":"withdraw","side":"far"}
@@ -257,9 +274,10 @@
 {"line":226,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":226,"op":"hp","side":"far","hp":66}
 {"line":226,"op":"print","text":"It's not very effective…"}
+{"line":228,"op":"itemPopUp","side":"far","item":472}
 {"line":228,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":228,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":228,"op":"hp","side":"far","hp":72}
-{"line":228,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
 {"line":230,"op":"turn","number":20}
 {"line":233,"op":"print","text":"Charizard, come back!"}
 {"line":233,"op":"withdraw","side":"near"}
@@ -272,12 +290,14 @@
 {"line":237,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":237,"op":"hp","side":"near","hp":72}
 {"line":237,"op":"print","text":"It's not very effective…"}
+{"line":239,"op":"itemPopUp","side":"far","item":472}
 {"line":239,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":239,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":239,"op":"hp","side":"far","hp":78}
-{"line":239,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
+{"line":240,"op":"itemPopUp","side":"near","item":472}
 {"line":240,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":240,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":240,"op":"hp","side":"near","hp":78}
-{"line":240,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":242,"op":"turn","number":21}
 {"line":245,"op":"print","text":"Suicune, come back!"}
 {"line":245,"op":"withdraw","side":"near"}
@@ -302,12 +322,14 @@
 {"line":256,"op":"switchIn","side":"near","slot":0,"hp":78,"status":"slp"}
 {"line":257,"op":"hp","side":"near","hp":62}
 {"line":257,"op":"print","text":"Suicune was hurt by the spikes!"}
+{"line":259,"op":"itemPopUp","side":"far","item":472}
 {"line":259,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":259,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":259,"op":"hp","side":"far","hp":80}
-{"line":259,"op":"print","text":"The opposing Salamence restored a little HP using its Leftovers!"}
+{"line":260,"op":"itemPopUp","side":"near","item":472}
 {"line":260,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":260,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":260,"op":"hp","side":"near","hp":68}
-{"line":260,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":262,"op":"turn","number":23}
 {"line":265,"op":"print","text":"The opposing Salamence used Hidden Power!"}
 {"line":265,"op":"move","user":"far","target":"near","move":237}
@@ -316,12 +338,14 @@
 {"line":267,"op":"print","text":"It's super effective!"}
 {"line":268,"op":"print","text":"Suicune is fast asleep."}
 {"line":268,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":270,"op":"itemPopUp","side":"far","item":472}
 {"line":270,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":270,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":270,"op":"hp","side":"far","hp":86}
-{"line":270,"op":"print","text":"The opposing Salamence restored a little HP using its Leftovers!"}
+{"line":271,"op":"itemPopUp","side":"near","item":472}
 {"line":271,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":271,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":271,"op":"hp","side":"near","hp":38}
-{"line":271,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":273,"op":"turn","number":24}
 {"line":276,"op":"print","text":"The opposing Salamence used Hidden Power!"}
 {"line":276,"op":"move","user":"far","target":"near","move":237}
@@ -335,9 +359,10 @@
 {"line":281,"op":"print","text":"Suicune slept and restored its HP!"}
 {"line":281,"op":"status","side":"near","slot":0,"status":"slp"}
 {"line":282,"op":"hp","side":"near","hp":100}
+{"line":284,"op":"itemPopUp","side":"far","item":472}
 {"line":284,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":284,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":284,"op":"hp","side":"far","hp":92}
-{"line":284,"op":"print","text":"The opposing Salamence restored a little HP using its Leftovers!"}
 {"line":286,"op":"turn","number":25}
 {"line":289,"op":"print","text":"The opposing Salamence used Hidden Power!"}
 {"line":289,"op":"move","user":"far","target":"near","move":237}
@@ -346,12 +371,14 @@
 {"line":291,"op":"print","text":"It's super effective!"}
 {"line":292,"op":"print","text":"Suicune is fast asleep."}
 {"line":292,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":294,"op":"itemPopUp","side":"far","item":472}
 {"line":294,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":294,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":294,"op":"hp","side":"far","hp":98}
-{"line":294,"op":"print","text":"The opposing Salamence restored a little HP using its Leftovers!"}
+{"line":295,"op":"itemPopUp","side":"near","item":472}
 {"line":295,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":295,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":295,"op":"hp","side":"near","hp":69}
-{"line":295,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":297,"op":"turn","number":26}
 {"line":300,"op":"print","text":"The opposing Salamence used Hidden Power!"}
 {"line":300,"op":"move","user":"far","target":"near","move":237}
@@ -360,12 +387,14 @@
 {"line":302,"op":"print","text":"It's super effective!"}
 {"line":303,"op":"print","text":"Suicune is fast asleep."}
 {"line":303,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":305,"op":"itemPopUp","side":"far","item":472}
 {"line":305,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":305,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":305,"op":"hp","side":"far","hp":100}
-{"line":305,"op":"print","text":"The opposing Salamence restored a little HP using its Leftovers!"}
+{"line":306,"op":"itemPopUp","side":"near","item":472}
 {"line":306,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":306,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":306,"op":"hp","side":"near","hp":43}
-{"line":306,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":308,"op":"turn","number":27}
 {"line":311,"op":"print","text":"KeshBa45 withdrew Salamence!"}
 {"line":311,"op":"withdraw","side":"far"}
@@ -393,9 +422,10 @@
 {"line":325,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"one"}
 {"line":325,"op":"print","text":"Cloyster's Attack fell!"}
 {"line":324,"op":"ability","side":"far","ability":22,"show":false}
+{"line":327,"op":"itemPopUp","side":"near","item":472}
 {"line":327,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":327,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":327,"op":"hp","side":"near","hp":90}
-{"line":327,"op":"print","text":"Cloyster restored a little HP using its Leftovers!"}
 {"line":329,"op":"turn","number":29}
 {"line":332,"op":"print","text":"KeshBa45 withdrew Salamence!"}
 {"line":332,"op":"withdraw","side":"far"}
@@ -406,12 +436,14 @@
 {"line":334,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":334,"op":"hp","side":"far","hp":97}
 {"line":335,"op":"print","text":"Cloyster blew away Spikes!"}
+{"line":337,"op":"itemPopUp","side":"far","item":472}
 {"line":337,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":337,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":337,"op":"hp","side":"far","hp":100}
-{"line":337,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
+{"line":338,"op":"itemPopUp","side":"near","item":472}
 {"line":338,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":338,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":338,"op":"hp","side":"near","hp":96}
-{"line":338,"op":"print","text":"Cloyster restored a little HP using its Leftovers!"}
 {"line":340,"op":"turn","number":30}
 {"line":343,"op":"print","text":"Cloyster, come back!"}
 {"line":343,"op":"withdraw","side":"near"}
@@ -427,9 +459,10 @@
 {"line":353,"op":"print","text":"It's not very effective…"}
 {"line":354,"op":"print","text":"Suicune is fast asleep."}
 {"line":354,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":356,"op":"itemPopUp","side":"near","item":472}
 {"line":356,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":356,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":356,"op":"hp","side":"near","hp":94}
-{"line":356,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":358,"op":"turn","number":32}
 {"line":361,"op":"print","text":"KeshBa45 withdrew Starmie!"}
 {"line":361,"op":"withdraw","side":"far"}
@@ -437,9 +470,10 @@
 {"line":361,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
 {"line":362,"op":"print","text":"Suicune is fast asleep."}
 {"line":362,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":364,"op":"itemPopUp","side":"near","item":472}
 {"line":364,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":364,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":364,"op":"hp","side":"near","hp":99}
-{"line":364,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":366,"op":"turn","number":33}
 {"line":369,"op":"print","text":"Suicune, come back!"}
 {"line":369,"op":"withdraw","side":"near"}
@@ -466,9 +500,10 @@
 {"line":382,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"one"}
 {"line":382,"op":"print","text":"Cloyster's Attack fell!"}
 {"line":381,"op":"ability","side":"far","ability":22,"show":false}
+{"line":384,"op":"itemPopUp","side":"near","item":472}
 {"line":384,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":384,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":384,"op":"hp","side":"near","hp":100}
-{"line":384,"op":"print","text":"Cloyster restored a little HP using its Leftovers!"}
 {"line":386,"op":"turn","number":35}
 {"line":389,"op":"print","text":"KeshBa45 withdrew Salamence!"}
 {"line":389,"op":"withdraw","side":"far"}
@@ -487,9 +522,10 @@
 {"line":399,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":399,"op":"hp","side":"near","hp":94}
 {"line":400,"op":"print","text":"The opposing Starmie blew away Spikes!"}
+{"line":402,"op":"itemPopUp","side":"near","item":472}
 {"line":402,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":402,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":402,"op":"hp","side":"near","hp":99}
-{"line":402,"op":"print","text":"Jolteon restored a little HP using its Leftovers!"}
 {"line":404,"op":"turn","number":37}
 {"line":407,"op":"print","text":"Jolteon, come back!"}
 {"line":407,"op":"withdraw","side":"near"}
@@ -509,9 +545,10 @@
 {"line":417,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":417,"op":"hp","side":"far","hp":77}
 {"line":417,"op":"print","text":"It's not very effective…"}
+{"line":419,"op":"itemPopUp","side":"far","item":472}
 {"line":419,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":419,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":419,"op":"hp","side":"far","hp":83}
-{"line":419,"op":"print","text":"The opposing Skarmory restored a little HP using its Leftovers!"}
 {"line":421,"op":"turn","number":39}
 {"line":424,"op":"print","text":"The opposing Skarmory used Spikes!"}
 {"line":424,"op":"move","user":"far","target":"near","move":191}
@@ -521,9 +558,10 @@
 {"line":428,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":428,"op":"hp","side":"far","hp":62}
 {"line":428,"op":"print","text":"It's not very effective…"}
+{"line":430,"op":"itemPopUp","side":"far","item":472}
 {"line":430,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":430,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":430,"op":"hp","side":"far","hp":68}
-{"line":430,"op":"print","text":"The opposing Skarmory restored a little HP using its Leftovers!"}
 {"line":432,"op":"turn","number":40}
 {"line":435,"op":"print","text":"The opposing Skarmory used Spikes!"}
 {"line":435,"op":"move","user":"far","target":"near","move":191}
@@ -533,9 +571,10 @@
 {"line":439,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":439,"op":"hp","side":"far","hp":47}
 {"line":439,"op":"print","text":"It's not very effective…"}
+{"line":441,"op":"itemPopUp","side":"far","item":472}
 {"line":441,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":441,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":441,"op":"hp","side":"far","hp":53}
-{"line":441,"op":"print","text":"The opposing Skarmory restored a little HP using its Leftovers!"}
 {"line":443,"op":"turn","number":41}
 {"line":446,"op":"print","text":"Metagross used Meteor Mash!"}
 {"line":446,"op":"move","user":"near","target":"far","move":309}
@@ -549,12 +588,14 @@
 {"line":450,"op":"print","text":"Cloyster was dragged out!"}
 {"line":451,"op":"hp","side":"near","hp":84}
 {"line":451,"op":"print","text":"Cloyster was hurt by the spikes!"}
+{"line":453,"op":"itemPopUp","side":"near","item":472}
 {"line":453,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":453,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":453,"op":"hp","side":"near","hp":90}
-{"line":453,"op":"print","text":"Cloyster restored a little HP using its Leftovers!"}
+{"line":454,"op":"itemPopUp","side":"far","item":472}
 {"line":454,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":454,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":454,"op":"hp","side":"far","hp":36}
-{"line":454,"op":"print","text":"The opposing Skarmory restored a little HP using its Leftovers!"}
 {"line":456,"op":"turn","number":42}
 {"line":459,"op":"print","text":"KeshBa45 withdrew Skarmory!"}
 {"line":459,"op":"withdraw","side":"far"}
@@ -565,12 +606,14 @@
 {"line":461,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":461,"op":"hp","side":"far","hp":96}
 {"line":462,"op":"print","text":"Cloyster blew away Spikes!"}
+{"line":464,"op":"itemPopUp","side":"far","item":472}
 {"line":464,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":464,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":464,"op":"hp","side":"far","hp":100}
-{"line":464,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
+{"line":465,"op":"itemPopUp","side":"near","item":472}
 {"line":465,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":465,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":465,"op":"hp","side":"near","hp":96}
-{"line":465,"op":"print","text":"Cloyster restored a little HP using its Leftovers!"}
 {"line":467,"op":"turn","number":43}
 {"line":470,"op":"print","text":"KeshBa45 withdrew Starmie!"}
 {"line":470,"op":"withdraw","side":"far"}
@@ -580,12 +623,14 @@
 {"line":471,"op":"withdraw","side":"near"}
 {"line":471,"op":"print","text":"Go! Suicune!"}
 {"line":471,"op":"switchIn","side":"near","slot":0,"hp":99,"status":"slp"}
+{"line":473,"op":"itemPopUp","side":"near","item":472}
 {"line":473,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":473,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":473,"op":"hp","side":"near","hp":100}
-{"line":473,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
+{"line":474,"op":"itemPopUp","side":"far","item":472}
 {"line":474,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":474,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":474,"op":"hp","side":"far","hp":42}
-{"line":474,"op":"print","text":"The opposing Skarmory restored a little HP using its Leftovers!"}
 {"line":476,"op":"turn","number":44}
 {"line":479,"op":"print","text":"KeshBa45 withdrew Skarmory!"}
 {"line":479,"op":"withdraw","side":"far"}
@@ -598,9 +643,10 @@
 {"line":483,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":483,"op":"hp","side":"far","hp":88}
 {"line":483,"op":"print","text":"It's not very effective…"}
+{"line":485,"op":"itemPopUp","side":"far","item":472}
 {"line":485,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":485,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":485,"op":"hp","side":"far","hp":94}
-{"line":485,"op":"print","text":"The opposing Celebi restored a little HP using its Leftovers!"}
 {"line":487,"op":"turn","number":45}
 {"line":490,"op":"print","text":"Suicune, come back!"}
 {"line":490,"op":"withdraw","side":"near"}
@@ -609,9 +655,10 @@
 {"line":491,"op":"print","text":"The opposing Celebi used Leech Seed!"}
 {"line":491,"op":"move","user":"far","target":"near","move":73}
 {"line":492,"op":"print","text":"Metagross was seeded!"}
+{"line":494,"op":"itemPopUp","side":"far","item":472}
 {"line":494,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":494,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":494,"op":"hp","side":"far","hp":100}
-{"line":494,"op":"print","text":"The opposing Celebi restored a little HP using its Leftovers!"}
 {"line":495,"op":"anim","side":"near","anim":"leechSeedDrain"}
 {"line":495,"op":"hp","side":"near","hp":88}
 {"line":495,"op":"print","text":"Metagross's health is sapped by Leech Seed!"}
@@ -636,9 +683,10 @@
 {"line":512,"op":"hit","side":"near","effectiveness":"super"}
 {"line":512,"op":"hp","side":"near","hp":63}
 {"line":512,"op":"print","text":"It's super effective!"}
+{"line":514,"op":"itemPopUp","side":"near","item":472}
 {"line":514,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":514,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":514,"op":"hp","side":"near","hp":69}
-{"line":514,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":516,"op":"turn","number":48}
 {"line":519,"op":"print","text":"The opposing Celebi used Leech Seed!"}
 {"line":520,"op":"print","text":"Suicune avoided the attack!"}
@@ -648,9 +696,10 @@
 {"line":522,"op":"print","text":"Suicune's Sp. Atk rose!"}
 {"line":523,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
 {"line":523,"op":"print","text":"Suicune's Sp. Def rose!"}
+{"line":525,"op":"itemPopUp","side":"near","item":472}
 {"line":525,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":525,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":525,"op":"hp","side":"near","hp":75}
-{"line":525,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":527,"op":"turn","number":49}
 {"line":530,"op":"print","text":"The opposing Celebi used Leech Seed!"}
 {"line":531,"op":"print","text":"Suicune avoided the attack!"}
@@ -660,9 +709,10 @@
 {"line":533,"op":"print","text":"Suicune's Sp. Atk rose!"}
 {"line":534,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
 {"line":534,"op":"print","text":"Suicune's Sp. Def rose!"}
+{"line":536,"op":"itemPopUp","side":"near","item":472}
 {"line":536,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":536,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":536,"op":"hp","side":"near","hp":81}
-{"line":536,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":538,"op":"turn","number":50}
 {"line":541,"op":"print","text":"The opposing Celebi used Leech Seed!"}
 {"line":541,"op":"move","user":"far","target":"near","move":73}
@@ -672,12 +722,14 @@
 {"line":545,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":545,"op":"hp","side":"far","hp":78}
 {"line":545,"op":"print","text":"It's not very effective…"}
+{"line":547,"op":"itemPopUp","side":"far","item":472}
 {"line":547,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":547,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":547,"op":"hp","side":"far","hp":84}
-{"line":547,"op":"print","text":"The opposing Celebi restored a little HP using its Leftovers!"}
+{"line":548,"op":"itemPopUp","side":"near","item":472}
 {"line":548,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":548,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":548,"op":"hp","side":"near","hp":88}
-{"line":548,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":549,"op":"anim","side":"near","anim":"leechSeedDrain"}
 {"line":549,"op":"hp","side":"near","hp":75}
 {"line":549,"op":"print","text":"Suicune's health is sapped by Leech Seed!"}
@@ -690,9 +742,10 @@
 {"line":556,"op":"print","text":"The opposing Celebi used Perish Song!"}
 {"line":556,"op":"move","user":"far","target":"far","move":195}
 {"line":559,"op":"print","text":"All Pokémon that heard the song will faint in three turns!"}
+{"line":561,"op":"itemPopUp","side":"far","item":472}
 {"line":561,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":561,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":561,"op":"hp","side":"far","hp":100}
-{"line":561,"op":"print","text":"The opposing Celebi restored a little HP using its Leftovers!"}
 {"line":562,"op":"print","text":"Charizard's perish count fell to 3!"}
 {"line":563,"op":"print","text":"The opposing Celebi's perish count fell to 3!"}
 {"line":565,"op":"turn","number":52}
@@ -704,9 +757,10 @@
 {"line":569,"op":"withdraw","side":"far"}
 {"line":569,"op":"print","text":"KeshBa45 sent out Blissey!"}
 {"line":569,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":571,"op":"itemPopUp","side":"near","item":472}
 {"line":571,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":571,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":571,"op":"hp","side":"near","hp":94}
-{"line":571,"op":"print","text":"Metagross restored a little HP using its Leftovers!"}
 {"line":573,"op":"turn","number":53}
 {"line":576,"op":"print","text":"KeshBa45 withdrew Blissey!"}
 {"line":576,"op":"withdraw","side":"far"}
@@ -717,12 +771,14 @@
 {"line":579,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":579,"op":"hp","side":"far","hp":67}
 {"line":579,"op":"print","text":"It's not very effective…"}
+{"line":581,"op":"itemPopUp","side":"far","item":472}
 {"line":581,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":581,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":581,"op":"hp","side":"far","hp":73}
-{"line":581,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
+{"line":582,"op":"itemPopUp","side":"near","item":472}
 {"line":582,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":582,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":582,"op":"hp","side":"near","hp":99}
-{"line":582,"op":"print","text":"Metagross restored a little HP using its Leftovers!"}
 {"line":584,"op":"turn","number":54}
 {"line":587,"op":"print","text":"KeshBa45 withdrew Starmie!"}
 {"line":587,"op":"withdraw","side":"far"}
@@ -738,9 +794,10 @@
 {"line":592,"op":"print","text":"The opposing Skarmory fainted!"}
 {"line":595,"op":"print","text":"KeshBa45 sent out Metagross!"}
 {"line":595,"op":"switchIn","side":"far","slot":5,"hp":100,"status":"none"}
+{"line":597,"op":"itemPopUp","side":"near","item":472}
 {"line":597,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":597,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":597,"op":"hp","side":"near","hp":100}
-{"line":597,"op":"print","text":"Metagross restored a little HP using its Leftovers!"}
 {"line":599,"op":"turn","number":55}
 {"line":602,"op":"print","text":"Metagross, come back!"}
 {"line":602,"op":"withdraw","side":"near"}
@@ -750,9 +807,10 @@
 {"line":603,"op":"move","user":"far","target":"near","move":89}
 {"line":604,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":604,"op":"hp","side":"near","hp":71}
+{"line":606,"op":"itemPopUp","side":"near","item":472}
 {"line":606,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":606,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":606,"op":"hp","side":"near","hp":77}
-{"line":606,"op":"print","text":"Cloyster restored a little HP using its Leftovers!"}
 {"line":608,"op":"turn","number":56}
 {"line":611,"op":"print","text":"KeshBa45 withdrew Metagross!"}
 {"line":611,"op":"withdraw","side":"far"}
@@ -761,12 +819,14 @@
 {"line":612,"op":"print","text":"Cloyster used Spikes!"}
 {"line":612,"op":"move","user":"near","target":"far","move":191}
 {"line":613,"op":"print","text":"Spikes were scattered on the ground all around the opposing side!"}
+{"line":615,"op":"itemPopUp","side":"far","item":472}
 {"line":615,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":615,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":615,"op":"hp","side":"far","hp":79}
-{"line":615,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
+{"line":616,"op":"itemPopUp","side":"near","item":472}
 {"line":616,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":616,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":616,"op":"hp","side":"near","hp":84}
-{"line":616,"op":"print","text":"Cloyster restored a little HP using its Leftovers!"}
 {"line":618,"op":"turn","number":57}
 {"line":621,"op":"print","text":"Cloyster, come back!"}
 {"line":621,"op":"withdraw","side":"near"}
@@ -777,12 +837,14 @@
 {"line":623,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":623,"op":"hp","side":"near","hp":94}
 {"line":624,"op":"print","text":"The opposing Starmie blew away Spikes!"}
+{"line":626,"op":"itemPopUp","side":"near","item":472}
 {"line":626,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":626,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":626,"op":"hp","side":"near","hp":99}
-{"line":626,"op":"print","text":"Jolteon restored a little HP using its Leftovers!"}
+{"line":627,"op":"itemPopUp","side":"far","item":472}
 {"line":627,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":627,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":627,"op":"hp","side":"far","hp":85}
-{"line":627,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
 {"line":629,"op":"turn","number":58}
 {"line":632,"op":"print","text":"Jolteon, come back!"}
 {"line":632,"op":"withdraw","side":"near"}
@@ -811,12 +873,14 @@
 {"line":648,"op":"switchIn","side":"far","slot":4,"hp":85,"status":"none"}
 {"line":649,"op":"print","text":"Go! Jolteon!"}
 {"line":649,"op":"switchIn","side":"near","slot":4,"hp":99,"status":"none"}
+{"line":651,"op":"itemPopUp","side":"near","item":472}
 {"line":651,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":651,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":651,"op":"hp","side":"near","hp":100}
-{"line":651,"op":"print","text":"Jolteon restored a little HP using its Leftovers!"}
+{"line":652,"op":"itemPopUp","side":"far","item":472}
 {"line":652,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":652,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":652,"op":"hp","side":"far","hp":91}
-{"line":652,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
 {"line":654,"op":"turn","number":60}
 {"line":657,"op":"print","text":"KeshBa45 withdrew Starmie!"}
 {"line":657,"op":"withdraw","side":"far"}
@@ -841,9 +905,10 @@
 {"line":672,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":672,"op":"hp","side":"far","hp":93}
 {"line":672,"op":"print","text":"It's not very effective…"}
+{"line":674,"op":"itemPopUp","side":"far","item":472}
 {"line":674,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":674,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":674,"op":"hp","side":"far","hp":99}
-{"line":674,"op":"print","text":"The opposing Salamence restored a little HP using its Leftovers!"}
 {"line":676,"op":"turn","number":62}
 {"line":679,"op":"print","text":"Charizard, come back!"}
 {"line":679,"op":"withdraw","side":"near"}
@@ -854,12 +919,14 @@
 {"line":682,"op":"hit","side":"near","effectiveness":"super"}
 {"line":682,"op":"hp","side":"near","hp":38}
 {"line":682,"op":"print","text":"It's super effective!"}
+{"line":684,"op":"itemPopUp","side":"far","item":472}
 {"line":684,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":684,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":684,"op":"hp","side":"far","hp":100}
-{"line":684,"op":"print","text":"The opposing Salamence restored a little HP using its Leftovers!"}
+{"line":685,"op":"itemPopUp","side":"near","item":472}
 {"line":685,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":685,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":685,"op":"hp","side":"near","hp":45}
-{"line":685,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":687,"op":"turn","number":63}
 {"line":690,"op":"print","text":"Suicune, come back!"}
 {"line":690,"op":"withdraw","side":"near"}
@@ -869,9 +936,10 @@
 {"line":691,"op":"move","user":"far","target":"near","move":237}
 {"line":692,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":692,"op":"hp","side":"near","hp":71}
+{"line":694,"op":"itemPopUp","side":"near","item":472}
 {"line":694,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":694,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":694,"op":"hp","side":"near","hp":77}
-{"line":694,"op":"print","text":"Jolteon restored a little HP using its Leftovers!"}
 {"line":696,"op":"turn","number":64}
 {"line":699,"op":"print","text":"KeshBa45 withdrew Salamence!"}
 {"line":699,"op":"withdraw","side":"far"}
@@ -882,9 +950,10 @@
 {"line":701,"op":"anim","side":"far","anim":"statusPrz"}
 {"line":701,"op":"print","text":"The opposing Celebi is paralyzed, so it may be unable to move!"}
 {"line":701,"op":"status","side":"far","slot":2,"status":"par"}
+{"line":703,"op":"itemPopUp","side":"near","item":472}
 {"line":703,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":703,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":703,"op":"hp","side":"near","hp":84}
-{"line":703,"op":"print","text":"Jolteon restored a little HP using its Leftovers!"}
 {"line":705,"op":"turn","number":65}
 {"line":708,"op":"print","text":"Jolteon used Baton Pass!"}
 {"line":708,"op":"move","user":"near","target":"near","move":226}
@@ -893,9 +962,10 @@
 {"line":711,"op":"switchIn","side":"near","slot":0,"hp":45,"status":"none"}
 {"line":712,"op":"print","text":"The opposing Celebi couldn't move because it's paralyzed!"}
 {"line":712,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":714,"op":"itemPopUp","side":"near","item":472}
 {"line":714,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":714,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":714,"op":"hp","side":"near","hp":51}
-{"line":714,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":716,"op":"turn","number":66}
 {"line":719,"op":"print","text":"Suicune used Substitute!"}
 {"line":719,"op":"move","user":"near","target":"near","move":164}
@@ -904,9 +974,10 @@
 {"line":720,"op":"print","text":"Suicune put in a substitute!"}
 {"line":722,"op":"print","text":"The opposing Celebi couldn't move because it's paralyzed!"}
 {"line":722,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":724,"op":"itemPopUp","side":"near","item":472}
 {"line":724,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":724,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":724,"op":"hp","side":"near","hp":32}
-{"line":724,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":726,"op":"turn","number":67}
 {"line":729,"op":"print","text":"Suicune used Rest!"}
 {"line":729,"op":"move","user":"near","target":"near","move":156}
@@ -929,9 +1000,10 @@
 {"line":743,"op":"hit","side":"near","effectiveness":"super"}
 {"line":743,"op":"hp","side":"near","hp":62}
 {"line":743,"op":"print","text":"It's super effective!"}
+{"line":745,"op":"itemPopUp","side":"near","item":472}
 {"line":745,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":745,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":745,"op":"hp","side":"near","hp":68}
-{"line":745,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":747,"op":"turn","number":69}
 {"line":750,"op":"print","text":"Suicune is fast asleep."}
 {"line":750,"op":"anim","side":"near","anim":"statusSlp"}
@@ -940,9 +1012,10 @@
 {"line":753,"op":"hit","side":"near","effectiveness":"super"}
 {"line":753,"op":"hp","side":"near","hp":29}
 {"line":753,"op":"print","text":"It's super effective!"}
+{"line":755,"op":"itemPopUp","side":"near","item":472}
 {"line":755,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":755,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":755,"op":"hp","side":"near","hp":36}
-{"line":755,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":757,"op":"turn","number":70}
 {"line":760,"op":"print","text":"Suicune woke up!"}
 {"line":760,"op":"status","side":"near","slot":0,"status":"none"}
@@ -955,9 +1028,10 @@
 {"line":764,"op":"print","text":"The opposing Celebi used Perish Song!"}
 {"line":764,"op":"move","user":"far","target":"far","move":195}
 {"line":767,"op":"print","text":"All Pokémon that heard the song will faint in three turns!"}
+{"line":769,"op":"itemPopUp","side":"near","item":472}
 {"line":769,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":769,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":769,"op":"hp","side":"near","hp":42}
-{"line":769,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":770,"op":"print","text":"Suicune's perish count fell to 3!"}
 {"line":771,"op":"print","text":"The opposing Celebi's perish count fell to 3!"}
 {"line":773,"op":"turn","number":71}
@@ -974,9 +1048,10 @@
 {"line":780,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"one"}
 {"line":780,"op":"print","text":"Cloyster's Attack fell!"}
 {"line":779,"op":"ability","side":"far","ability":22,"show":false}
+{"line":782,"op":"itemPopUp","side":"near","item":472}
 {"line":782,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":782,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":782,"op":"hp","side":"near","hp":90}
-{"line":782,"op":"print","text":"Cloyster restored a little HP using its Leftovers!"}
 {"line":784,"op":"turn","number":72}
 {"line":787,"op":"print","text":"Cloyster, come back!"}
 {"line":787,"op":"withdraw","side":"near"}
@@ -986,9 +1061,10 @@
 {"line":788,"op":"move","user":"far","target":"near","move":337}
 {"line":789,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":789,"op":"hp","side":"near","hp":30}
+{"line":791,"op":"itemPopUp","side":"near","item":472}
 {"line":791,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":791,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":791,"op":"hp","side":"near","hp":36}
-{"line":791,"op":"print","text":"Jolteon restored a little HP using its Leftovers!"}
 {"line":793,"op":"turn","number":73}
 {"line":796,"op":"print","text":"KeshBa45 withdrew Salamence!"}
 {"line":796,"op":"withdraw","side":"far"}
@@ -999,9 +1075,10 @@
 {"line":798,"op":"anim","side":"far","anim":"statusPrz"}
 {"line":798,"op":"print","text":"The opposing Celebi is paralyzed, so it may be unable to move!"}
 {"line":798,"op":"status","side":"far","slot":2,"status":"par"}
+{"line":800,"op":"itemPopUp","side":"near","item":472}
 {"line":800,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":800,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":800,"op":"hp","side":"near","hp":42}
-{"line":800,"op":"print","text":"Jolteon restored a little HP using its Leftovers!"}
 {"line":802,"op":"turn","number":74}
 {"line":805,"op":"print","text":"Jolteon used Baton Pass!"}
 {"line":805,"op":"move","user":"near","target":"near","move":226}
@@ -1028,9 +1105,10 @@
 {"line":821,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"one"}
 {"line":821,"op":"print","text":"Suicune's Attack fell!"}
 {"line":820,"op":"ability","side":"far","ability":22,"show":false}
+{"line":823,"op":"itemPopUp","side":"near","item":472}
 {"line":823,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":823,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":823,"op":"hp","side":"near","hp":48}
-{"line":823,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":825,"op":"turn","number":76}
 {"line":828,"op":"print","text":"The opposing Salamence used Dragon Claw!"}
 {"line":828,"op":"move","user":"far","target":"near","move":337}
@@ -1080,9 +1158,10 @@
 {"line":866,"op":"hit","side":"near","effectiveness":"super"}
 {"line":866,"op":"hp","side":"near","hp":52}
 {"line":866,"op":"print","text":"It's super effective!"}
+{"line":868,"op":"itemPopUp","side":"near","item":472}
 {"line":868,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":868,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":868,"op":"hp","side":"near","hp":58}
-{"line":868,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":870,"op":"turn","number":81}
 {"line":873,"op":"print","text":"KeshBa45 withdrew Salamence!"}
 {"line":873,"op":"withdraw","side":"far"}
@@ -1103,9 +1182,10 @@
 {"line":885,"op":"print","text":"It's super effective!"}
 {"line":886,"op":"print","text":"Suicune is fast asleep."}
 {"line":886,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":888,"op":"itemPopUp","side":"near","item":472}
 {"line":888,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":888,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":888,"op":"hp","side":"near","hp":72}
-{"line":888,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":890,"op":"turn","number":83}
 {"line":893,"op":"print","text":"The opposing Celebi used Hidden Power!"}
 {"line":893,"op":"move","user":"far","target":"near","move":237}
@@ -1114,9 +1194,10 @@
 {"line":895,"op":"print","text":"It's super effective!"}
 {"line":896,"op":"print","text":"Suicune is fast asleep."}
 {"line":896,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":898,"op":"itemPopUp","side":"near","item":472}
 {"line":898,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":898,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":898,"op":"hp","side":"near","hp":40}
-{"line":898,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":900,"op":"turn","number":84}
 {"line":903,"op":"print","text":"The opposing Celebi used Hidden Power!"}
 {"line":903,"op":"move","user":"far","target":"near","move":237}
@@ -1168,9 +1249,10 @@
 {"line":941,"op":"move","user":"far","target":"near","move":69}
 {"line":942,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":942,"op":"hp","side":"near","hp":76}
+{"line":944,"op":"itemPopUp","side":"near","item":472}
 {"line":944,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":944,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":944,"op":"hp","side":"near","hp":82}
-{"line":944,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":946,"op":"turn","number":89}
 {"line":949,"op":"print","text":"Suicune woke up!"}
 {"line":949,"op":"status","side":"near","slot":0,"status":"none"}
@@ -1183,9 +1265,10 @@
 {"line":953,"op":"move","user":"far","target":"near","move":69}
 {"line":954,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":954,"op":"print","text":"The substitute took damage for Suicune!"}
+{"line":956,"op":"itemPopUp","side":"near","item":472}
 {"line":956,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":956,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":956,"op":"hp","side":"near","hp":63}
-{"line":956,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":958,"op":"turn","number":90}
 {"line":961,"op":"print","text":"KeshBa45 withdrew Blissey!"}
 {"line":961,"op":"withdraw","side":"far"}
@@ -1197,9 +1280,10 @@
 {"line":963,"op":"print","text":"Suicune's Sp. Atk rose!"}
 {"line":964,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
 {"line":964,"op":"print","text":"Suicune's Sp. Def rose!"}
+{"line":966,"op":"itemPopUp","side":"near","item":472}
 {"line":966,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":966,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":966,"op":"hp","side":"near","hp":69}
-{"line":966,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":968,"op":"turn","number":91}
 {"line":971,"op":"print","text":"The opposing Celebi used Perish Song!"}
 {"line":971,"op":"move","user":"far","target":"far","move":195}
@@ -1210,9 +1294,10 @@
 {"line":976,"op":"print","text":"Suicune's Sp. Atk rose!"}
 {"line":977,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
 {"line":977,"op":"print","text":"Suicune's Sp. Def rose!"}
+{"line":979,"op":"itemPopUp","side":"near","item":472}
 {"line":979,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":979,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":979,"op":"hp","side":"near","hp":75}
-{"line":979,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":980,"op":"print","text":"The opposing Celebi's perish count fell to 3!"}
 {"line":981,"op":"print","text":"Suicune's perish count fell to 3!"}
 {"line":983,"op":"turn","number":92}
@@ -1224,9 +1309,10 @@
 {"line":987,"op":"withdraw","side":"near"}
 {"line":987,"op":"print","text":"Go! Cloyster!"}
 {"line":987,"op":"switchIn","side":"near","slot":3,"hp":90,"status":"none"}
+{"line":989,"op":"itemPopUp","side":"near","item":472}
 {"line":989,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":989,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":989,"op":"hp","side":"near","hp":96}
-{"line":989,"op":"print","text":"Cloyster restored a little HP using its Leftovers!"}
 {"line":991,"op":"turn","number":93}
 {"line":994,"op":"print","text":"The opposing Salamence used Dragon Claw!"}
 {"line":994,"op":"move","user":"far","target":"near","move":337}
@@ -1244,9 +1330,10 @@
 {"line":1002,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
 {"line":1003,"op":"print","text":"Go! Jolteon!"}
 {"line":1003,"op":"switchIn","side":"near","slot":4,"hp":42,"status":"none"}
+{"line":1005,"op":"itemPopUp","side":"near","item":472}
 {"line":1005,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1005,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1005,"op":"hp","side":"near","hp":49}
-{"line":1005,"op":"print","text":"Jolteon restored a little HP using its Leftovers!"}
 {"line":1007,"op":"turn","number":94}
 {"line":1010,"op":"print","text":"Jolteon used Baton Pass!"}
 {"line":1010,"op":"move","user":"near","target":"near","move":226}
@@ -1264,9 +1351,10 @@
 {"line":1021,"op":"switchIn","side":"near","slot":0,"hp":75,"status":"none"}
 {"line":1022,"op":"print","text":"The opposing Blissey used Wish!"}
 {"line":1022,"op":"move","user":"far","target":"far","move":273}
+{"line":1024,"op":"itemPopUp","side":"near","item":472}
 {"line":1024,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1024,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1024,"op":"hp","side":"near","hp":82}
-{"line":1024,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":1026,"op":"turn","number":96}
 {"line":1029,"op":"print","text":"Suicune used Substitute!"}
 {"line":1029,"op":"move","user":"near","target":"near","move":164}
@@ -1278,9 +1366,10 @@
 {"line":1034,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":1034,"op":"print","text":"The substitute took damage for Suicune!"}
 {"line":1034,"op":"print","text":"It's not very effective…"}
+{"line":1036,"op":"itemPopUp","side":"near","item":472}
 {"line":1036,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1036,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1036,"op":"hp","side":"near","hp":63}
-{"line":1036,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":1038,"op":"turn","number":97}
 {"line":1041,"op":"print","text":"KeshBa45 withdrew Blissey!"}
 {"line":1041,"op":"withdraw","side":"far"}
@@ -1292,9 +1381,10 @@
 {"line":1043,"op":"print","text":"Suicune's Sp. Atk rose!"}
 {"line":1044,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
 {"line":1044,"op":"print","text":"Suicune's Sp. Def rose!"}
+{"line":1046,"op":"itemPopUp","side":"near","item":472}
 {"line":1046,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1046,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1046,"op":"hp","side":"near","hp":69}
-{"line":1046,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":1048,"op":"turn","number":98}
 {"line":1051,"op":"print","text":"KeshBa45 withdrew Celebi!"}
 {"line":1051,"op":"withdraw","side":"far"}
@@ -1306,9 +1396,10 @@
 {"line":1053,"op":"print","text":"Suicune's Sp. Atk rose!"}
 {"line":1054,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
 {"line":1054,"op":"print","text":"Suicune's Sp. Def rose!"}
+{"line":1056,"op":"itemPopUp","side":"near","item":472}
 {"line":1056,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1056,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1056,"op":"hp","side":"near","hp":75}
-{"line":1056,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":1058,"op":"turn","number":99}
 {"line":1061,"op":"print","text":"Suicune used Calm Mind!"}
 {"line":1061,"op":"move","user":"near","target":"near","move":347}
@@ -1323,9 +1414,10 @@
 {"line":1065,"op":"anim","side":"near","anim":"substituteFade"}
 {"line":1065,"op":"print","text":"Suicune's substitute faded!"}
 {"line":1065,"op":"volatile","side":"near","volatile":"substitute","on":false}
+{"line":1067,"op":"itemPopUp","side":"near","item":472}
 {"line":1067,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1067,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1067,"op":"hp","side":"near","hp":81}
-{"line":1067,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":1069,"op":"turn","number":100}
 {"line":1072,"op":"print","text":"Suicune used Substitute!"}
 {"line":1072,"op":"move","user":"near","target":"near","move":164}
@@ -1336,9 +1428,10 @@
 {"line":1075,"op":"move","user":"far","target":"near","move":69}
 {"line":1076,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":1076,"op":"print","text":"The substitute took damage for Suicune!"}
+{"line":1078,"op":"itemPopUp","side":"near","item":472}
 {"line":1078,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1078,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1078,"op":"hp","side":"near","hp":63}
-{"line":1078,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":1080,"op":"turn","number":101}
 {"line":1083,"op":"print","text":"Suicune used Calm Mind!"}
 {"line":1083,"op":"move","user":"near","target":"near","move":347}
@@ -1353,9 +1446,10 @@
 {"line":1087,"op":"anim","side":"near","anim":"substituteFade"}
 {"line":1087,"op":"print","text":"Suicune's substitute faded!"}
 {"line":1087,"op":"volatile","side":"near","volatile":"substitute","on":false}
+{"line":1089,"op":"itemPopUp","side":"near","item":472}
 {"line":1089,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1089,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1089,"op":"hp","side":"near","hp":69}
-{"line":1089,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":1091,"op":"turn","number":102}
 {"line":1094,"op":"print","text":"Suicune used Substitute!"}
 {"line":1094,"op":"move","user":"near","target":"near","move":164}
@@ -1366,9 +1460,10 @@
 {"line":1097,"op":"move","user":"far","target":"near","move":69}
 {"line":1098,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":1098,"op":"print","text":"The substitute took damage for Suicune!"}
+{"line":1100,"op":"itemPopUp","side":"near","item":472}
 {"line":1100,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1100,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1100,"op":"hp","side":"near","hp":50}
-{"line":1100,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":1102,"op":"turn","number":103}
 {"line":1105,"op":"print","text":"Suicune used Calm Mind!"}
 {"line":1105,"op":"move","user":"near","target":"near","move":347}
@@ -1383,9 +1478,10 @@
 {"line":1109,"op":"anim","side":"near","anim":"substituteFade"}
 {"line":1109,"op":"print","text":"Suicune's substitute faded!"}
 {"line":1109,"op":"volatile","side":"near","volatile":"substitute","on":false}
+{"line":1111,"op":"itemPopUp","side":"near","item":472}
 {"line":1111,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1111,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1111,"op":"hp","side":"near","hp":56}
-{"line":1111,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":1113,"op":"turn","number":104}
 {"line":1116,"op":"print","text":"Suicune used Substitute!"}
 {"line":1116,"op":"move","user":"near","target":"near","move":164}
@@ -1396,9 +1492,10 @@
 {"line":1119,"op":"move","user":"far","target":"near","move":69}
 {"line":1120,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":1120,"op":"print","text":"The substitute took damage for Suicune!"}
+{"line":1122,"op":"itemPopUp","side":"near","item":472}
 {"line":1122,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1122,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1122,"op":"hp","side":"near","hp":37}
-{"line":1122,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":1124,"op":"turn","number":105}
 {"line":1127,"op":"print","text":"Suicune used Calm Mind!"}
 {"line":1127,"op":"move","user":"near","target":"near","move":347}
@@ -1413,9 +1510,10 @@
 {"line":1131,"op":"anim","side":"near","anim":"substituteFade"}
 {"line":1131,"op":"print","text":"Suicune's substitute faded!"}
 {"line":1131,"op":"volatile","side":"near","volatile":"substitute","on":false}
+{"line":1133,"op":"itemPopUp","side":"near","item":472}
 {"line":1133,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1133,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1133,"op":"hp","side":"near","hp":44}
-{"line":1133,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":1135,"op":"turn","number":106}
 {"line":1138,"op":"print","text":"Suicune used Substitute!"}
 {"line":1138,"op":"move","user":"near","target":"near","move":164}
@@ -1426,9 +1524,10 @@
 {"line":1141,"op":"move","user":"far","target":"near","move":69}
 {"line":1142,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":1142,"op":"print","text":"The substitute took damage for Suicune!"}
+{"line":1144,"op":"itemPopUp","side":"near","item":472}
 {"line":1144,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1144,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1144,"op":"hp","side":"near","hp":25}
-{"line":1144,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":1146,"op":"turn","number":107}
 {"line":1149,"op":"print","text":"Suicune used Surf!"}
 {"line":1149,"op":"move","user":"near","target":"far","move":57}
@@ -1441,12 +1540,14 @@
 {"line":1152,"op":"anim","side":"near","anim":"substituteFade"}
 {"line":1152,"op":"print","text":"Suicune's substitute faded!"}
 {"line":1152,"op":"volatile","side":"near","volatile":"substitute","on":false}
+{"line":1154,"op":"itemPopUp","side":"near","item":472}
 {"line":1154,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1154,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1154,"op":"hp","side":"near","hp":31}
-{"line":1154,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
+{"line":1155,"op":"itemPopUp","side":"far","item":472}
 {"line":1155,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1155,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":1155,"op":"hp","side":"far","hp":58}
-{"line":1155,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":1157,"op":"turn","number":108}
 {"line":1160,"op":"print","text":"KeshBa45 withdrew Blissey!"}
 {"line":1160,"op":"withdraw","side":"far"}
@@ -1457,9 +1558,10 @@
 {"line":1162,"op":"volatile","side":"near","volatile":"substitute","on":true}
 {"line":1163,"op":"hp","side":"near","hp":6}
 {"line":1162,"op":"print","text":"Suicune put in a substitute!"}
+{"line":1165,"op":"itemPopUp","side":"near","item":472}
 {"line":1165,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1165,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1165,"op":"hp","side":"near","hp":12}
-{"line":1165,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":1167,"op":"turn","number":109}
 {"line":1170,"op":"print","text":"The opposing Celebi used Hidden Power!"}
 {"line":1170,"op":"move","user":"far","target":"near","move":237}
@@ -1483,9 +1585,10 @@
 {"line":1184,"op":"print","text":"It's super effective!"}
 {"line":1185,"op":"print","text":"Suicune is fast asleep."}
 {"line":1185,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1187,"op":"itemPopUp","side":"near","item":472}
 {"line":1187,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1187,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1187,"op":"hp","side":"near","hp":97}
-{"line":1187,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":1189,"op":"turn","number":111}
 {"line":1192,"op":"print","text":"The opposing Celebi used Hidden Power!"}
 {"line":1192,"op":"move","user":"far","target":"near","move":237}
@@ -1495,9 +1598,10 @@
 {"line":1195,"op":"print","text":"It's super effective!"}
 {"line":1196,"op":"print","text":"Suicune is fast asleep."}
 {"line":1196,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1198,"op":"itemPopUp","side":"near","item":472}
 {"line":1198,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1198,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1198,"op":"hp","side":"near","hp":24}
-{"line":1198,"op":"print","text":"Suicune restored a little HP using its Leftovers!"}
 {"line":1200,"op":"turn","number":112}
 {"line":1203,"op":"print","text":"The opposing Celebi used Hidden Power!"}
 {"line":1203,"op":"move","user":"far","target":"near","move":237}
@@ -1518,12 +1622,14 @@
 {"line":1217,"op":"withdraw","side":"far"}
 {"line":1217,"op":"print","text":"KeshBa45 sent out Blissey!"}
 {"line":1217,"op":"switchIn","side":"far","slot":1,"hp":58,"status":"none"}
+{"line":1219,"op":"itemPopUp","side":"near","item":472}
 {"line":1219,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1219,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1219,"op":"hp","side":"near","hp":55}
-{"line":1219,"op":"print","text":"Jolteon restored a little HP using its Leftovers!"}
+{"line":1220,"op":"itemPopUp","side":"far","item":472}
 {"line":1220,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1220,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":1220,"op":"hp","side":"far","hp":64}
-{"line":1220,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":1222,"op":"turn","number":114}
 {"line":1225,"op":"print","text":"Jolteon used Thunder Wave!"}
 {"line":1225,"op":"move","user":"near","target":"far","move":86}
@@ -1532,12 +1638,14 @@
 {"line":1226,"op":"status","side":"far","slot":1,"status":"par"}
 {"line":1227,"op":"print","text":"The opposing Blissey used Wish!"}
 {"line":1227,"op":"move","user":"far","target":"far","move":273}
+{"line":1229,"op":"itemPopUp","side":"near","item":472}
 {"line":1229,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1229,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1229,"op":"hp","side":"near","hp":61}
-{"line":1229,"op":"print","text":"Jolteon restored a little HP using its Leftovers!"}
+{"line":1230,"op":"itemPopUp","side":"far","item":472}
 {"line":1230,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1230,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":1230,"op":"hp","side":"far","hp":70}
-{"line":1230,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":1232,"op":"turn","number":115}
 {"line":1235,"op":"print","text":"Jolteon used Baton Pass!"}
 {"line":1235,"op":"move","user":"near","target":"near","move":226}
@@ -1566,9 +1674,10 @@
 {"line":1249,"op":"print","text":"The opposing Blissey is buffeted by the sandstorm!"}
 {"line":1249,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":1249,"op":"hp","side":"far","hp":94}
+{"line":1250,"op":"itemPopUp","side":"far","item":472}
 {"line":1250,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1250,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":1250,"op":"hp","side":"far","hp":100}
-{"line":1250,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":1252,"op":"turn","number":116}
 {"line":1255,"op":"status","side":"far","slot":1,"status":"none"}
 {"line":1256,"op":"print","text":"KeshBa45 withdrew Blissey!"}
@@ -1586,9 +1695,10 @@
 {"line":1262,"op":"print","text":"The opposing Starmie is buffeted by the sandstorm!"}
 {"line":1262,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":1262,"op":"hp","side":"far","hp":85}
+{"line":1263,"op":"itemPopUp","side":"far","item":472}
 {"line":1263,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1263,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":1263,"op":"hp","side":"far","hp":91}
-{"line":1263,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
 {"line":1265,"op":"turn","number":117}
 {"line":1268,"op":"print","text":"The opposing Starmie used Thunder Wave!"}
 {"line":1268,"op":"move","user":"far","target":"near","move":86}
@@ -1604,9 +1714,10 @@
 {"line":1274,"op":"print","text":"The opposing Starmie is buffeted by the sandstorm!"}
 {"line":1274,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":1274,"op":"hp","side":"far","hp":15}
+{"line":1275,"op":"itemPopUp","side":"far","item":472}
 {"line":1275,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1275,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":1275,"op":"hp","side":"far","hp":21}
-{"line":1275,"op":"print","text":"The opposing Starmie restored a little HP using its Leftovers!"}
 {"line":1277,"op":"turn","number":118}
 {"line":1280,"op":"print","text":"The opposing Starmie used Surf!"}
 {"line":1280,"op":"move","user":"far","target":"near","move":57}
@@ -1626,12 +1737,14 @@
 {"line":1291,"op":"print","text":"The opposing Celebi is buffeted by the sandstorm!"}
 {"line":1291,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":1291,"op":"hp","side":"far","hp":94}
+{"line":1292,"op":"itemPopUp","side":"far","item":472}
 {"line":1292,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1292,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":1292,"op":"hp","side":"far","hp":100}
-{"line":1292,"op":"print","text":"The opposing Celebi restored a little HP using its Leftovers!"}
+{"line":1293,"op":"itemPopUp","side":"near","item":472}
 {"line":1293,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1293,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1293,"op":"hp","side":"near","hp":43}
-{"line":1293,"op":"print","text":"Tyranitar restored a little HP using its Leftovers!"}
 {"line":1295,"op":"turn","number":119}
 {"line":1298,"op":"print","text":"Tyranitar, come back!"}
 {"line":1298,"op":"withdraw","side":"near"}
@@ -1649,12 +1762,14 @@
 {"line":1304,"op":"print","text":"The opposing Celebi is buffeted by the sandstorm!"}
 {"line":1304,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":1304,"op":"hp","side":"far","hp":94}
+{"line":1305,"op":"itemPopUp","side":"near","item":472}
 {"line":1305,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1305,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1305,"op":"hp","side":"near","hp":26}
-{"line":1305,"op":"print","text":"Jolteon restored a little HP using its Leftovers!"}
+{"line":1306,"op":"itemPopUp","side":"far","item":472}
 {"line":1306,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1306,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":1306,"op":"hp","side":"far","hp":100}
-{"line":1306,"op":"print","text":"The opposing Celebi restored a little HP using its Leftovers!"}
 {"line":1308,"op":"turn","number":120}
 {"line":1311,"op":"print","text":"KeshBa45 withdrew Celebi!"}
 {"line":1311,"op":"withdraw","side":"far"}
@@ -1673,12 +1788,14 @@
 {"line":1317,"op":"print","text":"The opposing Blissey is buffeted by the sandstorm!"}
 {"line":1317,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":1317,"op":"hp","side":"far","hp":94}
+{"line":1318,"op":"itemPopUp","side":"near","item":472}
 {"line":1318,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1318,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1318,"op":"hp","side":"near","hp":26}
-{"line":1318,"op":"print","text":"Jolteon restored a little HP using its Leftovers!"}
+{"line":1319,"op":"itemPopUp","side":"far","item":472}
 {"line":1319,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1319,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":1319,"op":"hp","side":"far","hp":100}
-{"line":1319,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":1321,"op":"turn","number":121}
 {"line":1324,"op":"status","side":"far","slot":1,"status":"none"}
 {"line":1325,"op":"print","text":"KeshBa45 withdrew Blissey!"}
@@ -1698,12 +1815,14 @@
 {"line":1332,"op":"print","text":"The opposing Celebi is buffeted by the sandstorm!"}
 {"line":1332,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":1332,"op":"hp","side":"far","hp":76}
+{"line":1333,"op":"itemPopUp","side":"near","item":472}
 {"line":1333,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1333,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1333,"op":"hp","side":"near","hp":26}
-{"line":1333,"op":"print","text":"Jolteon restored a little HP using its Leftovers!"}
+{"line":1334,"op":"itemPopUp","side":"far","item":472}
 {"line":1334,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1334,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":1334,"op":"hp","side":"far","hp":82}
-{"line":1334,"op":"print","text":"The opposing Celebi restored a little HP using its Leftovers!"}
 {"line":1336,"op":"turn","number":122}
 {"line":1339,"op":"print","text":"Jolteon used Thunder Wave!"}
 {"line":1339,"op":"move","user":"near","target":"far","move":86}
@@ -1721,16 +1840,18 @@
 {"line":1346,"op":"print","text":"The opposing Celebi is buffeted by the sandstorm!"}
 {"line":1346,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":1346,"op":"hp","side":"far","hp":76}
+{"line":1347,"op":"itemPopUp","side":"near","item":472}
 {"line":1347,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1347,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1347,"op":"hp","side":"near","hp":26}
-{"line":1347,"op":"print","text":"Jolteon restored a little HP using its Leftovers!"}
 {"line":1348,"op":"anim","side":"near","anim":"leechSeedDrain"}
 {"line":1348,"op":"hp","side":"near","hp":13}
 {"line":1348,"op":"print","text":"Jolteon's health is sapped by Leech Seed!"}
 {"line":1349,"op":"hp","side":"far","hp":84}
+{"line":1350,"op":"itemPopUp","side":"far","item":472}
 {"line":1350,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1350,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":1350,"op":"hp","side":"far","hp":91}
-{"line":1350,"op":"print","text":"The opposing Celebi restored a little HP using its Leftovers!"}
 {"line":1352,"op":"turn","number":123}
 {"line":1355,"op":"status","side":"far","slot":2,"status":"none"}
 {"line":1356,"op":"print","text":"KeshBa45 withdrew Celebi!"}
@@ -1747,12 +1868,14 @@
 {"line":1363,"op":"print","text":"The opposing Blissey is buffeted by the sandstorm!"}
 {"line":1363,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":1363,"op":"hp","side":"far","hp":94}
+{"line":1364,"op":"itemPopUp","side":"far","item":472}
 {"line":1364,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1364,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":1364,"op":"hp","side":"far","hp":100}
-{"line":1364,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
+{"line":1365,"op":"itemPopUp","side":"near","item":472}
 {"line":1365,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1365,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1365,"op":"hp","side":"near","hp":49}
-{"line":1365,"op":"print","text":"Tyranitar restored a little HP using its Leftovers!"}
 {"line":1366,"op":"anim","side":"near","anim":"leechSeedDrain"}
 {"line":1366,"op":"hp","side":"near","hp":37}
 {"line":1366,"op":"print","text":"Tyranitar's health is sapped by Leech Seed!"}
@@ -1774,12 +1897,14 @@
 {"line":1380,"op":"print","text":"The opposing Blissey is buffeted by the sandstorm!"}
 {"line":1380,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":1380,"op":"hp","side":"far","hp":94}
+{"line":1381,"op":"itemPopUp","side":"far","item":472}
 {"line":1381,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1381,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":1381,"op":"hp","side":"far","hp":100}
-{"line":1381,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
+{"line":1382,"op":"itemPopUp","side":"near","item":472}
 {"line":1382,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1382,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1382,"op":"hp","side":"near","hp":43}
-{"line":1382,"op":"print","text":"Tyranitar restored a little HP using its Leftovers!"}
 {"line":1384,"op":"turn","number":125}
 {"line":1387,"op":"print","text":"The opposing Blissey used Seismic Toss!"}
 {"line":1387,"op":"move","user":"far","target":"near","move":69}
@@ -1792,12 +1917,14 @@
 {"line":1392,"op":"print","text":"The opposing Blissey is buffeted by the sandstorm!"}
 {"line":1392,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":1392,"op":"hp","side":"far","hp":94}
+{"line":1393,"op":"itemPopUp","side":"far","item":472}
 {"line":1393,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1393,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":1393,"op":"hp","side":"far","hp":100}
-{"line":1393,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
+{"line":1394,"op":"itemPopUp","side":"near","item":472}
 {"line":1394,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1394,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":1394,"op":"hp","side":"near","hp":23}
-{"line":1394,"op":"print","text":"Tyranitar restored a little HP using its Leftovers!"}
 {"line":1396,"op":"turn","number":126}
 {"line":1401,"op":"print","text":"The opposing Blissey used Seismic Toss!"}
 {"line":1401,"op":"move","user":"far","target":"near","move":69}

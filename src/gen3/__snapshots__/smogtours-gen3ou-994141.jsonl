@@ -1,4 +1,4 @@
-{"length":19946,"crc32":"5b1f521b","trainers":{"near":{"name":"SoggyBagel64","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Nametab","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":373,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Salamence"},{"species":51,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Dugtrio"}],"far":[{"species":286,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Breloom"},{"species":385,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Jirachi"},{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"},{"species":205,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Forretress"},{"species":51,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Dugtrio"},{"species":134,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Vaporeon"}]}}
+{"length":15481,"crc32":"593b8073","trainers":{"near":{"name":"SoggyBagel64","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Nametab","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":373,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Salamence"},{"species":51,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Dugtrio"}],"far":[{"species":286,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Breloom"},{"species":385,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Jirachi"},{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"},{"species":205,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Forretress"},{"species":51,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Dugtrio"},{"species":134,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Vaporeon"}]}}
 {"line":23,"op":"intro"}
 {"line":23,"op":"print","text":"You are challenged by Nametab!"}
 {"line":25,"op":"print","text":"Nametab sent out Breloom!"}
@@ -15,9 +15,10 @@
 {"line":33,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":33,"op":"hp","side":"far","hp":89}
 {"line":33,"op":"print","text":"It's not very effective…"}
+{"line":35,"op":"itemPopUp","side":"far","item":472}
 {"line":35,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":35,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":35,"op":"hp","side":"far","hp":95}
-{"line":35,"op":"print","text":"The opposing Jirachi restored a little HP using its Leftovers!"}
 {"line":37,"op":"turn","number":2}
 {"line":40,"op":"print","text":"Starmie used Hydro Pump!"}
 {"line":40,"op":"move","user":"near","target":"far","move":56}
@@ -29,9 +30,10 @@
 {"line":43,"op":"print","text":"The opposing Jirachi's Sp. Atk rose!"}
 {"line":44,"op":"stat","side":"far","stat":"spd","stages":1,"arrows":"none"}
 {"line":44,"op":"print","text":"The opposing Jirachi's Sp. Def rose!"}
+{"line":46,"op":"itemPopUp","side":"far","item":472}
 {"line":46,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":46,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":46,"op":"hp","side":"far","hp":59}
-{"line":46,"op":"print","text":"The opposing Jirachi restored a little HP using its Leftovers!"}
 {"line":48,"op":"turn","number":3}
 {"line":51,"op":"print","text":"Starmie, come back!"}
 {"line":51,"op":"withdraw","side":"near"}
@@ -41,12 +43,14 @@
 {"line":52,"op":"move","user":"far","target":"near","move":85}
 {"line":53,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":53,"op":"hp","side":"near","hp":87}
+{"line":55,"op":"itemPopUp","side":"far","item":472}
 {"line":55,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":55,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":55,"op":"hp","side":"far","hp":65}
-{"line":55,"op":"print","text":"The opposing Jirachi restored a little HP using its Leftovers!"}
+{"line":56,"op":"itemPopUp","side":"near","item":472}
 {"line":56,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":56,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":56,"op":"hp","side":"near","hp":93}
-{"line":56,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":58,"op":"turn","number":4}
 {"line":61,"op":"print","text":"The opposing Jirachi used Substitute!"}
 {"line":61,"op":"move","user":"far","target":"far","move":164}
@@ -57,12 +61,14 @@
 {"line":64,"op":"move","user":"near","target":"far","move":69}
 {"line":65,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":65,"op":"print","text":"The substitute took damage for the opposing Jirachi!"}
+{"line":67,"op":"itemPopUp","side":"far","item":472}
 {"line":67,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":67,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":67,"op":"hp","side":"far","hp":46}
-{"line":67,"op":"print","text":"The opposing Jirachi restored a little HP using its Leftovers!"}
+{"line":68,"op":"itemPopUp","side":"near","item":472}
 {"line":68,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":68,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":68,"op":"hp","side":"near","hp":99}
-{"line":68,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":70,"op":"turn","number":5}
 {"line":73,"op":"print","text":"The opposing Jirachi used Ice Punch!"}
 {"line":73,"op":"move","user":"far","target":"near","move":8}
@@ -80,12 +86,14 @@
 {"line":78,"op":"anim","side":"far","anim":"substituteFade"}
 {"line":78,"op":"print","text":"The opposing Jirachi's substitute faded!"}
 {"line":78,"op":"volatile","side":"far","volatile":"substitute","on":false}
+{"line":80,"op":"itemPopUp","side":"far","item":472}
 {"line":80,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":80,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":80,"op":"hp","side":"far","hp":52}
-{"line":80,"op":"print","text":"The opposing Jirachi restored a little HP using its Leftovers!"}
+{"line":81,"op":"itemPopUp","side":"near","item":472}
 {"line":81,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":81,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":81,"op":"hp","side":"near","hp":95}
-{"line":81,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":83,"op":"turn","number":6}
 {"line":86,"op":"print","text":"The opposing Jirachi used Substitute!"}
 {"line":86,"op":"move","user":"far","target":"far","move":164}
@@ -96,12 +104,14 @@
 {"line":89,"op":"move","user":"near","target":"far","move":69}
 {"line":90,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":90,"op":"print","text":"The substitute took damage for the opposing Jirachi!"}
+{"line":92,"op":"itemPopUp","side":"far","item":472}
 {"line":92,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":92,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":92,"op":"hp","side":"far","hp":33}
-{"line":92,"op":"print","text":"The opposing Jirachi restored a little HP using its Leftovers!"}
+{"line":93,"op":"itemPopUp","side":"near","item":472}
 {"line":93,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":93,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":93,"op":"hp","side":"near","hp":100}
-{"line":93,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":95,"op":"turn","number":7}
 {"line":98,"op":"print","text":"The opposing Jirachi used Ice Punch!"}
 {"line":98,"op":"move","user":"far","target":"near","move":8}
@@ -114,12 +124,14 @@
 {"line":101,"op":"anim","side":"far","anim":"substituteFade"}
 {"line":101,"op":"print","text":"The opposing Jirachi's substitute faded!"}
 {"line":101,"op":"volatile","side":"far","volatile":"substitute","on":false}
+{"line":103,"op":"itemPopUp","side":"far","item":472}
 {"line":103,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":103,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":103,"op":"hp","side":"far","hp":40}
-{"line":103,"op":"print","text":"The opposing Jirachi restored a little HP using its Leftovers!"}
+{"line":104,"op":"itemPopUp","side":"near","item":472}
 {"line":104,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":104,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":104,"op":"hp","side":"near","hp":96}
-{"line":104,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":106,"op":"turn","number":8}
 {"line":109,"op":"print","text":"The opposing Jirachi used Substitute!"}
 {"line":109,"op":"move","user":"far","target":"far","move":164}
@@ -130,12 +142,14 @@
 {"line":112,"op":"move","user":"near","target":"far","move":69}
 {"line":113,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":113,"op":"print","text":"The substitute took damage for the opposing Jirachi!"}
+{"line":115,"op":"itemPopUp","side":"far","item":472}
 {"line":115,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":115,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":115,"op":"hp","side":"far","hp":21}
-{"line":115,"op":"print","text":"The opposing Jirachi restored a little HP using its Leftovers!"}
+{"line":116,"op":"itemPopUp","side":"near","item":472}
 {"line":116,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":116,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":116,"op":"hp","side":"near","hp":100}
-{"line":116,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":118,"op":"turn","number":9}
 {"line":121,"op":"print","text":"The opposing Jirachi used Ice Punch!"}
 {"line":121,"op":"move","user":"far","target":"near","move":8}
@@ -148,12 +162,14 @@
 {"line":124,"op":"anim","side":"far","anim":"substituteFade"}
 {"line":124,"op":"print","text":"The opposing Jirachi's substitute faded!"}
 {"line":124,"op":"volatile","side":"far","volatile":"substitute","on":false}
+{"line":126,"op":"itemPopUp","side":"far","item":472}
 {"line":126,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":126,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":126,"op":"hp","side":"far","hp":27}
-{"line":126,"op":"print","text":"The opposing Jirachi restored a little HP using its Leftovers!"}
+{"line":127,"op":"itemPopUp","side":"near","item":472}
 {"line":127,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":127,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":127,"op":"hp","side":"near","hp":95}
-{"line":127,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":129,"op":"turn","number":10}
 {"line":132,"op":"print","text":"The opposing Jirachi used Ice Punch!"}
 {"line":132,"op":"move","user":"far","target":"near","move":8}
@@ -164,12 +180,14 @@
 {"line":135,"op":"move","user":"near","target":"far","move":69}
 {"line":136,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":136,"op":"hp","side":"far","hp":2}
+{"line":138,"op":"itemPopUp","side":"far","item":472}
 {"line":138,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":138,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":138,"op":"hp","side":"far","hp":8}
-{"line":138,"op":"print","text":"The opposing Jirachi restored a little HP using its Leftovers!"}
+{"line":139,"op":"itemPopUp","side":"near","item":472}
 {"line":139,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":139,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":139,"op":"hp","side":"near","hp":80}
-{"line":139,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":141,"op":"turn","number":11}
 {"line":146,"op":"print","text":"Nametab withdrew Jirachi!"}
 {"line":146,"op":"withdraw","side":"far"}
@@ -179,12 +197,14 @@
 {"line":147,"op":"move","user":"near","target":"far","move":69}
 {"line":148,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":148,"op":"hp","side":"far","hp":63}
+{"line":150,"op":"itemPopUp","side":"far","item":472}
 {"line":150,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":150,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":150,"op":"hp","side":"far","hp":69}
-{"line":150,"op":"print","text":"The opposing Breloom restored a little HP using its Leftovers!"}
+{"line":151,"op":"itemPopUp","side":"near","item":472}
 {"line":151,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":151,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":151,"op":"hp","side":"near","hp":86}
-{"line":151,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":153,"op":"turn","number":12}
 {"line":156,"op":"anim","side":"far","anim":"focusPunchSetup"}
 {"line":156,"op":"print","text":"The opposing Breloom is tightening its focus!"}
@@ -197,12 +217,14 @@
 {"line":160,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":160,"op":"hp","side":"near","hp":74}
 {"line":160,"op":"print","text":"It's not very effective…"}
+{"line":162,"op":"itemPopUp","side":"far","item":472}
 {"line":162,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":162,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":162,"op":"hp","side":"far","hp":75}
-{"line":162,"op":"print","text":"The opposing Breloom restored a little HP using its Leftovers!"}
+{"line":163,"op":"itemPopUp","side":"near","item":472}
 {"line":163,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":163,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":163,"op":"hp","side":"near","hp":80}
-{"line":163,"op":"print","text":"Celebi restored a little HP using its Leftovers!"}
 {"line":165,"op":"turn","number":13}
 {"line":168,"op":"print","text":"Nametab withdrew Breloom!"}
 {"line":168,"op":"withdraw","side":"far"}
@@ -220,9 +242,10 @@
 {"line":174,"op":"print","text":"Celebi is buffeted by the sandstorm!"}
 {"line":174,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":174,"op":"hp","side":"near","hp":74}
+{"line":175,"op":"itemPopUp","side":"near","item":472}
 {"line":175,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":175,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":175,"op":"hp","side":"near","hp":80}
-{"line":175,"op":"print","text":"Celebi restored a little HP using its Leftovers!"}
 {"line":177,"op":"turn","number":14}
 {"line":185,"op":"print","text":"Nametab withdrew Tyranitar!"}
 {"line":185,"op":"withdraw","side":"far"}
@@ -236,16 +259,18 @@
 {"line":190,"op":"print","text":"Celebi is buffeted by the sandstorm!"}
 {"line":190,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":190,"op":"hp","side":"near","hp":74}
+{"line":191,"op":"itemPopUp","side":"far","item":472}
 {"line":191,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":191,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":191,"op":"hp","side":"far","hp":15}
-{"line":191,"op":"print","text":"The opposing Jirachi restored a little HP using its Leftovers!"}
 {"line":192,"op":"anim","side":"far","anim":"leechSeedDrain"}
 {"line":192,"op":"hp","side":"far","hp":2}
 {"line":192,"op":"print","text":"The opposing Jirachi's health is sapped by Leech Seed!"}
 {"line":193,"op":"hp","side":"near","hp":86}
+{"line":194,"op":"itemPopUp","side":"near","item":472}
 {"line":194,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":194,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":194,"op":"hp","side":"near","hp":93}
-{"line":194,"op":"print","text":"Celebi restored a little HP using its Leftovers!"}
 {"line":196,"op":"turn","number":15}
 {"line":200,"op":"print","text":"Nametab withdrew Jirachi!"}
 {"line":200,"op":"withdraw","side":"far"}
@@ -268,9 +293,10 @@
 {"line":212,"op":"print","text":"It's super effective!"}
 {"line":214,"op":"print","text":"The sandstorm is raging."}
 {"line":214,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":215,"op":"itemPopUp","side":"near","item":472}
 {"line":215,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":215,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":215,"op":"hp","side":"near","hp":44}
-{"line":215,"op":"print","text":"Skarmory restored a little HP using its Leftovers!"}
 {"line":217,"op":"turn","number":17}
 {"line":220,"op":"print","text":"Skarmory used Protect!"}
 {"line":220,"op":"move","user":"near","target":"near","move":182}
@@ -279,9 +305,10 @@
 {"line":223,"op":"print","text":"Skarmory protected itself!"}
 {"line":225,"op":"print","text":"The sandstorm is raging."}
 {"line":225,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":226,"op":"itemPopUp","side":"near","item":472}
 {"line":226,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":226,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":226,"op":"hp","side":"near","hp":50}
-{"line":226,"op":"print","text":"Skarmory restored a little HP using its Leftovers!"}
 {"line":228,"op":"turn","number":18}
 {"line":231,"op":"print","text":"Skarmory, come back!"}
 {"line":231,"op":"withdraw","side":"near"}
@@ -298,12 +325,14 @@
 {"line":236,"op":"print","text":"Blissey is buffeted by the sandstorm!"}
 {"line":236,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":236,"op":"hp","side":"near","hp":80}
+{"line":237,"op":"itemPopUp","side":"near","item":472}
 {"line":237,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":237,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":237,"op":"hp","side":"near","hp":86}
-{"line":237,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":238,"op":"itemPopUp","side":"far","item":472}
 {"line":238,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":238,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":238,"op":"hp","side":"far","hp":94}
-{"line":238,"op":"print","text":"The opposing Forretress restored a little HP using its Leftovers!"}
 {"line":240,"op":"turn","number":19}
 {"line":243,"op":"print","text":"Blissey, come back!"}
 {"line":243,"op":"withdraw","side":"near"}
@@ -317,12 +346,14 @@
 {"line":247,"op":"print","text":"The opposing Forretress blew away Spikes!"}
 {"line":249,"op":"print","text":"The sandstorm is raging."}
 {"line":249,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":250,"op":"itemPopUp","side":"near","item":472}
 {"line":250,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":250,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":250,"op":"hp","side":"near","hp":54}
-{"line":250,"op":"print","text":"Skarmory restored a little HP using its Leftovers!"}
+{"line":251,"op":"itemPopUp","side":"far","item":472}
 {"line":251,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":251,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":251,"op":"hp","side":"far","hp":100}
-{"line":251,"op":"print","text":"The opposing Forretress restored a little HP using its Leftovers!"}
 {"line":253,"op":"turn","number":20}
 {"line":256,"op":"print","text":"Skarmory used Drill Peck!"}
 {"line":256,"op":"move","user":"near","target":"far","move":65}
@@ -333,12 +364,14 @@
 {"line":259,"op":"print","text":"Spikes were scattered on the ground all around your side!"}
 {"line":261,"op":"print","text":"The sandstorm is raging."}
 {"line":261,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":262,"op":"itemPopUp","side":"near","item":472}
 {"line":262,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":262,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":262,"op":"hp","side":"near","hp":60}
-{"line":262,"op":"print","text":"Skarmory restored a little HP using its Leftovers!"}
+{"line":263,"op":"itemPopUp","side":"far","item":472}
 {"line":263,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":263,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":263,"op":"hp","side":"far","hp":91}
-{"line":263,"op":"print","text":"The opposing Forretress restored a little HP using its Leftovers!"}
 {"line":265,"op":"turn","number":21}
 {"line":268,"op":"print","text":"Nametab withdrew Forretress!"}
 {"line":268,"op":"withdraw","side":"far"}
@@ -352,12 +385,14 @@
 {"line":273,"op":"print","text":"The opposing Breloom is buffeted by the sandstorm!"}
 {"line":273,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":273,"op":"hp","side":"far","hp":69}
+{"line":274,"op":"itemPopUp","side":"far","item":472}
 {"line":274,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":274,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":274,"op":"hp","side":"far","hp":75}
-{"line":274,"op":"print","text":"The opposing Breloom restored a little HP using its Leftovers!"}
+{"line":275,"op":"itemPopUp","side":"near","item":472}
 {"line":275,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":275,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":275,"op":"hp","side":"near","hp":66}
-{"line":275,"op":"print","text":"Skarmory restored a little HP using its Leftovers!"}
 {"line":277,"op":"turn","number":22}
 {"line":280,"op":"print","text":"Skarmory, come back!"}
 {"line":280,"op":"withdraw","side":"near"}
@@ -378,12 +413,14 @@
 {"line":287,"op":"print","text":"Celebi is buffeted by the sandstorm!"}
 {"line":287,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":287,"op":"hp","side":"near","hp":74}
+{"line":288,"op":"itemPopUp","side":"far","item":472}
 {"line":288,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":288,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":288,"op":"hp","side":"far","hp":75}
-{"line":288,"op":"print","text":"The opposing Breloom restored a little HP using its Leftovers!"}
+{"line":289,"op":"itemPopUp","side":"near","item":472}
 {"line":289,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":289,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":289,"op":"hp","side":"near","hp":80}
-{"line":289,"op":"print","text":"Celebi restored a little HP using its Leftovers!"}
 {"line":291,"op":"turn","number":23}
 {"line":294,"op":"anim","side":"far","anim":"focusPunchSetup"}
 {"line":294,"op":"print","text":"The opposing Breloom is tightening its focus!"}
@@ -407,12 +444,14 @@
 {"line":304,"op":"print","text":"The opposing Breloom is buffeted by the sandstorm!"}
 {"line":304,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":304,"op":"hp","side":"far","hp":69}
+{"line":305,"op":"itemPopUp","side":"near","item":472}
 {"line":305,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":305,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":305,"op":"hp","side":"near","hp":29}
-{"line":305,"op":"print","text":"Starmie restored a little HP using its Leftovers!"}
+{"line":306,"op":"itemPopUp","side":"far","item":472}
 {"line":306,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":306,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":306,"op":"hp","side":"far","hp":75}
-{"line":306,"op":"print","text":"The opposing Breloom restored a little HP using its Leftovers!"}
 {"line":308,"op":"turn","number":24}
 {"line":311,"op":"print","text":"Nametab withdrew Breloom!"}
 {"line":311,"op":"withdraw","side":"far"}
@@ -433,12 +472,14 @@
 {"line":319,"op":"print","text":"Starmie is buffeted by the sandstorm!"}
 {"line":319,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":319,"op":"hp","side":"near","hp":23}
+{"line":320,"op":"itemPopUp","side":"near","item":472}
 {"line":320,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":320,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":320,"op":"hp","side":"near","hp":29}
-{"line":320,"op":"print","text":"Starmie restored a little HP using its Leftovers!"}
+{"line":321,"op":"itemPopUp","side":"far","item":472}
 {"line":321,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":321,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":321,"op":"hp","side":"far","hp":72}
-{"line":321,"op":"print","text":"The opposing Forretress restored a little HP using its Leftovers!"}
 {"line":323,"op":"turn","number":25}
 {"line":327,"op":"print","text":"Starmie used Rapid Spin!"}
 {"line":327,"op":"move","user":"near","target":"far","move":229}
@@ -453,12 +494,14 @@
 {"line":334,"op":"print","text":"Starmie is buffeted by the sandstorm!"}
 {"line":334,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":334,"op":"hp","side":"near","hp":23}
+{"line":335,"op":"itemPopUp","side":"near","item":472}
 {"line":335,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":335,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":335,"op":"hp","side":"near","hp":29}
-{"line":335,"op":"print","text":"Starmie restored a little HP using its Leftovers!"}
+{"line":336,"op":"itemPopUp","side":"far","item":472}
 {"line":336,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":336,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":336,"op":"hp","side":"far","hp":77}
-{"line":336,"op":"print","text":"The opposing Forretress restored a little HP using its Leftovers!"}
 {"line":338,"op":"turn","number":26}
 {"line":341,"op":"print","text":"Starmie used Hydro Pump!"}
 {"line":341,"op":"move","user":"near","target":"far","move":56}
@@ -471,12 +514,14 @@
 {"line":346,"op":"print","text":"Starmie is buffeted by the sandstorm!"}
 {"line":346,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":346,"op":"hp","side":"near","hp":23}
+{"line":347,"op":"itemPopUp","side":"near","item":472}
 {"line":347,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":347,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":347,"op":"hp","side":"near","hp":29}
-{"line":347,"op":"print","text":"Starmie restored a little HP using its Leftovers!"}
+{"line":348,"op":"itemPopUp","side":"far","item":472}
 {"line":348,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":348,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":348,"op":"hp","side":"far","hp":32}
-{"line":348,"op":"print","text":"The opposing Forretress restored a little HP using its Leftovers!"}
 {"line":350,"op":"turn","number":27}
 {"line":353,"op":"print","text":"Starmie used Hydro Pump!"}
 {"line":354,"op":"print","text":"The opposing Forretress avoided the attack!"}
@@ -487,12 +532,14 @@
 {"line":358,"op":"print","text":"Starmie is buffeted by the sandstorm!"}
 {"line":358,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":358,"op":"hp","side":"near","hp":23}
+{"line":359,"op":"itemPopUp","side":"near","item":472}
 {"line":359,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":359,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":359,"op":"hp","side":"near","hp":29}
-{"line":359,"op":"print","text":"Starmie restored a little HP using its Leftovers!"}
+{"line":360,"op":"itemPopUp","side":"far","item":472}
 {"line":360,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":360,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":360,"op":"hp","side":"far","hp":38}
-{"line":360,"op":"print","text":"The opposing Forretress restored a little HP using its Leftovers!"}
 {"line":362,"op":"turn","number":28}
 {"line":365,"op":"print","text":"Starmie used Hydro Pump!"}
 {"line":365,"op":"move","user":"near","target":"far","move":56}
@@ -509,9 +556,10 @@
 {"line":374,"op":"print","text":"Starmie is buffeted by the sandstorm!"}
 {"line":374,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":374,"op":"hp","side":"near","hp":23}
+{"line":375,"op":"itemPopUp","side":"near","item":472}
 {"line":375,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":375,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":375,"op":"hp","side":"near","hp":29}
-{"line":375,"op":"print","text":"Starmie restored a little HP using its Leftovers!"}
 {"line":377,"op":"turn","number":29}
 {"line":380,"op":"print","text":"The opposing Dugtrio used Hidden Power!"}
 {"line":380,"op":"move","user":"far","target":"near","move":237}
@@ -531,9 +579,10 @@
 {"line":391,"op":"print","text":"Salamence is buffeted by the sandstorm!"}
 {"line":391,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":391,"op":"hp","side":"near","hp":94}
+{"line":392,"op":"itemPopUp","side":"near","item":472}
 {"line":392,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":392,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":392,"op":"hp","side":"near","hp":100}
-{"line":392,"op":"print","text":"Salamence restored a little HP using its Leftovers!"}
 {"line":394,"op":"turn","number":30}
 {"line":397,"op":"print","text":"Nametab withdrew Dugtrio!"}
 {"line":397,"op":"withdraw","side":"far"}
@@ -553,12 +602,14 @@
 {"line":404,"op":"print","text":"The opposing Vaporeon is buffeted by the sandstorm!"}
 {"line":404,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":404,"op":"hp","side":"far","hp":65}
+{"line":405,"op":"itemPopUp","side":"near","item":472}
 {"line":405,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":405,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":405,"op":"hp","side":"near","hp":100}
-{"line":405,"op":"print","text":"Salamence restored a little HP using its Leftovers!"}
+{"line":406,"op":"itemPopUp","side":"far","item":472}
 {"line":406,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":406,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":406,"op":"hp","side":"far","hp":71}
-{"line":406,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":408,"op":"turn","number":31}
 {"line":411,"op":"print","text":"Salamence, come back!"}
 {"line":411,"op":"withdraw","side":"near"}
@@ -576,9 +627,10 @@
 {"line":419,"op":"print","text":"Celebi is buffeted by the sandstorm!"}
 {"line":419,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":419,"op":"hp","side":"near","hp":74}
+{"line":420,"op":"itemPopUp","side":"near","item":472}
 {"line":420,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":420,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":420,"op":"hp","side":"near","hp":80}
-{"line":420,"op":"print","text":"Celebi restored a little HP using its Leftovers!"}
 {"line":422,"op":"turn","number":32}
 {"line":425,"op":"print","text":"The opposing Dugtrio used Hidden Power!"}
 {"line":425,"op":"move","user":"far","target":"near","move":237}
@@ -603,9 +655,10 @@
 {"line":438,"op":"hp","side":"near","hp":0}
 {"line":439,"op":"faint","side":"near"}
 {"line":439,"op":"print","text":"Celebi fainted!"}
+{"line":440,"op":"itemPopUp","side":"far","item":472}
 {"line":440,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":440,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":440,"op":"hp","side":"far","hp":94}
-{"line":440,"op":"print","text":"The opposing Tyranitar restored a little HP using its Leftovers!"}
 {"line":444,"op":"print","text":"Go! Dugtrio!"}
 {"line":444,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
 {"line":445,"op":"turn","number":33}
@@ -632,12 +685,14 @@
 {"line":462,"op":"print","text":"Salamence is buffeted by the sandstorm!"}
 {"line":462,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":462,"op":"hp","side":"near","hp":94}
+{"line":463,"op":"itemPopUp","side":"near","item":472}
 {"line":463,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":463,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":463,"op":"hp","side":"near","hp":100}
-{"line":463,"op":"print","text":"Salamence restored a little HP using its Leftovers!"}
+{"line":464,"op":"itemPopUp","side":"far","item":472}
 {"line":464,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":464,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":464,"op":"hp","side":"far","hp":7}
-{"line":464,"op":"print","text":"The opposing Tyranitar restored a little HP using its Leftovers!"}
 {"line":466,"op":"turn","number":34}
 {"line":469,"op":"print","text":"Nametab withdrew Tyranitar!"}
 {"line":469,"op":"withdraw","side":"far"}
@@ -659,12 +714,14 @@
 {"line":479,"op":"print","text":"The opposing Vaporeon is buffeted by the sandstorm!"}
 {"line":479,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":479,"op":"hp","side":"far","hp":53}
+{"line":480,"op":"itemPopUp","side":"near","item":472}
 {"line":480,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":480,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":480,"op":"hp","side":"near","hp":100}
-{"line":480,"op":"print","text":"Salamence restored a little HP using its Leftovers!"}
+{"line":481,"op":"itemPopUp","side":"far","item":472}
 {"line":481,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":481,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":481,"op":"hp","side":"far","hp":59}
-{"line":481,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":483,"op":"turn","number":35}
 {"line":486,"op":"print","text":"Salamence, come back!"}
 {"line":486,"op":"withdraw","side":"near"}
@@ -682,12 +739,14 @@
 {"line":492,"op":"print","text":"Blissey is buffeted by the sandstorm!"}
 {"line":492,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":492,"op":"hp","side":"near","hp":71}
+{"line":493,"op":"itemPopUp","side":"far","item":472}
 {"line":493,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":493,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":493,"op":"hp","side":"far","hp":59}
-{"line":493,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
+{"line":494,"op":"itemPopUp","side":"near","item":472}
 {"line":494,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":494,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":494,"op":"hp","side":"near","hp":77}
-{"line":494,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":496,"op":"turn","number":36}
 {"line":499,"op":"print","text":"The opposing Vaporeon used Wish!"}
 {"line":499,"op":"move","user":"far","target":"far","move":273}
@@ -704,12 +763,14 @@
 {"line":505,"op":"print","text":"The opposing Vaporeon is buffeted by the sandstorm!"}
 {"line":505,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":505,"op":"hp","side":"far","hp":53}
+{"line":506,"op":"itemPopUp","side":"near","item":472}
 {"line":506,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":506,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":506,"op":"hp","side":"near","hp":77}
-{"line":506,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":507,"op":"itemPopUp","side":"far","item":472}
 {"line":507,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":507,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":507,"op":"hp","side":"far","hp":59}
-{"line":507,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":509,"op":"turn","number":37}
 {"line":512,"op":"print","text":"Blissey used Wish!"}
 {"line":512,"op":"move","user":"near","target":"near","move":273}
@@ -729,12 +790,14 @@
 {"line":519,"op":"print","text":"The opposing Vaporeon is buffeted by the sandstorm!"}
 {"line":519,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":519,"op":"hp","side":"far","hp":94}
+{"line":520,"op":"itemPopUp","side":"near","item":472}
 {"line":520,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":520,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":520,"op":"hp","side":"near","hp":68}
-{"line":520,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":521,"op":"itemPopUp","side":"far","item":472}
 {"line":521,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":521,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":521,"op":"hp","side":"far","hp":100}
-{"line":521,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":523,"op":"turn","number":38}
 {"line":526,"op":"print","text":"Blissey used Seismic Toss!"}
 {"line":526,"op":"move","user":"near","target":"far","move":69}
@@ -756,12 +819,14 @@
 {"line":534,"op":"print","text":"The opposing Vaporeon is buffeted by the sandstorm!"}
 {"line":534,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":534,"op":"hp","side":"far","hp":73}
+{"line":535,"op":"itemPopUp","side":"near","item":472}
 {"line":535,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":535,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":535,"op":"hp","side":"near","hp":100}
-{"line":535,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":536,"op":"itemPopUp","side":"far","item":472}
 {"line":536,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":536,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":536,"op":"hp","side":"far","hp":79}
-{"line":536,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":538,"op":"turn","number":39}
 {"line":541,"op":"print","text":"Nametab withdrew Vaporeon!"}
 {"line":541,"op":"withdraw","side":"far"}
@@ -779,12 +844,14 @@
 {"line":547,"op":"print","text":"Blissey is buffeted by the sandstorm!"}
 {"line":547,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":547,"op":"hp","side":"near","hp":94}
+{"line":548,"op":"itemPopUp","side":"far","item":472}
 {"line":548,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":548,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":548,"op":"hp","side":"far","hp":63}
-{"line":548,"op":"print","text":"The opposing Breloom restored a little HP using its Leftovers!"}
+{"line":549,"op":"itemPopUp","side":"near","item":472}
 {"line":549,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":549,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":549,"op":"hp","side":"near","hp":100}
-{"line":549,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":551,"op":"turn","number":40}
 {"line":554,"op":"print","text":"Blissey, come back!"}
 {"line":554,"op":"withdraw","side":"near"}
@@ -804,9 +871,10 @@
 {"line":560,"op":"print","text":"The opposing Breloom is buffeted by the sandstorm!"}
 {"line":560,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":560,"op":"hp","side":"far","hp":57}
+{"line":561,"op":"itemPopUp","side":"far","item":472}
 {"line":561,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":561,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":561,"op":"hp","side":"far","hp":63}
-{"line":561,"op":"print","text":"The opposing Breloom restored a little HP using its Leftovers!"}
 {"line":563,"op":"turn","number":41}
 {"line":566,"op":"print","text":"Skarmory, come back!"}
 {"line":566,"op":"withdraw","side":"near"}
@@ -829,12 +897,14 @@
 {"line":575,"op":"print","text":"The opposing Breloom is buffeted by the sandstorm!"}
 {"line":575,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":575,"op":"hp","side":"far","hp":57}
+{"line":576,"op":"itemPopUp","side":"near","item":472}
 {"line":576,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":576,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":576,"op":"hp","side":"near","hp":61}
-{"line":576,"op":"print","text":"Salamence restored a little HP using its Leftovers!"}
+{"line":577,"op":"itemPopUp","side":"far","item":472}
 {"line":577,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":577,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":577,"op":"hp","side":"far","hp":63}
-{"line":577,"op":"print","text":"The opposing Breloom restored a little HP using its Leftovers!"}
 {"line":579,"op":"turn","number":42}
 {"line":582,"op":"print","text":"Nametab withdrew Breloom!"}
 {"line":582,"op":"withdraw","side":"far"}
@@ -856,12 +926,14 @@
 {"line":592,"op":"print","text":"The opposing Vaporeon is buffeted by the sandstorm!"}
 {"line":592,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":592,"op":"hp","side":"far","hp":61}
+{"line":593,"op":"itemPopUp","side":"near","item":472}
 {"line":593,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":593,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":593,"op":"hp","side":"near","hp":61}
-{"line":593,"op":"print","text":"Salamence restored a little HP using its Leftovers!"}
+{"line":594,"op":"itemPopUp","side":"far","item":472}
 {"line":594,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":594,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":594,"op":"hp","side":"far","hp":67}
-{"line":594,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":596,"op":"turn","number":43}
 {"line":599,"op":"print","text":"Salamence, come back!"}
 {"line":599,"op":"withdraw","side":"near"}
@@ -877,12 +949,14 @@
 {"line":604,"op":"print","text":"The opposing Vaporeon is buffeted by the sandstorm!"}
 {"line":604,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":604,"op":"hp","side":"far","hp":61}
+{"line":605,"op":"itemPopUp","side":"near","item":472}
 {"line":605,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":605,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":605,"op":"hp","side":"near","hp":100}
-{"line":605,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":606,"op":"itemPopUp","side":"far","item":472}
 {"line":606,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":606,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":606,"op":"hp","side":"far","hp":67}
-{"line":606,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":608,"op":"turn","number":44}
 {"line":611,"op":"print","text":"Blissey used Seismic Toss!"}
 {"line":611,"op":"move","user":"near","target":"far","move":69}
@@ -902,12 +976,14 @@
 {"line":618,"op":"print","text":"The opposing Vaporeon is buffeted by the sandstorm!"}
 {"line":618,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":618,"op":"hp","side":"far","hp":89}
+{"line":619,"op":"itemPopUp","side":"near","item":472}
 {"line":619,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":619,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":619,"op":"hp","side":"near","hp":100}
-{"line":619,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":620,"op":"itemPopUp","side":"far","item":472}
 {"line":620,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":620,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":620,"op":"hp","side":"far","hp":95}
-{"line":620,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":622,"op":"turn","number":45}
 {"line":625,"op":"print","text":"Blissey used Wish!"}
 {"line":625,"op":"move","user":"near","target":"near","move":273}
@@ -921,12 +997,14 @@
 {"line":630,"op":"print","text":"The opposing Vaporeon is buffeted by the sandstorm!"}
 {"line":630,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":630,"op":"hp","side":"far","hp":89}
+{"line":631,"op":"itemPopUp","side":"near","item":472}
 {"line":631,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":631,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":631,"op":"hp","side":"near","hp":100}
-{"line":631,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":632,"op":"itemPopUp","side":"far","item":472}
 {"line":632,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":632,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":632,"op":"hp","side":"far","hp":95}
-{"line":632,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":634,"op":"turn","number":46}
 {"line":637,"op":"print","text":"Blissey used Seismic Toss!"}
 {"line":637,"op":"move","user":"near","target":"far","move":69}
@@ -948,12 +1026,14 @@
 {"line":645,"op":"print","text":"The opposing Vaporeon is buffeted by the sandstorm!"}
 {"line":645,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":645,"op":"hp","side":"far","hp":67}
+{"line":646,"op":"itemPopUp","side":"near","item":472}
 {"line":646,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":646,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":646,"op":"hp","side":"near","hp":100}
-{"line":646,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":647,"op":"itemPopUp","side":"far","item":472}
 {"line":647,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":647,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":647,"op":"hp","side":"far","hp":73}
-{"line":647,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":649,"op":"turn","number":47}
 {"line":652,"op":"print","text":"Blissey used Seismic Toss!"}
 {"line":652,"op":"move","user":"near","target":"far","move":69}
@@ -969,12 +1049,14 @@
 {"line":658,"op":"print","text":"The opposing Vaporeon is buffeted by the sandstorm!"}
 {"line":658,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":658,"op":"hp","side":"far","hp":46}
+{"line":659,"op":"itemPopUp","side":"near","item":472}
 {"line":659,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":659,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":659,"op":"hp","side":"near","hp":100}
-{"line":659,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":660,"op":"itemPopUp","side":"far","item":472}
 {"line":660,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":660,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":660,"op":"hp","side":"far","hp":52}
-{"line":660,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":662,"op":"turn","number":48}
 {"line":665,"op":"print","text":"Blissey used Thunder Wave!"}
 {"line":666,"op":"print","text":"The opposing Vaporeon is already paralyzed!"}
@@ -994,12 +1076,14 @@
 {"line":673,"op":"print","text":"The opposing Vaporeon is buffeted by the sandstorm!"}
 {"line":673,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":673,"op":"hp","side":"far","hp":94}
+{"line":674,"op":"itemPopUp","side":"near","item":472}
 {"line":674,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":674,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":674,"op":"hp","side":"near","hp":87}
-{"line":674,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":675,"op":"itemPopUp","side":"far","item":472}
 {"line":675,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":675,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":675,"op":"hp","side":"far","hp":100}
-{"line":675,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":677,"op":"turn","number":49}
 {"line":680,"op":"print","text":"Blissey used Thunder Wave!"}
 {"line":681,"op":"print","text":"The opposing Vaporeon is already paralyzed!"}
@@ -1013,12 +1097,14 @@
 {"line":686,"op":"print","text":"The opposing Vaporeon is buffeted by the sandstorm!"}
 {"line":686,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":686,"op":"hp","side":"far","hp":94}
+{"line":687,"op":"itemPopUp","side":"near","item":472}
 {"line":687,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":687,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":687,"op":"hp","side":"near","hp":87}
-{"line":687,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":688,"op":"itemPopUp","side":"far","item":472}
 {"line":688,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":688,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":688,"op":"hp","side":"far","hp":100}
-{"line":688,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":690,"op":"turn","number":50}
 {"line":693,"op":"print","text":"Blissey, come back!"}
 {"line":693,"op":"withdraw","side":"near"}
@@ -1031,9 +1117,10 @@
 {"line":697,"op":"print","text":"The opposing Vaporeon is buffeted by the sandstorm!"}
 {"line":697,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":697,"op":"hp","side":"far","hp":94}
+{"line":698,"op":"itemPopUp","side":"far","item":472}
 {"line":698,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":698,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":698,"op":"hp","side":"far","hp":100}
-{"line":698,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":700,"op":"turn","number":51}
 {"line":703,"op":"print","text":"Skarmory is fast asleep."}
 {"line":703,"op":"anim","side":"near","anim":"statusSlp"}
@@ -1053,9 +1140,10 @@
 {"line":712,"op":"print","text":"The opposing Breloom is buffeted by the sandstorm!"}
 {"line":712,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":712,"op":"hp","side":"far","hp":95}
+{"line":713,"op":"itemPopUp","side":"far","item":472}
 {"line":713,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":713,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":713,"op":"hp","side":"far","hp":100}
-{"line":713,"op":"print","text":"The opposing Breloom restored a little HP using its Leftovers!"}
 {"line":715,"op":"turn","number":52}
 {"line":718,"op":"anim","side":"far","anim":"focusPunchSetup"}
 {"line":718,"op":"print","text":"The opposing Breloom is tightening its focus!"}
@@ -1077,9 +1165,10 @@
 {"line":730,"op":"print","text":"The opposing Vaporeon is buffeted by the sandstorm!"}
 {"line":730,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":730,"op":"hp","side":"far","hp":82}
+{"line":731,"op":"itemPopUp","side":"far","item":472}
 {"line":731,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":731,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":731,"op":"hp","side":"far","hp":88}
-{"line":731,"op":"print","text":"The opposing Vaporeon restored a little HP using its Leftovers!"}
 {"line":733,"op":"turn","number":53}
 {"line":734,"op":"print","text":"Nametab forfeited."}
 {"line":736,"op":"print","text":"SoggyBagel64 won the battle!"}
