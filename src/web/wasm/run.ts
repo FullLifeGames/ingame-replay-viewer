@@ -15,6 +15,7 @@ import {
   soundLine,
 } from './audio'
 import workletUrl from './audio-worklet.ts?worker&url'
+import { buildFailure } from './failures'
 import { WASM_FILES } from './files'
 import type { StartMessage, WorkerReport } from './messages'
 import {
@@ -77,9 +78,14 @@ export interface Run {
 export async function buildModule(dump: Uint8Array): Promise<Built> {
   await checkBaseRom(dump)
   const [patch, json] = await Promise.all([fetchBytes(WASM_FILES.patch), fetchJson(ROM_FILES.slot)])
-  const bytes = applyBps(patch, dump)
-  const module = await WebAssembly.compile(bytes as Uint8Array<ArrayBuffer>)
-  return { module, slot: readSlotDescription(json), bytes: bytes.length }
+  const slot = readSlotDescription(json)
+  try {
+    const bytes = applyBps(patch, dump)
+    const module = await WebAssembly.compile(bytes as Uint8Array<ArrayBuffer>)
+    return { module, slot, bytes: bytes.length }
+  } catch (error: unknown) {
+    throw buildFailure(error)
+  }
 }
 
 /**

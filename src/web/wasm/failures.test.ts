@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { instantiateFailureLine, MODULE_MEMORY_BYTES } from './failures'
+import { buildFailure, instantiateFailureLine, MODULE_MEMORY_BYTES } from './failures'
 
 // The words each browser gives when it cannot reserve a module's fixed memory at instantiation.
 const CHROMIUM =
@@ -52,5 +52,30 @@ describe('instantiateFailureLine', () => {
 
   it('counts the memory in bytes as the link gives it', () => {
     expect(MODULE_MEMORY_BYTES).toBe(256 * 1024 * 1024)
+  })
+})
+
+// The page applies the patch to the dump and compiles the module before any worker starts.
+describe('buildFailure', () => {
+  const LINE =
+    'This browser ran out of memory while it built the game from your dump (Array buffer ' +
+    'allocation failed). Close other tabs or apps, then load the page again and pick your dump.'
+
+  it('says that the browser ran out of memory, with its words and the remedy', () => {
+    const failure = buildFailure(new RangeError('Array buffer allocation failed'))
+    expect(failure).toBeInstanceOf(Error)
+    expect((failure as Error).message).toBe(LINE)
+  })
+
+  it('reads the words when the error is no RangeError', () => {
+    expect(String(buildFailure(new Error(`WebAssembly.compile(): ${CHROMIUM}`)))).toContain(
+      'ran out of memory while it built the game',
+    )
+  })
+
+  it('passes any other failure on as it came', () => {
+    const other = new Error('the patch does not fit this dump')
+    expect(buildFailure(other)).toBe(other)
+    expect(buildFailure('a thrown string')).toBe('a thrown string')
   })
 })
