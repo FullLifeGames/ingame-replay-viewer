@@ -49,12 +49,13 @@ test('a test replay picked on the WebAssembly page shows its list and asks for S
   page,
   baseURL,
 }) => {
-  await guardRequests(page, baseURL)
+  const notSameOriginGets = await guardRequests(page, baseURL)
   await page.goto('/wasm.html')
   const second = 'smogtours-gen3ou-994086'
   await page.getByLabel('Test replay').selectOption(second)
   await expect(page.getByRole('status')).toHaveText(new RegExp(`^Picked ${second}\\. Press Start`))
   await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${second}: `))
+  expect(notSameOriginGets).toEqual([])
 })
 
 // #50 with the module: the replay loaded by link starts at fast, as Start plays what the list
