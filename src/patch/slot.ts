@@ -1,6 +1,6 @@
 // The replay slot of a built ROM (ADR 0008): the description that the build writes next to the
-// patch, and the one rule for putting a stream into the slot. The page (#8) and the screenshot
-// tool (scripts/rom-shot.ts) both write through it.
+// patch, the check of a slot's own header against it, and the one rule for putting a stream into
+// the slot. The page (#8) and the screenshot tool (scripts/rom-shot.ts) both write through it.
 
 /** Where the slot lies in the built ROM; build/rom/replay-slot.json holds one. */
 export interface SlotDescription {
@@ -21,6 +21,101 @@ export class SlotError extends Error {
 }
 
 const hex = (value: number) => `0x${value.toString(16)}`
+
+/** Byte offsets of the slot header's fields: the REPLAY_SLOT_OFFSET_* defines of replay_slot.h. */
+export interface SlotHeaderLayout {
+  version: number
+  headerSize: number
+  slotSize: number
+  streamLength: number
+}
+
+/** What a slot's own header says, as the build wrote it (rom/gen3/src/replay_slot.c). */
+export interface SlotHeader {
+  magic: string
+  slotVersion: number
+  headerSize: number
+  size: number
+}
+
+function readOffsetDefine(headerText: string, field: string): number {
+  const name = `REPLAY_SLOT_OFFSET_${field}`
+  const text = new RegExp(`^#define\\s+${name}\\s+(.+?)\\s*(?://.*)?$`, 'm').exec(headerText)?.[1]
+  if (text === undefined) throw new SlotError(`replay_slot.h: ${name} missing`)
+  if (!/^(?:0x[0-9a-f]+|\d+)$/i.test(text)) {
+    throw new SlotError(`replay_slot.h: ${name} is "${text}", not a plain number`)
+  }
+  return Number(text)
+}
+
+/** The header's field offsets from the text of rom/gen3/include/replay_slot.h. */
+export function readSlotHeaderLayout(headerText: string): SlotHeaderLayout {
+  return {
+    version: readOffsetDefine(headerText, 'VERSION'),
+    headerSize: readOffsetDefine(headerText, 'HEADER_SIZE'),
+    slotSize: readOffsetDefine(headerText, 'SLOT_SIZE'),
+    streamLength: readOffsetDefine(headerText, 'STREAM_LENGTH'),
+  }
+}
+
+/** The header at the start of `slot`; the magic is the first `magicLength` bytes. */
+export function readSlotHeader(
+  slot: Uint8Array,
+  layout: SlotHeaderLayout,
+  magicLength: number,
+): SlotHeader {
+  const needs = Math.max(
+    magicLength,
+    layout.version + 2,
+    layout.headerSize + 2,
+    layout.slotSize + 4,
+  )
+  if (slot.length < needs) {
+    throw new SlotError(
+      `the replay slot has ${hex(slot.length)} bytes, its header needs ${hex(needs)}`,
+    )
+  }
+  const view = new DataView(slot.buffer, slot.byteOffset, slot.byteLength)
+  return {
+    magic: String.fromCharCode(...slot.subarray(0, magicLength)),
+    slotVersion: view.getUint16(layout.version, true),
+    headerSize: view.getUint16(layout.headerSize, true),
+    size: view.getUint32(layout.slotSize, true),
+  }
+}
+
+/**
+ * Refuses a description from another build than the slot at the start of `slot`: its
+ * version, its sizes and the places of the length and the stream must match the slot's header.
+ */
+export function checkSlotHeader(
+  slot: Uint8Array,
+  description: SlotDescription,
+  layout: SlotHeaderLayout,
+): void {
+  const found = readSlotHeader(slot, layout, description.magic.length)
+  if (found.magic !== description.magic) {
+    throw new SlotError(
+      `no ${description.magic} magic at the start of the slot: it is not the slot the description names`,
+    )
+  }
+  const { offset } = description
+  const fields: [string, number, number, (value: number) => string][] = [
+    ['version', found.slotVersion, description.slotVersion, String],
+    ['header size', found.headerSize, description.headerSize, hex],
+    ['slot size', found.size, description.size, hex],
+    ['stream offset', found.headerSize, description.streamOffset - offset, hex],
+    ['length offset', layout.streamLength, description.lengthOffset - offset, hex],
+    ['capacity', found.size - found.headerSize, description.capacity, hex],
+  ]
+  const differs = fields.find(([, inHeader, inDescription]) => inHeader !== inDescription)
+  if (differs === undefined) return
+  const [name, inHeader, inDescription, show] = differs
+  throw new SlotError(
+    `the slot's header gives ${name} ${show(inHeader)}, the slot description ${name} ` +
+      `${show(inDescription)}, so the two come from different builds`,
+  )
+}
 
 function checkRom(rom: Uint8Array, description: SlotDescription): void {
   const { offset, size, magic } = description

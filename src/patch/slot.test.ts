@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { SlotError, writeReplaySlot } from './slot.ts'
+import header from '../../rom/gen3/include/replay_slot.h?raw'
+import {
+  checkSlotHeader,
+  readSlotHeader,
+  readSlotHeaderLayout,
+  SlotError,
+  writeReplaySlot,
+} from './slot.ts'
 import type { SlotDescription } from './slot.ts'
 
 // A small ROM with the slot at 0x100: 0x20 bytes of header, 0x40 bytes of stream.
@@ -105,6 +112,99 @@ describe('writing a stream into the replay slot', () => {
     const rom = emptyRom().subarray(0, DESCRIPTION.offset + DESCRIPTION.size - 1)
     expect(() => writeReplaySlot(rom, DESCRIPTION, streamOf(4))).toThrow(
       new SlotError('the ROM has 0x15f bytes and ends before the replay slot at 0x100 does'),
+    )
+  })
+})
+
+const LAYOUT = readSlotHeaderLayout(header)
+
+// The slot's header as the build writes it (rom/gen3/src/replay_slot.c), for DESCRIPTION's slot.
+function slotHeader(fields: { version?: number; headerSize?: number; size?: number } = {}) {
+  const bytes = new Uint8Array(DESCRIPTION.headerSize)
+  bytes.set(new TextEncoder().encode(DESCRIPTION.magic))
+  const view = new DataView(bytes.buffer)
+  view.setUint16(0x08, fields.version ?? DESCRIPTION.slotVersion, true)
+  view.setUint16(0x0a, fields.headerSize ?? DESCRIPTION.headerSize, true)
+  view.setUint32(0x0c, fields.size ?? DESCRIPTION.size, true)
+  return bytes
+}
+
+describe("the slot's own header", () => {
+  it('has the field offsets of replay_slot.h', () => {
+    expect(LAYOUT).toEqual({ version: 0x08, headerSize: 0x0a, slotSize: 0x0c, streamLength: 0x10 })
+  })
+
+  it('refuses a header text without one of the offsets', () => {
+    const text = header.replace(/^#define REPLAY_SLOT_OFFSET_SLOT_SIZE.*$/m, '')
+    expect(() => readSlotHeaderLayout(text)).toThrow(
+      'replay_slot.h: REPLAY_SLOT_OFFSET_SLOT_SIZE missing',
+    )
+  })
+
+  it('refuses an offset that is not a plain number', () => {
+    const text = header.replace(
+      /^#define REPLAY_SLOT_OFFSET_VERSION .*$/m,
+      '#define REPLAY_SLOT_OFFSET_VERSION (4 + 4)',
+    )
+    expect(() => readSlotHeaderLayout(text)).toThrow(
+      'replay_slot.h: REPLAY_SLOT_OFFSET_VERSION is "(4 + 4)", not a plain number',
+    )
+  })
+
+  it('reads the magic, the version and both sizes', () => {
+    expect(readSlotHeader(slotHeader({ size: 0x20000 }), LAYOUT, 8)).toEqual({
+      magic: 'IRV_SLOT',
+      slotVersion: 1,
+      headerSize: 0x20,
+      size: 0x20000,
+    })
+  })
+
+  it('refuses a slot too short for its header', () => {
+    expect(() => readSlotHeader(slotHeader().subarray(0, 0x0f), LAYOUT, 8)).toThrow(
+      new SlotError('the replay slot has 0xf bytes, its header needs 0x10'),
+    )
+  })
+
+  it('passes a description of the same build', () => {
+    expect(() => {
+      checkSlotHeader(slotHeader(), DESCRIPTION, LAYOUT)
+    }).not.toThrow()
+  })
+
+  it.each([
+    [{ version: 2 }, 'version 2, the slot description version 1'],
+    [{ headerSize: 0x40 }, 'header size 0x40, the slot description header size 0x20'],
+    [{ size: 0x20000 }, 'slot size 0x20000, the slot description slot size 0x60'],
+  ])('refuses a description of another build: %o', (fields, values) => {
+    expect(() => {
+      checkSlotHeader(slotHeader(fields), DESCRIPTION, LAYOUT)
+    }).toThrow(
+      new SlotError(`the slot's header gives ${values}, so the two come from different builds`),
+    )
+  })
+
+  it.each([
+    [{ streamOffset: 0x130 }, 'stream offset 0x20, the slot description stream offset 0x30'],
+    [{ lengthOffset: 0x114 }, 'length offset 0x10, the slot description length offset 0x14'],
+    [{ capacity: 0x3f }, 'capacity 0x40, the slot description capacity 0x3f'],
+  ])('refuses a description whose places disagree with the header: %o', (change, values) => {
+    expect(() => {
+      checkSlotHeader(slotHeader(), { ...DESCRIPTION, ...change }, LAYOUT)
+    }).toThrow(
+      new SlotError(`the slot's header gives ${values}, so the two come from different builds`),
+    )
+  })
+
+  it('refuses a slot without the magic before it reads the sizes', () => {
+    const bytes = slotHeader({ version: 2 })
+    bytes[0] = 0
+    expect(() => {
+      checkSlotHeader(bytes, DESCRIPTION, LAYOUT)
+    }).toThrow(
+      new SlotError(
+        'no IRV_SLOT magic at the start of the slot: it is not the slot the description names',
+      ),
     )
   })
 })

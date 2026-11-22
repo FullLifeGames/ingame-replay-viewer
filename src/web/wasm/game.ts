@@ -1,7 +1,12 @@
 // The game module as its hosts see it: the exports and imports of build/wasm/irv-emerald.js, the
 // stream written into its slot, and the frame hook of the page's worker. DOM-free; the Node
 // harness (scripts/wasm-run.ts) shares the module's shape.
-import { type SlotDescription, writeReplaySlot } from '../../patch/slot.ts'
+import {
+  checkSlotHeader,
+  type SlotDescription,
+  type SlotHeaderLayout,
+  writeReplaySlot,
+} from '../../patch/slot.ts'
 import { FRAME_BYTES, widenFrame } from './frame.ts'
 import { readProgress, type ProgressLayout } from './progress.ts'
 import { type SharedBuffers, waitForTick, writeStatus } from './protocol.ts'
@@ -37,10 +42,17 @@ export interface ModuleHooks {
 /**
  * Writes `stream` into the module's slot through the rule for a ROM (src/patch/slot.ts). The
  * module's slot has the layout of the ROM's, which `romSlot` (replay-slot.json) describes, so the
- * description is moved to the slot's own address.
+ * description is moved to the slot's own address. A `romSlot` that the slot's own header
+ * contradicts comes from another build and is refused before anything is written.
  */
-export function writeStream(game: GameModule, romSlot: SlotDescription, stream: Uint8Array): void {
+export function writeStream(
+  game: GameModule,
+  romSlot: SlotDescription,
+  stream: Uint8Array,
+  layout: SlotHeaderLayout,
+): void {
   const at = game._IrvWasm_Slot()
+  checkSlotHeader(game.HEAPU8.subarray(at), romSlot, layout)
   const slot: SlotDescription = {
     ...romSlot,
     offset: 0,

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import type { SlotDescription } from '../../patch/slot'
+import { readSlotHeaderLayout, type SlotDescription } from '../../patch/slot'
 import header from '../../../rom/gen3/include/replay_progress.h?raw'
+import slotHeader from '../../../rom/gen3/include/replay_slot.h?raw'
 import { FRAME_BYTES } from './frame'
 import { frameHandler, writeStream } from './game'
 import type { GameModule } from './game'
@@ -9,6 +10,7 @@ import { readProgressLayout } from './progress'
 import { CONTROL, createShared, grant, readStatus } from './protocol'
 
 const LAYOUT = readProgressLayout(header)
+const SLOT_LAYOUT = readSlotHeaderLayout(slotHeader)
 const SLOT = 0x1000
 const PROGRESS = 0x3000
 const PIXELS = 0x4000
@@ -28,9 +30,14 @@ const ROM_SLOT: SlotDescription = {
   romSize: 0x2000000,
 }
 
-function fakeGame(): GameModule {
+// The module's slot with the header its build wrote (rom/gen3/src/replay_slot.c).
+function fakeGame(slot: { version?: number; size?: number } = {}): GameModule {
   const memory = new Uint8Array(PIXELS + FRAME_BYTES)
   memory.set(new TextEncoder().encode(MAGIC), SLOT)
+  const view = new DataView(memory.buffer, SLOT)
+  view.setUint16(0x08, slot.version ?? 1, true)
+  view.setUint16(0x0a, 0x20, true)
+  view.setUint32(0x0c, slot.size ?? 0x100, true)
   memory.fill(0xee, SLOT + 0x40, SLOT + 0x100)
   return {
     HEAPU8: memory,
@@ -44,23 +51,38 @@ function fakeGame(): GameModule {
 describe('the stream in the module', () => {
   it("lands at the module's slot with its length, by the layout of the ROM's slot", () => {
     const game = fakeGame()
-    writeStream(game, ROM_SLOT, Uint8Array.of(1, 2, 3))
+    writeStream(game, ROM_SLOT, Uint8Array.of(1, 2, 3), SLOT_LAYOUT)
     const view = new DataView(game.HEAPU8.buffer)
     expect(view.getUint32(SLOT + 0x10, true)).toBe(3)
     expect([...game.HEAPU8.subarray(SLOT + 0x20, SLOT + 0x24)]).toEqual([1, 2, 3, 0])
     expect(game.HEAPU8[SLOT + 0xff]).toBe(0)
     expect(game.HEAPU8[SLOT + 0x100]).toBe(0)
+    expect(view.getUint32(SLOT + 0x0c, true)).toBe(0x100)
   })
 
   it('is refused when it does not fit the slot or the slot has no magic', () => {
     expect(() => {
-      writeStream(fakeGame(), ROM_SLOT, new Uint8Array(0xe1))
+      writeStream(fakeGame(), ROM_SLOT, new Uint8Array(0xe1), SLOT_LAYOUT)
     }).toThrow('the stream has 225 bytes, the replay slot holds 224')
     const game = fakeGame()
     game.HEAPU8.fill(0, SLOT, SLOT + 8)
     expect(() => {
-      writeStream(game, ROM_SLOT, Uint8Array.of(1))
-    }).toThrow('no IRV_SLOT magic at 0x0')
+      writeStream(game, ROM_SLOT, Uint8Array.of(1), SLOT_LAYOUT)
+    }).toThrow('no IRV_SLOT magic at the start of the slot')
+  })
+
+  it("is refused when the module's slot is larger than replay-slot.json says", () => {
+    const game = fakeGame({ size: 0x20000 })
+    expect(() => {
+      writeStream(game, ROM_SLOT, Uint8Array.of(1), SLOT_LAYOUT)
+    }).toThrow('slot size 0x20000, the slot description slot size 0x100')
+    expect(game.HEAPU8[SLOT + 0x20]).toBe(0)
+  })
+
+  it("is refused when the module's slot has another version than replay-slot.json", () => {
+    expect(() => {
+      writeStream(fakeGame({ version: 2 }), ROM_SLOT, Uint8Array.of(1), SLOT_LAYOUT)
+    }).toThrow('version 2, the slot description version 1')
   })
 })
 
