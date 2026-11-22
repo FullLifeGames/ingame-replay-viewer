@@ -10,32 +10,40 @@
 #include "multiboot.h"
 #include "siirtc.h"
 #include "gba/flash_internal.h"
+#include "irv_wasm_stub_list.h"
 #include <stdio.h>
+#include <emscripten/em_js.h>
 
 // The WebAssembly build (#35) leaves out the files that drive cartridge and link hardware
 // (wasm.json "exclude") and the assembly of crt0.s and the BIOS. These stand in for their symbols.
 // Each kind does what the replay needs and no more:
 // - Flash is present and empty, as the ROM sees it on mGBA. The replay never loads a save and
-//   never writes flash (replay_boot.c), so a write is only logged.
+//   never writes flash (replay_boot.c), so a write stops the run.
 // - The clock is fixed and working, so every run of a stream sees the same time.
-// - Link and multiboot calls are logged once each and report success with 0. A replay should
-//   reach only the ones InitRFU makes at boot; the log shows any other.
-// - A call that cannot work here (a soft reset, the crash screen) names itself and aborts.
+// - Link and multiboot calls report success with 0. A replay reaches only the ones InitRFU makes
+//   at boot, which irv_wasm_stub_list.h lists (#46); each logs once. Any other stops the run.
+// - A call that cannot work here (a soft reset, the crash screen) stops the run.
 // - DebugPrintf and the asserts print to the console, as mGBA's log does.
 
-// Prints the name the first time a stub runs.
+// A stub off the list ends the run: the throw ends AgbMain, as a throw of the frame import does
+// (irv_wasm_frame.c), and the host shows the message. It must not throw a number: Emscripten's
+// setjmp support reads a thrown number as a longjmp. The message reads the name with
+// UTF8ToString, which the link includes only when asked.
+EM_JS_DEPS(irv_wasm_stubs, "$UTF8ToString");
+EM_JS(void, IrvWasm_StopAtStub, (const char *name), {
+    throw new Error('irv-emerald: ' + UTF8ToString(name)
+        + ' is a stub that no replay should call');
+});
+
+// Lets a listed stub run and prints its name the first time; stops the run at any other.
 static void StubCalled(const char *name, bool8 *logged)
 {
     if (*logged)
         return;
+    if (!IrvWasm_StubMayRun(name))
+        IrvWasm_StopAtStub(name);
     *logged = TRUE;
     printf("irv-emerald: %s is a stub in the WebAssembly build\n", name);
-}
-
-static void Unsupported(const char *name)
-{
-    printf("irv-emerald: %s cannot run in the WebAssembly build\n", name);
-    abort();
 }
 
 #define LOGGED_STUB(type, name, params) \
@@ -43,7 +51,7 @@ static void Unsupported(const char *name)
 #define LOGGED_VOID_STUB(name, params) \
     void name params { static bool8 logged; StubCalled(#name, &logged); }
 #define UNSUPPORTED_STUB(name, params) \
-    void name params { Unsupported(#name); }
+    void name params { IrvWasm_StopAtStub(#name); }
 
 // crt0.s and rom_header.s. INTR_VECTOR takes IntrMain's address, which no one calls here: the
 // frame glue calls gIntrTable itself. The header fields hold what gbafix writes from the Makefile.
