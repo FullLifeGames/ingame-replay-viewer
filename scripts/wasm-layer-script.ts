@@ -54,7 +54,7 @@ export const FRAME_BYTES = FRAME_WIDTH * FRAME_HEIGHT * 2
  * colours (16 bits each), the effect (0 none, 1 alpha, 2 brighter, 3 darker), EVA, EVB and EVY.
  */
 export const traceFrame: Op = [10]
-export const TRACE_ENTRY = 8
+const TRACE_ENTRY = 8
 export const TRACE_BYTES = FRAME_WIDTH * FRAME_HEIGHT * TRACE_ENTRY
 
 /** Appends the first `max` calls of the IRQ handler as a flag and VCOUNT each, zeros after them. */
