@@ -145,6 +145,26 @@ describe('item pop-ups (BattleScript_ItemPopUp_Scripting)', () => {
     ])
   })
 
+  // Gen 2's berries (Gold Berry, Berry) have no row in the expansion: the eaten berry plays its
+  // animation with no pop-up, and its heal is no berry shown before, so it keeps our line.
+  it('keeps the line of a heal by an eaten berry the expansion lacks, and shows no pop-up', () => {
+    const result = streamOfLog(
+      '|-enditem|p1a: Dugtrio|Gold Berry|[eat]',
+      '|-heal|p1a: Dugtrio|70/100|[from] item: Gold Berry',
+    )
+    const scene = result.instructions.filter(({ line }) => line >= NEXT).slice(0, -1)
+    expect(scene.map(({ instruction }) => plain(instruction))).toEqual([
+      anim('near', 'heldItemBerry'),
+      anim('near', 'heldItemEffect'),
+      { op: 'hp', side: 'near', hp: 70 },
+      'Dugtrio restored a little HP using its Gold Berry!',
+    ])
+    expect(result.fallbacks.map(({ line, kind }) => [line, kind])).toEqual([
+      [NEXT, 'item'],
+      [NEXT + 1, 'item'],
+    ])
+  })
+
   it('keeps the line and the fallback of a heal by an item the expansion lacks', () => {
     const result = streamOfLog('|-heal|p1a: Dugtrio|70/100|[from] item: Mail')
     const scene = result.instructions.filter(({ line }) => line >= NEXT).slice(0, -1)
