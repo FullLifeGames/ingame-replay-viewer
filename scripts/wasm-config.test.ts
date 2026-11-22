@@ -36,13 +36,8 @@ describe('the WebAssembly build config', () => {
     ])
     // PORTABLE turns on the sound files' hand-off to the host and their PSG synthesis.
     expect(config.platform.defines).toEqual(['IRV_WASM_PLATFORM', 'RENDERER_EASY_DRAW', 'PORTABLE'])
-    expect(config.platform.files).toEqual(
-      expect.arrayContaining([
-        'src/music_player.c',
-        'src/sound_mixer.c',
-        'src/platform/cgb_audio.c',
-      ]),
-    )
+    // Our layer plays the sound (#43, B8b): no borrowed C file is left in the list.
+    expect(config.platform.files.filter((file) => file.endsWith('.c'))).toEqual([])
     expect(config.jobs).toBe(2)
   })
 

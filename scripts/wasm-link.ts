@@ -67,17 +67,9 @@ export function asmObjects(dir: string): string[] {
   return objects
 }
 
-// The layer's sequencer (#43, B8a) defines MPlayMain, TrackStop and the ply_* commands, as the
-// borrowed music_player.c still does, and its layout check needs the game's struct layout that
-// patch 0007 changes. Both stay out of the module until the sound swap (B8b) deletes this line;
-// the host harness compiles them meanwhile.
-const AFTER_SOUND_SWAP = /^irv_(wasm_)?mp2k_/
-
 // The glue and our platform layer compile alike, and their objects share build/wasm/obj/glue.
 export function glueSources(dirs: readonly string[] = [GLUE_DIR, LAYER_DIR]): string[] {
-  const sources = dirs
-    .flatMap((dir) => folderSources(dir))
-    .filter((source) => !AFTER_SOUND_SWAP.test(basename(source)))
+  const sources = dirs.flatMap((dir) => folderSources(dir))
   const names = sources.map((source) => basename(source))
   const twice = names.filter((name, i) => names.indexOf(name) !== i)
   if (twice.length > 0) {

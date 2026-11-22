@@ -1,7 +1,7 @@
 // The layout check of our layer's sound structs (#43, B8a): rom/gen3/wasm/src/irv_wasm_mp2k_layout.c
-// holds each struct of layer/irv_mp2k_types.h against the game's include/gba/m4a_internal.h. It
-// joins the module with the sound swap (B8b); until then this spec compiles it for 32 bits, the
-// module's pointer size, against the pinned tree (devbox: CI has no tree).
+// holds each struct of layer/irv_mp2k_types.h against the game's include/gba/m4a_internal.h. The
+// module's build compiles it with the glue; this spec compiles it alone for 32 bits, the module's
+// pointer size, against the pinned tree, in seconds (devbox: CI has no tree).
 import { spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'

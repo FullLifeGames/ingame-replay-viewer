@@ -1,6 +1,6 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { basename, join } from 'node:path'
 
 import { afterAll, describe, expect, it } from 'vitest'
 
@@ -35,19 +35,23 @@ describe('the C files of our platform layer', () => {
 
   it('enter the module with the glue', () => {
     const sources = glueSources()
-    const layer = layerSources().filter((source) => !source.includes('/irv_mp2k_'))
-    expect(sources).toEqual(expect.arrayContaining(layer))
+    expect(sources).toEqual(expect.arrayContaining(layerSources()))
     expect(sources).toEqual(
       expect.arrayContaining([expect.stringMatching(/src\/irv_wasm_frame\.c$/)]),
     )
     expect(sources.some((source) => source.includes('/host/'))).toBe(false)
   })
 
-  it('keep the sequencer and its layout check out of the module until the sound swap (B8b)', () => {
-    const sequencer = layerSources().filter((source) => source.includes('/irv_mp2k_'))
-    expect(sequencer.length).toBeGreaterThan(0)
-    expect(glueSources().filter((source) => /\/irv_(wasm_)?mp2k_/.test(source))).toEqual([])
-    expect(hostCommand('/tmp/out/irv_layer_host', {})).toEqual(expect.arrayContaining(sequencer))
+  it('bring the sound engine and its layout check into the module and the harness (B8b)', () => {
+    const engine = layerSources().filter((source) => source.includes('/irv_mp2k_'))
+    expect(engine.map((source) => basename(source))).toEqual(
+      expect.arrayContaining(['irv_mp2k_main.c', 'irv_mp2k_mixer.c', 'irv_mp2k_sound.c']),
+    )
+    expect(glueSources()).toEqual(
+      expect.arrayContaining([...engine, expect.stringMatching(/src\/irv_wasm_mp2k_layout\.c$/)]),
+    )
+    expect(glueSources().some((source) => source.endsWith('irv_wasm_sound_layout.c'))).toBe(false)
+    expect(hostCommand('/tmp/out/irv_layer_host', {})).toEqual(expect.arrayContaining(engine))
   })
 
   it('may not share a name with a file of the glue, whose objects share one folder', () => {

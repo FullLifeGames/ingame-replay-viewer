@@ -11,10 +11,7 @@
       "include/mp2k_common.h",
       "include/music_player.h",
       "include/platform.h",
-      "include/sound_mixer.h",
-      "src/music_player.c",
-      "src/platform/cgb_audio.c",
-      "src/sound_mixer.c"
+      "include/sound_mixer.h"
     ],
     "defines": ["IRV_WASM_PLATFORM", "RENDERER_EASY_DRAW", "PORTABLE"]
   },

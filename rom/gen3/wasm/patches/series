@@ -5,6 +5,5 @@
 0004-m4a-no-vcount-wait.patch
 0005-bg-tilemap-buffer-in-data.patch
 0006-text-glyph-copy-shift-by-32.patch
-0007-m4a-internal-float-mixer.patch
 0008-m4a-platform-mixer.patch
 0009-random-no-naked-asm.patch

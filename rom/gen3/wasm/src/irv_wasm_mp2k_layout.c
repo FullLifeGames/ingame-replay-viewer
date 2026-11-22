@@ -2,12 +2,12 @@
 #include "irv_mp2k_types.h"
 #include <stddef.h>
 
-// The WebAssembly build (#43): the sequencer of our platform layer takes the sound engine's data
-// in its own structs (layer/irv_mp2k_types.h), each pointer as a 32-bit address, while the game
+// The WebAssembly build (#43): the sound engine of our platform layer takes the engine's data in
+// its own structs (layer/irv_mp2k_types.h), each pointer as a 32-bit address, while the game
 // passes its own (include/gba/m4a_internal.h). These asserts hold each field of each pair at one
-// offset and one size. Until the sound swap (B8b) this file stays out of the module
-// (scripts/wasm-link.ts); scripts/wasm-mp2k-layout.test.ts compiles it for 32 bits against the
-// pinned tree's header.
+// offset and one size. The module compiles this file with the glue; so does
+// scripts/wasm-mp2k-layout.test.ts, for 32 bits against the pinned tree's header, without a
+// module build.
 
 #define FIELD_SIZE(type, field) sizeof(((struct type *)0)->field)
 
