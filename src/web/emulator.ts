@@ -25,10 +25,22 @@ export type EmulatorCore = Pick<
 > & {
   readonly FS: ReplayFs
   /** Created with the game's audio, so absent before it; sound is best effort. */
-  readonly SDL2?: {
-    readonly audioContext?: Pick<AudioContext, 'state' | 'resume'>
+  SDL2?: {
+    /** SDL opens its audio with a context set here; quitGame closes it and clears the field. */
+    audioContext?: HandedAudio | undefined
     readonly audio?: { readonly scriptProcessorNode?: { onaudioprocess: unknown } }
   }
+}
+
+/** The part of an audio context the adapter and SDL's glue touch. */
+type HandedAudio = Pick<AudioContext, 'state' | 'resume' | 'close'>
+
+/** The audio context a Start tap opens; the next game's SDL2 takes it in place of its own. */
+export interface AudioHandOver {
+  /** Call inside the Start click: Firefox lets a page start audio only during the tap. */
+  open(): void
+  /** The context the last open made, once; undefined after a take or a failed open. */
+  take(): HandedAudio | undefined
 }
 
 /** What the page asks of the emulator. */
@@ -56,13 +68,51 @@ type GameState = 'none' | 'running' | 'crashed'
 /** Starts a suspended audio context; a refusal leaves the replay silent and nothing else. */
 function wakeAudio(core: EmulatorCore): void {
   const context = core.SDL2?.audioContext
-  if (context?.state === 'suspended') {
-    context.resume().catch(() => undefined)
+  if (context?.state === 'suspended') quietly(context.resume())
+}
+
+/** Best effort, as all sound: a refused close or resume leaves the replay as it is. */
+function quietly(work: Promise<void>): void {
+  work.catch(() => undefined)
+}
+
+/**
+ * Opens one context per Start tap. mGBA loads seconds after the tap, past the user activation
+ * that Firefox demands, so the tap opens the context and SDL2 adopts it (#51).
+ */
+export function audioHandOver(create: () => HandedAudio = () => new AudioContext()): AudioHandOver {
+  let pending: HandedAudio | undefined
+  return {
+    open: () => {
+      if (pending !== undefined) quietly(pending.close())
+      pending = undefined
+      try {
+        pending = create()
+      } catch {
+        return
+      }
+      if (pending.state === 'suspended') quietly(pending.resume())
+    },
+    take: () => {
+      const taken = pending
+      pending = undefined
+      return taken
+    },
   }
 }
 
-/** The adapter over a loaded mGBA module. */
-export function createEmulator(core: EmulatorCore): Emulator {
+// SDL's glue keeps an existing Module.SDL2 and opens its audio with the context it finds there.
+// A context SDL still holds wins: two contexts would only fight over the device.
+function handAudio(core: EmulatorCore, audio: AudioHandOver | undefined): void {
+  const context = audio?.take()
+  if (context === undefined) return
+  const sdl = (core.SDL2 ??= {})
+  if (sdl.audioContext === undefined) sdl.audioContext = context
+  else quietly(context.close())
+}
+
+/** The adapter over a loaded mGBA module; `audio` hands each Start's context to the game. */
+export function createEmulator(core: EmulatorCore, audio?: AudioHandOver): Emulator {
   let state: GameState = 'none'
   let prepared = false
   const listeners: ((line: string) => void)[] = []
@@ -95,6 +145,7 @@ export function createEmulator(core: EmulatorCore): Emulator {
     run: (rom) => {
       if (!prepared) prepare()
       replaceImage(rom)
+      handAudio(core, audio)
       if (!core.loadGame(IMAGE, SAVE))
         throw new EmulatorError('The emulator did not accept the ROM.')
       state = 'running'
@@ -116,7 +167,10 @@ export function createEmulator(core: EmulatorCore): Emulator {
 }
 
 /** Loads mGBA into `canvas`; the page calls it at the first Start, not on load. */
-export async function loadEmulator(canvas: HTMLCanvasElement): Promise<Emulator> {
+export async function loadEmulator(
+  canvas: HTMLCanvasElement,
+  audio?: AudioHandOver,
+): Promise<Emulator> {
   const { default: mGBA } = await import('@thenick775/mgba-wasm')
-  return createEmulator(await mGBA({ canvas }))
+  return createEmulator(await mGBA({ canvas }), audio)
 }
