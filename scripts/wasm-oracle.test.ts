@@ -12,7 +12,14 @@ import { buildHost } from './wasm-layer.ts'
 import { frame, FRAME_BYTES, runScript } from './wasm-layer-script.ts'
 import { rgb } from './wasm-layer-video.ts'
 import { parseOracleArgs, stateFrames, summarize } from './wasm-oracle.ts'
-import { diffFrame, mgbaRgb, parseVideoState, sideBySide, stateOps } from './wasm-oracle-state.ts'
+import {
+  diffFrame,
+  gbatekColour,
+  mgbaRgb,
+  parseVideoState,
+  sideBySide,
+  stateOps,
+} from './wasm-oracle-state.ts'
 
 const scratch = mkdtempSync(join(tmpdir(), 'irv-oracle-'))
 let host = ''
@@ -109,6 +116,24 @@ describe("mGBA's colour of a traced pixel", () => {
   })
 })
 
+describe("GBATEK's colour of a traced pixel", () => {
+  const trace = { top: rgb(30, 25, 17), below: rgb(31, 31, 31), effect: 0, eva: 7, evb: 9, evy: 8 }
+
+  it('keeps the top colour when the pixel has no effect', () => {
+    expect(gbatekColour(trace)).toBe(rgb(30, 25, 17))
+  })
+
+  it('blends the 5-bit channels: (top * EVA + below * EVB) / 16, rounded down, at most 31', () => {
+    expect(gbatekColour({ ...trace, effect: 1 })).toBe(rgb(30, 28, 24))
+    expect(gbatekColour({ ...trace, effect: 1, eva: 16, evb: 16 })).toBe(rgb(31, 31, 31))
+  })
+
+  it('brightens by (31 - I) * EVY / 16 and darkens by I * EVY / 16, the product rounded down', () => {
+    expect(gbatekColour({ ...trace, effect: 2 })).toBe(rgb(30, 28, 24))
+    expect(gbatekColour({ ...trace, effect: 3 })).toBe(rgb(15, 13, 9))
+  })
+})
+
 describe('the script of a state', () => {
   it('draws the state as it was dumped', () => {
     const pixels = draw(stateBytes({}, { 0: rgb(3, 4, 5) }))
@@ -177,11 +202,35 @@ describe("the comparison with mGBA's frame", () => {
     for (let i = 0; i < 240 * 160; i++) view.setUint16(8 * i, rgb(31, 0, 0), true)
     view.setUint16(8 * 7, rgb(0, 31, 0), true)
     const diff = diffFrame(
-      ours,
+      new Uint16Array(240 * 160).fill(rgb(31, 0, 0)),
       linesFrame(() => rgb(31, 0, 0)),
       trace,
     )
     expect(diff.pixels).toBe(1)
+  })
+
+  it("holds our drawn pixel against GBATEK's result of its trace, whatever mGBA shows", () => {
+    // A blend that returns the top colour unchanged: mGBA's frame shows the blend of the trace,
+    // and the trace names the right layers, so only the drawn pixel is wrong.
+    const traced = { top: rgb(31, 0, 0), below: rgb(0, 0, 31), effect: 1, eva: 8, evb: 8, evy: 0 }
+    const trace = new Uint8Array(240 * 160 * 8)
+    const view = new DataView(trace.buffer)
+    for (let i = 0; i < 240 * 160; i++) view.setUint16(8 * i, rgb(31, 0, 0), true)
+    view.setUint16(8 * 7, traced.top, true)
+    view.setUint16(8 * 7 + 2, traced.below, true)
+    trace.set([traced.effect, traced.eva, traced.evb, traced.evy], 8 * 7 + 4)
+    const theirs = linesFrame(() => rgb(31, 0, 0))
+    const blended = mgbaRgb(traced)
+    theirs.rgb.set([blended >> 16, (blended >> 8) & 0xff, blended & 0xff], 3 * 7)
+    const drawn = new Uint16Array(240 * 160).fill(rgb(31, 0, 0))
+    expect(diffFrame(drawn, theirs, trace)).toEqual({
+      pixels: 1,
+      lines: [{ line: 0, pixels: 1 }],
+      offTrace: 1,
+    })
+    const right = drawn.slice()
+    right[7] = rgb(15, 0, 15)
+    expect(diffFrame(right, theirs, trace)).toEqual({ pixels: 0, lines: [], offTrace: 0 })
   })
 
   it('refuses a frame that is not 240x160', () => {
@@ -213,9 +262,9 @@ describe('the oracle run', () => {
     expect(stateFrames(files)).toEqual([60, 120])
   })
 
-  it('counts equal frames for both pairings and lists the differing ones', () => {
+  it('counts equal frames for both pairings and lists the differing ones with their off-trace pixels', () => {
     const equal = { pixels: 0, lines: [] }
-    const off = { pixels: 4, lines: [{ line: 7, pixels: 4 }] }
+    const off = { pixels: 4, lines: [{ line: 7, pixels: 4 }], offTrace: 3 }
     const report = summarize('s', [
       { frame: 60, same: equal, next: off },
       { frame: 120, same: off, next: equal },
@@ -225,7 +274,7 @@ describe('the oracle run', () => {
       name: 's',
       states: 3,
       equal: { same: 2, next: 1 },
-      differing: [{ frame: 120, pixels: 4, lines: 1, firstLine: 7 }],
+      differing: [{ frame: 120, pixels: 4, lines: 1, firstLine: 7, offTrace: 3 }],
     })
   })
 })

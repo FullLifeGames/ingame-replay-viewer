@@ -95,6 +95,8 @@ export interface FrameDiff {
   pixels: number
   /** The lines with a difference, with their count of differing pixels. */
   lines: { line: number; pixels: number }[]
+  /** With a trace: the pixels we drew other than GBATEK's result of their trace (gbatekColour). */
+  offTrace?: number
 }
 
 const EFFECT_ALPHA = 1
@@ -133,9 +135,41 @@ export function mgbaRgb(trace: PixelTrace): number {
   return rgb
 }
 
+const CHANNEL_MAX = 31
+
 /**
- * Our BGR555 frame against mGBA's RGB frame, each channel widened as the page does; with the
- * harness's trace of our frame, each pixel's colour as mGBA would show our layers and effect.
+ * The BGR555 colour GBATEK gives a pixel of the harness's trace ("LCD I/O Color Special Effects"):
+ * per 5-bit channel, alpha MIN(31, top * EVA + below * EVB), brighter top + (31 - top) * EVY,
+ * darker top - top * EVY, each product counting sixteenths and rounded down. The layer's frame
+ * must hold this colour wherever the oracle grades its trace against mGBA.
+ */
+export function gbatekColour(trace: PixelTrace): number {
+  let colour = 0
+  for (let shift = 0; shift < 15; shift += 5) {
+    const top = (trace.top >> shift) & CHANNEL_MAX
+    const below = (trace.below >> shift) & CHANNEL_MAX
+    let channel = top
+    if (trace.effect === EFFECT_ALPHA)
+      channel = Math.min(CHANNEL_MAX, (top * trace.eva + below * trace.evb) >> 4)
+    else if (trace.effect === EFFECT_UP) channel = top + (((CHANNEL_MAX - top) * trace.evy) >> 4)
+    else if (trace.effect === EFFECT_DOWN) channel = top - ((top * trace.evy) >> 4)
+    colour |= channel << shift
+  }
+  return colour
+}
+
+/** One pixel's verdict: whether it differs from mGBA's, and whether we drew it off its trace. */
+function pixelVerdict(drawn: number, theirs: number, trace: Uint8Array | undefined, i: number) {
+  if (trace === undefined) return { differs: widenedRgb(drawn) !== theirs, off: false }
+  const traced = traceAt(trace, i)
+  const off = drawn !== gbatekColour(traced)
+  return { differs: off || mgbaRgb(traced) !== theirs, off }
+}
+
+/**
+ * Our BGR555 frame against mGBA's RGB frame, each channel widened as the page does. With the
+ * harness's trace of our frame, each pixel's colour as mGBA would show our layers and effect, and
+ * our drawn pixel must be GBATEK's result of the same trace: a pixel differs when either fails.
  */
 export function diffFrame(ours: Uint16Array, theirs: Frame, trace?: Uint8Array): FrameDiff {
   if (theirs.width !== FRAME_WIDTH || theirs.height !== FRAME_HEIGHT) {
@@ -143,17 +177,19 @@ export function diffFrame(ours: Uint16Array, theirs: Frame, trace?: Uint8Array):
   }
   const lines: FrameDiff['lines'] = []
   let pixels = 0
+  let offTrace = 0
   for (let y = 0; y < FRAME_HEIGHT; y++) {
     let count = 0
     for (let x = 0; x < FRAME_WIDTH; x++) {
       const i = y * FRAME_WIDTH + x
-      const expected = trace === undefined ? widenedRgb(ours[i] ?? 0) : mgbaRgb(traceAt(trace, i))
-      if (expected !== rgbAt(theirs.rgb, i)) count++
+      const { differs, off } = pixelVerdict(ours[i] ?? 0, rgbAt(theirs.rgb, i), trace, i)
+      if (off) offTrace++
+      if (differs) count++
     }
     if (count > 0) lines.push({ line: y, pixels: count })
     pixels += count
   }
-  return { pixels, lines }
+  return trace === undefined ? { pixels, lines } : { pixels, lines, offTrace }
 }
 
 const widenedRgb = (colour: number) =>

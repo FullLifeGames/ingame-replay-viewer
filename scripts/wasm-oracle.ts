@@ -4,7 +4,8 @@
 // this script draws each state with our renderer in the host harness and compares it with mGBA's
 // frame line by line. Both images come from one mGBA instant, so no difference of pace enters.
 // mGBA applies the colour special effects to 8-bit channels, so a pixel with an effect is held
-// against mGBA's arithmetic on our layers and effect, from the harness's trace (mgbaRgb).
+// against mGBA's arithmetic on our layers and effect, from the harness's trace (mgbaRgb), and the
+// pixel we drew is held against GBATEK's 5-bit result of the same trace (gbatekColour).
 // The report goes to build/wasm/oracle/report.json, the first ten differences of each stream as
 // side-by-side PPMs (ours left) next to the dumps.
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -73,7 +74,8 @@ export interface StreamReport {
   states: number
   /** Equal frames when a state is paired with its own frame, and with the next one. */
   equal: { same: number; next: number }
-  differing: { frame: number; pixels: number; lines: number; firstLine: number }[]
+  /** `offTrace`: the differing pixels we drew other than GBATEK's result of their trace. */
+  differing: { frame: number; pixels: number; lines: number; firstLine: number; offTrace: number }[]
 }
 
 export function summarize(name: string, compared: readonly Compared[]): StreamReport {
@@ -88,6 +90,7 @@ export function summarize(name: string, compared: readonly Compared[]): StreamRe
       pixels: c.same.pixels,
       lines: c.same.lines.length,
       firstLine: c.same.lines[0]?.line ?? -1,
+      offTrace: c.same.offTrace ?? 0,
     }))
   return { name, states: compared.length, equal, differing }
 }
