@@ -9,7 +9,7 @@ const CHANS = SOUND_INFO + 0x50
 const CHANNEL = 0x40
 const PCM_CHANNELS = 12
 /** MP2K spec 6.1: the buffer's right half (FIFO A), then its left half (FIFO B). */
-export const HALF = 1584
+const HALF = 1584
 const PCM_BUFFER = CHANS + PCM_CHANNELS * CHANNEL
 const INFO_BYTES = PCM_BUFFER - SOUND_INFO + 2 * HALF
 /** The harness's IrvSound_HandOver (layer/host/irv_layer_host_mp2k.c): count, rate, pairs. */
@@ -57,7 +57,7 @@ export function waveBytes(wave: Wave): number[] {
 }
 
 /** A DirectSound channel as ply_note leaves it (MP2K spec 5.6). */
-export interface MixChannel {
+interface MixChannel {
   type?: number
   wave: number
   frequency?: number
@@ -96,7 +96,7 @@ export interface MixScene {
   before?: Readonly<Record<number, readonly Op[]>>
 }
 
-export interface MixState {
+interface MixState {
   status: number
   envelope: number
   envelopeRight: number
