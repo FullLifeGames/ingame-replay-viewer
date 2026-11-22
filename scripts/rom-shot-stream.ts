@@ -1,12 +1,12 @@
 // The streams of the screenshot run: a test replay's stream from the Gen 3 game backend, a
-// hand-made battle written with the stream encoder, the same stream with version 2, and the decoder
-// that turns the bytes back into instructions for the scene points. src/gen3/ imports without file
-// extensions and imports JSON, as the page's bundler resolves them, so scripts/rom-shot.ts loads
-// this module through Vite's module runner, not with plain Node.
+// hand-made battle written with the stream encoder, the same stream with an unknown version, and
+// the decoder that turns the bytes back into instructions for the scene points. src/gen3/ imports
+// without file extensions and imports JSON, as the page's bundler resolves them, so
+// scripts/rom-shot.ts loads this module through Vite's module runner, not with plain Node.
 import { buildGen3Stream } from '../src/gen3/backend.ts'
 import { decodeStream } from '../src/gen3/stream/decode.ts'
 import { encodeStream } from '../src/gen3/stream/encode.ts'
-import { STREAM_OFFSET } from '../src/gen3/stream/format.ts'
+import { STREAM, STREAM_OFFSET } from '../src/gen3/stream/format.ts'
 import type { Instruction, Stream, StreamMon } from '../src/gen3/stream/instructions.ts'
 import { moveOf, speciesOf } from '../src/gen3/tables/lookup.ts'
 import trainerPics from '../src/gen3/tables/trainer-pics.json'
@@ -92,7 +92,10 @@ export function handMadeBytes(): Uint8Array {
   return encodeStream(handMadeStream())
 }
 
-/** The same stream with version 2 in its header, which the ROM interpreter refuses. */
+/** The first version after the one the encoder writes: the ROM interpreter refuses it. */
+export const UNKNOWN_VERSION = STREAM.version + 1
+
+/** The same stream with another version in its header. */
 export function withVersion(bytes: Uint8Array, version: number): Uint8Array {
   const copy = bytes.slice()
   new DataView(copy.buffer).setUint16(STREAM_OFFSET.version, version, true)

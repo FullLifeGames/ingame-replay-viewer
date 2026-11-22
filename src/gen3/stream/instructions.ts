@@ -66,6 +66,12 @@ interface Operands {
   volatile: OnSide & { readonly volatile: Volatile; readonly on: boolean }
   ability: OnSide & { readonly ability: number; readonly show: boolean }
   item: InParty & { readonly item: number }
+  /** The pop-up of the side's held item as it takes effect. */
+  itemPopUp: OnSide & { readonly item: number }
+  /** The end-of-turn animation of the move that traps the side's mon. */
+  trapTurn: OnSide & { readonly move: number }
+  /** The text box emptied, as a battle script's `flushtextbox`; no operands. */
+  flushTextBox: unknown
 }
 
 export type Instruction = { [K in Op]: { readonly op: K } & Operands[K] }[Op]
@@ -170,6 +176,15 @@ export const LAYOUT: { readonly [K in FixedOp]: Fields<Operands[K]> } = {
     ['slot', 'slot'],
     ['item', below(counts.ITEMS_COUNT)],
   ],
+  itemPopUp: [
+    ['side', side],
+    ['item', below(counts.ITEMS_COUNT)],
+  ],
+  trapTurn: [
+    ['side', side],
+    ['move', below(counts.MOVES_COUNT_ALL)],
+  ],
+  flushTextBox: [],
 }
 
 /** A trainer's fields; their offsets are TRAINER_OFFSET's under the same names. */

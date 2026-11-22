@@ -7,6 +7,7 @@ import {
   effective,
   failed,
   fainted,
+  hitCount,
   immune,
   missed,
   statChanged,
@@ -64,6 +65,11 @@ describe('move phrases (P1)', () => {
     expect(critical()).toBe('A critical hit!')
     expect(effective('super')).toBe("It's super effective!")
     expect(effective('resisted')).toBe("It's not very effective…")
+  })
+
+  it('counts the hits of a multi-hit move, one in the singular', () => {
+    expect(hitCount(1)).toBe('The Pokémon was hit 1 time!')
+    expect(hitCount(5)).toBe('The Pokémon was hit 5 times!')
   })
 
   it('says a move does not affect an immune target', () => {

@@ -1,11 +1,13 @@
 // Switches and faints (plan §6), in the order of the expansion's scripts: a switch calls the old
 // Pokémon back and sends the new one; Roar (`BattleScript_RoarSuccessSwitch`) and Baton Pass
 // (`BattleScript_EffectBatonPass`) return it without a word; a faint plays before its line.
-// Destiny Bond's attacker hears the held line and drains its bar before it faints.
+// Destiny Bond's attacker hears the held line and drains its bar before it faints; a target that
+// a multi-hit move's last hit knocks out hears the move's last lines after its own.
 import { fainted } from '../text/phrases'
 import { draggedOut, sentOut, withdrawn } from '../text/phrases-field'
 import type { Context, EventOf } from './context'
 import { takeDown } from './effects'
+import { afterFaint } from './hits'
 import { endIntro, sendOutLead } from './intro'
 import { scaleHp } from './scale'
 
@@ -46,5 +48,6 @@ export function faint({ who, line }: EventOf<'faint'>, ctx: Context): void {
   takeDown(who, line, ctx)
   ctx.emit(line, { op: 'faint', side: ctx.activeSide(who) })
   ctx.print(line, fainted(ctx.mon(who)))
+  afterFaint(who, ctx)
   ctx.leave(who.side)
 }

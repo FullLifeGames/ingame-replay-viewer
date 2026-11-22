@@ -1,4 +1,4 @@
-// The instruction stream, version 1 (plan §2): the numbers both sides of the seam share. The C
+// The instruction stream, version 2 (plan §2): the numbers both sides of the seam share. The C
 // side is rom/gen3/include/replay_stream.h; format.test.ts holds the two equal, name by name
 // (`OP.sendOut` is REPLAY_OP_SEND_OUT). The stream is little-endian; it starts with its version.
 import type { BoostID, StatusName } from '@pkmn/data'
@@ -7,7 +7,7 @@ import type { Side } from '../../script/types'
 
 /** The stream header's values and where the team tables and the instructions start. */
 export const STREAM = {
-  version: 1,
+  version: 2,
   headerSize: 0x10,
   sideCount: 2,
   partySize: 6,
@@ -82,6 +82,9 @@ export const OP = {
   volatile: 0x0f,
   ability: 0x10,
   item: 0x11,
+  itemPopUp: 0x12,
+  trapTurn: 0x13,
+  flushTextBox: 0x14,
 } as const
 
 export type Op = keyof typeof OP
@@ -105,6 +108,9 @@ export const OP_SIZE = {
   volatile: 3,
   ability: 4,
   item: 4,
+  itemPopUp: 3,
+  trapTurn: 3,
+  flushTextBox: 0,
 } as const satisfies Record<Exclude<Op, 'print'>, number>
 
 /** PRINT's operand: its text in the game's charset and EOS, one glyph at least. */
@@ -164,4 +170,5 @@ export const ANIM = {
   statusSlp: 14,
   statusPrz: 15,
   statusFrz: 16,
+  simpleHeal: 17,
 } as const

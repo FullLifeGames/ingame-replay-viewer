@@ -1,0 +1,314 @@
+{"length":4438,"crc32":"8d75ef92","trainers":{"near":{"name":"chronosxsonorhc","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"oldsmellybastard","trainerPic":2,"teamSize":6,"revealed":3}},"parties":{"near":[{"species":38,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ninetales"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":233,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Porygon2"},{"species":254,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Sceptile"},{"species":260,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Swampert"},{"species":237,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Hitmontop"}],"far":[{"species":348,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Jumbo Shrimp"},{"species":260,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Fent Cart"},{"species":214,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Come on and "},null,null,null]}}
+{"line":25,"op":"intro"}
+{"line":25,"op":"print","text":"You are challenged by oldsmellybastard!"}
+{"line":27,"op":"print","text":"oldsmellybastard sent out Jumbo Shrimp!"}
+{"line":27,"op":"sendOut","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":26,"op":"print","text":"Go! Ninetales!"}
+{"line":26,"op":"sendOut","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":28,"op":"turn","number":1}
+{"line":32,"op":"print","text":"Ninetales used Will-O-Wisp!"}
+{"line":33,"op":"print","text":"The opposing Jumbo Shrimp avoided the attack!"}
+{"line":34,"op":"print","text":"The opposing Jumbo Shrimp used Rock Blast!"}
+{"line":34,"op":"move","user":"far","target":"near","move":350}
+{"line":36,"op":"hit","side":"near","effectiveness":"super"}
+{"line":36,"op":"hp","side":"near","hp":76}
+{"line":38,"op":"flushTextBox"}
+{"line":38,"op":"move","user":"far","target":"near","move":350}
+{"line":38,"op":"hit","side":"near","effectiveness":"super"}
+{"line":38,"op":"hp","side":"near","hp":48}
+{"line":39,"op":"print","text":"It's super effective!"}
+{"line":39,"op":"print","text":"The Pokémon was hit 2 times!"}
+{"line":41,"op":"itemPopUp","side":"near","item":472}
+{"line":41,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":41,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":41,"op":"hp","side":"near","hp":54}
+{"line":43,"op":"turn","number":2}
+{"line":46,"op":"print","text":"Ninetales used Charm!"}
+{"line":46,"op":"move","user":"near","target":"far","move":204}
+{"line":47,"op":"stat","side":"far","stat":"atk","stages":-2,"arrows":"one"}
+{"line":47,"op":"print","text":"The opposing Jumbo Shrimp's Attack harshly fell!"}
+{"line":48,"op":"print","text":"The opposing Jumbo Shrimp used Rock Blast!"}
+{"line":49,"op":"print","text":"Ninetales avoided the attack!"}
+{"line":51,"op":"itemPopUp","side":"near","item":472}
+{"line":51,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":51,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":51,"op":"hp","side":"near","hp":60}
+{"line":53,"op":"turn","number":3}
+{"line":56,"op":"print","text":"oldsmellybastard withdrew Jumbo Shrimp!"}
+{"line":56,"op":"withdraw","side":"far"}
+{"line":56,"op":"print","text":"oldsmellybastard sent out Fent Cart!"}
+{"line":56,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":57,"op":"print","text":"Ninetales used Will-O-Wisp!"}
+{"line":57,"op":"move","user":"near","target":"far","move":261}
+{"line":58,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":58,"op":"print","text":"The opposing Fent Cart was burned!"}
+{"line":58,"op":"status","side":"far","slot":1,"status":"brn"}
+{"line":60,"op":"itemPopUp","side":"near","item":472}
+{"line":60,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":60,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":60,"op":"hp","side":"near","hp":66}
+{"line":61,"op":"print","text":"The opposing Fent Cart was hurt by its burn!"}
+{"line":61,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":61,"op":"hp","side":"far","hp":88}
+{"line":63,"op":"turn","number":4}
+{"line":66,"op":"print","text":"Ninetales, come back!"}
+{"line":66,"op":"withdraw","side":"near"}
+{"line":66,"op":"print","text":"Go! Celebi!"}
+{"line":66,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":67,"op":"print","text":"The opposing Fent Cart used Surf!"}
+{"line":67,"op":"move","user":"far","target":"near","move":57}
+{"line":69,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":69,"op":"hp","side":"near","hp":86}
+{"line":69,"op":"print","text":"It's not very effective…"}
+{"line":71,"op":"itemPopUp","side":"near","item":472}
+{"line":71,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":71,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":71,"op":"hp","side":"near","hp":92}
+{"line":72,"op":"itemPopUp","side":"far","item":472}
+{"line":72,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":72,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":72,"op":"hp","side":"far","hp":94}
+{"line":73,"op":"print","text":"The opposing Fent Cart was hurt by its burn!"}
+{"line":73,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":73,"op":"hp","side":"far","hp":82}
+{"line":75,"op":"turn","number":5}
+{"line":78,"op":"print","text":"Celebi, come back!"}
+{"line":78,"op":"withdraw","side":"near"}
+{"line":78,"op":"print","text":"Go! Porygon2!"}
+{"line":78,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":79,"op":"ability","side":"near","ability":67,"show":true}
+{"line":79,"op":"ability","side":"near","ability":67,"show":false}
+{"line":80,"op":"print","text":"The opposing Fent Cart used Ice Beam!"}
+{"line":80,"op":"move","user":"far","target":"near","move":58}
+{"line":81,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":81,"op":"hp","side":"near","hp":80}
+{"line":83,"op":"itemPopUp","side":"near","item":472}
+{"line":83,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":83,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":83,"op":"hp","side":"near","hp":87}
+{"line":84,"op":"itemPopUp","side":"far","item":472}
+{"line":84,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":84,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":84,"op":"hp","side":"far","hp":88}
+{"line":85,"op":"print","text":"The opposing Fent Cart was hurt by its burn!"}
+{"line":85,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":85,"op":"hp","side":"far","hp":76}
+{"line":87,"op":"turn","number":6}
+{"line":90,"op":"print","text":"oldsmellybastard withdrew Fent Cart!"}
+{"line":90,"op":"withdraw","side":"far"}
+{"line":90,"op":"print","text":"oldsmellybastard sent out Jumbo Shrimp!"}
+{"line":90,"op":"switchIn","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":91,"op":"print","text":"Porygon2 used Ice Beam!"}
+{"line":91,"op":"move","user":"near","target":"far","move":58}
+{"line":92,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":92,"op":"hp","side":"far","hp":72}
+{"line":94,"op":"itemPopUp","side":"near","item":472}
+{"line":94,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":94,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":94,"op":"hp","side":"near","hp":93}
+{"line":96,"op":"turn","number":7}
+{"line":99,"op":"print","text":"Porygon2 used Toxic!"}
+{"line":99,"op":"move","user":"near","target":"far","move":92}
+{"line":100,"op":"anim","side":"far","anim":"statusPsn"}
+{"line":100,"op":"print","text":"The opposing Jumbo Shrimp was badly poisoned!"}
+{"line":100,"op":"status","side":"far","slot":0,"status":"tox"}
+{"line":101,"op":"itemPopUp","side":"far","item":522}
+{"line":101,"op":"anim","side":"far","anim":"heldItemBerry"}
+{"line":101,"op":"item","side":"far","slot":0,"item":0}
+{"line":102,"op":"print","text":"The opposing Jumbo Shrimp's Lum Berry cured its poison!"}
+{"line":102,"op":"status","side":"far","slot":0,"status":"none"}
+{"line":103,"op":"print","text":"The opposing Jumbo Shrimp used Hidden Power!"}
+{"line":103,"op":"move","user":"far","target":"near","move":237}
+{"line":104,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":104,"op":"hp","side":"near","hp":57}
+{"line":106,"op":"itemPopUp","side":"near","item":472}
+{"line":106,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":106,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":106,"op":"hp","side":"near","hp":63}
+{"line":108,"op":"turn","number":8}
+{"line":111,"op":"print","text":"Porygon2 used Ice Beam!"}
+{"line":111,"op":"move","user":"near","target":"far","move":58}
+{"line":112,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":112,"op":"hp","side":"far","hp":40}
+{"line":113,"op":"print","text":"The opposing Jumbo Shrimp used Hidden Power!"}
+{"line":113,"op":"move","user":"far","target":"near","move":237}
+{"line":114,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":114,"op":"hp","side":"near","hp":25}
+{"line":116,"op":"itemPopUp","side":"near","item":472}
+{"line":116,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":116,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":116,"op":"hp","side":"near","hp":31}
+{"line":118,"op":"turn","number":9}
+{"line":121,"op":"print","text":"Porygon2 used Recover!"}
+{"line":121,"op":"move","user":"near","target":"near","move":105}
+{"line":122,"op":"hp","side":"near","hp":81}
+{"line":122,"op":"print","text":"Porygon2's HP was restored."}
+{"line":123,"op":"print","text":"The opposing Jumbo Shrimp used Hidden Power!"}
+{"line":123,"op":"move","user":"far","target":"near","move":237}
+{"line":124,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":124,"op":"hp","side":"near","hp":45}
+{"line":126,"op":"itemPopUp","side":"near","item":472}
+{"line":126,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":126,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":126,"op":"hp","side":"near","hp":52}
+{"line":128,"op":"turn","number":10}
+{"line":131,"op":"print","text":"Porygon2 used Ice Beam!"}
+{"line":131,"op":"move","user":"near","target":"far","move":58}
+{"line":132,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":132,"op":"hp","side":"far","hp":12}
+{"line":133,"op":"print","text":"The opposing Jumbo Shrimp used Hidden Power!"}
+{"line":133,"op":"move","user":"far","target":"near","move":237}
+{"line":134,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":134,"op":"hp","side":"near","hp":19}
+{"line":136,"op":"itemPopUp","side":"near","item":472}
+{"line":136,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":136,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":136,"op":"hp","side":"near","hp":25}
+{"line":138,"op":"turn","number":11}
+{"line":141,"op":"print","text":"Porygon2 used Recover!"}
+{"line":141,"op":"move","user":"near","target":"near","move":105}
+{"line":142,"op":"hp","side":"near","hp":75}
+{"line":142,"op":"print","text":"Porygon2's HP was restored."}
+{"line":143,"op":"print","text":"The opposing Jumbo Shrimp used Hidden Power!"}
+{"line":143,"op":"move","user":"far","target":"near","move":237}
+{"line":144,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":144,"op":"hp","side":"near","hp":41}
+{"line":146,"op":"itemPopUp","side":"near","item":472}
+{"line":146,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":146,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":146,"op":"hp","side":"near","hp":48}
+{"line":148,"op":"turn","number":12}
+{"line":151,"op":"print","text":"Porygon2 used Ice Beam!"}
+{"line":151,"op":"move","user":"near","target":"far","move":58}
+{"line":152,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":152,"op":"hp","side":"far","hp":0}
+{"line":153,"op":"faint","side":"far"}
+{"line":153,"op":"print","text":"The opposing Jumbo Shrimp fainted!"}
+{"line":156,"op":"print","text":"oldsmellybastard sent out Fent Cart!"}
+{"line":156,"op":"switchIn","side":"far","slot":1,"hp":76,"status":"brn"}
+{"line":158,"op":"itemPopUp","side":"near","item":472}
+{"line":158,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":158,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":158,"op":"hp","side":"near","hp":54}
+{"line":159,"op":"itemPopUp","side":"far","item":472}
+{"line":159,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":159,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":159,"op":"hp","side":"far","hp":82}
+{"line":160,"op":"print","text":"The opposing Fent Cart was hurt by its burn!"}
+{"line":160,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":160,"op":"hp","side":"far","hp":70}
+{"line":162,"op":"turn","number":13}
+{"line":165,"op":"print","text":"Porygon2 used Recover!"}
+{"line":165,"op":"move","user":"near","target":"near","move":105}
+{"line":166,"op":"hp","side":"near","hp":100}
+{"line":166,"op":"print","text":"Porygon2's HP was restored."}
+{"line":167,"op":"print","text":"The opposing Fent Cart used Rain Dance!"}
+{"line":167,"op":"move","user":"far","target":"far","move":240}
+{"line":168,"op":"weather","weather":"rain"}
+{"line":168,"op":"print","text":"It started to rain!"}
+{"line":170,"op":"print","text":"Rain continues to fall."}
+{"line":170,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":171,"op":"itemPopUp","side":"far","item":472}
+{"line":171,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":171,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":171,"op":"hp","side":"far","hp":76}
+{"line":172,"op":"print","text":"The opposing Fent Cart was hurt by its burn!"}
+{"line":172,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":172,"op":"hp","side":"far","hp":63}
+{"line":174,"op":"turn","number":14}
+{"line":177,"op":"print","text":"Porygon2, come back!"}
+{"line":177,"op":"withdraw","side":"near"}
+{"line":177,"op":"print","text":"Go! Sceptile!"}
+{"line":177,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":178,"op":"print","text":"The opposing Fent Cart used Surf!"}
+{"line":178,"op":"move","user":"far","target":"near","move":57}
+{"line":180,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":180,"op":"hp","side":"near","hp":65}
+{"line":180,"op":"print","text":"It's not very effective…"}
+{"line":182,"op":"print","text":"Rain continues to fall."}
+{"line":182,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":183,"op":"itemPopUp","side":"near","item":472}
+{"line":183,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":183,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":183,"op":"hp","side":"near","hp":71}
+{"line":184,"op":"itemPopUp","side":"far","item":472}
+{"line":184,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":184,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":184,"op":"hp","side":"far","hp":70}
+{"line":185,"op":"print","text":"The opposing Fent Cart was hurt by its burn!"}
+{"line":185,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":185,"op":"hp","side":"far","hp":57}
+{"line":187,"op":"turn","number":15}
+{"line":190,"op":"print","text":"Sceptile, come back!"}
+{"line":190,"op":"withdraw","side":"near"}
+{"line":190,"op":"print","text":"Go! Swampert!"}
+{"line":190,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":191,"op":"print","text":"oldsmellybastard withdrew Fent Cart!"}
+{"line":191,"op":"withdraw","side":"far"}
+{"line":191,"op":"print","text":"oldsmellybastard sent out Come on and Slam!"}
+{"line":191,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":193,"op":"print","text":"Rain continues to fall."}
+{"line":193,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":195,"op":"turn","number":16}
+{"line":198,"op":"print","text":"The opposing Come on and Slam used Swords Dance!"}
+{"line":198,"op":"move","user":"far","target":"far","move":14}
+{"line":199,"op":"stat","side":"far","stat":"atk","stages":2,"arrows":"one"}
+{"line":199,"op":"print","text":"The opposing Come on and Slam's Attack rose sharply!"}
+{"line":200,"op":"print","text":"Swampert used Ice Beam!"}
+{"line":200,"op":"move","user":"near","target":"far","move":58}
+{"line":201,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":201,"op":"hp","side":"far","hp":79}
+{"line":203,"op":"print","text":"Rain continues to fall."}
+{"line":203,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":205,"op":"turn","number":17}
+{"line":208,"op":"print","text":"Swampert, come back!"}
+{"line":208,"op":"withdraw","side":"near"}
+{"line":208,"op":"print","text":"Go! Hitmontop!"}
+{"line":208,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
+{"line":209,"op":"ability","side":"near","ability":22,"show":true}
+{"line":210,"op":"stat","side":"far","stat":"atk","stages":-1,"arrows":"one"}
+{"line":210,"op":"print","text":"The opposing Come on and Slam's Attack fell!"}
+{"line":209,"op":"ability","side":"near","ability":22,"show":false}
+{"line":211,"op":"print","text":"The opposing Come on and Slam used Swords Dance!"}
+{"line":211,"op":"move","user":"far","target":"far","move":14}
+{"line":212,"op":"stat","side":"far","stat":"atk","stages":2,"arrows":"one"}
+{"line":212,"op":"print","text":"The opposing Come on and Slam's Attack rose sharply!"}
+{"line":214,"op":"weather","weather":"none"}
+{"line":214,"op":"print","text":"The rain stopped."}
+{"line":216,"op":"turn","number":18}
+{"line":219,"op":"print","text":"The opposing Come on and Slam used Megahorn!"}
+{"line":219,"op":"move","user":"far","target":"near","move":224}
+{"line":221,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":221,"op":"hp","side":"near","hp":0}
+{"line":221,"op":"print","text":"It's not very effective…"}
+{"line":222,"op":"faint","side":"near"}
+{"line":222,"op":"print","text":"Hitmontop fainted!"}
+{"line":225,"op":"print","text":"Go! Porygon2!"}
+{"line":225,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":226,"op":"ability","side":"near","ability":62,"show":true}
+{"line":226,"op":"ability","side":"near","ability":62,"show":false}
+{"line":229,"op":"turn","number":19}
+{"line":232,"op":"print","text":"Porygon2 used Protect!"}
+{"line":232,"op":"move","user":"near","target":"near","move":182}
+{"line":233,"op":"print","text":"Porygon2 protected itself!"}
+{"line":234,"op":"print","text":"The opposing Come on and Slam used Megahorn!"}
+{"line":235,"op":"print","text":"Porygon2 avoided the attack!"}
+{"line":238,"op":"turn","number":20}
+{"line":241,"op":"print","text":"The opposing Come on and Slam used Megahorn!"}
+{"line":241,"op":"move","user":"far","target":"near","move":224}
+{"line":242,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":242,"op":"hp","side":"near","hp":0}
+{"line":243,"op":"faint","side":"near"}
+{"line":243,"op":"print","text":"Porygon2 fainted!"}
+{"line":246,"op":"print","text":"Go! Swampert!"}
+{"line":246,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":249,"op":"turn","number":21}
+{"line":252,"op":"print","text":"The opposing Come on and Slam used Megahorn!"}
+{"line":252,"op":"move","user":"far","target":"near","move":224}
+{"line":253,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":253,"op":"hp","side":"near","hp":0}
+{"line":254,"op":"faint","side":"near"}
+{"line":254,"op":"print","text":"Swampert fainted!"}
+{"line":255,"op":"print","text":"chronosxsonorhc forfeited."}
+{"line":257,"op":"print","text":"oldsmellybastard won the battle!"}
+{"line":257,"op":"end","outcome":"farWon"}

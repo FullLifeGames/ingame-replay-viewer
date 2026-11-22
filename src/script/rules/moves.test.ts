@@ -171,4 +171,15 @@ describe('the move rules', () => {
     ])
     expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
   })
+
+  // Showdown's gen 3 `tryMoveHit` logs it once after a multi-hit move's last hit
+  // (data/mods/gen3/scripts.ts), naming the target (#15).
+  it('counts the hits of a multi-hit move', () => {
+    const script = scriptOf('|-hitcount|p2a: Tyranitar|3')
+
+    expect(eventsFrom(script, NEXT)).toEqual([
+      { kind: 'hitCount', line: NEXT, who: TYRANITAR, hits: 3 },
+    ])
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
 })

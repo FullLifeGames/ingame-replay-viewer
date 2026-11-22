@@ -42,6 +42,50 @@ describe('an effect that starts (P1)', () => {
   })
 })
 
+describe('a partial trap that starts (P1, `gWrappedStringIds`)', () => {
+  const TRAPPED = {
+    Bind: [
+      'The opposing Tyranitar was squeezed by Dugtrio!',
+      'Dugtrio was squeezed by the opposing Tyranitar!',
+    ],
+    Wrap: [
+      'The opposing Tyranitar was wrapped by Dugtrio!',
+      'Dugtrio was wrapped by the opposing Tyranitar!',
+    ],
+    'Fire Spin': [
+      'The opposing Tyranitar became trapped in the vortex!',
+      'Dugtrio became trapped in the vortex!',
+    ],
+    Whirlpool: [
+      'The opposing Tyranitar became trapped in the vortex!',
+      'Dugtrio became trapped in the vortex!',
+    ],
+    Clamp: [
+      'Dugtrio clamped down on the opposing Tyranitar!',
+      'The opposing Tyranitar clamped down on Dugtrio!',
+    ],
+    'Sand Tomb': [
+      'The opposing Tyranitar became trapped by the quicksand!',
+      'Dugtrio became trapped by the quicksand!',
+    ],
+  }
+  const scenes = Object.entries(TRAPPED).flatMap(([move, [onFar = '', onNear = '']]) => [
+    [move, 'p2a: Tyranitar', 'p1a: Dugtrio', onFar],
+    [move, 'p1a: Dugtrio', 'p2a: Tyranitar', onNear],
+  ])
+
+  it.each(scenes)('words %s on %s by %s', (move, target, trapper, text) => {
+    const { event, mon } = sceneOf('effectStart', `|-start|${target}|move: ${move}|[of] ${trapper}`)
+    const source = event.source && mon(event.source)
+    expect(effectStarted(mon(event.who), event.effect, source)).toEqual({ text })
+  })
+
+  it('gives a trap that names no trapper our wording and a fallback', () => {
+    const { event, mon } = sceneOf('effectStart', '|-start|p2a: Tyranitar|move: Wrap')
+    expect(effectStarted(mon(event.who), event.effect, undefined).fallback).toBeDefined()
+  })
+})
+
 describe('an effect that acts (P1)', () => {
   it.each([
     [

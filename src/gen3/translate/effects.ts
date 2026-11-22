@@ -19,7 +19,8 @@ import {
   singleTurn as lastsTheTurn,
 } from '../text/phrases-effects'
 import { type Context, type EventOf, sameMon } from './context'
-import { bar, drain, hitLines, isSubstituteCost } from './hp'
+import { hit, hitLines } from './hits'
+import { bar, drain, isSubstituteCost } from './hp'
 
 const VOLATILES: Partial<Readonly<Record<string, Volatile>>> = { substitute: 'substitute' }
 
@@ -68,7 +69,7 @@ export function effectEnd(event: EventOf<'effectEnd'>, ctx: Context): void {
 function substituteBreaks(event: EventOf<'effectEnd'>, ctx: Context): void {
   const { who, effect, line } = event
   const side = ctx.activeSide(who)
-  ctx.emit(line, { op: 'hit', side, effectiveness: event.effectiveness ?? 'normal' })
+  hit(line, side, event.effectiveness, ctx)
   ctx.print(line, effectActivated(ctx.mon(who), effect))
   ctx.emit(line, { op: 'anim', side, anim: 'substituteFade' })
   ctx.print(line, effectEnded(ctx.mon(who), effect))
@@ -83,13 +84,7 @@ export function effectActivate(event: EventOf<'effectActivate'>, ctx: Context): 
     ctx.takenDown = { ...event, who }
     return
   }
-  if (event.damage && who !== undefined) {
-    ctx.emit(line, {
-      op: 'hit',
-      side: ctx.activeSide(who),
-      effectiveness: event.effectiveness ?? 'normal',
-    })
-  }
+  if (event.damage && who !== undefined) hit(line, ctx.activeSide(who), event.effectiveness, ctx)
   ctx.print(line, effectActivated(who && ctx.mon(who), effect))
   hitLines(event, ctx)
 }

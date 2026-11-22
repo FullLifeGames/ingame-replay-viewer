@@ -41,6 +41,24 @@ export interface PopUp {
   readonly ability: number
 }
 
+/** A multi-hit move while its hits play (`hits.ts`). */
+export interface MultiHit {
+  /** The MOVE that plays again before every hit after the first; absent when the move plays none. */
+  readonly move: Instruction | undefined
+  /** Whether the target that the count line names faints in the move's own lines. */
+  readonly faints: boolean
+  hits: number
+  /** The effectiveness of the hits, said once after the last. */
+  effectiveness: 'super' | 'resisted' | undefined
+}
+
+/** Lines that wait for the faint of `who`. */
+export interface HeldLines {
+  readonly who: PokemonRef
+  readonly line: number
+  readonly texts: readonly string[]
+}
+
 /** A player as the header and the text show them. */
 export interface Player {
   /** For the trainer table: fitted to the charset, plain spaces. */
@@ -61,6 +79,10 @@ export class Context {
   popUp: PopUp | undefined
   /** The Destiny Bond line whose holder takes its attacker down; the attacker's faint plays it. */
   takenDown: (EventOf<'effectActivate'> & { readonly who: PokemonRef }) | undefined
+  /** The multi-hit move in hand, from its MOVE to its count line. */
+  multiHit: MultiHit | undefined
+  /** A multi-hit move's last lines, which its knocked out target's faint says. */
+  afterFaint: HeldLines | undefined
   /** The index in `script.events` of the event in hand; the walk sets it. */
   at = 0
   /** The Pokémon whose move the log shows last; its own HP loss is no hit. */

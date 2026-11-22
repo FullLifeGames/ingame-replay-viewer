@@ -14,15 +14,23 @@ static enum ReplayError Validate(void)
     return Replay_Validate(ReplayStream_Data(), ReplayStream_Length());
 }
 
-TEST("Replay: a stream of version 2 is refused before a battle starts")
+// A stream of this version is refused, and no battle starts.
+static void ExpectVersionRefused(u32 version)
 {
     ReplayStream_Begin();
     ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
-    ReplayStream_SetU16(REPLAY_STREAM_OFFSET_VERSION, 2);
+    ReplayStream_SetU16(REPLAY_STREAM_OFFSET_VERSION, version);
     EXPECT_EQ(Replay_Start(ReplayStream_Data(), ReplayStream_Length(), REPLAY_EXIT_AT_END, CB2_TestRunner), REPLAY_ERROR_VERSION);
     EXPECT_EQ(gReplayProgress.error, REPLAY_ERROR_VERSION);
     EXPECT(gMain.callback2 == CB2_TestRunner);
     EXPECT(!Replay_IsLoaded());
+}
+
+// Version 1 is the format before ITEM_POP_UP and TRAP_TURN, as an older backend writes it.
+TEST("Replay: a stream of version 1 or 3 is refused before a battle starts")
+{
+    ExpectVersionRefused(1);
+    ExpectVersionRefused(REPLAY_STREAM_VERSION + 1);
 }
 
 TEST("Replay: a stream of no bytes is refused as empty")
@@ -63,6 +71,21 @@ TEST("Replay: TURN with size 3 is refused")
     ReplayStream_Op(REPLAY_OP_TURN, 3, operands);
     ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
     EXPECT_EQ(Validate(), REPLAY_ERROR_SIZE);
+}
+
+TEST("Replay: FLUSH_TEXT_BOX with size 1 is refused, with size 0 it passes")
+{
+    const u8 operand = 0;
+
+    ReplayStream_Begin();
+    ReplayStream_Op(REPLAY_OP_FLUSH_TEXT_BOX, 1, &operand);
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_SIZE);
+
+    ReplayStream_Begin();
+    ReplayStream_FlushTextBox();
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_NONE);
 }
 
 TEST("Replay: an op that runs past the instructions is refused")

@@ -1,4 +1,4 @@
-{"length":17417,"crc32":"235f8323","trainers":{"near":{"name":"Bugsileus","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Christos","trainerPic":2,"teamSize":6,"revealed":5}},"parties":{"near":[{"species":234,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Stantler"},{"species":230,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Kingdra"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":130,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gyarados"},{"species":379,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Registeel"},{"species":51,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Dugtrio"}],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"},{"species":94,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gengar"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":260,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Swampert"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"},null]}}
+{"length":13931,"crc32":"b195e996","trainers":{"near":{"name":"Bugsileus","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Christos","trainerPic":2,"teamSize":6,"revealed":5}},"parties":{"near":[{"species":234,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Stantler"},{"species":230,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Kingdra"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":130,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gyarados"},{"species":379,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Registeel"},{"species":51,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Dugtrio"}],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"},{"species":94,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gengar"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":260,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Swampert"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"},null]}}
 {"line":23,"op":"intro"}
 {"line":23,"op":"print","text":"You are challenged by Christos!"}
 {"line":25,"op":"print","text":"Christos sent out Tyranitar!"}
@@ -29,9 +29,10 @@
 {"line":44,"op":"print","text":"Stantler is buffeted by the sandstorm!"}
 {"line":44,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":44,"op":"hp","side":"near","hp":61}
+{"line":45,"op":"itemPopUp","side":"near","item":472}
 {"line":45,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":45,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":45,"op":"hp","side":"near","hp":68}
-{"line":45,"op":"print","text":"Stantler restored a little HP using its Leftovers!"}
 {"line":47,"op":"turn","number":2}
 {"line":50,"op":"print","text":"Christos withdrew Tyranitar!"}
 {"line":50,"op":"withdraw","side":"far"}
@@ -50,12 +51,14 @@
 {"line":56,"op":"print","text":"The opposing Gengar is buffeted by the sandstorm!"}
 {"line":56,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":56,"op":"hp","side":"far","hp":94}
+{"line":57,"op":"itemPopUp","side":"near","item":472}
 {"line":57,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":57,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":57,"op":"hp","side":"near","hp":68}
-{"line":57,"op":"print","text":"Stantler restored a little HP using its Leftovers!"}
+{"line":58,"op":"itemPopUp","side":"far","item":472}
 {"line":58,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":58,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":58,"op":"hp","side":"far","hp":100}
-{"line":58,"op":"print","text":"The opposing Gengar restored a little HP using its Leftovers!"}
 {"line":60,"op":"turn","number":3}
 {"line":63,"op":"print","text":"Stantler, come back!"}
 {"line":63,"op":"withdraw","side":"near"}
@@ -66,6 +69,7 @@
 {"line":65,"op":"anim","side":"near","anim":"statusBrn"}
 {"line":65,"op":"print","text":"Kingdra was burned!"}
 {"line":65,"op":"status","side":"near","slot":1,"status":"brn"}
+{"line":66,"op":"itemPopUp","side":"near","item":522}
 {"line":66,"op":"anim","side":"near","anim":"heldItemBerry"}
 {"line":66,"op":"item","side":"near","slot":1,"item":0}
 {"line":67,"op":"print","text":"Kingdra's Lum Berry cured its burn!"}
@@ -78,9 +82,10 @@
 {"line":71,"op":"print","text":"The opposing Gengar is buffeted by the sandstorm!"}
 {"line":71,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":71,"op":"hp","side":"far","hp":94}
+{"line":72,"op":"itemPopUp","side":"far","item":472}
 {"line":72,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":72,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":72,"op":"hp","side":"far","hp":100}
-{"line":72,"op":"print","text":"The opposing Gengar restored a little HP using its Leftovers!"}
 {"line":74,"op":"turn","number":4}
 {"line":78,"op":"print","text":"Christos withdrew Gengar!"}
 {"line":78,"op":"withdraw","side":"far"}
@@ -107,9 +112,10 @@
 {"line":90,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
 {"line":92,"op":"print","text":"Rain continues to fall."}
 {"line":92,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":93,"op":"itemPopUp","side":"near","item":472}
 {"line":93,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":93,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":93,"op":"hp","side":"near","hp":74}
-{"line":93,"op":"print","text":"Stantler restored a little HP using its Leftovers!"}
 {"line":95,"op":"turn","number":6}
 {"line":98,"op":"print","text":"The opposing Swampert used Protect!"}
 {"line":98,"op":"move","user":"far","target":"far","move":182}
@@ -118,9 +124,10 @@
 {"line":101,"op":"print","text":"The opposing Swampert protected itself!"}
 {"line":103,"op":"print","text":"Rain continues to fall."}
 {"line":103,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":104,"op":"itemPopUp","side":"near","item":472}
 {"line":104,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":104,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":104,"op":"hp","side":"near","hp":80}
-{"line":104,"op":"print","text":"Stantler restored a little HP using its Leftovers!"}
 {"line":106,"op":"turn","number":7}
 {"line":109,"op":"print","text":"Stantler, come back!"}
 {"line":109,"op":"withdraw","side":"near"}
@@ -153,9 +160,10 @@
 {"line":129,"op":"volatile","side":"near","volatile":"substitute","on":true}
 {"line":130,"op":"hp","side":"near","hp":76}
 {"line":129,"op":"print","text":"Blissey put in a substitute!"}
+{"line":132,"op":"itemPopUp","side":"near","item":472}
 {"line":132,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":132,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":132,"op":"hp","side":"near","hp":82}
-{"line":132,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":134,"op":"turn","number":10}
 {"line":138,"op":"print","text":"The opposing Metagross used Earthquake!"}
 {"line":138,"op":"move","user":"far","target":"near","move":89}
@@ -167,9 +175,10 @@
 {"line":140,"op":"print","text":"A critical hit!"}
 {"line":141,"op":"print","text":"Blissey used Thunder!"}
 {"line":142,"op":"print","text":"The opposing Metagross avoided the attack!"}
+{"line":144,"op":"itemPopUp","side":"near","item":472}
 {"line":144,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":144,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":144,"op":"hp","side":"near","hp":88}
-{"line":144,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":146,"op":"turn","number":11}
 {"line":150,"op":"print","text":"Blissey, come back!"}
 {"line":150,"op":"withdraw","side":"near"}
@@ -205,15 +214,17 @@
 {"line":174,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":174,"op":"print","text":"Gyarados was badly poisoned!"}
 {"line":174,"op":"status","side":"near","slot":3,"status":"tox"}
+{"line":176,"op":"itemPopUp","side":"near","item":472}
 {"line":176,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":176,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":176,"op":"hp","side":"near","hp":89}
-{"line":176,"op":"print","text":"Gyarados restored a little HP using its Leftovers!"}
 {"line":177,"op":"print","text":"Gyarados was hurt by its poisoning!"}
 {"line":177,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":177,"op":"hp","side":"near","hp":83}
+{"line":178,"op":"itemPopUp","side":"far","item":472}
 {"line":178,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":178,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":178,"op":"hp","side":"far","hp":60}
-{"line":178,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":180,"op":"turn","number":14}
 {"line":183,"op":"print","text":"The opposing Swampert used Protect!"}
 {"line":183,"op":"move","user":"far","target":"far","move":182}
@@ -224,15 +235,17 @@
 {"line":186,"op":"print","text":"Gyarados's Attack rose!"}
 {"line":187,"op":"stat","side":"near","stat":"spe","stages":1,"arrows":"none"}
 {"line":187,"op":"print","text":"Gyarados's Speed rose!"}
+{"line":189,"op":"itemPopUp","side":"near","item":472}
 {"line":189,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":189,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":189,"op":"hp","side":"near","hp":89}
-{"line":189,"op":"print","text":"Gyarados restored a little HP using its Leftovers!"}
 {"line":190,"op":"print","text":"Gyarados was hurt by its poisoning!"}
 {"line":190,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":190,"op":"hp","side":"near","hp":77}
+{"line":191,"op":"itemPopUp","side":"far","item":472}
 {"line":191,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":191,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":191,"op":"hp","side":"far","hp":66}
-{"line":191,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":193,"op":"turn","number":15}
 {"line":196,"op":"print","text":"Christos withdrew Swampert!"}
 {"line":196,"op":"withdraw","side":"far"}
@@ -240,9 +253,10 @@
 {"line":196,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"par"}
 {"line":197,"op":"print","text":"Gyarados used Double-Edge!"}
 {"line":198,"op":"print","text":"It doesn't affect the opposing Gengar…"}
+{"line":200,"op":"itemPopUp","side":"near","item":472}
 {"line":200,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":200,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":200,"op":"hp","side":"near","hp":83}
-{"line":200,"op":"print","text":"Gyarados restored a little HP using its Leftovers!"}
 {"line":201,"op":"print","text":"Gyarados was hurt by its poisoning!"}
 {"line":201,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":201,"op":"hp","side":"near","hp":65}
@@ -265,9 +279,10 @@
 {"line":212,"op":"print","text":"Gyarados is buffeted by the sandstorm!"}
 {"line":212,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":212,"op":"hp","side":"near","hp":59}
+{"line":213,"op":"itemPopUp","side":"near","item":472}
 {"line":213,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":213,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":213,"op":"hp","side":"near","hp":65}
-{"line":213,"op":"print","text":"Gyarados restored a little HP using its Leftovers!"}
 {"line":214,"op":"print","text":"Gyarados was hurt by its poisoning!"}
 {"line":214,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":214,"op":"hp","side":"near","hp":40}
@@ -286,15 +301,17 @@
 {"line":228,"op":"print","text":"Gyarados is buffeted by the sandstorm!"}
 {"line":228,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":228,"op":"hp","side":"near","hp":34}
+{"line":229,"op":"itemPopUp","side":"near","item":472}
 {"line":229,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":229,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":229,"op":"hp","side":"near","hp":40}
-{"line":229,"op":"print","text":"Gyarados restored a little HP using its Leftovers!"}
 {"line":230,"op":"print","text":"Gyarados was hurt by its poisoning!"}
 {"line":230,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":230,"op":"hp","side":"near","hp":10}
+{"line":231,"op":"itemPopUp","side":"far","item":472}
 {"line":231,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":231,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":231,"op":"hp","side":"far","hp":73}
-{"line":231,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":233,"op":"turn","number":18}
 {"line":236,"op":"print","text":"Gyarados, come back!"}
 {"line":236,"op":"withdraw","side":"near"}
@@ -307,9 +324,10 @@
 {"line":241,"op":"print","text":"Kingdra is buffeted by the sandstorm!"}
 {"line":241,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":241,"op":"hp","side":"near","hp":89}
+{"line":242,"op":"itemPopUp","side":"far","item":472}
 {"line":242,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":242,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":242,"op":"hp","side":"far","hp":79}
-{"line":242,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":244,"op":"turn","number":19}
 {"line":247,"op":"print","text":"Christos withdrew Swampert!"}
 {"line":247,"op":"withdraw","side":"far"}
@@ -332,9 +350,10 @@
 {"line":258,"op":"hp","side":"near","hp":73}
 {"line":260,"op":"print","text":"Rain continues to fall."}
 {"line":260,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":261,"op":"itemPopUp","side":"near","item":472}
 {"line":261,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":261,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":261,"op":"hp","side":"near","hp":79}
-{"line":261,"op":"print","text":"Registeel restored a little HP using its Leftovers!"}
 {"line":263,"op":"turn","number":21}
 {"line":266,"op":"print","text":"Christos withdrew Blissey!"}
 {"line":266,"op":"withdraw","side":"far"}
@@ -357,9 +376,10 @@
 {"line":276,"op":"hp","side":"far","hp":75}
 {"line":278,"op":"print","text":"Rain continues to fall."}
 {"line":278,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":279,"op":"itemPopUp","side":"far","item":472}
 {"line":279,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":279,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":279,"op":"hp","side":"far","hp":81}
-{"line":279,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":281,"op":"turn","number":23}
 {"line":284,"op":"print","text":"Kingdra, come back!"}
 {"line":284,"op":"withdraw","side":"near"}
@@ -379,12 +399,14 @@
 {"line":292,"op":"switchIn","side":"near","slot":2,"hp":88,"status":"none"}
 {"line":294,"op":"weather","weather":"none"}
 {"line":294,"op":"print","text":"The rain stopped."}
+{"line":295,"op":"itemPopUp","side":"near","item":472}
 {"line":295,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":295,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":295,"op":"hp","side":"near","hp":94}
-{"line":295,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":296,"op":"itemPopUp","side":"far","item":472}
 {"line":296,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":296,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":296,"op":"hp","side":"far","hp":87}
-{"line":296,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":298,"op":"turn","number":24}
 {"line":301,"op":"print","text":"Christos withdrew Blissey!"}
 {"line":301,"op":"withdraw","side":"far"}
@@ -395,9 +417,10 @@
 {"line":303,"op":"volatile","side":"near","volatile":"substitute","on":true}
 {"line":304,"op":"hp","side":"near","hp":69}
 {"line":303,"op":"print","text":"Blissey put in a substitute!"}
+{"line":306,"op":"itemPopUp","side":"near","item":472}
 {"line":306,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":306,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":306,"op":"hp","side":"near","hp":75}
-{"line":306,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":308,"op":"turn","number":25}
 {"line":311,"op":"print","text":"The opposing Metagross used Earthquake!"}
 {"line":311,"op":"move","user":"far","target":"near","move":89}
@@ -411,9 +434,10 @@
 {"line":315,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":315,"op":"hp","side":"far","hp":47}
 {"line":315,"op":"print","text":"A critical hit!"}
+{"line":317,"op":"itemPopUp","side":"near","item":472}
 {"line":317,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":317,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":317,"op":"hp","side":"near","hp":81}
-{"line":317,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":319,"op":"turn","number":26}
 {"line":322,"op":"print","text":"Blissey, come back!"}
 {"line":322,"op":"withdraw","side":"near"}
@@ -442,9 +466,10 @@
 {"line":339,"op":"print","text":"The opposing Metagross fainted!"}
 {"line":342,"op":"print","text":"Christos sent out Swampert!"}
 {"line":342,"op":"switchIn","side":"far","slot":3,"hp":79,"status":"none"}
+{"line":344,"op":"itemPopUp","side":"far","item":472}
 {"line":344,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":344,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":344,"op":"hp","side":"far","hp":85}
-{"line":344,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":346,"op":"turn","number":28}
 {"line":349,"op":"print","text":"Dugtrio, come back!"}
 {"line":349,"op":"withdraw","side":"near"}
@@ -455,24 +480,28 @@
 {"line":352,"op":"hit","side":"near","effectiveness":"super"}
 {"line":352,"op":"hp","side":"near","hp":28}
 {"line":352,"op":"print","text":"It's super effective!"}
+{"line":354,"op":"itemPopUp","side":"near","item":472}
 {"line":354,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":354,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":354,"op":"hp","side":"near","hp":34}
-{"line":354,"op":"print","text":"Registeel restored a little HP using its Leftovers!"}
+{"line":355,"op":"itemPopUp","side":"far","item":472}
 {"line":355,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":355,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":355,"op":"hp","side":"far","hp":91}
-{"line":355,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":357,"op":"turn","number":29}
 {"line":360,"op":"print","text":"The opposing Swampert used Protect!"}
 {"line":360,"op":"move","user":"far","target":"far","move":182}
 {"line":361,"op":"print","text":"The opposing Swampert protected itself!"}
 {"line":362,"op":"print","text":"Registeel used Seismic Toss!"}
 {"line":363,"op":"print","text":"The opposing Swampert protected itself!"}
+{"line":365,"op":"itemPopUp","side":"near","item":472}
 {"line":365,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":365,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":365,"op":"hp","side":"near","hp":40}
-{"line":365,"op":"print","text":"Registeel restored a little HP using its Leftovers!"}
+{"line":366,"op":"itemPopUp","side":"far","item":472}
 {"line":366,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":366,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":366,"op":"hp","side":"far","hp":97}
-{"line":366,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":368,"op":"turn","number":30}
 {"line":371,"op":"print","text":"Registeel, come back!"}
 {"line":371,"op":"withdraw","side":"near"}
@@ -491,9 +520,10 @@
 {"line":379,"op":"move","user":"far","target":"near","move":85}
 {"line":380,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":380,"op":"hp","side":"near","hp":69}
+{"line":382,"op":"itemPopUp","side":"near","item":472}
 {"line":382,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":382,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":382,"op":"hp","side":"near","hp":75}
-{"line":382,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":384,"op":"turn","number":32}
 {"line":387,"op":"print","text":"Christos withdrew Gengar!"}
 {"line":387,"op":"withdraw","side":"far"}
@@ -504,12 +534,14 @@
 {"line":389,"op":"volatile","side":"near","volatile":"substitute","on":true}
 {"line":390,"op":"hp","side":"near","hp":50}
 {"line":389,"op":"print","text":"Blissey put in a substitute!"}
+{"line":392,"op":"itemPopUp","side":"near","item":472}
 {"line":392,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":392,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":392,"op":"hp","side":"near","hp":56}
-{"line":392,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":393,"op":"itemPopUp","side":"far","item":472}
 {"line":393,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":393,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":393,"op":"hp","side":"far","hp":100}
-{"line":393,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":395,"op":"turn","number":33}
 {"line":398,"op":"print","text":"Blissey used Ice Beam!"}
 {"line":398,"op":"move","user":"near","target":"far","move":58}
@@ -522,12 +554,14 @@
 {"line":401,"op":"anim","side":"near","anim":"substituteFade"}
 {"line":401,"op":"print","text":"Blissey's substitute faded!"}
 {"line":401,"op":"volatile","side":"near","volatile":"substitute","on":false}
+{"line":403,"op":"itemPopUp","side":"near","item":472}
 {"line":403,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":403,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":403,"op":"hp","side":"near","hp":63}
-{"line":403,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":404,"op":"itemPopUp","side":"far","item":472}
 {"line":404,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":404,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":404,"op":"hp","side":"far","hp":86}
-{"line":404,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":406,"op":"turn","number":34}
 {"line":409,"op":"print","text":"Blissey, come back!"}
 {"line":409,"op":"withdraw","side":"near"}
@@ -542,9 +576,10 @@
 {"line":413,"op":"print","text":"Registeel fainted!"}
 {"line":416,"op":"print","text":"Go! Kingdra!"}
 {"line":416,"op":"switchIn","side":"near","slot":1,"hp":89,"status":"none"}
+{"line":418,"op":"itemPopUp","side":"far","item":472}
 {"line":418,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":418,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":418,"op":"hp","side":"far","hp":92}
-{"line":418,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":420,"op":"turn","number":35}
 {"line":423,"op":"print","text":"Christos withdrew Swampert!"}
 {"line":423,"op":"withdraw","side":"far"}
@@ -556,9 +591,10 @@
 {"line":425,"op":"print","text":"It started to rain!"}
 {"line":427,"op":"print","text":"Rain continues to fall."}
 {"line":427,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":428,"op":"itemPopUp","side":"far","item":472}
 {"line":428,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":428,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":428,"op":"hp","side":"far","hp":94}
-{"line":428,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":430,"op":"turn","number":36}
 {"line":433,"op":"print","text":"Kingdra used Surf!"}
 {"line":433,"op":"move","user":"near","target":"far","move":57}
@@ -570,9 +606,10 @@
 {"line":436,"op":"hp","side":"near","hp":57}
 {"line":438,"op":"print","text":"Rain continues to fall."}
 {"line":438,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":439,"op":"itemPopUp","side":"far","item":472}
 {"line":439,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":439,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":439,"op":"hp","side":"far","hp":75}
-{"line":439,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":441,"op":"turn","number":37}
 {"line":444,"op":"print","text":"Kingdra, come back!"}
 {"line":444,"op":"withdraw","side":"near"}
@@ -584,9 +621,10 @@
 {"line":446,"op":"hp","side":"near","hp":53}
 {"line":448,"op":"print","text":"Rain continues to fall."}
 {"line":448,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":449,"op":"itemPopUp","side":"far","item":472}
 {"line":449,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":449,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":449,"op":"hp","side":"far","hp":81}
-{"line":449,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":451,"op":"turn","number":38}
 {"line":454,"op":"print","text":"Dugtrio used Earthquake!"}
 {"line":454,"op":"move","user":"near","target":"far","move":89}
@@ -598,9 +636,10 @@
 {"line":457,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":459,"op":"print","text":"Rain continues to fall."}
 {"line":459,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":460,"op":"itemPopUp","side":"far","item":472}
 {"line":460,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":460,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":460,"op":"hp","side":"far","hp":92}
-{"line":460,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":462,"op":"turn","number":39}
 {"line":465,"op":"print","text":"Dugtrio used Earthquake!"}
 {"line":465,"op":"move","user":"near","target":"far","move":89}
@@ -612,9 +651,10 @@
 {"line":468,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":470,"op":"weather","weather":"none"}
 {"line":470,"op":"print","text":"The rain stopped."}
+{"line":471,"op":"itemPopUp","side":"far","item":472}
 {"line":471,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":471,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":471,"op":"hp","side":"far","hp":100}
-{"line":471,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":473,"op":"turn","number":40}
 {"line":476,"op":"print","text":"Dugtrio used Earthquake!"}
 {"line":476,"op":"move","user":"near","target":"far","move":89}
@@ -624,9 +664,10 @@
 {"line":478,"op":"move","user":"far","target":"far","move":135}
 {"line":479,"op":"hp","side":"far","hp":99}
 {"line":479,"op":"print","text":"The opposing Blissey's HP was restored."}
+{"line":481,"op":"itemPopUp","side":"far","item":472}
 {"line":481,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":481,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":481,"op":"hp","side":"far","hp":100}
-{"line":481,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":483,"op":"turn","number":41}
 {"line":486,"op":"print","text":"Dugtrio used Earthquake!"}
 {"line":486,"op":"move","user":"near","target":"far","move":89}
@@ -636,9 +677,10 @@
 {"line":488,"op":"move","user":"far","target":"far","move":135}
 {"line":489,"op":"hp","side":"far","hp":99}
 {"line":489,"op":"print","text":"The opposing Blissey's HP was restored."}
+{"line":491,"op":"itemPopUp","side":"far","item":472}
 {"line":491,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":491,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":491,"op":"hp","side":"far","hp":100}
-{"line":491,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":493,"op":"turn","number":42}
 {"line":496,"op":"print","text":"Dugtrio used Earthquake!"}
 {"line":496,"op":"move","user":"near","target":"far","move":89}
@@ -648,9 +690,10 @@
 {"line":498,"op":"move","user":"far","target":"far","move":135}
 {"line":499,"op":"hp","side":"far","hp":98}
 {"line":499,"op":"print","text":"The opposing Blissey's HP was restored."}
+{"line":501,"op":"itemPopUp","side":"far","item":472}
 {"line":501,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":501,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":501,"op":"hp","side":"far","hp":100}
-{"line":501,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":503,"op":"turn","number":43}
 {"line":506,"op":"print","text":"Dugtrio used Earthquake!"}
 {"line":506,"op":"move","user":"near","target":"far","move":89}
@@ -687,9 +730,10 @@
 {"line":535,"op":"move","user":"far","target":"far","move":135}
 {"line":536,"op":"hp","side":"far","hp":98}
 {"line":536,"op":"print","text":"The opposing Blissey's HP was restored."}
+{"line":538,"op":"itemPopUp","side":"far","item":472}
 {"line":538,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":538,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":538,"op":"hp","side":"far","hp":100}
-{"line":538,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":540,"op":"turn","number":47}
 {"line":543,"op":"print","text":"Dugtrio used Earthquake!"}
 {"line":543,"op":"move","user":"near","target":"far","move":89}
@@ -699,9 +743,10 @@
 {"line":545,"op":"move","user":"far","target":"far","move":135}
 {"line":546,"op":"hp","side":"far","hp":98}
 {"line":546,"op":"print","text":"The opposing Blissey's HP was restored."}
+{"line":548,"op":"itemPopUp","side":"far","item":472}
 {"line":548,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":548,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":548,"op":"hp","side":"far","hp":100}
-{"line":548,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":550,"op":"turn","number":48}
 {"line":553,"op":"print","text":"Dugtrio used Earthquake!"}
 {"line":553,"op":"move","user":"near","target":"far","move":89}
@@ -756,9 +801,10 @@
 {"line":600,"op":"print","text":"Dugtrio was damaged by the recoil!"}
 {"line":601,"op":"print","text":"The opposing Blissey used Thunder Wave!"}
 {"line":602,"op":"print","text":"It doesn't affect Dugtrio…"}
+{"line":604,"op":"itemPopUp","side":"far","item":472}
 {"line":604,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":604,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":604,"op":"hp","side":"far","hp":90}
-{"line":604,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":606,"op":"turn","number":54}
 {"line":609,"op":"print","text":"Dugtrio used Struggle!"}
 {"line":609,"op":"move","user":"near","target":"far","move":165}
@@ -775,12 +821,14 @@
 {"line":615,"op":"print","text":"Dugtrio fainted!"}
 {"line":618,"op":"print","text":"Go! Blissey!"}
 {"line":618,"op":"switchIn","side":"near","slot":2,"hp":63,"status":"none"}
+{"line":620,"op":"itemPopUp","side":"near","item":472}
 {"line":620,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":620,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":620,"op":"hp","side":"near","hp":69}
-{"line":620,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":621,"op":"itemPopUp","side":"far","item":472}
 {"line":621,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":621,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":621,"op":"hp","side":"far","hp":65}
-{"line":621,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":623,"op":"turn","number":55}
 {"line":626,"op":"print","text":"Blissey used Ice Beam!"}
 {"line":626,"op":"move","user":"near","target":"far","move":58}
@@ -790,9 +838,10 @@
 {"line":628,"op":"move","user":"far","target":"far","move":135}
 {"line":629,"op":"hp","side":"far","hp":100}
 {"line":629,"op":"print","text":"The opposing Blissey's HP was restored."}
+{"line":631,"op":"itemPopUp","side":"near","item":472}
 {"line":631,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":631,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":631,"op":"hp","side":"near","hp":75}
-{"line":631,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":633,"op":"turn","number":56}
 {"line":636,"op":"print","text":"Blissey used Substitute!"}
 {"line":636,"op":"move","user":"near","target":"near","move":164}
@@ -801,9 +850,10 @@
 {"line":637,"op":"print","text":"Blissey put in a substitute!"}
 {"line":639,"op":"print","text":"The opposing Blissey used Thunder Wave!"}
 {"line":640,"op":"print","text":"But it failed!"}
+{"line":642,"op":"itemPopUp","side":"near","item":472}
 {"line":642,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":642,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":642,"op":"hp","side":"near","hp":56}
-{"line":642,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":644,"op":"turn","number":57}
 {"line":647,"op":"print","text":"Blissey used Calm Mind!"}
 {"line":647,"op":"move","user":"near","target":"near","move":347}
@@ -815,9 +865,10 @@
 {"line":650,"op":"move","user":"far","target":"near","move":69}
 {"line":651,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":651,"op":"print","text":"The substitute took damage for Blissey!"}
+{"line":653,"op":"itemPopUp","side":"near","item":472}
 {"line":653,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":653,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":653,"op":"hp","side":"near","hp":62}
-{"line":653,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":655,"op":"turn","number":58}
 {"line":658,"op":"print","text":"Blissey used Calm Mind!"}
 {"line":658,"op":"move","user":"near","target":"near","move":347}
@@ -832,9 +883,10 @@
 {"line":662,"op":"anim","side":"near","anim":"substituteFade"}
 {"line":662,"op":"print","text":"Blissey's substitute faded!"}
 {"line":662,"op":"volatile","side":"near","volatile":"substitute","on":false}
+{"line":664,"op":"itemPopUp","side":"near","item":472}
 {"line":664,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":664,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":664,"op":"hp","side":"near","hp":68}
-{"line":664,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
 {"line":666,"op":"turn","number":59}
 {"line":669,"op":"print","text":"Christos withdrew Blissey!"}
 {"line":669,"op":"withdraw","side":"far"}
@@ -845,12 +897,14 @@
 {"line":671,"op":"volatile","side":"near","volatile":"substitute","on":true}
 {"line":672,"op":"hp","side":"near","hp":44}
 {"line":671,"op":"print","text":"Blissey put in a substitute!"}
+{"line":674,"op":"itemPopUp","side":"near","item":472}
 {"line":674,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":674,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":674,"op":"hp","side":"near","hp":50}
-{"line":674,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":675,"op":"itemPopUp","side":"far","item":472}
 {"line":675,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":675,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":675,"op":"hp","side":"far","hp":98}
-{"line":675,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":677,"op":"turn","number":60}
 {"line":680,"op":"print","text":"Blissey used Ice Beam!"}
 {"line":680,"op":"move","user":"near","target":"far","move":58}
@@ -863,12 +917,14 @@
 {"line":683,"op":"anim","side":"near","anim":"substituteFade"}
 {"line":683,"op":"print","text":"Blissey's substitute faded!"}
 {"line":683,"op":"volatile","side":"near","volatile":"substitute","on":false}
+{"line":685,"op":"itemPopUp","side":"near","item":472}
 {"line":685,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":685,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":685,"op":"hp","side":"near","hp":56}
-{"line":685,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":686,"op":"itemPopUp","side":"far","item":472}
 {"line":686,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":686,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":686,"op":"hp","side":"far","hp":68}
-{"line":686,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":688,"op":"turn","number":61}
 {"line":691,"op":"print","text":"Blissey, come back!"}
 {"line":691,"op":"withdraw","side":"near"}
@@ -878,9 +934,10 @@
 {"line":692,"op":"move","user":"far","target":"near","move":89}
 {"line":693,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":693,"op":"hp","side":"near","hp":17}
+{"line":695,"op":"itemPopUp","side":"far","item":472}
 {"line":695,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":695,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":695,"op":"hp","side":"far","hp":74}
-{"line":695,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":697,"op":"turn","number":62}
 {"line":700,"op":"print","text":"The opposing Swampert used Protect!"}
 {"line":700,"op":"move","user":"far","target":"far","move":182}
@@ -891,9 +948,10 @@
 {"line":703,"op":"print","text":"It started to rain!"}
 {"line":705,"op":"print","text":"Rain continues to fall."}
 {"line":705,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":706,"op":"itemPopUp","side":"far","item":472}
 {"line":706,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":706,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":706,"op":"hp","side":"far","hp":80}
-{"line":706,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":708,"op":"turn","number":63}
 {"line":711,"op":"print","text":"Christos withdrew Swampert!"}
 {"line":711,"op":"withdraw","side":"far"}
@@ -905,9 +963,10 @@
 {"line":713,"op":"hp","side":"far","hp":93}
 {"line":715,"op":"print","text":"Rain continues to fall."}
 {"line":715,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":716,"op":"itemPopUp","side":"far","item":472}
 {"line":716,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":716,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":716,"op":"hp","side":"far","hp":99}
-{"line":716,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":718,"op":"turn","number":64}
 {"line":721,"op":"print","text":"Kingdra used Surf!"}
 {"line":721,"op":"move","user":"near","target":"far","move":57}
@@ -920,9 +979,10 @@
 {"line":724,"op":"status","side":"near","slot":1,"status":"par"}
 {"line":726,"op":"print","text":"Rain continues to fall."}
 {"line":726,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":727,"op":"itemPopUp","side":"far","item":472}
 {"line":727,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":727,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":727,"op":"hp","side":"far","hp":82}
-{"line":727,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":729,"op":"turn","number":65}
 {"line":732,"op":"print","text":"The opposing Blissey used Wish!"}
 {"line":732,"op":"move","user":"far","target":"far","move":273}
@@ -932,9 +992,10 @@
 {"line":734,"op":"hp","side":"far","hp":57}
 {"line":736,"op":"print","text":"Rain continues to fall."}
 {"line":736,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":737,"op":"itemPopUp","side":"far","item":472}
 {"line":737,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":737,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":737,"op":"hp","side":"far","hp":63}
-{"line":737,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":739,"op":"turn","number":66}
 {"line":742,"op":"print","text":"Christos withdrew Blissey!"}
 {"line":742,"op":"withdraw","side":"far"}
@@ -951,9 +1012,10 @@
 {"line":750,"op":"switchIn","side":"far","slot":2,"hp":63,"status":"none"}
 {"line":751,"op":"print","text":"Kingdra couldn't move because it's paralyzed!"}
 {"line":751,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":753,"op":"itemPopUp","side":"far","item":472}
 {"line":753,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":753,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":753,"op":"hp","side":"far","hp":69}
-{"line":753,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":755,"op":"turn","number":68}
 {"line":758,"op":"print","text":"The opposing Blissey used Seismic Toss!"}
 {"line":758,"op":"move","user":"far","target":"near","move":69}
@@ -963,12 +1025,14 @@
 {"line":760,"op":"print","text":"Kingdra fainted!"}
 {"line":763,"op":"print","text":"Go! Blissey!"}
 {"line":763,"op":"switchIn","side":"near","slot":2,"hp":56,"status":"none"}
+{"line":765,"op":"itemPopUp","side":"near","item":472}
 {"line":765,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":765,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":765,"op":"hp","side":"near","hp":62}
-{"line":765,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":766,"op":"itemPopUp","side":"far","item":472}
 {"line":766,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":766,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":766,"op":"hp","side":"far","hp":75}
-{"line":766,"op":"print","text":"The opposing Blissey restored a little HP using its Leftovers!"}
 {"line":768,"op":"turn","number":69}
 {"line":771,"op":"print","text":"Christos withdrew Blissey!"}
 {"line":771,"op":"withdraw","side":"far"}
@@ -979,12 +1043,14 @@
 {"line":773,"op":"volatile","side":"near","volatile":"substitute","on":true}
 {"line":774,"op":"hp","side":"near","hp":37}
 {"line":773,"op":"print","text":"Blissey put in a substitute!"}
+{"line":776,"op":"itemPopUp","side":"near","item":472}
 {"line":776,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":776,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":776,"op":"hp","side":"near","hp":43}
-{"line":776,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":777,"op":"itemPopUp","side":"far","item":472}
 {"line":777,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":777,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":777,"op":"hp","side":"far","hp":86}
-{"line":777,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":779,"op":"turn","number":70}
 {"line":782,"op":"print","text":"Blissey used Ice Beam!"}
 {"line":782,"op":"move","user":"near","target":"far","move":58}
@@ -997,12 +1063,14 @@
 {"line":785,"op":"anim","side":"near","anim":"substituteFade"}
 {"line":785,"op":"print","text":"Blissey's substitute faded!"}
 {"line":785,"op":"volatile","side":"near","volatile":"substitute","on":false}
+{"line":787,"op":"itemPopUp","side":"near","item":472}
 {"line":787,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":787,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":787,"op":"hp","side":"near","hp":49}
-{"line":787,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":788,"op":"itemPopUp","side":"far","item":472}
 {"line":788,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":788,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":788,"op":"hp","side":"far","hp":72}
-{"line":788,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":790,"op":"turn","number":71}
 {"line":793,"op":"print","text":"Blissey used Ice Beam!"}
 {"line":793,"op":"move","user":"near","target":"far","move":58}
@@ -1017,12 +1085,14 @@
 {"line":797,"op":"move","user":"far","target":"near","move":89}
 {"line":798,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":798,"op":"hp","side":"near","hp":12}
+{"line":800,"op":"itemPopUp","side":"near","item":472}
 {"line":800,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":800,"op":"anim","side":"near","anim":"simpleHeal"}
 {"line":800,"op":"hp","side":"near","hp":18}
-{"line":800,"op":"print","text":"Blissey restored a little HP using its Leftovers!"}
+{"line":801,"op":"itemPopUp","side":"far","item":472}
 {"line":801,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":801,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":801,"op":"hp","side":"far","hp":60}
-{"line":801,"op":"print","text":"The opposing Swampert restored a little HP using its Leftovers!"}
 {"line":803,"op":"turn","number":72}
 {"line":807,"op":"print","text":"Blissey used Ice Beam!"}
 {"line":807,"op":"move","user":"near","target":"far","move":58}
