@@ -57,13 +57,15 @@ static uint16_t Brightness(const struct IrvEffect *effect, uint16_t colour, bool
 }
 
 // Alpha blending mixes the top pixel only when it is a 1st target and the next pixel down a 2nd
-// one. "Semi-Transparent OBJs": such an OBJ is always a 1st target and always blends; where it
-// overlaps a 2nd target, the brightness effect does not take place.
+// one. "Semi-Transparent OBJs": such an OBJ always blends with a 2nd target below it, whatever
+// BLDCNT says, and then takes no brightness effect. Where nothing below it is a 2nd target,
+// GBATEK leaves open whether it still counts as a 1st target; mGBA's frame says it does so only
+// by BLDCNT bit 4, as any OBJ (the oracle, 994052's state 29880).
 uint32_t IrvRender_EffectOf(const struct IrvEffect *effect, const struct IrvPixel *top,
                             const struct IrvPixel *below, bool semiTransparent)
 {
     uint32_t mode = (effect->control >> 6) & 3;
-    bool firstTarget = semiTransparent || ((effect->control >> top->layer) & 1);
+    bool firstTarget = (effect->control >> top->layer) & 1;
     bool secondTarget = below->layer != IRV_LAYER_NONE && ((effect->control >> (8 + below->layer)) & 1);
 
     if (semiTransparent && secondTarget)

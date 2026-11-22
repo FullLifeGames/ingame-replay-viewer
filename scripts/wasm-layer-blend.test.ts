@@ -187,8 +187,11 @@ describe('a semi-transparent sprite', () => {
     expect([pixel(drawn, 0, 0), pixel(drawn, 8, 0)]).toEqual([B, 0])
   })
 
-  it('gets the brightness effect as a 1st target where nothing behind it is a 2nd target', () => {
+  // GBATEK leaves this open; mGBA's frame decides it (994052's state 29880).
+  it('gets the brightness effect, where nothing behind it is a 2nd target, only with BLDCNT bit 4', () => {
     const video = blend(layers([3], semi), bldcnt(0, BLEND_DOWN, BG2), 0, 16).io16(REG.BLDY, 16)
+    expect(first(video)).toBe(SPRITE)
+    blend(video, bldcnt(LAYER_OBJ, BLEND_DOWN, BG2), 0, 16)
     expect(first(video)).toBe(0)
   })
 })
