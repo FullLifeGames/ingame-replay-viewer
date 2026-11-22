@@ -22,16 +22,27 @@ export function ticksPerSecond(speed: Speed): number | undefined {
   return factor === undefined ? undefined : GBA_FRAMES_PER_SECOND * factor
 }
 
-/** The tick rule: how many frames the game may have played by a moment, in milliseconds. */
+// A gap between two asks longer than this is a pause (a hidden tab gets no animation frame).
+const PAUSE_MS = 250
+
+/**
+ * The tick rule: how many frames the game may have played by a moment, in milliseconds. The
+ * count runs on from the start or the last change, so a game that falls behind catches up. After
+ * a pause the count goes on from what it allowed before the pause.
+ */
 export class TickClock {
   private current: Speed
   private since: number
   private base: number
+  private asked: number
+  private granted: number
 
   constructor(speed: Speed, now: number, frame = 0) {
     this.current = speed
     this.since = now
     this.base = frame
+    this.asked = now
+    this.granted = frame
   }
 
   get speed(): Speed {
@@ -42,7 +53,13 @@ export class TickClock {
   allowed(now: number): number | undefined {
     const rate = ticksPerSecond(this.current)
     if (rate === undefined) return undefined
-    return this.base + Math.floor(((now - this.since) * rate) / 1000)
+    if (now - this.asked > PAUSE_MS) {
+      this.since = now
+      this.base = this.granted
+    }
+    this.asked = now
+    this.granted = this.base + Math.floor(((now - this.since) * rate) / 1000)
+    return this.granted
   }
 
   /** Another speed from `now` on, counted from `frame`, the frame the game is at. */
@@ -50,6 +67,8 @@ export class TickClock {
     this.current = speed
     this.since = now
     this.base = frame
+    this.asked = now
+    this.granted = frame
   }
 }
 
@@ -108,10 +127,14 @@ export function createShared(audioCapacity: number): SharedBuffers {
   }
 }
 
+// At fast the allowed word takes the largest Int32, so a worker that read it before the switch
+// finds it changed when it waits.
+const EVERY_FRAME = 2 ** 31 - 1
+
 /** The page's side: allows the game `allowed` frames, or every frame when undefined. */
 export function grant(control: Int32Array, allowed: number | undefined): void {
   Atomics.store(control, CONTROL.fast, allowed === undefined ? 1 : 0)
-  if (allowed !== undefined) Atomics.store(control, CONTROL.allowed, allowed)
+  Atomics.store(control, CONTROL.allowed, allowed ?? EVERY_FRAME)
   Atomics.notify(control, CONTROL.allowed)
 }
 

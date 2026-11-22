@@ -18,6 +18,13 @@ import {
 } from './protocol'
 import { AudioRing } from './ring'
 
+/** Asks the clock every animation frame of 16 ms from `from` to `to`; returns the last answer. */
+function walk(clock: TickClock, from: number, to: number): number | undefined {
+  let allowed: number | undefined
+  for (let now = from; now < to; now += 16) allowed = clock.allowed(now)
+  return clock.allowed(to) ?? allowed
+}
+
 const progress = { done: 3, total: 34, turn: 1, error: 0, finished: false, playing: true }
 
 describe('the tick rule', () => {
@@ -38,8 +45,8 @@ describe('the tick rule', () => {
     expect(clock.allowed(1000)).toBe(0)
     expect(clock.allowed(1016)).toBe(0)
     expect(clock.allowed(1017)).toBe(1)
-    expect(clock.allowed(2000)).toBe(59)
-    expect(clock.allowed(61_000)).toBe(3583)
+    expect(walk(clock, 1017, 2000)).toBe(59)
+    expect(walk(clock, 2000, 61_000)).toBe(3583)
   })
 
   it('sets no limit at fast, and counts from the frame the game is at after a change', () => {
@@ -48,9 +55,20 @@ describe('the tick rule', () => {
     clock.change('2x', 5000, 1234)
     expect(clock.speed).toBe('2x')
     expect(clock.allowed(5000)).toBe(1234)
-    expect(clock.allowed(6000)).toBe(1234 + 119)
+    expect(walk(clock, 5000, 6000)).toBe(1234 + 119)
     clock.change('1x', 6000, 1300)
-    expect(clock.allowed(7000)).toBe(1300 + 59)
+    expect(walk(clock, 6000, 7000)).toBe(1300 + 59)
+  })
+
+  // A hidden tab gets no animation frame, so the page grants nothing and the game pauses. When
+  // the tab comes back, the game goes on from there instead of racing to catch up.
+  it('resumes where it paused after a gap of more than a quarter second', () => {
+    const clock = new TickClock('1x', 0)
+    expect(walk(clock, 0, 1000)).toBe(59)
+    expect(clock.allowed(9000)).toBe(59)
+    expect(clock.allowed(9200)).toBe(59 + 11)
+    expect(clock.allowed(9450)).toBe(59 + 26)
+    expect(walk(clock, 9450, 10_450)).toBe(59 + 86)
   })
 })
 
@@ -84,6 +102,19 @@ describe('the wait for a tick', () => {
     const control = new Int32Array(createShared(16).control)
     grant(control, 4)
     expect(waitForTick(control, 5, 5)).toBe(false)
+  })
+
+  // The worker checks the fast word, reads the allowed word and waits on what it read. A switch
+  // to fast in between must change the word it waits on, or the wait outlasts the switch.
+  it('wakes a worker that waits on the frames it read before a switch to fast', () => {
+    const control = new Int32Array(createShared(16).control)
+    grant(control, 4)
+    const seen = Atomics.load(control, CONTROL.allowed)
+    grant(control, undefined)
+    expect(Atomics.wait(control, CONTROL.allowed, seen, 50)).toBe('not-equal')
+    grant(control, 7)
+    expect(Atomics.load(control, CONTROL.allowed)).toBe(7)
+    expect(waitForTick(control, 8, 0)).toBe(false)
   })
 
   it('never waits at fast, and waits again after a speed with ticks', () => {
