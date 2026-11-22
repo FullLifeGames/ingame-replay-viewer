@@ -14,7 +14,7 @@ interface FixtureSection {
 interface FixtureSymbol {
   name: string
   value?: number
-  // A section name, 'ABS' or 'UND'.
+  // A section name, 'ABS', 'COMMON' or 'UND'.
   section: string
   bind?: 'local' | 'global' | 'weak'
   type?: 'notype' | 'section'
@@ -24,7 +24,8 @@ interface FixtureRelocation {
   section: string
   offset: number
   type: number
-  symbol: string
+  // A symbol's name, or a raw index into the symbol table.
+  symbol: string | number
 }
 
 export interface FixtureElf {
@@ -90,6 +91,7 @@ interface Header {
 
 const BINDS = { local: 0, global: 1, weak: 2 }
 const SHN_ABS = 0xfff1
+const SHN_COMMON = 0xfff2
 
 function symbolTable(
   fixture: FixtureElf,
@@ -101,7 +103,8 @@ function symbolTable(
   )
   const table = new Bytes().u32(0).u32(0).u32(0).u32(0)
   for (const symbol of symbols) {
-    const shndx = { ABS: SHN_ABS, UND: 0 }[symbol.section] ?? sectionIndex(symbol.section)
+    const shndx =
+      { ABS: SHN_ABS, COMMON: SHN_COMMON, UND: 0 }[symbol.section] ?? sectionIndex(symbol.section)
     const type = symbol.type === 'section' ? 3 : 0
     table
       .u32(type === 3 ? 0 : strtab.add(symbol.name))
@@ -113,7 +116,8 @@ function symbolTable(
       .u16(shndx)
   }
   const firstGlobal = 1 + symbols.filter((symbol) => symbol.bind === 'local').length
-  const index = (name: string) => 1 + symbols.findIndex((symbol) => symbol.name === name)
+  const index = (name: string | number) =>
+    typeof name === 'number' ? name : 1 + symbols.findIndex((symbol) => symbol.name === name)
   return { bytes: table.out, firstGlobal, index }
 }
 

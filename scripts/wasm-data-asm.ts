@@ -170,8 +170,18 @@ function field(ctx: Context, section: ElfSection, reloc: ElfRelocation): string 
       `${ctx.source}: relocation type ${String(reloc.type)} at offset ${hex(reloc.offset)} in ${section.name}; the converter knows R_ARM_ABS32, R_ARM_ABS16 and R_ARM_ABS8`,
     )
   }
-  const symbol = ctx.elf.symbols[reloc.symbol]
-  if (symbol === undefined) throw new Error(`${ctx.source}: no symbol ${String(reloc.symbol)}`)
+  const at = `at ${hex(reloc.offset)}`
+  // A field past the end would read the next section's bytes as its addend (review W3).
+  if (reloc.offset + kind.width > section.bytes.length) {
+    throw new Error(
+      `${ctx.source}: ${kind.name} ${at} runs past the end of the ${String(section.bytes.length)} bytes of ${section.name}`,
+    )
+  }
+  // Index 0 is the null symbol, which names nothing.
+  const symbol = reloc.symbol === 0 ? undefined : ctx.elf.symbols[reloc.symbol]
+  if (symbol === undefined) {
+    throw new Error(`${ctx.source}: the relocation ${at} in ${section.name} has no symbol`)
+  }
   const addend = readAddend(section, reloc.offset, kind.width)
   const value = absoluteValue(ctx, symbol)
   if (value !== undefined) return fitted(symbol.name, value + addend, kind.width)
