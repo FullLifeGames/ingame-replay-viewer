@@ -1,6 +1,6 @@
 # Wave 3: the WebAssembly spike and exact HP
 
-Issues #35 (milestone M1b) and #41 (M2). The user picked the spike at the wave 2 gate (answer 4a, 21.11.2026) and asked for #41 in the next round after reporting it the same day. One stage with two lanes side by side goes to `master` in pull request PR_NUMBER (S1, closes #35 and #41).
+Issues #35 (milestone M1b) and #41 (M2). The user picked the spike at the wave 2 gate (answer 4a, 21.11.2026) and asked for #41 in the next round after reporting it the same day. One stage with two lanes side by side goes to `master` in pull request #42 (S1, closes #35 and #41).
 
 `wave/03` started from `master` at 7fa0bb6 (wave 2 merged) on 21.11.2026. Its first commit records the wave 2 gate in `docs/waves/wave-02.md`. The working files sit under `.waves/03/` (gitignored); this booking keeps what lasts.
 
@@ -64,12 +64,12 @@ Each entry gives the scene, the options, the choice and what a reversal costs.
 
 ## Gate
 
-Open. The gate page asks the user six questions: the merge of PR_NUMBER, the route for milestone 2, the platform layer, the assets in the module patch, the rests as issues, and what wave 4 takes. The dev page runs behind `tailscale serve` for the user's own look at both pages.
+Open. The gate page asks the user six questions: the merge of #42, the route for milestone 2, the platform layer, the assets in the module patch, the rests as issues, and what wave 4 takes. The dev page runs behind `tailscale serve` for the user's own look at both pages.
 
 | Stage | Lane | Issues | Pull request | State before the gate |
 | ----- | ---- | ------ | ------------ | --------------------- |
-| S1    | a    | #41    | PR_NUMBER    | waits for the okay    |
-| S1    | b    | #35    | PR_NUMBER    | waits for the okay    |
+| S1    | a    | #41    | #42          | waits for the okay    |
+| S1    | b    | #35    | #42          | waits for the okay    |
 
 ## Rests
 
