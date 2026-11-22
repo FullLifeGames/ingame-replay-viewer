@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
+import { moveOf } from '../tables/lookup'
 import { plain, popUp, sceneOf, streamOfLog } from '../testing'
 
 describe('ability pop-ups', () => {
@@ -91,6 +92,38 @@ describe('ability pop-ups', () => {
       popUp('near', 'Levitate', true),
       "It doesn't affect Dugtrio…",
       popUp('near', 'Levitate', false),
+    ])
+  })
+
+  // Own Tempo: `BattleScript_OwnTempoPrevents` runs before `attackanimation`, and Swagger's
+  // `BattleScript_SwaggerOwnTempoPrevents` after the animation and the raise (#37).
+  it('shows Own Tempo stopping confusion in place of a Confuse Ray', () => {
+    const scene = sceneOf(
+      '|move|p1a: Dugtrio|Confuse Ray|p2a: Tyranitar',
+      '|-immune|p2a: Tyranitar|confusion|[from] ability: Own Tempo',
+    )
+    expect(scene.map(plain)).toEqual([
+      'Dugtrio used Confuse Ray!',
+      popUp('far', 'Own Tempo', true),
+      'The opposing Tyranitar cannot be confused!',
+      popUp('far', 'Own Tempo', false),
+    ])
+  })
+
+  it('shows Own Tempo stopping confusion after a Swagger raised the stat', () => {
+    const scene = sceneOf(
+      '|move|p1a: Dugtrio|Swagger|p2a: Tyranitar',
+      '|-boost|p2a: Tyranitar|atk|2',
+      '|-immune|p2a: Tyranitar|confusion|[from] ability: Own Tempo',
+    )
+    expect(scene.map(plain)).toEqual([
+      'Dugtrio used Swagger!',
+      { op: 'move', user: 'near', target: 'far', move: moveOf('Swagger').number },
+      { op: 'stat', side: 'far', stat: 'atk', stages: 2, arrows: 'one' },
+      "The opposing Tyranitar's Attack rose sharply!",
+      popUp('far', 'Own Tempo', true),
+      'The opposing Tyranitar cannot be confused!',
+      popUp('far', 'Own Tempo', false),
     ])
   })
 

@@ -21,6 +21,11 @@ export const MOVE_TEMPLATES = {
   doesntAffect: tagged('STRINGID_ITDOESNTAFFECT', (who: Mon) => {
     return `It doesn't affect ${nameInside(who)}…`
   }),
+  // `BattleScript_OwnTempoPrevents` and `BattleScript_SwaggerOwnTempoPrevents`
+  // (data/battle_scripts_1.s), with the target as `sBATTLER`.
+  cannotBeConfused: tagged('STRINGID_PKMNPREVENTSCONFUSIONWITH', (who: Mon) => {
+    return `${nameAtStart(who)} cannot be confused!`
+  }),
   failed: tagged('STRINGID_BUTITFAILED', () => 'But it failed!'),
   // B_MSG_SUBSTITUTE_FAILED in `gSubstituteUsedStringIds`; `BattleScript_EffectSubstitute`
   // prints it and skips the animation (data/battle_scripts_1.s).
@@ -92,7 +97,12 @@ export function effective(effectiveness: 'super' | 'resisted'): string {
   return MOVE_TEMPLATES[template].render()
 }
 
-export const immune = (who: Mon) => MOVE_TEMPLATES.doesntAffect.render(who)
+/** An immunity the log names confusion for has its own line (Own Tempo's); any other has none. */
+export function immune(who: Mon, effect?: Effect): string {
+  if (effect && toID(effect.name) === 'confusion')
+    return MOVE_TEMPLATES.cannotBeConfused.render(who)
+  return MOVE_TEMPLATES.doesntAffect.render(who)
+}
 
 /** Keyed by the effect's id: a status, `unboost`, or a move such as `move: Substitute`. */
 const ALREADY: Partial<Record<StatusName | 'unboost' | 'substitute', (who: Mon) => string>> = {

@@ -94,8 +94,8 @@ export function miss({ user, target, line }: EventOf<'miss'>, ctx: Context): voi
   ctx.print(line, missed(ctx.mon(user), target && ctx.mon(target)))
 }
 
-export function immunity({ who, line }: EventOf<'immune'>, ctx: Context): void {
-  ctx.print(line, immune(ctx.mon(who)))
+export function immunity({ who, effect, line }: EventOf<'immune'>, ctx: Context): void {
+  ctx.print(line, immune(ctx.mon(who), effect))
 }
 
 export function failure({ who, effect, weak, line }: EventOf<'fail'>, ctx: Context): void {
