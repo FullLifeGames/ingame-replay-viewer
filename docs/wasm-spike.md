@@ -33,6 +33,8 @@ In B6 the worklet read about 3 % slower than the worker wrote (0.962 against 0.9
 
 The worklet now caps the ring's latency at 0.2 s. When more waits, it skips the oldest samples down to 0.1 s in whole left and right pairs and counts them. It also counts its underruns, the output frames that found the ring empty once the sound had started. The test hook reports both, and the e2e asserts the worker's pace and reports the worklet's. The ring's counters wrap at 2^32, so a run that plays on for hours keeps its sound.
 
+Fix step 11's e2e ran beside another session's Playwright tests (load average 4.8 to 7.7 on six cores). At 1x the worker wrote 1.000 of the mixer's rate, and the worklet played 0.800. By END the worklet had skipped 1,142,690 samples, 13.6 s of the 48.9 s, and had missed 41,120 output frames, 0.93 s; no push overran. At 2x the worklet played 0.617 against 0.993 written. Under that load the audio thread of headless Chromium ran a fifth slow, and the cap held the latency by skipping the difference. Without the cap the ring would have filled and dropped as much.
+
 ### Timing
 
 The page ticks at the GBA's 59.7275 frames per second. The e2e measures 1x within 5 % of that and 2x within 5 % of twice that. Fast runs the worker as fast as it goes, and at END the page leaves fast for 1x, so no core spins while the game plays on after the replay. A hidden tab gets no animation frame, so the game pauses there at 1x and 2x. When the tab comes back into view, the page resumes the tick clock, and the game goes on from where it paused. A page that misses animation frames while in view still catches up.
@@ -65,14 +67,14 @@ mGBA itself varies between sessions on the same ROM: 994052 reached END at frame
 
 Wall-clock numbers on devbox are rough: its six cores are slow and shared, and another session ran beside some of these runs.
 
-| Host     | Engine                                                  | 994052 to its stop                                                        | Frames per second                 |
-| -------- | ------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------- |
-| Node 24  | WebAssembly at `-O2` (`wasm:run`)                       | 106.6 s and 110.0 s in B7, 121.9 s after the RNG fix                      | 330 to 377                        |
-| native   | mGBA headless (`rom:shots`, frames taken at the scenes) | 40.3 s and 43.1 s                                                         | 933 to 998                        |
-| Chromium | WebAssembly page at fast                                | 116.0 s on the dev server and 120.1 s on the preview in B7, 113.8 s in B6 | 330 to 348, averaged over the run |
-| Chromium | mGBA page at fast-forward                               | 10 s windows at multipliers 16 to 256 (two runs)                          | 243 to 314; 60.0 and 60.2 at 1x   |
+| Host     | Engine                                                  | 994052 to its stop                                                                                                               | Frames per second                                |
+| -------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Node 24  | WebAssembly at `-O2` (`wasm:run`)                       | 106.6 s and 110.0 s in B7, 121.9 s after the RNG fix                                                                             | 330 to 377                                       |
+| native   | mGBA headless (`rom:shots`, frames taken at the scenes) | 40.3 s and 43.1 s                                                                                                                | 933 to 998                                       |
+| Chromium | WebAssembly page at fast                                | 116.0 s on the dev server and 120.1 s on the preview in B7, 113.8 s in B6; 155.0 s in fix step 11 under the other session's load | 330 to 348 averaged over the run; 256 under load |
+| Chromium | mGBA page at fast-forward                               | 10 s windows at multipliers 16 to 256 (two runs)                                                                                 | 243 to 314; 60.0 and 60.2 at 1x                  |
 
-At 1x the module needs about a sixth of one core on devbox. Native mGBA runs about 2.6 times faster than the module in Node (B7's interleaved runs). In Chromium the gap closes: mGBA's own WebAssembly build tops out at about 314 frames per second, with the multiplier at 64 or 256, and the module plays 994052 at 330 to 348 on average. The numbers measure different stretches. Each of mGBA's windows covers the 10 s of the battle it fell on, while the module's numbers average the whole run, so call the two engines even in the browser.
+At 1x the module needs about a sixth of one core on devbox. Native mGBA runs about 2.6 times faster than the module in Node (B7's interleaved runs). In Chromium the gap closes: mGBA's own WebAssembly build tops out at about 314 frames per second, with the multiplier at 64 or 256, and the module plays 994052 at 330 to 348 on average (256 in fix step 11, under another session's load). The numbers measure different stretches. Each of mGBA's windows covers the 10 s of the battle it fell on, while the module's numbers average the whole run, so call the two engines even in the browser.
 
 The mGBA probe (`e2e/wasm-spike.spec.ts`, its second test) plays 994052 on the emulator page and sets mGBA's fast-forward multiplier to 1, 4, 16 and 64 in a first run and 1, 16, 64 and 256 in a second, counting frames for 10 s at each through mGBA's end-of-frame callback. The page keeps mGBA's module to itself, so the probe wraps the package's default export as the browser loads it; the page's code stays as it is.
 
@@ -100,7 +102,7 @@ The module itself, `irv-emerald.wasm` (25,977,583 bytes), never leaves devbox: t
 
 #35 also asks where the speed options go, mGBA's fast-forward or our own frame loop, and how #17, the patch size, gets solved.
 
-The speed options go into our own frame loop if milestone 2 ships the module. The page already grants the worker its frames by the tick rule (`src/web/wasm/protocol.ts`), so 1x, 2x and fast are one factor each, the sound follows at 1x and 2x, and fast gives way to 1x at END. If milestone 2 keeps mGBA, the options go to mGBA's fast-forward multiplier instead. In Chromium that tops out near 314 frames per second, where the module's fast averages 330 to 348.
+The speed options go into our own frame loop if milestone 2 ships the module. The page already grants the worker its frames by the tick rule (`src/web/wasm/protocol.ts`), so 1x, 2x and fast are one factor each, the sound follows at 1x and 2x, and fast gives way to 1x at END. If milestone 2 keeps mGBA, the options go to mGBA's fast-forward multiplier instead. In Chromium that tops out near 314 frames per second, where the module's fast averaged 330 to 348 in B6 and B7.
 
 The module does not solve #17. Its patch is 20.98 MB raw and 14.18 MB with brotli, against 18.39 MB and 14.49 MB for the ROM patch. Each copies under a quarter of its bytes from the dump and carries the rest itself. A visitor fetches 0.81 MB less on the WebAssembly page with either compression, and the host's compression saves more than the switch: brotli takes 3.90 MB off the ROM patch. Per-asset extraction (below, "Nintendo's assets from the dump") is the one lever the spike found that shrinks the module patch itself, by the retail assets the expansion recompresses. The expansion's new assets stay in the patch on either route.
 
@@ -189,7 +191,7 @@ These are proposals. The ADRs stay as they are until the gate rules.
 
 ## Rests
 
-- The audio drift: in headless Chromium the worklet reads about 3 % slower than the worker writes. The latency cap holds the fill at 0.2 s, and each skip back to 0.1 s cuts the sound once; at a 3 % gap that is a cut every few seconds. A resampler that follows the fill would play it without cuts. The worklet also starts to play with no reserve, so a frame that comes late from the worker plays as silence; the underrun count shows how often.
+- The audio drift: in headless Chromium the worklet reads 2.5 to 3 % slower than the worker writes, and a fifth slower on a loaded devbox. The latency cap holds the fill at 0.2 s, and each skip back to 0.1 s cuts the sound once; at a 3 % gap that is a cut every few seconds. A resampler that follows the fill would play it without cuts. The worklet also starts to play with no reserve, so a frame that comes late from the worker plays as silence; the underrun count shows how often.
 - `pokedex_cry_screen.c` reads `SoundInfo.pcmBuffer`, which holds floats in the module, through the tree's header that declares bytes. It is off the battle path; the Pokédex cry screen would show noise.
 - `include/script.h` has three inline checks that test a pointer for ROM mirror 1 (specials, `gotonative`, `callnative`). Under the module they read every pointer as unmarked, so an effect analysis stops early. That is the field path, not the battle's.
 - `-fsanitize=shift`: one full compile to list the shifts by 32 or more that the battle path reaches.
