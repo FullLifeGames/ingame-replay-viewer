@@ -27,6 +27,10 @@ Milestone 1b: find out whether the pinned expansion with our C files runs in the
 - A new scene `level` in the screenshot run looks at the "Lv" glyph in the far healthbox, on mGBA and on the module alike.
 - Two reviews (build and C; page, e2e and docs) found 20 defects. Fix steps 10 and 11 fixed all of them: among others the RNG helpers, a `git apply` that could do nothing without an error, a worker left running after two Start presses, a failed audio context that blocked every later Start, ring counters that wrapped after seven hours, and a latency cap of 0.2 s on the sound.
 
+### After the gate opened
+
+- The user's phone would not let them pick their dump on the preview. Both pages filtered the picker to `.gba`, and phone pickers grey out files with an extension they cannot type. The filter is gone from `index.html` and `wasm.html`; the SHA1 check still refuses any file that is not US Emerald. `src/web/pages.test.ts` fails on a filter.
+
 ## Evidence
 
 - gen3customgame-2115579570 builds a stream of 9264 bytes with no fallback. Its 260 dropped lines: 82 chat, 63 spacer, 37 timestamp, 28 debug, 26 upkeep, 18 timer, 3 metadata, 1 rule, 1 room, 1 hint; none unsupported or unknown. All 116 HP values in the stream are whole numbers from 0 to 100. A probe outside the specs measured this, and the reviewer's rerun gave the same counts; the specs cover the rule.
@@ -61,6 +65,7 @@ Each entry gives the scene, the options, the choice and what a reversal costs.
 - S1-19 (#35) A hidden tab. The review asked whether playback resumes where it paused or jumps ahead. (a) resume where it paused, (b) jump ahead. Chosen (a). The first cut treated every gap over a quarter second as a pause, which slowed the game on a busy machine; the clock now rebases only when the tab comes back into view. Reversal: one condition.
 - S1-20 (#35) Heavy runs beside another session. devbox allows one heavy check at a time across sessions, and ps-dashboard-2 queued its runs for hours. (a) each of our heavy runs also takes ps-dashboard-2's lock file, so the runs take turns, (b) wait until its queue empties. Chosen (a): `flock` only opens the file, and our runs fit between theirs. Reversal: none.
 - S1-21 (#35) No tester step. (a) the gate's preview link for the user's own look, with the e2e and the 13 scenes as evidence, (b) a tester agent in a browser before the gate. Chosen (a): the machine was contended, and the spike page is a test page beside the viewer. Reversal: a tester step in the next wave.
+- S1-22 (preview) The dump picker on phones. (a) drop the `accept` filter on both pages, (b) widen it with `application/octet-stream`, (c) leave it until phones get their own issue (R7). Chosen (a): the SHA1 check already refuses a wrong file with its SHA1, and a wider filter still depends on how each phone maps types. Reversal: one attribute per page.
 
 ## Gate
 

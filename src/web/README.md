@@ -55,7 +55,7 @@ Vite accepts the `.ts.net` host name (`server.allowedHosts` in `vite.config.ts`)
 
 ## Your dump
 
-The page reads your dump in this tab. It checks the SHA1 against `rom/gen3/build.json`, applies the patch and keeps the patched ROM in memory. It never uploads the dump and never stores it: no IndexedDB, no local storage, no savestate. mGBA's file system stays in memory, and its autosave is off. A reload forgets the dump.
+The page reads your dump in this tab. Its picker takes any file: a phone greys out a `.gba` file when the picker filters by that extension, and the SHA1 check refuses any other file. It checks the SHA1 against `rom/gen3/build.json`, applies the patch and keeps the patched ROM in memory. It never uploads the dump and never stores it: no IndexedDB, no local storage, no savestate. mGBA's file system stays in memory, and its autosave is off. A reload forgets the dump.
 
 Besides its own files, the page sends only GET requests: the two `/rom/` files from its own server, and a replay JSON from `replay.pokemonshowdown.com` when you load a replay by link or ID.
 
