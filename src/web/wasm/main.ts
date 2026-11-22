@@ -1,15 +1,16 @@
 // The WebAssembly spike page (#35): wires the controls of wasm.html. It rebuilds the module from
 // the user's dump with the module patch, turns the picked replay into its stream as the emulator
 // page does, and runs the game in a worker (run.ts). The page allows the worker's frames by the
-// tick rule (protocol.ts) and draws the newest frame on each animation frame. The game's sound
-// goes from the worker through the audio ring to an audio worklet (audio.ts), at 1x and 2x; fast
-// stays silent. The dump stays in this tab.
+// tick rule (protocol.ts) and draws the newest whole frame (frame-swap.ts) on each animation
+// frame. The game's sound goes from the worker through the audio ring to an audio worklet
+// (audio.ts), at 1x and 2x; fast stays silent. The dump stays in this tab.
 import { environmentProblem } from '../environment'
 import { messageOf } from '../message'
 import { FIRST_REPLAY, TEST_REPLAYS } from '../replays'
 import { endedLine } from '../status'
 import { streamOfReplay } from '../stream'
 import { FRAME_HEIGHT, FRAME_WIDTH } from './frame'
+import { readFrame } from './frame-swap'
 import { grant, readStatus, type Speed, writePace } from './protocol'
 import {
   AudioOpener,
@@ -56,7 +57,7 @@ function drawLoop(
         view.showSpeed(speed)
       }
     }
-    image.data.set(run.frame)
+    readFrame(run.control, run.frames, image.data)
     context?.putImageData(image, 0, 0)
     view.progress(progressLine(status, run))
   }

@@ -4,6 +4,7 @@ import { readSlotHeaderLayout, type SlotDescription, SlotMismatchError } from '.
 import header from '../../../rom/gen3/include/replay_progress.h?raw'
 import slotHeader from '../../../rom/gen3/include/replay_slot.h?raw'
 import { FRAME_BYTES } from './frame'
+import { claimFrame, frameBuffer, readFrame } from './frame-swap'
 import { frameHandler, writeStream } from './game'
 import type { GameModule } from './game'
 import { readProgressLayout } from './progress'
@@ -108,7 +109,9 @@ describe('the frame hook', () => {
     grant(control, 2)
     const onFrame = frameHandler(() => game, shared, LAYOUT)
     onFrame(PIXELS)
-    expect([...new Uint8Array(shared.frame, 0, 4)]).toEqual([0xff, 0, 0, 0xff])
+    const page = new Uint8ClampedArray(FRAME_BYTES)
+    readFrame(control, shared.frames, page)
+    expect([...page.subarray(0, 4)]).toEqual([0xff, 0, 0, 0xff])
     expect(readStatus(control)).toMatchObject({ frame: 1, done: 7, playing: true })
     view.setUint8(LAYOUT.offsets.finished, 1)
     onFrame(PIXELS)
@@ -123,5 +126,24 @@ describe('the frame hook', () => {
     const onFrame = frameHandler(() => game, shared, LAYOUT)
     for (let i = 0; i < 5; i++) onFrame(PIXELS)
     expect(control[CONTROL.frame]).toBe(5)
+  })
+
+  it('widens each frame into the buffer the page does not hold, then puts it in front', () => {
+    const game = fakeGame()
+    const shared = createShared(16)
+    const control = new Int32Array(shared.control)
+    grant(control, undefined)
+    const onFrame = frameHandler(() => game, shared, LAYOUT)
+    game.HEAPU16.fill(31, PIXELS >> 1, (PIXELS >> 1) + 240 * 160)
+    onFrame(PIXELS)
+    expect(control[CONTROL.front]).toBe(1)
+    expect([...frameBuffer(shared.frames, 1).subarray(0, 4)]).toEqual([0xff, 0, 0, 0xff])
+    expect(claimFrame(control)).toBe(1)
+    game.HEAPU16.fill(31 << 5, PIXELS >> 1, (PIXELS >> 1) + 240 * 160)
+    onFrame(PIXELS)
+    // The page still holds buffer 1, which keeps the frame it claimed.
+    expect(control[CONTROL.front]).toBe(0)
+    expect([...frameBuffer(shared.frames, 1).subarray(0, 4)]).toEqual([0xff, 0, 0, 0xff])
+    expect([...frameBuffer(shared.frames, 0).subarray(0, 4)]).toEqual([0, 0xff, 0, 0xff])
   })
 })

@@ -160,9 +160,35 @@ async function playHandMade(page: Page, bytes: number[]): Promise<void> {
   expect(rms).toBeGreaterThan(0)
 }
 
+// Restart at 2x: twice the 1x pace and the same sound into the ring, then END. With two frame
+// buffers (#48) the page copies one while the worker widens the other.
+async function restartAt2x(page: Page): Promise<void> {
+  const line = page.getByRole('status')
+  await page.getByLabel('2x').check()
+  await page.getByRole('button', { name: 'Restart' }).click()
+  await expect(line).toHaveText(new RegExp(`^Running ${HAND_MADE}`))
+  await page.waitForTimeout(2_000)
+  const { paced, written, read, played, rms } = await rate(page, 5_000)
+  report({ stream: HAND_MADE, speed: '2x', paced, written, read, played, rms })
+  expect(paced / GBA_FRAMES_PER_SECOND).toBeGreaterThan(1.9)
+  expect(paced / GBA_FRAMES_PER_SECOND).toBeLessThan(2.1)
+  // Double pace: every other pair of twice the frames, so the ring fills as fast as at 1x.
+  expect(written).toBeGreaterThan(0.95)
+  expect(written).toBeLessThan(1.05)
+  expect(rms).toBeGreaterThan(0)
+  const end = await finished(page, 180_000)
+  await expect(line).toHaveText(`Played ${HAND_MADE} to the end of the battle.`)
+  const seconds = (end.finishedMs ?? 0) / 1000
+  report({ stream: HAND_MADE, speed: '2x', toEnd: end.finishedAt, seconds })
+  expect(end.done).toBe(end.total)
+  expect((await status(page))?.speed).toBe('2x')
+}
+
 test.use({ launchOptions: { args: ['--autoplay-policy=no-user-gesture-required'] } })
 
-test('the spike page plays the hand-made battle at 1x and 994052 at fast', async ({ page }) => {
+test('the spike page plays the hand-made battle at 1x and 2x and 994052 at fast', async ({
+  page,
+}) => {
   const missing = [DUMP, ...NEEDED].filter((path) => !existsSync(path))
   test.skip(
     missing.length > 0,
@@ -193,19 +219,8 @@ test('the spike page plays the hand-made battle at 1x and 994052 at fast', async
     await playHandMade(page, handMade)
   })
 
-  await test.step('Restart at 2x plays twice as fast', async () => {
-    await page.getByLabel('2x').check()
-    await page.getByRole('button', { name: 'Restart' }).click()
-    await expect(line).toHaveText(new RegExp(`^Running ${HAND_MADE}`))
-    await page.waitForTimeout(2_000)
-    const { paced, written, read, played, rms } = await rate(page, 5_000)
-    report({ stream: HAND_MADE, speed: '2x', paced, written, read, played, rms })
-    expect(paced / GBA_FRAMES_PER_SECOND).toBeGreaterThan(1.9)
-    expect(paced / GBA_FRAMES_PER_SECOND).toBeLessThan(2.1)
-    // Double pace: every other pair of twice the frames, so the ring fills as fast as at 1x.
-    expect(written).toBeGreaterThan(0.95)
-    expect(written).toBeLessThan(1.05)
-    expect(rms).toBeGreaterThan(0)
+  await test.step('Restart at 2x plays twice as fast and reaches END', async () => {
+    await restartAt2x(page)
   })
 
   await test.step('994052 reaches END at fast', async () => {

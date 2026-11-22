@@ -8,7 +8,8 @@ import {
   type SlotHeaderLayout,
   writeReplaySlot,
 } from '../../patch/slot.ts'
-import { FRAME_BYTES, widenFrame } from './frame.ts'
+import { widenFrame } from './frame.ts'
+import { backBuffer, frameBuffer, publishFrame, waitUntilUnread } from './frame-swap.ts'
 import { readProgress, type ProgressLayout } from './progress.ts'
 import { type SharedBuffers, waitForTick, writeStatus } from './protocol.ts'
 
@@ -72,8 +73,9 @@ export function writeStream(
 }
 
 /**
- * The worker's irvFrame: the frame widened into the shared frame buffer, the frame count and the
- * progress into the control words, then the wait until the page allows the frame.
+ * The worker's irvFrame: the frame widened into the frame buffer the page does not copy and put in
+ * front (frame-swap.ts), the frame count and the progress into the control words, then the wait
+ * until the page allows the frame.
  */
 export function frameHandler(
   game: () => GameModule,
@@ -81,12 +83,14 @@ export function frameHandler(
   layout: ProgressLayout,
 ): (pixels: number) => void {
   const control = new Int32Array(buffers.control)
-  const rgba = new Uint8Array(buffers.frame, 0, FRAME_BYTES)
   let frame = 0
   return (pixels) => {
     const module = game()
     frame++
-    widenFrame(module.HEAPU16, pixels >> 1, rgba, 4)
+    const back = backBuffer(control)
+    waitUntilUnread(control, back)
+    widenFrame(module.HEAPU16, pixels >> 1, frameBuffer(buffers.frames, back), 4)
+    publishFrame(control, back)
     writeStatus(control, frame, readProgress(module.HEAPU8, module._IrvWasm_Progress(), layout))
     waitForTick(control, frame)
   }

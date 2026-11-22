@@ -49,7 +49,8 @@ export type Sound = AudioContext | string
 export interface Run {
   readonly worker: Worker
   readonly control: Int32Array
-  readonly frame: Uint8Array
+  /** The two frame buffers; the page reads them through readFrame (frame-swap.ts) only. */
+  readonly frames: SharedArrayBuffer
   readonly clock: TickClock
   readonly ring: AudioRing
   readonly output: AudioWorkletNode | undefined
@@ -136,7 +137,7 @@ export function startRun(built: Built, picked: Picked, speed: Speed, sound: Soun
   return {
     worker,
     control: new Int32Array(buffers.control),
-    frame: new Uint8Array(buffers.frame),
+    frames: buffers.frames,
     clock: new TickClock(speed, now),
     ring: new AudioRing(buffers.audio),
     output,
