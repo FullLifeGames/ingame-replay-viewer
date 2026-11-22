@@ -83,7 +83,8 @@ function hblankOps(state: VideoState, ewram: Uint8Array): Op[] {
 
 /** The script that draws the state: its four areas, then DMA0 at HBlank when it ran. */
 export function stateOps(state: VideoState): Op[] {
-  const io = state.io.slice()
+  // A copy: the state may sit in a Buffer from readFileSync, whose slice() shares its memory.
+  const io = new Uint8Array(state.io)
   // DMA0 starts from the replay's own DmaSet, so the IO it loads holds the channel disabled.
   if (state.ewram !== undefined) io[DMA0_CNT + 3] = (io[DMA0_CNT + 3] ?? 0) & 0x7f
   const ops = [load(IO, io), load(PRAM, state.pram), load(VRAM, state.vram), load(OAM, state.oam)]

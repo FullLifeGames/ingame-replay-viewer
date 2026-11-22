@@ -134,6 +134,21 @@ describe('the script of a state', () => {
       ).pixels,
     ).toBe(0)
   })
+
+  it('replays DMA0 from a state read as a Buffer, whose slice shares its memory', () => {
+    const table = Uint16Array.from({ length: 200 }, (_, i) => rgb(i % 32, 0, 1))
+    const ewram = new Uint8Array(0x40000)
+    ewram.set(new Uint8Array(table.buffer))
+    const control = (0x8000 | 0x2000 | 0x0200 | 0x0060) * 0x10000 + 1
+    const io = { 0xb0: 0x02000002, 0xb4: 0x05000000, 0xb8: control }
+    const pixels = draw(Buffer.from(stateBytes(io, { 0: 0x7fff }, ewram)))
+    expect(
+      diffFrame(
+        pixels,
+        linesFrame((y) => table[y] ?? 0),
+      ).pixels,
+    ).toBe(0)
+  })
 })
 
 describe("the comparison with mGBA's frame", () => {
