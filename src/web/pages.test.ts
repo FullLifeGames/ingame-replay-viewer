@@ -24,3 +24,20 @@ describe('the dump input', () => {
     })
   }
 })
+
+// #52: the WebAssembly page loads a replay by link and lists what the game does not show, with the
+// ids, labels and texts of the emulator page, so both pages share replay-view.ts.
+const REPLAY_PARTS: Record<string, RegExp> = {
+  'the replay form': /<form id="replay-form">[\s\S]*?<\/form>/,
+  'the list': /<p id="replay-summary"><\/p>[\s\S]*?<ol id="not-shown-rows"><\/ol>/,
+}
+
+describe('the replay form and the "Not shown" list', () => {
+  for (const [part, pattern] of Object.entries(REPLAY_PARTS)) {
+    it(`reads the same on both pages: ${part}`, () => {
+      const onIndex = pattern.exec(indexHtml)?.[0]
+      expect(onIndex).toBeDefined()
+      expect(pattern.exec(wasmHtml)?.[0]).toBe(onIndex)
+    })
+  }
+})

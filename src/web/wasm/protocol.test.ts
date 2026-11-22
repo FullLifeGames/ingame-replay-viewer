@@ -87,10 +87,10 @@ describe('the tick rule', () => {
 })
 
 describe('the shared buffers', () => {
-  it('hold one RGBA frame of 240x160x4 bytes, the control words and the audio ring', () => {
+  it('hold two RGBA frames of 240x160x4 bytes, the control words and the audio ring', () => {
     const shared = createShared(1024)
-    expect(shared.frame.byteLength).toBe(FRAME_BYTES)
-    expect(shared.frame.byteLength).toBe(240 * 160 * 4)
+    expect(shared.frames.byteLength).toBe(2 * FRAME_BYTES)
+    expect(FRAME_BYTES).toBe(240 * 160 * 4)
     expect(new Int32Array(shared.control).length).toBe(Object.keys(CONTROL).length)
     expect(new AudioRing(shared.audio).capacity).toBe(1024)
   })

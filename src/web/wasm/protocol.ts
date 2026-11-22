@@ -3,7 +3,7 @@
 // everything goes through shared memory: the worker writes each frame, the frame count and
 // the replay progress there, and before it plays on it waits until the page allows the frame. The
 // page allows frames by the tick rule (1x, 2x) or lifts the limit (fast). DOM-free; messages.ts
-// holds the two messages.
+// holds the two messages, frame-swap.ts the hand-over of the frames through two buffers.
 import { FRAME_BYTES } from './frame.ts'
 import type { Progress } from './progress.ts'
 import { ringBytes } from './ring.ts'
@@ -92,7 +92,14 @@ export const CONTROL = {
   finished: 8,
   playing: 9,
   pace: 10,
+  /** The frame buffer that holds the newest whole frame (frame-swap.ts). */
+  front: 11,
+  /** The frame buffer the page copies, or NOT_READING. */
+  reading: 12,
 } as const
+
+/** The reading word while the page copies no frame buffer. */
+export const NOT_READING = -1
 
 /**
  * The page's side: how the worker hands on the game's sound at `speed`. 1x plays it, 2x plays it
@@ -110,17 +117,19 @@ export function readPace(control: Int32Array): number {
 export interface SharedBuffers {
   /** Int32 words at the indexes of CONTROL. */
   readonly control: SharedArrayBuffer
-  /** The newest frame as RGBA. */
-  readonly frame: SharedArrayBuffer
+  /** Two RGBA frames, one after the other: the newest whole frame and the one the worker draws. */
+  readonly frames: SharedArrayBuffer
   /** The audio ring (ring.ts): the game's sound, left and right interleaved. */
   readonly audio: SharedArrayBuffer
 }
 
 /** Fresh buffers for one run, with an audio ring of `audioCapacity` samples. */
 export function createShared(audioCapacity: number): SharedBuffers {
+  const control = new SharedArrayBuffer(4 * Object.keys(CONTROL).length)
+  Atomics.store(new Int32Array(control), CONTROL.reading, NOT_READING)
   return {
-    control: new SharedArrayBuffer(4 * Object.keys(CONTROL).length),
-    frame: new SharedArrayBuffer(FRAME_BYTES),
+    control,
+    frames: new SharedArrayBuffer(2 * FRAME_BYTES),
     audio: new SharedArrayBuffer(ringBytes(audioCapacity)),
   }
 }

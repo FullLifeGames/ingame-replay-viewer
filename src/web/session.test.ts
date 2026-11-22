@@ -4,7 +4,7 @@ import replay994052 from '../../test/fixtures/replays/smogtours-gen3ou-994052.js
 import { NOT_STARTED_LINE } from './emulator'
 import type { TestReplay } from './replays'
 import { ROM_FILES } from './rom-files'
-import { SessionError } from './session'
+import { SessionError } from './replay-choice'
 import {
   BASE,
   DESCRIPTION,
