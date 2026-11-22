@@ -10,7 +10,7 @@ Two things stand between it and a public build. The borrowed platform layer has 
 
 ## What the build is
 
-- Emscripten 7.0.0 (pinned in `rom/gen3/wasm/wasm.json`, installed under `~/tools/emsdk`) compiles 387 C files: 384 tree files, our replay files among them and six from patched copies, plus the three borrowed sound files. All 387 compile at `-O2`, and so do the 18 C files of our glue and our platform layer. In wave 3 the build compiled six borrowed files; #43 took out three. The census before any fix had 373 of 395 passing. It applies no overlay patch, so it still counts the files that one fixes, `random.c` among them, as failing.
+- Emscripten 7.0.0 (pinned in `rom/gen3/wasm/wasm.json`, installed under `~/tools/emsdk`) compiles 388 C files: 385 tree files, our replay files among them and six from patched copies, plus the three borrowed sound files. All 387 compile at `-O2`, and so do the 18 C files of our glue and our platform layer. In wave 3 the build compiled six borrowed files; #43 took out three. The census before any fix had 373 of 395 passing. It applies no overlay patch, so it still counts the files that one fixes, `random.c` among them, as failing.
 - The 544 data objects that the ROM build assembles with ARM `as` (battle scripts, animation scripts, event scripts, songs) go through a converter (`scripts/wasm-convert.ts`). It reads each ARM ELF object and writes LLVM's WebAssembly assembly with the same bytes and relocations. All 544 assemble.
 - The GBA's addresses map one to one into linear memory: EWRAM at 0x02000000, IO at 0x04000000, VRAM at 0x06000000, static data from 0x08000000, where the ROM would sit. The memory is a fixed 256 MB.
 - Our platform layer (`rom/gen3/wasm/layer/`, #43: 11 C files and 8 headers) stands in for the GBA's hardware. It makes the BIOS calls, runs DMA and the interrupts, drives the display line by line and draws each line: text and affine backgrounds, sprites, windows, blending and mosaic. We wrote it from GBATEK and the game's own sources. It includes no header of the expansion, so a native harness (`layer/host/`) runs the same files in the specs, in CI too.
@@ -24,9 +24,9 @@ Two things stand between it and a public build. The borrowed platform layer has 
 
 All 13 scenes of `rom:shots` pass in the Node harness (`npm run wasm:run`) on hand-made and on 994052, with the same probes and thresholds as on mGBA, and both refusals show their colour.
 
-Our renderer (#43) draws every frame. `npm run wasm:diff` counts the pixels where a scene frame of the module differs from mGBA's. With our renderer and the two fixes to the game's drawing code below (`bg.c`, `text.c`), most scene frames of both streams match mGBA's to the pixel. The others catch a sprite in motion, and the two engines stand a few frames apart there (see Timing): `intro-before` (882 pixels) and `weather-start` (20,849) on both streams, as with the borrowed renderer in wave 3; `first-faint` (791 on 994052, 1,584 on hand-made), where the faint slide stands a step apart; and on hand-made `win` and `held` (803 each), where the player's Magneton stands at another point of its motion. The last three of hand-made matched in wave 4's step B4 and differ since the shot tool's mGBA runs on the module's fixed clock (see Frames to END), with our frames unchanged. The module of wave 3 with the borrowed renderer, saved as the baseline, draws all 40 scene frames of both streams byte for byte as ours does, so each count above comes from where mGBA stands, and our layer adds none.
+Our renderer (#43) draws every frame. `npm run wasm:diff` counts the pixels where a scene frame of the module differs from mGBA's. With our renderer and the two fixes to the game's drawing code below (`bg.c`, `text.c`), most scene frames of both streams match mGBA's to the pixel. `outro` is one of them on both streams: 150 frames after END the module's frame equals mGBA's, with the winner's trainer slid in, the text box and the field. The others catch a sprite in motion, and the two engines stand a few frames apart there (see Timing): `intro-before` (882 pixels) and `weather-start` (20,849) on both streams, as with the borrowed renderer in wave 3; `first-faint` (791 on 994052, 1,584 on hand-made), where the faint slide stands a step apart; and on hand-made `win` (803), where the player's Magneton stands at another point of its motion. Hand-made's `first-faint` and `win` matched in wave 4's step B4 and differ since the shot tool's mGBA runs on the module's fixed clock (see Frames to END), with our frames unchanged. Stage 3's merged tree (stream format 2, the outro) gave the same counts. In #43's first part the module of wave 3 with the borrowed renderer drew all 40 scene frames of both streams byte for byte as ours does, so each count above comes from where mGBA stands, and our layer adds none.
 
-`npm run wasm:oracle` checks the renderer against mGBA without that gap. The shot tool dumps mGBA's own video state every 60 frames; the oracle draws each state with our layer in the native harness and compares the result with mGBA's frame of the same instant. In #43's last run each sampled state matched its mGBA frame: 48 of 48 on hand-made and 660 of 660 on 994052. mGBA blends its colours on 8-bit channels, so the oracle holds a blended pixel against mGBA's arithmetic on our choice of layers and coefficients. It also holds the pixel our layer drew against GBATEK's 5-bit arithmetic on the same choice, which the blend specs pin. At no frame's end did either stream show an affine background, mosaic, WIN1 or a 256-colour tile (#43's census), and no sampled state brightens (BLDCNT mode 2), so only their specs check those.
+`npm run wasm:oracle` checks the renderer against mGBA without that gap. The shot tool dumps mGBA's own video state every 60 frames; the oracle draws each state with our layer in the native harness and compares the result with mGBA's frame of the same instant. On stage 3's merged tree each sampled state matched its mGBA frame: 48 of 48 on hand-made and 682 of 682 on 994052. mGBA blends its colours on 8-bit channels, so the oracle holds a blended pixel against mGBA's arithmetic on our choice of layers and coefficients. It also holds the pixel our layer drew against GBATEK's 5-bit arithmetic on the same choice, which the blend specs pin. At no frame's end did either stream show an affine background, mosaic, WIN1 or a 256-colour tile (#43's census), and no sampled state brightens (BLDCNT mode 2), so only their specs check those.
 
 ### Sound
 
@@ -50,21 +50,21 @@ A held B would end the replay in both builds: the replay plays as a recorded bat
 
 ## Frames to END
 
-| Stream                        | WebAssembly, Node | mGBA, headless    | WebAssembly before sound (B4) |
-| ----------------------------- | ----------------- | ----------------- | ----------------------------- |
-| hand-made (34 ops)            | 2916              | 2910              | 2876                          |
-| 994052 (461 ops)              | 39637             | 39630             | 38942                         |
-| refusals (`EMPTY`, `VERSION`) | error at frame 31 | error at frame 44 | 31                            |
+| Stream                        | WebAssembly, Node | WebAssembly, Chromium | mGBA, headless    |
+| ----------------------------- | ----------------- | --------------------- | ----------------- |
+| hand-made (34 ops)            | 2916              | 2916                  | 2923              |
+| 994052 (494 ops)              | 40981             | 40981                 | 40974             |
+| refusals (`EMPTY`, `VERSION`) | error at frame 31 | not run               | error at frame 44 |
 
-Each engine ran both streams twice in B7, interleaved, and each pair of runs gave the same frames. The page in Chromium reaches END at the same frames as the Node harness (2916 for hand-made, 39637 for 994052), so both hosts play the same game.
+Wave 4 measured these on stage 3's merged tree: stream format 2, the first part of our platform layer, the outro, and mGBA on the fixed clock. In format 1, 994052's stream held 461 ops. Two `rom:shots` runs of hand-made wrote the same 20 frames byte for byte and reached END at the same frame, and mGBA reached END on 994052 at 40974 in both the oracle's run and `rom:shots`'. The e2e plays hand-made at 1x and 994052 at fast in Chromium, and the page reaches END at the Node harness's frames.
 
 Three things move the counts:
 
 - Boot. mGBA spends 13 frames before the game's first frame, which the module skips: it calls `AgbMain` straight away. The refusals show it (44 against 31).
-- The silent stubs before B6. Until the module had sound, every cry and fanfare that the game waits for ended at once, and in B4 994052 reached END 767 frames before mGBA. With the mixer in, the module ends 7 frames after mGBA.
-- VBlank overruns. On the GBA a frame whose work runs past the next VBlank misses it and takes two. The module's work takes no display time, so its frames never overrun, which would let it finish earlier. After the 13 boot frames, the module still takes about 20 frames more than mGBA on both streams. So mGBA's overruns cost it fewer frames than something else costs the module, the mixer's timing of the cry waits being the first candidate. The spike did not measure the split.
+- The silent stubs before B6. Until the module had sound, every cry and fanfare that the game waits for ended at once, and in the spike's step B4 the module reached END at 2876 on hand-made and 38942 on 994052, 767 frames before mGBA. With the mixer in, the module ends 7 frames after mGBA on 994052 and 7 before it on hand-made.
+- VBlank overruns. On the GBA a frame whose work runs past the next VBlank misses it and takes two. The module's work takes no display time, so its frames never overrun, which would let it finish earlier. After the 13 boot frames, the module takes 6 frames more than mGBA on hand-made and 20 more on 994052. So mGBA's overruns cost it fewer frames than something else costs the module, the mixer's timing of the cry waits being the first candidate. The spike did not measure the split.
 
-mGBA itself varies between sessions on the same ROM: 994052 reached END at frame 39709 in B4 and 39734 in fix step 6, against 39630 in both runs of B7, and hand-made at 2947 in fix step 6 against 2910. That spread of 104 frames is larger than the gap between the engines. The clock caused it. mGBA's cartridge clock followed the host's, and the game reads it at boot: in #43 two runs of hand-made parted at frame 10, in the clock's seconds. Since #43 the shot tool stops mGBA's clock at the module's time, noon on 1 January 2000 UTC. Two oracle runs of hand-made then dumped byte-identical states and frames, and two runs of 994052 (the oracle's and `rom:shots`') reached END at the same frame. With that clock mGBA reaches END at frame 2923 on hand-made and 39629 on 994052; the module stays at 2916 and 39637.
+On the host's clock and stream format 1, mGBA varied between sessions on the same ROM: 994052 reached END at frame 39709 in B4 and 39734 in fix step 6, against 39630 in both runs of B7, and hand-made at 2947 in fix step 6 against 2910. That spread of 104 frames is larger than the gap between the engines. The clock caused it. mGBA's cartridge clock followed the host's, and the game reads it at boot: in #43 two runs of hand-made parted at frame 10, in the clock's seconds. Since #43 the shot tool stops mGBA's clock at the module's time, noon on 1 January 2000 UTC. Two oracle runs of hand-made then dumped byte-identical states and frames, and two runs of 994052 (the oracle's and `rom:shots`') reached END at the same frame. With that clock and format 1, mGBA reached END at frame 2923 on hand-made and 39629 on 994052, and the module at 2916 and 39637.
 
 ## Speed
 
@@ -83,21 +83,21 @@ The mGBA probe (`e2e/wasm-spike.spec.ts`, its second test) plays 994052 on the e
 
 ## Download size
 
-Bytes, with gzip at level 9 and brotli at quality 11 from Node's zlib:
+Bytes, with gzip at level 9 and brotli at quality 11 from Node's zlib (`scripts/patch-sizes.ts`, stage 3's merged tree of wave 4: stream format 2, our platform layer's first part):
 
 | File                                  | Raw            | gzip           | brotli         |
 | ------------------------------------- | -------------- | -------------- | -------------- |
-| `irv-emerald-wasm.bps` (module patch) | 20,975,219     | 15,603,390     | 14,183,001     |
+| `irv-emerald-wasm.bps` (module patch) | 20,977,267     | 15,605,329     | 14,159,223     |
 | `irv-emerald.js` (Emscripten's glue)  | 8,458          | 3,094          | 2,803          |
-| **WebAssembly page**                  | **20,983,677** | **15,606,484** | **14,185,804** |
+| **WebAssembly page**                  | **20,985,725** | **15,608,423** | **14,162,026** |
 | `mgba.wasm`                           | 1,852,041      | 597,591        | 463,184        |
 | `mgba.js`                             | 248,854        | 57,127         | 48,706         |
-| `irv-emerald.bps` (ROM patch)         | 18,388,891     | 15,757,973     | 14,486,382     |
-| **Emulator page**                     | **20,489,786** | **16,412,691** | **14,998,272** |
+| `irv-emerald.bps` (ROM patch)         | 18,391,067     | 15,762,689     | 14,487,718     |
+| **Emulator page**                     | **20,491,962** | **16,417,407** | **14,999,608** |
 
-Raw, the WebAssembly page fetches 0.49 MB more. Compressed, it fetches 0.81 MB less with either method. The dev server sends both pages' files uncompressed; a real host picks the encoding (M2).
+Raw, the WebAssembly page fetches 0.49 MB more. Compressed, it fetches 0.81 MB less with gzip and 0.84 MB less with brotli. The dev server sends both pages' files uncompressed; a real host picks the encoding (M2).
 
-The module patch copies 5,815,589 of the module's 25,977,583 bytes (22.4 %) from the dump and carries 20,143,848 bytes as literals. For comparison, the ROM patch copies 8,069,773 of the ROM's 33,554,432 bytes (24.0 %) from the dump (the BPS actions SourceRead and SourceCopy, counted in both patches).
+In wave 3 the module patch copied 5,815,589 of the module's 25,977,583 bytes (22.4 %) from the dump and carried 20,143,848 bytes as literals. For comparison, the ROM patch copied 8,069,773 of the ROM's 33,554,432 bytes (24.0 %) from the dump (the BPS actions SourceRead and SourceCopy, counted in both patches).
 
 The module itself, `irv-emerald.wasm` (25,977,583 bytes), never leaves devbox: the server answers 404 for it, and the page rebuilds it from the dump.
 
@@ -107,7 +107,7 @@ The module itself, `irv-emerald.wasm` (25,977,583 bytes), never leaves devbox: t
 
 The speed options go into our own frame loop if milestone 2 ships the module. The page already grants the worker its frames by the tick rule (`src/web/wasm/protocol.ts`), so 1x, 2x and fast are one factor each, the sound follows at 1x and 2x, and fast gives way to 1x at END. If milestone 2 keeps mGBA, the options go to mGBA's fast-forward multiplier instead. In Chromium that tops out near 314 frames per second, where the module's fast averaged 330 to 348 in B6 and B7.
 
-The module does not solve #17. Its patch is 20.98 MB raw and 14.18 MB with brotli, against 18.39 MB and 14.49 MB for the ROM patch. Each copies under a quarter of its bytes from the dump and carries the rest itself. A visitor fetches 0.81 MB less on the WebAssembly page with either compression, and the host's compression saves more than the switch: brotli takes 3.90 MB off the ROM patch. Per-asset extraction (below, "Nintendo's assets from the dump") is the one lever the spike found that shrinks the module patch itself, by the retail assets the expansion recompresses. The expansion's new assets stay in the patch on either route.
+The module does not solve #17. Its patch is 20.98 MB raw and 14.16 MB with brotli, against 18.39 MB and 14.49 MB for the ROM patch. Each copies under a quarter of its bytes from the dump and carries the rest itself. A visitor fetches 0.81 MB less on the WebAssembly page with gzip and 0.84 MB less with brotli, and the host's compression saves more than the switch: brotli takes 3.90 MB off the ROM patch. Per-asset extraction (below, "Nintendo's assets from the dump") is the one lever the spike found that shrinks the module patch itself, by the retail assets the expansion recompresses. The expansion's new assets stay in the patch on either route.
 
 ## Patches, shadow headers and flags
 
