@@ -148,6 +148,15 @@ describe('decodeStream', () => {
     expect(steven.trainers.near.trainerPic).toBe(trainerPics.TRAINER_PIC_STEVEN)
   })
 
+  it('refuses a far trainer pic without a front pic, as the encoder does (S3-2)', () => {
+    const pic = trainerOffset('far') + TRAINER_OFFSET.trainerPic
+    const pokedude = trainerPics.TRAINER_PIC_POKEDUDE
+    expect(patched([END], pic, u16(pokedude))).toThrow(Gen3Error)
+    expect(patched([END], pic, u16(pokedude))).toThrow(/far trainer pic \d+ has no front pic/)
+    const steven = patched([END], pic, u16(trainerPics.TRAINER_PIC_STEVEN))()
+    expect(steven.trainers.far.trainerPic).toBe(trainerPics.TRAINER_PIC_STEVEN)
+  })
+
   it('reads a slot with species 0 as empty, whatever its other bytes, as the ROM does', () => {
     const decoded = patched([END], monOffset('far', 3) + MON_OFFSET.species, [0, 0])()
     expect(decoded.parties.far[3]).toBeNull()

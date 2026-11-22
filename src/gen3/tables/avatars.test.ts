@@ -40,6 +40,13 @@ describe('trainerPicOf (#20)', () => {
     expect(trainerPicOf('far', 'aquagruntf')).toBe(PIC.TRAINER_PIC_AQUA_GRUNT_F)
   })
 
+  it('keeps a far pic only with a front pic (S3-2)', () => {
+    expect(trainerPicOf('near', 'pokedude')).toBe(PIC.TRAINER_PIC_POKEDUDE)
+    expect(trainerPicOf('far', 'pokedude')).toBe(PIC.TRAINER_PIC_MAY)
+    expect(trainerPicOf('near', 'oldman')).toBe(PIC.TRAINER_PIC_OLD_MAN)
+    expect(trainerPicOf('far', 'oldman')).toBe(PIC.TRAINER_PIC_MAY)
+  })
+
   it('falls back to Brendan near and May far for a number, a custom avatar, no match or none', () => {
     for (const avatar of ['265', '#uwliiiskyminflyers', 'hoopster', 'maniac', 'm', undefined]) {
       expect(trainerPicOf('near', avatar), String(avatar)).toBe(PIC.TRAINER_PIC_BRENDAN)
@@ -49,8 +56,11 @@ describe('trainerPicOf (#20)', () => {
 })
 
 describe('fitsSide (#20)', () => {
-  it('takes any pic far and only a pic with a back pic near', () => {
+  it('takes only a pic with a front pic far and only a pic with a back pic near', () => {
     expect(fitsSide('far', PIC.TRAINER_PIC_LEADER_NORMAN)).toBe(true)
+    expect(fitsSide('far', PIC.TRAINER_PIC_STEVEN)).toBe(true)
+    expect(fitsSide('far', PIC.TRAINER_PIC_POKEDUDE)).toBe(false)
+    expect(fitsSide('far', PIC.TRAINER_PIC_OLD_MAN)).toBe(false)
     expect(fitsSide('near', PIC.TRAINER_PIC_LEADER_NORMAN)).toBe(false)
     for (const pic of Object.values(backPics)) expect(fitsSide('near', pic)).toBe(true)
   })

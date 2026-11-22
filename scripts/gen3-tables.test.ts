@@ -49,7 +49,7 @@ const TREE: Record<string, string> = {
     'TRAINER_PIC_HIKER,',
     'TRAINER_PIC_COUNT,',
   ]),
-  // Back pics count only inside gTrainerPicInfo, and a commented field is no field.
+  // Front and back pics count only inside gTrainerPicInfo, and a commented field is no field.
   'src/data/graphics/trainers.h': [
     'const struct X sOther[] = { [TRAINER_PIC_HIKER] = { .backPic = 0 } };',
     'const struct TrainerPicInfo gTrainerPicInfo[TRAINER_PIC_COUNT] =',
@@ -122,6 +122,10 @@ describe('generateTables on a small tree', () => {
     expect(parsed('trainer-back-pics.json')).toEqual({
       TRAINER_PIC_NONE: 0,
       TRAINER_PIC_BRENDAN: 1,
+    })
+    expect(parsed('trainer-front-pics.json')).toEqual({
+      TRAINER_PIC_BRENDAN: 1,
+      TRAINER_PIC_HIKER: 2,
     })
     expect(parsed('charmap.json')).toEqual({
       eos: 255,

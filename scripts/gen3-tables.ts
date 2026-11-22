@@ -88,8 +88,9 @@ const TRAINER_PICS = {
   count: 'TRAINER_PIC_COUNT',
 }
 
-// Only a pic with a back pic can stand on the near side (#20); gTrainerPicInfo says which.
-const BACK_PICS = { data: 'src/data/graphics/trainers.h', array: 'gTrainerPicInfo' }
+// The near side draws a back pic and the far side a front pic (#20, S3-2); gTrainerPicInfo says
+// which pics have each.
+const PIC_INFO = { data: 'src/data/graphics/trainers.h', array: 'gTrainerPicInfo' }
 
 const LEVEL_CAP = { header: 'include/constants/pokemon.h', define: 'MAX_LEVEL' }
 
@@ -97,6 +98,7 @@ export const TABLE_FILES = [
   ...CONTENT.map((content) => `${content.table}.json`),
   'trainer-pics.json',
   'trainer-back-pics.json',
+  'trainer-front-pics.json',
   'counts.json',
   'charmap.json',
   'meta.json',
@@ -169,26 +171,28 @@ function trainerPics(read: ReadTree): object {
 
 const C_COMMENT = /\/\/[^\n]*|\/\*[\s\S]*?\*\//g
 
-// The entries of gTrainerPicInfo with a .backPic, by the trainer pic enum's names and numbers.
-function trainerBackPics(read: ReadTree): object {
+// The entries of gTrainerPicInfo that set `field` (backPic or frontPic), by the trainer pic enum's
+// names and numbers.
+function trainerPicsWith(read: ReadTree, field: 'backPic' | 'frontPic'): object {
   const values = parseEnum(read(TRAINER_PICS.header), TRAINER_PICS.enumName)
-  const code = read(BACK_PICS.data).replace(C_COMMENT, '')
-  const declaration = new RegExp(String.raw`\b${BACK_PICS.array}\s*\[[^\]]*\]\s*=`).exec(code)
-  if (declaration === null) throw new Error(`${BACK_PICS.data} has no ${BACK_PICS.array}`)
+  const code = read(PIC_INFO.data).replace(C_COMMENT, '')
+  const declaration = new RegExp(String.raw`\b${PIC_INFO.array}\s*\[[^\]]*\]\s*=`).exec(code)
+  if (declaration === null) throw new Error(`${PIC_INFO.data} has no ${PIC_INFO.array}`)
   const start = declaration.index + declaration[0].length
   const body = code.slice(start, code.indexOf('};', start))
-  const withBack = new Set<string>()
+  const fieldSet = new RegExp(String.raw`\.${field}\s*=`)
+  const withField = new Set<string>()
   for (const entry of body.split(/(?=\[TRAINER_PIC_\w+\]\s*=)/)) {
     const constant = /^\[(TRAINER_PIC_\w+)\]/.exec(entry)?.[1]
-    if (constant === undefined || !/\.backPic\s*=/.test(entry)) continue
+    if (constant === undefined || !fieldSet.test(entry)) continue
     if (!values.has(constant)) {
       throw new Error(
-        `${BACK_PICS.array} gives ${constant}, which enum ${TRAINER_PICS.enumName} lacks`,
+        `${PIC_INFO.array} gives ${constant}, which enum ${TRAINER_PICS.enumName} lacks`,
       )
     }
-    withBack.add(constant)
+    withField.add(constant)
   }
-  return Object.fromEntries([...values].filter(([constant]) => withBack.has(constant)))
+  return Object.fromEntries([...values].filter(([constant]) => withField.has(constant)))
 }
 
 // The bounds of a stream's numbers, by the expansion's own names: each content enum's count, the
@@ -224,7 +228,8 @@ export function generateTables(read: ReadTree, pin: UpstreamPin): GeneratedTable
     files[`${content.table}.json`] = jsonText(contentTable(recorded, content, notes))
   }
   files['trainer-pics.json'] = jsonText(trainerPics(recorded))
-  files['trainer-back-pics.json'] = jsonText(trainerBackPics(recorded))
+  files['trainer-back-pics.json'] = jsonText(trainerPicsWith(recorded, 'backPic'))
+  files['trainer-front-pics.json'] = jsonText(trainerPicsWith(recorded, 'frontPic'))
   files['counts.json'] = jsonText(counts(recorded))
   files['charmap.json'] = jsonText(parseCharmap(recorded('charmap.txt')))
   const sorted = [...hashes].sort(([a], [b]) => (a < b ? -1 : 1))

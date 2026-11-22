@@ -1,11 +1,12 @@
 // The trainer pic of each side from the player's Showdown avatar (#20, rulings U4 a, I6 a, I12 a).
 // The rule runs over the trainer pic constants of the pinned expansion and lists no name: an
 // avatar finds the pic whose name it spells, whole or by a tail of the name's words. The near
-// side shows a back pic, so it takes only a pic that has one; without a match the near side
-// shows Brendan and the far side May.
+// side shows a back pic and the far side a front pic, so each side takes only a pic that has
+// one (S3-2); without a match the near side shows Brendan and the far side May.
 import type { Side } from '../../script/types'
 import counts from './counts.json'
 import backPics from './trainer-back-pics.json'
+import frontPics from './trainer-front-pics.json'
 import trainerPics from './trainer-pics.json'
 
 const FALLBACK: Readonly<Record<Side, number>> = {
@@ -13,10 +14,16 @@ const FALLBACK: Readonly<Record<Side, number>> = {
   far: trainerPics.TRAINER_PIC_MAY,
 }
 
-const BACK_PICS: ReadonlySet<number> = new Set(Object.values(backPics))
+/** The view of a trainer pic each side draws. */
+export const DRAWN_VIEW: Readonly<Record<Side, 'back' | 'front'>> = { near: 'back', far: 'front' }
+
+const PICS_WITH: Readonly<Record<'back' | 'front', ReadonlySet<number>>> = {
+  back: new Set(Object.values(backPics)),
+  front: new Set(Object.values(frontPics)),
+}
 
 /** Whether `pic` can stand on `side`: the near side draws a back pic, the far side a front pic. */
-export const fitsSide = (side: Side, pic: number): boolean => side === 'far' || BACK_PICS.has(pic)
+export const fitsSide = (side: Side, pic: number): boolean => PICS_WITH[DRAWN_VIEW[side]].has(pic)
 
 /** Lowercase letters and digits only: `Aqua_Grunt-F` and `aquagruntf` share a key. */
 const keyOf = (text: string) => text.toLowerCase().replace(/[^a-z0-9]/g, '')

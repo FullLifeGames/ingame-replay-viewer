@@ -76,14 +76,24 @@ describe('encodeStream', () => {
       `the near trainer pic ${String(trainerPics.TRAINER_PIC_LEADER_NORMAN)} has no back pic`,
     )
     expect(() => encodeStream(near(trainerPics.TRAINER_PIC_RED))).not.toThrow()
-    const far = {
+    const far = (trainerPic: number) => ({
       ...stream,
-      trainers: {
-        ...stream.trainers,
-        far: { ...stream.trainers.far, trainerPic: trainerPics.TRAINER_PIC_LEADER_NORMAN },
-      },
-    }
-    expect(() => encodeStream(far)).not.toThrow()
+      trainers: { ...stream.trainers, far: { ...stream.trainers.far, trainerPic } },
+    })
+    expect(() => encodeStream(far(trainerPics.TRAINER_PIC_LEADER_NORMAN))).not.toThrow()
+  })
+
+  it('refuses a far trainer pic without a front pic, as the ROM will (S3-2)', () => {
+    const stream = streamOf([END])
+    const far = (trainerPic: number) => ({
+      ...stream,
+      trainers: { ...stream.trainers, far: { ...stream.trainers.far, trainerPic } },
+    })
+    expect(() => encodeStream(far(trainerPics.TRAINER_PIC_POKEDUDE))).toThrow(
+      `the far trainer pic ${String(trainerPics.TRAINER_PIC_POKEDUDE)} has no front pic`,
+    )
+    expect(() => encodeStream(far(trainerPics.TRAINER_PIC_OLD_MAN))).toThrow(/has no front pic/)
+    expect(() => encodeStream(far(trainerPics.TRAINER_PIC_STEVEN))).not.toThrow()
   })
 
   it('refuses a party that is not six slots', () => {
