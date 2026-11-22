@@ -4,7 +4,7 @@ The dev page. You pick your US Emerald dump and a replay, press Start, and the r
 
 The Start tap opens the page's audio context and hands it to mGBA, which loads seconds later. Firefox opens audio only while a tap lasts, so a context opened after the load stays silent there. If the browser refuses the context, the replay plays without sound. Each Start opens a new context, because mGBA closes its audio when it quits the last game.
 
-The DOM-free modules (`session.ts`, `fetch.ts`, `rom.ts`, `stream.ts` and the rest) have specs in Node. `main.ts` and `view.ts` hold the DOM wiring; the e2e covers them, and coverage leaves them out.
+The DOM-free modules (`session.ts`, `replay-choice.ts`, `fetch.ts`, `rom.ts`, `stream.ts` and the rest) have specs in Node. `main.ts`, `view.ts` and `replay-view.ts` hold the DOM wiring; the e2e covers them, and coverage leaves them out.
 
 ## Starting the page
 
@@ -22,7 +22,7 @@ The plugin in `scripts/web-server.ts` puts `Cross-Origin-Opener-Policy: same-ori
 
 `wasm.html` is a test page for the WebAssembly spike (#35). It sits beside the emulator page, which stays the viewer. Open `http://localhost:5177/wasm.html`; the emulator page links to it.
 
-The page runs the game without an emulator. The build compiles the expansion to WebAssembly (`npm run wasm:build`), and the page rebuilds that module from your dump with a BPS patch, as it rebuilds the ROM. You pick the same dump and a test replay, then press Start. The game runs in a worker, and the page allows its frames at 1x, 2x or fast. The worker draws each frame into one of two buffers and the page copies the other, so the page never shows a half-drawn frame. The game's sound plays at 1x, and at 2x at double pace and pitch. At fast it stays silent, and at END the page leaves fast for 1x. The sound starts with Start, because a browser opens audio only after a click. If the page cannot open its audio, the game plays without sound, the status line says why, and the next Start tries again.
+The page runs the game without an emulator. The build compiles the expansion to WebAssembly (`npm run wasm:build`), and the page rebuilds that module from your dump with a BPS patch, as it rebuilds the ROM. You pick the same dump and a test replay, or load a replay by link or ID, then press Start. Both pages share the replay controls (`replay-view.ts`) and the choice (`replay-choice.ts`), so the list under the game gives the same counts on both, and Start plays the replay the list describes. The game runs in a worker, and the page allows its frames at 1x, 2x or fast. The worker draws each frame into one of two buffers and the page copies the other, so the page never shows a half-drawn frame. The game's sound plays at 1x, and at 2x at double pace and pitch. At fast it stays silent, and at END the page leaves fast for 1x. The sound starts with Start, because a browser opens audio only after a click. If the page cannot open its audio, the game plays without sound, the status line says why, and the next Start tries again.
 
 It needs `npm run rom:build`, `npm run wasm:build -- --compile`, `npm run wasm:convert` and `npm run wasm:build -- --link`, in that order, all heavy checks. The link writes `build/wasm/irv-emerald-wasm.bps` from your dump by the build's rule (`~/roms/` or `IRV_BASE_ROM`); `npm run wasm:build -- --patch` writes it alone.
 

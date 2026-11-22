@@ -38,6 +38,11 @@
         <label for="test-replay">Test replay</label>
         <select id="test-replay"></select>
       </p>
+      <form id="replay-form">
+        <label for="replay-input">Replay link or ID</label>
+        <input id="replay-input" type="text" placeholder="smogtours-gen3ou-994052" />
+        <button type="submit">Load</button>
+      </form>
       <div>
         <fieldset id="speed">
           <legend>Speed</legend>
@@ -53,6 +58,10 @@
       <p id="status" role="status"></p>
       <canvas id="screen" width="240" height="160"></canvas>
       <p id="progress"></p>
+      <p id="replay-summary"></p>
+      <h2 id="not-shown">Not shown in the game (0)</h2>
+      <ul id="not-shown-counts"></ul>
+      <ol id="not-shown-rows"></ol>
     </div>
     <script type="module" src="./wasm/main.ts"></script>
   </body>
