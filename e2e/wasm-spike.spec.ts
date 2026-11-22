@@ -2,7 +2,8 @@
 // build's rule and skips without it or without the build outputs. It plays the hand-made battle
 // at 1x and 994052 at fast, reads the run's status through the page's test hook, and checks the
 // tick rule's pace at 1x and 2x. The game's sound plays at 1x and 2x and stays silent at fast; the
-// test counts the samples that pass the audio ring and measures their loudness. A second test
+// test counts the samples that pass the audio ring and measures their loudness. Two Start presses
+// during the build start one run, and at END the page leaves fast for 1x. A second test
 // measures mGBA on the emulator page at fast-forward, for the write-up's speed comparison (B7).
 // The frames and the sound come from the dump, so only numbers leave the tests.
 import { existsSync, readFileSync } from 'node:fs'
@@ -19,12 +20,11 @@ import { planStreams } from '../scripts/rom-shot.ts'
 import { wasmPaths } from '../scripts/wasm-compile.ts'
 import { LINK_OUTPUTS, WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'
 import { WASM_OUTPUT_NAMES } from '../scripts/wasm-outputs.ts'
-import { MIXER_RATE } from '../src/web/wasm/protocol.ts'
+import { GBA_FRAMES_PER_SECOND, MIXER_RATE } from '../src/web/wasm/protocol.ts'
 import { frame } from './frames.ts'
 
 const FIRST = 'smogtours-gen3ou-994052'
 const HAND_MADE = 'hand-made'
-const GBA_FRAMES_PER_SECOND = 59.7275
 const DUMP = readPreflightInput(process.env, loadBuildConfig().baseRom.sha1).baseRomPath
 const ROM_PATCH = join(buildPaths().outDir, OUTPUT_NAMES.patch)
 const SLOT = join(buildPaths().outDir, OUTPUT_NAMES.slot)
@@ -45,11 +45,16 @@ const EXPOSE_CORE =
 /** The run's sound: samples through the ring, left and right counted apart. */
 interface Sound {
   written: number
+  /** Read includes the samples the worklet skipped to hold its latency cap. */
   read: number
+  writtenToEnd: number | undefined
   overruns: number
+  skipped: number
+  underruns: number
   rms: number
-  rate: number
-  state: string
+  rate: number | undefined
+  state: string | undefined
+  silence: string | undefined
 }
 
 interface Status {
@@ -59,8 +64,11 @@ interface Status {
   done: number
   total: number
   finished: boolean
+  speed: string
   wallMs: number
   finishedMs: number | undefined
+  failure: string | undefined
+  runs: { started: number; live: number }
 }
 
 interface Hook {
@@ -71,11 +79,20 @@ interface Hook {
 const status = (page: Page) =>
   page.evaluate(() => (globalThis as unknown as { irvWasmSpike: Hook }).irvWasmSpike.status())
 
+// Waits for END, and stops at once when the game failed: its line, not a timeout, fails the test.
 async function finished(page: Page, timeout: number): Promise<Status> {
   await expect
-    .poll(async () => (await status(page))?.finishedMs, { timeout, intervals: [1000] })
-    .toBeGreaterThan(0)
-  return (await status(page)) as Status
+    .poll(
+      async () => {
+        const now = await status(page)
+        return now?.failure ?? ((now?.finishedMs ?? 0) > 0 || undefined)
+      },
+      { timeout, intervals: [1000] },
+    )
+    .toBeDefined()
+  const end = (await status(page)) as Status
+  expect(end.failure).toBeUndefined()
+  return end
 }
 
 /**
@@ -89,12 +106,14 @@ async function rate(page: Page, ms: number) {
   const perSecond = (from: number, to: number) =>
     ((to - from) * 1000) / (after.wallMs - before.wallMs)
   const pairs = (from: number, to: number) => perSecond(from, to) / 2 / MIXER_RATE
+  const [from, to] = [before.audio, after.audio]
   return {
     paced: perSecond(before.frame, after.frame),
-    written: pairs(before.audio.written, after.audio.written),
-    read: pairs(before.audio.read, after.audio.read),
-    rms: after.audio.rms,
-    sound: after.audio,
+    written: pairs(from.written, to.written),
+    read: pairs(from.read, to.read),
+    played: pairs(from.read - from.skipped, to.read - to.skipped),
+    rms: to.rms,
+    sound: to,
   }
 }
 
@@ -117,21 +136,25 @@ async function playHandMade(page: Page, bytes: number[]): Promise<void> {
     [HAND_MADE, bytes] as const,
   )
   await page.waitForTimeout(2_000)
-  const { paced, written, read, rms, sound } = await rate(page, 5_000)
+  const { paced, written, read, played, rms, sound } = await rate(page, 5_000)
   expect((await frame(page)).colours).toBeGreaterThan(1)
   const end = await finished(page, 240_000)
   const seconds = (end.finishedMs ?? 0) / 1000
   report({ stream: HAND_MADE, speed: '1x', toEnd: end.finishedAt, seconds, paced })
-  const { overruns, state } = sound
-  report({ stream: HAND_MADE, speed: '1x', written, read, rms, overruns, state, rate: sound.rate })
+  const { overruns, skipped, underruns, state } = end.audio
+  report({ stream: HAND_MADE, speed: '1x', written, read, played, rms, state: state ?? '-' })
+  report({ stream: HAND_MADE, speed: '1x', overruns, skipped, underruns, rate: sound.rate ?? 0 })
   expect(end.done).toBe(end.total)
   expect(paced / GBA_FRAMES_PER_SECOND).toBeGreaterThan(0.95)
   expect(paced / GBA_FRAMES_PER_SECOND).toBeLessThan(1.05)
+  expect(sound.silence).toBeUndefined()
   expect(state).toBe('running')
-  for (const pace of [written, read]) {
-    expect(pace).toBeGreaterThan(0.95)
-    expect(pace).toBeLessThan(1.05)
-  }
+  // The worker's pace is the page's; the worklet's follows the audio clock of headless Chromium,
+  // so its numbers are reported, and only a stalled or far slower read fails the test.
+  expect(written).toBeGreaterThan(0.95)
+  expect(written).toBeLessThan(1.05)
+  expect(read).toBeGreaterThan(0)
+  expect(read).toBeGreaterThanOrEqual(0.9 * written)
   expect(rms).toBeGreaterThan(0)
 }
 
@@ -153,7 +176,16 @@ test('the spike page plays the hand-made battle at 1x and 994052 at fast', async
   expect(await page.evaluate('[isSecureContext, crossOriginIsolated]')).toEqual([true, true])
   const line = page.getByRole('status')
   await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles(DUMP)
-  await expect(line).toHaveText(/built the module/, { timeout: 180_000 })
+
+  await test.step('two Start presses during the build start one run', async () => {
+    const start = page.getByRole('button', { name: 'Start', exact: true })
+    await start.click()
+    await start.click()
+    // The status line may end on the build's line, which comes at the same moment.
+    await expect
+      .poll(async () => (await status(page))?.runs, { timeout: 180_000, intervals: [1000] })
+      .toEqual({ started: 1, live: 1 })
+  })
 
   await test.step('the hand-made battle reaches END at 1x, with its sound', async () => {
     await playHandMade(page, handMade)
@@ -164,8 +196,8 @@ test('the spike page plays the hand-made battle at 1x and 994052 at fast', async
     await page.getByRole('button', { name: 'Restart' }).click()
     await expect(line).toHaveText(new RegExp(`^Running ${HAND_MADE}`))
     await page.waitForTimeout(2_000)
-    const { paced, written, read, rms } = await rate(page, 5_000)
-    report({ stream: HAND_MADE, speed: '2x', paced, written, read, rms })
+    const { paced, written, read, played, rms } = await rate(page, 5_000)
+    report({ stream: HAND_MADE, speed: '2x', paced, written, read, played, rms })
     expect(paced / GBA_FRAMES_PER_SECOND).toBeGreaterThan(1.9)
     expect(paced / GBA_FRAMES_PER_SECOND).toBeLessThan(2.1)
     // Double pace: every other pair of twice the frames, so the ring fills as fast as at 1x.
@@ -184,9 +216,13 @@ test('the spike page plays the hand-made battle at 1x and 994052 at fast', async
     const fps = Math.round(end.finishedAt / seconds)
     report({ stream: FIRST, speed: 'fast', toEnd: end.finishedAt, seconds, fps })
     expect(end.done).toBe(end.total)
-    expect(end.audio.written).toBe(0)
+    expect(end.audio.writtenToEnd).toBe(0)
+    // After END the page leaves fast for 1x, so the game plays on without a core at full load.
+    await expect(page.getByLabel('1x')).toBeChecked()
+    expect((await status(page))?.speed).toBe('1x')
   })
 
+  expect((await status(page))?.runs.live).toBe(1)
   expect(errors).toEqual([])
 })
 
