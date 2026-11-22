@@ -68,6 +68,17 @@ describe('faints', () => {
     ])
   })
 
+  it('drains no bar of a user that faints by its own Explosion (#39)', () => {
+    const scene = sceneOf(
+      '|move|p1a: Dugtrio|Explosion|p2a: Tyranitar',
+      '|-damage|p2a: Tyranitar|0 fnt',
+      '|faint|p1a: Dugtrio',
+      '|faint|p2a: Tyranitar',
+    )
+    expect(scene).not.toContainEqual(expect.objectContaining({ op: 'hp', side: 'near' }))
+    expect(scene).toContainEqual({ op: 'faint', side: 'near' })
+  })
+
   it('refuses a faint of a Pokémon that is not active', () => {
     expect(() => sceneOf('|faint|p2a: Tyranitar', '|faint|p2a: Tyranitar')).toThrow(Gen3Error)
     expect(() => sceneOf('|faint|p2a: Tyranitar', '|faint|p2a: Tyranitar')).toThrow(/not active/)

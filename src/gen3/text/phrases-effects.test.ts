@@ -50,6 +50,7 @@ describe('an effect that acts (P1)', () => {
     ],
     ['|move: Splash', 'But nothing happened!'],
     ['p1a: Dugtrio|confusion', 'Dugtrio is confused!'],
+    ['p2a: Tyranitar|move: Destiny Bond', 'The opposing Tyranitar took its attacker down with it!'],
   ])('words %s', (rest, text) => {
     const { event, mon } = sceneOf('effectActivate', `|-activate|${rest}`)
     expect(effectActivated(event.who && mon(event.who), event.effect)).toEqual({ text })
