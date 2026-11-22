@@ -85,7 +85,7 @@ const STARTS: Readonly<Record<string, Line>> = {
 /**
  * The start lines of the partial traps that name their trapper, by the move's id, as
  * `gWrappedStringIds` keys the game's lines by the move; Fire Spin's, Whirlpool's and Sand Tomb's
- * name none and sit in `STARTS`.
+ * name none and sit in `STARTS`. `scripts/gen3-traps.test.ts` ties these ids to that table.
  */
 const TRAPPED_BY: Readonly<Record<string, (who: Mon, trapper: Mon) => string>> = {
   bind: E.squeezed.render,
