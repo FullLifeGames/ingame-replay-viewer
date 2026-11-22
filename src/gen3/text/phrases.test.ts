@@ -83,6 +83,9 @@ describe('move phrases (P1)', () => {
       "The opposing Tyranitar's stats were not lowered!",
     ],
     ['|-fail|p1a: Dugtrio|move: Substitute|[weak]', SUBSTITUTE_WEAK],
+    // STRINGID_PKMNHASSUBSTITUTE, src/battle_message.c (#38).
+    ['|-fail|p1a: Dugtrio|move: Substitute', 'Dugtrio already has a substitute!'],
+    ['|-fail|p2a: Tyranitar|move: Substitute', 'The opposing Tyranitar already has a substitute!'],
   ])('words the failure %s', (line, text) => {
     const { event, mon } = sceneOf('fail', line)
     expect(failed(mon(event.who), event.effect, event.weak)).toBe(text)

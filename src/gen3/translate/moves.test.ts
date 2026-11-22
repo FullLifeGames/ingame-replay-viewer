@@ -62,7 +62,10 @@ describe('moves', () => {
       '|move|p1a: Dugtrio|Substitute|p1a: Dugtrio',
       '|-fail|p1a: Dugtrio|move: Substitute',
     )
-    expect(substitute.map(plain)).not.toContainEqual(expect.objectContaining({ op: 'move' }))
+    expect(substitute.map(plain)).toEqual([
+      'Dugtrio used Substitute!',
+      'Dugtrio already has a substitute!',
+    ])
   })
 
   it('plays no animation for a Substitute that the user has too little HP for', () => {
