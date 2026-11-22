@@ -81,7 +81,8 @@ describe('the stream in the module', () => {
     }).toThrow(
       new SlotMismatchError(
         'the slot gives slot size 0x20000 and replay-slot.json gives 0x100, so they come from ' +
-          'different builds. Run npm run wasm:build again.',
+          'different builds. Run npm run rom:build, npm run wasm:build -- --compile, ' +
+          'npm run wasm:convert and npm run wasm:build -- --link again, in that order.',
       ),
     )
     expect(game.HEAPU8[SLOT + 0x20]).toBe(0)
@@ -92,7 +93,8 @@ describe('the stream in the module', () => {
       writeStream(fakeGame({ version: 2 }), ROM_SLOT, Uint8Array.of(1), SLOT_LAYOUT)
     }).toThrow(
       'the slot gives version 2 and replay-slot.json gives 1, so they come from different ' +
-        'builds. Run npm run wasm:build again.',
+        'builds. Run npm run rom:build, npm run wasm:build -- --compile, npm run wasm:convert ' +
+        'and npm run wasm:build -- --link again, in that order.',
     )
   })
 })

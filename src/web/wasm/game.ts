@@ -8,6 +8,7 @@ import {
   type SlotHeaderLayout,
   writeReplaySlot,
 } from '../../patch/slot.ts'
+import { MODULE_BUILD_STEPS } from './files.ts'
 import { widenFrame } from './frame.ts'
 import { backBuffer, frameBuffer, publishFrame, waitUntilUnread } from './frame-swap.ts'
 import { readProgress, type ProgressLayout } from './progress.ts'
@@ -59,7 +60,7 @@ export function writeStream(
     checkSlotHeader(game.HEAPU8.subarray(at), romSlot, layout)
   } catch (error) {
     if (!(error instanceof SlotMismatchError)) throw error
-    throw new SlotMismatchError(`${error.message}. Run npm run wasm:build again.`)
+    throw new SlotMismatchError(`${error.message}. Run ${MODULE_BUILD_STEPS} again, in that order.`)
   }
   const slot: SlotDescription = {
     ...romSlot,
