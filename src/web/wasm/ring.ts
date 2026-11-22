@@ -2,10 +2,11 @@
 // to the audio thread, in a SharedArrayBuffer that both see. A header of counters comes first,
 // then the float samples. DOM-free, so the worker, the worklet and the Node harness share it.
 
-// The ring's header: the samples written and read so far, and the overruns. The two counters are
-// Int32 words that wrap at 2^32; with a capacity that is a power of two, a counter masked by the
+// The ring's header: the samples written and read so far, the overruns, the samples the reader
+// skipped to hold its latency cap, and its underruns. The written and read counters are Int32
+// words that wrap at 2^32; with a capacity that is a power of two, a counter masked by the
 // capacity gives its sample's place on either side of the wrap.
-const RING = { written: 0, read: 1, overruns: 2 } as const
+const RING = { written: 0, read: 1, overruns: 2, skipped: 3, underruns: 4 } as const
 const RING_HEADER_BYTES = 4 * Object.keys(RING).length
 // A larger capacity would let the fill reach 2^31, which a signed Int32 cannot hold.
 const MAX_CAPACITY = 2 ** 30
@@ -41,8 +42,19 @@ export class AudioRing {
     this.mask = this.capacity - 1
   }
 
+  /** The pushes that found the ring full and dropped samples. */
   get overruns(): number {
     return Atomics.load(this.header, RING.overruns)
+  }
+
+  /** The samples the reader skipped to hold its latency cap (trim). */
+  get skipped(): number {
+    return Atomics.load(this.header, RING.skipped)
+  }
+
+  /** The output frames the reader played as silence because the ring was empty. */
+  get underruns(): number {
+    return Atomics.load(this.header, RING.underruns)
   }
 
   /** The samples written since the ring was made, modulo 2^32. */
@@ -85,6 +97,26 @@ export class AudioRing {
     for (let i = 0; i < count; i++) out[i] = this.samples[(read + i) & this.mask] ?? 0
     Atomics.store(this.header, RING.read, (read + count) | 0)
     return count
+  }
+
+  /**
+   * The reader's side, before it pulls: when more than `limit` samples wait, skips the oldest
+   * down to half of `limit` in whole left and right pairs, and returns how many it skipped. The
+   * writer only reads the read counter to find its free space, which a skip only grows.
+   */
+  trim(limit: number): number {
+    const read = Atomics.load(this.header, RING.read)
+    const waiting = this.waiting(Atomics.load(this.header, RING.written), read)
+    if (waiting <= limit) return 0
+    const skip = waiting - 2 * Math.floor(limit / 4)
+    Atomics.store(this.header, RING.read, (read + skip) | 0)
+    Atomics.add(this.header, RING.skipped, skip)
+    return skip
+  }
+
+  /** The reader's side: `frames` output frames found the ring empty. */
+  countUnderruns(frames: number): void {
+    if (frames > 0) Atomics.add(this.header, RING.underruns, frames)
   }
 
   /** The samples written and not yet read, on either side of the counters' wrap. */

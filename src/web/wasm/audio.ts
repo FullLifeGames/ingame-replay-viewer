@@ -8,10 +8,17 @@ import { AudioRing } from './ring.ts'
 /** The name the audio worklet registers its processor under. */
 export const AUDIO_PROCESSOR = 'irv-audio'
 
-/** What the page hands the processor: the run's audio ring and the rate its samples have. */
+/** The message on the processor's port after which it plays no more (RingReader.stop). */
+export const AUDIO_STOP = 'stop'
+
+/**
+ * What the page hands the processor: the run's audio ring, the rate its samples have, and the
+ * latency cap: the samples, left and right counted apart, that may wait in the ring.
+ */
 export interface AudioProcessorOptions {
   readonly ring: SharedArrayBuffer
   readonly rate: number
+  readonly latency: number
 }
 
 /**
@@ -67,15 +74,17 @@ interface Pair {
   dry: boolean
 }
 
-/** Linear resampling from the ring's left and right pairs at `from` Hz to two outputs at `to` Hz. */
+/**
+ * Linear resampling from the ring's left and right pairs at `from` Hz to two outputs at `to` Hz.
+ * Once the first pair has come, it counts each output frame without a pair as an underrun.
+ */
 export class Resampler {
-  /** The output frames that had no sample in the ring and played silence. */
-  missed = 0
   private readonly step: number
   private readonly scratch = new Float32Array(2)
   private previous: Pair | undefined
   private next: Pair | undefined
   private fraction = 0
+  private started = false
 
   private readonly ring: AudioRing
 
@@ -93,8 +102,10 @@ export class Resampler {
   fill(left: Float32Array, right: Float32Array): void {
     let previous = (this.previous ??= this.take())
     let next = (this.next ??= this.take())
+    let missed = 0
     for (let i = 0; i < left.length; i++) {
-      if (previous.dry) this.missed++
+      this.started ||= !previous.dry
+      if (previous.dry && this.started) missed++
       left[i] = previous.left + (next.left - previous.left) * this.fraction
       right[i] = previous.right + (next.right - previous.right) * this.fraction
       this.fraction += this.step
@@ -105,11 +116,43 @@ export class Resampler {
     }
     this.previous = previous
     this.next = next
+    this.ring.countUnderruns(missed)
   }
 
   private take(): Pair {
     if (this.ring.pull(this.scratch) < 2) return { left: 0, right: 0, dry: true }
     return { left: this.scratch[0] ?? 0, right: this.scratch[1] ?? 0, dry: false }
+  }
+}
+
+/**
+ * The audio worklet's processor without the worklet: each call plays the ring into the left and
+ * right outputs, after it held the ring at the latency cap. Once stopped, it plays no more and
+ * returns false, which lets the audio thread drop the processor.
+ */
+export class RingReader {
+  private readonly ring: AudioRing
+  private readonly resampler: Resampler
+  private readonly latency: number
+  private stopped = false
+
+  constructor(options: AudioProcessorOptions, outputRate: number) {
+    this.ring = new AudioRing(options.ring)
+    this.resampler = new Resampler(this.ring, options.rate, outputRate)
+    this.latency = options.latency
+  }
+
+  stop(): void {
+    this.stopped = true
+  }
+
+  process(outputs: Float32Array[][]): boolean {
+    if (this.stopped) return false
+    const [left, right] = outputs[0] ?? []
+    if (left === undefined) return true
+    this.ring.trim(this.latency)
+    this.resampler.fill(left, right ?? new Float32Array(left.length))
+    return true
   }
 }
 

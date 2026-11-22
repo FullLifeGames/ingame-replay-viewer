@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { AudioMeter, audioHandler, paceSamples, Resampler } from './audio'
+import { AudioMeter, audioHandler, paceSamples, Resampler, RingReader } from './audio'
 import { createShared, MIXER_RATE, writePace } from './protocol'
 import { AudioRing } from './ring'
 
@@ -98,16 +98,62 @@ describe('the resampler of the audio worklet', () => {
     ])
   })
 
-  it('plays silence once the ring runs dry and counts the frames it missed', () => {
-    const resampler = new Resampler(ringOf(stereo([1, 1])), 1, 1)
-    expect(fill(resampler, 3)[0]).toEqual([1, 0, 0])
-    expect(resampler.missed).toBe(2)
+  it('plays silence once the ring runs dry and counts the frames it missed in the ring', () => {
+    const ring = ringOf(stereo([1, 1]))
+    expect(fill(new Resampler(ring, 1, 1), 3)[0]).toEqual([1, 0, 0])
+    expect(ring.underruns).toBe(2)
+  })
+
+  // The worklet starts before the worker's first frame, which is no underrun.
+  it('counts no missed frame before the first sample arrives', () => {
+    const ring = ringOf(stereo())
+    const resampler = new Resampler(ring, 1, 1)
+    fill(resampler, 4)
+    expect(ring.underruns).toBe(0)
+    ring.push(stereo([1, 1], [2, 2]))
+    expect(fill(resampler, 4)[0]).toEqual([0, 0, 1, 2])
+    expect(ring.underruns).toBe(0)
+    expect(fill(resampler, 2)[0]).toEqual([0, 0])
+    expect(ring.underruns).toBe(2)
   })
 
   it('refuses a rate that is not positive', () => {
     expect(() => new Resampler(ringOf(stereo()), 0, 48000)).toThrow(
       'the resampler needs two positive rates, not 0 Hz and 48000 Hz',
     )
+  })
+})
+
+describe('the ring reader of the audio worklet', () => {
+  function setUp(samples: Float32Array) {
+    const buffer = createShared(64).audio
+    const ring = new AudioRing(buffer)
+    ring.push(samples)
+    return { ring, reader: new RingReader({ ring: buffer, rate: 1, latency: 8 }, 1) }
+  }
+
+  function outputs(frames: number): Float32Array[][] {
+    return [[new Float32Array(frames), new Float32Array(frames)]]
+  }
+
+  it('plays the ring into the left and right outputs, held at the latency cap', () => {
+    const { ring, reader } = setUp(stereo([1, -1], [2, -2], [3, -3], [4, -4], [5, -5], [6, -6]))
+    const out = outputs(2)
+    expect(reader.process(out)).toBe(true)
+    expect(out[0]?.map((channel) => [...channel])).toEqual([
+      [5, 6],
+      [-5, -6],
+    ])
+    expect(ring.skipped).toBe(8)
+  })
+
+  it('stops for good once the page stops it, so the audio thread can drop it', () => {
+    const { ring, reader } = setUp(stereo([1, 1]))
+    reader.stop()
+    const out = outputs(1)
+    expect(reader.process(out)).toBe(false)
+    expect([...(out[0]?.[0] ?? [])]).toEqual([0])
+    expect(ring.totalRead).toBe(0)
   })
 })
 

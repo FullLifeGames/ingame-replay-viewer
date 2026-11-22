@@ -64,4 +64,32 @@ describe('the audio ring', () => {
       )
     }
   })
+
+  // The latency cap: the reader holds what waits at or under a limit, so a writer that runs a
+  // little faster than the audio clock cannot fill the ring.
+  it('skips the oldest samples down to half the cap when more waits, and counts them', () => {
+    const ring = new AudioRing(createShared(16).audio)
+    ring.push(Float32Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+    expect(ring.trim(8)).toBe(6)
+    expect(ring.skipped).toBe(6)
+    const out = new Float32Array(8)
+    expect(ring.pull(out)).toBe(4)
+    expect([...out.subarray(0, 4)]).toEqual([7, 8, 9, 10])
+    ring.push(Float32Array.of(11, 12, 13, 14))
+    expect(ring.trim(8)).toBe(0)
+    expect(ring.skipped).toBe(6)
+  })
+
+  it('skips whole left and right pairs only', () => {
+    const ring = new AudioRing(createShared(16).audio)
+    ring.push(new Float32Array(12))
+    expect(ring.trim(10)).toBe(8)
+  })
+
+  it('counts the output frames that found it empty', () => {
+    const ring = new AudioRing(createShared(4).audio)
+    ring.countUnderruns(3)
+    ring.countUnderruns(0)
+    expect(ring.underruns).toBe(3)
+  })
 })

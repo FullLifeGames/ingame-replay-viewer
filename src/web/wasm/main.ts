@@ -13,7 +13,7 @@ import { FIRST_REPLAY, TEST_REPLAYS } from '../replays'
 import { checkBaseRom, readSlotDescription } from '../rom'
 import { ROM_FILES } from '../rom-files'
 import { streamOfReplay } from '../stream'
-import { AUDIO_PROCESSOR, AudioMeter, type AudioProcessorOptions } from './audio'
+import { AUDIO_PROCESSOR, AUDIO_STOP, AudioMeter, type AudioProcessorOptions } from './audio'
 import workletUrl from './audio-worklet.ts?worker&url'
 import { WASM_FILES } from './files'
 import { FRAME_HEIGHT, FRAME_WIDTH } from './frame'
@@ -33,6 +33,9 @@ import { findSpikeView, type SpikeView } from './view'
 
 // About 1.56 s of the game's sound, left and right: the ring takes a power of two (ring.ts).
 const AUDIO_CAPACITY = 2 ** 17
+// The latency cap: at most 0.2 s of sound waits in the ring. Past it, the worklet skips the oldest
+// samples down to 0.1 s, so a worker that writes faster than the audio clock plays stays in step.
+const AUDIO_LATENCY = 2 * Math.round(MIXER_RATE / 5)
 // The newest samples the test hook measures: about a tenth of a second.
 const MEASURED_SAMPLES = 8192
 
@@ -76,7 +79,7 @@ async function openAudio(): Promise<AudioContext> {
 
 /** The run's sound: a processor that plays the ring into the context. */
 function connectRing(context: AudioContext, ring: SharedArrayBuffer): AudioWorkletNode {
-  const processorOptions: AudioProcessorOptions = { ring, rate: MIXER_RATE }
+  const processorOptions: AudioProcessorOptions = { ring, rate: MIXER_RATE, latency: AUDIO_LATENCY }
   const node = new AudioWorkletNode(context, AUDIO_PROCESSOR, {
     numberOfInputs: 0,
     outputChannelCount: [2],
@@ -162,6 +165,7 @@ function createSpike(view: SpikeView) {
     if (module === undefined) throw new Error('Pick your US Emerald dump first, then press Start.')
     if (chosen === undefined) throw new Error('Pick a replay first, then press Start.')
     run?.worker.terminate()
+    run?.output.port.postMessage(AUDIO_STOP)
     run?.output.disconnect()
     last = chosen
     await context.resume()
