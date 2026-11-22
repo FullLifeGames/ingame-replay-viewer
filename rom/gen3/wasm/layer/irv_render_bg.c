@@ -58,8 +58,20 @@ static uint16_t TilePixel(const struct TextBg *bg, uint16_t entry, uint32_t x, u
     return index == 0 ? IRV_PIXEL_NONE : bg->palette[index] & IRV_WHITE;
 }
 
+// GBATEK "LCD I/O Mosaic Function": each pixel of a block shows the block's first pixel.
+static void MosaicRow(uint16_t *out, uint32_t sizeMinus1)
+{
+    uint32_t x;
+
+    if (sizeMinus1 == 0)
+        return;
+    for (x = 0; x < IRV_SCREEN_WIDTH; x++)
+        out[x] = out[IrvRender_MosaicStart(x, sizeMinus1)];
+}
+
 // GBATEK "LCD I/O BG Control", "LCD I/O BG Scrolling": the offsets are 9 bits, and the map wraps
-// around at its own width and height.
+// around at its own width and height. BGCNT bit 6 turns the mosaic on: "LCD I/O Mosaic Function"
+// has a line show the first line of its block, and MOSAIC bits 0-3 and 4-7 size the BG blocks.
 void IrvRender_TextBgLine(uint32_t bgNum, uint32_t line, uint16_t *out)
 {
     uint16_t control = IRV_IO16(IRV_REG_BG0CNT + 2 * bgNum);
@@ -76,6 +88,8 @@ void IrvRender_TextBgLine(uint32_t bgNum, uint32_t line, uint16_t *out)
     bg.screenBase = ((control >> 8) & 0x1F) * 0x800;
     bg.width = (control & 0x4000) ? 512 : 256;
     bg.colors256 = (control & 0x80) != 0;
+    if (control & 0x40)
+        line = IrvRender_MosaicStart(line, (IRV_IO16(IRV_REG_MOSAIC) >> 4) & 0xF);
     y = (line + vofs) & (height - 1);
     for (x = 0; x < IRV_SCREEN_WIDTH; x++)
     {
@@ -84,4 +98,6 @@ void IrvRender_TextBgLine(uint32_t bgNum, uint32_t line, uint16_t *out)
             entry = MapEntry(&bg, mapX, y);
         out[x] = TilePixel(&bg, entry, mapX & 7, y & 7);
     }
+    if (control & 0x40)
+        MosaicRow(out, IRV_IO16(IRV_REG_MOSAIC) & 0xF);
 }

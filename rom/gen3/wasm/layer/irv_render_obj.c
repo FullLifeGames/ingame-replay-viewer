@@ -27,6 +27,7 @@ struct Obj
     uint32_t boxWidth;
     uint32_t boxHeight;
     uint32_t row;
+    uint32_t mosaicH;
 };
 
 struct ObjContext
@@ -91,16 +92,32 @@ static bool OnScreen(const struct Obj *obj, uint32_t boxX, uint32_t *screenX)
     return *screenX < IRV_SCREEN_WIDTH;
 }
 
+// GBATEK "LCD I/O Mosaic Function": under the OBJ mosaic, column i of the OBJ's area shows the
+// column at the first pixel of its screen block; none where that pixel lies left of the area.
+static bool MosaicColumn(const struct Obj *obj, uint32_t i, uint32_t screenX, uint32_t *column)
+{
+    uint32_t back;
+
+    if (obj->mosaicH == 0)
+    {
+        *column = i;
+        return true;
+    }
+    back = screenX - IrvRender_MosaicStart(screenX, obj->mosaicH);
+    *column = i - back;
+    return back <= i;
+}
+
 static void DrawRegular(const struct ObjContext *context, const struct Obj *obj)
 {
     uint32_t y = (obj->attr1 & 0x2000) ? obj->height - 1 - obj->row : obj->row;
-    uint32_t i, x, screenX;
+    uint32_t i, x, column, screenX;
 
     for (i = 0; i < obj->width; i++)
     {
-        if (!OnScreen(obj, i, &screenX))
+        if (!OnScreen(obj, i, &screenX) || !MosaicColumn(obj, i, screenX, &column))
             continue;
-        x = (obj->attr1 & 0x1000) ? obj->width - 1 - i : i;
+        x = (obj->attr1 & 0x1000) ? obj->width - 1 - column : column;
         Plot(context, obj, screenX, ObjTexel(context, obj, x, y));
     }
 }
@@ -115,19 +132,30 @@ static void DrawAffine(const struct ObjContext *context, const struct Obj *obj)
     int32_t pa = params[3], pb = params[7], pc = params[11], pd = params[15];
     int32_t dy = (int32_t)obj->row - (int32_t)(obj->boxHeight / 2);
     int32_t dx, tx, ty;
-    uint32_t i, screenX;
+    uint32_t i, column, screenX;
 
     for (i = 0; i < obj->boxWidth; i++)
     {
-        if (!OnScreen(obj, i, &screenX))
+        if (!OnScreen(obj, i, &screenX) || !MosaicColumn(obj, i, screenX, &column))
             continue;
-        dx = (int32_t)i - (int32_t)(obj->boxWidth / 2);
+        dx = (int32_t)column - (int32_t)(obj->boxWidth / 2);
         tx = ((pa * dx + pb * dy) >> 8) + (int32_t)(obj->width / 2);
         ty = ((pc * dx + pd * dy) >> 8) + (int32_t)(obj->height / 2);
         if (tx < 0 || ty < 0 || tx >= (int32_t)obj->width || ty >= (int32_t)obj->height)
             continue;
         Plot(context, obj, screenX, ObjTexel(context, obj, tx, ty));
     }
+}
+
+// GBATEK "LCD I/O Mosaic Function": attribute 0 bit 12 turns the mosaic on, MOSAIC bits 8-11 and
+// 12-15 size the OBJ blocks. The line shows the OBJ's row at the first line of its block, which
+// may lie above the OBJ: then the row is past the area, and nothing is drawn.
+static void MosaicObj(struct Obj *obj, uint32_t line)
+{
+    uint16_t mosaic = IRV_IO16(IRV_REG_MOSAIC);
+
+    obj->mosaicH = (mosaic >> 8) & 0xF;
+    obj->row = (IrvRender_MosaicStart(line, mosaic >> 12) - (obj->attr0 & 0xFF)) & 0xFF;
 }
 
 // Reads OBJ n and tells whether it covers the line. "LCD OBJ - OAM Attributes": bit 9 of
@@ -152,7 +180,12 @@ static bool ReadObj(const uint16_t *oam, uint32_t n, uint32_t line, struct Obj *
     obj->boxHeight = (affine && (obj->attr0 & 0x200)) ? obj->height * 2 : obj->height;
     obj->x = obj->attr1 & 0x1FF;
     obj->row = (line - (obj->attr0 & 0xFF)) & 0xFF;
-    return obj->row < obj->boxHeight;
+    obj->mosaicH = 0;
+    if (obj->row >= obj->boxHeight)
+        return false;
+    if (obj->attr0 & 0x1000)
+        MosaicObj(obj, line);
+    return true;
 }
 
 // GBATEK "LCD OBJ - Overview": a regular OBJ costs one cycle per pixel of its width, an affine
@@ -182,6 +215,8 @@ void IrvRender_ObjLine(uint32_t line, struct IrvObjLine *out)
         if (cost > cycles)
             break;
         cycles -= cost;
+        if (obj.row >= obj.boxHeight)
+            continue;
         if (obj.attr0 & 0x100)
             DrawAffine(&context, &obj);
         else

@@ -23,6 +23,18 @@
 #define IRV_DISPCNT_FORCED_BLANK 0x0080
 #define IRV_DISPCNT_BG0          0x0100
 #define IRV_DISPCNT_OBJ          0x1000
+#define IRV_DISPCNT_WIN0         0x2000
+#define IRV_DISPCNT_OBJ_WINDOW   0x8000
+#define IRV_DISPCNT_WINDOWS      0xE000
+
+// GBATEK "LCD I/O Window Feature", "LCD I/O Color Special Effects": the layers in the order of
+// the WININ, WINOUT and BLDCNT bits. IRV_LAYER_NONE stands below the backdrop and is no target.
+#define IRV_LAYER_OBJ      4
+#define IRV_LAYER_BACKDROP 5
+#define IRV_LAYER_NONE     6
+#define IRV_WINDOW_OBJ     (1 << IRV_LAYER_OBJ)
+#define IRV_WINDOW_EFFECT  (1 << 5)
+#define IRV_WINDOW_ALL     0x3F
 
 #define IRV_OBJ_PRIORITY_NONE 4
 
@@ -40,6 +52,29 @@ struct IrvObjLine
     uint8_t window[IRV_SCREEN_WIDTH];
 };
 
+// A layer's pixel where it is opaque: its colour and its layer.
+struct IrvPixel
+{
+    uint16_t colour;
+    uint8_t layer;
+};
+
+// GBATEK "LCD I/O Color Special Effects": BLDCNT and the coefficients, read once per line.
+struct IrvEffect
+{
+    uint16_t control;
+    uint32_t eva;
+    uint32_t evb;
+    uint32_t evy;
+};
+
+// GBATEK "LCD I/O Mosaic Function": the first position of the mosaic block that holds `position`,
+// for a size field that holds the block's size minus 1. Blocks count from the screen's edge.
+static inline uint32_t IrvRender_MosaicStart(uint32_t position, uint32_t sizeMinus1)
+{
+    return position - position % (sizeMinus1 + 1);
+}
+
 // irv_render.c: one visible line into `row`, BGR555.
 void IrvRender_Line(uint32_t line, uint16_t *row);
 
@@ -48,5 +83,14 @@ void IrvRender_TextBgLine(uint32_t bg, uint32_t line, uint16_t *out);
 
 // irv_render_obj.c: the OBJ layer of one line.
 void IrvRender_ObjLine(uint32_t line, struct IrvObjLine *out);
+
+// irv_render_window.c: the WININ or WINOUT bits that hold at each pixel of the line.
+void IrvRender_WindowLine(uint32_t line, const struct IrvObjLine *obj, uint8_t *enable);
+
+// irv_render_blend.c: the line's effect settings, and the colour of a pixel whose top two layers
+// are `top` and `below`; `semiTransparent` tells whether `top` is a semi-transparent OBJ.
+void IrvRender_EffectLine(struct IrvEffect *effect);
+uint16_t IrvRender_Effect(const struct IrvEffect *effect, const struct IrvPixel *top,
+                          const struct IrvPixel *below, bool semiTransparent);
 
 #endif // GUARD_IRV_RENDER_H

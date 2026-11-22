@@ -22,7 +22,8 @@ const OBJ_PALETTE = 0x200
 const OBJ_TILES = 0x10000
 
 // GBATEK "LCD I/O Display Control", "LCD I/O Interrupts and Status", "LCD I/O BG Control",
-// "LCD I/O BG Scrolling", "GBA Interrupt Control".
+// "LCD I/O BG Scrolling", "LCD I/O Window Feature", "LCD I/O Mosaic Function", "LCD I/O Color
+// Special Effects", "GBA Interrupt Control".
 export const REG = {
   DISPCNT: 0x000,
   DISPSTAT: 0x004,
@@ -30,6 +31,16 @@ export const REG = {
   BG0CNT: 0x008,
   BG0HOFS: 0x010,
   BG0VOFS: 0x012,
+  WIN0H: 0x040,
+  WIN1H: 0x042,
+  WIN0V: 0x044,
+  WIN1V: 0x046,
+  WININ: 0x048,
+  WINOUT: 0x04a,
+  MOSAIC: 0x04c,
+  BLDCNT: 0x050,
+  BLDALPHA: 0x052,
+  BLDY: 0x054,
   IE: 0x200,
   IF: 0x202,
   IME: 0x208,
@@ -42,6 +53,22 @@ export const DISPCNT_OBJ_1D = 1 << 6
 export const DISPCNT_FORCED_BLANK = 1 << 7
 export const dispcntBg = (bg: number) => 1 << (8 + bg)
 export const DISPCNT_OBJ = 1 << 12
+export const DISPCNT_WIN0 = 1 << 13
+export const DISPCNT_WIN1 = 1 << 14
+export const DISPCNT_OBJ_WINDOW = 1 << 15
+
+/** A window's edges: left and right plus 1, top and bottom plus 1. */
+export const windowH = (x1: number, x2: number) => (x1 << 8) | x2
+export const windowV = (y1: number, y2: number) => (y1 << 8) | y2
+
+/** The layer bits of WININ, WINOUT and BLDCNT's targets: BG0-BG3, OBJ, then the effect (or the backdrop). */
+export const LAYER_OBJ = 1 << 4
+export const WINDOW_EFFECT = 1 << 5
+export const LAYER_BACKDROP = 1 << 5
+export const BLEND_ALPHA = 1 << 6
+export const BLEND_UP = 2 << 6
+export const BLEND_DOWN = 3 << 6
+export const bldcnt = (first: number, mode: number, second: number) => first | mode | (second << 8)
 
 export const DISPSTAT_VBLANK_IRQ = 1 << 3
 export const DISPSTAT_HBLANK_IRQ = 1 << 4
@@ -59,12 +86,14 @@ export interface BgControl {
   charBase?: number
   screenBase?: number
   colors256?: boolean
+  mosaic?: boolean
   size?: number
 }
 
 export const bgControl = (control: BgControl) =>
   (control.priority ?? 0) |
   ((control.charBase ?? 0) << 2) |
+  (control.mosaic === true ? 0x40 : 0) |
   (control.colors256 === true ? 0x80 : 0) |
   ((control.screenBase ?? 0) << 8) |
   ((control.size ?? 0) << 14)
@@ -113,7 +142,12 @@ export interface Obj {
   /** The rotation/scaling group; set turns the OBJ affine. */
   affine?: number
   doubleSize?: boolean
+  /** OBJ Mode 1 or 2 of attribute 0. */
+  mode?: 'semi-transparent' | 'window'
+  mosaic?: boolean
 }
+
+const OBJ_MODE = { 'semi-transparent': 1, window: 2 } as const
 
 const bit = (set: boolean | undefined, value: number) => (set === true ? value : 0)
 
@@ -124,6 +158,8 @@ function objAttr0(obj: Obj): number {
     (obj.y & 0xff) |
     bit(affine, 0x100) |
     bit(flag9, 0x200) |
+    (obj.mode === undefined ? 0 : OBJ_MODE[obj.mode] << 10) |
+    bit(obj.mosaic, 0x1000) |
     bit(obj.colors256, 0x2000) |
     ((obj.shape ?? 0) << 14)
   )
@@ -176,6 +212,12 @@ export class Video {
       mapEntry(entry),
       true,
     )
+    return this
+  }
+
+  /** Every entry of the 32x32 screen block. */
+  bgFill(screenBase: number, entry: MapEntry): this {
+    for (let i = 0; i < 32 * 32; i++) this.bgMap(screenBase, i % 32, Math.floor(i / 32), entry)
     return this
   }
 

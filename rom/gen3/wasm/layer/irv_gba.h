@@ -28,13 +28,22 @@ extern uint8_t *gIrvHostMemory;
 #define IRV_IO32(offset) (*(volatile uint32_t *)IRV_PTR(IRV_IO + (offset)))
 
 // GBATEK "LCD I/O Display Control", "LCD I/O Interrupts and Status", "LCD I/O BG Control",
-// "LCD I/O BG Scrolling".
+// "LCD I/O BG Scrolling", "LCD I/O Window Feature", "LCD I/O Mosaic Function", "LCD I/O Color
+// Special Effects".
 #define IRV_REG_DISPCNT  0x00
 #define IRV_REG_DISPSTAT 0x04
 #define IRV_REG_VCOUNT   0x06
 #define IRV_REG_BG0CNT   0x08
 #define IRV_REG_BG0HOFS  0x10
 #define IRV_REG_BG0VOFS  0x12
+#define IRV_REG_WIN0H    0x40
+#define IRV_REG_WIN0V    0x44
+#define IRV_REG_WININ    0x48
+#define IRV_REG_WINOUT   0x4A
+#define IRV_REG_MOSAIC   0x4C
+#define IRV_REG_BLDCNT   0x50
+#define IRV_REG_BLDALPHA 0x52
+#define IRV_REG_BLDY     0x54
 
 #define IRV_DISPSTAT_VBLANK      (1 << 0)
 #define IRV_DISPSTAT_HBLANK      (1 << 1)
