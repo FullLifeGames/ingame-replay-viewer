@@ -24,6 +24,9 @@ export function ringBytes(capacity: number): number {
   return RING_HEADER_BYTES + 4 * capacity
 }
 
+/** What a trim at the latency cap `limit` leaves waiting: half of it, in whole pairs. */
+export const trimFloor = (limit: number): number => 2 * Math.floor(limit / 4)
+
 /**
  * A ring of float samples from one writer (the worker) to one reader (the audio thread). The
  * game's sound goes in as left and right pairs; a power of two is even, so every push and pull
@@ -112,14 +115,14 @@ export class AudioRing {
 
   /**
    * The reader's side, before it pulls: when more than `limit` samples wait, skips the oldest
-   * down to half of `limit` in whole left and right pairs, and returns how many it skipped. The
-   * writer only reads the read counter to find its free space, which a skip only grows.
+   * down to `trimFloor(limit)`, and returns how many it skipped. The writer only reads the read
+   * counter to find its free space, which a skip only grows.
    */
   trim(limit: number): number {
     const read = Atomics.load(this.header, RING.read)
     const waiting = this.between(Atomics.load(this.header, RING.written), read)
     if (waiting <= limit) return 0
-    const skip = waiting - 2 * Math.floor(limit / 4)
+    const skip = waiting - trimFloor(limit)
     Atomics.store(this.header, RING.read, (read + skip) | 0)
     Atomics.add(this.header, RING.skipped, skip)
     return skip

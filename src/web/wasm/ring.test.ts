@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { createShared } from './protocol'
-import { AudioRing } from './ring'
+import { AudioRing, trimFloor } from './ring'
 
 describe('the audio ring', () => {
   it('wraps around its end and hands the samples out in order', () => {
@@ -85,6 +85,15 @@ describe('the audio ring', () => {
     const ring = new AudioRing(createShared(16).audio)
     ring.push(new Float32Array(12))
     expect(ring.trim(10)).toBe(8)
+  })
+
+  it('names what a trim leaves: half the cap, in whole pairs', () => {
+    expect(trimFloor(8)).toBe(4)
+    expect(trimFloor(10)).toBe(4)
+    const ring = new AudioRing(createShared(16).audio)
+    ring.push(new Float32Array(12))
+    ring.trim(10)
+    expect(ring.waiting).toBe(trimFloor(10))
   })
 
   it('counts the dry spells the reader found', () => {

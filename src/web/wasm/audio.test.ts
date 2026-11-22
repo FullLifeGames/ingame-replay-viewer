@@ -132,6 +132,25 @@ describe('the resampler of the audio worklet', () => {
     expect(ring.underruns).toBe(1)
   })
 
+  // A call can end on a take that found the ring empty; the worker may push before the next call.
+  it('takes a dry look-ahead pair again once the worker pushed', () => {
+    const ring = ringOf(stereo([0, 0], [2, 2]))
+    const resampler = new Resampler(ring, 1, 2)
+    expect(fill(resampler, 3)[0]).toEqual([0, 1, 2])
+    ring.push(stereo([4, 4]))
+    expect(fill(resampler, 2)[0]).toEqual([3, 4])
+    expect(ring.underruns).toBe(0)
+  })
+
+  it('plays on when a call ended on a dry ring and the worker pushed before the next', () => {
+    const ring = ringOf(stereo([1, 1], [2, 2]))
+    const resampler = new Resampler(ring, 1, 1)
+    expect(fill(resampler, 2)[0]).toEqual([1, 2])
+    ring.push(stereo([3, 3], [4, 4]))
+    expect(fill(resampler, 2)[0]).toEqual([3, 4])
+    expect(ring.underruns).toBe(0)
+  })
+
   it('refuses a rate that is not positive', () => {
     expect(() => new Resampler(ringOf(stereo()), 0, 48000)).toThrow(
       'the resampler needs two positive rates, not 0 Hz and 48000 Hz',
@@ -140,11 +159,11 @@ describe('the resampler of the audio worklet', () => {
 })
 
 describe('the ring reader of the audio worklet', () => {
-  function setUp(samples: Float32Array, reserve = 4) {
+  function setUp(samples: Float32Array, reserve = 4, latency = 8) {
     const buffer = createShared(64).audio
     const ring = new AudioRing(buffer)
     ring.push(samples)
-    return { ring, reader: new RingReader({ ring: buffer, rate: 1, latency: 8, reserve }, 1) }
+    return { ring, reader: new RingReader({ ring: buffer, rate: 1, latency, reserve }, 1) }
   }
 
   function outputs(frames: number): Float32Array[][] {
@@ -169,7 +188,7 @@ describe('the ring reader of the audio worklet', () => {
   })
 
   it('plays silence and counts no underrun until its reserve waits, then plays it in order', () => {
-    const { ring, reader } = setUp(stereo([1, 1], [2, 2]), 6)
+    const { ring, reader } = setUp(stereo([1, 1], [2, 2]), 6, 12)
     expect(play(reader, 4)).toEqual([0, 0, 0, 0])
     expect(ring.totalRead).toBe(0)
     ring.push(stereo([3, 3]))
@@ -178,7 +197,7 @@ describe('the ring reader of the audio worklet', () => {
   })
 
   it('waits for its reserve again after a dry spell, and counts the dry spell once', () => {
-    const { ring, reader } = setUp(stereo([1, 1], [2, 2], [3, 3]), 6)
+    const { ring, reader } = setUp(stereo([1, 1], [2, 2], [3, 3]), 6, 12)
     play(reader, 3)
     expect(play(reader, 2)).toEqual([0, 0])
     ring.push(stereo([4, 4], [5, 5]))
@@ -190,10 +209,13 @@ describe('the ring reader of the audio worklet', () => {
     expect(ring.underruns).toBe(2)
   })
 
-  it('refuses a reserve above the latency cap, which it could never fill', () => {
-    expect(() => setUp(stereo(), 10)).toThrow(
-      'the audio reserve of 10 samples is above the latency cap of 8, so the worklet would never play',
+  // A trim leaves half the cap; a larger reserve could wait behind each trim for good.
+  it('refuses a reserve above what a trim at the latency cap leaves, and takes it equal', () => {
+    expect(() => setUp(stereo(), 6)).toThrow(
+      'the audio reserve of 6 samples is above the 4 samples a trim at the latency cap of 8 ' +
+        'leaves, so the worklet could wait for it for good',
     )
+    expect(() => setUp(stereo(), 4)).not.toThrow()
   })
 
   it('stops for good once the page stops it, so the audio thread can drop it', () => {

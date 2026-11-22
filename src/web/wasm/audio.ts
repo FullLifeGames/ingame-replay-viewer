@@ -4,7 +4,7 @@
 // worker, the worklet and the Node harness share it.
 import { HalfBand } from './half-band.ts'
 import { MIXER_RATE, readPace, type SharedBuffers } from './protocol.ts'
-import { AudioRing } from './ring.ts'
+import { AudioRing, trimFloor } from './ring.ts'
 
 /** The name the audio worklet registers its processor under. */
 export const AUDIO_PROCESSOR = 'irv-audio'
@@ -128,6 +128,7 @@ export class Resampler {
 
   /** Plays from output frame `from` on until the outputs are full or the ring runs dry. */
   private play(left: Float32Array, right: Float32Array, from: number): number {
+    this.forgetDry()
     let previous = (this.previous ??= this.take())
     let next = (this.next ??= this.take())
     for (let i = from; i < left.length; i++) {
@@ -143,6 +144,18 @@ export class Resampler {
     this.previous = previous
     this.next = next
     return left.length
+  }
+
+  /**
+   * Drops the pairs a take found dry at the end of the last call, keeping their order, so the
+   * pairs the worker pushed since then play and no dry spell counts.
+   */
+  private forgetDry(): void {
+    if (this.previous?.dry) {
+      this.previous = this.next?.dry === false ? this.next : undefined
+      this.next = undefined
+    }
+    if (this.next?.dry) this.next = undefined
   }
 
   /** Counts the dry spell and waits for the reserve; a pair that came meanwhile plays first. */
@@ -173,9 +186,12 @@ export class RingReader {
 
   constructor(options: AudioProcessorOptions, outputRate: number) {
     const { latency, reserve } = options
-    if (reserve > latency) {
+    const floor = trimFloor(latency)
+    if (reserve > floor) {
       throw new Error(
-        `the audio reserve of ${String(reserve)} samples is above the latency cap of ${String(latency)}, so the worklet would never play`,
+        `the audio reserve of ${String(reserve)} samples is above the ${String(floor)} samples ` +
+          `a trim at the latency cap of ${String(latency)} leaves, ` +
+          'so the worklet could wait for it for good',
       )
     }
     this.ring = new AudioRing(options.ring)
