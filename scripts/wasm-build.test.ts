@@ -38,6 +38,31 @@ describe('the wasm:build arguments', () => {
     })
   })
 
+  it('compiles and links a sanitized build with its reports under build/wasm/sanitize', () => {
+    expect(parseBuildArgs(['--compile', '--sanitize', 'shift'], '/repo/build/wasm')).toEqual({
+      mode: 'compile',
+      out: '/repo/build/wasm/sanitize/compile.md',
+      sanitize: 'shift',
+    })
+    expect(parseBuildArgs(['--sanitize', 'shift', '--link', '/x/l.md'], '/o')).toEqual({
+      mode: 'link',
+      out: '/x/l.md',
+      sanitize: 'shift',
+    })
+  })
+
+  it.each([[['--census', '--sanitize', 'shift']], [['--patch', '--sanitize', 'shift']]])(
+    'refuses a sanitized %j, which only --compile and --link take',
+    (args) => {
+      expect(() => parseBuildArgs(args, '/o')).toThrow(/usage/)
+    },
+  )
+
+  it('refuses a check it does not know', () => {
+    expect(() => parseBuildArgs(['--compile', '--sanitize', 'address'], '/o')).toThrow(/address/)
+    expect(() => parseBuildArgs(['--compile', '--sanitize'], '/o')).toThrow(/shift/)
+  })
+
   it.each([[[]], [['--census', 'relative.md']], [['--census', '/a', '/b']]])(
     'refuses %j',
     (args) => {

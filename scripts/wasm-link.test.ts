@@ -13,6 +13,7 @@ const paths: WasmPaths = {
   obj: '/repo/build/wasm/obj',
   shadow: '/repo/rom/gen3/wasm/include',
   overlay: '/repo/build/wasm/overlay',
+  asm: '/repo/build/wasm/asm',
   emcc: '/tools/emsdk/upstream/emscripten/emcc',
 }
 
@@ -130,6 +131,20 @@ describe('the link command', () => {
     expect(argv).not.toContain('-O0')
     expect(linkCommand(paths, objects, '-O0')).toContain('-O0')
     expect(linkCommand(paths, objects, '-O0')).not.toContain('-O2')
+  })
+
+  it('links a sanitized build with its check and the normal data objects', () => {
+    const sanitized = {
+      ...paths,
+      out: '/repo/build/wasm/sanitize',
+      obj: '/repo/build/wasm/sanitize/obj',
+    }
+    const own = ['/repo/build/wasm/sanitize/obj/src/main.o', '/repo/build/wasm/asm/data/a.o']
+    const linked = linkCommand(sanitized, own, '-O2', 'shift')
+    expect(linked).toContain('-fsanitize=shift')
+    expect(linked[linked.indexOf('-o') + 1]).toBe('/repo/build/wasm/sanitize/irv-emerald.js')
+    expect(argv.filter((arg) => arg.startsWith('-fsanitize'))).toEqual([])
+    expect(() => linkCommand(sanitized, ['/repo/build/wasm/obj/src/main.o'])).toThrow(/outside/)
   })
 
   it('puts static data at the cartridge address, above every GBA memory range', () => {

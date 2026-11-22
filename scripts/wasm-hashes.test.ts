@@ -144,6 +144,20 @@ describe('the arguments of wasm:run', () => {
     expect(parseRunArgs(['--against-baseline'])).toEqual({ mode: 'against', names: [] })
     expect(() => parseRunArgs(['--baseline', '--against-baseline'])).toThrow(/one of/)
   })
+
+  it('plays the sanitized module with --sanitize, against the baseline but never saving one', () => {
+    expect(parseRunArgs(['--sanitize', 'shift', 'hand-made'])).toEqual({
+      mode: 'plain',
+      names: ['hand-made'],
+      sanitize: 'shift',
+    })
+    expect(parseRunArgs(['--against-baseline', '--sanitize', 'shift'])).toMatchObject({
+      mode: 'against',
+      sanitize: 'shift',
+    })
+    expect(() => parseRunArgs(['--baseline', '--sanitize', 'shift'])).toThrow(/sanitized/)
+    expect(() => parseRunArgs(['--sanitize', 'address'])).toThrow(/address/)
+  })
 })
 
 describe('the baseline', () => {

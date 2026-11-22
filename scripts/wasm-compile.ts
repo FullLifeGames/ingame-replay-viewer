@@ -16,6 +16,8 @@ export interface WasmPaths {
   shadow: string
   // Patched copies of upstream files, from rom/gen3/wasm/patches.
   overlay: string
+  // The data objects of npm run wasm:convert, which a sanitized build links too.
+  asm: string
   emcc: string
 }
 
@@ -29,6 +31,7 @@ export interface CompileCommand {
 
 export interface CompileOptions {
   optimise: '-O0' | '-O2'
+  sanitize?: Sanitizer | undefined
   // Sources of the tree that compile from their patched copy under build/wasm/overlay.
   overlay?: readonly string[]
 }
@@ -50,6 +53,32 @@ const CPPFLAGS = ['-Wno-trigraphs', '-DMODERN=1', '-DTESTING=0', '-DEMERALD', '-
 // (incompatible function pointers, implicit declarations) are what the census must see.
 const CFLAGS = ['-std=gnu17', '-Wall', '-Wno-strict-aliasing', '-Wno-pointer-to-int-cast']
 const ASSETS_DIR = 'build/assets'
+
+// The checks of a sanitized build (#44): clang's shift check, logged by UBSan's runtime with the
+// file and line of each site, once per site, and the run goes on.
+const SANITIZERS = ['shift'] as const
+export type Sanitizer = (typeof SANITIZERS)[number]
+
+export function parseSanitizer(check: string | undefined): Sanitizer {
+  const known = SANITIZERS.find((name) => name === check)
+  if (known === undefined) {
+    const named = check === undefined ? 'no check' : `no check ${check}`
+    throw new Error(`--sanitize knows ${named}; it takes ${SANITIZERS.join(', ')}`)
+  }
+  return known
+}
+
+/** emcc's flags for a check, at the compile and at the link. */
+export const sanitizeFlags = (check?: Sanitizer): string[] =>
+  check === undefined ? [] : [`-fsanitize=${check}`]
+
+/** Where a sanitized build keeps its records, objects, copies, module and runs. */
+export const sanitizedDir = (out: string): string => join(out, 'sanitize')
+
+export function sanitizedPaths(paths: WasmPaths): WasmPaths {
+  const out = sanitizedDir(paths.out)
+  return { ...paths, out, obj: join(out, 'obj'), overlay: join(out, 'overlay') }
+}
 const PREPROC = 'tools/preproc/preproc'
 
 export function wasmPaths(
@@ -65,6 +94,7 @@ export function wasmPaths(
     obj: join(out, 'obj'),
     shadow: join(repoDir, 'rom', 'gen3', 'wasm', 'include'),
     overlay: join(out, 'overlay'),
+    asm: join(out, 'asm'),
     emcc: join(emsdk, 'upstream', 'emscripten', 'emcc'),
   }
 }
@@ -111,6 +141,7 @@ function command(paths: WasmPaths, unit: Unit, options: CompileOptions): Compile
       'c',
       '-c',
       options.optimise,
+      ...sanitizeFlags(options.sanitize),
       ...CFLAGS,
       ...unit.flags,
       '-o',

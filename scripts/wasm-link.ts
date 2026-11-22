@@ -5,8 +5,8 @@
 import { readdirSync } from 'node:fs'
 import { basename, join, relative, sep } from 'node:path'
 
-import { objectPath } from './wasm-compile.ts'
-import type { CompileOptions, WasmPaths } from './wasm-compile.ts'
+import { objectPath, sanitizeFlags } from './wasm-compile.ts'
+import type { CompileOptions, Sanitizer, WasmPaths } from './wasm-compile.ts'
 import { WASM_DIR } from './wasm-config.ts'
 import { folderSources, LAYER_DIR } from './wasm-layer.ts'
 
@@ -87,10 +87,15 @@ export function glueSources(dirs: readonly string[] = [GLUE_DIR, LAYER_DIR]): st
   return sources
 }
 
-function checkInside(out: string, objects: readonly string[]): void {
-  const outside = objects.filter((object) => relative(out, object).startsWith(`..${sep}`))
+// The objects lie under the build's outputs, or among the data objects, which a sanitized build
+// shares with the normal one.
+function checkInside(paths: WasmPaths, objects: readonly string[]): void {
+  const inside = (dir: string, object: string) => !relative(dir, object).startsWith(`..${sep}`)
+  const outside = objects.filter(
+    (object) => !inside(paths.out, object) && !inside(paths.asm, object),
+  )
   if (outside.length > 0) {
-    throw new Error(`the link takes objects outside ${out}: ${outside.join(', ')}`)
+    throw new Error(`the link takes objects outside ${paths.out}: ${outside.join(', ')}`)
   }
 }
 
@@ -98,13 +103,15 @@ export function linkCommand(
   paths: WasmPaths,
   objects: readonly string[],
   optimise: CompileOptions['optimise'] = '-O2',
+  sanitize?: Sanitizer,
 ): string[] {
-  checkInside(paths.out, objects)
+  checkInside(paths, objects)
   const { globalBase, initialMemory, stackSize } = linkSettings()
   const exports = LINK_EXPORTS.map((name) => `_${name}`).join(',')
   return [
     paths.emcc,
     optimise,
+    ...sanitizeFlags(sanitize),
     ...objects,
     // The host instantiates, writes the stream into the slot, then calls AgbMain itself.
     '-sINVOKE_RUN=0',

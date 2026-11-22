@@ -8,7 +8,9 @@ import {
   checkNamedSources,
   compileCommands,
   glueCommands,
+  parseSanitizer,
   pipelineScript,
+  sanitizedPaths,
   treeSources,
   wasmPaths,
   wasmRoots,
@@ -24,6 +26,7 @@ const paths: WasmPaths = {
   obj: '/repo/build/wasm/obj',
   shadow: '/repo/rom/gen3/wasm/include',
   overlay: '/repo/build/wasm/overlay',
+  asm: '/repo/build/wasm/asm',
   emcc: '/tools/emsdk/upstream/emscripten/emcc',
 }
 const config: WasmConfig = {
@@ -170,6 +173,35 @@ describe('the compile commands', () => {
   it('finds the tree, the outputs, the shadow headers and emcc from the repo and EMSDK', () => {
     expect(wasmPaths('/repo', { EMSDK: '/opt/emsdk' }, '/home/u')).toEqual(pathsFor('/opt/emsdk'))
     expect(wasmPaths('/repo', {}, '/home/u')).toEqual(pathsFor('/home/u/tools/emsdk'))
+  })
+})
+
+describe('the sanitized build (#44)', () => {
+  it('compiles every file and the glue with the check, and the normal build without it', () => {
+    const options = { optimise: '-O2', sanitize: 'shift' } as const
+    expect(only(compileCommands(config, ['src/main.c'], paths, options)).compile).toContain(
+      '-fsanitize=shift',
+    )
+    expect(only(glueCommands(paths, ['/repo/rom/gen3/wasm/src/a.c'], options)).compile).toContain(
+      '-fsanitize=shift',
+    )
+    const normal = only(compileCommands(config, ['src/main.c'], paths)).compile
+    expect(normal.filter((arg) => arg.startsWith('-fsanitize'))).toEqual([])
+  })
+
+  it('writes its objects, overlay copies and records under build/wasm/sanitize', () => {
+    expect(sanitizedPaths(paths)).toEqual({
+      ...paths,
+      out: '/repo/build/wasm/sanitize',
+      obj: '/repo/build/wasm/sanitize/obj',
+      overlay: '/repo/build/wasm/sanitize/overlay',
+    })
+  })
+
+  it('takes the shift check and refuses any other', () => {
+    expect(parseSanitizer('shift')).toBe('shift')
+    expect(() => parseSanitizer('address')).toThrow(/address.*shift/)
+    expect(() => parseSanitizer(undefined)).toThrow(/shift/)
   })
 })
 

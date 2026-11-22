@@ -8,7 +8,9 @@
 // the .err files in build/wasm/compile and the report, and fails when a file fails. `--link
 // [report.md]` compiles the glue again and links it with the objects of compile.json and build/wasm/asm (npm run wasm:convert) into
 // build/wasm/irv-emerald.js and irv-emerald.wasm, then writes the patch from the dump to the module
-// (irv-emerald-wasm.bps); `--patch [report.md]` writes that patch alone. Everything it writes lies under build/wasm and
+// (irv-emerald-wasm.bps); `--patch [report.md]` writes that patch alone. `--sanitize shift` beside
+// `--compile` or `--link` builds a module with clang's shift check (#44) under build/wasm/sanitize,
+// with no patch, and leaves the normal outputs alone. Everything it writes lies under build/wasm and
 // .cache/wasm, apart from a report path named on the command line. The tree comes from
 // `npm run rom:build`.
 import { execFileSync } from 'node:child_process'
@@ -27,11 +29,14 @@ import {
   checkNamedSources,
   compileCommands,
   glueCommands,
+  parseSanitizer,
+  sanitizedDir,
+  sanitizedPaths,
   treeSources,
   wasmPaths,
   wasmRoots,
 } from './wasm-compile.ts'
-import type { CompileCommand, CompileOptions, WasmPaths } from './wasm-compile.ts'
+import type { CompileCommand, CompileOptions, Sanitizer, WasmPaths } from './wasm-compile.ts'
 import { loadWasmConfig, WASM_DIR } from './wasm-config.ts'
 import type { WasmConfig } from './wasm-config.ts'
 import { asmObjects, compiledObjects, glueSources, linkCommand, LINK_OUTPUTS } from './wasm-link.ts'
@@ -42,10 +47,11 @@ import { writeModulePatch } from './wasm-outputs.ts'
 export interface BuildArgs {
   mode: 'census' | 'report' | 'compile' | 'link' | 'patch'
   out: string
+  sanitize?: Sanitizer | undefined
 }
 
 const USAGE =
-  'usage: wasm:build --census [/abs/report.md] | --census-report [/abs/report.md] | --compile [/abs/report.md] | --link [/abs/report.md] | --patch [/abs/report.md]'
+  'usage: wasm:build --census [/abs/report.md] | --census-report [/abs/report.md] | --compile [/abs/report.md] | --link [/abs/report.md] | --patch [/abs/report.md], --compile and --link with --sanitize shift'
 const MODES: Record<string, BuildArgs['mode']> = {
   '--census': 'census',
   '--census-report': 'report',
@@ -64,13 +70,25 @@ const RECORDS = {
 // A file that takes longer at -O0 has a problem of its own; the census names it.
 const TIMEOUT_MS = 20 * 60 * 1000
 
+const SANITIZED_MODES: readonly BuildArgs['mode'][] = ['compile', 'link']
+
+// `--sanitize <check>` may stand anywhere; the rest keeps its order.
+function takeSanitize(args: readonly string[]): { sanitize?: Sanitizer; rest: string[] } {
+  const at = args.indexOf('--sanitize')
+  if (at < 0) return { rest: [...args] }
+  return { sanitize: parseSanitizer(args[at + 1]), rest: args.toSpliced(at, 2) }
+}
+
 export function parseBuildArgs(args: readonly string[], outDir: string): BuildArgs {
-  const [flag, out, ...rest] = args
+  const { sanitize, rest } = takeSanitize(args)
+  const [flag, out, ...more] = rest
   const mode = flag === undefined ? undefined : MODES[flag]
-  if (mode === undefined || rest.length > 0 || (out !== undefined && !isAbsolute(out))) {
+  if (mode === undefined || more.length > 0 || (out !== undefined && !isAbsolute(out))) {
     throw new Error(USAGE)
   }
-  return { mode, out: out ?? join(outDir, `${RECORDS[mode]}.md`) }
+  if (sanitize !== undefined && !SANITIZED_MODES.includes(mode)) throw new Error(USAGE)
+  const dir = sanitize === undefined ? outDir : sanitizedDir(outDir)
+  return { mode, out: out ?? join(dir, `${RECORDS[mode]}.md`), sanitize }
 }
 
 export function checkEmccVersion(banner: string, wanted: string): void {
@@ -172,17 +190,19 @@ function prepare(paths: WasmPaths): string[] {
   return overlay.filter((file) => file.startsWith('src/') && file.endsWith('.c'))
 }
 
-async function compile(paths: WasmPaths, config: WasmConfig, out: string): Promise<void> {
+async function compile(paths: WasmPaths, config: WasmConfig, args: BuildArgs): Promise<void> {
   checkToolchain(paths, config)
   const sources = treeSources(paths.tree)
   checkNamedSources(config, sources)
-  const options: CompileOptions = { optimise: '-O2', overlay: prepare(paths) }
+  const { sanitize } = args
+  const options: CompileOptions = { optimise: '-O2', overlay: prepare(paths), sanitize }
   const commands = compileCommands(config, sources, paths, options)
   const entries = await runAll(paths, config, 'compile', commands)
-  report(paths, config, 'compile', out)
+  report(paths, config, 'compile', args.out)
   failIfAny(entries)
   // wasm:convert reads the glue's function types too, from the objects glue.json records.
-  failIfAny(await runAll(paths, config, 'glue', glueCommands(paths, glueSources())))
+  const glue = glueCommands(paths, glueSources(), { optimise: '-O2', sanitize })
+  failIfAny(await runAll(paths, config, 'glue', glue))
 }
 
 function failIfAny(entries: readonly CensusEntry[]): void {
@@ -193,19 +213,20 @@ function failIfAny(entries: readonly CensusEntry[]): void {
 
 // The glue compiles at -O2 like the rest, and so does the link (fix step 6): every scene passes,
 // the module is 2.4 MB smaller, the link peaks at 271 MB and takes 20 s against 5-9 s at -O0.
-async function link(paths: WasmPaths, config: WasmConfig, out: string): Promise<void> {
+async function link(paths: WasmPaths, config: WasmConfig, args: BuildArgs): Promise<void> {
   checkToolchain(paths, config)
   const record = JSON.parse(readFileSync(join(paths.out, 'compile.json'), 'utf8')) as {
     entries: CompileRecordEntry[]
   }
-  const glue = glueCommands(paths, glueSources())
+  const { sanitize } = args
+  const glue = glueCommands(paths, glueSources(), { optimise: '-O2', sanitize })
   failIfAny(await runAll(paths, config, 'glue', glue))
   const objects = [
     ...compiledObjects(record.entries, paths),
     ...glue.map((command) => command.object),
-    ...asmObjects(join(paths.out, 'asm')),
+    ...asmObjects(paths.asm),
   ]
-  const argv = linkCommand(paths, objects)
+  const argv = linkCommand(paths, objects, '-O2', sanitize)
   say(`linking ${String(objects.length)} objects`)
   const start = performance.now()
   execFileSync(argv[0] as string, argv.slice(1), { cwd: paths.out, stdio: 'inherit' })
@@ -214,7 +235,9 @@ async function link(paths: WasmPaths, config: WasmConfig, out: string): Promise<
     (name) => `${name} ${String(statSync(join(paths.out, name)).size)} B`,
   )
   const text = `Link: ${String(objects.length)} objects, ${String(seconds)} s; ${sizes.join(', ')}.\n`
-  writeFileSync(out, `${text}${patch(paths)}\n`)
+  // A sanitized module only lists shift sites (#44); no page loads it, so it gets no patch.
+  const tail = sanitize === undefined ? patch(paths) : 'Patch: none for a sanitized module.'
+  writeFileSync(args.out, `${text}${tail}\n`)
   say(text.trim())
 }
 
@@ -241,12 +264,13 @@ function report(paths: WasmPaths, config: WasmConfig, mode: Run, out: string): v
 
 async function main(): Promise<void> {
   await runCliAsync('wasm:build', async () => {
-    const paths = wasmPaths(REPO_DIR)
-    const args = parseBuildArgs(process.argv.slice(2), paths.out)
+    const normal = wasmPaths(REPO_DIR)
+    const args = parseBuildArgs(process.argv.slice(2), normal.out)
+    const paths = args.sanitize === undefined ? normal : sanitizedPaths(normal)
     const config = loadWasmConfig()
     if (args.mode === 'census') await census(paths, config, args.out)
-    else if (args.mode === 'compile') await compile(paths, config, args.out)
-    else if (args.mode === 'link') await link(paths, config, args.out)
+    else if (args.mode === 'compile') await compile(paths, config, args)
+    else if (args.mode === 'link') await link(paths, config, args)
     else if (args.mode === 'patch') writeFileSync(args.out, `${patch(paths)}\n`)
     else report(paths, config, 'census', args.out)
   })
