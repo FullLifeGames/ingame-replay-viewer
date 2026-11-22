@@ -1,6 +1,6 @@
 // DMA and the IRQ hook of our platform layer (#43, plan B2), run natively in the host harness on
 // a GBA address space of its own. Each scene follows GBATEK's "GBA DMA Transfers" and "GBA
-// Interrupt Control". The harness's `dma` command runs a script of operations and returns what
+// Interrupt Control". The harness's `script` command runs a script of operations and returns what
 // its reads saw, in order; its result counts the handler's calls (high half) and ORs their flags.
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -8,7 +8,21 @@ import { join } from 'node:path'
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import { buildHost, runLayer } from './wasm-layer.ts'
+import { buildHost } from './wasm-layer.ts'
+import {
+  asHalves,
+  asWords,
+  dmaSet,
+  halves,
+  load,
+  raise,
+  read,
+  run,
+  runScript,
+  wordBytes,
+  write16,
+} from './wasm-layer-script.ts'
+import type { Op } from './wasm-layer-script.ts'
 
 const scratch = mkdtempSync(join(tmpdir(), 'irv-dma-'))
 let host = ''
@@ -42,42 +56,8 @@ const cntH = (channel: number) => IO + 0xba + channel * 12
 const [IE, IF, IME] = [IO + 0x200, IO + 0x202, IO + 0x208]
 const FLAG_DMA3 = 1 << 11
 
-type Op = number[]
-/** The bytes as little-endian words, the last one padded with zeros. */
-const packed = (bytes: number[]) => {
-  const padded = new Uint8Array(Math.ceil(bytes.length / 4) * 4)
-  padded.set(bytes)
-  return Array.from(new Uint32Array(padded.buffer))
-}
-const load = (address: number, bytes: number[]): Op => [1, address, bytes.length, ...packed(bytes)]
-const dmaSet = (channel: number, src: number, dest: number, word: number): Op => [
-  2,
-  channel,
-  src,
-  dest,
-  word,
-]
-const run = (timing: number): Op => [3, timing]
-const write16 = (address: number, value: number): Op => [4, address, value]
-const raise = (flag: number): Op => [5, flag]
-const read = (address: number, length: number): Op => [6, address, length]
-
-const halves = (values: readonly number[]) =>
-  Array.from(new Uint8Array(Uint16Array.from(values).buffer))
-const wordBytes = (values: readonly number[]) =>
-  Array.from(new Uint8Array(Uint32Array.from(values).buffer))
-const asHalves = (bytes: Uint8Array) => Array.from(new Uint16Array(bytes.slice().buffer))
-const asWords = (bytes: Uint8Array) => Array.from(new Uint32Array(bytes.slice().buffer))
-
 /** Runs a script; `reads` is the byte count its read operations return together. */
-function script(ops: Op[], reads: number) {
-  const words = ops.flat()
-  const { result, dest } = runLayer(host, 'dma', {
-    src: wordBytes(words),
-    dest: new Uint8Array(reads),
-  })
-  return { calls: result >>> 16, flags: result & 0xffff, dest }
-}
+const script = (ops: Op[], reads: number) => runScript(host, ops, reads)
 
 describe('an immediate DMA', () => {
   it('copies halfwords at once and clears its enable bit', () => {

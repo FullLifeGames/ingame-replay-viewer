@@ -3,7 +3,7 @@
 // ROM's replay slot, runs it and checks the frames. It is a host program: the build never copies
 // it into the expansion's tree.
 //
-//     replay_shot <rom> <progress address> <frame dir> [<name>:<done>:<frames> ...]
+//     replay_shot <rom> <progress address> <frame dir> [--state-every <n>] [<name>:<done>:<frames> ...]
 //
 // It loads the ROM with no save file and no BIOS file, so mGBA keeps the save in memory and runs
 // its own BIOS, and runs frames as fast as it can. After each frame it reads gReplayProgress
@@ -15,6 +15,15 @@
 // refusal screen is up), or when `done` has not changed for STALL_FRAMES frames: the viewer presses
 // no button, so an op that waits for one stalls. The frame it stops on goes to
 // <frame dir>/final.ppm.
+//
+// With --state-every <n> (the mGBA oracle of the WebAssembly build, #43) it also writes, on each
+// frame that is a multiple of n, the video state as <frame dir>/state-<frame>.bin
+// (replay_state.c) and the frame as frame-<frame>.ppm, and the frame after it as
+// frame-<frame + 1>.ppm, so the oracle can tell which frame a state belongs to. The probe of
+// #43's step B3 found that a state belongs to the frame of its own number: runFrame returns
+// after line 159 and before the game's VBlank handler runs (42 of 48 states of hand-made and 585
+// of 660 of 994052 equal their own frame, 21 and 334 the next one, and DMA0's internal source
+// stands 160 units past the SAD the game wrote).
 //
 // Output on stdout, one JSON object per line: {"shot":...} for each shot, then {"status":...}.
 // Exit code 0 when the run reached a status, 2 on a usage or emulator error.
@@ -35,6 +44,7 @@
 // The offsets of struct ReplayProgress, which the ROM checks against the struct. scripts/rom-shot.ts
 // checks the symbol's size against REPLAY_PROGRESS_SIZE before it runs this tool.
 #include "replay_progress.h"
+#include "replay_state.h"
 
 #define STALL_FRAMES 3600
 #define ERROR_FRAMES 30
@@ -72,6 +82,7 @@ struct Run
     const char *frameDir;
     struct Shot shots[MAX_SHOTS];
     int shotCount;
+    unsigned long stateEvery;
 };
 
 // mGBA logs every DMA and BIOS call by default; only its errors reach stderr here.
@@ -199,6 +210,19 @@ static void DropAudio(struct mCore *core)
     blip_clear(core->getAudioChannel(core, 1));
 }
 
+// The oracle's dump: the state and the frame on each multiple of stateEvery, and the frame after.
+static bool DumpState(struct Run *run, unsigned long frame)
+{
+    char name[MAX_NAME];
+
+    if (run->stateEvery == 0 || (run->stateEvery > 1 && frame % run->stateEvery > 1))
+        return true;
+    if (frame % run->stateEvery == 0 && !WriteVideoState(run->core, run->frameDir, frame))
+        return false;
+    snprintf(name, sizeof(name), "frame-%lu", frame);
+    return WriteFrame(run, name);
+}
+
 static const char *Play(struct Run *run, unsigned long *frame, struct Progress *progress)
 {
     unsigned lastDone = 0;
@@ -208,6 +232,8 @@ static const char *Play(struct Run *run, unsigned long *frame, struct Progress *
     {
         run->core->runFrame(run->core);
         DropAudio(run->core);
+        if (!DumpState(run, *frame))
+            return NULL;
         *progress = ReadProgress(run);
         if (!TakeShots(run, *progress, *frame))
             return NULL;
@@ -233,15 +259,24 @@ static int ParseArgs(struct Run *run, int argc, char **argv)
     int i;
 
     if (argc < 4)
-        return Fail("usage: replay_shot <rom> <progress address> <frame dir> [<name>:<done>:<frames> ...]", NULL);
+        return Fail("usage: replay_shot <rom> <progress address> <frame dir> [--state-every <n>] [<name>:<done>:<frames> ...]", NULL);
     errno = 0;
     run->progressAddress = (uint32_t)strtoul(argv[2], &end, 0);
     if (errno != 0 || *end != '\0' || run->progressAddress == 0)
         return Fail("not an address", argv[2]);
     run->frameDir = argv[3];
-    if (argc - 4 > MAX_SHOTS)
+    i = 4;
+    if (argc > 5 && strcmp(argv[4], "--state-every") == 0)
+    {
+        errno = 0;
+        run->stateEvery = strtoul(argv[5], &end, 10);
+        if (errno != 0 || *end != '\0' || run->stateEvery == 0)
+            return Fail("not a frame count", argv[5]);
+        i = 6;
+    }
+    if (argc - i > MAX_SHOTS)
         return Fail("too many shots", NULL);
-    for (i = 4; i < argc; i++)
+    for (; i < argc; i++)
     {
         if (!ParseShot(argv[i], &run->shots[run->shotCount++]))
             return Fail("not a shot <name>:<done>:<frames>", argv[i]);

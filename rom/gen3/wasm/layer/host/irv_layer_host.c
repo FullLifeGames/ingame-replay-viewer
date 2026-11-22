@@ -3,8 +3,8 @@
 //   irv_layer_host <command> <input> <output>
 // The input holds little-endian words: the argument count and the arguments, the source's length
 // and bytes, the destination's length and bytes. The output holds the result word and the
-// destination after the call. The DMA command runs on a GBA address space of its own
-// (irv_layer_host_dma.c).
+// destination after the call. The script command runs on a GBA address space of its own
+// (irv_layer_host_script.c).
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -151,7 +151,7 @@ static const struct Command sCommands[] = {
     {"sine", 0, RunSine},
     {"bgaffine", 1, RunBgAffine},
     {"objaffine", 2, RunObjAffine},
-    {"dma", 0, RunDmaScript},
+    {"script", 0, RunScript},
 };
 
 static void WriteOutput(const char *path, const struct HostCall *call)

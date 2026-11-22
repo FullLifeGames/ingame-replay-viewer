@@ -9,6 +9,8 @@ import {
   progressAddress,
   readErrorNames,
   readToolOutput,
+  TOOL_SOURCES,
+  toolArgs,
   toolBuildArgs,
 } from './rom-shot-run.ts'
 import { ROM_DIR } from './rom-config.ts'
@@ -57,8 +59,14 @@ describe('the address of gReplayProgress', () => {
 })
 
 describe('the shot tool', () => {
-  it('is built from its one C file and our headers against libmgba', () => {
-    expect(toolBuildArgs('/src/replay_shot.c', '/out/replay_shot')).toEqual([
+  it('is built from its C files and our headers against libmgba', () => {
+    expect(TOOL_SOURCES.map((source) => source.slice(ROM_DIR.length + 1))).toEqual([
+      'shot/replay_shot.c',
+      'shot/replay_state.c',
+    ])
+    expect(
+      toolBuildArgs(['/src/replay_shot.c', '/src/replay_state.c'], '/out/replay_shot'),
+    ).toEqual([
       '-std=gnu11',
       '-O2',
       '-Wall',
@@ -69,8 +77,19 @@ describe('the shot tool', () => {
       '-o',
       '/out/replay_shot',
       '/src/replay_shot.c',
+      '/src/replay_state.c',
       '-lmgba',
     ])
+  })
+
+  it('takes the ROM, the address in hex, the frame folder and the shots', () => {
+    const run = { tool: 't', rom: 'r.gba', address: 0x2024abc, frameDir: 'f', shots: ['a:1:2'] }
+    expect(toolArgs(run)).toEqual(['r.gba', '0x2024abc', 'f', 'a:1:2'])
+  })
+
+  it('asks for a video state every N frames before the shots, for the mGBA oracle', () => {
+    const run = { tool: 't', rom: 'r.gba', address: 16, frameDir: 'f', shots: [], stateEvery: 60 }
+    expect(toolArgs(run)).toEqual(['r.gba', '0x10', 'f', '--state-every', '60'])
   })
 
   it('reports shots and a final status, one JSON object per line', () => {

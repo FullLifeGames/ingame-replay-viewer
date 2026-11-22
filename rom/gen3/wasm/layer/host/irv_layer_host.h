@@ -21,8 +21,8 @@ struct HostCall
 
 _Noreturn void Fail(const char *what);
 
-// irv_layer_host_dma.c: the source is a script of DMA operations, the destination what its reads
-// return.
-void RunDmaScript(struct HostCall *call);
+// irv_layer_host_script.c: the source is a script of operations on the GBA address space, the
+// destination what its reads, frames and IRQ logs return.
+void RunScript(struct HostCall *call);
 
 #endif // GUARD_IRV_LAYER_HOST_H
