@@ -54,6 +54,8 @@ const BYTES_PER_LINE = 16
 const NAME = /^[A-Za-z_.][\w.$]*$/
 // ARM mapping symbols ($a, $t, $d) mark code and data runs; they carry nothing for wasm.
 const MAPPING = /^\$[adt](\.|$)/
+// The end of the first line of every data assembly; the tree guard finds a tracked one by it.
+export const CONVERTED_BY = 'converted by scripts/wasm-data-asm.ts'
 
 export function symbolLookup(elfs: readonly ElfObject[], wasm: WasmLookup): SymbolLookup {
   const absolute = new Map<string, number>()
@@ -292,7 +294,7 @@ export function convertElf(elf: ElfObject, lookup: SymbolLookup, source: string)
   const declarations = functions.map(
     (name) => `\t.functype\t${name} ${lookup.functions.get(name) ?? ''}`,
   )
-  const heading = `# ${source}, converted by scripts/wasm-data-asm.ts`
+  const heading = `# ${source}, ${CONVERTED_BY}`
   const text = [heading, ...declarations, ...body, ...effectList(effects), '']
   return { text: text.join('\n'), functions, undefined: [...ctx.undefined].sort(), effects }
 }
