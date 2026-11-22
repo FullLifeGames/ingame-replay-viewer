@@ -13,8 +13,8 @@
 
 // Checking an instruction stream (replay_stream.h) for the interpreter (#6).
 // Replay_ValidateStream checks the whole stream before a battle starts: the header, the team
-// tables, and each instruction's size and operands. What it lets through, the interpreter can play
-// without checks. It reads the stream through replay_stream.c.
+// tables, each instruction's size and operands, and then the order rules (ValidateOrder). What it
+// lets through, the interpreter can play without checks. It reads the stream through replay_stream.c.
 
 // The kinds of operand, in the byte order of each op.
 enum ReplayOperand
@@ -272,6 +272,95 @@ static enum ReplayError ValidateInstructions(const volatile u8 *stream, u16 *cou
     return ended ? REPLAY_ERROR_NONE : REPLAY_ERROR_NO_END;
 }
 
+// Where a side's battler is, for the order rules (replay_stream.h).
+enum ReplayPresence
+{
+    PRESENCE_NONE, // no battler sent out yet
+    PRESENCE_OUT,
+    PRESENCE_LEFT, // its battler left by WITHDRAW or FAINT
+};
+
+// The masks hold a bit per op and per animation, and each names its ops as format.ts does.
+STATIC_ASSERT(ARRAY_COUNT(sOpFormats) <= 32, ReplayOrderOpsFitTheMask);
+STATIC_ASSERT(REPLAY_ANIM_SIMPLE_HEAL < 32, ReplayOrderAnimsFitTheMask);
+STATIC_ASSERT(REPLAY_ORDER_ON_FIELD_OPS == ((1 << REPLAY_OP_WITHDRAW) | (1 << REPLAY_OP_MOVE) | (1 << REPLAY_OP_HIT) | (1 << REPLAY_OP_HP) | (1 << REPLAY_OP_FAINT) | (1 << REPLAY_OP_STAT) | (1 << REPLAY_OP_ANIM) | (1 << REPLAY_OP_VOLATILE) | (1 << REPLAY_OP_ABILITY) | (1 << REPLAY_OP_ITEM_POP_UP) | (1 << REPLAY_OP_TRAP_TURN)), ReplayOrderOnFieldOps);
+STATIC_ASSERT(REPLAY_ORDER_FREE_ANIMS == ((1 << REPLAY_ANIM_RAIN_CONTINUES) | (1 << REPLAY_ANIM_SUN_CONTINUES) | (1 << REPLAY_ANIM_SANDSTORM_CONTINUES) | (1 << REPLAY_ANIM_HAIL_CONTINUES)), ReplayOrderFreeAnims);
+
+static bool32 IsInMask(u32 mask, u32 bit)
+{
+    return (mask >> bit) & 1;
+}
+
+// SEND_OUT puts a side's first battler out, SWITCH_IN the next one after WITHDRAW or FAINT.
+static enum ReplayError ValidateEntry(u8 *presence, u32 op, u32 side)
+{
+    u32 before = (op == REPLAY_OP_SEND_OUT) ? PRESENCE_NONE : PRESENCE_LEFT;
+
+    if (presence[side] != before)
+        return REPLAY_ERROR_ORDER;
+    presence[side] = PRESENCE_OUT;
+    return REPLAY_ERROR_NONE;
+}
+
+// Every side operand of the op names a side with its battler out, unless the op is an ANIM of
+// REPLAY_ORDER_FREE_ANIMS. WITHDRAW and FAINT then take the battler off.
+static enum ReplayError ValidateOnField(u8 *presence, u32 op, const volatile u8 *operands)
+{
+    const u8 *kinds = sOpFormats[op].operands;
+    const volatile u8 *operand = operands;
+    bool32 sidesOut = TRUE;
+    u32 i;
+
+    for (i = 0; i < MAX_OPERANDS && kinds[i] != OPERAND_NONE; i++)
+    {
+        if (kinds[i] == OPERAND_SIDE && presence[*operand] != PRESENCE_OUT)
+            sidesOut = FALSE;
+        if (kinds[i] == OPERAND_ANIM && IsInMask(REPLAY_ORDER_FREE_ANIMS, *operand))
+            return REPLAY_ERROR_NONE;
+        operand += sOperandRanges[kinds[i]].width;
+    }
+    if (!sidesOut)
+        return REPLAY_ERROR_ORDER;
+    // The side is the one operand of WITHDRAW and FAINT.
+    if (op == REPLAY_OP_WITHDRAW || op == REPLAY_OP_FAINT)
+        presence[operands[0]] = PRESENCE_LEFT;
+    return REPLAY_ERROR_NONE;
+}
+
+// One instruction at byte at of the instructions, under the order rules.
+static enum ReplayError ValidateOrderOf(u8 *presence, const volatile u8 *instruction, u32 at, bool32 introduced)
+{
+    u32 op = instruction[0];
+    const volatile u8 *operands = instruction + REPLAY_INSTRUCTION_HEADER_SIZE;
+
+    if (op == REPLAY_OP_INTRO)
+        return (at == 0) ? REPLAY_ERROR_NONE : REPLAY_ERROR_ORDER;
+    if (op == REPLAY_OP_SEND_OUT && !introduced)
+        return REPLAY_ERROR_ORDER;
+    // The side is the first operand of SEND_OUT and SWITCH_IN.
+    if (op == REPLAY_OP_SEND_OUT || op == REPLAY_OP_SWITCH_IN)
+        return ValidateEntry(presence, op, operands[0]);
+    if (IsInMask(REPLAY_ORDER_ON_FIELD_OPS, op))
+        return ValidateOnField(presence, op, operands);
+    return REPLAY_ERROR_NONE;
+}
+
+// The second pass, over instructions the first pass let through: each one keeps the order rules
+// of replay_stream.h.
+static enum ReplayError ValidateOrder(const volatile u8 *stream)
+{
+    const volatile u8 *instructions = stream + Replay_ReadU32(stream + REPLAY_STREAM_OFFSET_INSTRUCTIONS_OFFSET);
+    u32 length = Replay_ReadU32(stream + REPLAY_STREAM_OFFSET_INSTRUCTIONS_LENGTH);
+    u8 presence[REPLAY_STREAM_SIDE_COUNT] = { PRESENCE_NONE, PRESENCE_NONE };
+    bool32 introduced = (instructions[0] == REPLAY_OP_INTRO);
+    enum ReplayError error = REPLAY_ERROR_NONE;
+    u32 at;
+
+    for (at = 0; at < length && error == REPLAY_ERROR_NONE; at += REPLAY_INSTRUCTION_HEADER_SIZE + instructions[at + 1])
+        error = ValidateOrderOf(presence, instructions + at, at, introduced);
+    return error;
+}
+
 enum ReplayError Replay_ValidateStream(const volatile u8 *stream, u32 length, u16 *count)
 {
     enum ReplayError error = ValidateHeader(stream, length);
@@ -281,6 +370,8 @@ enum ReplayError Replay_ValidateStream(const volatile u8 *stream, u32 length, u1
         error = ValidateTeams(stream);
     if (error == REPLAY_ERROR_NONE)
         error = ValidateInstructions(stream, count);
+    if (error == REPLAY_ERROR_NONE)
+        error = ValidateOrder(stream);
     return error;
 }
 

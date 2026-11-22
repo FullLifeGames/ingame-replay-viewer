@@ -21,6 +21,7 @@ enum ReplayError
     REPLAY_ERROR_NO_END,  // the instructions do not end with their only END
     REPLAY_ERROR_OPERAND, // an operand outside its range, a party slot without a mon, or a PRINT text that is not glyphs and one EOS
     REPLAY_ERROR_TEAM,    // a trainer or team table entry outside its range, or a side without a mon
+    REPLAY_ERROR_ORDER,   // an instruction that breaks the order rules (replay_stream.h)
 };
 
 // What the interpreter does after END: the ROM holds the last scene, the tests leave the battle

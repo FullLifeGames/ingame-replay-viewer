@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { Gen3Error } from '../errors'
 import counts from '../tables/counts.json'
 import { decodeStream } from './decode'
-import { encodeStream } from './encode'
+import { encodeInstruction, encodeStream } from './encode'
 import {
   MON,
   MON_OFFSET,
@@ -14,7 +14,7 @@ import {
   trainerOffset,
 } from './format'
 import type { Instruction } from './instructions'
-import { EACH_OP, streamOf } from './testing'
+import { AFTER_LEADS, EACH_OP, LEADS, rawBytes, streamOf, streamWithLeads } from './testing'
 
 const END: Instruction = { op: 'end', outcome: 'tie' }
 
@@ -32,7 +32,7 @@ describe('decodeStream', () => {
   it('reads back one instruction of each op and full team tables (F5)', () => {
     const stream = streamOf(EACH_OP)
     expect(decodeStream(encodeStream(stream))).toEqual(stream)
-    const rise = streamOf([
+    const rise = streamWithLeads([
       { op: 'stat', side: 'near', stat: 'spe', stages: 6, arrows: 'one' },
       END,
     ])
@@ -108,7 +108,7 @@ describe('decodeStream', () => {
     const operands = STREAM.tablesEnd + 2
     expect(patched([status, END], operands + 2, [7])).toThrow(/enum/)
     expect(patched([status, END], operands + 1, [6])).toThrow(/slot/)
-    expect(patched([ability, END], operands + 3, [2])).toThrow(/flag/)
+    expect(patched([...LEADS, ability, END], AFTER_LEADS + 2 + 3, [2])).toThrow(/flag/)
   })
 
   it('refuses a max HP the game bar cannot drop to, as the ROM does (0x7FFF and up)', () => {
@@ -144,30 +144,43 @@ describe('decodeStream', () => {
     expect(decoded.parties.far[4]).not.toBeNull()
   })
 
+  it('refuses a MOVE before any SEND_OUT, as the ROM does (#18)', () => {
+    const move: Instruction = { op: 'move', user: 'near', target: 'far', move: 1 }
+    expect(() => decodeStream(rawBytes([{ op: 'intro' }, move, END]))).toThrow(
+      'move at 1 names the near side, which has no battler out',
+    )
+    expect(decodeStream(rawBytes([...LEADS, move, END]))).toEqual(streamWithLeads([move, END]))
+  })
+
   it('refuses a side whose party holds no mon', () => {
     const empty = Array<number>(STREAM.partySize * MON.size).fill(0)
     expect(patched([END], monOffset('near', 0), empty)).toThrow(/the near party holds no mon/)
   })
 
   it('refuses a slot operand that names an empty slot', () => {
-    const operands = STREAM.tablesEnd + 2
-    const ops: readonly Instruction[] = [
-      { op: 'sendOut', side: 'near', slot: 0, hp: 100, status: 'none' },
-      { op: 'switchIn', side: 'near', slot: 1, hp: 100, status: 'none' },
-      { op: 'status', side: 'near', slot: 0, status: 'brn' },
-      { op: 'item', side: 'near', slot: 1, item: 1 },
+    // Each op after the instructions the order rules ask before it.
+    const intro: Instruction = { op: 'intro' }
+    const withdraw: Instruction = { op: 'withdraw', side: 'near' }
+    const cases: [readonly Instruction[], Instruction][] = [
+      [[intro], { op: 'sendOut', side: 'near', slot: 0, hp: 100, status: 'none' }],
+      [[...LEADS, withdraw], { op: 'switchIn', side: 'near', slot: 1, hp: 100, status: 'none' }],
+      [[], { op: 'status', side: 'near', slot: 0, status: 'brn' }],
+      [[], { op: 'item', side: 'near', slot: 1, item: 1 }],
     ]
-    for (const instruction of ops) {
-      expect(patched([instruction, END], operands + 1, [2]), instruction.op).toThrow(
+    for (const [before, instruction] of cases) {
+      const slot = STREAM.tablesEnd + before.flatMap(encodeInstruction).length + 3
+      expect(patched([...before, instruction, END], slot, [2]), instruction.op).toThrow(
         new RegExp(`${instruction.op} names near slot 2, which holds no mon`),
       )
     }
+    const operands = STREAM.tablesEnd + 2
+    const ops = cases.map(([, instruction]) => instruction)
     const far = patched([{ ...ops[2], side: 'far' } as Instruction, END], operands + 1, [5])
     expect(far().instructions[0]).toEqual({ op: 'status', side: 'far', slot: 5, status: 'brn' })
   })
 
   it('refuses a move, ability or item number at or above its count, as the ROM does', () => {
-    const operands = STREAM.tablesEnd + 2
+    const operands = AFTER_LEADS + 2
     const move: Instruction = { op: 'move', user: 'far', target: 'near', move: 1 }
     const ability: Instruction = { op: 'ability', side: 'near', ability: 1, show: true }
     const item: Instruction = { op: 'item', side: 'far', slot: 0, item: 1 }
@@ -177,9 +190,11 @@ describe('decodeStream', () => {
       [item, 2, counts.ITEMS_COUNT, /item item 874/],
     ]
     for (const [instruction, at, count, message] of cases) {
-      expect(patched([instruction, END], operands + at, u16(count))).toThrow(message)
-      const decoded = patched([instruction, END], operands + at, u16(count - 1))()
-      expect(decoded.instructions[0], instruction.op).toMatchObject({ op: instruction.op })
+      expect(patched([...LEADS, instruction, END], operands + at, u16(count))).toThrow(message)
+      const decoded = patched([...LEADS, instruction, END], operands + at, u16(count - 1))()
+      expect(decoded.instructions[LEADS.length], instruction.op).toMatchObject({
+        op: instruction.op,
+      })
     }
   })
 

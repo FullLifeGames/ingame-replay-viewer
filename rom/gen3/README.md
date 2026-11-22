@@ -31,7 +31,7 @@ The ROM interpreter (`src/replay_interpreter.c`, `src/replay_setup.c`) plays an 
 - 0002 hides the near side's HP numbers while a replay runs.
 - 0003 makes the ROM boot straight into it. `src/replay_boot.c` starts the stream in the replay slot with no save file and no button press, and shows a dark red screen when the interpreter refuses the stream.
 
-`src/replay_stream_check.c` checks the whole stream before a battle starts, and `src/replay_stream.c` reads it. The ops share `include/replay_ops.h` with the main loop:
+`src/replay_stream_check.c` checks the whole stream before a battle starts, in two passes: first each instruction alone, then the order rules in the header comment of `include/replay_stream.h` (no MOVE before its user is sent out, no HP for a side whose battler fainted, and the rest). `src/replay_stream.c` reads the stream. The ops share `include/replay_ops.h` with the main loop:
 
 - END, TURN, PRINT, FLUSH_TEXT_BOX, INTRO and SEND_OUT: the main loop, `src/replay_interpreter.c`. FLUSH_TEXT_BOX empties the text box as a battle script's `flushtextbox` does, before each later hit of a multi-hit move; ITEM_POP_UP starts with the same flush.
 - MOVE, HIT, HP and FAINT: `src/replay_ops_damage.c`
@@ -48,7 +48,7 @@ The tests in `test/replay_*.c` use `include/test/replay_test.h`:
 
 - `REPLAY_TEST(name)` writes a stream in its `STREAM` block with the `ReplayStream_*` writer (`test/replay_stream_writer.c`), queues the events it expects in `SCENE` with upstream's matchers (`MESSAGE`, `HP_BAR`, `ANIMATION` and the rest), and checks the battle in `THEN`, after END and before the test leaves the battle, so the parties, `gBattleStruct` and the sprites are still there.
 - `ReplayTest_KOAnimsAtOpStart(op)` returns the KO animation counter at the start of op `op`, counted from 0, for the first 32 ops of the stream. The interpreter records it through the hook `ReplayTest_AtOpStart`, which exists in test builds (`TESTING`).
-- A plain `TEST` whose name starts with `Replay:` checks a refusal with `Replay_Validate`, without a battle.
+- A plain `TEST` whose name starts with `Replay:` checks a refusal with `Replay_Validate`, without a battle. The order cases in `test/replay_refuse_order.c` start with `Replay: order:`. `src/gen3/stream/order.test.ts` holds the same cases with the same ops and verdicts, and fails when a case is on one side only.
 
 ## Screenshots
 

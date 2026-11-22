@@ -12,7 +12,7 @@ import {
   type StreamMon,
   TRAINER_FIELDS,
 } from './instructions'
-import { DUGTRIO, streamOf } from './testing'
+import { DUGTRIO, streamOf, streamWithLeads } from './testing'
 
 const END: Instruction = { op: 'end', outcome: 'nearWon' }
 
@@ -55,6 +55,14 @@ describe('encodeStream', () => {
     expect(() => encodeStream(streamOf([]))).toThrow(Gen3Error)
     expect(() => encodeStream(streamOf([END, { op: 'intro' }]))).toThrow(/END/)
     expect(() => encodeStream(streamOf([END, END]))).toThrow(/END/)
+  })
+
+  it('refuses a MOVE before any SEND_OUT, as the ROM does (#18)', () => {
+    const move: Instruction = { op: 'move', user: 'near', target: 'far', move: 1 }
+    expect(() => encodeStream(streamOf([{ op: 'intro' }, move, END]))).toThrow(
+      'move at 1 names the near side, which has no battler out',
+    )
+    expect(() => encodeStream(streamWithLeads([move, END]))).not.toThrow()
   })
 
   it('refuses a party that is not six slots', () => {

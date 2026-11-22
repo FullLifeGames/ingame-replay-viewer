@@ -1,6 +1,17 @@
 // The instruction stream, version 2 (plan §2): the numbers both sides of the seam share. The C
 // side is rom/gen3/include/replay_stream.h; format.test.ts holds the two equal, name by name
 // (`OP.sendOut` is REPLAY_OP_SEND_OUT). The stream is little-endian; it starts with its version.
+//
+// The order rules (#18): a stream that breaks one is refused by the encoder, the decoder
+// (order.ts) and the ROM's validator alike.
+// 1. INTRO comes at most once, as the first instruction.
+// 2. SEND_OUT needs INTRO before it and a side that has had no battler out yet.
+// 3. SWITCH_IN needs a side whose battler left by WITHDRAW or FAINT.
+// 4. Each side operand of the ops in ORDER.onFieldOps names a side with a battler out; WITHDRAW
+//    and FAINT take it off. An ANIM of ORDER.freeAnims is free: the game plays the weather
+//    animations with no battler out, after a double KO.
+// 5. Every other op is free: PRINT, TURN, WEATHER, END, FLUSH_TEXT_BOX, and STATUS and ITEM,
+//    which name a party slot (Heal Bell reaches the whole party).
 import type { BoostID, StatusName } from '@pkmn/data'
 
 import type { Side } from '../../script/types'
@@ -172,3 +183,11 @@ export const ANIM = {
   statusFrz: 16,
   simpleHeal: 17,
 } as const
+
+/**
+ * The masks of the order rules, as bits by OP and ANIM number: the ops whose side operands name a
+ * side with a battler out (WITHDRAW, MOVE, HIT, HP, FAINT, STAT, ANIM, VOLATILE, ABILITY,
+ * ITEM_POP_UP, TRAP_TURN), and the four weather anims that need none. order.test.ts holds each
+ * mask equal to the OR of those names.
+ */
+export const ORDER = { onFieldOps: 0xdb7a0, freeAnims: 0xf0 } as const
