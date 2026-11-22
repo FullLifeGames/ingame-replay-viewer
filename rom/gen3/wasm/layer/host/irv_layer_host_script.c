@@ -18,8 +18,9 @@
 //                                       per pixel, irv_render.h)
 //  11 psgreset rate                    (IrvPsg_Reset)
 //  12 psgframe count                   (IrvPsg_Frame; appends its count pairs of floats)
-//  13 sound   call a b                 (HostSoundCall, irv_layer_host_mp2k.c; appends its result
-//                                       word if it gives one)
+//  13 sound   call a b                 (HostSoundCall, irv_layer_host_mp2k.c: 0 the players, 1-4
+//                                       the sequencer's calls, 5 SoundMain, 6 m4aSoundVSync,
+//                                       7 SoundMainBTM; appends its result word if it gives one)
 // The result holds the handler's calls in its upper half and the OR of their flags in its lower.
 #include <stdlib.h>
 #include <string.h>

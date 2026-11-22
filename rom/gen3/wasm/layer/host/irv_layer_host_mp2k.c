@@ -11,18 +11,35 @@
 //   CgbOscOff          appends the channel number to the log at HOST_LOG
 //   ply_xcmd           the XCMD sub-commands xRELE, xIECV, xIECL, xWAIT and 0x0D (MP2K spec 3)
 //   FadeOutBody        nothing
+//   IrvSound_HandOver  writes the pair count, the rate and the pairs at HOST_AUDIO
 #include <string.h>
 #include "irv_layer_host.h"
 #include "irv_mp2k.h"
 
 #define HOST_LOG     0x0203F000
 #define HOST_LOG_MAX 15
+#define HOST_AUDIO   0x02040000
+#define HOST_PAIRS   1584
 
 // MP2K spec 2.6, gClockTable.
 const uint8_t gClockTable[] = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
     28, 30, 32, 36, 40, 42, 44, 48, 52, 54, 56, 60, 64, 66, 68, 72, 76, 78, 80, 84, 88, 90, 92, 96,
 };
+
+// MP2K spec 2.5, gDeltaEncodingTable.
+const int8_t gDeltaEncodingTable[] = { 0, 1, 4, 9, 16, 25, 36, 49, -64, -49, -36, -25, -16, -9, -4, -1 };
+
+void IrvSound_HandOver(const float *pairs, uint32_t count, int32_t rate)
+{
+    uint32_t *words = IRV_PTR(HOST_AUDIO);
+
+    if (count > HOST_PAIRS)
+        Fail("a frame of more sound pairs than the harness keeps");
+    words[0] = count;
+    words[1] = (uint32_t)rate;
+    memcpy(&words[2], pairs, count * 2 * sizeof(float));
+}
 
 static void HostCgbOscOff(uint8_t chan);
 static uint32_t HostMidiKeyToCgbFreq(uint8_t chan, uint8_t key, uint8_t fine);
@@ -238,6 +255,15 @@ bool HostSoundCall(uint32_t call, uint32_t a, uint32_t b, uint32_t *result)
     case 4:
         *result = umul3232H32(a, b);
         return true;
+    case 5:
+        SoundMain();
+        return false;
+    case 6:
+        m4aSoundVSync();
+        return false;
+    case 7:
+        SoundMainBTM(IrvSound_Ptr(a));
+        return false;
     default:
         Fail("an unknown sound call in the script");
     }

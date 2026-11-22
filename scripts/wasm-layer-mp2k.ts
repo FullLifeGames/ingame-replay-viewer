@@ -5,8 +5,8 @@
 import { load, type Op, read, runScript, wordBytes } from './wasm-layer-script.ts'
 
 export const ID = 0x68736d53
-const SOUND_INFO_POINTER = 0x03007ff0
-const SOUND_INFO = 0x03000000
+export const SOUND_INFO_POINTER = 0x03007ff0
+export const SOUND_INFO = 0x03000000
 const CHANS = SOUND_INFO + 0x50
 const CGB_CHANS = 0x03001000
 const JUMP_TABLE = 0x03001200
@@ -90,6 +90,8 @@ export interface Scene {
   before?: Readonly<Record<number, readonly Op[]>>
   /** Bytes read back after each frame besides the engine's. */
   probe?: { at: number; length: number }
+  /** Each frame runs m4aSoundVSync and SoundMain (calls 6 and 5) instead of the players alone. */
+  mixer?: boolean
 }
 
 type Kind = 'u8' | 's8' | 'u16' | 'u32'
@@ -103,6 +105,7 @@ const CHANNEL_FIELDS = {
   attack: [0x04, 'u8'],
   release: [0x07, 'u8'],
   key: [0x08, 'u8'],
+  envelope: [0x09, 'u8'],
   echoVolume: [0x0c, 'u8'],
   echoLength: [0x0d, 'u8'],
   gate: [0x10, 'u8'],
@@ -261,7 +264,8 @@ function setup(scene: Scene): Op[] {
 /**
  * The harness's sound calls (operation 13): 0 the players' frame as SoundMain runs it
  * (MPlayMainHead on musicPlayerHead), 1 MPlayJumpTableCopy(a), 2 TrackStop(a, b),
- * 3 RealClearChain(a), 4 umul3232H32(a, b), which appends its result word.
+ * 3 RealClearChain(a), 4 umul3232H32(a, b), which appends its result word, 5 SoundMain,
+ * 6 m4aSoundVSync, 7 SoundMainBTM(a).
  */
 export const sound = (call: number, a = 0, b = 0): Op => [13, call, a, b]
 
@@ -279,7 +283,8 @@ export function runSound(host: string, scene: Scene, frames: number): Frame[] {
   const frameBytes = reads.reduce((sum, op) => sum + (op[2] as number), 0)
   const ops = setup(scene)
   for (let frame = 0; frame < frames; frame++) {
-    ops.push(...(scene.before?.[frame] ?? []), sound(0), ...reads)
+    const run = scene.mixer === true ? [sound(6), sound(5)] : [sound(0)]
+    ops.push(...(scene.before?.[frame] ?? []), ...run, ...reads)
   }
   const { dest } = runScript(host, ops, frames * frameBytes)
   return Array.from({ length: frames }, (_, frame) =>

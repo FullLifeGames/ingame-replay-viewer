@@ -83,7 +83,21 @@ uint32_t IrvSound_ChannelFrequency(const struct IrvSoundChannel *chan, const str
 // irv_mp2k_commands.c: clearing the LFO (MP2K spec 3, "Clearing the LFO").
 void IrvSound_ClearLfo(struct IrvSoundTrack *track);
 
-// The engine's names, as the game declares them (MP2K spec 1).
+// irv_mp2k_mixer.c: one DirectSound channel's frame, its envelope and its samples added to the
+// segment's right and left halves (MP2K spec 6.4, 6.5).
+void IrvSound_MixChannel(struct IrvSoundChannel *chan, uint32_t index, int8_t *right, int8_t *left);
+
+// The host's audio import: `count` pairs of floats (left, right) at `rate` pairs per second. The
+// glue defines it in the module (irv_wasm_sound.c), the harness on the host.
+void IrvSound_HandOver(const float *pairs, uint32_t count, int32_t rate);
+
+// The engine's names, as the game declares them (MP2K spec 1). SoundMainBTM takes the pointer
+// that Clear64byte passes through the jump table (MP2K spec 10, O2 (b)): the game's header
+// declares it without one, and a function pointer in WebAssembly is called with the type the
+// caller gives.
+void SoundMain(void);
+void SoundMainBTM(void *ptr);
+void m4aSoundVSync(void);
 uint32_t umul3232H32(uint32_t multiplier, uint32_t multiplicand);
 void MPlayMain(struct IrvSoundPlayer *player);
 void MPlayJumpTableCopy(uint32_t *table);
@@ -116,6 +130,7 @@ void TrkVolPitSet(struct IrvSoundPlayer *player, struct IrvSoundTrack *track);
 void FadeOutBody(struct IrvSoundPlayer *player);
 uint32_t MidiKeyToFreq(struct IrvSoundWave *wave, uint8_t key, uint8_t fine);
 extern const uint8_t gClockTable[];
+extern const int8_t gDeltaEncodingTable[];
 extern const uint32_t gMPlayJumpTableTemplate[];
 
 #endif // GUARD_IRV_MP2K_H

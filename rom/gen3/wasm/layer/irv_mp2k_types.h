@@ -21,6 +21,8 @@
 // MP2K spec 2.2: the voice's type byte.
 #define IRV_VOICE_PSG   0x07
 #define IRV_VOICE_FIX   0x08
+#define IRV_VOICE_REV   0x10
+#define IRV_VOICE_CMP   0x20
 #define IRV_VOICE_SPLIT 0x40
 #define IRV_VOICE_DRUMS 0x80
 
@@ -29,6 +31,7 @@
 #define IRV_CHANNEL_STOP  0x40
 #define IRV_CHANNEL_ECHO  0x04
 #define IRV_CHANNEL_PHASE 0x03
+#define IRV_CHANNEL_LOOP  0x10
 #define IRV_CHANNEL_ON    (IRV_CHANNEL_START | IRV_CHANNEL_STOP | IRV_CHANNEL_ECHO | IRV_CHANNEL_PHASE)
 
 // MP2K spec 4.4: a PSG channel's changes for the game's CgbSound.
@@ -44,6 +47,10 @@
 #define IRV_TRACK_START         0x40
 #define IRV_TRACK_EXIST         0x80
 #define IRV_PLAYER_PAUSE        0x80000000u
+
+// MP2K spec 2.4: the sample loops when its flags byte (offset 3, the high byte of `status`) has
+// one of these bits.
+#define IRV_WAVE_LOOP 0xC000
 
 // MP2K spec 2.4 (struct WaveData): the sample header; the samples follow.
 struct IrvSoundWave
