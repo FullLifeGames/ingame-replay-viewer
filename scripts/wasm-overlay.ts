@@ -81,6 +81,16 @@ function apply(set: CopySet, patch: Patch): void {
   }
 }
 
+// git apply skips a path it resolves outside its cwd and still exits 0 (review W2), so each file a
+// patch names must differ from its source afterwards.
+function checkChanged(set: CopySet, patches: readonly Patch[]): void {
+  for (const file of new Set(patches.flatMap((patch) => patch.files))) {
+    if (!readFileSync(join(set.to, file)).equals(readFileSync(join(set.from, file)))) continue
+    const names = patches.filter((patch) => patch.files.includes(file)).map((patch) => patch.name)
+    throw new Error(`${names.join(', ')} left ${file} as it was in ${set.to}`)
+  }
+}
+
 // Returns the copied files, relative to both folders.
 export function prepareCopies(set: CopySet): string[] {
   checkRemovable(set.roots, set.to)
@@ -93,5 +103,6 @@ export function prepareCopies(set: CopySet): string[] {
   }
   mkdirSync(set.to, { recursive: true })
   for (const patch of patches) apply(set, patch)
+  checkChanged(set, patches)
   return files
 }

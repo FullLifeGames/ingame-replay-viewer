@@ -7,11 +7,13 @@ import {
   rmSync,
   writeFileSync,
 } from 'node:fs'
+import { spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 
 import { afterAll, describe, expect, it } from 'vitest'
 
+import { withoutGitVariables } from './rom-git.ts'
 import { patchedFiles, prepareCopies } from './wasm-overlay.ts'
 import type { CopySet } from './wasm-overlay.ts'
 
@@ -112,6 +114,25 @@ describe('the patched copies', () => {
   it('refuse a patch of a file outside the list', () => {
     const set = layout({ '0001-a.patch': patch('src/a.c', 'int a;', 'int a2;') }, ['src/b.c'])
     expect(() => prepareCopies(set)).toThrow(/0001-a\.patch changes src\/a\.c, which .* lacks/)
+  })
+
+  // build/wasm lies inside our repository. There git apply resolves a/src/a.c from the
+  // repository's root, skips it and exits 0, unless a ceiling stops its search (review W2).
+  it('patch the copies when the build folder lies inside a git repository', () => {
+    const set = layout({ '0001-a.patch': patch('src/a.c', 'int a;', 'int a2;') })
+    const base = dirname(set.from)
+    const init = spawnSync('git', ['init', '-q'], {
+      cwd: base,
+      env: withoutGitVariables(process.env),
+    })
+    expect(init.status).toBe(0)
+    expect(prepareCopies(set)).toEqual(['src/a.c'])
+    expect(readFileSync(join(set.to, 'src', 'a.c'), 'utf8')).toBe('int a2;\n')
+  })
+
+  it('stop when a patch applies and leaves its file as it was', () => {
+    const set = layout({ '0001-a.patch': patch('src/a.c', 'int a;', 'int a;') })
+    expect(() => prepareCopies(set)).toThrow(/0001-a\.patch left src\/a\.c as it was/)
   })
 
   it('refuse a patch that does not apply and name it', () => {
