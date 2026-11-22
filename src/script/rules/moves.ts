@@ -63,10 +63,16 @@ export const MOVE_RULES = {
     ],
   },
   '|-immune|': {
-    arity: 1,
+    arity: 2,
     reads: ['from', 'of'],
-    build: ({ line, args: [, who], kwArgs, battle }) => [
-      { kind: 'immune', line, who: refOf(battle, who, line), ...causeOf(kwArgs, battle, line) },
+    build: ({ line, args: [, who, effect], kwArgs, battle }) => [
+      {
+        kind: 'immune',
+        line,
+        who: refOf(battle, who, line),
+        ...(effect ? { effect: effectOf(effect) } : {}),
+        ...causeOf(kwArgs, battle, line),
+      },
     ],
   },
   '|-block|': {

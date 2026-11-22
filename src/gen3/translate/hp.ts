@@ -6,6 +6,7 @@
 import { toID } from '@pkmn/dex'
 
 import type { ScriptEvent } from '../../script/events'
+import type { PokemonRef } from '../../script/types'
 import type { Anim } from '../stream/instructions'
 import { critical, effective } from '../text/phrases'
 import { healed, hurt, isTrapping, wishCameTrue } from '../text/phrases-hp'
@@ -108,4 +109,13 @@ function play(steps: readonly Step[], event: HpEvent, ctx: Context, text: PrintT
 
 export function bar({ who, line, hp }: HpEvent, ctx: Context): void {
   ctx.emit(line, { op: 'hp', side: ctx.activeSide(who), hp: scaleHp(hp) })
+}
+
+/**
+ * Empties the bar of a Pokémon that faints with no HP line in the log: Destiny Bond's attacker
+ * and a perish count at 0. The expansion drains the bar before these faints
+ * (`BattleScript_DestinyBondTakesLife`, `BattleScript_PerishSongTakesLife`).
+ */
+export function drain(who: PokemonRef, line: number, ctx: Context): void {
+  ctx.emit(line, { op: 'hp', side: ctx.activeSide(who), hp: 0 })
 }

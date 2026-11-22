@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
 import { moveOf } from '../tables/lookup'
-import { plain, sceneOf, streamOfLog } from '../testing'
+import { plain, popUp, sceneOf, streamOfLog } from '../testing'
 
 const EARTHQUAKE = moveOf('Earthquake').number
 const earthquake = '|move|p1a: Dugtrio|Earthquake|p2a: Tyranitar'
@@ -62,7 +62,10 @@ describe('moves', () => {
       '|move|p1a: Dugtrio|Substitute|p1a: Dugtrio',
       '|-fail|p1a: Dugtrio|move: Substitute',
     )
-    expect(substitute.map(plain)).not.toContainEqual(expect.objectContaining({ op: 'move' }))
+    expect(substitute.map(plain)).toEqual([
+      'Dugtrio used Substitute!',
+      'Dugtrio already has a substitute!',
+    ])
   })
 
   it('plays no animation for a Substitute that the user has too little HP for', () => {
@@ -81,6 +84,61 @@ describe('moves', () => {
     expect(scene.map(plain)).toEqual([
       'Dugtrio used Earthquake!',
       "It doesn't affect the opposing Tyranitar…",
+    ])
+  })
+
+  // #36: the expansion's `CanAbilityAbsorbMove` takes the move in before `attackanimation`.
+  it.each([
+    ['Thunderbolt', 'Volt Absorb'],
+    ['Surf', 'Water Absorb'],
+  ])('plays no animation for a %s that %s takes in below full HP', (name, ability) => {
+    const scene = sceneOf(
+      `|move|p1a: Dugtrio|${name}|p2a: Tyranitar`,
+      `|-heal|p2a: Tyranitar|60/100|[from] ability: ${ability}|[of] p1a: Dugtrio`,
+    )
+    expect(scene.map(plain)).toEqual([
+      `Dugtrio used ${name}!`,
+      popUp('far', ability, true),
+      { op: 'hp', side: 'far', hp: 60 },
+      'The opposing Tyranitar had its HP restored.',
+      popUp('far', ability, false),
+    ])
+  })
+
+  // #36, "at full HP": Showdown logs an immunity there, which plays no animation already.
+  it.each([
+    ['Thunderbolt', 'Volt Absorb'],
+    ['Surf', 'Water Absorb'],
+  ])('plays no animation for a %s that %s takes in at full HP', (name, ability) => {
+    const scene = sceneOf(
+      `|move|p1a: Dugtrio|${name}|p2a: Tyranitar`,
+      `|-immune|p2a: Tyranitar|[from] ability: ${ability}`,
+    )
+    expect(scene.map(plain)).toEqual([
+      `Dugtrio used ${name}!`,
+      popUp('far', ability, true),
+      "It doesn't affect the opposing Tyranitar…",
+      popUp('far', ability, false),
+    ])
+  })
+
+  it("plays the animation of a move whose user heals by an ability, not its target's", () => {
+    const scene = sceneOf(
+      earthquake,
+      '|-heal|p1a: Dugtrio|60/100|[from] ability: Volt Absorb',
+      '|-damage|p2a: Tyranitar|50/100',
+    )
+    expect(scene.map(plain).slice(0, 2)).toEqual([
+      'Dugtrio used Earthquake!',
+      { op: 'move', user: 'near', target: 'far', move: EARTHQUAKE },
+    ])
+  })
+
+  it('plays the animation of a move followed by a heal of its target by an item', () => {
+    const scene = sceneOf(earthquake, '|-heal|p2a: Tyranitar|60/100|[from] item: Leftovers')
+    expect(scene.map(plain).slice(0, 2)).toEqual([
+      'Dugtrio used Earthquake!',
+      { op: 'move', user: 'near', target: 'far', move: EARTHQUAKE },
     ])
   })
 

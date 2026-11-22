@@ -59,6 +59,8 @@ export class Context {
   leads: Leads | undefined
   /** The pop-up of an `-ability` line while it stays up over the events after it. */
   popUp: PopUp | undefined
+  /** The Destiny Bond line whose holder takes its attacker down; the attacker's faint plays it. */
+  takenDown: (EventOf<'effectActivate'> & { readonly who: PokemonRef }) | undefined
   /** The index in `script.events` of the event in hand; the walk sets it. */
   at = 0
   /** The Pokémon whose move the log shows last; its own HP loss is no hit. */

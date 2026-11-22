@@ -7,7 +7,7 @@ Decisions from the design session on 2026-11-20 that are not ADRs, plus the road
 - **Audience**: a public web tool on fulllifegames.com/Tools/. The user brings their own ROM (ADR 0002). Development runs on devbox, watched over Tailscale.
 - **Target game order**: pokeemerald-expansion first, then Black 2/White 2, later a Gen 5 counterpart of the expansion, then 3D (ADR 0003).
 - **Scope order**: era-matched replays first on each target game, newer formats after. Singles before doubles.
-- **Game-side code**: no forks (ADR 0007). Gen 3 replays go into the ROM image before the game starts (ADR 0008).
+- **Game-side code**: no forks (ADR 0007). Gen 3 replays go into the game's memory before it starts (ADR 0009); the emulator page, the fallback, writes them into the ROM image (ADR 0008).
 - **Battle text**: BW2 uses its own message banks; Gen 3 starts with finished text from outside (ADR 0005).
 - **Replay input (v1)**: a replay URL or ID from replay.pokemonshowdown.com, or an uploaded file (Showdown's downloaded replay HTML, or a raw log). The browser fetches the replay JSON directly; no proxy is needed.
 - **Viewer controls (v1)**: play/pause, speed (1×/2×/fast), restart, and a small panel with player names and the turn number. Player 1 is always the near side.
@@ -27,7 +27,7 @@ Decisions from the design session on 2026-11-20 that are not ADRs, plus the road
   Every fallback is listed next to the dropped lines.
 
 - **Test replays**: real public replays saved as JSON in the repo, picked by hand or through Showdown's replay search, never from the MatchChecker crawl data. Each gets a snapshot test of its battle script and a check that every line is either shown or dropped.
-- **Gen 3 emulator**: `@thenick775/mgba-wasm` in the browser, unchanged. Native headless mGBA for tests on devbox: `mgba-rom-test` runs the expansion's `make check`, and the screenshot checks run on the system's libmgba. Milestone 1b decides whether a WebAssembly build of the expansion replaces the emulator before going public. Gen 5 stays on an emulator either way, because BW2 draws its battles with the DS's 3D chip and runs its sound on a second processor.
+- **Gen 3 emulator**: `@thenick775/mgba-wasm` in the browser, unchanged. Native headless mGBA for tests on devbox: `mgba-rom-test` runs the expansion's `make check`, and the screenshot checks run on the system's libmgba. Milestone 1b showed that a WebAssembly build of the expansion runs in the browser without an emulator (`docs/wasm-spike.md`), and milestone 2 ships it (wave 3 gate, 22.11.2026). mGBA stays as the fallback page until our own platform layer passes the screenshot scenes (#43). Gen 5 stays on an emulator either way, because BW2 draws its battles with the DS's 3D chip and runs its sound on a second processor.
 - **Testing inside the ROM**: the expansion's own headless test runner (`make check`) feeds instruction streams to the ROM interpreter and checks what was shown. A few headless-emulator screenshot checks cover the whole pipeline. These are heavy checks on devbox and run one at a time.
 - **Repo layout**: this repo holds the code outside the ROM, our ROM-side files and their list of changes against pinned upstream, the docs, and the build. Nintendo assets never enter it.
 - **License**: MIT for this repo (ADR 0006).
@@ -50,12 +50,12 @@ Decisions from the design session on 2026-11-20 that are not ADRs, plus the road
    The first test replays are about five ADV OU replays from Smogon tournaments.
 
    **1b. WebAssembly spike.** A time-boxed attempt to compile the expansion straight to WebAssembly, so it runs in the browser without an emulator. It would borrow pokeemerald-multiplatform's platform layer (a software graphics renderer, a sound mixer, DMA and the BIOS calls). That layer carries no licence as a whole: the fork's MIT grant covers only its own changes, and the files come from Kurausukun's PC port, which has no licence (`docs/wasm-spike.md`, "Licences").
-   - If it works, milestone 2 ships the WebAssembly build. Nintendo's assets then come from the user's ROM (ADR 0002 amended), and the page hands the instruction stream to the game directly instead of through the replay slot (ADR 0008 replaced).
-   - If it doesn't, milestone 2 ships the emulator plus a patch.
+   - Result (wave 3, 22.11.2026): it works. Both test streams play from boot to the end in Chromium with sound, and the 13 screenshot scenes match mGBA's. Milestone 2 ships the WebAssembly build. The module patch carries what the ROM patch carries (ADR 0002 amended), and the worker writes the stream into the replay slot in the module's memory (ADR 0009). A public build needs a platform layer of our own (#43).
    - Reference only: tripplyons/pokeemerald-wasm (vanilla, no license file).
 
 2. **Gen 3 web tool v1.** Public on fulllifegames.com/Tools/, with replay URL and upload, the v1 controls and presentation, and Gen 1–3 singles formats.
-   - Open: how it is deployed to vserver, including the COOP/COEP headers the emulator needs.
+   - Ships the WebAssembly build, with the emulator page as the fallback until #43 is done. Milestone 2 closes every open Gen 3 issue before the work moves on (user, 22.11.2026).
+   - Open: how it is deployed to vserver, including the COOP/COEP headers the page needs for `SharedArrayBuffer`.
 3. **Newer formats on Gen 3.** Gen 4–9 singles, including Tera, Mega Evolution, Z-Moves and Dynamax.
    - Open: which formats besides Gen 9 OU come first.
 4. **Doubles on Gen 3.** VGC, including Champions formats with open team sheets.

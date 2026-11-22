@@ -4,6 +4,8 @@ import { NEXT } from '../../script/testing'
 import { plain, sceneOf, streamOfLog } from '../testing'
 
 const any = expect.any(Number) as number
+const fallbacksOf = (...lines: string[]) =>
+  streamOfLog(...lines).fallbacks.filter(({ line }) => line >= NEXT)
 const substitute = (on: boolean) => ({ op: 'volatile', side: 'near', volatile: 'substitute', on })
 
 describe('Substitute (X12)', () => {
@@ -140,5 +142,65 @@ describe('other effects on one Pokémon', () => {
       { line: NEXT, kind: 'mechanic', detail: 'no state in the stream for perish3 starting' },
       { line: NEXT + 1, kind: 'mechanic', detail: 'no state in the stream for perish3 ending' },
     ])
+  })
+})
+
+describe('a Pokémon that faints by its effect drains its bar first (#39)', () => {
+  const destinyBond = [
+    '|move|p1a: Dugtrio|Earthquake|p2a: Tyranitar',
+    '|-damage|p2a: Tyranitar|0 fnt',
+    '|-activate|p2a: Tyranitar|move: Destiny Bond',
+    '|faint|p2a: Tyranitar',
+    '|faint|p1a: Dugtrio',
+  ]
+
+  it('says Destiny Bond took the attacker down after the holder faints, then drains it', () => {
+    expect(sceneOf(...destinyBond).map(plain)).toEqual([
+      'Dugtrio used Earthquake!',
+      { op: 'move', user: 'near', target: 'far', move: any },
+      { op: 'hit', side: 'far', effectiveness: 'normal' },
+      { op: 'hp', side: 'far', hp: 0 },
+      { op: 'faint', side: 'far' },
+      'The opposing Tyranitar fainted!',
+      'The opposing Tyranitar took its attacker down with it!',
+      { op: 'hp', side: 'near', hp: 0 },
+      { op: 'faint', side: 'near' },
+      'Dugtrio fainted!',
+    ])
+    expect(fallbacksOf(...destinyBond)).toEqual([])
+  })
+
+  it.each([
+    ['in the turn', ['|turn|2', '|faint|p1a: Dugtrio']],
+    ['in the log', ['|faint|p2a: Tyranitar']],
+  ])('says Destiny Bond at once when no faint of its attacker follows %s', (_, after) => {
+    const scene = sceneOf('|-activate|p2a: Tyranitar|move: Destiny Bond', ...after)
+    expect(scene.map(plain)[0]).toBe('The opposing Tyranitar took its attacker down with it!')
+    expect(scene).not.toContainEqual(expect.objectContaining({ op: 'hp' }))
+  })
+
+  it('drains each bar after its perish count reaches 0, before the faints', () => {
+    const scene = sceneOf(
+      '|-start|p1a: Dugtrio|perish0',
+      '|-start|p2a: Tyranitar|perish0',
+      '|faint|p1a: Dugtrio',
+      '|faint|p2a: Tyranitar',
+    )
+    expect(scene.map(plain)).toEqual([
+      "Dugtrio's perish count fell to 0!",
+      { op: 'hp', side: 'near', hp: 0 },
+      "The opposing Tyranitar's perish count fell to 0!",
+      { op: 'hp', side: 'far', hp: 0 },
+      { op: 'faint', side: 'near' },
+      'Dugtrio fainted!',
+      { op: 'faint', side: 'far' },
+      'The opposing Tyranitar fainted!',
+    ])
+  })
+
+  it('drains no bar for a count above 0', () => {
+    expect(sceneOf('|-start|p1a: Dugtrio|perish1')).not.toContainEqual(
+      expect.objectContaining({ op: 'hp' }),
+    )
   })
 })
