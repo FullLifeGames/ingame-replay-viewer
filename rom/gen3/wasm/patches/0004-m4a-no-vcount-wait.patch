@@ -1,7 +1,9 @@
 SampleFreqSet waits until the display reaches line 159, so timer 0 starts in step with the
 VBlank. In the WebAssembly build VCOUNT moves only inside VBlankIntrWait, so the wait never
-ends and the game hangs in m4aSoundInit before its first frame. The silent build has no timer
-0 to align, so under IRV_WASM the wait goes.
+ends and the game hangs in m4aSoundInit before its first frame. No timer drives the sound in
+the build: the VBlank handler calls m4aSoundMain, whose SoundMain the glue forwards to the
+port's mixer (rom/gen3/wasm/src/irv_wasm_sound.c), once per frame. Timer 0 has nothing to align,
+so under IRV_WASM the wait goes.
 
 diff --git a/src/m4a.c b/src/m4a.c
 index 08f0531..a7f0fff 100644
