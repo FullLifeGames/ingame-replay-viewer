@@ -1,0 +1,43 @@
+event_scripts.s marks a command or a native that requests effects as func + ROM_SIZE,
+and script.c tests the pointer for ROM mirror 1. A wasm table index carries no addend, so
+the data converter writes the plain index and lists the marked functions in
+gIrvWasmEffectFunctions (scripts/wasm-effects.ts). Under IRV_WASM the command check
+searches that list, and Script_MatchesCallNative compares the plain pointer.
+
+diff --git a/src/script.c b/src/script.c
+index 06ea905..aea83c9 100644
+--- a/src/script.c
++++ b/src/script.c
+@@ -623,8 +623,21 @@ struct ScriptEffectContext *gScriptEffectContext = NULL;
+ 
+ static bool32 Script_IsEffectInstrumentedCommand(ScrCmdFunc func)
+ {
++#ifdef IRV_WASM
++    extern const ScrCmdFunc gIrvWasmEffectFunctions[];
++    extern const u32 gIrvWasmEffectFunctionCount;
++    u32 i;
++
++    for (i = 0; i < gIrvWasmEffectFunctionCount; i++)
++    {
++        if (gIrvWasmEffectFunctions[i] == func)
++            return TRUE;
++    }
++    return FALSE;
++#else
+     // In ROM mirror 1.
+     return (((uintptr_t)func) & 0xE000000) == 0xA000000;
++#endif
+ }
+ 
+ /* 'setjmp' and 'longjmp' cause link errors, so we use
+@@ -728,8 +741,10 @@ bool32 Script_MatchesCallNative(const u8 *script, void *funcPtr, bool32 requestE
+         return FALSE;
+     u32 callnativeFunc = (((((script[4] << 8) + script[3]) << 8) + script[2]) << 8) + script[1];
+     u32 targetFunc = (u32)funcPtr;
++#ifndef IRV_WASM
+     if (requestEffects)
+         targetFunc |= 0xA000000;
++#endif
+     if (callnativeFunc == targetFunc)
+         return TRUE;
+     return FALSE;

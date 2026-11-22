@@ -14,6 +14,7 @@ The viewer plays Pokémon Showdown replays back inside real Pokémon games. A ga
 - `src/gen3/`: the Gen 3 game backend (battle script to instruction stream), plain TypeScript.
 - `src/web/`: the pages and the emulator.
 - `rom/gen3/`: our C files and the list of changes against the pinned pokeemerald-expansion. The build scripts are `scripts/rom-*`. The upstream checkout (`.cache/rom/`) and the build outputs (`build/rom/`) stay out of the tracked tree.
+- `rom/gen3/wasm/`: the WebAssembly build of the spike (#35, `docs/wasm-spike.md`): its config, glue C files, shadow headers, and the patches against copies of upstream files and of the borrowed platform layer. The build scripts are `scripts/wasm-*`. The platform layer (`.cache/wasm/`) and the outputs (`build/wasm/`) stay out of the tracked tree.
 - `src/patch/`: the BPS codec that the build and the page share, plain TypeScript.
 - `test/fixtures/replays/`: the test replays as Showdown's replay JSON. Unit specs sit next to their source as `*.test.ts`.
 - `docs/waves/`: one booking per wave.

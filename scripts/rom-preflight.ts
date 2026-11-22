@@ -65,7 +65,7 @@ function memoryProblem(meminfo: string): string | undefined {
   return `only ${gib} GiB of memory available, the ROM build needs ${String(MIN_AVAILABLE / GIB)} GiB; let other heavy checks end first (free -g)`
 }
 
-function baseRomProblem(path: string, expectedSha1: string): string | undefined {
+export function baseRomProblem(path: string, expectedSha1: string): string | undefined {
   if (!existsSync(path)) return `no base ROM at ${path}; set IRV_BASE_ROM to your US Emerald dump`
   const sha1 = createHash('sha1').update(readFileSync(path)).digest('hex')
   if (sha1 === expectedSha1) return undefined

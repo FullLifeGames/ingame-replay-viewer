@@ -18,6 +18,7 @@ describe('the scene points of a decoded instruction list (S6)', () => {
       'near-balls',
       'far-balls',
       'send-outs',
+      'level',
       'weather-start',
       'first-move',
       'first-hp',
@@ -35,6 +36,7 @@ describe('the scene points of a decoded instruction list (S6)', () => {
       'near-balls',
       'far-balls',
       'send-outs',
+      'level',
       'weather-start',
       'first-move',
       'first-hp',
@@ -80,6 +82,53 @@ describe('the scene points of a decoded instruction list (S6)', () => {
       region: SCREEN.nearHpDigits,
       colour: 0xffffde,
     })
+  })
+
+  it('looks for the "Lv" glyph left of the far level digits after the second SEND_OUT', () => {
+    const scene = named(
+      [
+        { op: 'intro' },
+        { op: 'sendOut', side: 'far', slot: 0, hp: 100, status: 'none' },
+        { op: 'sendOut', side: 'near', slot: 0, hp: 100, status: 'none' },
+        { op: 'end', outcome: 'tie' },
+      ],
+      'level',
+    )
+    expect(scene?.shots).toEqual([{ name: 'level', done: 3, frames: 0 }])
+    // Level 100: "Lv" (8 pixels) and three digits of 5 end at x 100, so the glyph starts at 77.
+    expect(scene?.check).toEqual({
+      probe: 'text',
+      shot: 'level',
+      region: { x: 77, y: 21, width: 8, height: 8 },
+    })
+  })
+
+  it('moves the "Lv" glyph right by a digit for each digit the far level lacks', () => {
+    const stream = streamOf([
+      { op: 'sendOut', side: 'far', slot: 1, hp: 100, status: 'none' },
+      { op: 'sendOut', side: 'near', slot: 0, hp: 100, status: 'none' },
+      { op: 'end', outcome: 'tie' },
+    ])
+    const regionAt = (level: number) => {
+      const far = stream.parties.far.map((mon, slot) => (slot === 1 ? { ...DUGTRIO, level } : mon))
+      const scenes = scenesOf({ ...stream, parties: { ...stream.parties, far } })
+      const check = scenes.find((found) => found.name === 'level')?.check
+      return check?.probe === 'text' ? check.region.x : undefined
+    }
+    expect([regionAt(100), regionAt(42), regionAt(7)]).toEqual([77, 82, 87])
+  })
+
+  it('has no level scene without a far SEND_OUT', () => {
+    expect(
+      named(
+        [
+          { op: 'sendOut', side: 'near', slot: 0, hp: 100, status: 'none' },
+          { op: 'sendOut', side: 'near', slot: 1, hp: 100, status: 'none' },
+          { op: 'end', outcome: 'tie' },
+        ],
+        'level',
+      ),
+    ).toBeUndefined()
   })
 
   it('shoots the first move 20 frames into its animation', () => {

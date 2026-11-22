@@ -101,6 +101,23 @@ function sendOutScene(input: Input): Scene | undefined {
   }
 }
 
+// After both send-outs the far healthbox shows "Lv" and the level of the far mon; the probe looks
+// for the "Lv" glyph alone, left of the digits.
+function levelScene(input: Input): Scene | undefined {
+  const sendOuts = input.stream.instructions.flatMap((instruction, at) =>
+    instruction.op === 'sendOut' ? [{ at, instruction }] : [],
+  )
+  const second = sendOuts[1]?.at
+  const far = sendOuts.find(({ instruction }) => instruction.side === 'far')?.instruction
+  const level = far === undefined ? undefined : input.stream.parties.far[far.slot]?.level
+  if (second === undefined || level === undefined) return undefined
+  const { end, y, height, lvWidth, digitWidth } = SCREEN.farLevel
+  const x = end - lvWidth - String(level).length * digitWidth
+  const shot = { name: 'level', done: second + 1, frames: 0 }
+  const region = { x, y, width: lvWidth, height }
+  return { name: shot.name, shots: [shot], check: { probe: 'text', shot: shot.name, region } }
+}
+
 function moveScene(input: Input): Scene | undefined {
   const at = firstOf(input, 'move')
   if (at < 0) return undefined
@@ -205,6 +222,7 @@ const SCENES: readonly (readonly [string, (input: Input) => Scene | undefined])[
   ['near-balls', (input) => ballScene(input.stream, 'near')],
   ['far-balls', (input) => ballScene(input.stream, 'far')],
   ['send-outs', sendOutScene],
+  ['level', levelScene],
   ['weather-start', (input) => weatherScene(input.stream)],
   ['first-move', moveScene],
   ['first-hp', hpScene],

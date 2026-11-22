@@ -20,6 +20,16 @@ describe('environmentProblem', () => {
     expect(line).toContain('Cross-Origin-Embedder-Policy: require-corp')
   })
 
+  // The WebAssembly spike page runs no emulator; its lines name the game instead.
+  it('names what the page runs', () => {
+    for (const isSecureContext of [false, true]) {
+      const environment = { isSecureContext, crossOriginIsolated: false }
+      const line = environmentProblem(environment, 'the game')
+      expect(line).toContain('so the game cannot run')
+      expect(line).not.toContain('emulator')
+    }
+  })
+
   it('has no line for a secure, cross-origin isolated page', () => {
     expect(environmentProblem({ isSecureContext: true, crossOriginIsolated: true })).toBeUndefined()
   })

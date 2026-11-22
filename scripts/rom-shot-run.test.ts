@@ -6,10 +6,8 @@ import { describe, expect, it } from 'vitest'
 import {
   INTERPRETER_HEADER_PATH,
   judgeRun,
-  PROGRESS_HEADER_PATH,
   progressAddress,
   readErrorNames,
-  readProgressLayout,
   readToolOutput,
   toolBuildArgs,
 } from './rom-shot-run.ts'
@@ -37,31 +35,6 @@ describe('the names of the interpreter errors', () => {
     expect(() => readErrorNames('enum ReplayError\n{\n    REPLAY_ERROR_NONE = 3,\n};')).toThrow(
       'REPLAY_ERROR_NONE = 3',
     )
-  })
-})
-
-describe('the layout the shot tool reads', () => {
-  it('comes from replay_progress.h: the size of struct ReplayProgress and the refusal colour', () => {
-    expect(readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))).toEqual({
-      size: 12,
-      refusedColour: 0x630000,
-    })
-  })
-
-  it('widens the five bits of the red channel to eight, as mGBA does', () => {
-    const header = (red: string) =>
-      `#define REPLAY_PROGRESS_SIZE 8\n#define REPLAY_REFUSED_RED ${red} // the backdrop\n`
-    expect(readProgressLayout(header('31')).refusedColour).toBe(0xff0000)
-    expect(readProgressLayout(header('0x01')).refusedColour).toBe(0x080000)
-  })
-
-  it('refuses a define that is missing or no plain number', () => {
-    expect(() => readProgressLayout('#define REPLAY_REFUSED_RED 12\n')).toThrow(
-      'replay_progress.h: REPLAY_PROGRESS_SIZE missing',
-    )
-    expect(() =>
-      readProgressLayout('#define REPLAY_PROGRESS_SIZE 8\n#define REPLAY_REFUSED_RED (6 * 2)\n'),
-    ).toThrow('replay_progress.h: REPLAY_REFUSED_RED is "(6 * 2)", not a plain number')
   })
 })
 

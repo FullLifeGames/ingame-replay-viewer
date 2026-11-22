@@ -1,7 +1,9 @@
-// Nothing from a ROM in the tracked tree (ADR 0002): no ROM, savestate, ELF, patch or screenshot
-// frame by its name, no file that starts with a GBA cartridge header, a BPS, IPS or UPS magic or
-// the magic of a PPM frame (what rom:shots writes), and the build folders stay ignored. The contents come from the index, which is what a commit takes, not from
-// the files on disk.
+// Nothing from a ROM in the tracked tree (ADR 0002): no ROM, savestate, ELF, patch, screenshot
+// frame or WebAssembly module by its name, no file that starts with a GBA cartridge header, a BPS,
+// IPS or UPS magic, the magic of a PPM frame (what rom:shots writes), the wasm magic or the heading
+// of the converter's data assembly (the module and wasm:convert carry the game's data), and the
+// build folders stay ignored. The contents come from the index, which is what a commit takes, not
+// from the files on disk.
 import { execFileSync } from 'node:child_process'
 import { mkdtempSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -9,6 +11,8 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { afterAll, describe, expect, it } from 'vitest'
+
+import { CONVERTED_BY } from './wasm-data-asm.ts'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = execFileSync('git', ['rev-parse', '--show-toplevel'], {
@@ -19,7 +23,7 @@ const root = execFileSync('git', ['rev-parse', '--show-toplevel'], {
 const git = (...args: string[]) => execFileSync('git', args, { cwd: root, encoding: 'utf8' })
 const tracked = git('ls-files', '-z').split('\0').filter(Boolean)
 
-const FORBIDDEN_NAME = /\.(?:gba|agb|bps|ips|ups|sav|srm|elf|nds|ss\w*|state|ppm)$/i
+const FORBIDDEN_NAME = /\.(?:gba|agb|bps|ips|ups|sav|srm|elf|nds|ss\w*|state|ppm|wasm)$/i
 
 // The GBA header: the fixed value 0x96 at 0xB2 and the complement over 0xA0 to 0xBC at 0xBD. The
 // check needs none of the Nintendo logo bytes, so this spec holds nothing taken from a ROM.
@@ -31,6 +35,18 @@ function hasGbaHeader(bytes: Uint8Array): boolean {
   if (bytes.length < HEADER_END || bytes[0xb2] !== 0x96) return false
   const sum = bytes.subarray(0xa0, 0xbd).reduce((total, byte) => total + byte, 0)
   return ((-sum - 0x19) & 0xff) === bytes[0xbd]
+}
+
+const WASM_MAGIC = [0x00, 0x61, 0x73, 0x6d]
+
+function hasWasmMagic(bytes: Uint8Array): boolean {
+  return WASM_MAGIC.every((byte, index) => bytes[index] === byte)
+}
+
+// wasm:convert writes "# data/x.o, converted by ..." as the first line of each data assembly.
+function isConvertedData(bytes: Uint8Array): boolean {
+  const first = new TextDecoder().decode(bytes).split('\n', 1)[0] ?? ''
+  return first.startsWith('# ') && first.endsWith(`, ${CONVERTED_BY}`)
 }
 
 function hasPatchMagic(bytes: Uint8Array): boolean {
@@ -72,7 +88,11 @@ function stagedHeads(repo: string): Staged[] {
 
 const offending = (repo: string) =>
   stagedHeads(repo)
-    .filter(({ head }) => hasGbaHeader(head) || hasPatchMagic(head) || hasFrameMagic(head))
+    .filter(({ head }) =>
+      [hasGbaHeader, hasPatchMagic, hasFrameMagic, hasWasmMagic, isConvertedData].some((check) =>
+        check(head),
+      ),
+    )
     .map(({ path }) => path)
 
 function syntheticHeader(): Uint8Array {
@@ -114,23 +134,38 @@ describe('the check of a repo index', () => {
     writeFileSync(join(repo, name), `${magic}\u0000\u0001`)
   }
   writeFileSync(join(repo, 'frame.dat'), 'P6\n240 160\n255\n\u0000\u0001')
+  writeFileSync(join(repo, 'module.dat'), '\u0000asm\u0001\u0000\u0000\u0000')
+  writeFileSync(join(repo, 'songs.txt'), `# sound/x.o, ${CONVERTED_BY}\n\t.byte\t1\n`)
+  writeFileSync(join(repo, 'about.md'), `# Notes on the files ${CONVERTED_BY} writes\n`)
   execFileSync('git', ['add', '-A'], { cwd: repo })
   unlinkSync(join(repo, 'renamed.txt'))
 
-  it('finds a ROM header and the patch magics under any name, also when the file left the disk', () => {
-    expect(offending(repo)).toEqual(['a.dat', 'b.dat', 'c.dat', 'frame.dat', 'renamed.txt'])
+  it('finds a ROM header, the magics and the data assembly under any name, also when the file left the disk', () => {
+    expect(offending(repo)).toEqual([
+      'a.dat',
+      'b.dat',
+      'c.dat',
+      'frame.dat',
+      'module.dat',
+      'renamed.txt',
+      'songs.txt',
+    ])
   })
 })
 
 describe('the name rule', () => {
-  it.each(['emerald.gba', 'irv-emerald.bps', 'save.sav', 'first-hp.ppm', 'shots/WIN.PPM'])(
-    'refuses %s',
-    (path) => {
-      expect(FORBIDDEN_NAME.test(path)).toBe(true)
-    },
-  )
+  it.each([
+    'emerald.gba',
+    'irv-emerald.bps',
+    'save.sav',
+    'first-hp.ppm',
+    'shots/WIN.PPM',
+    'build/wasm/irv-emerald.wasm',
+  ])('refuses %s', (path) => {
+    expect(FORBIDDEN_NAME.test(path)).toBe(true)
+  })
 
-  it.each(['notes.md', 'ppm.ts', 'rom-shot-probes.ts'])('takes %s', (path) => {
+  it.each(['notes.md', 'ppm.ts', 'rom-shot-probes.ts', 'wasm-run.ts'])('takes %s', (path) => {
     expect(FORBIDDEN_NAME.test(path)).toBe(false)
   })
 })
@@ -140,7 +175,7 @@ describe('the tracked tree', () => {
     expect(tracked.filter((path) => FORBIDDEN_NAME.test(path))).toEqual([])
   })
 
-  it('holds no file that starts with a GBA header, a patch magic or a frame magic', () => {
+  it('holds no file that starts with a GBA header, a patch, frame or wasm magic, or data assembly', () => {
     expect(stagedHeads(root).length).toBeGreaterThan(0)
     expect(offending(root)).toEqual([])
   })
@@ -153,6 +188,11 @@ describe('the tracked tree', () => {
     'build/rom/shots/994052/first-hp.ppm',
     'build/rom/shots/994052.gba',
     'build/rom/check.log',
+    'build/wasm/irv-emerald.wasm',
+    'build/wasm/irv-emerald-wasm.bps',
+    'build/wasm/asm/data/battle_scripts_1.s',
+    'build/wasm/asm/data/battle_scripts_1.o',
+    '.cache/wasm/platform/src/platform/bios.c',
   ])('ignores %s', (path) => {
     expect(git('check-ignore', path).trim()).toBe(path)
   })

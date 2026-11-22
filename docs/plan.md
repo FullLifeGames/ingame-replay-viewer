@@ -49,7 +49,7 @@ Decisions from the design session on 2026-11-20 that are not ADRs, plus the road
 
    The first test replays are about five ADV OU replays from Smogon tournaments.
 
-   **1b. WebAssembly spike.** A time-boxed attempt to compile the expansion straight to WebAssembly, so it runs in the browser without an emulator. It would borrow pokeemerald-multiplatform's MIT platform layer (a software graphics renderer, a sound mixer, DMA, timers and the BIOS calls).
+   **1b. WebAssembly spike.** A time-boxed attempt to compile the expansion straight to WebAssembly, so it runs in the browser without an emulator. It would borrow pokeemerald-multiplatform's platform layer (a software graphics renderer, a sound mixer, DMA and the BIOS calls). That layer carries no licence as a whole: the fork's MIT grant covers only its own changes, and the files come from Kurausukun's PC port, which has no licence (`docs/wasm-spike.md`, "Licences").
    - If it works, milestone 2 ships the WebAssembly build. Nintendo's assets then come from the user's ROM (ADR 0002 amended), and the page hands the instruction stream to the game directly instead of through the replay slot (ADR 0008 replaced).
    - If it doesn't, milestone 2 ships the emulator plus a patch.
    - Reference only: tripplyons/pokeemerald-wasm (vanilla, no license file).

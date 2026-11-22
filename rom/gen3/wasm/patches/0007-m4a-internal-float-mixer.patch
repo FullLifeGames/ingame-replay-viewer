@@ -1,0 +1,81 @@
+The platform's mixer (sound_mixer.c, music_player.c of the pinned port) mixes in floats. It
+reads struct SoundInfo as its SoundMixerState and struct SoundChannel as its MixerSource, so
+m4a.c and the mixer must agree on one layout: a float divFreq (the reciprocal of the sample
+rate), a float fw, a u32 blockCount in place of xpi and xpc, and a float pcmBuffer of the
+port's 4907 frames. The port's SoundMainBTM clears the 64 bytes at its argument, as Clear64byte
+in m4a.c calls it. Under IRV_WASM the header takes the port's types; sizes and offsets of every
+other struct stay as they are.
+
+diff --git a/include/gba/m4a_internal.h b/include/gba/m4a_internal.h
+--- a/include/gba/m4a_internal.h
++++ b/include/gba/m4a_internal.h
+@@ -152,7 +152,11 @@
+     u8 rhythmPan;
+     u8 dummy3[3];
+     u32 count;
++#ifdef IRV_WASM
++    float fw;
++#else
+     u32 fw;
++#endif
+     u32 frequency;
+     struct WaveData *wav;
+     s8 *currentPointer;
+@@ -160,13 +164,21 @@
+     void *prevChannelPointer;
+     void *nextChannelPointer;
+     u32 dummy4;
++#ifdef IRV_WASM
++    u32 blockCount;
++#else
+     u16 xpi;
+     u16 xpc;
++#endif
+ };
+ 
+ #define MAX_DIRECTSOUND_CHANNELS 12
+ 
++#ifdef IRV_WASM
++#define PCM_DMA_BUF_SIZE 4907 // the platform mixer's float buffer
++#else
+ #define PCM_DMA_BUF_SIZE 1584 // size of Direct Sound buffer
++#endif
+ 
+ struct MusicPlayerInfo;
+ 
+@@ -205,7 +217,11 @@
+     u8 gap[3];
+     s32 pcmSamplesPerVBlank;
+     s32 pcmFreq;
++#ifdef IRV_WASM
++    float divFreq;
++#else
+     s32 divFreq;
++#endif
+     struct CgbChannel *cgbChans;
+     MPlayMainFunc MPlayMainHead;
+     struct MusicPlayerInfo *musicPlayerHead;
+@@ -217,7 +233,11 @@
+     ExtVolPitFunc ExtVolPit;
+     u8 gap2[16];
+     struct SoundChannel chans[MAX_DIRECTSOUND_CHANNELS];
++#ifdef IRV_WASM
++    float pcmBuffer[PCM_DMA_BUF_SIZE * 2];
++#else
+     s8 ALIGNED(4) pcmBuffer[PCM_DMA_BUF_SIZE * 2];
++#endif
+ };
+ 
+ struct SongHeader
+@@ -411,7 +431,11 @@
+ 
+ u32 umul3232H32(u32 multiplier, u32 multiplicand);
+ void SoundMain(void);
++#ifdef IRV_WASM
++void SoundMainBTM(void *ptr);
++#else
+ void SoundMainBTM(void);
++#endif
+ void TrackStop(struct MusicPlayerInfo *mplayInfo, struct MusicPlayerTrack *track);
+ void MPlayMain(struct MusicPlayerInfo *);
+ void RealClearChain(void *x);
