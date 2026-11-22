@@ -51,6 +51,7 @@ export const EFFECT_TEMPLATES = {
   protecting: tagged('STRINGID_PKMNPROTECTEDITSELF2', start('protected itself!')),
   braced: tagged('STRINGID_PKMNBRACEDITSELF', start('braced itself!')),
   focusing: tagged('STRINGID_PKMNTIGHTENINGFOCUS', start('is tightening its focus!')),
+  tookFoe: tagged('STRINGID_PKMNTOOKFOE', start('took its attacker down with it!')),
 }
 
 const E = EFFECT_TEMPLATES
@@ -85,6 +86,7 @@ export function effectStarted(who: Mon, effect: Effect, source: Mon | undefined)
 const ACTS: Readonly<Record<string, Line>> = {
   substitute: E.substituteHit.render,
   confusion: E.isConfused.render,
+  destinybond: E.tookFoe.render,
 }
 
 /** An effect that acts; Splash's "nothing" names no Pokémon. */

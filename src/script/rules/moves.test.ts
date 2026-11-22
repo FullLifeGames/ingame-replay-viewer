@@ -153,5 +153,22 @@ describe('the move rules', () => {
       },
       { kind: 'miss', line: NEXT + 2, user: DUGTRIO },
     ])
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
+
+  // Own Tempo's `onHit` (Showdown, data/abilities.ts) names what it stops (#37).
+  it('keeps what an immunity stops when the log names it', () => {
+    const script = scriptOf('|-immune|p2a: Tyranitar|confusion|[from] ability: Own Tempo')
+
+    expect(eventsFrom(script, NEXT)).toEqual([
+      {
+        kind: 'immune',
+        line: NEXT,
+        who: TYRANITAR,
+        effect: { name: 'confusion' },
+        cause: { name: 'Own Tempo', kind: 'ability' },
+      },
+    ])
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
   })
 })

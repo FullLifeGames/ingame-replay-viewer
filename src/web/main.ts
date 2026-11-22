@@ -1,6 +1,6 @@
 // The dev page (#8): wires the controls of index.html to the session. The user's dump stays in
 // this tab; nothing is stored, and the only requests are same-origin GETs and Showdown's replay.
-import { loadEmulator } from './emulator'
+import { type AudioHandOver, audioHandOver, loadEmulator } from './emulator'
 import { environmentProblem } from './environment'
 import { fetchBytes, fetchJson } from './fetch'
 import { messageOf } from './message'
@@ -52,7 +52,7 @@ function wireReplays(session: Session, view: View): void {
   pick(FIRST_REPLAY)
 }
 
-function wireRun(session: Session, view: View): void {
+function wireRun(session: Session, view: View, audio: AudioHandOver): void {
   let running = ''
   view.dump.addEventListener('change', () => {
     const file = view.dump.files?.[0]
@@ -64,6 +64,8 @@ function wireRun(session: Session, view: View): void {
     })
   })
   view.start.addEventListener('click', () => {
+    // Before any await: Firefox opens audio only while the tap's activation lasts (#51).
+    audio.open()
     view.status(say.STARTING_LINE)
     view.start.disabled = true
     act(view, async () => {
@@ -86,10 +88,11 @@ function wireRun(session: Session, view: View): void {
 const view = findView()
 const problem = environmentProblem({ isSecureContext, crossOriginIsolated })
 if (problem === undefined) {
+  const audio = audioHandOver()
   const session = createSession({
     fetchBytes,
     fetchJson,
-    loadEmulator: () => loadEmulator(view.canvas),
+    loadEmulator: () => loadEmulator(view.canvas, audio),
     onCrash: (line) => {
       view.status(line)
       view.restart.disabled = true
@@ -97,7 +100,7 @@ if (problem === undefined) {
   })
   view.status(say.READY_LINE)
   wireReplays(session, view)
-  wireRun(session, view)
+  wireRun(session, view, audio)
 } else {
   view.showOnly(problem)
 }

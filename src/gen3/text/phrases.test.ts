@@ -69,6 +69,16 @@ describe('move phrases (P1)', () => {
   it('says a move does not affect an immune target', () => {
     const { event, mon } = sceneOf('immune', '|-immune|p2a: Tyranitar')
     expect(immune(mon(event.who))).toBe("It doesn't affect the opposing Tyranitar…")
+    expect(immune(mon(event.who), { name: 'par' })).toBe(
+      "It doesn't affect the opposing Tyranitar…",
+    )
+  })
+
+  // STRINGID_PKMNPREVENTSCONFUSIONWITH, src/battle_message.c (#37).
+  it('says Own Tempo keeps a Pokémon from confusion', () => {
+    const line = '|-immune|p1a: Dugtrio|confusion|[from] ability: Own Tempo'
+    const { event, mon } = sceneOf('immune', line)
+    expect(immune(mon(event.who), event.effect)).toBe('Dugtrio cannot be confused!')
   })
 
   it.each([
@@ -83,6 +93,9 @@ describe('move phrases (P1)', () => {
       "The opposing Tyranitar's stats were not lowered!",
     ],
     ['|-fail|p1a: Dugtrio|move: Substitute|[weak]', SUBSTITUTE_WEAK],
+    // STRINGID_PKMNHASSUBSTITUTE, src/battle_message.c (#38).
+    ['|-fail|p1a: Dugtrio|move: Substitute', 'Dugtrio already has a substitute!'],
+    ['|-fail|p2a: Tyranitar|move: Substitute', 'The opposing Tyranitar already has a substitute!'],
   ])('words the failure %s', (line, text) => {
     const { event, mon } = sceneOf('fail', line)
     expect(failed(mon(event.who), event.effect, event.weak)).toBe(text)

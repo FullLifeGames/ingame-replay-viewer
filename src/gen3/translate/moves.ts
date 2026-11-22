@@ -16,6 +16,11 @@
 // a move whose own lines change nothing on its target but stats at their limit. The game still
 // animates a TARGET_ALL_BATTLERS move that did nothing (of Gen 3's moves, Perish Song); this
 // module does not tell it apart.
+//
+// Volt Absorb and Water Absorb take the move in before its animation (#36): `CanAbilityAbsorbMove`
+// (src/battle_util.c) runs in `TARGET_FAILURE_TARGET_BLOCKED` (src/battle_move_resolution.c),
+// which sets MOVE_RESULT_FAILED. Showdown logs it as a heal of the target by its ability right
+// after the move, or an `-immune` at full HP. The rule reads no ability names.
 import type { ScriptEvent } from '../../script/events'
 import { moveOf } from '../tables/lookup'
 import { critical, effective, failed, immune, missed, usedMove } from '../text/phrases'
@@ -59,11 +64,18 @@ function onlyLimits(move: EventOf<'move'>, events: readonly ScriptEvent[]): bool
   return events.some(limit) && !events.some((event) => changed(event, move))
 }
 
-/** Whether the move in hand did nothing: a no-effect line, or only stats at their limit. */
+/** Whether the move's target took it in by its ability: a heal by an ability, right after it. */
+function absorbed(next: ScriptEvent | undefined, { user, target }: EventOf<'move'>): boolean {
+  if (next?.kind !== 'heal' || next.cause?.kind !== 'ability' || target === undefined) return false
+  return !sameMon(user, target) && sameMon(next.who, target)
+}
+
+/** Whether the move in hand did nothing: a no-effect line, an absorb, or only stats at limit. */
 function didNothing(event: EventOf<'move'>, ctx: Context): boolean {
-  const next = ctx.near(1)?.kind
-  if (next !== undefined && NO_EFFECT.has(next)) return true
-  return next === 'statLimit' && onlyLimits(event, eventsOfMove(ctx, event))
+  const next = ctx.near(1)
+  if (next !== undefined && NO_EFFECT.has(next.kind)) return true
+  if (absorbed(next, event)) return true
+  return next?.kind === 'statLimit' && onlyLimits(event, eventsOfMove(ctx, event))
 }
 
 /** Sleep Talk and a locked move (`calledBy`) change nothing: the game says "used" each time. */
@@ -82,8 +94,8 @@ export function miss({ user, target, line }: EventOf<'miss'>, ctx: Context): voi
   ctx.print(line, missed(ctx.mon(user), target && ctx.mon(target)))
 }
 
-export function immunity({ who, line }: EventOf<'immune'>, ctx: Context): void {
-  ctx.print(line, immune(ctx.mon(who)))
+export function immunity({ who, effect, line }: EventOf<'immune'>, ctx: Context): void {
+  ctx.print(line, immune(ctx.mon(who), effect))
 }
 
 export function failure({ who, effect, weak, line }: EventOf<'fail'>, ctx: Context): void {

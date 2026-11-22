@@ -2,6 +2,8 @@
 
 The dev page. You pick your US Emerald dump and a replay, press Start, and the replay plays in the patched ROM in mGBA (`@thenick775/mgba-wasm`). Below the game, the page lists every battle log line the game does not show: the dropped lines and the backend's fallbacks.
 
+The Start tap opens the page's audio context and hands it to mGBA, which loads seconds later. Firefox opens audio only while a tap lasts, so a context opened after the load stays silent there. If the browser refuses the context, the replay plays without sound. Each Start opens a new context, because mGBA closes its audio when it quits the last game.
+
 The DOM-free modules (`session.ts`, `fetch.ts`, `rom.ts`, `stream.ts` and the rest) have specs in Node. `main.ts` and `view.ts` hold the DOM wiring; the e2e covers them, and coverage leaves them out.
 
 ## Starting the page

@@ -123,6 +123,8 @@ interface ImmuneEvent extends Caused {
   readonly kind: 'immune'
   readonly line: number
   readonly who: PokemonRef
+  /** What the Pokémon is immune to, where the line names it (Own Tempo's `confusion`). */
+  readonly effect?: Effect
 }
 
 interface FailEvent extends Caused {

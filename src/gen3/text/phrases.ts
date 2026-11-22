@@ -1,6 +1,7 @@
 // Phrases for moves, hits, faints and stat changes (plan §5): each takes the names and values an
 // event carries and returns the game's text in Unicode. The backend encodes it for PRINT.
 import type { BoostID, StatusName } from '@pkmn/data'
+import { toID } from '@pkmn/dex'
 
 import type { Effect } from '../../script/types'
 import { Gen3Error } from '../errors'
@@ -20,11 +21,20 @@ export const MOVE_TEMPLATES = {
   doesntAffect: tagged('STRINGID_ITDOESNTAFFECT', (who: Mon) => {
     return `It doesn't affect ${nameInside(who)}…`
   }),
+  // `BattleScript_OwnTempoPrevents` and `BattleScript_SwaggerOwnTempoPrevents`
+  // (data/battle_scripts_1.s), with the target as `sBATTLER`.
+  cannotBeConfused: tagged('STRINGID_PKMNPREVENTSCONFUSIONWITH', (who: Mon) => {
+    return `${nameAtStart(who)} cannot be confused!`
+  }),
   failed: tagged('STRINGID_BUTITFAILED', () => 'But it failed!'),
   // B_MSG_SUBSTITUTE_FAILED in `gSubstituteUsedStringIds`; `BattleScript_EffectSubstitute`
   // prints it and skips the animation (data/battle_scripts_1.s).
   substituteWeak: tagged('STRINGID_TOOWEAKFORSUBSTITUTE', () => {
     return 'But it does not have enough HP left to make a substitute!'
+  }),
+  // `BattleScript_AlreadyHasSubstitute` prints it before the animation (data/battle_scripts_1.s).
+  hasSubstitute: tagged('STRINGID_PKMNHASSUBSTITUTE', (who: Mon) => {
+    return `${nameAtStart(who)} already has a substitute!`
   }),
   alreadyAsleep: tagged('STRINGID_PKMNALREADYASLEEP', (who: Mon) => {
     return `${nameAtStart(who)} is already asleep!`
@@ -87,24 +97,31 @@ export function effective(effectiveness: 'super' | 'resisted'): string {
   return MOVE_TEMPLATES[template].render()
 }
 
-export const immune = (who: Mon) => MOVE_TEMPLATES.doesntAffect.render(who)
+/** An immunity the log names confusion for has its own line (Own Tempo's); any other has none. */
+export function immune(who: Mon, effect?: Effect): string {
+  if (effect && toID(effect.name) === 'confusion')
+    return MOVE_TEMPLATES.cannotBeConfused.render(who)
+  return MOVE_TEMPLATES.doesntAffect.render(who)
+}
 
-const ALREADY: Partial<Record<StatusName | 'unboost', (who: Mon) => string>> = {
+/** Keyed by the effect's id: a status, `unboost`, or a move such as `move: Substitute`. */
+const ALREADY: Partial<Record<StatusName | 'unboost' | 'substitute', (who: Mon) => string>> = {
   slp: MOVE_TEMPLATES.alreadyAsleep.render,
   psn: MOVE_TEMPLATES.alreadyPoisoned.render,
   tox: MOVE_TEMPLATES.alreadyPoisoned.render,
   par: MOVE_TEMPLATES.alreadyParalyzed.render,
   brn: MOVE_TEMPLATES.alreadyBurned.render,
   unboost: MOVE_TEMPLATES.statsNotLowered.render,
+  substitute: MOVE_TEMPLATES.hasSubstitute.render,
 }
 
 /**
- * A failure the log names a status or `unboost` for has its own line, and so has one for too
- * little HP (`weak`, Substitute's); any other fails.
+ * A failure the log names a status, `unboost` or a Substitute already up for has its own line,
+ * and so has one for too little HP (`weak`, Substitute's); any other fails.
  */
 export function failed(who: Mon, effect: Effect | undefined, weak?: true): string {
   if (weak) return MOVE_TEMPLATES.substituteWeak.render()
-  const own = effect && ALREADY[effect.name as StatusName | 'unboost']
+  const own = effect && ALREADY[toID(effect.name) as keyof typeof ALREADY]
   return own ? own(who) : MOVE_TEMPLATES.failed.render()
 }
 
