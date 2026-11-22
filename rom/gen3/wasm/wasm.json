@@ -11,13 +11,9 @@
       "include/mp2k_common.h",
       "include/music_player.h",
       "include/platform.h",
-      "include/platform/dma.h",
       "include/sound_mixer.h",
       "src/music_player.c",
-      "src/platform/bios.c",
       "src/platform/cgb_audio.c",
-      "src/platform/dma.c",
-      "src/platform/gba_easy_draw.c",
       "src/sound_mixer.c"
     ],
     "defines": ["IRV_WASM_PLATFORM", "RENDERER_EASY_DRAW", "PORTABLE"]

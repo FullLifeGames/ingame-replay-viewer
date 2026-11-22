@@ -74,7 +74,7 @@ describe('the objects of the link', () => {
     for (const name of ['irv_wasm_stubs.c', 'irv_wasm_frame.c', 'irv_wasm.h']) {
       touch(join(glue, name))
     }
-    expect(glueSources(glue)).toEqual([
+    expect(glueSources([glue])).toEqual([
       join(glue, 'irv_wasm_frame.c'),
       join(glue, 'irv_wasm_stubs.c'),
     ])

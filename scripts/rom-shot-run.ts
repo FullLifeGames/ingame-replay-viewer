@@ -11,7 +11,11 @@ import { findSymbol } from './rom-slot.ts'
 export { readProgressLayout } from '../src/web/wasm/progress.ts'
 export type { ProgressLayout } from '../src/web/wasm/progress.ts'
 
-const TOOL_SOURCE = join(ROM_DIR, 'shot', 'replay_shot.c')
+// replay_state.c dumps the video state for the mGBA oracle of the WebAssembly build (#43).
+export const TOOL_SOURCES = ['replay_shot.c', 'replay_state.c'].map((name) =>
+  join(ROM_DIR, 'shot', name),
+)
+const TOOL_HEADER = join(ROM_DIR, 'shot', 'replay_state.h')
 const INCLUDE_DIR = join(ROM_DIR, 'include')
 export const INTERPRETER_HEADER_PATH = join(INCLUDE_DIR, 'replay_interpreter.h')
 // The layout the tool reads; it includes this header too, and the ROM checks it against the struct.
@@ -80,21 +84,21 @@ export function progressAddress(nmOutput: string, size: number): number {
   return symbol.address
 }
 
-export function toolBuildArgs(source: string, output: string): string[] {
+export function toolBuildArgs(sources: readonly string[], output: string): string[] {
   const warnings = ['-Wall', '-Wextra', '-Werror']
-  return ['-std=gnu11', '-O2', ...warnings, '-I', INCLUDE_DIR, '-o', output, source, '-lmgba']
+  return ['-std=gnu11', '-O2', ...warnings, '-I', INCLUDE_DIR, '-o', output, ...sources, '-lmgba']
 }
 
-/** Builds the tool when it is missing or older than its source or the header it reads. */
+/** Builds the tool when it is missing or older than its sources or the headers it reads. */
 export function buildTool(output: string): void {
   const newest = Math.max(
-    ...[TOOL_SOURCE, PROGRESS_HEADER_PATH].map((path) => statSync(path).mtimeMs),
+    ...[...TOOL_SOURCES, TOOL_HEADER, PROGRESS_HEADER_PATH].map((path) => statSync(path).mtimeMs),
   )
   if (existsSync(output) && statSync(output).mtimeMs >= newest) return
   mkdirSync(dirname(output), { recursive: true })
   // CC names another C compiler, as make has it.
   const compiler = process.env.CC ?? 'cc'
-  const result = spawnSync(compiler, toolBuildArgs(TOOL_SOURCE, output), { encoding: 'utf8' })
+  const result = spawnSync(compiler, toolBuildArgs(TOOL_SOURCES, output), { encoding: 'utf8' })
   if (result.error !== undefined) throw result.error
   if (result.status !== 0) {
     throw new Error(
@@ -116,18 +120,33 @@ export function readToolOutput(text: string): ToolOutput {
   return { shots, status }
 }
 
+/**
+ * The cartridge clock the tool gives mGBA, in seconds since 1970 UTC: noon on 1 January 2000, the
+ * time the module's clock stub holds (sFixedTime in rom/gen3/wasm/src/irv_wasm_stubs.c). With the
+ * host's clock two runs of one stream parted at frame 10 (#43, step B4).
+ */
+export const TOOL_CLOCK = Date.UTC(2000, 0, 1, 12) / 1000
+
 export interface ToolRun {
   tool: string
   rom: string
   address: number
   frameDir: string
   shots: string[]
+  /** Dump the video state and the frame every N frames, for the mGBA oracle (#43). */
+  stateEvery?: number
+}
+
+export function toolArgs(run: ToolRun): string[] {
+  const states = run.stateEvery === undefined ? [] : ['--state-every', String(run.stateEvery)]
+  const clock = ['--clock', String(TOOL_CLOCK)]
+  return [run.rom, `0x${run.address.toString(16)}`, run.frameDir, ...clock, ...states, ...run.shots]
 }
 
 export function runTool(run: ToolRun): ToolOutput {
   mkdirSync(run.frameDir, { recursive: true })
-  const args = [run.rom, `0x${run.address.toString(16)}`, run.frameDir, ...run.shots]
-  const result = spawnSync(run.tool, args, { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 })
+  const options = { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 } as const
+  const result = spawnSync(run.tool, toolArgs(run), options)
   if (result.error !== undefined) throw result.error
   if (result.status !== 0) throw new Error(`the shot tool failed: ${result.stderr.trim()}`)
   return readToolOutput(result.stdout)

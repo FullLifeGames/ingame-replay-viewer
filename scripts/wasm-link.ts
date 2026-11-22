@@ -3,13 +3,15 @@
 // objects of build/wasm/asm. It never globs build/wasm/obj, which still holds census objects of
 // excluded files. Its outputs land in build/wasm only.
 import { readdirSync } from 'node:fs'
-import { join, relative, sep } from 'node:path'
+import { basename, join, relative, sep } from 'node:path'
 
 import { objectPath } from './wasm-compile.ts'
 import type { CompileOptions, WasmPaths } from './wasm-compile.ts'
 import { WASM_DIR } from './wasm-config.ts'
+import { folderSources, LAYER_DIR } from './wasm-layer.ts'
 
-// Our C files of the build: the frame, the stubs, the replacements and the memory check.
+// Our C files of the build: the frame, the stubs, the replacements and the memory check, then
+// our platform layer (wasm-layer.ts).
 const GLUE_DIR = join(WASM_DIR, 'src')
 export const LINK_OUTPUTS = { js: 'irv-emerald.js', wasm: 'irv-emerald.wasm' } as const
 /** The commands that make the link's outputs and the module patch, in order. */
@@ -65,11 +67,17 @@ export function asmObjects(dir: string): string[] {
   return objects
 }
 
-export function glueSources(dir: string = GLUE_DIR): string[] {
-  return readdirSync(dir)
-    .filter((name) => name.endsWith('.c'))
-    .sort()
-    .map((name) => join(dir, name))
+// The glue and our platform layer compile alike, and their objects share build/wasm/obj/glue.
+export function glueSources(dirs: readonly string[] = [GLUE_DIR, LAYER_DIR]): string[] {
+  const sources = dirs.flatMap((dir) => folderSources(dir))
+  const names = sources.map((source) => basename(source))
+  const twice = names.filter((name, i) => names.indexOf(name) !== i)
+  if (twice.length > 0) {
+    throw new Error(
+      `${twice.join(', ')} named twice in ${dirs.join(' and ')}: one object would hide the other`,
+    )
+  }
+  return sources
 }
 
 function checkInside(out: string, objects: readonly string[]): void {

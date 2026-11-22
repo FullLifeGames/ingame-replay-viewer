@@ -101,7 +101,7 @@ The expansion with our C files, compiled by Emscripten into a WebAssembly module
 _Avoid_: native build, port, recompilation
 
 **Platform layer**:
-The C code that stands in for the GBA's hardware in the WebAssembly build: the BIOS calls, DMA, the scanline renderer and the sound mixer. The spike borrows it from a pinned commit of pokeemerald-multiplatform. Its files stay out of git; the platform patches carry 45 of its lines.
+The C code that stands in for the GBA's hardware in the WebAssembly build: the BIOS calls, DMA, the interrupts, the frame driver, the scanline renderer and the sound. Ours lives in `rom/gen3/wasm/layer/` under the repository's MIT licence (#43). The sound still comes from three files borrowed from a pinned commit of pokeemerald-multiplatform; they stay out of git, and one platform patch carries 8 of their lines.
 _Avoid_: emulator, HAL, backend (a game backend is ours)
 
 **Glue**:

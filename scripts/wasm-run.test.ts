@@ -9,6 +9,7 @@ import { refusalScenes } from './rom-shot-scenes.ts'
 import type { Scene } from './rom-shot-scenes.ts'
 import { GBA_ROM_BASE, loadSlotLayout } from './rom-slot.ts'
 import { MIXER_RATE } from '../src/web/wasm/protocol.ts'
+import { frameLines } from './wasm-hashes.ts'
 import { playCommand, playModule, STALL_FRAMES } from './wasm-run.ts'
 import type { GameModule, ModuleHooks } from './wasm-run.ts'
 
@@ -196,6 +197,19 @@ describe('playing a stream in the module', () => {
     const run = await playModule(fake.factory, { stream: undefined, scenes: [], layout: LAYOUT })
     expect(run.audio.samples).toBe(run.output.status.frame * AUDIO_SAMPLES.length)
     expect(run.audio.rms).toBeCloseTo(0.5)
+  })
+
+  it('hashes every frame it plays, the last one too, for the A/B against the baseline', async () => {
+    const end = { ...playing(34), finished: true }
+    const fake = fakeModule((frame) => ({
+      progress: frame < 30 ? playing(1) : end,
+      colour: frame < 10 ? 0 : 7,
+    }))
+    const run = await playModule(fake.factory, { stream: undefined, scenes: [], layout: LAYOUT })
+    expect(run.hashes.frames).toBe(30)
+    expect(frameLines(run.hashes, 9)).toEqual(frameLines(run.hashes, 1))
+    expect(frameLines(run.hashes, 10)).not.toEqual(frameLines(run.hashes, 9))
+    expect(frameLines(run.hashes, 30)).toEqual(frameLines(run.hashes, 10))
   })
 
   it('fails when AgbMain returns, which the game never does', async () => {
