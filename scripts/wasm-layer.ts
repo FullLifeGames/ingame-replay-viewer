@@ -82,8 +82,12 @@ export function readLayerOutput(bytes: Uint8Array): LayerOutput {
   return { result, dest: bytes.slice(4) }
 }
 
-/** Runs one command of the harness at `host` on the request. */
-export function runLayer(host: string, command: string, request: LayerRequest): LayerOutput {
+/** Runs one command of the harness at `host` on the request; `log` holds what the layer printed. */
+export function runLayer(
+  host: string,
+  command: string,
+  request: LayerRequest,
+): LayerOutput & { log: string } {
   const dir = mkdtempSync(join(host, '..', 'call-'))
   const [input, output] = [join(dir, 'in.bin'), join(dir, 'out.bin')]
   writeFileSync(input, layerInput(request))
@@ -94,5 +98,5 @@ export function runLayer(host: string, command: string, request: LayerRequest): 
       `irv_layer_host ${command} failed (exit ${String(result.status)}): ${result.stderr}`,
     )
   }
-  return readLayerOutput(new Uint8Array(readFileSync(output)))
+  return { ...readLayerOutput(new Uint8Array(readFileSync(output))), log: result.stdout }
 }

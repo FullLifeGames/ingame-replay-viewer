@@ -89,6 +89,8 @@ export interface BgControl {
   screenBase?: number
   colors256?: boolean
   mosaic?: boolean
+  /** BG2 and BG3 in the affine modes: the map wraps around instead of ending transparent. */
+  wrap?: boolean
   size?: number
 }
 
@@ -98,6 +100,7 @@ export const bgControl = (control: BgControl) =>
   (control.mosaic === true ? 0x40 : 0) |
   (control.colors256 === true ? 0x80 : 0) |
   ((control.screenBase ?? 0) << 8) |
+  (control.wrap === true ? 0x2000 : 0) |
   ((control.size ?? 0) << 14)
 
 export interface MapEntry {

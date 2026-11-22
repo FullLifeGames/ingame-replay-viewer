@@ -28,7 +28,7 @@ extern uint8_t *gIrvHostMemory;
 #define IRV_IO32(offset) (*(volatile uint32_t *)IRV_PTR(IRV_IO + (offset)))
 
 // GBATEK "LCD I/O Display Control", "LCD I/O Interrupts and Status", "LCD I/O BG Control",
-// "LCD I/O BG Scrolling", "LCD I/O Window Feature", "LCD I/O Mosaic Function", "LCD I/O Color
+// "LCD I/O BG Scrolling", "LCD I/O BG Rotation/Scaling", "LCD I/O Window Feature", "LCD I/O Mosaic Function", "LCD I/O Color
 // Special Effects".
 #define IRV_REG_DISPCNT  0x00
 #define IRV_REG_DISPSTAT 0x04
@@ -36,6 +36,7 @@ extern uint8_t *gIrvHostMemory;
 #define IRV_REG_BG0CNT   0x08
 #define IRV_REG_BG0HOFS  0x10
 #define IRV_REG_BG0VOFS  0x12
+#define IRV_REG_BG2PA    0x20
 #define IRV_REG_WIN0H    0x40
 #define IRV_REG_WIN0V    0x44
 #define IRV_REG_WININ    0x48
@@ -44,6 +45,15 @@ extern uint8_t *gIrvHostMemory;
 #define IRV_REG_BLDCNT   0x50
 #define IRV_REG_BLDALPHA 0x52
 #define IRV_REG_BLDY     0x54
+
+// GBATEK "LCD I/O BG Rotation/Scaling": PA, PB, PC and PD, then the reference point X and Y, for
+// BG2 from 0x04000020 and for BG3 16 bytes on.
+#define IRV_AFFINE_STRIDE 0x10
+#define IRV_AFFINE_PB     0x02
+#define IRV_AFFINE_PC     0x04
+#define IRV_AFFINE_PD     0x06
+#define IRV_AFFINE_X      0x08
+#define IRV_AFFINE_Y      0x0C
 
 #define IRV_DISPSTAT_VBLANK      (1 << 0)
 #define IRV_DISPSTAT_HBLANK      (1 << 1)

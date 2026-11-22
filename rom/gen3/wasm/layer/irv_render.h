@@ -7,6 +7,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "irv_gba.h"
 
 #define IRV_SCREEN_WIDTH  240
 #define IRV_SCREEN_HEIGHT 160
@@ -81,11 +82,29 @@ static inline uint32_t IrvRender_MosaicStart(uint32_t position, uint32_t sizeMin
     return position - position % (sizeMinus1 + 1);
 }
 
+// GBATEK "LCD VRAM Overview": in the tile modes, BG map and tile data share the first 64 KB.
+// GBATEK does not let BG data reach into the OBJ tiles; such a read is taken as colour 0.
+#define IRV_BG_VRAM_SIZE 0x10000
+
+static inline uint8_t IrvRender_BgVram(uint32_t offset)
+{
+    return offset < IRV_BG_VRAM_SIZE ? ((const uint8_t *)IRV_PTR(IRV_VRAM))[offset] : 0;
+}
+
 // irv_render.c: one visible line into `row`, BGR555.
 void IrvRender_Line(uint32_t line, uint16_t *row);
 
-// irv_render_bg.c: one line of a text background.
+// irv_render_bg.c: one line of a text background; the horizontal mosaic of a BG's line.
 void IrvRender_TextBgLine(uint32_t bg, uint32_t line, uint16_t *out);
+void IrvRender_MosaicRow(uint16_t *out, uint32_t sizeMinus1);
+
+// irv_render_affine.c: the internal reference points of BG2 and BG3. The frame driver reloads
+// them from the registers at line 160; before each visible line the renderer reloads one the game
+// wrote since, and after each line it steps both by PB and PD. Then one line of an affine BG.
+void IrvRender_FrameStart(void);
+void IrvRender_AffineLineStart(uint32_t line);
+void IrvRender_AffineLineEnd(void);
+void IrvRender_AffineBgLine(uint32_t bg, uint16_t *out);
 
 // irv_render_obj.c: the OBJ layer of one line.
 void IrvRender_ObjLine(uint32_t line, struct IrvObjLine *out);

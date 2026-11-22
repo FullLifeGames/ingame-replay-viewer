@@ -1,39 +1,54 @@
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 #include "irv_gba.h"
 #include "irv_render.h"
 
 #define BG_COUNT 4
 
+#define BG_OFF    0
+#define BG_TEXT   1
+#define BG_AFFINE 2
+
+// The bitmap modes 3-5 and the prohibited modes 6-7 are not drawn (plan B5, open decision 6).
+#define LAST_TILE_MODE 2
+
 struct BgLayer
 {
     uint32_t bg;
     uint32_t priority;
+    uint32_t kind;
 };
 
-// GBATEK "LCD I/O Display Control": BG0-BG3 are text BGs in mode 0, BG0 and BG1 in mode 1. The
-// affine BGs of modes 1 and 2 and the bitmap modes 3-5 are not drawn yet.
-static bool IsTextBg(uint32_t mode, uint32_t bg)
+// GBATEK "LCD I/O Display Control", the table of BG modes: mode 0 has four text BGs, mode 1 text
+// BG0 and BG1 and affine BG2, mode 2 affine BG2 and BG3.
+static uint32_t BgKind(uint32_t mode, uint32_t bg)
 {
-    return mode == 0 || (mode == 1 && bg < 2);
+    if (mode == 0 || (mode == 1 && bg < 2))
+        return BG_TEXT;
+    if ((mode == 1 && bg == 2) || (mode == 2 && bg >= 2))
+        return BG_AFFINE;
+    return BG_OFF;
 }
 
-// The enabled text BGs in front-to-back order. GBATEK "LCD I/O BG Control": a lower priority
+// The enabled BGs of the mode in front-to-back order. GBATEK "LCD I/O BG Control": a lower priority
 // value lies in front, and among equal priorities the lower BG number.
 static uint32_t SortBgs(uint16_t dispcnt, struct BgLayer *layers)
 {
-    uint32_t count = 0, priority, bg;
+    uint32_t count = 0, priority, bg, kind;
 
     for (priority = 0; priority < 4; priority++)
     {
         for (bg = 0; bg < BG_COUNT; bg++)
         {
-            if (!(dispcnt & (IRV_DISPCNT_BG0 << bg)) || !IsTextBg(dispcnt & IRV_DISPCNT_MODE, bg))
+            kind = BgKind(dispcnt & IRV_DISPCNT_MODE, bg);
+            if (!(dispcnt & (IRV_DISPCNT_BG0 << bg)) || kind == BG_OFF)
                 continue;
             if ((IRV_IO16(IRV_REG_BG0CNT + 2 * bg) & 3) != priority)
                 continue;
             layers[count].bg = bg;
             layers[count].priority = priority;
+            layers[count].kind = kind;
             count++;
         }
     }
@@ -123,29 +138,55 @@ static uint16_t ComposePixel(const struct Line *line, uint32_t x)
     return IrvRender_ApplyEffect(&line->effect, kind, pixels[0].colour, pixels[1].colour);
 }
 
-// GBATEK "LCD I/O Display Control": forced blank shows white lines.
-void IrvRender_Line(uint32_t lineNum, uint16_t *row)
+// One colour on the whole line, and in the harness's trace.
+static void FillLine(uint32_t lineNum, uint16_t *row, uint16_t colour)
+{
+    uint32_t x;
+
+    for (x = 0; x < IRV_SCREEN_WIDTH; x++)
+        row[x] = colour;
+#ifdef IRV_HOST
+    if (gIrvPixelTrace != NULL)
+    {
+        for (x = 0; x < IRV_SCREEN_WIDTH; x++)
+            gIrvPixelTrace[lineNum * IRV_SCREEN_WIDTH + x].top = colour;
+    }
+#endif
+}
+
+static uint16_t Backdrop(void)
+{
+    return *(const uint16_t *)IRV_PTR(IRV_PRAM) & IRV_WHITE;
+}
+
+// No silent drop: the first line in a mode the layer does not draw says so, once per run.
+static void BitmapLine(uint32_t lineNum, uint16_t *row, uint32_t mode)
+{
+    static bool sSaid;
+
+    if (!sSaid)
+    {
+        printf("irv-layer: BG mode %u is not drawn; its lines show the backdrop\n", (unsigned)mode);
+        sSaid = true;
+    }
+    FillLine(lineNum, row, Backdrop());
+}
+
+static void DrawLine(uint32_t lineNum, uint16_t *row)
 {
     static struct Line sLine;
     uint16_t dispcnt = IRV_IO16(IRV_REG_DISPCNT);
-    uint32_t i, x;
+    uint32_t i, x, bg;
 
-    if (dispcnt & IRV_DISPCNT_FORCED_BLANK)
-    {
-        for (x = 0; x < IRV_SCREEN_WIDTH; x++)
-            row[x] = IRV_WHITE;
-#ifdef IRV_HOST
-        if (gIrvPixelTrace != NULL)
-        {
-            for (x = 0; x < IRV_SCREEN_WIDTH; x++)
-                gIrvPixelTrace[lineNum * IRV_SCREEN_WIDTH + x].top = IRV_WHITE;
-        }
-#endif
-        return;
-    }
     sLine.count = SortBgs(dispcnt, sLine.layers);
     for (i = 0; i < sLine.count; i++)
-        IrvRender_TextBgLine(sLine.layers[i].bg, lineNum, sLine.bg[sLine.layers[i].bg]);
+    {
+        bg = sLine.layers[i].bg;
+        if (sLine.layers[i].kind == BG_AFFINE)
+            IrvRender_AffineBgLine(bg, sLine.bg[bg]);
+        else
+            IrvRender_TextBgLine(bg, lineNum, sLine.bg[bg]);
+    }
     if (dispcnt & IRV_DISPCNT_OBJ)
     {
         IrvRender_ObjLine(lineNum, &sLine.obj);
@@ -157,8 +198,25 @@ void IrvRender_Line(uint32_t lineNum, uint16_t *row)
     }
     IrvRender_WindowLine(lineNum, &sLine.obj, sLine.enable);
     IrvRender_EffectLine(&sLine.effect);
-    sLine.backdrop = *(const uint16_t *)IRV_PTR(IRV_PRAM) & IRV_WHITE;
+    sLine.backdrop = Backdrop();
     sLine.number = lineNum;
     for (x = 0; x < IRV_SCREEN_WIDTH; x++)
         row[x] = ComposePixel(&sLine, x);
+}
+
+// GBATEK "LCD I/O Display Control": forced blank shows white lines. The affine reference points
+// step after every line, drawn or not.
+void IrvRender_Line(uint32_t lineNum, uint16_t *row)
+{
+    uint16_t dispcnt = IRV_IO16(IRV_REG_DISPCNT);
+    uint32_t mode = dispcnt & IRV_DISPCNT_MODE;
+
+    IrvRender_AffineLineStart(lineNum);
+    if (dispcnt & IRV_DISPCNT_FORCED_BLANK)
+        FillLine(lineNum, row, IRV_WHITE);
+    else if (mode > LAST_TILE_MODE)
+        BitmapLine(lineNum, row, mode);
+    else
+        DrawLine(lineNum, row);
+    IrvRender_AffineLineEnd();
 }

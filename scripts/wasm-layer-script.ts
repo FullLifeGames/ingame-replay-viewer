@@ -65,15 +65,17 @@ export interface ScriptResult {
   calls: number
   flags: number
   dest: Uint8Array
+  /** The lines the layer printed. */
+  log: string
 }
 
 /** Runs a script; `reads` is the byte count its reads, frames and logs append together. */
 export function runScript(host: string, ops: readonly Op[], reads: number): ScriptResult {
-  const { result, dest } = runLayer(host, 'script', {
+  const { result, dest, log } = runLayer(host, 'script', {
     src: wordBytes(ops.flat()),
     dest: new Uint8Array(reads),
   })
-  return { calls: result >>> 16, flags: result & 0xffff, dest }
+  return { calls: result >>> 16, flags: result & 0xffff, dest, log }
 }
 
 export interface PixelTrace {

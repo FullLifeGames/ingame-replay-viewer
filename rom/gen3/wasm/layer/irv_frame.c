@@ -41,9 +41,11 @@ static void HBlank(uint32_t line)
         IrvLayer_RaiseIrq(IRV_INTR_HBLANK);
 }
 
-// "LCD I/O Interrupts and Status": VBlank DMA and the VBlank IRQ start with line 160.
+// "LCD I/O Interrupts and Status": VBlank DMA and the VBlank IRQ start with line 160. "LCD I/O BG
+// Rotation/Scaling": the affine reference points reload in VBlank, before the game's handler.
 static void VBlank(void)
 {
+    IrvRender_FrameStart();
     RunDMAs(IRV_DMA_TIMING_VBLANK);
     if (IRV_IO16(IRV_REG_DISPSTAT) & IRV_DISPSTAT_VBLANK_IRQ)
         IrvLayer_RaiseIrq(IRV_INTR_VBLANK);
