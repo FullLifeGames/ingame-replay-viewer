@@ -1,6 +1,6 @@
 // Our platform layer of the WebAssembly build (#43): the C files of rom/gen3/wasm/layer enter the
 // module with the glue, and the same list compiles natively into the host harness
-// (layer/host/irv_layer_host.c), so the specs run the layer in CI without emsdk or the expansion.
+// (the C files of layer/host), so the specs run the layer in CI without emsdk or the expansion.
 // The harness serves one command per run: `irv_layer_host <command> <input> <output>`. The input
 // holds the arguments, a source and a destination; the output holds a result word and the
 // destination after the call.
@@ -11,7 +11,7 @@ import { join } from 'node:path'
 import { WASM_DIR } from './wasm-config.ts'
 
 export const LAYER_DIR = join(WASM_DIR, 'layer')
-const HOST_SOURCE = join(LAYER_DIR, 'host', 'irv_layer_host.c')
+const HOST_DIR = join(LAYER_DIR, 'host')
 const INSTALL = 'install one with sudo apt install gcc, or name it in CC'
 
 /** The C files of one folder of the build, sorted, without those of its subfolders. */
@@ -28,7 +28,8 @@ export const layerSources = (dir: string = LAYER_DIR) => folderSources(dir)
 export function hostCommand(output: string, env: NodeJS.ProcessEnv = process.env): string[] {
   const cc = env.CC ?? 'cc'
   const flags = ['-std=gnu17', '-O1', '-Wall', '-Wextra', '-Werror', '-DIRV_HOST']
-  return [cc, ...flags, '-I', LAYER_DIR, ...layerSources(), HOST_SOURCE, '-lm', '-o', output]
+  const sources = [...layerSources(), ...folderSources(HOST_DIR)]
+  return [cc, ...flags, '-I', LAYER_DIR, ...sources, '-lm', '-o', output]
 }
 
 /** Compiles the harness into `dir` and returns its path. */

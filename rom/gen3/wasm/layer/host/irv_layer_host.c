@@ -3,27 +3,17 @@
 //   irv_layer_host <command> <input> <output>
 // The input holds little-endian words: the argument count and the arguments, the source's length
 // and bytes, the destination's length and bytes. The output holds the result word and the
-// destination after the call.
+// destination after the call. The DMA command runs on a GBA address space of its own
+// (irv_layer_host_dma.c).
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "irv_bios.h"
 #include "irv_sine.h"
+#include "irv_layer_host.h"
 
-#define MAX_ARGS 8
-
-struct HostCall
-{
-    uint32_t argc;
-    uint32_t args[MAX_ARGS];
-    uint8_t *src;
-    uint8_t *dest;
-    uint32_t destLength;
-    uint32_t result;
-};
-
-static void Fail(const char *what)
+void Fail(const char *what)
 {
     fprintf(stderr, "irv_layer_host: %s\n", what);
     exit(2);
@@ -84,14 +74,14 @@ static uint8_t *TakeBlock(struct Reader *reader, uint32_t *length)
 static void ParseCall(const uint8_t *bytes, size_t length, struct HostCall *call)
 {
     struct Reader reader = {bytes, length};
-    uint32_t srcLength, i;
+    uint32_t i;
 
     call->argc = TakeWord(&reader);
     if (call->argc > MAX_ARGS)
         Fail("more than 8 arguments");
     for (i = 0; i < call->argc; i++)
         call->args[i] = TakeWord(&reader);
-    call->src = TakeBlock(&reader, &srcLength);
+    call->src = TakeBlock(&reader, &call->srcLength);
     call->dest = TakeBlock(&reader, &call->destLength);
     if (reader.left != 0)
         Fail("the input has bytes after the destination");
@@ -161,6 +151,7 @@ static const struct Command sCommands[] = {
     {"sine", 0, RunSine},
     {"bgaffine", 1, RunBgAffine},
     {"objaffine", 2, RunObjAffine},
+    {"dma", 0, RunDmaScript},
 };
 
 static void WriteOutput(const char *path, const struct HostCall *call)

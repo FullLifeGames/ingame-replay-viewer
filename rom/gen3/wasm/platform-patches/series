@@ -1,4 +1,3 @@
 # Patches against copies of the platform files in build/wasm/platform, applied in this order.
-0002-dma-header-masks.patch
 0003-easy-draw-vram.patch
 0004-cgb-audio-wave-ram-pointer.patch

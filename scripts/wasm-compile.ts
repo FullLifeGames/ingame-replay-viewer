@@ -166,8 +166,8 @@ export function platformCommands(
 }
 
 // The glue's own C files (rom/gen3/wasm/src) and our platform layer's (rom/gen3/wasm/layer),
-// given as absolute paths. They include platform/dma.h as the platform files do, but compile as
-// files of the game, so the platform defines stay off. The layer's headers come before the
+// given as absolute paths. They include the borrowed sound headers, but compile as files of the
+// game, so the platform defines stay off. The layer's headers come before the
 // borrowed ones, so the glue reaches our layer first.
 export function glueCommands(
   paths: WasmPaths,

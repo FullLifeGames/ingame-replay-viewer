@@ -59,7 +59,10 @@ describe('the host harness', () => {
       expect.arrayContaining(['-std=gnu17', '-Wall', '-Wextra', '-Werror', '-DIRV_HOST']),
     )
     expect(argv).toEqual(expect.arrayContaining(layerSources()))
-    expect(argv).toEqual(expect.arrayContaining([join(LAYER_DIR, 'host', 'irv_layer_host.c')]))
+    const host = ['irv_layer_host.c', 'irv_layer_host_dma.c'].map((name) =>
+      join(LAYER_DIR, 'host', name),
+    )
+    expect(argv).toEqual(expect.arrayContaining(host))
     expect(argv.slice(-2)).toEqual(['-o', '/tmp/out/irv_layer_host'])
   })
 
