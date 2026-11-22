@@ -84,6 +84,7 @@ export const OP = {
   item: 0x11,
   itemPopUp: 0x12,
   trapTurn: 0x13,
+  flushTextBox: 0x14,
 } as const
 
 export type Op = keyof typeof OP
@@ -109,6 +110,7 @@ export const OP_SIZE = {
   item: 4,
   itemPopUp: 3,
   trapTurn: 3,
+  flushTextBox: 0,
 } as const satisfies Record<Exclude<Op, 'print'>, number>
 
 /** PRINT's operand: its text in the game's charset and EOS, one glyph at least. */

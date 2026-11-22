@@ -142,11 +142,12 @@ describe('encodeInstruction', () => {
     expect(encodeInstruction(move)).toEqual([0x07, 4, 0, 1, 0x12, 0x03])
   })
 
-  it('encodes the ops of version 2: ITEM_POPUP, TRAP_TURN and ANIM SIMPLE_HEAL', () => {
+  it('encodes the ops of version 2: ITEM_POPUP, TRAP_TURN, FLUSH_TEXT_BOX, ANIM SIMPLE_HEAL', () => {
     const popUp: Instruction = { op: 'itemPopUp', side: 'far', item: 0x0123 }
     expect(encodeInstruction(popUp)).toEqual([0x12, 3, 1, 0x23, 0x01])
     const trap: Instruction = { op: 'trapTurn', side: 'near', move: 83 }
     expect(encodeInstruction(trap)).toEqual([0x13, 3, 0, 83, 0])
+    expect(encodeInstruction({ op: 'flushTextBox' })).toEqual([0x14, 0])
     const heal: Instruction = { op: 'anim', side: 'far', anim: 'simpleHeal' }
     expect(encodeInstruction(heal)).toEqual([0x0d, 2, 1, 17])
   })

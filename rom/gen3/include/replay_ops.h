@@ -26,6 +26,10 @@ u32 Replay_GetStatus1(u32 status);
 // Returns FALSE when a headless test draws nothing and waits for nothing.
 bool32 Replay_PrintText(const volatile u8 *text, u32 frames);
 
+// Empties the text box as a battle script's flushtextbox does: printstring STRINGID_EMPTYSTRING3,
+// then waitmessage 1. FLUSH_TEXT_BOX and ITEM_POP_UP share it. Returns as Replay_PrintText.
+bool32 Replay_FlushTextBox(void);
+
 // replay_ops_damage.c
 bool32 Replay_OpMove(const volatile u8 *operands, u32 step);
 bool32 Replay_OpHit(const volatile u8 *operands, u32 step);

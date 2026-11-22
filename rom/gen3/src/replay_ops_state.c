@@ -3,7 +3,6 @@
 #include "battle_anim.h"
 #include "battle_controllers.h"
 #include "battle_interface.h"
-#include "battle_message.h"
 #include "pokemon.h"
 #include "replay_interpreter.h"
 #include "replay_ops.h"
@@ -12,9 +11,9 @@
 #include "constants/battle_anim.h"
 #include "constants/pokemon.h"
 
-// The ops of a mon's state (#6, #19): STATUS, STAT, ITEM and ITEM_POP_UP. Both parties are local in a recorded
-// battle, so each writes the party mon itself; the battle mon changes only while that party mon is
-// on the field.
+// The ops of a mon's state (#6, #19): STATUS, STAT, ITEM and ITEM_POP_UP. Both parties are local
+// in a recorded battle, so each writes the party mon itself; the battle mon changes only while that
+// party mon is on the field.
 
 static bool32 IsOnField(u32 battler, u32 slot)
 {
@@ -113,7 +112,7 @@ bool32 Replay_OpItemPopUp(const volatile u8 *operands, u32 step)
     switch (step)
     {
     case 0:
-        Replay_PrintText(gText_EmptyString3, 1);
+        Replay_FlushTextBox();
         return FALSE;
     case 1:
         gLastUsedItem = Replay_ReadU16(operands + 1);

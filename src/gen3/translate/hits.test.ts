@@ -1,6 +1,7 @@
 // Multi-hit moves (#15), as the pinned expansion plays them: every hit plays the move's animation,
-// the hit and the bar, and says its critical hit; the effectiveness waits for the last hit, then
-// the count line follows. A target that the last hit knocks out faints before both lines.
+// the hit and the bar, and says its critical hit; every hit after the first empties the text box
+// first (`BattleScript_FlushMessageBox`); the effectiveness waits for the last hit, then the count
+// line follows. A target that the last hit knocks out faints before both lines.
 import { describe, expect, it } from 'vitest'
 
 import type { Side } from '../../script/types'
@@ -24,6 +25,7 @@ const hit = (side: Side, effectiveness: Effectiveness = 'normal') => ({
 const hp = (side: Side, value: number) => ({ op: 'hp', side, hp: value })
 const ROCK_BLAST = move('Rock Blast')
 const DOUBLE_KICK = move('Double Kick')
+const FLUSH = { op: 'flushTextBox' }
 const FAINTED = 'The opposing Tyranitar fainted!'
 const SUPER = "It's super effective!"
 
@@ -48,10 +50,12 @@ describe('a multi-hit move', () => {
       ROCK_BLAST,
       hit('far', 'super'),
       hp('far', 80),
+      FLUSH,
       ROCK_BLAST,
       hit('far', 'super'),
       hp('far', 55),
       'A critical hit!',
+      FLUSH,
       ROCK_BLAST,
       hit('far', 'super'),
       hp('far', 35),
@@ -74,6 +78,7 @@ describe('a multi-hit move', () => {
       DOUBLE_KICK,
       hit('far'),
       hp('far', 20),
+      FLUSH,
       DOUBLE_KICK,
       hit('far'),
       hp('far', 0),
@@ -126,13 +131,37 @@ describe('a multi-hit move', () => {
 
     const isOp = (op: string) => (step: string | Instruction) =>
       typeof step !== 'string' && step.op === op
-    expect(scene.filter((step) => isOp('move')(step) || isOp('hit')(step))).toEqual([
+    const shownOps = ['move', 'hit', 'flushTextBox']
+    expect(scene.filter((step) => shownOps.some((op) => isOp(op)(step)))).toEqual([
       DOUBLE_KICK,
       hit('far'),
+      FLUSH,
       DOUBLE_KICK,
       hit('far'),
     ])
     expect(scene.at(-1)).toBe('The Pokémon was hit 2 times!')
+  })
+
+  // `move()` plays no MOVE for a move marked `[still]`, `[miss]` or `[notarget]`, or one that did
+  // nothing. No Gen 3 log gives a multi-hit move with hits any of these today, so this log is made
+  // by hand: its hits still play, each later one after the flush, with no move animation.
+  it('plays the hits of a move that played no MOVE, with the flush and without the move', () => {
+    expect(
+      shown(
+        '|move|p1a: Dugtrio|Double Kick|p2a: Tyranitar|[still]',
+        '|-damage|p2a: Tyranitar|80/100',
+        '|-damage|p2a: Tyranitar|60/100',
+        '|-hitcount|p2a: Tyranitar|2',
+      ),
+    ).toEqual([
+      'Dugtrio used Double Kick!',
+      hit('far'),
+      hp('far', 80),
+      FLUSH,
+      hit('far'),
+      hp('far', 60),
+      'The Pokémon was hit 2 times!',
+    ])
   })
 })
 

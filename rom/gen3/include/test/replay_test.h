@@ -74,6 +74,7 @@ void ReplayStream_Item(u32 side, u32 slot, u32 item);
 void ReplayStream_ItemPopUp(u32 side, u32 item);
 // move is the move that traps the side's mon.
 void ReplayStream_TrapTurn(u32 side, u32 move);
+void ReplayStream_FlushTextBox(void);
 void ReplayStream_Weather(u32 weather);
 void ReplayStream_Volatile(u32 side, u32 volatileId, bool32 on);
 // show: TRUE shows the ability pop-up, FALSE hides it.

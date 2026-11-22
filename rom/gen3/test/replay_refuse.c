@@ -73,6 +73,21 @@ TEST("Replay: TURN with size 3 is refused")
     EXPECT_EQ(Validate(), REPLAY_ERROR_SIZE);
 }
 
+TEST("Replay: FLUSH_TEXT_BOX with size 1 is refused, with size 0 it passes")
+{
+    const u8 operand = 0;
+
+    ReplayStream_Begin();
+    ReplayStream_Op(REPLAY_OP_FLUSH_TEXT_BOX, 1, &operand);
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_SIZE);
+
+    ReplayStream_Begin();
+    ReplayStream_FlushTextBox();
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_NONE);
+}
+
 TEST("Replay: an op that runs past the instructions is refused")
 {
     ReplayStream_Begin();

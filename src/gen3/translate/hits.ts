@@ -2,10 +2,12 @@
 // plays its sound and hit animation; the critical hit and effectiveness lines follow the bar.
 //
 // A multi-hit move says "used" once (`CancelerAttackstring`, src/battle_move_resolution.c), then
-// `MoveEndMultihitMove` restarts the canceler for every later hit, so each hit plays the move's
-// animation (`CancelerMoveAnimation`), the hit, the bar and its critical hit line. The
-// effectiveness waits for the last hit (`Cmd_resultmessage`, src/battle_script_commands.c);
-// `BattleScript_MultiHitPrintStrings` (data/battle_scripts_1.s) says it, then the count line.
+// `MoveEndMultihitMove` empties the text box (`BattleScript_FlushMessageBox`) and restarts the
+// canceler for every later hit, so the "used" line or the last critical hit line stays up until
+// then, and each hit plays the move's animation (`CancelerMoveAnimation`), the hit, the bar and its
+// critical hit line. The effectiveness waits for the last hit (`Cmd_resultmessage`,
+// src/battle_script_commands.c); `BattleScript_MultiHitPrintStrings` (data/battle_scripts_1.s)
+// says it, then the count line.
 // `MOVEEND_FAINT_BLOCK` runs before `MOVEEND_MULTIHIT_MOVE`, so a target that the last hit knocks
 // out faints before both lines (upstream's test/battle/move_effect/multi_hit.c). Showdown logs
 // `-hitcount` once after the last hit and the faint after it (data/mods/gen3/scripts.ts).
@@ -34,7 +36,10 @@ export function startMove(
   }
 }
 
-/** One hit on `side`; a multi-hit move plays its MOVE again before every hit after the first. */
+/**
+ * One hit on `side`; before every hit after the first, a multi-hit move empties the text box and
+ * plays its MOVE again.
+ */
 export function hit(
   line: number,
   side: Side,
@@ -43,10 +48,15 @@ export function hit(
 ): void {
   const multiHit = ctx.multiHit
   if (multiHit !== undefined) {
-    if (multiHit.hits > 0 && multiHit.move !== undefined) ctx.emit(line, multiHit.move)
+    if (multiHit.hits > 0) nextHit(line, multiHit.move, ctx)
     multiHit.hits += 1
   }
   ctx.emit(line, { op: 'hit', side, effectiveness: effectiveness ?? 'normal' })
+}
+
+function nextHit(line: number, move: Instruction | undefined, ctx: Context): void {
+  ctx.emit(line, { op: 'flushTextBox' })
+  if (move !== undefined) ctx.emit(line, move)
 }
 
 /** The lines after a hit: a critical hit, then the effectiveness, which a multi-hit move holds. */

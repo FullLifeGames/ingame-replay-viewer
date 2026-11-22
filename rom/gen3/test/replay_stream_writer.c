@@ -233,6 +233,11 @@ void ReplayStream_TrapTurn(u32 side, u32 move)
     ReplayStream_Op(REPLAY_OP_TRAP_TURN, REPLAY_OP_TRAP_TURN_SIZE, operands);
 }
 
+void ReplayStream_FlushTextBox(void)
+{
+    ReplayStream_Op(REPLAY_OP_FLUSH_TEXT_BOX, REPLAY_OP_FLUSH_TEXT_BOX_SIZE, NULL);
+}
+
 const u8 *ReplayStream_Data(void)
 {
     return sStream;

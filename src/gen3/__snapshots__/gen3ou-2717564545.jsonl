@@ -1,4 +1,4 @@
-{"length":4436,"crc32":"4ddfc681","trainers":{"near":{"name":"chronosxsonorhc","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"oldsmellybastard","trainerPic":2,"teamSize":6,"revealed":3}},"parties":{"near":[{"species":38,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ninetales"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":233,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Porygon2"},{"species":254,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Sceptile"},{"species":260,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Swampert"},{"species":237,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Hitmontop"}],"far":[{"species":348,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Jumbo Shrimp"},{"species":260,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Fent Cart"},{"species":214,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Come on and "},null,null,null]}}
+{"length":4438,"crc32":"8d75ef92","trainers":{"near":{"name":"chronosxsonorhc","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"oldsmellybastard","trainerPic":2,"teamSize":6,"revealed":3}},"parties":{"near":[{"species":38,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ninetales"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":233,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Porygon2"},{"species":254,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Sceptile"},{"species":260,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Swampert"},{"species":237,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Hitmontop"}],"far":[{"species":348,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Jumbo Shrimp"},{"species":260,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Fent Cart"},{"species":214,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Come on and "},null,null,null]}}
 {"line":25,"op":"intro"}
 {"line":25,"op":"print","text":"You are challenged by oldsmellybastard!"}
 {"line":27,"op":"print","text":"oldsmellybastard sent out Jumbo Shrimp!"}
@@ -12,6 +12,7 @@
 {"line":34,"op":"move","user":"far","target":"near","move":350}
 {"line":36,"op":"hit","side":"near","effectiveness":"super"}
 {"line":36,"op":"hp","side":"near","hp":76}
+{"line":38,"op":"flushTextBox"}
 {"line":38,"op":"move","user":"far","target":"near","move":350}
 {"line":38,"op":"hit","side":"near","effectiveness":"super"}
 {"line":38,"op":"hp","side":"near","hp":48}

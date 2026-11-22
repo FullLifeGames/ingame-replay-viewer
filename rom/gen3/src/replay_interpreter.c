@@ -42,6 +42,7 @@ struct ReplayState
 static bool32 Op_End(const volatile u8 *operands, u32 step);
 static bool32 Op_Turn(const volatile u8 *operands, u32 step);
 static bool32 Op_Print(const volatile u8 *operands, u32 step);
+static bool32 Op_FlushTextBox(const volatile u8 *operands, u32 step);
 static bool32 Op_Intro(const volatile u8 *operands, u32 step);
 static bool32 Op_SendOut(const volatile u8 *operands, u32 step);
 static void Replay_RunBattle(void);
@@ -54,29 +55,30 @@ static EWRAM_DATA struct ReplayState sReplay = {0};
 // The step function of each op of format v2. Replay_Validate refuses any other op.
 static const ReplayOpFunc sOps[] =
 {
-    [REPLAY_OP_END]         = Op_End,
-    [REPLAY_OP_TURN]        = Op_Turn,
-    [REPLAY_OP_PRINT]       = Op_Print,
-    [REPLAY_OP_INTRO]       = Op_Intro,
-    [REPLAY_OP_SEND_OUT]    = Op_SendOut,
-    [REPLAY_OP_MOVE]        = Replay_OpMove,
-    [REPLAY_OP_HIT]         = Replay_OpHit,
-    [REPLAY_OP_HP]          = Replay_OpHp,
-    [REPLAY_OP_FAINT]       = Replay_OpFaint,
-    [REPLAY_OP_WITHDRAW]    = Replay_OpWithdraw,
-    [REPLAY_OP_SWITCH_IN]   = Replay_OpSwitchIn,
-    [REPLAY_OP_STATUS]      = Replay_OpStatus,
-    [REPLAY_OP_STAT]        = Replay_OpStat,
-    [REPLAY_OP_ANIM]        = Replay_OpAnim,
-    [REPLAY_OP_WEATHER]     = Replay_OpWeather,
-    [REPLAY_OP_VOLATILE]    = Replay_OpVolatile,
-    [REPLAY_OP_ABILITY]     = Replay_OpAbility,
-    [REPLAY_OP_ITEM]        = Replay_OpItem,
-    [REPLAY_OP_ITEM_POP_UP] = Replay_OpItemPopUp,
-    [REPLAY_OP_TRAP_TURN]   = Replay_OpTrapTurn,
+    [REPLAY_OP_END]            = Op_End,
+    [REPLAY_OP_TURN]           = Op_Turn,
+    [REPLAY_OP_PRINT]          = Op_Print,
+    [REPLAY_OP_INTRO]          = Op_Intro,
+    [REPLAY_OP_SEND_OUT]       = Op_SendOut,
+    [REPLAY_OP_MOVE]           = Replay_OpMove,
+    [REPLAY_OP_HIT]            = Replay_OpHit,
+    [REPLAY_OP_HP]             = Replay_OpHp,
+    [REPLAY_OP_FAINT]          = Replay_OpFaint,
+    [REPLAY_OP_WITHDRAW]       = Replay_OpWithdraw,
+    [REPLAY_OP_SWITCH_IN]      = Replay_OpSwitchIn,
+    [REPLAY_OP_STATUS]         = Replay_OpStatus,
+    [REPLAY_OP_STAT]           = Replay_OpStat,
+    [REPLAY_OP_ANIM]           = Replay_OpAnim,
+    [REPLAY_OP_WEATHER]        = Replay_OpWeather,
+    [REPLAY_OP_VOLATILE]       = Replay_OpVolatile,
+    [REPLAY_OP_ABILITY]        = Replay_OpAbility,
+    [REPLAY_OP_ITEM]           = Replay_OpItem,
+    [REPLAY_OP_ITEM_POP_UP]    = Replay_OpItemPopUp,
+    [REPLAY_OP_TRAP_TURN]      = Replay_OpTrapTurn,
+    [REPLAY_OP_FLUSH_TEXT_BOX] = Op_FlushTextBox,
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sOps) == REPLAY_OP_TRAP_TURN + 1, ReplayOpsCoverFormatV2);
+STATIC_ASSERT(ARRAY_COUNT(sOps) == REPLAY_OP_FLUSH_TEXT_BOX + 1, ReplayOpsCoverFormatV2);
 
 // The battle outcome of each REPLAY_OUTCOME_*. A tie and an unknown end are draws.
 static const u8 sOutcomes[] =
@@ -309,6 +311,20 @@ static bool32 Op_Print(const volatile u8 *operands, u32 step)
     if (step != 0)
         return TRUE;
     return !Replay_PrintText(operands, B_WAIT_TIME_LONG);
+}
+
+bool32 Replay_FlushTextBox(void)
+{
+    return Replay_PrintText(gText_EmptyString3, 1);
+}
+
+// FLUSH_TEXT_BOX: the text box emptied, as BattleScript_FlushMessageBox does before each later hit
+// of a multi-hit move (MoveEndMultihitMove).
+static bool32 Op_FlushTextBox(const volatile u8 *operands, u32 step)
+{
+    if (step != 0)
+        return TRUE;
+    return !Replay_FlushTextBox();
 }
 
 // INTRO: the game's own intro (DoBattleIntro, saved by Replay_TakeOverBattleMain) up to its first

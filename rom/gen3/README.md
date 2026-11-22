@@ -33,6 +33,7 @@ The ROM interpreter (`src/replay_interpreter.c`, `src/replay_setup.c`) plays an 
 
 `src/replay_stream_check.c` checks the whole stream before a battle starts, and `src/replay_stream.c` reads it. The ops share `include/replay_ops.h` with the main loop:
 
+- END, TURN, PRINT, FLUSH_TEXT_BOX, INTRO and SEND_OUT: the main loop, `src/replay_interpreter.c`. FLUSH_TEXT_BOX empties the text box as a battle script's `flushtextbox` does, before each later hit of a multi-hit move; ITEM_POP_UP starts with the same flush.
 - MOVE, HIT, HP and FAINT: `src/replay_ops_damage.c`
 - WITHDRAW and SWITCH_IN: `src/replay_ops_switch.c`
 - STATUS, STAT, ITEM and ITEM_POP_UP: `src/replay_ops_state.c`

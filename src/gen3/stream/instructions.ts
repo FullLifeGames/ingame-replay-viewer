@@ -70,6 +70,8 @@ interface Operands {
   itemPopUp: OnSide & { readonly item: number }
   /** The end-of-turn animation of the move that traps the side's mon. */
   trapTurn: OnSide & { readonly move: number }
+  /** The text box emptied, as a battle script's `flushtextbox`; no operands. */
+  flushTextBox: unknown
 }
 
 export type Instruction = { [K in Op]: { readonly op: K } & Operands[K] }[Op]
@@ -182,6 +184,7 @@ export const LAYOUT: { readonly [K in FixedOp]: Fields<Operands[K]> } = {
     ['side', side],
     ['move', below(counts.MOVES_COUNT_ALL)],
   ],
+  flushTextBox: [],
 }
 
 /** A trainer's fields; their offsets are TRAINER_OFFSET's under the same names. */

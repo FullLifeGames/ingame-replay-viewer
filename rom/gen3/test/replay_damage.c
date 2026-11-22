@@ -6,13 +6,14 @@
 #include "test/replay_test.h"
 #include "constants/battle.h"
 #include "constants/battle_anim.h"
+#include "constants/characters.h"
 #include "constants/moves.h"
 #include "constants/songs.h"
 #include "constants/species.h"
 
-// A move and its damage (#6): MOVE plays the user's move animation, HIT the effectiveness sound and
-// the hit animation, HP moves the HP bar and sets the mon's HP, FAINT plays the faint cry and the
-// faint animation.
+// A move and its damage (#6, #15): MOVE plays the user's move animation, HIT the effectiveness
+// sound and the hit animation, HP moves the HP bar and sets the mon's HP, FAINT plays the faint cry
+// and the faint animation, and FLUSH_TEXT_BOX empties the text box before a later hit.
 
 // Dugtrio near and Magneton far, both on the field.
 static void StartDugtrioVsMagneton(u32 nearHp, u32 farHp)
@@ -65,6 +66,40 @@ REPLAY_TEST("A normal hit plays SE_EFFECTIVE and a resisted one SE_NOT_EFFECTIVE
         EFFECTIVENESS_SE(nearMon, SE_EFFECTIVE);
         ANIMATION(ANIM_TYPE_MOVE, MOVE_ROCK_SLIDE, nearMon, target: farMon);
         EFFECTIVENESS_SE(farMon, SE_NOT_EFFECTIVE);
+    }
+}
+
+// MoveEndMultihitMove runs BattleScript_FlushMessageBox (flushtextbox: printstring
+// STRINGID_EMPTYSTRING3, waitmessage 1) before every later hit, so the critical hit line of the
+// hit before stays up until then.
+REPLAY_TEST("FLUSH_TEXT_BOX empties the text box between two hits of Double Kick")
+{
+    STREAM
+    {
+        StartDugtrioVsMagneton(100, 100);
+        ReplayStream_Print(COMPOUND_STRING("Dugtrio used Double Kick!"));
+        ReplayStream_Move(REPLAY_SIDE_NEAR, REPLAY_SIDE_FAR, MOVE_DOUBLE_KICK);
+        ReplayStream_Hit(REPLAY_SIDE_FAR, REPLAY_EFFECTIVENESS_NORMAL);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 80);
+        ReplayStream_Print(COMPOUND_STRING("A critical hit!"));
+        ReplayStream_FlushTextBox();
+        ReplayStream_Move(REPLAY_SIDE_NEAR, REPLAY_SIDE_FAR, MOVE_DOUBLE_KICK);
+        ReplayStream_Hit(REPLAY_SIDE_FAR, REPLAY_EFFECTIVENESS_NORMAL);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 60);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        MESSAGE("Dugtrio used Double Kick!");
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_DOUBLE_KICK, nearMon, target: farMon);
+        HP_BAR(farMon, hp: 80);
+        MESSAGE("A critical hit!");
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_DOUBLE_KICK, nearMon, target: farMon);
+        HP_BAR(farMon, hp: 60);
+    }
+    THEN
+    {
+        EXPECT_EQ(gDisplayedStringBattle[0], EOS);
     }
 }
 
