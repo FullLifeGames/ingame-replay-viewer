@@ -239,11 +239,12 @@ describe('the WebAssembly spike files', () => {
     expect(await climbing.text()).not.toBe('next')
   })
 
-  it('names the link when the glue or the patch is missing', async () => {
+  it('names every build step when the glue or the patch is missing', async () => {
     const response = await fetch(`${emptyBase}/${WASM_FILES.glue}`)
     expect(response.status).toBe(404)
     expect(await response.text()).toBe(
-      `${join(empty, 'wasm', LINK_OUTPUTS.js)} is missing: run npm run wasm:build -- --link\n`,
+      `${join(empty, 'wasm', LINK_OUTPUTS.js)} is missing: run npm run rom:build, ` +
+        'npm run wasm:build -- --compile, npm run wasm:convert and npm run wasm:build -- --link\n',
     )
   })
 })

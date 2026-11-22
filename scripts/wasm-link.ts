@@ -12,6 +12,10 @@ import { WASM_DIR } from './wasm-config.ts'
 // Our C files of the build: the frame, the stubs, the replacements and the memory check.
 const GLUE_DIR = join(WASM_DIR, 'src')
 export const LINK_OUTPUTS = { js: 'irv-emerald.js', wasm: 'irv-emerald.wasm' } as const
+/** The commands that make the link's outputs and the module patch, in order. */
+export const WASM_BUILD_STEPS =
+  'npm run rom:build, npm run wasm:build -- --compile, npm run wasm:convert and ' +
+  'npm run wasm:build -- --link'
 // What the host calls: the game's entry, and where the slot and the replay progress lie.
 const LINK_EXPORTS = ['AgbMain', 'IrvWasm_Slot', 'IrvWasm_Progress'] as const
 

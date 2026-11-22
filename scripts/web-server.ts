@@ -13,7 +13,7 @@ import { WASM_FILES } from '../src/web/wasm/files.ts'
 import { OUTPUT_NAMES } from './rom-outputs.ts'
 import { buildPaths, REPO_DIR } from './rom-paths.ts'
 import { wasmPaths } from './wasm-compile.ts'
-import { LINK_OUTPUTS } from './wasm-link.ts'
+import { LINK_OUTPUTS, WASM_BUILD_STEPS } from './wasm-link.ts'
 import { WASM_OUTPUT_NAMES } from './wasm-outputs.ts'
 
 type Middleware = (req: IncomingMessage, res: ServerResponse, next: () => void) => void
@@ -78,7 +78,7 @@ const wasmMount = (dir: string): Mount => ({
     [`/${WASM_FILES.patch}`, { name: WASM_OUTPUT_NAMES.patch, type: BINARY }],
   ]),
   dir,
-  build: 'npm run wasm:build -- --link',
+  build: WASM_BUILD_STEPS,
   passOn: isPageModule,
 })
 

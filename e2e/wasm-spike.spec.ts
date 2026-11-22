@@ -17,7 +17,7 @@ import { readPreflightInput } from '../scripts/rom-preflight.ts'
 import { PROGRESS_HEADER_PATH, readProgressLayout } from '../scripts/rom-shot-run.ts'
 import { planStreams } from '../scripts/rom-shot.ts'
 import { wasmPaths } from '../scripts/wasm-compile.ts'
-import { LINK_OUTPUTS } from '../scripts/wasm-link.ts'
+import { LINK_OUTPUTS, WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'
 import { WASM_OUTPUT_NAMES } from '../scripts/wasm-outputs.ts'
 import { MIXER_RATE } from '../src/web/wasm/protocol.ts'
 import { frame } from './frames.ts'
@@ -141,7 +141,7 @@ test('the spike page plays the hand-made battle at 1x and 994052 at fast', async
   const missing = [DUMP, ...NEEDED].filter((path) => !existsSync(path))
   test.skip(
     missing.length > 0,
-    `missing ${missing.join(', ')}; run npm run rom:build and npm run wasm:build -- --link, or set IRV_BASE_ROM`,
+    `missing ${missing.join(', ')}; run ${WASM_BUILD_STEPS}, or set IRV_BASE_ROM`,
   )
   test.setTimeout(900_000)
   // The test hook starts the hand-made battle without a click, so the page may open its audio.
