@@ -1,4 +1,4 @@
-// The scene diff of the WebAssembly build (#43, plan section 2.3): `node scripts/wasm-diff.ts
+// The scene diff of the WebAssembly build (#43, plan section 2.3): `npm run wasm:diff --
 // [<stream> ...]`. For each scene frame that `npm run wasm:run` wrote to build/wasm/run/<stream>/,
 // it counts the pixels that differ from mGBA's frame of the same scene in
 // build/rom/shots/<stream>/ (from `npm run rom:shots`) and boxes them. A scene in mid-animation
