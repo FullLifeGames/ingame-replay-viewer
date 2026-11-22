@@ -14,7 +14,7 @@ Two things stood between it and a public build in wave 3: a platform layer we ma
 - The 544 data objects that the ROM build assembles with ARM `as` (battle scripts, animation scripts, event scripts, songs) go through a converter (`scripts/wasm-convert.ts`). It reads each ARM ELF object and writes LLVM's WebAssembly assembly with the same bytes and relocations. All 544 assemble.
 - The GBA's addresses map one to one into linear memory: EWRAM at 0x02000000, IO at 0x04000000, VRAM at 0x06000000, static data from 0x08000000, where the ROM would sit. The memory is a fixed 256 MB.
 - Our platform layer (`rom/gen3/wasm/layer/`, #43: 17 C files and 11 headers) stands in for the GBA's hardware. It makes the BIOS calls, runs DMA and the interrupts, drives the display line by line and draws each line: text and affine backgrounds, sprites, windows, blending and mosaic. It also plays the sound: the game's music players and the PCM mixer (`irv_mp2k_*.c`, written from a functional spec of the game's sound engine) and the four PSG channels, synthesised from the sound registers (`irv_psg.c`). We wrote it from GBATEK and the game's own sources. It includes no header of the expansion, so a native harness (`layer/host/`) runs the same files in the specs, in CI too.
-- Our glue (`rom/gen3/wasm/src/`, seven files, 690 lines) blocks in `VBlankIntrWait`, has our layer run the frame, passes each interrupt to the game's handler, and hands each frame and its sound to JavaScript. It also stubs flash, the clock, the link cable and multiboot. Its compile checks the offset and size of every field that our layer's structs share with the expansion's.
+- Our glue (`rom/gen3/wasm/src/`, eight files, 728 lines) blocks in `VBlankIntrWait`, has our layer run the frame, passes each interrupt to the game's handler, and hands each frame and its sound to JavaScript. It also stubs flash, the clock, the link cable and multiboot. A run may call four of the stubs, the ones `InitRFU` calls at boot, which `irv_wasm_stub_list.h` lists (#46). A call to any other stub stops the run with the stub's name, and `wasm:run` and the page show it. The glue's compile checks the offset and size of every field that our layer's structs share with the expansion's.
 - The page (`src/web/wasm.html`) rebuilds the module from your dump with a BPS patch, the way the emulator page rebuilds the ROM. A worker runs the game and hands each frame over through two buffers, so the page never copies a frame the worker is still writing (#48). The page allows the worker its frames at 1x, 2x or fast, and an audio worklet plays its sound.
 
 ## What works
@@ -86,23 +86,23 @@ The mGBA probe (`e2e/wasm-spike.spec.ts`, its second test) plays 994052 on the e
 
 ## Download size
 
-Bytes, with gzip at level 9 and brotli at quality 11 from Node's zlib (`scripts/patch-sizes.ts`, stage 3's merged tree of wave 4: stream format 2, our platform layer's first part):
+Bytes, with gzip at level 9 and brotli at quality 11 from Node's zlib (`scripts/patch-sizes.ts`). The module's rows measure stage 4's build of wave 4: stream format 2, our whole platform layer, the stub list. The emulator page's rows are stage 3's, whose files stage 4 left unchanged:
 
 | File                                  | Raw            | gzip           | brotli         |
 | ------------------------------------- | -------------- | -------------- | -------------- |
-| `irv-emerald-wasm.bps` (module patch) | 20,977,267     | 15,605,329     | 14,159,223     |
-| `irv-emerald.js` (Emscripten's glue)  | 8,458          | 3,094          | 2,803          |
-| **WebAssembly page**                  | **20,985,725** | **15,608,423** | **14,162,026** |
+| `irv-emerald-wasm.bps` (module patch) | 20,966,477     | 15,594,645     | 14,155,278     |
+| `irv-emerald.js` (Emscripten's glue)  | 8,696          | 3,167          | 2,865          |
+| **WebAssembly page**                  | **20,975,173** | **15,597,812** | **14,158,143** |
 | `mgba.wasm`                           | 1,852,041      | 597,591        | 463,184        |
 | `mgba.js`                             | 248,854        | 57,127         | 48,706         |
 | `irv-emerald.bps` (ROM patch)         | 18,391,067     | 15,762,689     | 14,487,718     |
 | **Emulator page**                     | **20,491,962** | **16,417,407** | **14,999,608** |
 
-Raw, the WebAssembly page fetches 0.49 MB more. Compressed, it fetches 0.81 MB less with gzip and 0.84 MB less with brotli. The dev server sends both pages' files uncompressed; a real host picks the encoding (M2).
+Raw, the WebAssembly page fetches 0.48 MB more. Compressed, it fetches 0.82 MB less with gzip and 0.84 MB less with brotli. The dev server sends both pages' files uncompressed; a real host picks the encoding (M2).
 
 In wave 3 the module patch copied 5,815,589 of the module's 25,977,583 bytes (22.4 %) from the dump and carried 20,143,848 bytes as literals. For comparison, the ROM patch copied 8,069,773 of the ROM's 33,554,432 bytes (24.0 %) from the dump (the BPS actions SourceRead and SourceCopy, counted in both patches).
 
-The module itself, `irv-emerald.wasm` (25,977,583 bytes), never leaves devbox: the server answers 404 for it, and the page rebuilds it from the dump.
+The module itself, `irv-emerald.wasm` (25,968,977 bytes), never leaves devbox: the server answers 404 for it, and the page rebuilds it from the dump.
 
 ## What it means for the speed options and for #17
 
@@ -110,7 +110,7 @@ The module itself, `irv-emerald.wasm` (25,977,583 bytes), never leaves devbox: t
 
 The speed options go into our own frame loop if milestone 2 ships the module. The page already grants the worker its frames by the tick rule (`src/web/wasm/protocol.ts`), so 1x, 2x and fast are one factor each, the sound follows at 1x and 2x, and fast gives way to 1x at END. If milestone 2 keeps mGBA, the options go to mGBA's fast-forward multiplier instead. In Chromium that tops out near 314 frames per second, where the module's fast averaged 330 to 348 in B6 and B7.
 
-The module does not solve #17. Its patch is 20.98 MB raw and 14.16 MB with brotli, against 18.39 MB and 14.49 MB for the ROM patch. Each copies under a quarter of its bytes from the dump and carries the rest itself. A visitor fetches 0.81 MB less on the WebAssembly page with gzip and 0.84 MB less with brotli, and the host's compression saves more than the switch: brotli takes 3.90 MB off the ROM patch. Per-asset extraction (below, "Nintendo's assets from the dump") is the one lever the spike found that shrinks the module patch itself, by the retail assets the expansion recompresses. The expansion's new assets stay in the patch on either route.
+The module does not solve #17. Its patch is 20.97 MB raw and 14.16 MB with brotli, against 18.39 MB and 14.49 MB for the ROM patch. Each copies under a quarter of its bytes from the dump and carries the rest itself. A visitor fetches 0.82 MB less on the WebAssembly page with gzip and 0.84 MB less with brotli, and the host's compression saves more than the switch: brotli takes 3.90 MB off the ROM patch. Per-asset extraction (below, "Nintendo's assets from the dump") is the one lever the spike found that shrinks the module patch itself, by the retail assets the expansion recompresses. The expansion's new assets stay in the patch on either route.
 
 ## Patches, shadow headers and flags
 
@@ -210,7 +210,6 @@ The gate accepted both drafts on 22.11.2026 (answers 2a and 4a): the amendment n
 - The OBJ cycle budget per line follows GBATEK's counts, and no oracle state is known to reach it.
 - The window edges with X1 > X2 or Y1 > Y2 read as X2 = 240 and Y2 = 160, as GBATEK says, with no wrap. The oracle saw three WIN0 ranges and no WIN1, so only the specs check this. The animations of Memento, Curse and Fake Out build WIN0H from moving values (`battle_anim_dark.c`, `battle_anim_ghost.c`, `battle_anim_effects_2.c`); an oracle run every frame across one of them would settle it.
 - Nothing ties the module to `build/rom/replay-slot.json` beyond the slot's magic. A ROM rebuilt with another slot layout beside a stale module would let the page write past the module's slot; the module could export its slot's size for the page to check.
-- An unexpected stub call (the link cable, multiboot) only logs to the console. For milestone 2, a list of allowed stubs that fails a run would catch one.
 - `docs/plan.md` said the page hands the stream over instead of through the replay slot, while the ADR 0008 draft kept the slot in linear memory. The gate took the draft (ADR 0009), and the plan now says so.
 - `wasm-config.ts` and `rom-config.ts` each check their config fields; one shared checker would do.
 - The production build for a real host, and its headers, stay M2's work. `npm run build` with `vite preview` already serves the spike page: the e2e passed against it, with the worker and the worklet loading from `dist/assets/`.
