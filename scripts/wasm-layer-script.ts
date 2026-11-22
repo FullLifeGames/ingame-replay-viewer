@@ -49,6 +49,14 @@ export const FRAME_WIDTH = 240
 export const FRAME_HEIGHT = 160
 export const FRAME_BYTES = FRAME_WIDTH * FRAME_HEIGHT * 2
 
+/**
+ * One frame as `frame` does, then the harness's trace of it: per pixel the top two layers'
+ * colours (16 bits each), the effect (0 none, 1 alpha, 2 brighter, 3 darker), EVA, EVB and EVY.
+ */
+export const traceFrame: Op = [10]
+export const TRACE_ENTRY = 8
+export const TRACE_BYTES = FRAME_WIDTH * FRAME_HEIGHT * TRACE_ENTRY
+
 /** Appends the first `max` calls of the IRQ handler as a flag and VCOUNT each, zeros after them. */
 export const irqLog = (max: number): Op => [9, max]
 export const IRQ_LOG_ENTRY = 4
@@ -66,4 +74,26 @@ export function runScript(host: string, ops: readonly Op[], reads: number): Scri
     dest: new Uint8Array(reads),
   })
   return { calls: result >>> 16, flags: result & 0xffff, dest }
+}
+
+export interface PixelTrace {
+  top: number
+  below: number
+  effect: number
+  eva: number
+  evb: number
+  evy: number
+}
+
+/** Pixel `i` of a trace that `traceFrame` appended. */
+export function traceAt(trace: Uint8Array, i: number): PixelTrace {
+  const view = new DataView(trace.buffer, trace.byteOffset + i * TRACE_ENTRY, TRACE_ENTRY)
+  return {
+    top: view.getUint16(0, true),
+    below: view.getUint16(2, true),
+    effect: view.getUint8(4),
+    eva: view.getUint8(5),
+    evb: view.getUint8(6),
+    evy: view.getUint8(7),
+  }
 }

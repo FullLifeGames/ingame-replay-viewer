@@ -11,6 +11,8 @@ import {
   irqLog,
   load,
   runScript,
+  TRACE_BYTES,
+  traceFrame,
 } from './wasm-layer-script.ts'
 import type { Op } from './wasm-layer-script.ts'
 
@@ -272,4 +274,13 @@ export function drawFrame(host: string, video: Video, logMax = 0): DrawnFrame {
     irqs.push({ flag: log[2 * i] ?? 0, vcount: log[2 * i + 1] ?? 0 })
   }
   return { pixels, irqs, calls }
+}
+
+/** Runs the state's script and one frame with the harness's trace of each pixel. */
+export function traceVideo(host: string, video: Video) {
+  const { dest } = runScript(host, [...videoOps(video), traceFrame], FRAME_BYTES + TRACE_BYTES)
+  return {
+    pixels: new Uint16Array(dest.slice(0, FRAME_BYTES).buffer),
+    trace: dest.slice(FRAME_BYTES),
+  }
 }

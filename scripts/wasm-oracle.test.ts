@@ -12,7 +12,7 @@ import { buildHost } from './wasm-layer.ts'
 import { frame, FRAME_BYTES, runScript } from './wasm-layer-script.ts'
 import { rgb } from './wasm-layer-video.ts'
 import { parseOracleArgs, stateFrames, summarize } from './wasm-oracle.ts'
-import { diffFrame, parseVideoState, sideBySide, stateOps } from './wasm-oracle-state.ts'
+import { diffFrame, mgbaRgb, parseVideoState, sideBySide, stateOps } from './wasm-oracle-state.ts'
 
 const scratch = mkdtempSync(join(tmpdir(), 'irv-oracle-'))
 let host = ''
@@ -81,6 +81,34 @@ describe('a video state of the shot tool', () => {
   })
 })
 
+describe("mGBA's colour of a traced pixel", () => {
+  const trace = { top: rgb(30, 25, 17), below: rgb(31, 31, 31), effect: 0, eva: 7, evb: 9, evy: 8 }
+  const channels = (c: number) => [c >> 16, (c >> 8) & 0xff, c & 0xff]
+
+  it('widens the top colour as the page does when the pixel has no effect', () => {
+    expect(channels(mgbaRgb(trace))).toEqual([30, 25, 17].map(widenChannel))
+  })
+
+  it('blends the widened channels: (top * EVA + below * EVB) / 16, rounded down, at most 255', () => {
+    // hand-made's state 900 at (0, 0): mGBA shows 251, 233, 204, not a widened 5-bit colour.
+    expect(channels(mgbaRgb({ ...trace, effect: 1 }))).toEqual([251, 233, 204])
+    expect(channels(mgbaRgb({ ...trace, effect: 1, eva: 16, evb: 16 }))).toEqual([255, 255, 255])
+  })
+
+  it('brightens and darkens the widened channels by EVY / 16, the product rounded down', () => {
+    // widened 247, 206, 140
+    expect(channels(mgbaRgb({ ...trace, effect: 2 }))).toEqual([251, 230, 197])
+    expect(channels(mgbaRgb({ ...trace, effect: 3 }))).toEqual([124, 103, 70])
+  })
+
+  it('darkens red by subtracting its product, green and blue by multiplying by 16 - EVY', () => {
+    // 994052's state 10740 (EVY 9): white turns 112, 111, 111.
+    expect(channels(mgbaRgb({ ...trace, top: rgb(31, 31, 31), effect: 3, evy: 9 }))).toEqual([
+      112, 111, 111,
+    ])
+  })
+})
+
 describe('the script of a state', () => {
   it('draws the state as it was dumped', () => {
     const pixels = draw(stateBytes({}, { 0: rgb(3, 4, 5) }))
@@ -126,6 +154,19 @@ describe("the comparison with mGBA's frame", () => {
         { line: 9, pixels: 1 },
       ],
     })
+  })
+
+  it('takes the expected colour of each pixel from the trace when there is one', () => {
+    const trace = new Uint8Array(240 * 160 * 8)
+    const view = new DataView(trace.buffer)
+    for (let i = 0; i < 240 * 160; i++) view.setUint16(8 * i, rgb(31, 0, 0), true)
+    view.setUint16(8 * 7, rgb(0, 31, 0), true)
+    const diff = diffFrame(
+      ours,
+      linesFrame(() => rgb(31, 0, 0)),
+      trace,
+    )
+    expect(diff.pixels).toBe(1)
   })
 
   it('refuses a frame that is not 240x160', () => {

@@ -14,6 +14,8 @@
 //   8 frame                            (IrvLayer_RunFrame; appends its 240x160 BGR555 pixels)
 //   9 log     max                      (appends the first max calls of the handler as a 16-bit
 //                                       flag and VCOUNT each, zeros after the last)
+//  10 trace                            (a frame as 8 does, then its trace: struct IrvPixelTrace
+//                                       per pixel, irv_render.h)
 // The result holds the handler's calls in its upper half and the OR of their flags in its lower.
 #include <stdlib.h>
 #include <string.h>
@@ -22,8 +24,10 @@
 #include "irv_gba.h"
 #include "irv_irq.h"
 #include "irv_layer_host.h"
+#include "irv_render.h"
 
 uint8_t *gIrvHostMemory;
+struct IrvPixelTrace *gIrvPixelTrace;
 
 #define FRAME_BYTES (240 * 160 * 2)
 #define MAX_ON_IRQ  8
@@ -135,6 +139,17 @@ static void Frame(struct Script *script, struct HostCall *call)
     Append(script, call, sPixels, FRAME_BYTES);
 }
 
+static void TraceFrame(struct Script *script, struct HostCall *call)
+{
+    static struct IrvPixelTrace sTrace[240 * 160];
+
+    memset(sTrace, 0, sizeof(sTrace));
+    gIrvPixelTrace = sTrace;
+    Frame(script, call);
+    gIrvPixelTrace = NULL;
+    Append(script, call, sTrace, sizeof(sTrace));
+}
+
 static void Log(struct Script *script, struct HostCall *call)
 {
     uint32_t max = NextWord(script);
@@ -199,6 +214,9 @@ static void RunOperation(struct Script *script, struct HostCall *call)
         break;
     case 9:
         Log(script, call);
+        break;
+    case 10:
+        TraceFrame(script, call);
         break;
     default:
         Fail("an unknown operation in the script");

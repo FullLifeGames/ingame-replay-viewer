@@ -3,6 +3,8 @@
 // in mGBA and dumps mGBA's video state and frame every n frames (rom/gen3/shot/replay_state.c);
 // this script draws each state with our renderer in the host harness and compares it with mGBA's
 // frame line by line. Both images come from one mGBA instant, so no difference of pace enters.
+// mGBA applies the colour special effects to 8-bit channels, so a pixel with an effect is held
+// against mGBA's arithmetic on our layers and effect, from the harness's trace (mgbaRgb).
 // The report goes to build/wasm/oracle/report.json, the first ten differences of each stream as
 // side-by-side PPMs (ours left) next to the dumps.
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -24,7 +26,7 @@ import {
 } from './rom-shot-run.ts'
 import { wasmPaths } from './wasm-compile.ts'
 import { buildHost } from './wasm-layer.ts'
-import { frame, FRAME_BYTES, runScript } from './wasm-layer-script.ts'
+import { FRAME_BYTES, runScript, TRACE_BYTES, traceFrame } from './wasm-layer-script.ts'
 import { diffFrame, parseVideoState, sideBySide, stateOps } from './wasm-oracle-state.ts'
 import type { FrameDiff, VideoState } from './wasm-oracle-state.ts'
 import { wasmRoots } from './wasm-platform.ts'
@@ -90,9 +92,14 @@ export function summarize(name: string, compared: readonly Compared[]): StreamRe
   return { name, states: compared.length, equal, differing }
 }
 
-function drawState(host: string, state: VideoState): Uint16Array {
-  const { dest } = runScript(host, [...stateOps(state), frame], FRAME_BYTES)
-  return new Uint16Array(dest.buffer, dest.byteOffset, FRAME_BYTES / 2)
+/** Our frame of the state, and the harness's trace of it. */
+function drawState(host: string, state: VideoState): { ours: Uint16Array; trace: Uint8Array } {
+  const ops = [...stateOps(state), traceFrame]
+  const { dest } = runScript(host, ops, FRAME_BYTES + TRACE_BYTES)
+  return {
+    ours: new Uint16Array(dest.buffer, dest.byteOffset, FRAME_BYTES / 2),
+    trace: dest.subarray(FRAME_BYTES),
+  }
 }
 
 function readFrame(dir: string, at: number): Frame | undefined {
@@ -104,15 +111,15 @@ function compareDump(host: string, dir: string): Compared[] {
   const compared: Compared[] = []
   let crops = 0
   for (const at of stateFrames(readdirSync(dir))) {
-    const ours = drawState(
+    const { ours, trace } = drawState(
       host,
       parseVideoState(readFileSync(join(dir, `state-${String(at)}.bin`))),
     )
     const same = readFrame(dir, at)
     if (same === undefined) throw new Error(`${dir}: state ${String(at)} has no frame`)
     const next = readFrame(dir, at + 1)
-    const entry: Compared = { frame: at, same: diffFrame(ours, same) }
-    if (next !== undefined) entry.next = diffFrame(ours, next)
+    const entry: Compared = { frame: at, same: diffFrame(ours, same, trace) }
+    if (next !== undefined) entry.next = diffFrame(ours, next, trace)
     if (entry.same.pixels > 0 && crops++ < CROPS) {
       writeFileSync(join(dir, `diff-${String(at)}.ppm`), sideBySide(ours, same))
     }

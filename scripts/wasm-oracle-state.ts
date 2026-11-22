@@ -3,8 +3,8 @@
 // with our renderer in the host harness, and the per-line comparison with mGBA's own frame.
 import { widenChannel } from '../src/web/wasm/frame.ts'
 import type { Frame } from './rom-shot-probes.ts'
-import { dmaSet, FRAME_HEIGHT, FRAME_WIDTH, load, write16 } from './wasm-layer-script.ts'
-import type { Op } from './wasm-layer-script.ts'
+import { dmaSet, FRAME_HEIGHT, FRAME_WIDTH, load, traceAt, write16 } from './wasm-layer-script.ts'
+import type { Op, PixelTrace } from './wasm-layer-script.ts'
 import { IO, OAM, PRAM, VRAM } from './wasm-layer-video.ts'
 
 const MAGIC = 0x53565249
@@ -96,8 +96,47 @@ export interface FrameDiff {
   lines: { line: number; pixels: number }[]
 }
 
-/** Our BGR555 frame against mGBA's RGB frame, each channel widened as the page does. */
-export function diffFrame(ours: Uint16Array, theirs: Frame): FrameDiff {
+const EFFECT_ALPHA = 1
+const EFFECT_UP = 2
+const EFFECT_DOWN = 3
+
+/**
+ * mGBA darkens red as GBATEK has it, I - I * EVY / 16 with the product rounded down, but green
+ * and blue as I * (16 - EVY) / 16 rounded down, one lower where the product leaves a remainder.
+ * Found black-box in step B4: every channel of 994052's states 5520, 7800, 10560 and 10740.
+ */
+const mgbaDarker = (channel: number, evy: number, red: boolean) =>
+  red ? channel - ((channel * evy) >> 4) : (channel * (16 - evy)) >> 4
+
+/**
+ * The colour mGBA shows for a pixel of the harness's trace. mGBA's frame holds 8-bit channels:
+ * it widens each 5-bit channel as the page does, and applies a colour special effect to the
+ * widened channels with GBATEK's formulas, each product of a coefficient counting sixteenths and
+ * rounded down (darkening apart, see mgbaDarker). So a pixel with an effect falls between two
+ * 5-bit colours in mGBA's frame, and our layer, which gives 5-bit colours as the GBA does, can
+ * never equal it. Found black-box in step B4: every channel of hand-made's state 900 fits, 58977
+ * of 58977.
+ */
+export function mgbaRgb(trace: PixelTrace): number {
+  let rgb = 0
+  for (let shift = 0; shift < 15; shift += 5) {
+    const top = widenChannel((trace.top >> shift) & 31)
+    const below = widenChannel((trace.below >> shift) & 31)
+    let channel = top
+    if (trace.effect === EFFECT_ALPHA)
+      channel = Math.min(255, (top * trace.eva + below * trace.evb) >> 4)
+    else if (trace.effect === EFFECT_UP) channel = top + (((255 - top) * trace.evy) >> 4)
+    else if (trace.effect === EFFECT_DOWN) channel = mgbaDarker(top, trace.evy, shift === 0)
+    rgb |= channel << (16 - (8 * shift) / 5)
+  }
+  return rgb
+}
+
+/**
+ * Our BGR555 frame against mGBA's RGB frame, each channel widened as the page does; with the
+ * harness's trace of our frame, each pixel's colour as mGBA would show our layers and effect.
+ */
+export function diffFrame(ours: Uint16Array, theirs: Frame, trace?: Uint8Array): FrameDiff {
   if (theirs.width !== FRAME_WIDTH || theirs.height !== FRAME_HEIGHT) {
     throw new Error(`mGBA's frame is ${String(theirs.width)}x${String(theirs.height)}`)
   }
@@ -107,7 +146,8 @@ export function diffFrame(ours: Uint16Array, theirs: Frame): FrameDiff {
     let count = 0
     for (let x = 0; x < FRAME_WIDTH; x++) {
       const i = y * FRAME_WIDTH + x
-      if (widenedRgb(ours[i] ?? 0) !== rgbAt(theirs.rgb, i)) count++
+      const expected = trace === undefined ? widenedRgb(ours[i] ?? 0) : mgbaRgb(traceAt(trace, i))
+      if (expected !== rgbAt(theirs.rgb, i)) count++
     }
     if (count > 0) lines.push({ line: y, pixels: count })
     pixels += count

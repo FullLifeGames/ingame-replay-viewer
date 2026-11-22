@@ -50,6 +50,7 @@ struct Line
     uint8_t enable[IRV_SCREEN_WIDTH];
     struct IrvEffect effect;
     uint16_t backdrop;
+    uint32_t number;
 };
 
 static uint32_t Push(struct IrvPixel *pixels, uint32_t count, uint16_t colour, uint8_t layer)
@@ -89,16 +90,37 @@ static void TopTwo(const struct Line *line, uint32_t x, struct IrvPixel *pixels)
         Push(pixels, count, 0, IRV_LAYER_NONE);
 }
 
+#ifdef IRV_HOST
+static void Trace(const struct Line *line, uint32_t x, const struct IrvPixel *pixels, uint32_t kind)
+{
+    struct IrvPixelTrace *trace;
+
+    if (gIrvPixelTrace == NULL)
+        return;
+    trace = &gIrvPixelTrace[line->number * IRV_SCREEN_WIDTH + x];
+    trace->top = pixels[0].colour;
+    trace->below = pixels[1].colour;
+    trace->effect = kind;
+    trace->eva = line->effect.eva;
+    trace->evb = line->effect.evb;
+    trace->evy = line->effect.evy;
+}
+#endif
+
 // GBATEK "LCD I/O Window Feature": a pixel's window bit 5 enables the colour special effects.
 static uint16_t ComposePixel(const struct Line *line, uint32_t x)
 {
     struct IrvPixel pixels[2];
+    uint32_t kind = IRV_EFFECT_NONE;
 
     TopTwo(line, x, pixels);
-    if (!(line->enable[x] & IRV_WINDOW_EFFECT))
-        return pixels[0].colour;
-    return IrvRender_Effect(&line->effect, &pixels[0], &pixels[1],
-                            pixels[0].layer == IRV_LAYER_OBJ && line->obj.semiTransparent[x]);
+    if (line->enable[x] & IRV_WINDOW_EFFECT)
+        kind = IrvRender_EffectOf(&line->effect, &pixels[0], &pixels[1],
+                                  pixels[0].layer == IRV_LAYER_OBJ && line->obj.semiTransparent[x]);
+#ifdef IRV_HOST
+    Trace(line, x, pixels, kind);
+#endif
+    return IrvRender_ApplyEffect(&line->effect, kind, pixels[0].colour, pixels[1].colour);
 }
 
 // GBATEK "LCD I/O Display Control": forced blank shows white lines.
@@ -112,6 +134,13 @@ void IrvRender_Line(uint32_t lineNum, uint16_t *row)
     {
         for (x = 0; x < IRV_SCREEN_WIDTH; x++)
             row[x] = IRV_WHITE;
+#ifdef IRV_HOST
+        if (gIrvPixelTrace != NULL)
+        {
+            for (x = 0; x < IRV_SCREEN_WIDTH; x++)
+                gIrvPixelTrace[lineNum * IRV_SCREEN_WIDTH + x].top = IRV_WHITE;
+        }
+#endif
         return;
     }
     sLine.count = SortBgs(dispcnt, sLine.layers);
@@ -129,6 +158,7 @@ void IrvRender_Line(uint32_t lineNum, uint16_t *row)
     IrvRender_WindowLine(lineNum, &sLine.obj, sLine.enable);
     IrvRender_EffectLine(&sLine.effect);
     sLine.backdrop = *(const uint16_t *)IRV_PTR(IRV_PRAM) & IRV_WHITE;
+    sLine.number = lineNum;
     for (x = 0; x < IRV_SCREEN_WIDTH; x++)
         row[x] = ComposePixel(&sLine, x);
 }

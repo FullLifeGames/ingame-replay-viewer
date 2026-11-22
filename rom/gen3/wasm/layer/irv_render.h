@@ -68,6 +68,12 @@ struct IrvEffect
     uint32_t evy;
 };
 
+// GBATEK "LCD I/O Color Special Effects", BLDCNT bits 6-7: the effect a pixel gets.
+#define IRV_EFFECT_NONE  0
+#define IRV_EFFECT_ALPHA 1
+#define IRV_EFFECT_UP    2
+#define IRV_EFFECT_DOWN  3
+
 // GBATEK "LCD I/O Mosaic Function": the first position of the mosaic block that holds `position`,
 // for a size field that holds the block's size minus 1. Blocks count from the screen's edge.
 static inline uint32_t IrvRender_MosaicStart(uint32_t position, uint32_t sizeMinus1)
@@ -87,10 +93,30 @@ void IrvRender_ObjLine(uint32_t line, struct IrvObjLine *out);
 // irv_render_window.c: the WININ or WINOUT bits that hold at each pixel of the line.
 void IrvRender_WindowLine(uint32_t line, const struct IrvObjLine *obj, uint8_t *enable);
 
-// irv_render_blend.c: the line's effect settings, and the colour of a pixel whose top two layers
-// are `top` and `below`; `semiTransparent` tells whether `top` is a semi-transparent OBJ.
+// irv_render_blend.c: the line's effect settings; the effect a pixel gets whose top two layers are
+// `top` and `below` (`semiTransparent` tells whether `top` is a semi-transparent OBJ); and the
+// colour that effect gives.
 void IrvRender_EffectLine(struct IrvEffect *effect);
-uint16_t IrvRender_Effect(const struct IrvEffect *effect, const struct IrvPixel *top,
-                          const struct IrvPixel *below, bool semiTransparent);
+uint32_t IrvRender_EffectOf(const struct IrvEffect *effect, const struct IrvPixel *top,
+                            const struct IrvPixel *below, bool semiTransparent);
+uint16_t IrvRender_ApplyEffect(const struct IrvEffect *effect, uint32_t kind, uint16_t top,
+                               uint16_t below);
+
+#ifdef IRV_HOST
+// The host harness's trace of a frame, never in the module: for each pixel the colours of its top
+// two layers, the effect it got and the coefficients, so that the mGBA oracle can tell our
+// choice of layers and effect apart from the arithmetic of mGBA's frame.
+struct IrvPixelTrace
+{
+    uint16_t top;
+    uint16_t below;
+    uint8_t effect;
+    uint8_t eva;
+    uint8_t evb;
+    uint8_t evy;
+};
+
+extern struct IrvPixelTrace *gIrvPixelTrace;
+#endif
 
 #endif // GUARD_IRV_RENDER_H
