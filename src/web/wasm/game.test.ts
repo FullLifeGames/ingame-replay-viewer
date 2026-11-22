@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { readSlotHeaderLayout, type SlotDescription } from '../../patch/slot'
+import { readSlotHeaderLayout, type SlotDescription, SlotMismatchError } from '../../patch/slot'
 import header from '../../../rom/gen3/include/replay_progress.h?raw'
 import slotHeader from '../../../rom/gen3/include/replay_slot.h?raw'
 import { FRAME_BYTES } from './frame'
@@ -68,21 +68,31 @@ describe('the stream in the module', () => {
     game.HEAPU8.fill(0, SLOT, SLOT + 8)
     expect(() => {
       writeStream(game, ROM_SLOT, Uint8Array.of(1), SLOT_LAYOUT)
-    }).toThrow('no IRV_SLOT magic at the start of the slot')
+    }).toThrow(
+      /^no IRV_SLOT magic at the start of the slot: it is not the slot the description names$/,
+    )
   })
 
   it("is refused when the module's slot is larger than replay-slot.json says", () => {
     const game = fakeGame({ size: 0x20000 })
     expect(() => {
       writeStream(game, ROM_SLOT, Uint8Array.of(1), SLOT_LAYOUT)
-    }).toThrow('slot size 0x20000, the slot description slot size 0x100')
+    }).toThrow(
+      new SlotMismatchError(
+        'the slot gives slot size 0x20000 and replay-slot.json gives 0x100, so they come from ' +
+          'different builds. Run npm run wasm:build again.',
+      ),
+    )
     expect(game.HEAPU8[SLOT + 0x20]).toBe(0)
   })
 
   it("is refused when the module's slot has another version than replay-slot.json", () => {
     expect(() => {
       writeStream(fakeGame({ version: 2 }), ROM_SLOT, Uint8Array.of(1), SLOT_LAYOUT)
-    }).toThrow('version 2, the slot description version 1')
+    }).toThrow(
+      'the slot gives version 2 and replay-slot.json gives 1, so they come from different ' +
+        'builds. Run npm run wasm:build again.',
+    )
   })
 })
 

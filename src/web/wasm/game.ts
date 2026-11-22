@@ -4,6 +4,7 @@
 import {
   checkSlotHeader,
   type SlotDescription,
+  SlotMismatchError,
   type SlotHeaderLayout,
   writeReplaySlot,
 } from '../../patch/slot.ts'
@@ -43,7 +44,8 @@ export interface ModuleHooks {
  * Writes `stream` into the module's slot through the rule for a ROM (src/patch/slot.ts). The
  * module's slot has the layout of the ROM's, which `romSlot` (replay-slot.json) describes, so the
  * description is moved to the slot's own address. A `romSlot` that the slot's own header
- * contradicts comes from another build and is refused before anything is written.
+ * contradicts comes from another build and is refused before anything is written, with the
+ * build that makes both again.
  */
 export function writeStream(
   game: GameModule,
@@ -52,7 +54,12 @@ export function writeStream(
   layout: SlotHeaderLayout,
 ): void {
   const at = game._IrvWasm_Slot()
-  checkSlotHeader(game.HEAPU8.subarray(at), romSlot, layout)
+  try {
+    checkSlotHeader(game.HEAPU8.subarray(at), romSlot, layout)
+  } catch (error) {
+    if (!(error instanceof SlotMismatchError)) throw error
+    throw new SlotMismatchError(`${error.message}. Run npm run wasm:build again.`)
+  }
   const slot: SlotDescription = {
     ...romSlot,
     offset: 0,

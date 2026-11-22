@@ -6,6 +6,7 @@ import {
   readSlotHeader,
   readSlotHeaderLayout,
   SlotError,
+  SlotMismatchError,
   writeReplaySlot,
 } from './slot.ts'
 import type { SlotDescription } from './slot.ts'
@@ -173,26 +174,26 @@ describe("the slot's own header", () => {
   })
 
   it.each([
-    [{ version: 2 }, 'version 2, the slot description version 1'],
-    [{ headerSize: 0x40 }, 'header size 0x40, the slot description header size 0x20'],
-    [{ size: 0x20000 }, 'slot size 0x20000, the slot description slot size 0x60'],
+    [{ version: 2 }, 'version 2 and replay-slot.json gives 1'],
+    [{ headerSize: 0x40 }, 'header size 0x40 and replay-slot.json gives 0x20'],
+    [{ size: 0x20000 }, 'slot size 0x20000 and replay-slot.json gives 0x60'],
   ])('refuses a description of another build: %o', (fields, values) => {
     expect(() => {
       checkSlotHeader(slotHeader(fields), DESCRIPTION, LAYOUT)
     }).toThrow(
-      new SlotError(`the slot's header gives ${values}, so the two come from different builds`),
+      new SlotMismatchError(`the slot gives ${values}, so they come from different builds`),
     )
   })
 
   it.each([
-    [{ streamOffset: 0x130 }, 'stream offset 0x20, the slot description stream offset 0x30'],
-    [{ lengthOffset: 0x114 }, 'length offset 0x10, the slot description length offset 0x14'],
-    [{ capacity: 0x3f }, 'capacity 0x40, the slot description capacity 0x3f'],
+    [{ streamOffset: 0x130 }, 'stream offset 0x20 and replay-slot.json gives 0x30'],
+    [{ lengthOffset: 0x114 }, 'length offset 0x10 and replay-slot.json gives 0x14'],
+    [{ capacity: 0x3f }, 'capacity 0x40 and replay-slot.json gives 0x3f'],
   ])('refuses a description whose places disagree with the header: %o', (change, values) => {
     expect(() => {
       checkSlotHeader(slotHeader(), { ...DESCRIPTION, ...change }, LAYOUT)
     }).toThrow(
-      new SlotError(`the slot's header gives ${values}, so the two come from different builds`),
+      new SlotMismatchError(`the slot gives ${values}, so they come from different builds`),
     )
   })
 

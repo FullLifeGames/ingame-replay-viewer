@@ -20,6 +20,11 @@ export class SlotError extends Error {
   override name = 'SlotError'
 }
 
+/** A slot's header and replay-slot.json that disagree, so they come from different builds. */
+export class SlotMismatchError extends SlotError {
+  override name = 'SlotMismatchError'
+}
+
 const hex = (value: number) => `0x${value.toString(16)}`
 
 /** Byte offsets of the slot header's fields: the REPLAY_SLOT_OFFSET_* defines of replay_slot.h. */
@@ -111,9 +116,9 @@ export function checkSlotHeader(
   const differs = fields.find(([, inHeader, inDescription]) => inHeader !== inDescription)
   if (differs === undefined) return
   const [name, inHeader, inDescription, show] = differs
-  throw new SlotError(
-    `the slot's header gives ${name} ${show(inHeader)}, the slot description ${name} ` +
-      `${show(inDescription)}, so the two come from different builds`,
+  throw new SlotMismatchError(
+    `the slot gives ${name} ${show(inHeader)} and replay-slot.json gives ` +
+      `${show(inDescription)}, so they come from different builds`,
   )
 }
 
