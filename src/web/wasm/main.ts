@@ -31,8 +31,8 @@ import {
 import { AudioRing } from './ring'
 import { findSpikeView, type SpikeView } from './view'
 
-// One second of the game's sound, left and right; an even capacity keeps the pairs whole.
-const AUDIO_CAPACITY = 2 * MIXER_RATE
+// About 1.56 s of the game's sound, left and right: the ring takes a power of two (ring.ts).
+const AUDIO_CAPACITY = 2 ** 17
 // The newest samples the test hook measures: about a tenth of a second.
 const MEASURED_SAMPLES = 8192
 

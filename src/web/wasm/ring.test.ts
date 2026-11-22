@@ -39,9 +39,29 @@ describe('the audio ring', () => {
     expect(ring.recent(new Float32Array(9))).toBe(4)
   })
 
-  it('refuses a capacity that is not a positive whole number', () => {
-    expect(() => createShared(0)).toThrow(
-      'the audio ring needs a capacity of 1 or more samples, not 0',
-    )
+  // At 84,096 samples per second the counters pass 2^31 after about 7 hours of one run.
+  it('keeps the samples in order when its counters pass 2^31', () => {
+    const shared = createShared(8)
+    // The header starts with the samples written and read: the state after 2^31 - 2 of each.
+    new Int32Array(shared.audio, 0, 2).fill(2 ** 31 - 2)
+    const ring = new AudioRing(shared.audio)
+    expect(ring.push(Float32Array.of(1, 2, 3, 4, 5, 6))).toBe(0)
+    expect(ring.push(Float32Array.of(7, 8, 9))).toBe(1)
+    const out = new Float32Array(8)
+    expect(ring.pull(out)).toBe(8)
+    expect([...out]).toEqual([1, 2, 3, 4, 5, 6, 7, 8])
+    expect([ring.totalWritten, ring.totalRead]).toEqual([2 ** 31 + 6, 2 ** 31 + 6])
+    const recent = new Float32Array(2)
+    expect(ring.recent(recent)).toBe(2)
+    expect([...recent]).toEqual([7, 8])
+  })
+
+  // A power of two keeps left and right pairs whole and lets the counters wrap at 2^32.
+  it('refuses a capacity that is not a power of two from 2 on', () => {
+    for (const capacity of [0, 1, 3, 6, 2.5]) {
+      expect(() => createShared(capacity)).toThrow(
+        `the audio ring needs a power of two from 2 on as its capacity, not ${String(capacity)}`,
+      )
+    }
   })
 })
