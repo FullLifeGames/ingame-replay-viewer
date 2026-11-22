@@ -88,11 +88,15 @@ const TRAINER_PICS = {
   count: 'TRAINER_PIC_COUNT',
 }
 
+// Only a pic with a back pic can stand on the near side (#20); gTrainerPicInfo says which.
+const BACK_PICS = { data: 'src/data/graphics/trainers.h', array: 'gTrainerPicInfo' }
+
 const LEVEL_CAP = { header: 'include/constants/pokemon.h', define: 'MAX_LEVEL' }
 
 export const TABLE_FILES = [
   ...CONTENT.map((content) => `${content.table}.json`),
   'trainer-pics.json',
+  'trainer-back-pics.json',
   'counts.json',
   'charmap.json',
   'meta.json',
@@ -163,6 +167,30 @@ function trainerPics(read: ReadTree): object {
   return Object.fromEntries([...values].filter(([constant]) => constant.startsWith('TRAINER_PIC_')))
 }
 
+const C_COMMENT = /\/\/[^\n]*|\/\*[\s\S]*?\*\//g
+
+// The entries of gTrainerPicInfo with a .backPic, by the trainer pic enum's names and numbers.
+function trainerBackPics(read: ReadTree): object {
+  const values = parseEnum(read(TRAINER_PICS.header), TRAINER_PICS.enumName)
+  const code = read(BACK_PICS.data).replace(C_COMMENT, '')
+  const declaration = new RegExp(String.raw`\b${BACK_PICS.array}\s*\[[^\]]*\]\s*=`).exec(code)
+  if (declaration === null) throw new Error(`${BACK_PICS.data} has no ${BACK_PICS.array}`)
+  const start = declaration.index + declaration[0].length
+  const body = code.slice(start, code.indexOf('};', start))
+  const withBack = new Set<string>()
+  for (const entry of body.split(/(?=\[TRAINER_PIC_\w+\]\s*=)/)) {
+    const constant = /^\[(TRAINER_PIC_\w+)\]/.exec(entry)?.[1]
+    if (constant === undefined || !/\.backPic\s*=/.test(entry)) continue
+    if (!values.has(constant)) {
+      throw new Error(
+        `${BACK_PICS.array} gives ${constant}, which enum ${TRAINER_PICS.enumName} lacks`,
+      )
+    }
+    withBack.add(constant)
+  }
+  return Object.fromEntries([...values].filter(([constant]) => withBack.has(constant)))
+}
+
 // The bounds of a stream's numbers, by the expansion's own names: each content enum's count, the
 // trainer pics' count and the level cap.
 function counts(read: ReadTree): Record<string, number> {
@@ -196,6 +224,7 @@ export function generateTables(read: ReadTree, pin: UpstreamPin): GeneratedTable
     files[`${content.table}.json`] = jsonText(contentTable(recorded, content, notes))
   }
   files['trainer-pics.json'] = jsonText(trainerPics(recorded))
+  files['trainer-back-pics.json'] = jsonText(trainerBackPics(recorded))
   files['counts.json'] = jsonText(counts(recorded))
   files['charmap.json'] = jsonText(parseCharmap(recorded('charmap.txt')))
   const sorted = [...hashes].sort(([a], [b]) => (a < b ? -1 : 1))

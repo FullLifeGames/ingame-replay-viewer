@@ -10,6 +10,7 @@
     "include/constants/species.h": "cd07f8773c77b41b9821ac030cbc3e0ef82cc6f0740efc7608afbf5ffe78ceaf",
     "include/constants/trainers.h": "ecc47245a6806fb9573db30c39eb43115a7c695ae60d8c515f264d483a0204d3",
     "src/data/abilities.h": "c3b041279967171e55b55b8bd5fcd7d3c904cdf93120736cb98d211d331c97be",
+    "src/data/graphics/trainers.h": "200d5bed260e17e9ee4ab103bb2e0b49ecd22eb23d3d67586f3f8a66cafcff60",
     "src/data/items.h": "107f1b78a457f3a9c48749f325d674b62fe559b0ebfc365db13e82b00b19ecd3",
     "src/data/moves_info.h": "31c841954be8ca3f24b48c49dc447cd90678c9530045f7c43772dcaea95ade1f",
     "src/data/pokemon/species_info.h": "1373a200ef9fd2c3f02297c0ab3872ecbbbb497b4f079d1db0f6ba6a5a42d249",

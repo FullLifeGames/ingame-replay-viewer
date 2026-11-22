@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { Gen3Error } from '../errors'
 import counts from '../tables/counts.json'
+import trainerPics from '../tables/trainer-pics.json'
 import { encodeInstruction, encodeStream } from './encode'
 import { fieldSize } from './fields'
 import { MON, MON_OFFSET, OP_SIZE, STREAM, TRAINER, TRAINER_OFFSET } from './format'
@@ -63,6 +64,26 @@ describe('encodeStream', () => {
       'move at 1 names the near side, which has no battler out',
     )
     expect(() => encodeStream(streamWithLeads([move, END]))).not.toThrow()
+  })
+
+  it('refuses a near trainer pic without a back pic, as the ROM will (#20)', () => {
+    const stream = streamOf([END])
+    const near = (trainerPic: number) => ({
+      ...stream,
+      trainers: { ...stream.trainers, near: { ...stream.trainers.near, trainerPic } },
+    })
+    expect(() => encodeStream(near(trainerPics.TRAINER_PIC_LEADER_NORMAN))).toThrow(
+      `the near trainer pic ${String(trainerPics.TRAINER_PIC_LEADER_NORMAN)} has no back pic`,
+    )
+    expect(() => encodeStream(near(trainerPics.TRAINER_PIC_RED))).not.toThrow()
+    const far = {
+      ...stream,
+      trainers: {
+        ...stream.trainers,
+        far: { ...stream.trainers.far, trainerPic: trainerPics.TRAINER_PIC_LEADER_NORMAN },
+      },
+    }
+    expect(() => encodeStream(far)).not.toThrow()
   })
 
   it('refuses a party that is not six slots', () => {

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { Gen3Error } from '../errors'
 import counts from '../tables/counts.json'
+import trainerPics from '../tables/trainer-pics.json'
 import { decodeStream } from './decode'
 import { encodeInstruction, encodeStream } from './encode'
 import {
@@ -136,6 +137,15 @@ describe('decodeStream', () => {
     expect(patched([END], species, [0xff, 0xff])).toThrow(/species 65535/)
     const pic = trainerOffset('far') + TRAINER_OFFSET.trainerPic
     expect(patched([END], pic, u16(counts.TRAINER_PIC_COUNT))).toThrow(/trainerPic 158/)
+  })
+
+  it('refuses a near trainer pic without a back pic, as the encoder does (#20)', () => {
+    const pic = trainerOffset('near') + TRAINER_OFFSET.trainerPic
+    const norman = trainerPics.TRAINER_PIC_LEADER_NORMAN
+    expect(patched([END], pic, u16(norman))).toThrow(Gen3Error)
+    expect(patched([END], pic, u16(norman))).toThrow(/near trainer pic \d+ has no back pic/)
+    const steven = patched([END], pic, u16(trainerPics.TRAINER_PIC_STEVEN))()
+    expect(steven.trainers.near.trainerPic).toBe(trainerPics.TRAINER_PIC_STEVEN)
   })
 
   it('reads a slot with species 0 as empty, whatever its other bytes, as the ROM does', () => {

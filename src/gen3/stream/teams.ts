@@ -1,13 +1,19 @@
 // The rules between the team tables and the instructions, as the ROM's validator holds them
-// (ValidateTeams, ValidateOperands): each side's party holds a mon, and an operand that names a
-// party slot names one that holds a mon. The encoder and the decoder both check them here.
+// (ValidateTeams, ValidateOperands): the near trainer pic has a back pic, each side's party holds
+// a mon, and an operand that names a party slot names one that holds a mon. The encoder and the
+// decoder both check them here.
 import type { Side } from '../../script/types'
 import { Gen3Error } from '../errors'
+import { fitsSide } from '../tables/avatars'
 import { SIDE } from './format'
 import type { Stream } from './instructions'
 
-export function checkTeams({ parties, instructions }: Stream): void {
+export function checkTeams({ trainers, parties, instructions }: Stream): void {
   for (const side of Object.keys(SIDE) as Side[]) {
+    const pic = trainers[side].trainerPic
+    if (!fitsSide(side, pic)) {
+      throw new Gen3Error(`the ${side} trainer pic ${String(pic)} has no back pic`)
+    }
     if (parties[side].every((mon) => mon === null)) {
       throw new Gen3Error(`the ${side} party holds no mon`)
     }

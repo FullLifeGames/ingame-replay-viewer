@@ -12,7 +12,7 @@ Decisions from the design session on 2026-11-20 that are not ADRs, plus the road
 - **Replay input (v1)**: a replay URL or ID from replay.pokemonshowdown.com, or an uploaded file (Showdown's downloaded replay HTML, or a raw log). The browser fetches the replay JSON directly; no proxy is needed.
 - **Viewer controls (v1)**: play/pause, speed (1×/2×/fast), restart, and a small panel with player names and the turn number. Player 1 is always the near side.
 - **Presentation (v1)**:
-  - trainer sprites picked from the Showdown avatar, falling back to a generic trainer class
+  - trainer sprites picked from the Showdown avatar, falling back to Brendan on the near side and May on the far side; the near side shows an avatar only if the game has its back sprite
   - the intro with the Poké Ball team display, in the expansion's wording ("You are challenged by Bob!")
   - trainer battle music
   - an outro with the winner
