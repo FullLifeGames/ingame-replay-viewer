@@ -94,6 +94,32 @@ _Avoid_: buffer, mailbox
 Whatever inside the target game reads the instruction stream and hands each instruction to the controller. That's either the game's own code or a small piece of ours.
 _Avoid_: engine, VM
 
+## The WebAssembly build
+
+**WebAssembly build**:
+The expansion with our C files, compiled by Emscripten into a WebAssembly module that the page runs in a worker, without an emulator. A spike so far (#35, `docs/wasm-spike.md`).
+_Avoid_: native build, port, recompilation
+
+**Platform layer**:
+The C code that stands in for the GBA's hardware in the WebAssembly build: the BIOS calls, DMA, the scanline renderer and the sound mixer. The spike borrows it from a pinned commit of pokeemerald-multiplatform and never commits it.
+_Avoid_: emulator, HAL, backend (a game backend is ours)
+
+**Glue**:
+Our C files for the WebAssembly build only (`rom/gen3/wasm/src/`): the frame loop, the interrupts, the hand-over of frames and sound to JavaScript, and the stubs for hardware the viewer does not use. Emscripten's own JavaScript runtime is "Emscripten's glue".
+_Avoid_: shim, wrapper
+
+**Module patch**:
+The BPS patch from the base ROM to the WebAssembly module (`irv-emerald-wasm.bps`). The page applies it to the user's dump, as it applies the patch for the ROM image.
+_Avoid_: wasm patch, module download
+
+**Overlay patch**:
+A change to a copy of an upstream file that only the WebAssembly build compiles. The ROM build never sees it.
+_Avoid_: wasm patch (that name fits the module patch too)
+
+**Shadow header**:
+Our header that the WebAssembly build finds before the upstream header of the same name. It includes upstream's and changes only defines.
+_Avoid_: override, stub header
+
 ## Scope
 
 **Era-matched replay**:

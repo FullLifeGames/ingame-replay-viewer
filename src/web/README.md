@@ -34,7 +34,7 @@ The dev server serves two files from `build/wasm/`: `/wasm/irv-emerald.js` (the 
 npm run build && npx vite preview --port 5177 --strictPort
 ```
 
-The preview uses the same plugin, so it sends the same headers and serves the same two files from `build/rom/`. `dist/` holds the page, mGBA's script, worker and wasm, and the test replays. It holds no ROM, patch or save. mGBA's worker and wasm load from `dist/assets/`, and the replay runs as it does on the dev server. The production build for a real host is M2's work.
+The preview uses the same plugin, so it sends the same headers and serves the same two files from `build/rom/`. `dist/` holds the page, mGBA's script, worker and wasm, and the test replays. It holds no ROM, patch or save. mGBA's worker and wasm load from `dist/assets/`, and the replay runs as it does on the dev server. The spike page `wasm.html` sits in `dist/` too: its worker and audio worklet load from `dist/assets/`, and the plugin serves its two `/wasm/` files from `build/wasm/`. The spike's e2e passed against the preview (wave 3, B7). The production build for a real host is M2's work.
 
 ## HTTPS or localhost
 
