@@ -277,10 +277,12 @@ describe('the scene points of a decoded instruction list (S6)', () => {
     expect(outro('farWon')?.check).toEqual({
       ...compared,
       region: { x: 176, y: 8, width: 64, height: 64 },
+      kept: SCREEN.message,
     })
     expect(outro('nearWon')?.check).toEqual({
       ...compared,
       region: { x: 48, y: 48, width: 64, height: 64 },
+      kept: SCREEN.message,
     })
     for (const outcome of ['tie', 'unknown'] as const) {
       expect(outro(outcome)?.check).toEqual({ ...compared, probe: 'same', region: SCREEN.message })

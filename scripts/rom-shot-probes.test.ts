@@ -131,6 +131,52 @@ describe('checking the shots of a scene', () => {
     expect(checkShots(check, drawn)).toEqual({ pass: true, detail: '4 pixels differ' })
   })
 
+  describe('a change that must keep a region as the frame before shows it (the outro)', () => {
+    const trainer = { x: 0, y: 0, width: 8, height: 8 }
+    const textBox = { x: 0, y: 8, width: 24, height: 8 }
+    const withText = () => {
+      const frame = paint(frameOf(0x506070), textBox, 0xf8f8f8)
+      return paint(frame, { x: 2, y: 10, width: 5, height: 3 }, 0x484848)
+    }
+    const win = withText()
+    const slidIn = paint(withText(), { x: 1, y: 1, width: 6, height: 6 }, 0xc08040)
+    // A palette fade to black on its way: every colour at half its brightness.
+    const halfFaded = { ...slidIn, rgb: slidIn.rgb.map((channel) => channel >> 1) }
+    const check = {
+      probe: 'differs',
+      before: 'win',
+      after: 'outro',
+      region: trainer,
+      kept: textBox,
+    } as const
+    const verdict = (outro: Frame) =>
+      checkShots(
+        check,
+        new Map([
+          ['win', win],
+          ['outro', outro],
+        ]),
+      )
+
+    it('passes the frame with the trainer slid in and the text box as it was', () => {
+      expect(verdict(slidIn)).toEqual({ pass: true, detail: '36 pixels differ' })
+    })
+
+    it('fails a black frame, which differs in the trainer region too', () => {
+      expect(verdict(frameOf(0x000000))).toEqual({
+        pass: false,
+        detail: '64 pixels differ, but 192 pixels of the kept region differ too',
+      })
+    })
+
+    it('fails a frame on its way to black', () => {
+      expect(verdict(halfFaded)).toEqual({
+        pass: false,
+        detail: '64 pixels differ, but 192 pixels of the kept region differ too',
+      })
+    })
+  })
+
   it('fails a scene whose frames show nothing new', () => {
     expect(checkShots({ probe: 'differs', before: 'before', after: 'before' }, frames)).toEqual({
       pass: false,

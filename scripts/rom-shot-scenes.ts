@@ -207,8 +207,9 @@ function winScene(input: Input): Scene | undefined {
 // winner's trainer in and holds the scene for 120 frames before it fades to black; 150 frames
 // after END lie in that hold. BtlController_HandleTrainerSlide ends the trainer's 64x64 sprite
 // centred on (80, 80) near and on (176 + 32, 40) far (U/src/battle_controllers.c:2516-2546), where
-// the win frame shows the field. A tie or an unknown end has no winner: the outro holds the last
-// line in the text box as the win frame shows it.
+// the win frame shows the field. The win line stays in the text box until the fade, so a frame
+// with the box changed is fading or black. A tie or an unknown end has no winner: the outro holds
+// the last line in the text box as the win frame shows it.
 const OUTRO_FRAMES = 150
 const TRAINER_REGIONS: Readonly<Record<Side, Region>> = {
   near: { x: 48, y: 48, width: 64, height: 64 },
@@ -226,7 +227,13 @@ function outroScene(input: Input): Scene | undefined {
   const check: Check =
     winner === undefined
       ? { probe: 'same', before: 'win', after: shot.name, region: SCREEN.message }
-      : { probe: 'differs', before: 'win', after: shot.name, region: TRAINER_REGIONS[winner] }
+      : {
+          probe: 'differs',
+          before: 'win',
+          after: shot.name,
+          region: TRAINER_REGIONS[winner],
+          kept: SCREEN.message,
+        }
   return { name: shot.name, shots: [shot], check }
 }
 
