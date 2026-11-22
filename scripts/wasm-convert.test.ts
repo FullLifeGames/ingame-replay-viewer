@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { convertTargets, dataObjects } from './wasm-convert.ts'
+import { wasmPaths } from './wasm-compile.ts'
+import { convertTargets, dataObjects, signatureObjects } from './wasm-convert.ts'
 
 const paths = { build: '/repo/.cache/rom/expansion/build/emerald', out: '/repo/build/wasm' }
 
@@ -25,5 +26,32 @@ describe('the targets of wasm:convert', () => {
 
   it.each([['../src/main.o'], ['/abs/data/maps.o'], ['data/maps.s']])('refuses %s', (object) => {
     expect(() => convertTargets([object], paths)).toThrow(object)
+  })
+})
+
+// build/wasm/obj also holds the census's -O0 objects of excluded files; their prototypes must not
+// give a data object its function types (review U1).
+describe('the C objects that give the function types', () => {
+  const build = wasmPaths('/repo')
+  const records: Record<string, { source: string; ok: boolean }[]> = {
+    'compile.json': [{ source: 'src/main.c', ok: true }],
+    'glue.json': [{ source: 'glue/irv_wasm_frame.c', ok: true }],
+  }
+
+  it('are the objects compile.json and glue.json record, and no other', () => {
+    expect(signatureObjects(build, (name) => records[name] ?? [])).toEqual([
+      '/repo/build/wasm/obj/src/main.o',
+      '/repo/build/wasm/obj/glue/irv_wasm_frame.o',
+    ])
+  })
+
+  it('refuse a record with a failed file', () => {
+    const failed: typeof records = {
+      ...records,
+      'glue.json': [{ source: 'glue/irv_wasm_frame.c', ok: false }],
+    }
+    expect(() => signatureObjects(build, (name) => failed[name] ?? [])).toThrow(
+      /glue\.json records failed files: glue\/irv_wasm_frame\.c/,
+    )
   })
 })

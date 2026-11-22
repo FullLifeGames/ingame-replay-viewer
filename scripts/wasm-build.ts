@@ -4,9 +4,9 @@
 // [report.md]` renders the report again from census.json. `--compile [report.md]` compiles what
 // the build links at -O2: the files of the tree that wasm.json keeps, the patched copies of
 // build/wasm/overlay and the platform files, fetched into .cache/wasm/platform and patched in
-// build/wasm/platform; it writes compile.json, the .err files in build/wasm/compile and the
-// report, and fails when a file fails. `--link [report.md]` compiles the glue of rom/gen3/wasm/src
-// and links it with the objects of compile.json and build/wasm/asm (npm run wasm:convert) into
+// build/wasm/platform, then the glue of rom/gen3/wasm/src; it writes compile.json, glue.json,
+// the .err files in build/wasm/compile and the report, and fails when a file fails. `--link
+// [report.md]` compiles the glue again and links it with the objects of compile.json and build/wasm/asm (npm run wasm:convert) into
 // build/wasm/irv-emerald.js and irv-emerald.wasm, then writes the patch from the dump to the module
 // (irv-emerald-wasm.bps); `--patch [report.md]` writes that patch alone. Everything it writes lies under build/wasm and
 // .cache/wasm, apart from a report path named on the command line. The tree comes from
@@ -189,6 +189,8 @@ async function compile(paths: WasmPaths, config: WasmConfig, out: string): Promi
   const entries = await runAll(paths, config, 'compile', commands)
   report(paths, config, 'compile', out)
   failIfAny(entries)
+  // wasm:convert reads the glue's function types too, from the objects glue.json records.
+  failIfAny(await runAll(paths, config, 'glue', glueCommands(paths, glueSources())))
 }
 
 function failIfAny(entries: readonly CensusEntry[]): void {

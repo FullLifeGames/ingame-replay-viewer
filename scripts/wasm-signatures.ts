@@ -4,6 +4,8 @@
 // type, import and function sections and the linking section's symbol table.
 
 export interface WasmSymbols {
+  // The object's name, for errors.
+  name: string
   // Defined, non-local functions: name to `(params) -> (results)`.
   functions: Map<string, string>
   // Imported functions with the type their callers declared.
@@ -160,7 +162,7 @@ export function readWasmSymbols(bytes: Uint8Array, name: string): WasmSymbols {
   const sections = readSections(bytes, name)
   const reader = sections.linking
   if (reader === undefined) throw new Error(`${name} has no linking section; emcc -c writes one`)
-  const out: WasmSymbols = { functions: new Map(), imports: new Map(), data: new Set() }
+  const out: WasmSymbols = { name, functions: new Map(), imports: new Map(), data: new Set() }
   reader.uleb()
   while (reader.at < reader.bytes.length) {
     const type = reader.u8()
@@ -179,14 +181,28 @@ export interface WasmLookup {
   data: Set<string>
 }
 
+// Two definitions of one name must agree on its type (review U1).
+function definitions(objects: readonly WasmSymbols[]): Map<string, string> {
+  const functions = new Map<string, string>()
+  const definedIn = new Map<string, string>()
+  for (const object of objects) {
+    for (const [name, type] of object.functions) {
+      const known = functions.get(name)
+      if (known !== undefined && known !== type) {
+        const first = definedIn.get(name) ?? ''
+        throw new Error(`${name} is ${known} in ${first} and ${type} in ${object.name}`)
+      }
+      functions.set(name, type)
+      definedIn.set(name, object.name)
+    }
+  }
+  return functions
+}
+
 // A definition gives the signature; an import stands in for a function no object defines.
 export function mergeWasmSymbols(objects: readonly WasmSymbols[]): WasmLookup {
-  const functions = new Map<string, string>()
-  const data = new Set<string>()
-  for (const object of objects) {
-    for (const [name, type] of object.functions) functions.set(name, type)
-    for (const name of object.data) data.add(name)
-  }
+  const functions = definitions(objects)
+  const data = new Set(objects.flatMap((object) => [...object.data]))
   for (const object of objects) {
     for (const [name, type] of object.imports) if (!functions.has(name)) functions.set(name, type)
   }

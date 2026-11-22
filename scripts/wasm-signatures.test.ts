@@ -62,6 +62,23 @@ describe('the merged signatures', () => {
     expect(merged.functions.get('OnlyCalled')).toBe('(f64) -> ()')
   })
 
+  // Two definitions of one name with other types: the converter cannot tell which one the link
+  // keeps (review U1).
+  it('refuses two definitions of one name with different types and names both objects', () => {
+    const clash = wasmObject({ types: [[[], []]], functions: [{ name: 'BS_Defined', type: 0 }] })
+    expect(() =>
+      mergeWasmSymbols([readWasmSymbols(object, 'a.o'), readWasmSymbols(clash, 'b.o')]),
+    ).toThrow('BS_Defined is (i32, i64) -> (i32) in a.o and () -> () in b.o')
+  })
+
+  it('takes two definitions of one name with one type', () => {
+    const merged = mergeWasmSymbols([
+      readWasmSymbols(object, 'a.o'),
+      readWasmSymbols(object, 'b.o'),
+    ])
+    expect(merged.functions.get('BS_Defined')).toBe('(i32, i64) -> (i32)')
+  })
+
   it('collects the data of every object', () => {
     expect(mergeWasmSymbols([readWasmSymbols(object, 'a.o')]).data.has('gBattleMons')).toBe(true)
   })

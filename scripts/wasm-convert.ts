@@ -1,9 +1,10 @@
 // npm run wasm:convert [object ...]: the data objects of the ROM build as wasm objects (#35). Each
 // named object (a path under the tree's build/emerald, such as data/battle_scripts_1.o; all data
 // objects without a name) is converted to wasm assembly by wasm-data-asm.ts and assembled with
-// `emcc -c`. Function targets take their signatures from the C objects in build/wasm/obj, which
-// `npm run wasm:census` compiles. Everything lands under build/wasm/asm, with convert.json listing
-// the sizes, the function targets and the data targets that nothing defines.
+// `emcc -c`. Function targets take their signatures from the C objects that build/wasm/compile.json
+// and glue.json record, which `npm run wasm:build -- --compile` writes. Everything lands under
+// build/wasm/asm, with convert.json listing the sizes, the function targets and the data targets
+// that nothing defines.
 import { execFileSync, spawnSync } from 'node:child_process'
 import { mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, isAbsolute, join, normalize, sep } from 'node:path'
@@ -12,10 +13,13 @@ import { runCli } from './rom-cli.ts'
 import { REPO_DIR } from './rom-paths.ts'
 import { checkEmccVersion } from './wasm-build.ts'
 import { wasmPaths } from './wasm-compile.ts'
+import type { WasmPaths } from './wasm-compile.ts'
 import { loadWasmConfig } from './wasm-config.ts'
 import { convertElf, symbolLookup } from './wasm-data-asm.ts'
 import type { SymbolLookup } from './wasm-data-asm.ts'
 import { readElf } from './wasm-elf.ts'
+import { compiledObjects } from './wasm-link.ts'
+import type { CompileRecordEntry } from './wasm-link.ts'
 import { mergeWasmSymbols, readWasmSymbols } from './wasm-signatures.ts'
 
 export interface ConvertPaths {
@@ -66,13 +70,27 @@ export function convertTargets(objects: readonly string[], paths: ConvertPaths):
   })
 }
 
-function lookupFor(build: string, obj: string): SymbolLookup {
+// The objects of the build and the glue, never a glob of build/wasm/obj: it also holds the
+// census's -O0 objects of excluded files (review U1).
+export function signatureObjects(
+  paths: WasmPaths,
+  read: (record: string) => readonly CompileRecordEntry[],
+): string[] {
+  return ['compile.json', 'glue.json'].flatMap((record) =>
+    compiledObjects(read(record), paths, record),
+  )
+}
+
+const readRecord = (paths: WasmPaths) => (record: string) =>
+  (JSON.parse(readFileSync(join(paths.out, record), 'utf8')) as { entries: CompileRecordEntry[] })
+    .entries
+
+function lookupFor(build: string, paths: WasmPaths): SymbolLookup {
   const elfs = dataObjects(listing(build)).map((name) =>
     readElf(readFileSync(join(build, name)), name),
   )
-  const objects = listing(obj).filter((name) => name.endsWith('.o'))
-  if (objects.length === 0) throw new Error(`no C objects in ${obj}; run npm run wasm:census`)
-  const wasm = objects.map((name) => readWasmSymbols(readFileSync(join(obj, name)), name))
+  const objects = signatureObjects(paths, readRecord(paths))
+  const wasm = objects.map((path) => readWasmSymbols(readFileSync(path), path))
   say(`${String(elfs.length)} data objects, ${String(objects.length)} C objects read`)
   return symbolLookup(elfs, mergeWasmSymbols(wasm))
 }
@@ -124,7 +142,7 @@ function main(): void {
     const named = process.argv.slice(2)
     const objects = named.length > 0 ? named : dataObjects(listing(build))
     const targets = convertTargets(objects, { build, out: paths.out })
-    const lookup = lookupFor(build, paths.obj)
+    const lookup = lookupFor(build, paths)
     const results = targets.map((target) => {
       const result = convertOrRefuse(target, lookup, paths.emcc)
       const state = result.assembled ? 'assembled' : `FAILED\n${result.stderr}`

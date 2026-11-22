@@ -33,15 +33,17 @@ export interface CompileRecordEntry {
   ok: boolean
 }
 
+// record: the file under build/wasm the entries come from, for the errors.
 export function compiledObjects(
   entries: readonly CompileRecordEntry[],
   paths: WasmPaths,
+  record = 'compile.json',
 ): string[] {
-  if (entries.length === 0) throw new Error('build/wasm/compile.json records no file')
+  if (entries.length === 0) throw new Error(`build/wasm/${record} records no file`)
   const failed = entries.filter((entry) => !entry.ok).map((entry) => entry.source)
   if (failed.length > 0) {
     throw new Error(
-      `build/wasm/compile.json records failed files: ${failed.join(', ')}; run npm run wasm:build -- --compile`,
+      `build/wasm/${record} records failed files: ${failed.join(', ')}; run npm run wasm:build -- --compile`,
     )
   }
   return entries.map((entry) => objectPath(paths, entry.source))
