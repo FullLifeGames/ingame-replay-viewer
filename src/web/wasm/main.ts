@@ -25,31 +25,11 @@ import {
   stopRun,
   watchRun,
 } from './run'
+import { Runs } from './runs'
 import { findSpikeView, type SpikeView } from './view'
 
-/** The page's current run, and the runs it started and stopped: one at most is live. */
-class Runs {
-  current: Run | undefined
-  private started = 0
-  private stopped = 0
-
-  /** Stops the current run, if any, and makes `run` the current one. */
-  replace(run: Run): void {
-    if (this.current !== undefined) {
-      stopRun(this.current)
-      this.stopped += 1
-    }
-    this.current = run
-    this.started += 1
-  }
-
-  get counts() {
-    return { started: this.started, live: this.started - this.stopped }
-  }
-}
-
 /** The animation-frame loop: grants the run its frames, draws the newest and shows the progress. */
-function drawLoop(view: SpikeView, runs: Runs, changeSpeed: (speed: Speed) => void): void {
+function drawLoop(view: SpikeView, runs: Runs<Run>, changeSpeed: (speed: Speed) => void): void {
   const context = view.canvas.getContext('2d')
   const image = new ImageData(FRAME_WIDTH, FRAME_HEIGHT)
   const draw = (now: number) => {
@@ -78,9 +58,7 @@ function createSpike(view: SpikeView) {
   let built: Promise<Built> | undefined
   let picked: Promise<Picked> | undefined
   let last: Picked | undefined
-  // Each play takes a number; after its waits, only the newest one starts a run.
-  let plays = 0
-  const runs = new Runs()
+  const runs = new Runs<Run>(stopRun)
   const audio = new AudioOpener()
 
   const changeSpeed = (speed: Speed) => {
@@ -101,22 +79,26 @@ function createSpike(view: SpikeView) {
   }
 
   const play = async (stream?: Picked): Promise<string | undefined> => {
-    const ticket = ++plays
+    const ticket = runs.nextPlay()
     const [module, chosen, sound] = await Promise.all([built, stream ?? picked, audio.open()])
     if (module === undefined) throw new Error('Pick your US Emerald dump first, then press Start.')
     if (chosen === undefined) throw new Error('Pick a replay first, then press Start.')
     // A later Start or Restart came while this one waited; that one runs.
-    if (ticket !== plays) return undefined
+    if (!runs.isNewest(ticket)) return undefined
     last = chosen
     return runningLine(chosen, begin(module, chosen, sound))
   }
 
   return {
-    pickDump: (dump: Uint8Array) => {
-      built = buildModule(dump)
-      return built.then(
-        ({ bytes }) =>
-          `Your dump is US Emerald, and the page built the module (${String(bytes)} bytes). Press Start.`,
+    // The build starts before the file is read, so a Start during the read waits for it too. A
+    // run that started meanwhile keeps its line.
+    pickDump: (dump: Blob) => {
+      const mark = runs.mark()
+      built = dump.arrayBuffer().then((bytes) => buildModule(new Uint8Array(bytes)))
+      return built.then(({ bytes }) =>
+        runs.startedSince(mark)
+          ? undefined
+          : `Your dump is US Emerald, and the page built the module (${String(bytes)} bytes). Press Start.`,
       )
     },
     pickReplay: (id: string) => {
@@ -153,7 +135,7 @@ function wire(spike: Spike, view: SpikeView): void {
     const file = view.dump.files?.[0]
     if (file === undefined) return
     view.status('Checking your dump and building the module. This takes a few seconds.')
-    act(view, async () => spike.pickDump(new Uint8Array(await file.arrayBuffer())))
+    act(view, () => spike.pickDump(file))
   })
   view.testReplay.addEventListener('change', () => {
     spike.pickReplay(view.testReplay.value)
