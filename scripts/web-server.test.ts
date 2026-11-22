@@ -10,10 +10,11 @@ import type { Plugin, PreviewServer, ViteDevServer } from 'vite'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { ROM_FILES } from '../src/web/rom-files.ts'
+import { MODULE_MEMORY_BYTES } from '../src/web/wasm/failures.ts'
 import { WASM_FILES } from '../src/web/wasm/files.ts'
 import { OUTPUT_NAMES } from './rom-outputs.ts'
 import { REPO_DIR } from './rom-paths.ts'
-import { LINK_OUTPUTS } from './wasm-link.ts'
+import { LINK_OUTPUTS, linkSettings } from './wasm-link.ts'
 import { WASM_OUTPUT_NAMES } from './wasm-outputs.ts'
 import { FS_DENY, romServer } from './web-server.ts'
 
@@ -203,6 +204,11 @@ describe('the WebAssembly spike files', () => {
       glue: `wasm/${LINK_OUTPUTS.js}`,
       patch: `wasm/${WASM_OUTPUT_NAMES.patch}`,
     })
+  })
+
+  // The page's memory line names the number; src/web/ cannot import the link's settings (#49).
+  it('names the memory the link gives the module', () => {
+    expect(MODULE_MEMORY_BYTES).toBe(linkSettings().initialMemory)
   })
 
   it('serves the glue as JavaScript and the module patch from build/wasm, uncached', async () => {
