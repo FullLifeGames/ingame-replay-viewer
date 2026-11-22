@@ -42,9 +42,10 @@ static const struct ReplayAnim sAnims[] =
     [REPLAY_ANIM_STATUS_SLP]          = { REPLAY_ANIM_KIND_STATUS,  STATUS1_SLEEP },
     [REPLAY_ANIM_STATUS_PRZ]          = { REPLAY_ANIM_KIND_STATUS,  STATUS1_PARALYSIS },
     [REPLAY_ANIM_STATUS_FRZ]          = { REPLAY_ANIM_KIND_STATUS,  STATUS1_FREEZE },
+    [REPLAY_ANIM_SIMPLE_HEAL]         = { REPLAY_ANIM_KIND_GENERAL, B_ANIM_SIMPLE_HEAL },
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sAnims) == REPLAY_ANIM_STATUS_FRZ + 1, ReplayAnimsCoverFormatV1);
+STATIC_ASSERT(ARRAY_COUNT(sAnims) == REPLAY_ANIM_SIMPLE_HEAL + 1, ReplayAnimsCoverFormatV2);
 
 // ANIM: the animation on the side's mon; the op ends when the controller has played it.
 bool32 Replay_OpAnim(const volatile u8 *operands, u32 step)
@@ -58,6 +59,21 @@ bool32 Replay_OpAnim(const volatile u8 *operands, u32 step)
         BtlController_EmitStatusAnimation(battler, B_COMM_TO_CONTROLLER, FALSE, anim->id);
     else
         BtlController_EmitBattleAnimation(battler, B_COMM_TO_CONTROLLER, anim->id, 0);
+    MarkBattlerForControllerExec(battler);
+    return FALSE;
+}
+
+// TRAP_TURN: the end-of-turn animation of a trapped mon. BattleScript_WrapTurnDmg plays
+// B_ANIM_TURN_TRAP with the trapping move as its argument (HandleEndTurnWrap), and
+// AnimTask_GetTrappedMoveAnimId picks that move's own animation from it: Fire Spin's, Whirlpool's,
+// Clamp's, Sand Tomb's, or the squeeze of Bind and Wrap.
+bool32 Replay_OpTrapTurn(const volatile u8 *operands, u32 step)
+{
+    u32 battler = Replay_GetBattler(operands[0]);
+
+    if (step != 0)
+        return TRUE;
+    BtlController_EmitBattleAnimation(battler, B_COMM_TO_CONTROLLER, B_ANIM_TURN_TRAP, Replay_ReadU16(operands + 1));
     MarkBattlerForControllerExec(battler);
     return FALSE;
 }

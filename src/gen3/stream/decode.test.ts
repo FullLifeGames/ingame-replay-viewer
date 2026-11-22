@@ -46,8 +46,9 @@ describe('decodeStream', () => {
     expect(decodeStream(slot.subarray(8, 8 + bytes.length))).toEqual(streamOf([END]))
   })
 
-  it('refuses version 2 (F7)', () => {
-    expect(patched([END], 0, [2])).toThrow(/version 2/)
+  it('refuses versions 1 and 3 (F7)', () => {
+    expect(patched([END], 0, [1])).toThrow('stream version 1 is unknown; this reads version 2')
+    expect(patched([END], 0, [3])).toThrow('stream version 3 is unknown; this reads version 2')
   })
 
   it('refuses an op with the wrong size (F7)', () => {
@@ -57,11 +58,11 @@ describe('decodeStream', () => {
     expect(patched([turn, END], at, [1])).toThrow(Gen3Error)
   })
 
-  it('refuses an unknown op', () => {
-    expect(patched([END], STREAM.tablesEnd, [0x12])).toThrow(/op 18/)
+  it('refuses an unknown op, the one after the last op of version 2', () => {
+    expect(patched([END], STREAM.tablesEnd, [0x14])).toThrow(/op 20/)
   })
 
-  it('refuses a header that is not version 1', () => {
+  it('refuses a header whose sizes or offsets are not those of version 2', () => {
     const cases: [number, number][] = [
       [STREAM_OFFSET.headerSize, 0x20],
       [STREAM_OFFSET.trainerSize, 25],

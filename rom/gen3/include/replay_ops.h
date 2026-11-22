@@ -21,6 +21,11 @@ void Replay_PutMonOnField(u32 battler, u32 slot, u32 hp, u32 status);
 // The status1 of a REPLAY_STATUS_*.
 u32 Replay_GetStatus1(u32 status);
 
+// Puts text (EOS-terminated, in the game's charset) into the text box, as a battle script's
+// printstring does, and waits until it is printed and then this many frames, as waitmessage does.
+// Returns FALSE when a headless test draws nothing and waits for nothing.
+bool32 Replay_PrintText(const volatile u8 *text, u32 frames);
+
 // replay_ops_damage.c
 bool32 Replay_OpMove(const volatile u8 *operands, u32 step);
 bool32 Replay_OpHit(const volatile u8 *operands, u32 step);
@@ -35,9 +40,11 @@ bool32 Replay_OpSwitchIn(const volatile u8 *operands, u32 step);
 bool32 Replay_OpStatus(const volatile u8 *operands, u32 step);
 bool32 Replay_OpStat(const volatile u8 *operands, u32 step);
 bool32 Replay_OpItem(const volatile u8 *operands, u32 step);
+bool32 Replay_OpItemPopUp(const volatile u8 *operands, u32 step);
 
 // replay_anims.c
 bool32 Replay_OpAnim(const volatile u8 *operands, u32 step);
+bool32 Replay_OpTrapTurn(const volatile u8 *operands, u32 step);
 
 // replay_ops_field.c
 bool32 Replay_OpWeather(const volatile u8 *operands, u32 step);

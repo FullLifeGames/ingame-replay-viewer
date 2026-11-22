@@ -2,8 +2,9 @@
 // to END in headless mGBA and checks named scenes in its frames. A name is a test replay id (its
 // stream comes from the Gen 3 game backend; 994052 when no name is given, S2a D5) or hand-made (a
 // short battle written with the stream encoder). Two refusal runs follow: the built ROM's empty
-// slot (refused as EMPTY) and the hand-made stream with version 2 (refused as VERSION). Frames, the
-// ROMs and report.json go to build/rom/shots/. Needs a ROM from npm run rom:build and libmgba-dev.
+// slot (refused as EMPTY) and the hand-made stream with an unknown version (refused as VERSION).
+// Frames, the ROMs and report.json go to build/rom/shots/. Needs a ROM from npm run rom:build and
+// libmgba-dev.
 import { createHash } from 'node:crypto'
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -133,7 +134,7 @@ function streamBytes(shot: typeof ShotStream, name: string): Uint8Array {
 
 /**
  * The named streams, then two refusals: the empty slot (refused as EMPTY) and the hand-made
- * stream with version 2 (refused as VERSION).
+ * stream with the first unknown version (refused as VERSION).
  */
 export async function planStreams(
   names: readonly string[],
@@ -156,8 +157,8 @@ export async function planStreams(
     ...plays,
     { name: 'empty-slot', stream: undefined, scenes: refused, missing: [], expect: 'EMPTY' },
     {
-      name: 'version-2',
-      stream: shot.withVersion(shot.handMadeBytes(), 2),
+      name: `version-${String(shot.UNKNOWN_VERSION)}`,
+      stream: shot.withVersion(shot.handMadeBytes(), shot.UNKNOWN_VERSION),
       scenes: refused,
       missing: [],
       expect: 'VERSION',

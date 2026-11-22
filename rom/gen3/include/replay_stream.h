@@ -1,7 +1,7 @@
 #ifndef GUARD_REPLAY_STREAM_H
 #define GUARD_REPLAY_STREAM_H
 
-// The instruction stream, version 1: the Gen 3 game backend writes it into the replay slot's
+// The instruction stream, version 2: the Gen 3 game backend writes it into the replay slot's
 // stream (replay_slot.h) and the ROM interpreter plays it. src/gen3/stream/format.ts holds the same
 // numbers; its spec checks that both files define the same REPLAY_* names with the same values.
 // Keep each value a plain number.
@@ -11,7 +11,7 @@
 // The interpreter refuses a version it does not know, an unknown op, and an op with a fixed size
 // whose size byte differs.
 
-#define REPLAY_STREAM_VERSION        1
+#define REPLAY_STREAM_VERSION        2
 #define REPLAY_STREAM_HEADER_SIZE    0x10
 #define REPLAY_STREAM_SIDE_COUNT     2
 #define REPLAY_STREAM_PARTY_SIZE     6
@@ -58,43 +58,47 @@
 // REPLAY_SIDE_*, slot a party index, and HP is on the battle log's scale (maxHp of its mon).
 #define REPLAY_INSTRUCTION_HEADER_SIZE 2
 
-#define REPLAY_OP_END       0x00 // outcome u8 (REPLAY_OUTCOME_*); the last instruction
-#define REPLAY_OP_TURN      0x01 // number u16
-#define REPLAY_OP_PRINT     0x02 // text in the game's charset, ends with EOS; no line breaks
-#define REPLAY_OP_INTRO     0x03 // no operands
-#define REPLAY_OP_SEND_OUT  0x04 // side u8, slot u8, hp u16, status u8 (REPLAY_STATUS_*)
-#define REPLAY_OP_WITHDRAW  0x05 // side u8
-#define REPLAY_OP_SWITCH_IN 0x06 // side u8, slot u8, hp u16, status u8 (REPLAY_STATUS_*)
-#define REPLAY_OP_MOVE      0x07 // user side u8, target side u8, move u16 (MOVE_*)
-#define REPLAY_OP_HIT       0x08 // side u8, effectiveness u8 (REPLAY_EFFECTIVENESS_*)
-#define REPLAY_OP_HP        0x09 // side u8, hp u16
-#define REPLAY_OP_FAINT     0x0A // side u8
-#define REPLAY_OP_STATUS    0x0B // side u8, slot u8, status u8 (REPLAY_STATUS_*)
-#define REPLAY_OP_STAT      0x0C // side u8, stat u8 (REPLAY_STAT_*), stages s8, arrows u8 (REPLAY_ARROWS_*)
-#define REPLAY_OP_ANIM      0x0D // side u8, anim u8 (REPLAY_ANIM_*)
-#define REPLAY_OP_WEATHER   0x0E // weather u8 (REPLAY_WEATHER_*)
-#define REPLAY_OP_VOLATILE  0x0F // side u8, volatile u8 (REPLAY_VOLATILE_*), on u8
-#define REPLAY_OP_ABILITY   0x10 // side u8, ability u16 (ABILITY_*), show u8
-#define REPLAY_OP_ITEM      0x11 // side u8, slot u8, item u16 (ITEM_*)
+#define REPLAY_OP_END         0x00 // outcome u8 (REPLAY_OUTCOME_*); the last instruction
+#define REPLAY_OP_TURN        0x01 // number u16
+#define REPLAY_OP_PRINT       0x02 // text in the game's charset, ends with EOS; no line breaks
+#define REPLAY_OP_INTRO       0x03 // no operands
+#define REPLAY_OP_SEND_OUT    0x04 // side u8, slot u8, hp u16, status u8 (REPLAY_STATUS_*)
+#define REPLAY_OP_WITHDRAW    0x05 // side u8
+#define REPLAY_OP_SWITCH_IN   0x06 // side u8, slot u8, hp u16, status u8 (REPLAY_STATUS_*)
+#define REPLAY_OP_MOVE        0x07 // user side u8, target side u8, move u16 (MOVE_*)
+#define REPLAY_OP_HIT         0x08 // side u8, effectiveness u8 (REPLAY_EFFECTIVENESS_*)
+#define REPLAY_OP_HP          0x09 // side u8, hp u16
+#define REPLAY_OP_FAINT       0x0A // side u8
+#define REPLAY_OP_STATUS      0x0B // side u8, slot u8, status u8 (REPLAY_STATUS_*)
+#define REPLAY_OP_STAT        0x0C // side u8, stat u8 (REPLAY_STAT_*), stages s8, arrows u8 (REPLAY_ARROWS_*)
+#define REPLAY_OP_ANIM        0x0D // side u8, anim u8 (REPLAY_ANIM_*)
+#define REPLAY_OP_WEATHER     0x0E // weather u8 (REPLAY_WEATHER_*)
+#define REPLAY_OP_VOLATILE    0x0F // side u8, volatile u8 (REPLAY_VOLATILE_*), on u8
+#define REPLAY_OP_ABILITY     0x10 // side u8, ability u16 (ABILITY_*), show u8
+#define REPLAY_OP_ITEM        0x11 // side u8, slot u8, item u16 (ITEM_*)
+#define REPLAY_OP_ITEM_POP_UP 0x12 // side u8, item u16 (ITEM_*): the pop-up of a held item that takes effect
+#define REPLAY_OP_TRAP_TURN   0x13 // side u8, move u16 (MOVE_*): the trapping move
 
 // The size byte of each op but PRINT.
-#define REPLAY_OP_END_SIZE       1
-#define REPLAY_OP_TURN_SIZE      2
-#define REPLAY_OP_INTRO_SIZE     0
-#define REPLAY_OP_SEND_OUT_SIZE  5
-#define REPLAY_OP_WITHDRAW_SIZE  1
-#define REPLAY_OP_SWITCH_IN_SIZE 5
-#define REPLAY_OP_MOVE_SIZE      4
-#define REPLAY_OP_HIT_SIZE       2
-#define REPLAY_OP_HP_SIZE        3
-#define REPLAY_OP_FAINT_SIZE     1
-#define REPLAY_OP_STATUS_SIZE    3
-#define REPLAY_OP_STAT_SIZE      4
-#define REPLAY_OP_ANIM_SIZE      2
-#define REPLAY_OP_WEATHER_SIZE   1
-#define REPLAY_OP_VOLATILE_SIZE  3
-#define REPLAY_OP_ABILITY_SIZE   4
-#define REPLAY_OP_ITEM_SIZE      4
+#define REPLAY_OP_END_SIZE         1
+#define REPLAY_OP_TURN_SIZE        2
+#define REPLAY_OP_INTRO_SIZE       0
+#define REPLAY_OP_SEND_OUT_SIZE    5
+#define REPLAY_OP_WITHDRAW_SIZE    1
+#define REPLAY_OP_SWITCH_IN_SIZE   5
+#define REPLAY_OP_MOVE_SIZE        4
+#define REPLAY_OP_HIT_SIZE         2
+#define REPLAY_OP_HP_SIZE          3
+#define REPLAY_OP_FAINT_SIZE       1
+#define REPLAY_OP_STATUS_SIZE      3
+#define REPLAY_OP_STAT_SIZE        4
+#define REPLAY_OP_ANIM_SIZE        2
+#define REPLAY_OP_WEATHER_SIZE     1
+#define REPLAY_OP_VOLATILE_SIZE    3
+#define REPLAY_OP_ABILITY_SIZE     4
+#define REPLAY_OP_ITEM_SIZE        4
+#define REPLAY_OP_ITEM_POP_UP_SIZE 3
+#define REPLAY_OP_TRAP_TURN_SIZE   3
 
 // PRINT's size byte: one glyph and EOS at least.
 #define REPLAY_PRINT_MIN_SIZE 2
@@ -166,6 +170,7 @@
 #define REPLAY_ANIM_STATUS_SLP          14
 #define REPLAY_ANIM_STATUS_PRZ          15
 #define REPLAY_ANIM_STATUS_FRZ          16
+#define REPLAY_ANIM_SIMPLE_HEAL         17
 
 struct ReplayStreamHeader
 {
