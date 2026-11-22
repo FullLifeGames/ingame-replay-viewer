@@ -101,7 +101,7 @@ The expansion with our C files, compiled by Emscripten into a WebAssembly module
 _Avoid_: native build, port, recompilation
 
 **Platform layer**:
-The C code that stands in for the GBA's hardware in the WebAssembly build: the BIOS calls, DMA, the interrupts, the frame driver, the scanline renderer and the sound. Ours lives in `rom/gen3/wasm/layer/` under the repository's MIT licence (#43). The sound still comes from three files borrowed from a pinned commit of pokeemerald-multiplatform; they stay out of git, and one platform patch carries 8 of their lines.
+The C code that stands in for the GBA's hardware in the WebAssembly build: the BIOS calls, DMA, the interrupts, the frame driver, the scanline renderer and the sound. Ours lives in `rom/gen3/wasm/layer/` under the repository's MIT licence (#43). It took the place of the files the spike borrowed from pokeemerald-multiplatform.
 _Avoid_: emulator, HAL, backend (a game backend is ours)
 
 **Glue**:
@@ -117,7 +117,7 @@ A change to a copy of an upstream file that only the WebAssembly build compiles.
 _Avoid_: wasm patch (that name fits the module patch too)
 
 **Shadow header**:
-Our header that the WebAssembly build finds before the upstream header of the same name. It includes upstream's and adds to it: defines, and in `global.h` the includes and types the platform files expect.
+Our header that the WebAssembly build finds before the upstream header of the same name. It includes upstream's and adds to it, mostly defines.
 _Avoid_: override, stub header
 
 ## Scope
