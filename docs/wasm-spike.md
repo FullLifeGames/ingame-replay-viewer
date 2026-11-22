@@ -1,6 +1,6 @@
 # The WebAssembly spike (#35)
 
-Milestone 1b asked one question: can the pinned pokeemerald-expansion, with our C files, run in the browser as WebAssembly instead of inside mGBA? The spike ran in wave 3, lane b, from 21 to 22 November 2026: nine builder steps of a ten-step box, a review, and two fix steps for its findings. This page records what it found. Whether milestone 2 ships the WebAssembly build is the gate's call.
+Milestone 1b asked one question: can the pinned pokeemerald-expansion, with our C files, run in the browser as WebAssembly instead of inside mGBA? The spike ran in wave 3, lane b, from 21 to 22 November 2026: nine builder steps of a ten-step box, a review, and two fix steps for its findings. This page records what it found. The wave 3 gate (22.11.2026) chose to ship it in milestone 2, with a platform layer of our own (#43).
 
 ## Verdict
 
@@ -175,7 +175,7 @@ The module patch works as the ROM patch does: the page applies it to your dump. 
 
 ## Drafts for the gate
 
-These are proposals. The ADRs stay as they are until the gate rules.
+The gate accepted both drafts on 22.11.2026 (answers 2a and 4a): the amendment now closes ADR 0002, and ADR 0009 replaces ADR 0008 for the WebAssembly build. The texts below are the drafts as the gate read them.
 
 ### Draft: ADR 0002 amended
 
@@ -204,6 +204,6 @@ These are proposals. The ADRs stay as they are until the gate rules.
 - The 45 lines of borrowed text in the platform patches (50 with the five changed ones), if the layer stays borrowed.
 - Nothing ties the module to `build/rom/replay-slot.json` beyond the slot's magic. A ROM rebuilt with another slot layout beside a stale module would let the page write past the module's slot; the module could export its slot's size for the page to check.
 - An unexpected stub call (the link cable, multiboot) only logs to the console. For milestone 2, a list of allowed stubs that fails a run would catch one.
-- `docs/plan.md` says the page hands the stream over instead of through the replay slot, while the ADR 0008 draft keeps the slot in linear memory. The gate reconciles the two.
+- `docs/plan.md` said the page hands the stream over instead of through the replay slot, while the ADR 0008 draft kept the slot in linear memory. The gate took the draft (ADR 0009), and the plan now says so.
 - `wasm-config.ts` and `rom-config.ts` each check their config fields; one shared checker would do.
 - The production build for a real host, and its headers, stay M2's work. `npm run build` with `vite preview` already serves the spike page: the e2e passed against it, with the worker and the worklet loading from `dist/assets/`.

@@ -69,24 +69,36 @@ Each entry gives the scene, the options, the choice and what a reversal costs.
 
 ## Gate
 
-Open. The gate page asks the user six questions: the merge of #42, the route for milestone 2, the platform layer, the assets in the module patch, the rests as issues, and what wave 4 takes. The dev page runs behind `tailscale serve` for the user's own look at both pages.
+After the gate on 22.11.2026:
 
-| Stage | Lane | Issues | Pull request | State before the gate |
-| ----- | ---- | ------ | ------------ | --------------------- |
-| S1    | a    | #41    | #42          | waits for the okay    |
-| S1    | b    | #35    | #42          | waits for the okay    |
+| Stage | Lane | Issues | Pull request | State after the gate |
+| ----- | ---- | ------ | ------------ | -------------------- |
+| S1    | a    | #41    | #42          | merged, ed3466c      |
+| S1    | b    | #35    | #42          | merged, ed3466c      |
+
+The user tried both pages on an Android phone in Firefox. The picker fix (S1-22) went into #42 as 3ce73e1 before the merge. The dump still got lost: the Vite dev server reloads the page whenever its websocket drops, and the system file picker sends the browser to the background. From then on the preview ran as `npm run build` and `vite preview` behind `tailscale serve`, and both pages worked on the phone. The preview stopped after the gate.
+
+The gate asked seven questions on a review page; the user added the seventh from the phone. The answers, "1a 2a 3a 4a 5a 6c 7a", came on 22.11.2026:
+
+1. #42 merged at 3ce73e1 (merge ed3466c). #35 and #41 are closed.
+2. Milestone 2 ships the WebAssembly build. The emulator page stays as the fallback until a platform layer we may ship passes the 13 scenes. ADR 0002 got the drafted amendment, and ADR 0009 replaces ADR 0008 for the WebAssembly build.
+3. The platform layer becomes our own, under MIT, from GBATEK's descriptions: #43.
+4. The module patch is accepted as the ROM patch is. Per-asset extraction went into #17 as its way to a smaller patch.
+5. R1 to R7 became issues approved for M2, and so did the speed-up issue from the wave 2 gate (#50), with its text set to our frame loop. The list below names each issue.
+6. Wave 4 runs two lanes: the platform layer (#43), and the game fixes #15, #16, #19 and #36 to #39. The user's note: "I wanna finish Gen 3 though an M2, so let's have a full cleanup, but then focus on the next milestone, specifically heading to the extended dex and Gen 5". Milestone 2 closes every open Gen 3 issue before the work moves on. Which milestone comes next reads two ways (newer formats on Gen 3, the expansion's full dex, or Gen 5 and its expansion), so the integrator asks before it touches the roadmap.
+7. The two findings from the phone became issues approved for M2: #51, the emulator page's missing sound on Firefox for Android (a small fix for wave 4), and #52, the replay link field and the list of lines not shown on the WebAssembly page. The user confirmed in the chat that "format selection" meant the link field.
 
 ## Rests
 
-Proposals for issues, ruled at the gate. Where an item depends on the route for milestone 2, the line says so.
+Proposals for issues, ruled at the gate (answers 2a, 3a and 5a). Each line names its issue.
 
-- R1 (with the WebAssembly route): a platform layer we may ship, in place of the borrowed one. The gate's question 3 picks which.
-- R2 (with the WebAssembly route): one full compile with `-fsanitize=shift`, to list every shift by 32 or more that the battle path reaches. Nothing in the build warns about that class.
-- R3 (with the WebAssembly route): the module tells the page its slot size, so the page refuses a `replay-slot.json` from another build. Today only the magic ties them.
-- R4 (with the WebAssembly route): a list of the stubs a run may call; a run that calls another one fails.
-- R5 (with the WebAssembly route): sound on a real device. Headless Chromium played a fifth slower than the worker wrote under load; the 0.2 s cap kept the latency, at the cost of skipped samples. The worklet also starts with no reserve, so a late frame plays as silence, and 2x drops every other sample pair without a low-pass filter.
-- R6 (with the WebAssembly route): the frame buffer has no double buffering, so a frame can tear.
-- R7 (with the WebAssembly route): phones. 256 MB of fixed memory, a module worker, `SharedArrayBuffer` and an audio worklet, untried on a phone.
+- R1 (#43, M2, feature): a platform layer of our own under MIT, in place of the borrowed one.
+- R2 (#44, M2, small fix): one full compile with `-fsanitize=shift`, to list every shift by 32 or more that the battle path reaches. Nothing in the build warns about that class.
+- R3 (#45, M2, small fix): the module tells the page its slot size, so the page refuses a `replay-slot.json` from another build. Today only the magic ties them.
+- R4 (#46, M2, small fix): a list of the stubs a run may call; a run that calls another one fails.
+- R5 (#47, M2, feature): sound on a real device. Headless Chromium played a fifth slower than the worker wrote under load; the 0.2 s cap kept the latency, at the cost of skipped samples. The worklet also starts with no reserve, so a late frame plays as silence, and 2x drops every other sample pair without a low-pass filter.
+- R6 (#48, M2, small fix): the frame buffer has no double buffering, so a frame can tear.
+- R7 (#49, M2, feature): phones. 256 MB of fixed memory, a module worker, `SharedArrayBuffer` and an audio worklet. The user ran the spike page on an Android phone in Firefox at the gate, with sound; the other browsers stay untried.
 - R8 (no issue): the module's clock stays at 2000-01-01 12:00, while mGBA reads the host's.
 - R9 (no issue): mGBA's frames to END differ between sessions on the same ROM (up to 104 frames on 994052).
 - R10 (no issue): `pokedex_cry_screen.c` and three mirror checks in `include/script.h` read the module wrong; both sit off the battle path.

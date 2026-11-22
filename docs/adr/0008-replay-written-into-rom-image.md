@@ -1,5 +1,5 @@
 ---
-status: accepted for milestone 1; replaced if the WebAssembly spike (plan, milestone 1b) succeeds
+status: superseded by ADR 0009 for the WebAssembly build (22.11.2026); holds for the emulator page while it stays the fallback
 ---
 
 # Gen 3 replays are written into the ROM image before the game starts
