@@ -41,7 +41,7 @@ const patch = (file: string, from: string, to: string) =>
   ].join('\n')
 
 // An upstream tree, a patch folder and the build folder the copies go to.
-function layout(patches: Record<string, string>, files: CopySet['files'] = 'patched'): CopySet {
+function layout(patches: Record<string, string>): CopySet {
   const base = realpathSync(mkdtempSync(join(scratch, 'case-')))
   write(join(base, 'tree', 'src', 'a.c'), 'int a;\n')
   write(join(base, 'tree', 'src', 'b.c'), 'int b;\n')
@@ -53,7 +53,6 @@ function layout(patches: Record<string, string>, files: CopySet['files'] = 'patc
     from: join(base, 'tree'),
     to: join(roots.out, 'overlay'),
     patches: join(base, 'patches'),
-    files,
     roots,
   }
 }
@@ -100,20 +99,6 @@ describe('the patched copies', () => {
     })
     expect(prepareCopies(set)).toEqual(['src/a.c'])
     expect(readFileSync(join(set.to, 'src', 'a.c'), 'utf8')).toBe('int a3;\n')
-  })
-
-  it('copy every listed file, patched or not, and nothing else', () => {
-    const set = layout({ '0001-a.patch': patch('src/a.c', 'int a;', 'int a2;') }, [
-      'src/a.c',
-      'src/b.c',
-    ])
-    expect(prepareCopies(set)).toEqual(['src/a.c', 'src/b.c'])
-    expect(readFileSync(join(set.to, 'src', 'b.c'), 'utf8')).toBe('int b;\n')
-  })
-
-  it('refuse a patch of a file outside the list', () => {
-    const set = layout({ '0001-a.patch': patch('src/a.c', 'int a;', 'int a2;') }, ['src/b.c'])
-    expect(() => prepareCopies(set)).toThrow(/0001-a\.patch changes src\/a\.c, which .* lacks/)
   })
 
   // build/wasm lies inside our repository. There git apply resolves a/src/a.c from the

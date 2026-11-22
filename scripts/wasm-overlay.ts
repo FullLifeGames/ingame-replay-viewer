@@ -1,8 +1,7 @@
 // Patched copies for the WebAssembly build (#35, plan §2): an upstream file that needs a change is
-// copied from the tree into build/wasm/overlay and patched there by rom/gen3/wasm/patches/series;
-// the platform files are copied from their checkout into build/wasm/platform and patched by
-// platform-patches/series. The tree and the checkout stay byte for byte as they are. Each patch is
-// a `git diff` with its reason above the first `diff --git`, as rom/gen3/README.md asks.
+// copied from the tree into build/wasm/overlay and patched there by rom/gen3/wasm/patches/series.
+// The tree stays byte for byte as it is. Each patch is a `git diff` with its reason above the
+// first `diff --git`, as rom/gen3/README.md asks.
 import { spawnSync } from 'node:child_process'
 import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -15,10 +14,8 @@ import { readSeries } from './rom-upstream.ts'
 export interface CopySet {
   from: string
   to: string
-  // The folder with `series` and the patches it names.
+  // The folder with `series` and the patches it names. The files they change are the copies.
   patches: string
-  // 'patched': copy the files the patches change; a list: copy those, and patch only those.
-  files: readonly string[] | 'patched'
   roots: RomRoots
 }
 
@@ -55,19 +52,6 @@ function loadPatches(dir: string): Patch[] {
   })
 }
 
-function filesToCopy(set: CopySet, patches: readonly Patch[]): string[] {
-  const changed = patches.flatMap((patch) => patch.files)
-  if (set.files === 'patched') return [...new Set(changed)].sort()
-  const listed = new Set(set.files)
-  for (const patch of patches) {
-    const outside = patch.files.find((file) => !listed.has(file))
-    if (outside !== undefined) {
-      throw new Error(`${patch.name} changes ${outside}, which the list of ${set.from} lacks`)
-    }
-  }
-  return [...listed].sort()
-}
-
 // git apply outside any repository: the ceiling keeps it from finding ours above the copies.
 function apply(set: CopySet, patch: Patch): void {
   const env = { ...withoutGitVariables(process.env), GIT_CEILING_DIRECTORIES: dirname(set.to) }
@@ -95,7 +79,7 @@ function checkChanged(set: CopySet, patches: readonly Patch[]): void {
 export function prepareCopies(set: CopySet): string[] {
   checkRemovable(set.roots, set.to)
   const patches = loadPatches(set.patches)
-  const files = filesToCopy(set, patches)
+  const files = [...new Set(patches.flatMap((patch) => patch.files))].sort()
   emptyInside(set.roots, set.to)
   for (const file of files) {
     mkdirSync(dirname(join(set.to, file)), { recursive: true })

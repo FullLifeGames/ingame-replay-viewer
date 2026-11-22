@@ -163,8 +163,10 @@ async function census(paths: WasmPaths, config: WasmConfig, out: string): Promis
 // compile from their copies.
 function prepare(paths: WasmPaths): string[] {
   const overlay = prepareCopies({
-    ...{ from: paths.tree, to: paths.overlay, roots: wasmRoots(REPO_DIR), files: 'patched' },
+    from: paths.tree,
+    to: paths.overlay,
     patches: join(WASM_DIR, 'patches'),
+    roots: wasmRoots(REPO_DIR),
   })
   say(`${String(overlay.length)} overlay copies`)
   return overlay.filter((file) => file.startsWith('src/') && file.endsWith('.c'))
