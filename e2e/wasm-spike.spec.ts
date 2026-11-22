@@ -2,8 +2,9 @@
 // build's rule and skips without it or without the build outputs. It plays the hand-made battle
 // at 1x and 994052 at fast, reads the run's status through the page's test hook, and checks the
 // tick rule's pace at 1x and 2x. The game's sound plays at 1x and 2x and stays silent at fast; the
-// test counts the samples that pass the audio ring and measures their loudness. The frames and
-// the sound come from the dump, so only numbers leave the test.
+// test counts the samples that pass the audio ring and measures their loudness. A second test
+// measures mGBA on the emulator page at fast-forward, for the write-up's speed comparison (B7).
+// The frames and the sound come from the dump, so only numbers leave the tests.
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -25,11 +26,21 @@ const FIRST = 'smogtours-gen3ou-994052'
 const HAND_MADE = 'hand-made'
 const GBA_FRAMES_PER_SECOND = 59.7275
 const DUMP = readPreflightInput(process.env, loadBuildConfig().baseRom.sha1).baseRomPath
+const ROM_PATCH = join(buildPaths().outDir, OUTPUT_NAMES.patch)
+const SLOT = join(buildPaths().outDir, OUTPUT_NAMES.slot)
 const NEEDED = [
   join(wasmPaths(REPO_DIR).out, LINK_OUTPUTS.js),
   join(wasmPaths(REPO_DIR).out, WASM_OUTPUT_NAMES.patch),
-  join(buildPaths().outDir, OUTPUT_NAMES.slot),
+  SLOT,
 ]
+/** mGBA's fast-forward multipliers the probe runs 994052 at, one window each. */
+const MULTIPLIERS = [1, 16, 64, 256]
+const WINDOW_MS = 10_000
+// The emulator page keeps mGBA's module to itself. The probe wraps the package's default export
+// as the browser loads it, so the test reaches the module the page made; the page stays as it is.
+const EXPOSE_CORE =
+  'const irvExposeCore=async(options)=>{const core=await mGBA(options);' +
+  'globalThis.irvMgbaCore=core;return core};export default irvExposeCore;'
 
 /** The run's sound: samples through the ring, left and right counted apart. */
 interface Sound {
@@ -177,4 +188,69 @@ test('the spike page plays the hand-made battle at 1x and 994052 at fast', async
   })
 
   expect(errors).toEqual([])
+})
+
+interface Core {
+  setFastForwardMultiplier(multiplier: number): void
+  getFastForwardMultiplier(): number
+  addCoreCallbacks(callbacks: Record<string, () => void>): void
+}
+type Probe = typeof globalThis & { irvMgbaCore: Core; irvFrames: number; irvCrashed: boolean }
+
+// Frames per second over WINDOW_MS at `multiplier`, counted by mGBA's end-of-frame callback.
+async function mgbaRate(page: Page, multiplier: number) {
+  return page.evaluate(
+    async ([factor, ms]) => {
+      const probe = globalThis as Probe
+      probe.irvMgbaCore.setFastForwardMultiplier(factor)
+      await new Promise((done) => setTimeout(done, 2_000))
+      const [frames, start] = [probe.irvFrames, performance.now()]
+      await new Promise((done) => setTimeout(done, ms))
+      const fps = ((probe.irvFrames - frames) * 1000) / (performance.now() - start)
+      return { multiplier: probe.irvMgbaCore.getFastForwardMultiplier(), fps }
+    },
+    [multiplier, WINDOW_MS] as const,
+  )
+}
+
+test('mGBA on the emulator page plays 994052 at fast-forward (B7 measurement)', async ({
+  page,
+  context,
+}) => {
+  const missing = [DUMP, ROM_PATCH, SLOT].filter((path) => !existsSync(path))
+  test.skip(missing.length > 0, `missing ${missing.join(', ')}; run npm run rom:build`)
+  test.setTimeout(300_000)
+  await context.route(/\/mgba\.js(\?.*)?$/, async (route) => {
+    const response = await route.fetch()
+    const body = (await response.text()).replace('export default mGBA;', EXPOSE_CORE)
+    const headers = { ...response.headers() }
+    delete headers['content-length']
+    await route.fulfill({ response, body, headers })
+  })
+  const { romSha1 } = JSON.parse(readFileSync(SLOT, 'utf8')) as { romSha1: string }
+
+  await page.goto('/')
+  const line = page.getByRole('status')
+  await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles(DUMP)
+  await expect(line).toHaveText(new RegExp(romSha1), { timeout: 90_000 })
+  await expect(page.getByLabel('Test replay')).toHaveValue(FIRST)
+  await page.getByRole('button', { name: 'Start', exact: true }).click()
+  await expect(line).toHaveText(new RegExp(`^Running ${FIRST}`), { timeout: 60_000 })
+  await page.evaluate(() => {
+    const probe = globalThis as Probe
+    probe.irvFrames = 0
+    probe.irvCrashed = false
+    probe.irvMgbaCore.addCoreCallbacks({
+      videoFrameEndedCallback: () => (probe.irvFrames += 1),
+      coreCrashedCallback: () => (probe.irvCrashed = true),
+    })
+  })
+
+  for (const multiplier of MULTIPLIERS) {
+    const measured = await mgbaRate(page, multiplier)
+    report({ stream: FIRST, engine: 'mGBA', ...measured })
+    expect(measured.multiplier).toBe(multiplier)
+    expect(measured.fps).toBeGreaterThan(0)
+  }
+  expect(await page.evaluate(() => (globalThis as Probe).irvCrashed)).toBe(false)
 })
