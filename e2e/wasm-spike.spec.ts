@@ -80,6 +80,10 @@ async function startHandMade(page: Page, bytes: number[]): Promise<void> {
   const { read, written, sound } = await measure(page, '1x', 1)
   expect((await frame(page)).colours).toBeGreaterThan(1)
   expect(sound.silence).toBeUndefined()
+  // #47: a phone has no developer tools, so the progress line gives the sound's counts.
+  await expect(page.locator('#progress')).toHaveText(
+    /turn \d+\. The page skipped \d+ sound samples? and ran out of sound \d+ times?\.$/,
+  )
   // The worker's pace is the page's; the worklet's follows the audio clock of headless Chromium,
   // so its numbers are reported, and only a stalled or far slower read fails the test.
   expect(read).toBeGreaterThan(0)

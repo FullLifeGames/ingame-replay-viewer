@@ -197,6 +197,13 @@ export class RingReader {
   }
 }
 
+const counted = (count: number, one: string, many: string) =>
+  `${String(count)} ${count === 1 ? one : many}`
+
+/** The sound's counts on the page's progress line while sound plays (#47). */
+export const soundLine = ({ skipped, underruns }: { skipped: number; underruns: number }): string =>
+  `The page skipped ${counted(skipped, 'sound sample', 'sound samples')} and ran out of sound ${counted(underruns, 'time', 'times')}.`
+
 /** The count and the root mean square of the samples a host saw. */
 export class AudioMeter {
   samples = 0

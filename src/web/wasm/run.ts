@@ -7,7 +7,13 @@ import { fetchBytes, fetchJson } from '../fetch'
 import { messageOf } from '../message'
 import { checkBaseRom, readSlotDescription } from '../rom'
 import { ROM_FILES } from '../rom-files'
-import { AUDIO_PROCESSOR, AUDIO_STOP, AudioMeter, type AudioProcessorOptions } from './audio'
+import {
+  AUDIO_PROCESSOR,
+  AUDIO_STOP,
+  AudioMeter,
+  type AudioProcessorOptions,
+  soundLine,
+} from './audio'
 import workletUrl from './audio-worklet.ts?worker&url'
 import { WASM_FILES } from './files'
 import type { StartMessage, WorkerReport } from './messages'
@@ -186,12 +192,14 @@ export function reachEnd(run: Run, now: number): Speed {
   return speedAtEnd(run.clock.speed)
 }
 
+/** The run's progress, with the sound's skips and dry spells while it has sound (#47). */
 export const progressLine = (status: RunStatus, run: Run): string => {
   const finished =
     run.finishedMs === undefined
       ? ''
       : ` Finished at frame ${String(status.finishedAt)} after ${(run.finishedMs / 1000).toFixed(1)} s.`
-  return `Frame ${String(status.frame)}, instruction ${String(status.done)} of ${String(status.total)}, turn ${String(status.turn)}.${finished}`
+  const sound = run.output === undefined ? '' : ` ${soundLine(run.ring)}`
+  return `Frame ${String(status.frame)}, instruction ${String(status.done)} of ${String(status.total)}, turn ${String(status.turn)}.${finished}${sound}`
 }
 
 export const runningLine = (picked: Picked, run: Run): string => {

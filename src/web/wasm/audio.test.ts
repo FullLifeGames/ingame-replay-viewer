@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { AudioMeter, audioHandler, Resampler, RingReader, SoundPace } from './audio'
+import { AudioMeter, audioHandler, Resampler, RingReader, SoundPace, soundLine } from './audio'
 import { HalfBand } from './half-band'
 import { createShared, MIXER_RATE, writePace } from './protocol'
 import { AudioRing } from './ring'
@@ -203,6 +203,20 @@ describe('the ring reader of the audio worklet', () => {
     expect(reader.process(out)).toBe(false)
     expect([...(out[0]?.[0] ?? [])]).toEqual([0])
     expect(ring.totalRead).toBe(0)
+  })
+})
+
+describe('the sound line of the progress line', () => {
+  it('gives the skipped samples and the dry spells', () => {
+    expect(soundLine({ skipped: 1408, underruns: 2 })).toBe(
+      'The page skipped 1408 sound samples and ran out of sound 2 times.',
+    )
+  })
+
+  it('counts one of each in the singular', () => {
+    expect(soundLine({ skipped: 1, underruns: 1 })).toBe(
+      'The page skipped 1 sound sample and ran out of sound 1 time.',
+    )
   })
 })
 
