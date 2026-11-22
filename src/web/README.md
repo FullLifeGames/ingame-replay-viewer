@@ -32,6 +32,24 @@ The dev server serves two files from `build/wasm/`: `/wasm/irv-emerald.js` (the 
 
 `e2e/wasm-page.spec.ts` loads a replay by link on the page and checks its list against the emulator page's. With the dump and the build outputs, it also starts that replay at fast and waits until the game has played some of its instructions.
 
+## Phones
+
+Issue #49 asks the WebAssembly page to play a replay to its end on Android in Firefox and in Chrome, and on iOS in Safari. Each browser needs the same five things, and the page names what it lacks:
+
+- A secure context: HTTPS, which `tailscale serve` gives the page (see "Reaching the page over the tailnet"). Plain `http://<tailscale ip>` gets the secure-context line.
+- Cross-origin isolation, from the two headers of the dev server and the preview. Without it the browser grants no `SharedArrayBuffer`, which the worker and the page share for the frames, the sound and the pace. The page shows the isolation line instead of its controls.
+- Module workers: Firefox 114, Chrome 80, Safari 15 and their later versions. The page asks the `Worker` constructor before it shows its controls, and an older browser gets a line that names these versions.
+- The audio worklet (`AudioWorkletNode`). Without it the game plays without sound, and the status line says why.
+- 256 MB of memory for the module, fixed at instantiation and never grown. A phone that refuses it gets the line "This browser did not give the game the 256 MB of memory it needs", with the browser's own words, after Start. Each Start tries again with the picked dump. `src/web/wasm/failures.ts` holds the number, and the web server's spec holds it equal to the link's (`scripts/wasm-link.ts`).
+
+On 22.11.2026 the user played the spike page on an Android phone in Firefox over `tailscale serve`, with sound. The runs at the end of wave 4's stage 4 fill this table: a replay at 1x and at 2x to its end on each phone, with the counts of the progress line.
+
+| Phone and browser | Replay | 1x to the end | 2x to the end | Samples skipped | Ran out of sound | What the browser lacks |
+| ----------------- | ------ | ------------- | ------------- | --------------- | ---------------- | ---------------------- |
+| Android, Firefox  |        |               |               |                 |                  |                        |
+| Android, Chrome   |        |               |               |                 |                  |                        |
+| iOS, Safari       |        |               |               |                 |                  |                        |
+
 ## The preview
 
 ```sh
