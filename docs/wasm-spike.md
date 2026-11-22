@@ -35,7 +35,7 @@ The worklet now caps the ring's latency at 0.2 s. When more waits, it skips the 
 
 ### Timing
 
-The page ticks at the GBA's 59.7275 frames per second. The e2e measures 1x within 5 % of that and 2x within 5 % of twice that. Fast runs the worker as fast as it goes, and at END the page leaves fast for 1x, so no core spins while the game plays on after the replay. A hidden tab gets no animation frame, so the game pauses there at 1x and 2x; back in view, it goes on from where it paused. The tick clock counts any gap of more than 250 ms as such a pause.
+The page ticks at the GBA's 59.7275 frames per second. The e2e measures 1x within 5 % of that and 2x within 5 % of twice that. Fast runs the worker as fast as it goes, and at END the page leaves fast for 1x, so no core spins while the game plays on after the replay. A hidden tab gets no animation frame, so the game pauses there at 1x and 2x. When the tab comes back into view, the page resumes the tick clock, and the game goes on from where it paused. A page that misses animation frames while in view still catches up.
 
 ### Input
 
@@ -67,12 +67,12 @@ Wall-clock numbers on devbox are rough: its six cores are slow and shared, and a
 
 | Host     | Engine                                                  | 994052 to its stop                                                        | Frames per second                 |
 | -------- | ------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------- |
-| Node 24  | WebAssembly at `-O2` (`wasm:run`)                       | 106.6 s and 110.0 s                                                       | 366 to 377                        |
+| Node 24  | WebAssembly at `-O2` (`wasm:run`)                       | 106.6 s and 110.0 s in B7, 121.9 s after the RNG fix                      | 330 to 377                        |
 | native   | mGBA headless (`rom:shots`, frames taken at the scenes) | 40.3 s and 43.1 s                                                         | 933 to 998                        |
 | Chromium | WebAssembly page at fast                                | 116.0 s on the dev server and 120.1 s on the preview in B7, 113.8 s in B6 | 330 to 348, averaged over the run |
 | Chromium | mGBA page at fast-forward                               | 10 s windows at multipliers 16 to 256 (two runs)                          | 243 to 314; 60.0 and 60.2 at 1x   |
 
-At 1x the module needs about a sixth of one core on devbox. Native mGBA runs about 2.6 times faster than the module in Node. In Chromium the gap closes: mGBA's own WebAssembly build tops out at about 314 frames per second, with the multiplier at 64 or 256, and the module plays 994052 at 330 to 348 on average. The numbers measure different stretches. Each of mGBA's windows covers the 10 s of the battle it fell on, while the module's numbers average the whole run, so call the two engines even in the browser.
+At 1x the module needs about a sixth of one core on devbox. Native mGBA runs about 2.6 times faster than the module in Node (B7's interleaved runs). In Chromium the gap closes: mGBA's own WebAssembly build tops out at about 314 frames per second, with the multiplier at 64 or 256, and the module plays 994052 at 330 to 348 on average. The numbers measure different stretches. Each of mGBA's windows covers the 10 s of the battle it fell on, while the module's numbers average the whole run, so call the two engines even in the browser.
 
 The mGBA probe (`e2e/wasm-spike.spec.ts`, its second test) plays 994052 on the emulator page and sets mGBA's fast-forward multiplier to 1, 4, 16 and 64 in a first run and 1, 16, 64 and 256 in a second, counting frames for 10 s at each through mGBA's end-of-frame callback. The page keeps mGBA's module to itself, so the probe wraps the package's default export as the browser loads it; the page's code stays as it is.
 
@@ -82,9 +82,9 @@ Bytes, with gzip at level 9 and brotli at quality 11 from Node's zlib:
 
 | File                                  | Raw            | gzip           | brotli         |
 | ------------------------------------- | -------------- | -------------- | -------------- |
-| `irv-emerald-wasm.bps` (module patch) | 20,975,133     | 15,602,741     | 14,184,412     |
+| `irv-emerald-wasm.bps` (module patch) | 20,975,219     | 15,603,390     | 14,183,001     |
 | `irv-emerald.js` (Emscripten's glue)  | 8,458          | 3,094          | 2,803          |
-| **WebAssembly page**                  | **20,983,591** | **15,605,835** | **14,187,215** |
+| **WebAssembly page**                  | **20,983,677** | **15,606,484** | **14,185,804** |
 | `mgba.wasm`                           | 1,852,041      | 597,591        | 463,184        |
 | `mgba.js`                             | 248,854        | 57,127         | 48,706         |
 | `irv-emerald.bps` (ROM patch)         | 18,388,891     | 15,757,973     | 14,486,382     |
@@ -92,9 +92,9 @@ Bytes, with gzip at level 9 and brotli at quality 11 from Node's zlib:
 
 Raw, the WebAssembly page fetches 0.49 MB more. Compressed, it fetches 0.81 MB less with either method. The dev server sends both pages' files uncompressed; a real host picks the encoding (M2).
 
-The module patch copies 5,815,654 of the module's 25,977,607 bytes (22.4 %) from the dump and carries 20,143,807 bytes as literals. For comparison, the ROM patch copies 8,069,773 of the ROM's 33,554,432 bytes (24.0 %) from the dump (the BPS actions SourceRead and SourceCopy, counted in both patches).
+The module patch copies 5,815,589 of the module's 25,977,583 bytes (22.4 %) from the dump and carries 20,143,848 bytes as literals. For comparison, the ROM patch copies 8,069,773 of the ROM's 33,554,432 bytes (24.0 %) from the dump (the BPS actions SourceRead and SourceCopy, counted in both patches).
 
-The module itself, `irv-emerald.wasm` (25,977,607 bytes), never leaves devbox: the server answers 404 for it, and the page rebuilds it from the dump.
+The module itself, `irv-emerald.wasm` (25,977,583 bytes), never leaves devbox: the server answers 404 for it, and the page rebuilds it from the dump.
 
 ## What it means for the speed options and for #17
 
@@ -130,7 +130,7 @@ Each one passed on the GBA and broke the module; each fix stays inside the WebAs
 - **Function-pointer traps.** A WebAssembly function pointer is an index into a table, and `call_indirect` checks the callee's type. Three cases came up. `m4aSoundInit` calls jump table entry 35 (`SoundMainBTM`) with one argument, and the first stub took none: a signature trap, fixed in the glue's table. `decompress.c` copies its ARM decoders, the bytes between two function addresses, into a stack buffer and calls the buffer: "table index is out of bounds" at the battle's first load, fixed by patch 0003. `event_scripts.s` marks an effect command as `func + ROM_SIZE`, and a table index carries no addend: the converter refuses that by name, and patch 0002 looks the functions up in a list instead.
 - **The VCOUNT wait.** `SampleFreqSet` in `m4a.c` waits until the display reaches line 159. In the module VCOUNT moves only inside `VBlankIntrWait`, so the game hung in `m4aSoundInit` before its first frame. Patch 0004 drops the wait.
 
-- **The rename that renamed the callers.** `random.c` writes `Random32` as Thumb assembly in a naked function, which clang cannot compile for wasm32. The first build renamed it with `-DRandom32=IrvWasm_UnusedRandom32` and emptied its body, so that the glue's C `Random32` would serve every call. A `-D` rename also renames the file's own calls, the inline `Random()` among them. `RandomUniform` and the other helpers of `random.c` reached the empty copy: `RandomUniform` always returned its lower bound, and `AdvanceRandom`, called once per frame, never stepped the RNG. The review found it in the compiled object. Patch 0009 leaves the naked function out under `IRV_WASM`, the rename and the emptied body are gone, and the helpers call the glue's `Random32`. `wasm-config.ts` now refuses a define that renames a name.
+- **The rename that renamed the callers.** `random.c` writes `Random32` as Thumb assembly in a naked function, which clang cannot compile for wasm32. The first build renamed it with `-DRandom32=IrvWasm_UnusedRandom32` and emptied its body, so that the glue's C `Random32` would serve every call. A `-D` rename also renames the file's own calls, the inline `Random()` among them. `RandomUniform` and the other helpers of `random.c` reached the empty copy: `RandomUniform` always returned its lower bound, and `AdvanceRandom`, called once per frame, never stepped the RNG. The review found it in the compiled object. Patch 0009 leaves the naked function out under `IRV_WASM`, the rename and the emptied body are gone, and the helpers call the glue's `Random32`. `wasm-config.ts` now refuses a define that renames a name. After the fix both streams reach END at the same frames as before, and all 13 scenes pass.
 
 Smaller ones: `script.c` breaks out of its effect analysis with `__builtin_setjmp`, which clang refuses on wasm32 (patch 0001, libc's `setjmp`); `REG_DISPCNT` must start in forced blank as the BIOS leaves it, or the first DISPSTAT write stays buffered and VBlank never fires.
 

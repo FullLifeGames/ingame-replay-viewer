@@ -25,26 +25,21 @@ export function ticksPerSecond(speed: Speed): number | undefined {
 /** The speed after END: the game plays on, and fast gives way to 1x, so no core spins. */
 export const speedAtEnd = (speed: Speed): Speed => (speed === 'fast' ? '1x' : speed)
 
-// A gap between two asks longer than this is a pause (a hidden tab gets no animation frame).
-const PAUSE_MS = 250
-
 /**
  * The tick rule: how many frames the game may have played by a moment, in milliseconds. The
- * count runs on from the start or the last change, so a game that falls behind catches up. After
- * a pause the count goes on from what it allowed before the pause.
+ * count runs on from the start or the last change, so a game that falls behind catches up.
+ * After a pause (resume) the count goes on from what it allowed before the pause.
  */
 export class TickClock {
   private current: Speed
   private since: number
   private base: number
-  private asked: number
   private granted: number
 
   constructor(speed: Speed, now: number, frame = 0) {
     this.current = speed
     this.since = now
     this.base = frame
-    this.asked = now
     this.granted = frame
   }
 
@@ -56,13 +51,14 @@ export class TickClock {
   allowed(now: number): number | undefined {
     const rate = ticksPerSecond(this.current)
     if (rate === undefined) return undefined
-    if (now - this.asked > PAUSE_MS) {
-      this.since = now
-      this.base = this.granted
-    }
-    this.asked = now
     this.granted = this.base + Math.floor(((now - this.since) * rate) / 1000)
     return this.granted
+  }
+
+  /** The page is back in view at `now`: count on from the frames allowed before it was hidden. */
+  resume(now: number): void {
+    this.since = now
+    this.base = this.granted
   }
 
   /** Another speed from `now` on, counted from `frame`, the frame the game is at. */
@@ -70,7 +66,6 @@ export class TickClock {
     this.current = speed
     this.since = now
     this.base = frame
-    this.asked = now
     this.granted = frame
   }
 }

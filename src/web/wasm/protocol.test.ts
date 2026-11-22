@@ -67,14 +67,22 @@ describe('the tick rule', () => {
   })
 
   // A hidden tab gets no animation frame, so the page grants nothing and the game pauses. When
-  // the tab comes back, the game goes on from there instead of racing to catch up.
-  it('resumes where it paused after a gap of more than a quarter second', () => {
+  // the tab comes back, the page resumes the clock, and the game goes on from there instead of
+  // racing to catch up.
+  it('resumes where it paused when the page comes back into view', () => {
     const clock = new TickClock('1x', 0)
     expect(walk(clock, 0, 1000)).toBe(59)
+    clock.resume(9000)
     expect(clock.allowed(9000)).toBe(59)
     expect(clock.allowed(9200)).toBe(59 + 11)
-    expect(clock.allowed(9450)).toBe(59 + 26)
-    expect(walk(clock, 9450, 10_450)).toBe(59 + 86)
+    expect(walk(clock, 9200, 10_000)).toBe(59 + 59)
+  })
+
+  // A busy page can miss animation frames while the tab stays in view; the game catches up.
+  it('catches up after a late ask while the page is in view', () => {
+    const clock = new TickClock('1x', 0)
+    expect(walk(clock, 0, 1000)).toBe(59)
+    expect(clock.allowed(1600)).toBe(95)
   })
 })
 

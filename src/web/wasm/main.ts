@@ -51,6 +51,10 @@ function drawLoop(view: SpikeView, runs: Runs<Run>, changeSpeed: (speed: Speed) 
     view.progress(progressLine(status, run))
   }
   requestAnimationFrame(draw)
+  // A hidden tab gets no animation frame, so the game pauses; back in view, it goes on from there.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') runs.current?.clock.resume(performance.now())
+  })
 }
 
 /** The page's state and its actions; the view's events call them. */
