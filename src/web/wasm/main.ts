@@ -5,7 +5,7 @@
 // tick rule (protocol.ts) and draws the newest whole frame (frame-swap.ts) on each animation
 // frame. The game's sound goes from the worker through the audio ring to an audio worklet
 // (audio.ts), at 1x and 2x; fast stays silent. The dump stays in this tab.
-import { environmentProblem } from '../environment'
+import { environmentProblem, startsModuleWorkers } from '../environment'
 import { fetchJson } from '../fetch'
 import { messageOf } from '../message'
 import {
@@ -177,7 +177,14 @@ function wire(spike: Spike, view: SpikeView): void {
 }
 
 const view = findSpikeView()
-const problem = environmentProblem({ isSecureContext, crossOriginIsolated }, 'the game')
+// The probe's URL loads nothing: the browser reads the options first (web.dev's check).
+const moduleWorkers = startsModuleWorkers(
+  typeof Worker === 'undefined' ? undefined : (options) => new Worker('blob://', options),
+)
+const problem = environmentProblem(
+  { isSecureContext, crossOriginIsolated, moduleWorkers },
+  'the game',
+)
 if (problem === undefined) {
   const spike = createSpike(view)
   wire(spike, view)
