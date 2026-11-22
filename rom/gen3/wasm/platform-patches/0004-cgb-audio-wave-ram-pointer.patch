@@ -1,0 +1,19 @@
+cgb_audio.c reads the wave RAM bytes at REG_ADDR_WAVE_RAM0 + i. Under the port's PORTABLE,
+REG_BASE is an array of bytes, so that sum is a pointer. The build takes the expansion's
+headers, where REG_BASE is the number 0x04000000 (plan D2), so the sum needs a cast to a byte
+pointer before it is read.
+
+diff --git a/src/platform/cgb_audio.c b/src/platform/cgb_audio.c
+--- a/src/platform/cgb_audio.c
++++ b/src/platform/cgb_audio.c
+@@ -51,8 +51,8 @@
+ 
+ void cgb_set_wavram(){
+     for(u8 wavi = 0; wavi < 0x10; wavi++){
+-        gb.WAVRAM[(wavi << 1)] = (((*(REG_ADDR_WAVE_RAM0 + wavi)) & 0xF0) >> 4) / 7.5f - 1.0f;
+-        gb.WAVRAM[(wavi << 1) + 1] = (((*(REG_ADDR_WAVE_RAM0 + wavi)) & 0x0F)) / 7.5f - 1.0f;
++        gb.WAVRAM[(wavi << 1)] = (((*((vu8 *)REG_ADDR_WAVE_RAM0 + wavi)) & 0xF0) >> 4) / 7.5f - 1.0f;
++        gb.WAVRAM[(wavi << 1) + 1] = (((*((vu8 *)REG_ADDR_WAVE_RAM0 + wavi)) & 0x0F)) / 7.5f - 1.0f;
+     }
+ }
+ 

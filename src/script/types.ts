@@ -15,6 +15,7 @@ export type DropReason =
   | 'upkeep'
   | 'room'
   | 'hint'
+  | 'debug'
   | 'unknown'
   | 'unsupported'
 

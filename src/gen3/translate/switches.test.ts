@@ -49,6 +49,15 @@ describe('switches', () => {
       { op: 'switchIn', side: 'near', slot: 1, hp: 100, status: 'none' },
     ])
   })
+
+  it('scales the exact HP of a custom game onto 100 (#41)', () => {
+    const scene = sceneOf(
+      '|switch|p1a: Metagross|Metagross|319/319',
+      '|-damage|p1a: Metagross|160/319',
+    )
+    expect(scene).toContainEqual({ op: 'switchIn', side: 'near', slot: 1, hp: 100, status: 'none' })
+    expect(scene).toContainEqual({ op: 'hp', side: 'near', hp: 50 })
+  })
 })
 
 describe('faints', () => {

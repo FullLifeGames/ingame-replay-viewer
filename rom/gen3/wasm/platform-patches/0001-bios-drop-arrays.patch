@@ -1,0 +1,26 @@
+The multiplatform port keeps the GBA memory as arrays (REG_BASE, PLTT, VRAM_, OAM and
+the rest). The WebAssembly build maps the GBA addresses one to one into linear memory
+(plan D2), where the expansion's gba/defines.h names them as plain addresses, so the
+arrays go.
+
+diff --git a/src/platform/bios.c b/src/platform/bios.c
+index f13c6fd..5586106 100644
+--- a/src/platform/bios.c
++++ b/src/platform/bios.c
+@@ -1,16 +1,6 @@
+ #include "global.h"
+ // BIOS function implementations are based on the VBA-M source code.
+ 
+-//memory defines here because there's no better spot for them
+-u16 INTR_CHECK;
+-void *INTR_VECTOR;
+-unsigned char REG_BASE[0x400] __attribute__ ((aligned (4)));
+-unsigned char PLTT[PLTT_SIZE] __attribute__ ((aligned (4)));
+-unsigned char VRAM_[VRAM_SIZE] __attribute__ ((aligned (4)));
+-unsigned char OAM[OAM_SIZE] __attribute__ ((aligned (4)));
+-unsigned char FLASH_BASE[131072] __attribute__ ((aligned (4)));
+-struct SoundInfo *SOUND_INFO_PTR;
+-
+ static uint32_t CPUReadMemory(const void *src)
+ {
+     return *(uint32_t *)src;

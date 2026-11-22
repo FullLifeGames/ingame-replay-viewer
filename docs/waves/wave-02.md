@@ -75,26 +75,34 @@ Each entry gives the scene, the options, the choice and what a reversal costs.
 
 ## Gate
 
-At the gate on 21.11.2026:
+After the gate on 21.11.2026:
 
-| Stage | Lane | Issues        | Pull request | State at the gate  |
-| ----- | ---- | ------------- | ------------ | ------------------ |
-| S1    | a    | #14, #22, #23 | #34          | waits for the user |
-| S1    | b    | #21, #24      | #34          | waits for the user |
+| Stage | Lane | Issues        | Pull request | State after the gate |
+| ----- | ---- | ------------- | ------------ | -------------------- |
+| S1    | a    | #14, #22, #23 | #34          | merged, 7fa0bb6      |
+| S1    | b    | #21, #24      | #34          | merged, 7fa0bb6      |
 
-The dev page runs behind `tailscale serve` for the user's own look at 994052.
+The dev page ran behind `tailscale serve` for the user's own look at 994052 and stopped after the gate.
 
-The gate asks the user five questions on a review page: merge #34; keep the expansion's KO animation behind #24 or turn it off with a fourth patch; file the rests as issues; what wave 3 takes (the M1b WebAssembly spike, more M2 game work, or the speed-up options); and how the speed-up issue gets filed, since the permission check blocked it after the wave 1 gate.
+The gate asked the user five questions on a review page. The user answered "1a 2a 3a 4a 5a" on 21.11.2026, with no notes:
+
+1. #34 merged at 5ecdf9e (merge 7fa0bb6). #14, #21, #22, #23 and #24 are closed.
+2. The expansion's KO animation stays. The viewer shows the game it builds on, so Suicune glows blue after a KO as in the unmodified expansion.
+3. The rests became issues: R1 to R4 approved for M2 as small fixes, R5 parked with its trigger. The list below names each issue.
+4. Wave 3 takes the M1b WebAssembly spike, filed as #35. Its answer decides where the speed-up options go and how #17 gets solved.
+5. The user files the speed-up issue from the draft; the integrator sent its text in the chat.
+
+After the gate the user reported that gen3customgame-2115579570 fails on the page with "sendOut hp 100.00000000000001 is no u16" and asked for a fix in the next round. A custom game logs exact HP, and `scaleHp` turned 319/319 into 100.00000000000001. It became #41, approved for M2 as a small fix, and joins wave 3.
 
 ## Rests
 
-Proposals for issues, ruled at the gate. None of the five test replays hits one.
+Proposals for issues, ruled at the gate (answer 3a). None of the five test replays hits one. Each line names its issue.
 
-- R1 (M2, small fix): Volt Absorb and Water Absorb log `-heal` when they absorb a move, so the move plays its animation; the game skips it.
-- R2 (M2, small fix): Own Tempo's `-immune|…|confusion` becomes a dropped line.
-- R3 (M2, small fix): Substitute when one is already up prints "But it failed!"; the expansion says "Dugtrio already has a substitute!".
-- R4 (M2, small fix): Destiny Bond and Perish Song KO a Pokémon with HP left. Showdown logs no HP line before their `faint`, so our HP bar vanishes at its old width; the game drains it first.
-- R5 (parked until the speed-up work): the stream has no pause op, and the game waits `B_WAIT_TIME_SHORT` before an ability pop-up. Timing only.
+- R1 (#36, M2, small fix): Volt Absorb and Water Absorb log `-heal` when they absorb a move, so the move plays its animation; the game skips it.
+- R2 (#37, M2, small fix): Own Tempo's `-immune|…|confusion` becomes a dropped line.
+- R3 (#38, M2, small fix): Substitute when one is already up prints "But it failed!"; the expansion says "Dugtrio already has a substitute!".
+- R4 (#39, M2, small fix): Destiny Bond and Perish Song KO a Pokémon with HP left. Showdown logs no HP line before their `faint`, so our HP bar vanishes at its old width; the game drains it first.
+- R5 (#40, parked until the speed-up work): the stream has no pause op, and the game waits `B_WAIT_TIME_SHORT` before an ability pop-up. Timing only.
 - R6 (no issue): Perish Song is the only Gen 1-3 move with `TARGET_ALL_BATTLERS`, which the expansion animates even when it does nothing. Showdown logs that failure with `[still]`, so the stream already matches the game.
 - R7 (no issue): the expansion starts each KO animation twice, one frame apart; both end on the same frame.
 - R8 (no issue): `rom:shots` end frames differ by a few dozen frames between runs of the same stream and ROM (994052: 39 564 and 39 592). No check keys on them.

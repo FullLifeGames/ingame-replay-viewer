@@ -1,0 +1,106 @@
+The platform's mixer takes the place of m4a_1.s. Under IRV_WASM m4a.c runs it at 42048 Hz,
+the highest rate of the expansion's table (704 samples per frame at 59.7275 frames per
+second), and gives it the reciprocal of that rate as a float. The PSG channels have no
+hardware to play them: the platform's cgb_audio.c synthesises them from the sound registers,
+and it needs to hear when CgbSound and CgbOscOff start a note, set its sweep, length or
+envelope, or load the wave RAM, at the places the port's m4a.c tells it.
+
+diff --git a/src/m4a.c b/src/m4a.c
+--- a/src/m4a.c
++++ b/src/m4a.c
+@@ -1,5 +1,8 @@
+ #include "global.h"
+ #include "gba/m4a_internal.h"
++#ifdef IRV_WASM
++#include "irv_wasm_sound.h"
++#endif
+ #include "global.h"
+ 
+ extern const u8 gCgb3Vol[];
+@@ -73,7 +76,11 @@
+     SoundInit(&gSoundInfo);
+     MPlayExtender(gCgbChans);
+     m4aSoundMode(SOUND_MODE_DA_BIT_8
++#ifdef IRV_WASM
++               | SOUND_MODE_FREQ_42048
++#else
+                | SOUND_MODE_FREQ_13379
++#endif
+                | (12 << SOUND_MODE_MASVOL_SHIFT)
+                | (5 << SOUND_MODE_MAXCHN_SHIFT));
+ 
+@@ -259,6 +266,9 @@
+     REG_NR44 = 0x80;
+     REG_NR30 = 0;
+     REG_NR50 = 0x77;
++#ifdef IRV_WASM
++    IrvWasm_CgbInitChannels();
++#endif
+ 
+     soundInfo = SOUND_INFO_PTR;
+ 
+@@ -396,7 +406,11 @@
+     soundInfo->pcmFreq = (597275 * soundInfo->pcmSamplesPerVBlank + 5000) / 10000;
+ 
+     // CPU frequency 16.78Mhz
++#ifdef IRV_WASM
++    soundInfo->divFreq = 1.0f / soundInfo->pcmFreq;
++#else
+     soundInfo->divFreq = (16777216 / soundInfo->pcmFreq + 1) >> 1;
++#endif
+ 
+     // Turn off timer 0.
+     REG_TM0CNT_H = 0;
+@@ -822,6 +836,10 @@
+         REG_NR42 = 8;
+         REG_NR44 = 0x80;
+     }
++#ifdef IRV_WASM
++    cgb_set_envelope(chanNum - 1, 8);
++    cgb_trigger_note(chanNum - 1);
++#endif
+ }
+ 
+ static inline int CgbPan(struct CgbChannel *chan)
+@@ -945,6 +963,9 @@
+                 {
+                 case 1:
+                     *nrx0ptr = channels->sweep;
++#ifdef IRV_WASM
++                    cgb_set_sweep(channels->sweep);
++#endif
+                     // fallthrough
+                 case 2:
+                     *nrx1ptr = ((u32)channels->wavePointer << 6) + channels->length;
+@@ -958,6 +979,9 @@
+                         REG_WAVE_RAM2 = channels->wavePointer[2];
+                         REG_WAVE_RAM3 = channels->wavePointer[3];
+                         channels->currentPointer = channels->wavePointer;
++#ifdef IRV_WASM
++                        cgb_set_wavram();
++#endif
+                     }
+                     *nrx0ptr = 0;
+                     *nrx1ptr = channels->length;
+@@ -977,6 +1001,9 @@
+                         channels->n4 = 0x00;
+                     break;
+                 }
++#ifdef IRV_WASM
++                cgb_set_length(ch - 1, channels->length);
++#endif
+                 channels->envelopeCounter = channels->attack;
+                 if ((s8)(channels->attack & mask))
+                 {
+@@ -1173,6 +1200,11 @@
+                 if (ch == 1 && !(*nrx0ptr & 0x08))
+                     *nrx4ptr = channels->n4 | 0x80;
+             }
++#ifdef IRV_WASM
++            cgb_set_envelope(ch - 1, *nrx2ptr);
++            cgb_toggle_length(ch - 1, (*nrx4ptr & 0x40));
++            cgb_trigger_note(ch - 1);
++#endif
+         }
+ 
+     channel_complete:

@@ -40,6 +40,7 @@ const BEFORE_START = [
   ['|player|p2|', 'room'],
   ['a line of plain text', 'room'],
   ['|-hint|In Gen 3, Sleep Talk can be used while asleep.', 'hint'],
+  ['|debug|BP: 70', 'debug'],
 ] as const
 
 describe('dropReasonOf', () => {

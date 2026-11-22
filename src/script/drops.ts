@@ -29,6 +29,7 @@ const REASONS: Partial<Record<Protocol.ArgName, DropReason>> = {
   '|uhtml|': 'room',
   '|uhtmlchange|': 'room',
   '|-hint|': 'hint',
+  '|debug|': 'debug',
 }
 
 /** A `|player|` line that names its player, as the intro shows it. */

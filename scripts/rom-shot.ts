@@ -71,17 +71,23 @@ export function replayFile(id: string, files: readonly string[]): string {
   return file
 }
 
-interface RunPlan {
+/** A stream to play and what its run must show; the WebAssembly harness plays the same list. */
+export interface StreamPlan {
   name: string
-  /** The ROM bytes, or undefined for the built ROM as it is. */
-  rom: Uint8Array | undefined
+  /** The stream's bytes, or undefined for the slot as the build leaves it. */
+  stream: Uint8Array | undefined
   scenes: Scene[]
   /** The scenes the stream lacks. */
   missing: string[]
   expect: Expected
 }
 
-interface RunReport {
+interface RunPlan extends StreamPlan {
+  /** The ROM bytes, or undefined for the built ROM as it is. */
+  rom: Uint8Array | undefined
+}
+
+export interface RunReport {
   name: string
   expect: Expected
   seconds: number
@@ -91,7 +97,9 @@ interface RunReport {
   problems: string[]
 }
 
-const say = (line: string) => process.stdout.write(`rom:shots: ${line}\n`)
+type Say = (line: string) => void
+
+const say: Say = (line) => process.stdout.write(`rom:shots: ${line}\n`)
 
 // src/gen3/ resolves as the page's bundler does (no file extensions, JSON imports), which plain
 // Node cannot load; Vite's module runner loads it with the same resolution as the page.
@@ -123,19 +131,21 @@ function streamBytes(shot: typeof ShotStream, name: string): Uint8Array {
   return shot.replayBytes(JSON.parse(readFileSync(file, 'utf8')))
 }
 
-async function planRuns(
-  paths: BuildPaths,
+/**
+ * The named streams, then two refusals: the empty slot (refused as EMPTY) and the hand-made
+ * stream with version 2 (refused as VERSION).
+ */
+export async function planStreams(
   names: readonly string[],
   layout: ProgressLayout,
-): Promise<RunPlan[]> {
+): Promise<StreamPlan[]> {
   const shot = await loadShotStream()
-  const { rom, description } = readBuiltRom(paths)
-  const plays = names.map((name): RunPlan => {
+  const plays = names.map((name): StreamPlan => {
     const bytes = streamBytes(shot, name)
     const stream = shot.decodeStream(bytes)
     return {
       name,
-      rom: writeReplaySlot(rom, description, bytes),
+      stream: bytes,
       scenes: scenesOf(stream),
       missing: missingScenes(stream),
       expect: 'finished',
@@ -144,10 +154,10 @@ async function planRuns(
   const refused = refusalScenes(layout.refusedColour)
   return [
     ...plays,
-    { name: 'empty-slot', rom: undefined, scenes: refused, missing: [], expect: 'EMPTY' },
+    { name: 'empty-slot', stream: undefined, scenes: refused, missing: [], expect: 'EMPTY' },
     {
       name: 'version-2',
-      rom: writeReplaySlot(rom, description, shot.withVersion(shot.handMadeBytes(), 2)),
+      stream: shot.withVersion(shot.handMadeBytes(), 2),
       scenes: refused,
       missing: [],
       expect: 'VERSION',
@@ -155,7 +165,21 @@ async function planRuns(
   ]
 }
 
-function readFrames(dir: string): Map<string, Frame> {
+async function planRuns(
+  paths: BuildPaths,
+  names: readonly string[],
+  layout: ProgressLayout,
+): Promise<RunPlan[]> {
+  const plans = await planStreams(names, layout)
+  const { rom, description } = readBuiltRom(paths)
+  return plans.map((plan) => ({
+    ...plan,
+    rom: plan.stream === undefined ? undefined : writeReplaySlot(rom, description, plan.stream),
+  }))
+}
+
+/** The frames a run wrote into its folder as PPM, by name. */
+export function readFrames(dir: string): Map<string, Frame> {
   const frames = new Map<string, Frame>()
   for (const file of readdirSync(dir)) {
     if (file.endsWith('.ppm')) frames.set(file.slice(0, -4), readPpm(readFileSync(join(dir, file))))
@@ -187,24 +211,37 @@ function playRun(context: Context, plan: RunPlan): RunReport {
     shots: shotArgs(plan.scenes),
   })
   const seconds = Math.round((performance.now() - start) / 100) / 10
-  const frames = readFrames(frameDir)
+  return reportRun({ plan, output, frames: readFrames(frameDir), errors: context.errors, seconds })
+}
+
+export interface PlayedRun {
+  plan: StreamPlan
+  output: ToolOutput
+  frames: ReadonlyMap<string, Frame>
+  errors: readonly string[]
+  seconds: number
+}
+
+/** Checks a run's scenes on its frames and judges it. */
+export function reportRun(run: PlayedRun): RunReport {
+  const { plan, output } = run
   const scenes = plan.scenes.map((scene) => ({
     name: scene.name,
-    ...checkShots(scene.check, frames),
+    ...checkShots(scene.check, run.frames),
   }))
   const { missing } = plan
   const problems = judgeRun({
     expect: plan.expect,
     output,
     scenes,
-    errors: context.errors,
+    errors: run.errors,
     missing: requiresEveryScene(plan.name) ? missing : [],
   })
   const { name, expect } = plan
-  return { name, expect, seconds, status: output.status, scenes, missing, problems }
+  return { name, expect, seconds: run.seconds, status: output.status, scenes, missing, problems }
 }
 
-function sayRun(report: RunReport): void {
+function sayRun(report: RunReport, say: Say): void {
   const { status } = report
   const verdict = report.problems.length === 0 ? 'passed' : 'FAILED'
   say(
@@ -236,15 +273,20 @@ async function runShots(names: readonly string[]): Promise<void> {
   emptyInside(paths.roots, shotsDir)
   mkdirSync(shotsDir, { recursive: true })
   const reports = plans.map((plan) => playRun(context, plan))
-  reports.forEach(sayRun)
-  writeFileSync(join(shotsDir, 'report.json'), `${JSON.stringify(reports, null, 2)}\n`)
+  finishRuns(reports, shotsDir, say)
+}
+
+/** Says each run, writes report.json into the folder of the frames, and fails if a run failed. */
+export function finishRuns(reports: readonly RunReport[], dir: string, say: Say): void {
+  for (const report of reports) sayRun(report, say)
+  writeFileSync(join(dir, 'report.json'), `${JSON.stringify(reports, null, 2)}\n`)
   const failed = reports.filter((report) => report.problems.length > 0)
   if (failed.length > 0) {
     throw new Error(
-      `${String(failed.length)} of ${String(reports.length)} runs failed; frames in ${shotsDir}`,
+      `${String(failed.length)} of ${String(reports.length)} runs failed; frames in ${dir}`,
     )
   }
-  say(`all ${String(reports.length)} runs passed; frames and report.json in ${shotsDir}`)
+  say(`all ${String(reports.length)} runs passed; frames and report.json in ${dir}`)
 }
 
 async function main(): Promise<void> {

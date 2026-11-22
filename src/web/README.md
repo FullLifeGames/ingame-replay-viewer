@@ -16,13 +16,25 @@ The dev server serves two files from `build/rom/` and nothing else from there: `
 
 The plugin in `scripts/web-server.ts` puts `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp` on every response.
 
+## The WebAssembly spike page
+
+`wasm.html` is a test page for the WebAssembly spike (#35). It sits beside the emulator page, which stays the viewer. Open `http://localhost:5177/wasm.html`; the emulator page links to it.
+
+The page runs the game without an emulator. The build compiles the expansion to WebAssembly (`npm run wasm:build`), and the page rebuilds that module from your dump with a BPS patch, as it rebuilds the ROM. You pick the same dump and a test replay, then press Start. The game runs in a worker, and the page allows its frames at 1x, 2x or fast. The game's sound plays at 1x, and at 2x at double pace and pitch. At fast it stays silent, and at END the page leaves fast for 1x. The sound starts with Start, because a browser opens audio only after a click. If the page cannot open its audio, the game plays without sound, the status line says why, and the next Start tries again.
+
+It needs `npm run rom:build`, `npm run wasm:build -- --compile`, `npm run wasm:convert` and `npm run wasm:build -- --link`, in that order, all heavy checks. The link writes `build/wasm/irv-emerald-wasm.bps` from your dump by the build's rule (`~/roms/` or `IRV_BASE_ROM`); `npm run wasm:build -- --patch` writes it alone.
+
+The dev server serves two files from `build/wasm/`: `/wasm/irv-emerald.js` (the Emscripten glue) and `/wasm/irv-emerald-wasm.bps`. Any other `/wasm/` name answers 404, the module `irv-emerald.wasm` included. The page's own modules in `src/web/wasm/` pass through to Vite under the same prefix. The page also fetches `/rom/replay-slot.json`, since the module's replay slot has the ROM's layout.
+
+`e2e/wasm-spike.spec.ts` plays the hand-made battle at 1x and 994052 at fast, and checks the pace at 1x and 2x. It also counts the samples that pass the audio ring, reports the worklet's skips and underruns, and measures how loud the sound is. Two Start presses during the build must start one run. A game that fails stops the test with its line. It skips without the dump or the build outputs and names what is missing. Only numbers leave it.
+
 ## The preview
 
 ```sh
 npm run build && npx vite preview --port 5177 --strictPort
 ```
 
-The preview uses the same plugin, so it sends the same headers and serves the same two files from `build/rom/`. `dist/` holds the page, mGBA's script, worker and wasm, and the test replays. It holds no ROM, patch or save. mGBA's worker and wasm load from `dist/assets/`, and the replay runs as it does on the dev server. The production build for a real host is M2's work.
+The preview uses the same plugin, so it sends the same headers and serves the same two files from `build/rom/`. `dist/` holds the page, mGBA's script, worker and wasm, and the test replays. It holds no ROM, patch or save. mGBA's worker and wasm load from `dist/assets/`, and the replay runs as it does on the dev server. The spike page `wasm.html` sits in `dist/` too: its worker and audio worklet load from `dist/assets/`, and the plugin serves its two `/wasm/` files from `build/wasm/`. The spike's e2e passed against the preview (wave 3, B7). The production build for a real host is M2's work.
 
 ## HTTPS or localhost
 
@@ -43,7 +55,7 @@ Vite accepts the `.ts.net` host name (`server.allowedHosts` in `vite.config.ts`)
 
 ## Your dump
 
-The page reads your dump in this tab. It checks the SHA1 against `rom/gen3/build.json`, applies the patch and keeps the patched ROM in memory. It never uploads the dump and never stores it: no IndexedDB, no local storage, no savestate. mGBA's file system stays in memory, and its autosave is off. A reload forgets the dump.
+The page reads your dump in this tab. Its picker takes any file: a phone greys out a `.gba` file when the picker filters by that extension, and the SHA1 check refuses any other file. It checks the SHA1 against `rom/gen3/build.json`, applies the patch and keeps the patched ROM in memory. It never uploads the dump and never stores it: no IndexedDB, no local storage, no savestate. mGBA's file system stays in memory, and its autosave is off. A reload forgets the dump.
 
 Besides its own files, the page sends only GET requests: the two `/rom/` files from its own server, and a replay JSON from `replay.pokemonshowdown.com` when you load a replay by link or ID.
 
