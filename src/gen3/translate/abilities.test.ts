@@ -1,17 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
-import { abilityOf } from '../tables/lookup'
-import { plain, sceneOf, streamOfLog } from '../testing'
-
-type Side = 'near' | 'far'
-
-const popUp = (side: Side, name: string, show: boolean) => ({
-  op: 'ability',
-  side,
-  ability: abilityOf(name).number,
-  show,
-})
+import { plain, popUp, sceneOf, streamOfLog } from '../testing'
 
 describe('ability pop-ups', () => {
   it('sends the leads out, then raises and plays Sand Stream inside its pop-up (X10)', () => {
