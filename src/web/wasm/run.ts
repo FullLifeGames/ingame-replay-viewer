@@ -13,6 +13,7 @@ import { WASM_FILES } from './files'
 import type { StartMessage, WorkerReport } from './messages'
 import {
   createShared,
+  GBA_FRAMES_PER_SECOND,
   MIXER_RATE,
   readStatus,
   type RunStatus,
@@ -28,6 +29,9 @@ const AUDIO_CAPACITY = 2 ** 17
 // The latency cap: at most 0.2 s of sound waits in the ring. Past it, the worklet skips the oldest
 // samples down to 0.1 s, so a worker that writes faster than the audio clock plays stays in step.
 const AUDIO_LATENCY = 2 * Math.round(MIXER_RATE / 5)
+// The reserve (#47): two frames of sound, 1408 pairs or 33 ms, wait in the ring before the worklet
+// plays, at the start and after each dry spell. It stays under half of the cap's 0.1 s floor.
+const AUDIO_RESERVE = 2 * 2 * Math.round(MIXER_RATE / GBA_FRAMES_PER_SECOND)
 // The newest samples the test hook measures: about a tenth of a second.
 const MEASURED_SAMPLES = 8192
 
@@ -104,7 +108,12 @@ export class AudioOpener {
 /** The run's sound: a processor that plays the ring into the context, or why there is none. */
 function connectRing(sound: Sound, ring: SharedArrayBuffer) {
   if (typeof sound === 'string') return { output: undefined, silence: sound }
-  const processorOptions: AudioProcessorOptions = { ring, rate: MIXER_RATE, latency: AUDIO_LATENCY }
+  const processorOptions: AudioProcessorOptions = {
+    ring,
+    rate: MIXER_RATE,
+    latency: AUDIO_LATENCY,
+    reserve: AUDIO_RESERVE,
+  }
   try {
     const node = new AudioWorkletNode(sound, AUDIO_PROCESSOR, {
       numberOfInputs: 0,

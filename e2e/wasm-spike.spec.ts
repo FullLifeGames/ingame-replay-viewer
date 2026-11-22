@@ -46,8 +46,8 @@ type Measured = Awaited<ReturnType<typeof rate>>
 
 /**
  * The tick rule's pace at `factor` times the game's own, and the sound written into the ring at
- * the mixer's rate: at 2x the worker keeps every other pair of twice the frames, so the ring fills
- * as fast as at 1x.
+ * the mixer's rate: at 2x the worker filters twice the frames and keeps one pair of each two, so
+ * the ring fills as fast as at 1x.
  */
 function expectPace({ paced, written, rms }: Measured, factor: number): void {
   expect(paced / GBA_FRAMES_PER_SECOND).toBeGreaterThan(factor * 0.95)

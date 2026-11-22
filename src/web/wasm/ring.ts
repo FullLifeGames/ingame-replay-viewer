@@ -3,9 +3,9 @@
 // then the float samples. DOM-free, so the worker, the worklet and the Node harness share it.
 
 // The ring's header: the samples written and read so far, the overruns, the samples the reader
-// skipped to hold its latency cap, and its underruns. The written and read counters are Int32
-// words that wrap at 2^32; with a capacity that is a power of two, a counter masked by the
-// capacity gives its sample's place on either side of the wrap.
+// skipped to hold its latency cap, and its underruns (dry spells). The written and read counters
+// are Int32 words that wrap at 2^32; with a capacity that is a power of two, a counter masked by
+// the capacity gives its sample's place on either side of the wrap.
 const RING = { written: 0, read: 1, overruns: 2, skipped: 3, underruns: 4 } as const
 const RING_HEADER_BYTES = 4 * Object.keys(RING).length
 // A larger capacity would let the fill reach 2^31, which a signed Int32 cannot hold.
@@ -52,7 +52,10 @@ export class AudioRing {
     return Atomics.load(this.header, RING.skipped)
   }
 
-  /** The output frames the reader played as silence because the ring was empty. */
+  /**
+   * The dry spells: the times the reader found the ring empty while it played. Each one lasts
+   * until the reserve waits again, and counts once.
+   */
   get underruns(): number {
     return Atomics.load(this.header, RING.underruns)
   }
@@ -65,6 +68,14 @@ export class AudioRing {
   /** The samples read since the ring was made, modulo 2^32. */
   get totalRead(): number {
     return Atomics.load(this.header, RING.read) >>> 0
+  }
+
+  /** The samples written and not yet read. */
+  get waiting(): number {
+    return this.between(
+      Atomics.load(this.header, RING.written),
+      Atomics.load(this.header, RING.read),
+    )
   }
 
   /** Copies the newest samples written into the end of `out`, read or not; returns how many. */
@@ -81,7 +92,7 @@ export class AudioRing {
   /** Writes what fits; returns the samples it dropped, and counts an overrun when it dropped some. */
   push(input: Float32Array): number {
     const written = Atomics.load(this.header, RING.written)
-    const free = this.capacity - this.waiting(written, Atomics.load(this.header, RING.read))
+    const free = this.capacity - this.between(written, Atomics.load(this.header, RING.read))
     const count = Math.min(free, input.length)
     for (let i = 0; i < count; i++) this.samples[(written + i) & this.mask] = input[i] ?? 0
     Atomics.store(this.header, RING.written, (written + count) | 0)
@@ -93,7 +104,7 @@ export class AudioRing {
   /** Reads up to `out.length` samples into `out`; returns how many. */
   pull(out: Float32Array): number {
     const read = Atomics.load(this.header, RING.read)
-    const count = Math.min(out.length, this.waiting(Atomics.load(this.header, RING.written), read))
+    const count = Math.min(out.length, this.between(Atomics.load(this.header, RING.written), read))
     for (let i = 0; i < count; i++) out[i] = this.samples[(read + i) & this.mask] ?? 0
     Atomics.store(this.header, RING.read, (read + count) | 0)
     return count
@@ -106,7 +117,7 @@ export class AudioRing {
    */
   trim(limit: number): number {
     const read = Atomics.load(this.header, RING.read)
-    const waiting = this.waiting(Atomics.load(this.header, RING.written), read)
+    const waiting = this.between(Atomics.load(this.header, RING.written), read)
     if (waiting <= limit) return 0
     const skip = waiting - 2 * Math.floor(limit / 4)
     Atomics.store(this.header, RING.read, (read + skip) | 0)
@@ -114,13 +125,13 @@ export class AudioRing {
     return skip
   }
 
-  /** The reader's side: `frames` output frames found the ring empty. */
-  countUnderruns(frames: number): void {
-    if (frames > 0) Atomics.add(this.header, RING.underruns, frames)
+  /** The reader's side: it found the ring empty `spells` times while it played. */
+  countUnderruns(spells: number): void {
+    if (spells > 0) Atomics.add(this.header, RING.underruns, spells)
   }
 
   /** The samples written and not yet read, on either side of the counters' wrap. */
-  private waiting(written: number, read: number): number {
+  private between(written: number, read: number): number {
     return (written - read) | 0
   }
 }

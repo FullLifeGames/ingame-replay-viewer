@@ -26,12 +26,12 @@ describe('the audio ring', () => {
     expect([...out]).toEqual([1, 2, 3, 4])
   })
 
-  it('counts what went in and out, and shows the newest samples without reading them', () => {
+  it('counts what went in, out and waits, and shows the newest samples without reading them', () => {
     const ring = new AudioRing(createShared(4).audio)
     ring.push(Float32Array.of(1, 2, 3))
     ring.pull(new Float32Array(2))
     ring.push(Float32Array.of(4, 5))
-    expect([ring.totalWritten, ring.totalRead]).toEqual([5, 2])
+    expect([ring.totalWritten, ring.totalRead, ring.waiting]).toEqual([5, 2, 3])
     const out = new Float32Array(3)
     expect(ring.recent(out)).toBe(3)
     expect([...out]).toEqual([3, 4, 5])
@@ -47,6 +47,7 @@ describe('the audio ring', () => {
     const ring = new AudioRing(shared.audio)
     expect(ring.push(Float32Array.of(1, 2, 3, 4, 5, 6))).toBe(0)
     expect(ring.push(Float32Array.of(7, 8, 9))).toBe(1)
+    expect(ring.waiting).toBe(8)
     const out = new Float32Array(8)
     expect(ring.pull(out)).toBe(8)
     expect([...out]).toEqual([1, 2, 3, 4, 5, 6, 7, 8])
@@ -86,7 +87,7 @@ describe('the audio ring', () => {
     expect(ring.trim(10)).toBe(8)
   })
 
-  it('counts the output frames that found it empty', () => {
+  it('counts the dry spells the reader found', () => {
     const ring = new AudioRing(createShared(4).audio)
     ring.countUnderruns(3)
     ring.countUnderruns(0)
