@@ -1,5 +1,5 @@
 // Phrases for effects on one Pokémon (plan §5): Substitute, Leech Seed, confusion, the perish
-// count and the like as they start, act and end, effects for one turn, and blocks.
+// count, partial traps and the like as they start, act and end, effects for one turn, and blocks.
 import { toID } from '@pkmn/dex'
 
 import type { Effect } from '../../script/types'
@@ -52,6 +52,17 @@ export const EFFECT_TEMPLATES = {
   braced: tagged('STRINGID_PKMNBRACEDITSELF', start('braced itself!')),
   focusing: tagged('STRINGID_PKMNTIGHTENINGFOCUS', start('is tightening its focus!')),
   tookFoe: tagged('STRINGID_PKMNTOOKFOE', start('took its attacker down with it!')),
+  squeezed: tagged('STRINGID_PKMNSQUEEZEDBYBIND', (who: Mon, trapper: Mon) => {
+    return `${nameAtStart(who)} was squeezed by ${nameInside(trapper)}!`
+  }),
+  wrapped: tagged('STRINGID_PKMNWRAPPEDBY', (who: Mon, trapper: Mon) => {
+    return `${nameAtStart(who)} was wrapped by ${nameInside(trapper)}!`
+  }),
+  vortex: tagged('STRINGID_PKMNTRAPPEDINVORTEX', start('became trapped in the vortex!')),
+  clamped: tagged('STRINGID_PKMNCLAMPED', (who: Mon, trapper: Mon) => {
+    return `${nameAtStart(trapper)} clamped down on ${nameInside(who)}!`
+  }),
+  quicksand: tagged('STRINGID_PKMNTRAPPEDBYSANDTOMB', start('became trapped by the quicksand!')),
 }
 
 const E = EFFECT_TEMPLATES
@@ -66,16 +77,35 @@ const STARTS: Readonly<Record<string, Line>> = {
   attract: E.inLove.render,
   yawn: E.drowsy.render,
   nightmare: E.nightmare.render,
+  firespin: E.vortex.render,
+  whirlpool: E.vortex.render,
+  sandtomb: E.quicksand.render,
+}
+
+/**
+ * The start lines of the partial traps that name their trapper, by the move's id, as
+ * `gWrappedStringIds` keys the game's lines by the move; Fire Spin's, Whirlpool's and Sand Tomb's
+ * name none and sit in `STARTS`.
+ */
+const TRAPPED_BY: Readonly<Record<string, (who: Mon, trapper: Mon) => string>> = {
+  bind: E.squeezed.render,
+  wrap: E.wrapped.render,
+  clamp: E.clamped.render,
 }
 
 function startText(who: Mon, id: string, source: Mon | undefined): string | undefined {
   const perish = /^perish(\d)$/.exec(id)?.[1]
   if (perish !== undefined) return E.perish.render(who, perish)
   if (id === 'curse') return source && E.cursed.render(source, who)
+  const trapped = TRAPPED_BY[id]
+  if (trapped !== undefined) return source && trapped(who, source)
   return STARTS[id]?.(who)
 }
 
-/** An effect that starts on `who`; `source` is the Pokémon of `[of]` (Curse's user). */
+/**
+ * An effect that starts on `who`; `source` is the Pokémon of `[of]`: Curse's user, or the
+ * trapper of a partial trap.
+ */
 export function effectStarted(who: Mon, effect: Effect, source: Mon | undefined): Phrase {
   const text = startText(who, toID(effect.name), source)
   if (text !== undefined) return { text }

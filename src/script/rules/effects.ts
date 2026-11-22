@@ -5,6 +5,7 @@ import { causeOf, effectOf, flagsOf, refIfAny, refOf } from '../refs'
 import type { Rules } from './index'
 
 export const EFFECT_RULES = {
+  // A partial trap starts as `-activate|…|move: Fire Spin|[of] …`; the parser turns it into this.
   '|-start|': {
     arity: 2,
     reads: ['from', 'of', 'silent'],
@@ -19,9 +20,10 @@ export const EFFECT_RULES = {
       },
     ],
   },
+  // A partial trap's `[partiallytrapped]` maps to nothing: the effect names the trapping move.
   '|-end|': {
     arity: 2,
-    reads: ['from', 'of', 'silent'],
+    reads: ['from', 'of', 'silent', 'partiallytrapped'],
     build: ({ line, args: [, who, effect], kwArgs, battle }) => [
       {
         kind: 'effectEnd',

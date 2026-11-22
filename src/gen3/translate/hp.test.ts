@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
-import { itemOf } from '../tables/lookup'
+import { itemOf, moveOf } from '../tables/lookup'
 import { plain, sceneOf, streamOfLog } from '../testing'
 import { scaleHp } from './scale'
 import { STATUS_ANIM } from './status'
@@ -85,9 +85,10 @@ describe('damage with a cause', () => {
     ])
   })
 
-  it('says a trapping move first, then moves the bar', () => {
+  it("plays a trapping move's turn, says it, then moves the bar", () => {
     const scene = sceneOf('|-damage|p2a: Tyranitar|94/100|[from] move: Fire Spin')
     expect(scene.map(plain)).toEqual([
+      { op: 'trapTurn', side: 'far', move: moveOf('Fire Spin').number },
       'The opposing Tyranitar is hurt by Fire Spin!',
       hp('far', 94),
     ])

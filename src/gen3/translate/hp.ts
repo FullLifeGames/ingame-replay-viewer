@@ -2,13 +2,15 @@
 // hit animation, moves the bar, then says a critical hit and the effectiveness. Damage with a
 // cause follows the cause's script (`battle_scripts_1.s`): weather and confusion say it, hit and
 // move the bar; poison and burn say it, play the status animation and move the bar; Leech Seed
-// drains first; hazards, recoil, items and abilities move the bar before the line. A held item's
-// heal shows its pop-up and says nothing (`BattleScript_ItemHealHP_Ret`).
+// drains first; a partial trap plays its turn's animation with the trapping move, says it and moves
+// the bar (`BattleScript_WrapTurnDmg`); hazards, recoil, items and abilities move the bar before
+// the line. A held item's heal shows its pop-up and says nothing (`BattleScript_ItemHealHP_Ret`).
 import { toID } from '@pkmn/dex'
 
 import type { ScriptEvent } from '../../script/events'
 import type { PokemonRef } from '../../script/types'
 import type { Anim } from '../stream/instructions'
+import { moveOf } from '../tables/lookup'
 import { healed, hurt, isTrapping, wishCameTrue } from '../text/phrases-hp'
 import { type Context, type EventOf, type PrintText, sameMon } from './context'
 import { hit, hitLines } from './hits'
@@ -22,7 +24,10 @@ const SAY_HIT_BAR: readonly Step[] = ['say', 'hit', 'bar']
 const SAY_BAR: readonly Step[] = ['say', 'bar']
 const BAR_SAY: readonly Step[] = ['bar', 'say']
 
-/** By the cause's id; trapping moves say it first, every other cause moves the bar first. */
+/**
+ * By the cause's id; a trapping move plays its turn's animation (`trapTurn`), then says it; every
+ * other cause moves the bar first.
+ */
 const CAUSED: Readonly<Record<string, readonly Step[]>> = {
   sandstorm: SAY_HIT_BAR,
   hail: SAY_HIT_BAR,
@@ -63,7 +68,9 @@ export function damage(event: DamageEvent, ctx: Context): void {
   } else if (cause === undefined) {
     moveHit(event, ctx)
   } else {
-    const steps = CAUSED[toID(cause.name)] ?? (isTrapping(cause.name) ? SAY_BAR : BAR_SAY)
+    const trap = isTrapping(cause.name)
+    if (trap) trapTurn(event, cause.name, ctx)
+    const steps = CAUSED[toID(cause.name)] ?? (trap ? SAY_BAR : BAR_SAY)
     play(steps, event, ctx, hurt(ctx.mon(who), cause, event.source && ctx.mon(event.source)))
   }
 }
@@ -111,6 +118,17 @@ function play(steps: readonly Step[], event: HpEvent, ctx: Context, text: PrintT
     else if (step === 'hit') ctx.emit(event.line, { op: 'hit', side, effectiveness: 'normal' })
     else ctx.emit(event.line, { op: 'anim', side, anim: step })
   }
+}
+
+/**
+ * A partial trap's turn (TRAP_TURN): the game picks the animation by the trapping move
+ * (`AnimTask_GetTrappedMoveAnimId`). A move the expansion lacks passes its stand-in, which is
+ * listed.
+ */
+function trapTurn({ who, line }: DamageEvent, move: string, ctx: Context): void {
+  const found = moveOf(move)
+  ctx.note(line, found.fallback)
+  ctx.emit(line, { op: 'trapTurn', side: ctx.activeSide(who), move: found.number })
 }
 
 export function bar({ who, line, hp }: HpEvent, ctx: Context): void {
