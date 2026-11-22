@@ -5,6 +5,8 @@
 #include "battle_util2.h"
 #include "main.h"
 #include "pokemon.h"
+#include "replay_ops.h"
+#include "sprite.h"
 #include "window.h"
 #include "test/replay_test.h"
 
@@ -21,6 +23,7 @@
 EWRAM_DATA bool8 gReplayTestRunStream = FALSE;
 static EWRAM_DATA u16 sCheckedProgress = 0;
 static EWRAM_DATA u8 sKOAnimsAtOpStart[REPLAY_TEST_RECORDED_OPS] = {0};
+static EWRAM_DATA struct ReplayTestTrainerSprite sTrainerSpritesAtOpStart[REPLAY_TEST_RECORDED_OPS][REPLAY_STREAM_SIDE_COUNT] = {0};
 
 static void CB2_ReplayTest_Done(void);
 
@@ -36,6 +39,7 @@ static void ReplayTest_SetUp(void *data)
     DATA.queuedEventsFailIndex = MAX_QUEUED_EVENTS;
     sCheckedProgress = 0;
     memset(sKOAnimsAtOpStart, 0, sizeof(sKOAnimsAtOpStart));
+    memset(sTrainerSpritesAtOpStart, 0, sizeof(sTrainerSpritesAtOpStart));
     Replay_Unload();
 }
 
@@ -81,17 +85,45 @@ void ReplayTest_AtEnd(void)
     STATE->runThen = FALSE;
 }
 
+static void RecordTrainerSprites(struct ReplayTestTrainerSprite *recorded)
+{
+    u32 side;
+
+    for (side = 0; side < REPLAY_STREAM_SIDE_COUNT; side++)
+    {
+        const struct Sprite *sprite = &gSprites[gBattleStruct->trainerSlideSpriteIds[Replay_GetBattler(side)]];
+
+        recorded[side].images = sprite->images;
+        recorded[side].affineParam = sprite->oam.affineParam;
+        recorded[side].paletteTag = GetSpritePaletteTagByPaletteNum(sprite->oam.paletteNum);
+        recorded[side].inUse = sprite->inUse;
+    }
+}
+
 void ReplayTest_AtOpStart(u32 op)
 {
-    if (op < REPLAY_TEST_RECORDED_OPS)
-        sKOAnimsAtOpStart[op] = gBattleStruct->battlerKOAnimsRunning;
+    if (op >= REPLAY_TEST_RECORDED_OPS)
+        return;
+    sKOAnimsAtOpStart[op] = gBattleStruct->battlerKOAnimsRunning;
+    RecordTrainerSprites(sTrainerSpritesAtOpStart[op]);
+}
+
+static void CheckRecordedOp(u32 op)
+{
+    if (op >= REPLAY_TEST_RECORDED_OPS)
+        Test_ExitWithResult(TEST_RESULT_FAIL, SourceLine(0), "%s:%d: op %d is past the %d recorded ops", gTestRunnerState.test->filename, SourceLine(0), op, REPLAY_TEST_RECORDED_OPS);
 }
 
 u32 ReplayTest_KOAnimsAtOpStart(u32 op)
 {
-    if (op >= REPLAY_TEST_RECORDED_OPS)
-        Test_ExitWithResult(TEST_RESULT_FAIL, SourceLine(0), "%s:%d: op %d is past the %d recorded ops", gTestRunnerState.test->filename, SourceLine(0), op, REPLAY_TEST_RECORDED_OPS);
+    CheckRecordedOp(op);
     return sKOAnimsAtOpStart[op];
+}
+
+const struct ReplayTestTrainerSprite *ReplayTest_TrainerSpriteAtOpStart(u32 op, u32 side)
+{
+    CheckRecordedOp(op);
+    return &sTrainerSpritesAtOpStart[op][side];
 }
 
 static void CB2_ReplayTest_Done(void)

@@ -20,7 +20,7 @@ enum ReplayError
     REPLAY_ERROR_OVERRUN, // an instruction running past the end of the instructions
     REPLAY_ERROR_NO_END,  // the instructions do not end with their only END
     REPLAY_ERROR_OPERAND, // an operand outside its range, a party slot without a mon, or a PRINT text that is not glyphs and one EOS
-    REPLAY_ERROR_TEAM,    // a trainer or team table entry outside its range, or a side without a mon
+    REPLAY_ERROR_TEAM,    // a trainer or team table entry outside its range, a trainer pic its side cannot draw, or a side without a mon
     REPLAY_ERROR_ORDER,   // an instruction that breaks the order rules (replay_stream.h)
 };
 
@@ -69,6 +69,11 @@ enum ReplayError Replay_Start(const volatile u8 *stream, u32 length, enum Replay
 void Replay_TakeOverBattleMain(void);
 
 bool32 Replay_IsLoaded(void);
+
+// Called by the recorded controllers when they draw a trainer (patch 0004): the stream's trainer
+// pic of the battler's side while a replay is loaded, else fallback, so every other battle keeps
+// its own pic.
+u32 Replay_GetTrainerPic(u32 battler, u32 fallback);
 
 // Called by UpdateHpTextInHealthbox (patch 0002): TRUE while a replay is loaded, so the near
 // side's healthbox shows its HP bar without numbers, as the far side's does.

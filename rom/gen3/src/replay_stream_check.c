@@ -1,6 +1,7 @@
 #include "global.h"
 #include "battle.h"
 #include "battle_controllers.h"
+#include "data.h"
 #include "replay_interpreter.h"
 #include "replay_stream.h"
 #include "constants/abilities.h"
@@ -164,6 +165,18 @@ static bool32 IsMon(const volatile u8 *mon)
         && IsName(mon + REPLAY_MON_OFFSET_NICKNAME, REPLAY_MON_NICKNAME_LENGTH);
 }
 
+// A trainer pic the side can draw: the near side draws its back pic and the far side its front
+// pic (#20). gTrainerPicInfo holds TRAINER_PIC_COUNT entries (data.h); only a few have a back
+// pic, and POKEDUDE and OLD_MAN have no front pic.
+static bool32 IsTrainerPicOfSide(u32 pic, u32 side)
+{
+    if (pic >= TRAINER_PIC_COUNT)
+        return FALSE;
+    if (side == REPLAY_SIDE_NEAR)
+        return gTrainerPicInfo[pic].backPic != NULL;
+    return gTrainerPicInfo[pic].frontPic != NULL;
+}
+
 static enum ReplayError ValidateTeams(const volatile u8 *stream)
 {
     u32 side, slot, mons;
@@ -172,8 +185,7 @@ static enum ReplayError ValidateTeams(const volatile u8 *stream)
     {
         if (!IsName(Replay_GetTrainer(stream, side) + REPLAY_TRAINER_OFFSET_NAME, REPLAY_TRAINER_NAME_LENGTH))
             return REPLAY_ERROR_TEAM;
-        // gTrainerPicInfo holds TRAINER_PIC_COUNT entries (data.h).
-        if (Replay_ReadU16(Replay_GetTrainer(stream, side) + REPLAY_TRAINER_OFFSET_TRAINER_PIC) >= TRAINER_PIC_COUNT)
+        if (!IsTrainerPicOfSide(Replay_ReadU16(Replay_GetTrainer(stream, side) + REPLAY_TRAINER_OFFSET_TRAINER_PIC), side))
             return REPLAY_ERROR_TEAM;
         for (mons = 0, slot = 0; slot < REPLAY_STREAM_PARTY_SIZE; slot++)
         {
