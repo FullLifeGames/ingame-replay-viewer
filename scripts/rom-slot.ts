@@ -5,7 +5,8 @@ import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import type { SlotDescription } from '../src/patch/slot.ts'
+import { readSlotHeaderLayout } from '../src/patch/slot.ts'
+import type { SlotDescription, SlotHeaderLayout } from '../src/patch/slot.ts'
 import { ROM_DIR } from './rom-config.ts'
 
 export const SLOT_SYMBOL = 'gReplaySlot'
@@ -17,7 +18,7 @@ export interface SlotLayout {
   headerSize: number
   size: number
   alignment: number
-  offsets: { version: number; headerSize: number; slotSize: number; streamLength: number }
+  offsets: SlotHeaderLayout
 }
 
 export interface ElfSymbol {
@@ -65,12 +66,7 @@ export function readSlotLayout(headerText: string): SlotLayout {
     headerSize: number('HEADER_SIZE'),
     size: number('SIZE'),
     alignment: number('ALIGNMENT'),
-    offsets: {
-      version: number('OFFSET_VERSION'),
-      headerSize: number('OFFSET_HEADER_SIZE'),
-      slotSize: number('OFFSET_SLOT_SIZE'),
-      streamLength: number('OFFSET_STREAM_LENGTH'),
-    },
+    offsets: readSlotHeaderLayout(headerText),
   }
 }
 
