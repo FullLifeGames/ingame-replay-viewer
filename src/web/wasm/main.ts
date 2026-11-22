@@ -267,7 +267,7 @@ function wire(spike: Spike, view: SpikeView): void {
 }
 
 const view = findSpikeView()
-const problem = environmentProblem({ isSecureContext, crossOriginIsolated })
+const problem = environmentProblem({ isSecureContext, crossOriginIsolated }, 'the game')
 if (problem === undefined) {
   const spike = createSpike(view)
   wire(spike, view)
