@@ -13,18 +13,8 @@
 // port names its functions and structs in its own words; m4a.c and m4a_tables.c call them by the
 // names of m4a_1.s. This file forwards those names and hands each frame's samples to the host.
 
-// The port reads the expansion's structs as its own. Overlay patch 0007 gives SoundInfo and
-// SoundChannel the port's float fields; these hold the rest to the same layout.
-STATIC_ASSERT(sizeof(struct SoundMixerState) == sizeof(struct SoundInfo), IrvWasmMixerSize);
-STATIC_ASSERT(offsetof(struct SoundMixerState, sampleRateReciprocal) == offsetof(struct SoundInfo, divFreq), IrvWasmMixerRate);
-STATIC_ASSERT(offsetof(struct SoundMixerState, chans) == offsetof(struct SoundInfo, chans), IrvWasmMixerChans);
-STATIC_ASSERT(offsetof(struct SoundMixerState, outBuffer) == offsetof(struct SoundInfo, pcmBuffer), IrvWasmMixerBuffer);
-STATIC_ASSERT(sizeof(struct MixerSource) == sizeof(struct SoundChannel), IrvWasmChannelSize);
-STATIC_ASSERT(sizeof(struct MixerSource) == sizeof(struct CgbChannel), IrvWasmCgbChannelSize);
-STATIC_ASSERT(sizeof(struct MP2KPlayerState) == sizeof(struct MusicPlayerInfo), IrvWasmPlayerSize);
-// sound_data.o, assembled for the GBA, sizes gMPlayTrack_* by TRACK_SIZE (0x50).
-STATIC_ASSERT(sizeof(struct MP2KTrack) == sizeof(struct MusicPlayerTrack), IrvWasmTrackSize);
-STATIC_ASSERT(sizeof(struct MusicPlayerTrack) == 0x50, IrvWasmTrackDataSize);
+// The port reads the expansion's structs as its own; irv_wasm_sound_layout.c holds them to one
+// layout, field by field.
 
 void RunMixerFrame(void);
 void MP2KPlayerMain(void *player);
