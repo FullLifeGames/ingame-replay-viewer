@@ -18,6 +18,8 @@
 //                                       per pixel, irv_render.h)
 //  11 psgreset rate                    (IrvPsg_Reset)
 //  12 psgframe count                   (IrvPsg_Frame; appends its count pairs of floats)
+//  13 sound   call a b                 (HostSoundCall, irv_layer_host_mp2k.c; appends its result
+//                                       word if it gives one)
 // The result holds the handler's calls in its upper half and the OR of their flags in its lower.
 #include <stdlib.h>
 #include <string.h>
@@ -168,6 +170,17 @@ static void PsgFrame(struct Script *script, struct HostCall *call)
     free(pairs);
 }
 
+static void Sound(struct Script *script, struct HostCall *call)
+{
+    uint32_t which = NextWord(script);
+    uint32_t a = NextWord(script);
+    uint32_t b = NextWord(script);
+    uint32_t result;
+
+    if (HostSoundCall(which, a, b, &result))
+        Append(script, call, &result, sizeof(result));
+}
+
 static void Log(struct Script *script, struct HostCall *call)
 {
     uint32_t max = NextWord(script);
@@ -241,6 +254,9 @@ static void RunOperation(struct Script *script, struct HostCall *call)
         break;
     case 12:
         PsgFrame(script, call);
+        break;
+    case 13:
+        Sound(script, call);
         break;
     default:
         Fail("an unknown operation in the script");

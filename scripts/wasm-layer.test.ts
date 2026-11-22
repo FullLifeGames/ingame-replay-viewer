@@ -35,11 +35,19 @@ describe('the C files of our platform layer', () => {
 
   it('enter the module with the glue', () => {
     const sources = glueSources()
-    expect(sources).toEqual(expect.arrayContaining(layerSources()))
+    const layer = layerSources().filter((source) => !source.includes('/irv_mp2k_'))
+    expect(sources).toEqual(expect.arrayContaining(layer))
     expect(sources).toEqual(
       expect.arrayContaining([expect.stringMatching(/src\/irv_wasm_frame\.c$/)]),
     )
     expect(sources.some((source) => source.includes('/host/'))).toBe(false)
+  })
+
+  it('keep the sequencer and its layout check out of the module until the sound swap (B8b)', () => {
+    const sequencer = layerSources().filter((source) => source.includes('/irv_mp2k_'))
+    expect(sequencer.length).toBeGreaterThan(0)
+    expect(glueSources().filter((source) => /\/irv_(wasm_)?mp2k_/.test(source))).toEqual([])
+    expect(hostCommand('/tmp/out/irv_layer_host', {})).toEqual(expect.arrayContaining(sequencer))
   })
 
   it('may not share a name with a file of the glue, whose objects share one folder', () => {
