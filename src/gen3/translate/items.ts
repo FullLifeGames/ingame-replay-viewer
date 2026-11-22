@@ -12,25 +12,39 @@ import { itemOf } from '../tables/lookup'
 import { isSteal, itemRemoved, itemShown } from '../text/phrases-items'
 import { type Context, type EventOf, sameMon } from './context'
 
+/** The expansion's number of the item, or undefined for an item it lacks. */
+function numberOf(name: string): number | undefined {
+  const found = itemOf(name)
+  return found.fallback === undefined ? found.number : undefined
+}
+
 /** The item's number, or undefined for an item the expansion lacks, which is listed. */
 function heldItem(ctx: Context, line: number, name: string): number | undefined {
-  const found = itemOf(name)
-  ctx.note(line, found.fallback)
-  return found.fallback === undefined ? found.number : undefined
+  ctx.note(line, itemOf(name).fallback)
+  return numberOf(name)
+}
+
+/**
+ * The item the pop-up of `name` shows, or undefined for none. The one home of that decision:
+ * every item the expansion has shows its pop-up, one it lacks shows none.
+ */
+function popUpOf(name: string): number | undefined {
+  return numberOf(name)
 }
 
 /**
  * Shows the pop-up of `name` over `who` (ITEM_POP_UP: the text box emptied, the pop-up, its
- * wait) and says whether it did: an item the expansion lacks has none and is listed.
+ * wait) and says whether it did. An item the expansion lacks is listed.
  */
 export function itemPopUp(who: PokemonRef, name: string, line: number, ctx: Context): boolean {
-  const number = heldItem(ctx, line, name)
-  if (number !== undefined) showPopUp(who, number, line, ctx)
-  return number !== undefined
+  heldItem(ctx, line, name)
+  return showPopUp(who, name, line, ctx)
 }
 
-function showPopUp(who: PokemonRef, item: number, line: number, ctx: Context): void {
-  ctx.emit(line, { op: 'itemPopUp', side: ctx.activeSide(who), item })
+function showPopUp(who: PokemonRef, name: string, line: number, ctx: Context): boolean {
+  const item = popUpOf(name)
+  if (item !== undefined) ctx.emit(line, { op: 'itemPopUp', side: ctx.activeSide(who), item })
+  return item !== undefined
 }
 
 /** The berry `who` ate on the line before the event in hand, if it ate one there. */
@@ -44,7 +58,7 @@ export function eatenBefore(who: PokemonRef, ctx: Context): string | undefined {
 /** Whether the berry `name` that `who` ate on the line before showed its pop-up. */
 export function shownBefore(who: PokemonRef, name: string, ctx: Context): boolean {
   const eaten = eatenBefore(who, ctx)
-  return eaten !== undefined && toID(eaten) === toID(name) && itemOf(name).fallback === undefined
+  return eaten !== undefined && toID(eaten) === toID(name) && popUpOf(name) !== undefined
 }
 
 export function item(event: EventOf<'item'>, ctx: Context): void {
@@ -63,7 +77,7 @@ export function itemEnd(event: EventOf<'itemEnd'>, ctx: Context): void {
   const { who, cause, source, line } = event
   const number = heldItem(ctx, line, event.item)
   if (event.eaten) {
-    if (number !== undefined) showPopUp(who, number, line, ctx)
+    showPopUp(who, event.item, line, ctx)
     ctx.emit(line, { op: 'anim', side: ctx.activeSide(who), anim: 'heldItemBerry' })
   } else if (!event.silent) {
     ctx.print(line, itemRemoved(ctx.mon(who), event.item, cause, source && ctx.mon(source)))
