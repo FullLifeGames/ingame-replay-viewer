@@ -65,6 +65,17 @@ static inline uint32_t IrvSound_Word(const uint8_t *at)
     return at[0] | (at[1] << 8) | (at[2] << 16) | ((uint32_t)at[3] << 24);
 }
 
+// MP2K spec 12.3 (c): a note and the mixer visit maxChans DirectSound channels (5 in the game),
+// at least one, as the engine counts down after each channel. The engine has no upper bound;
+// 12, the size of the array (R4), is our guard against a maxChans of 13 to 15, which the game
+// never sets.
+static inline uint32_t IrvSound_PcmChannels(const struct IrvSoundInfo *info)
+{
+    if (info->maxChans == 0)
+        return 1;
+    return info->maxChans < IRV_SOUND_PCM_CHANNELS ? info->maxChans : IRV_SOUND_PCM_CHANNELS;
+}
+
 // irv_mp2k_note.c: the channel's volumes and pitch from its track (MP2K spec 5.4, 4.4).
 void IrvSound_SetChannelVolume(struct IrvSoundChannel *chan, const struct IrvSoundTrack *track);
 uint32_t IrvSound_ChannelFrequency(const struct IrvSoundChannel *chan, const struct IrvSoundTrack *track);

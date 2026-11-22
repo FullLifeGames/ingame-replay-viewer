@@ -251,3 +251,35 @@ describe('ties and the cry path (MP2K spec 3, 5.2, 11)', () => {
     expect(frames.map((frame) => frame.players[0]?.status)).toEqual([3, 3, 3, 3, PAUSE])
   })
 })
+
+describe("the spec side's answers (MP2K spec 12.2, 12.3)", () => {
+  const MAX_CHANS = 0x03000006
+  const raw = (tracks: number[][], frames: number, scene: Partial<Scene> = {}) =>
+    runSound(host, { songs: [{ voices: [{ wave: WAVE }], tracks }], ...scene }, frames)
+  const holder = (key: number) => [VOICE, 0, TIE, key, 100, W(24), FINE]
+  const late = [W(1), VOICE, 0, TIE, 70, 100, W(24), FINE]
+
+  it('ends a track whose first byte is data with no running status, and stops the player a tick later', () => {
+    const frames = raw([[0x3c, N(4), 60, 100, FINE]], 2)
+    expect(frames[0]?.tracks[0]?.[0]?.flags).toBe(0)
+    expect(frames[0]?.pcm[0]?.status).toBe(0)
+    expect(frames.map((frame) => frame.players[0]?.status)).toEqual([1, PAUSE])
+  })
+
+  it('leaves tempoC unreduced on the tick that stops the player', () => {
+    const frames = raw([[FINE]], 2)
+    expect(frames.map((frame) => frame.players[0]?.tempoC)).toEqual([0, 150])
+    expect(frames.map((frame) => frame.players[0]?.status)).toEqual([1, PAUSE])
+  })
+
+  it('scans maxChans DirectSound channels for a note, not the 12 of the array', () => {
+    const data = [{ at: MAX_CHANS, bytes: [3] }]
+    const frames = raw([holder(60), holder(61), holder(62), late], 2, { data })
+    expect(keys(frames[1] as Frame)).toEqual([60, 61, 62, 0, 0])
+  })
+
+  it('scans at least one channel when maxChans is 0', () => {
+    const frames = raw([holder(60)], 1, { data: [{ at: MAX_CHANS, bytes: [0] }] })
+    expect(keys(frames[0] as Frame)).toEqual([60, 0, 0, 0, 0])
+  })
+})

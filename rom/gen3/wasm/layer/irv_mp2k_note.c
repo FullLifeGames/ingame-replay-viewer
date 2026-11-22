@@ -106,16 +106,17 @@ static struct IrvSoundChannel *ChoosePsgChannel(const struct Note *note, uint32_
 
 // MP2K spec 5.5, DirectSound: the first off channel wins. Else the releasing channels compete,
 // the first of them whatever its priority; playing channels compete only while no releasing one
-// has been seen.
+// has been seen. The scan covers maxChans channels (12.3 c).
 static struct IrvSoundChannel *ChoosePcmChannel(const struct Note *note, uint32_t track)
 {
     struct IrvSoundInfo *info = IrvSound_Info();
     struct IrvSoundChannel *best = NULL;
     uint8_t priority = note->priority;
     bool releasing = false;
+    uint32_t count = IrvSound_PcmChannels(info);
     uint32_t i;
 
-    for (i = 0; i < info->maxChans && i < IRV_SOUND_PCM_CHANNELS; i++)
+    for (i = 0; i < count; i++)
     {
         struct IrvSoundChannel *chan = &info->chans[i];
         bool stopping = chan->statusFlags & IRV_CHANNEL_STOP;
