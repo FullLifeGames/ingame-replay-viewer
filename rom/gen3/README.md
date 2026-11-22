@@ -63,7 +63,7 @@ The WebAssembly spike (#35) compiles the expansion with our C files to a WebAsse
 
 - `wasm/wasm.json`: the pinned Emscripten release, the pinned platform layer (repository, commit, files), the tree files the module leaves out, and per-file defines and compiler flags.
 - `wasm/src/`: the glue, our C files for the module only. It blocks in `VBlankIntrWait`, draws the frame through the platform's renderer, raises the interrupts, hands frames and sound to JavaScript, and stubs flash, the clock, the link cable and multiboot.
-- `wasm/include/`: shadow headers. Each one shares a name with an upstream header, comes first on the include path, includes upstream's with `#include_next`, and then changes only defines. `irv_wasm_sound.h` is our own.
+- `wasm/include/`: shadow headers. Each one shares a name with an upstream header, comes first on the include path, includes upstream's with `#include_next`, and then adds to it. Most add defines; `global.h` also gives the platform files `<stdio.h>`, `<stdint.h>` and the port's fast integer types. `irv_wasm_sound.h` is our own.
 - `wasm/patches/series`: overlay patches. The build copies an upstream file into `build/wasm/overlay/`, applies its patch there, and compiles the copy. Each change sits under `#ifdef IRV_WASM`, and each patch carries its reason above `diff --git`, as the ROM's patches do.
 - `wasm/platform-patches/series`: patches against copies of the platform files in `build/wasm/platform/`, in the same form.
 
@@ -76,7 +76,7 @@ Each command is a heavy check on devbox, so run it alone and in the background:
 3. `npm run wasm:build -- --link` compiles the glue and links `build/wasm/irv-emerald.js` and `irv-emerald.wasm`, then writes the module patch `irv-emerald-wasm.bps` from your dump. `--patch` writes the patch alone.
 4. `npm run wasm:run -- hand-made 994052` plays streams in the module in Node and checks the scenes of `rom:shots`. It writes its frames and `report.json` to `build/wasm/run/`.
 
-`npm run wasm:census` compiles every tree file once at `-O0` and sorts the failures by class; the spike used it to find what the build had to change. Emscripten installs outside the repository, under `~/tools/emsdk`; `EMSDK` names another place.
+`npm run wasm:census` compiles every tree file once at `-O0` and sorts the failures by class; the spike used it to find what the build had to change. It applies no overlay patch, so a file that one fixes, `random.c` among them, still fails there. Emscripten installs outside the repository, under `~/tools/emsdk`; `EMSDK` names another place.
 
 ## Adding a patch
 
