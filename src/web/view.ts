@@ -1,50 +1,27 @@
-// The page's DOM: the elements of index.html and what main.ts shows in them. It holds no rule of
-// the flow; the texts come from status.ts.
-import type { ReplaySummary } from './session'
-import { countText, notShownHeading, replayLine, rowText } from './status'
+// The page's DOM: the elements of emulator.html and what main.ts shows in them. It holds no rule of
+// the flow; the replay controls and the list come from replay-view.ts.
+import { element, findReplayView } from './replay-view'
 
-function element<T extends HTMLElement>(id: string, type: new () => T): T {
-  const found = document.getElementById(id)
-  if (!(found instanceof type)) throw new Error(`index.html lacks the ${type.name} #${id}`)
-  return found
-}
-
-function fill(list: HTMLElement, texts: readonly string[]): void {
-  list.replaceChildren(
-    ...texts.map((text) => Object.assign(document.createElement('li'), { textContent: text })),
-  )
-}
+const PAGE = 'emulator.html'
 
 /** The page's controls, and the calls that show the flow's state. */
 export function findView() {
-  const status = element('status', HTMLParagraphElement)
-  const testReplay = element('test-replay', HTMLSelectElement)
+  const status = element(PAGE, 'status', HTMLParagraphElement)
   return {
-    dump: element('dump', HTMLInputElement),
-    testReplay,
-    replayForm: element('replay-form', HTMLFormElement),
-    replayInput: element('replay-input', HTMLInputElement),
-    start: element('start', HTMLButtonElement),
-    restart: element('restart', HTMLButtonElement),
-    canvas: element('screen', HTMLCanvasElement),
+    ...findReplayView(PAGE),
+    dump: element(PAGE, 'dump', HTMLInputElement),
+    start: element(PAGE, 'start', HTMLButtonElement),
+    restart: element(PAGE, 'restart', HTMLButtonElement),
+    canvas: element(PAGE, 'screen', HTMLCanvasElement),
     /** Hides everything but `line`, for a browser that cannot run the emulator. */
     showOnly: (line: string): void => {
-      const environment = element('environment', HTMLParagraphElement)
+      const environment = element(PAGE, 'environment', HTMLParagraphElement)
       environment.textContent = line
       environment.hidden = false
-      element('app', HTMLDivElement).hidden = true
+      element(PAGE, 'app', HTMLDivElement).hidden = true
     },
     status: (line: string): void => {
       status.textContent = line
-    },
-    offer: (ids: readonly string[], first: string): void => {
-      testReplay.replaceChildren(...ids.map((id) => new Option(id, id, false, id === first)))
-    },
-    showReplay: (summary: ReplaySummary): void => {
-      element('replay-summary', HTMLParagraphElement).textContent = replayLine(summary)
-      element('not-shown', HTMLHeadingElement).textContent = notShownHeading(summary.rows.length)
-      fill(element('not-shown-counts', HTMLUListElement), summary.counts.map(countText))
-      fill(element('not-shown-rows', HTMLOListElement), summary.rows.map(rowText))
     },
   }
 }

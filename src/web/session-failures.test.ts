@@ -4,7 +4,7 @@ import replay994176 from '../../test/fixtures/replays/smogtours-gen3ou-994176.js
 import { FetchError } from './fetch'
 import type { TestReplay } from './replays'
 import { ROM_FILES } from './rom-files'
-import { SessionError } from './session'
+import { SessionError } from './replay-choice'
 import {
   BASE,
   DESCRIPTION,

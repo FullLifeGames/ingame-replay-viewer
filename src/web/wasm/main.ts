@@ -1,15 +1,24 @@
-// The WebAssembly spike page (#35): wires the controls of wasm.html. It rebuilds the module from
-// the user's dump with the module patch, turns the picked replay into its stream as the emulator
-// page does, and runs the game in a worker (run.ts). The page allows the worker's frames by the
-// tick rule (protocol.ts) and draws the newest frame on each animation frame. The game's sound
-// goes from the worker through the audio ring to an audio worklet (audio.ts), at 1x and 2x; fast
-// stays silent. The dump stays in this tab.
-import { environmentProblem } from '../environment'
+// The viewer (#35): wires the controls of index.html. It rebuilds the module from
+// the user's dump with the module patch, picks a test replay or loads one by link or ID and lists
+// what the game does not show, as the emulator page does (replay-choice.ts, replay-view.ts), and
+// runs the picked stream in a worker (run.ts). The page allows the worker's frames by the
+// tick rule (protocol.ts) and draws the newest whole frame (frame-swap.ts) on each animation
+// frame. The game's sound goes from the worker through the audio ring to an audio worklet
+// (audio.ts), at 1x and 2x; fast stays silent. The dump stays in this tab.
+import { environmentProblem, startsModuleWorkers } from '../environment'
+import { fetchJson } from '../fetch'
 import { messageOf } from '../message'
-import { FIRST_REPLAY, TEST_REPLAYS } from '../replays'
-import { endedLine } from '../status'
-import { streamOfReplay } from '../stream'
+import {
+  createReplayChoice,
+  PICK_DUMP,
+  PICK_REPLAY,
+  type ReplayChoice,
+  SessionError,
+} from '../replay-choice'
+import { wireReplays } from '../replay-view'
+import { endedLine, READY_LINE } from '../status'
 import { FRAME_HEIGHT, FRAME_WIDTH } from './frame'
+import { readFrame } from './frame-swap'
 import { grant, readStatus, type Speed, writePace } from './protocol'
 import {
   AudioOpener,
@@ -44,8 +53,9 @@ function drawLoop(
     requestAnimationFrame(draw)
     const run = runs.current
     if (run === undefined) return
-    grant(run.control, run.clock.allowed(now))
+    // The clock grants from the frame the game reached, so a game that fell behind never races.
     const status = readStatus(run.control)
+    grant(run.control, run.clock.allowed(now, status.frame))
     if (status.finished && run.finishedMs === undefined) {
       // At END fast gives way to 1x (speedAtEnd), and the speed control shows it.
       const speed = reachEnd(run, now)
@@ -56,7 +66,7 @@ function drawLoop(
         view.showSpeed(speed)
       }
     }
-    image.data.set(run.frame)
+    readFrame(run.control, run.frames, image.data)
     context?.putImageData(image, 0, 0)
     view.progress(progressLine(status, run))
   }
@@ -67,11 +77,17 @@ function drawLoop(
   })
 }
 
+/** The newest pick's stream with its replay's id: what the list under the game describes. */
+async function pickedStream(choice: ReplayChoice): Promise<Picked | undefined> {
+  const chosen = await choice.chosen()
+  return chosen === undefined ? undefined : { id: chosen.summary.id, stream: chosen.bytes }
+}
+
 /** The page's state and its actions; the view's events call them. */
 function createSpike(view: SpikeView) {
   let built: Promise<Built> | undefined
-  let picked: Promise<Picked> | undefined
   let last: Picked | undefined
+  const choice = createReplayChoice(fetchJson)
   const runs = new Runs<NamedRun>(stopRun)
   const audio = new AudioOpener()
 
@@ -94,9 +110,10 @@ function createSpike(view: SpikeView) {
 
   const play = async (stream?: Picked): Promise<string | undefined> => {
     const ticket = runs.nextPlay()
-    const [module, chosen, sound] = await Promise.all([built, stream ?? picked, audio.open()])
-    if (module === undefined) throw new Error('Pick your US Emerald dump first, then press Start.')
-    if (chosen === undefined) throw new Error('Pick a replay first, then press Start.')
+    const picked = stream ?? pickedStream(choice)
+    const [module, chosen, sound] = await Promise.all([built, picked, audio.open()])
+    if (module === undefined) throw new SessionError(PICK_DUMP)
+    if (chosen === undefined) throw new SessionError(PICK_REPLAY)
     // A later Start or Restart came while this one waited; that one runs.
     if (!runs.isNewest(ticket)) return undefined
     last = chosen
@@ -115,11 +132,8 @@ function createSpike(view: SpikeView) {
           : `Your dump is US Emerald, and the page built the module (${String(bytes)} bytes). Press Start.`,
       )
     },
-    pickReplay: (id: string) => {
-      const replay = TEST_REPLAYS.find((test) => test.id === id)
-      if (replay === undefined) return
-      picked = replay.load().then((json) => ({ id, stream: streamOfReplay(json).stream.bytes }))
-    },
+    pickTestReplay: choice.pickTestReplay,
+    loadReplay: choice.loadReplay,
     play,
     /** The stream that ran last, from its start; the picked replay when none ran yet. */
     restart: () => play(last),
@@ -151,10 +165,6 @@ function wire(spike: Spike, view: SpikeView): void {
     view.status('Checking your dump and building the module. This takes a few seconds.')
     act(view, () => spike.pickDump(file))
   })
-  view.testReplay.addEventListener('change', () => {
-    spike.pickReplay(view.testReplay.value)
-    view.status(`Picked ${view.testReplay.value}. Press Start to play it.`)
-  })
   view.start.addEventListener('click', () => {
     act(view, () => spike.play())
   })
@@ -164,19 +174,22 @@ function wire(spike: Spike, view: SpikeView): void {
   view.onSpeed((speed) => {
     spike.changeSpeed(speed)
   })
-  view.offer(
-    TEST_REPLAYS.map((test) => test.id),
-    FIRST_REPLAY,
-  )
-  spike.pickReplay(FIRST_REPLAY)
+  wireReplays(spike, view)
 }
 
 const view = findSpikeView()
-const problem = environmentProblem({ isSecureContext, crossOriginIsolated }, 'the game')
+// The probe's URL loads nothing: the browser reads the options first (web.dev's check).
+const moduleWorkers = startsModuleWorkers(
+  typeof Worker === 'undefined' ? undefined : (options) => new Worker('blob://', options),
+)
+const problem = environmentProblem(
+  { isSecureContext, crossOriginIsolated, moduleWorkers },
+  'the game',
+)
 if (problem === undefined) {
   const spike = createSpike(view)
   wire(spike, view)
-  view.status('Pick your US Emerald dump, then press Start.')
+  view.status(READY_LINE)
   // The e2e plays a stream of its own (the hand-made battle) and reads the run's status.
   Object.assign(window, {
     irvWasmSpike: {

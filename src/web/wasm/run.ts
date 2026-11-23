@@ -7,12 +7,20 @@ import { fetchBytes, fetchJson } from '../fetch'
 import { messageOf } from '../message'
 import { checkBaseRom, readSlotDescription } from '../rom'
 import { ROM_FILES } from '../rom-files'
-import { AUDIO_PROCESSOR, AUDIO_STOP, AudioMeter, type AudioProcessorOptions } from './audio'
+import {
+  AUDIO_PROCESSOR,
+  AUDIO_STOP,
+  AudioMeter,
+  type AudioProcessorOptions,
+  soundLine,
+} from './audio'
 import workletUrl from './audio-worklet.ts?worker&url'
+import { buildFailure } from './failures'
 import { WASM_FILES } from './files'
 import type { StartMessage, WorkerReport } from './messages'
 import {
   createShared,
+  GBA_FRAMES_PER_SECOND,
   MIXER_RATE,
   readStatus,
   type RunStatus,
@@ -28,6 +36,9 @@ const AUDIO_CAPACITY = 2 ** 17
 // The latency cap: at most 0.2 s of sound waits in the ring. Past it, the worklet skips the oldest
 // samples down to 0.1 s, so a worker that writes faster than the audio clock plays stays in step.
 const AUDIO_LATENCY = 2 * Math.round(MIXER_RATE / 5)
+// The reserve (#47): two frames of sound, 1408 pairs or 33 ms, wait in the ring before the worklet
+// plays, at the start and after each dry spell. It stays under half of the cap's 0.1 s floor.
+const AUDIO_RESERVE = 2 * 2 * Math.round(MIXER_RATE / GBA_FRAMES_PER_SECOND)
 // The newest samples the test hook measures: about a tenth of a second.
 const MEASURED_SAMPLES = 8192
 
@@ -49,7 +60,8 @@ export type Sound = AudioContext | string
 export interface Run {
   readonly worker: Worker
   readonly control: Int32Array
-  readonly frame: Uint8Array
+  /** The two frame buffers; the page reads them through readFrame (frame-swap.ts) only. */
+  readonly frames: SharedArrayBuffer
   readonly clock: TickClock
   readonly ring: AudioRing
   readonly output: AudioWorkletNode | undefined
@@ -66,9 +78,14 @@ export interface Run {
 export async function buildModule(dump: Uint8Array): Promise<Built> {
   await checkBaseRom(dump)
   const [patch, json] = await Promise.all([fetchBytes(WASM_FILES.patch), fetchJson(ROM_FILES.slot)])
-  const bytes = applyBps(patch, dump)
-  const module = await WebAssembly.compile(bytes as Uint8Array<ArrayBuffer>)
-  return { module, slot: readSlotDescription(json), bytes: bytes.length }
+  const slot = readSlotDescription(json)
+  try {
+    const bytes = applyBps(patch, dump)
+    const module = await WebAssembly.compile(bytes as Uint8Array<ArrayBuffer>)
+    return { module, slot, bytes: bytes.length }
+  } catch (error: unknown) {
+    throw buildFailure(error)
+  }
 }
 
 /**
@@ -103,7 +120,12 @@ export class AudioOpener {
 /** The run's sound: a processor that plays the ring into the context, or why there is none. */
 function connectRing(sound: Sound, ring: SharedArrayBuffer) {
   if (typeof sound === 'string') return { output: undefined, silence: sound }
-  const processorOptions: AudioProcessorOptions = { ring, rate: MIXER_RATE, latency: AUDIO_LATENCY }
+  const processorOptions: AudioProcessorOptions = {
+    ring,
+    rate: MIXER_RATE,
+    latency: AUDIO_LATENCY,
+    reserve: AUDIO_RESERVE,
+  }
   try {
     const node = new AudioWorkletNode(sound, AUDIO_PROCESSOR, {
       numberOfInputs: 0,
@@ -136,7 +158,7 @@ export function startRun(built: Built, picked: Picked, speed: Speed, sound: Soun
   return {
     worker,
     control: new Int32Array(buffers.control),
-    frame: new Uint8Array(buffers.frame),
+    frames: buffers.frames,
     clock: new TickClock(speed, now),
     ring: new AudioRing(buffers.audio),
     output,
@@ -176,12 +198,14 @@ export function reachEnd(run: Run, now: number): Speed {
   return speedAtEnd(run.clock.speed)
 }
 
+/** The run's progress, with the sound's skips and dry spells while it has sound (#47). */
 export const progressLine = (status: RunStatus, run: Run): string => {
   const finished =
     run.finishedMs === undefined
       ? ''
       : ` Finished at frame ${String(status.finishedAt)} after ${(run.finishedMs / 1000).toFixed(1)} s.`
-  return `Frame ${String(status.frame)}, instruction ${String(status.done)} of ${String(status.total)}, turn ${String(status.turn)}.${finished}`
+  const sound = run.output === undefined ? '' : ` ${soundLine(run.ring)}`
+  return `Frame ${String(status.frame)}, instruction ${String(status.done)} of ${String(status.total)}, turn ${String(status.turn)}.${finished}${sound}`
 }
 
 export const runningLine = (picked: Picked, run: Run): string => {

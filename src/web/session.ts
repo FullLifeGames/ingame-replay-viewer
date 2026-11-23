@@ -5,23 +5,19 @@
 // the step and keeps the module's own words.
 import { type SlotDescription, writeReplaySlot } from '../patch/slot'
 import { type Emulator, EmulatorError, NOT_STARTED_LINE } from './emulator'
-import { messageOf } from './message'
-import { replayJsonUrl } from './replay-input'
+import {
+  createReplayChoice,
+  failed,
+  newest,
+  PICK_DUMP,
+  PICK_REPLAY,
+  type ReplaySummary,
+  SessionError,
+  step,
+} from './replay-choice'
 import type { TestReplay } from './replays'
 import { checkBaseRom, patchBaseRom, readSlotDescription } from './rom'
 import { ROM_FILES } from './rom-files'
-import {
-  notShown,
-  notShownCounts,
-  type NotShownCount,
-  type NotShownRow,
-  streamOfReplay,
-} from './stream'
-
-/** A step of the flow that failed; `cause` holds the module's own error. */
-export class SessionError extends Error {
-  override name = 'SessionError'
-}
 
 /** What the page hands the session: its GETs, the emulator's loader and the crash line's sink. */
 export interface SessionDeps {
@@ -39,15 +35,6 @@ export interface SessionDeps {
 export interface DumpSummary {
   /** The patched ROM's SHA1, which replay-slot.json names. */
   readonly romSha1: string
-}
-
-export interface ReplaySummary {
-  readonly id: string
-  readonly streamBytes: number
-  readonly instructions: number
-  /** What the game does not show, by line. */
-  readonly rows: readonly NotShownRow[]
-  readonly counts: readonly NotShownCount[]
 }
 
 export interface StartSummary {
@@ -70,21 +57,6 @@ export interface Session {
   restart(): void
 }
 
-const PICK_DUMP = 'Pick your US Emerald dump first, then press Start.'
-const PICK_REPLAY = 'Pick a replay first, then press Start.'
-
-const failed = (step: string, error: unknown): SessionError =>
-  new SessionError(`${step}: ${messageOf(error)}`, { cause: error })
-
-/** Runs one step of the flow; its failure becomes "<step>: <the module's message>". */
-async function step<T>(name: string, work: () => T | Promise<T>): Promise<T> {
-  try {
-    return await work()
-  } catch (error) {
-    throw failed(name, error)
-  }
-}
-
 /** `make`'s promise, made at the first call and made again after it failed. */
 function once<T>(make: () => Promise<T>): () => Promise<T> {
   let pending: Promise<T> | undefined
@@ -97,37 +69,9 @@ function once<T>(make: () => Promise<T>): () => Promise<T> {
   }
 }
 
-/**
- * The newest pick of one kind; an older pick that settles later counts for nothing. With
- * `keepEarlier`, a pick that fails hands the next Start the pick before it, or `undefined`.
- */
-function newest<T>(keepEarlier: boolean) {
-  let current: Promise<T | undefined> | undefined
-  return {
-    get: () => current,
-    pick: async (work: Promise<T>): Promise<T | undefined> => {
-      const earlier = current
-      const held = keepEarlier ? work.catch(() => earlier) : work
-      current = held
-      try {
-        const value = await work
-        return current === held ? value : undefined
-      } catch (error) {
-        if (current === held) throw error
-        return undefined
-      }
-    },
-  }
-}
-
 interface Dump {
   readonly rom: Uint8Array
   readonly description: SlotDescription
-}
-
-interface Chosen {
-  readonly bytes: Uint8Array
-  readonly summary: ReplaySummary
 }
 
 async function fetchBuildFiles(deps: SessionDeps) {
@@ -139,37 +83,12 @@ async function fetchBuildFiles(deps: SessionDeps) {
   return { patch, description }
 }
 
-function choose(json: unknown): Chosen {
-  const { replay, stream } = streamOfReplay(json)
-  const rows = notShown(replay, stream)
-  const summary: ReplaySummary = {
-    id: replay.id,
-    streamBytes: stream.bytes.length,
-    instructions: stream.instructions.length,
-    rows,
-    counts: notShownCounts(rows),
-  }
-  return { bytes: stream.bytes, summary }
-}
-
-const STREAM_STEP = 'Could not turn the replay into a stream'
 const PATCH_STEP = 'Could not patch your dump'
-
-async function chooseTestReplay(replay: TestReplay): Promise<Chosen> {
-  const json = await step(`Could not load the test replay ${replay.id}`, replay.load)
-  return step(STREAM_STEP, () => choose(json))
-}
-
-async function chooseShowdownReplay(deps: SessionDeps, input: string): Promise<Chosen> {
-  const url = await step('Could not read the replay link', () => replayJsonUrl(input))
-  const json = await step('Could not fetch the replay', () => deps.fetchJson(url))
-  return step(STREAM_STEP, () => choose(json))
-}
 
 export function createSession(deps: SessionDeps): Session {
   const buildFiles = once(() => fetchBuildFiles(deps))
   const dumps = newest<Dump>(false)
-  const replays = newest<Chosen>(true)
+  const replays = createReplayChoice(deps.fetchJson)
   let loaded: Emulator | undefined
   const emulator = once(async () => {
     const ready = await step('Could not start the emulator', deps.loadEmulator)
@@ -184,10 +103,9 @@ export function createSession(deps: SessionDeps): Session {
     const rom = await step(PATCH_STEP, () => patchBaseRom(bytes, patch, description))
     return { rom, description }
   }
-  const summaryOf = async (pick: Promise<Chosen | undefined>) => (await pick)?.summary
 
   const start = async (): Promise<StartSummary> => {
-    const [dump, chosen] = await Promise.all([dumps.get(), replays.get()])
+    const [dump, chosen] = await Promise.all([dumps.get(), replays.chosen()])
     if (dump === undefined) throw new SessionError(PICK_DUMP)
     if (chosen === undefined) throw new SessionError(PICK_REPLAY)
     const rom = await step('Could not write the replay into the ROM', () =>
@@ -206,8 +124,8 @@ export function createSession(deps: SessionDeps): Session {
       const dump = await dumps.pick(patched(bytes))
       return dump === undefined ? undefined : { romSha1: dump.description.romSha1 }
     },
-    pickTestReplay: (replay) => summaryOf(replays.pick(chooseTestReplay(replay))),
-    loadReplay: (input) => summaryOf(replays.pick(chooseShowdownReplay(deps, input))),
+    pickTestReplay: replays.pickTestReplay,
+    loadReplay: replays.loadReplay,
     start,
     restart: () => {
       try {

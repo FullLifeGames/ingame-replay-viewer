@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ingame Replay Viewer: WebAssembly spike</title>
+    <title>Ingame Replay Viewer: emulator page</title>
     <style>
       body {
         font-family: system-ui, sans-serif;
@@ -15,18 +15,12 @@
         image-rendering: pixelated;
         background: #000;
       }
-      fieldset {
-        display: inline;
-        border: none;
-        padding: 0;
-      }
     </style>
   </head>
   <body>
-    <h1>WebAssembly spike</h1>
+    <h1>Ingame Replay Viewer: emulator page</h1>
     <p>
-      A test page. The game runs as WebAssembly in a worker, without an emulator, and its sound
-      plays through an audio worklet. The <a href="./">emulator page</a> is the viewer.
+      This page runs the game in the mGBA emulator, the fallback for the <a href="./">viewer</a>.
     </p>
     <p id="environment" hidden></p>
     <div id="app">
@@ -38,22 +32,22 @@
         <label for="test-replay">Test replay</label>
         <select id="test-replay"></select>
       </p>
-      <div>
-        <fieldset id="speed">
-          <legend>Speed</legend>
-          <label><input type="radio" name="speed" value="1x" checked /> 1x</label>
-          <label><input type="radio" name="speed" value="2x" /> 2x</label>
-          <label><input type="radio" name="speed" value="fast" /> Fast</label>
-        </fieldset>
-      </div>
+      <form id="replay-form">
+        <label for="replay-input">Replay link or ID</label>
+        <input id="replay-input" type="text" placeholder="smogtours-gen3ou-994052" />
+        <button type="submit">Load</button>
+      </form>
       <p>
         <button id="start" type="button">Start</button>
-        <button id="restart" type="button">Restart</button>
+        <button id="restart" type="button" disabled>Restart</button>
       </p>
       <p id="status" role="status"></p>
       <canvas id="screen" width="240" height="160"></canvas>
-      <p id="progress"></p>
+      <p id="replay-summary"></p>
+      <h2 id="not-shown">Not shown in the game (0)</h2>
+      <ul id="not-shown-counts"></ul>
+      <ol id="not-shown-rows"></ol>
     </div>
-    <script type="module" src="./wasm/main.ts"></script>
+    <script type="module" src="./main.ts"></script>
   </body>
 </html>

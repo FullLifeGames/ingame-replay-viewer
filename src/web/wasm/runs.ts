@@ -1,4 +1,4 @@
-// The runs of the WebAssembly spike page (#35): the current run, the counts the test hook reports,
+// The runs of the viewer (#35): the current run, the counts the test hook reports,
 // and which play may start a run. DOM-free, so a Node spec covers it; main.ts hands it the stop.
 
 /** The page's current run, and the runs it started and stopped: one at most is live. */

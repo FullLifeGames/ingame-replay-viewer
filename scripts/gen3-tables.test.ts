@@ -192,7 +192,8 @@ describe('jsonText', () => {
   })
 })
 
-// Devbox only: CI has no 600 MB checkout, so the committed tables stand in for it there.
+// Devbox only: CI has no 600 MB checkout, so the committed tables stand in for it there. It reads
+// the pinned tree, which takes about 2 s alone and missed vitest's 5 s default under load.
 const tree = readerTree()
 describe.skipIf(!existsSync(tree))('the committed tables (T7, devbox)', () => {
   it('equal the tables generated from the pinned tree', () => {
@@ -203,5 +204,5 @@ describe.skipIf(!existsSync(tree))('the committed tables (T7, devbox)', () => {
       const committed: unknown = JSON.parse(readFileSync(join(TABLES_DIR, name), 'utf8'))
       expect(JSON.parse(files[name] ?? 'null'), name).toEqual(committed)
     }
-  })
+  }, 30_000)
 })

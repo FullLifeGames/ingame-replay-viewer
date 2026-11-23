@@ -1,8 +1,16 @@
 // The game module as its hosts see it: the exports and imports of build/wasm/irv-emerald.js, the
 // stream written into its slot, and the frame hook of the page's worker. DOM-free; the Node
 // harness (scripts/wasm-run.ts) shares the module's shape.
-import { type SlotDescription, writeReplaySlot } from '../../patch/slot.ts'
-import { FRAME_BYTES, widenFrame } from './frame.ts'
+import {
+  checkSlotHeader,
+  type SlotDescription,
+  SlotMismatchError,
+  type SlotHeaderLayout,
+  writeReplaySlot,
+} from '../../patch/slot.ts'
+import { MODULE_BUILD_STEPS } from './files.ts'
+import { widenFrame } from './frame.ts'
+import { backBuffer, frameBuffer, publishFrame, waitUntilUnread } from './frame-swap.ts'
 import { readProgress, type ProgressLayout } from './progress.ts'
 import { type SharedBuffers, waitForTick, writeStatus } from './protocol.ts'
 
@@ -37,10 +45,23 @@ export interface ModuleHooks {
 /**
  * Writes `stream` into the module's slot through the rule for a ROM (src/patch/slot.ts). The
  * module's slot has the layout of the ROM's, which `romSlot` (replay-slot.json) describes, so the
- * description is moved to the slot's own address.
+ * description is moved to the slot's own address. A `romSlot` that the slot's own header
+ * contradicts comes from another build and is refused before anything is written, with the
+ * build that makes both again.
  */
-export function writeStream(game: GameModule, romSlot: SlotDescription, stream: Uint8Array): void {
+export function writeStream(
+  game: GameModule,
+  romSlot: SlotDescription,
+  stream: Uint8Array,
+  layout: SlotHeaderLayout,
+): void {
   const at = game._IrvWasm_Slot()
+  try {
+    checkSlotHeader(game.HEAPU8.subarray(at), romSlot, layout)
+  } catch (error) {
+    if (!(error instanceof SlotMismatchError)) throw error
+    throw new SlotMismatchError(`${error.message}. Run ${MODULE_BUILD_STEPS} again, in that order.`)
+  }
   const slot: SlotDescription = {
     ...romSlot,
     offset: 0,
@@ -53,8 +74,9 @@ export function writeStream(game: GameModule, romSlot: SlotDescription, stream: 
 }
 
 /**
- * The worker's irvFrame: the frame widened into the shared frame buffer, the frame count and the
- * progress into the control words, then the wait until the page allows the frame.
+ * The worker's irvFrame: the frame widened into the frame buffer the page does not copy and put in
+ * front (frame-swap.ts), the frame count and the progress into the control words, then the wait
+ * until the page allows the frame.
  */
 export function frameHandler(
   game: () => GameModule,
@@ -62,12 +84,14 @@ export function frameHandler(
   layout: ProgressLayout,
 ): (pixels: number) => void {
   const control = new Int32Array(buffers.control)
-  const rgba = new Uint8Array(buffers.frame, 0, FRAME_BYTES)
   let frame = 0
   return (pixels) => {
     const module = game()
     frame++
-    widenFrame(module.HEAPU16, pixels >> 1, rgba, 4)
+    const back = backBuffer(control)
+    waitUntilUnread(control, back)
+    widenFrame(module.HEAPU16, pixels >> 1, frameBuffer(buffers.frames, back), 4)
+    publishFrame(control, back)
     writeStatus(control, frame, readProgress(module.HEAPU8, module._IrvWasm_Progress(), layout))
     waitForTick(control, frame)
   }

@@ -25,12 +25,11 @@ import {
   readProgressLayout,
   runTool,
 } from './rom-shot-run.ts'
-import { wasmPaths } from './wasm-compile.ts'
+import { wasmPaths, wasmRoots } from './wasm-compile.ts'
 import { buildHost } from './wasm-layer.ts'
 import { FRAME_BYTES, runScript, TRACE_BYTES, traceFrame } from './wasm-layer-script.ts'
 import { diffFrame, parseVideoState, sideBySide, stateOps } from './wasm-oracle-state.ts'
 import type { FrameDiff, VideoState } from './wasm-oracle-state.ts'
-import { wasmRoots } from './wasm-platform.ts'
 
 const DEFAULT_STREAMS = ['hand-made', '994052']
 const DEFAULT_EVERY = 60

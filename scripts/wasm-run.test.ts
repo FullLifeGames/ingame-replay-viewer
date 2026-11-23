@@ -10,7 +10,7 @@ import type { Scene } from './rom-shot-scenes.ts'
 import { GBA_ROM_BASE, loadSlotLayout } from './rom-slot.ts'
 import { MIXER_RATE } from '../src/web/wasm/protocol.ts'
 import { frameLines } from './wasm-hashes.ts'
-import { playCommand, playModule, STALL_FRAMES } from './wasm-run.ts'
+import { playCommand, playModule, runPlace, STALL_FRAMES } from './wasm-run.ts'
 import type { GameModule, ModuleHooks } from './wasm-run.ts'
 
 // The class of a WebAssembly trap, by its name.
@@ -240,5 +240,21 @@ describe('the run of one stream', () => {
       '--play',
       '/repo/build/wasm/run/hand-made',
     ])
+  })
+})
+
+describe('the module a run plays', () => {
+  it('is the module of build/wasm, its runs in build/wasm/run', () => {
+    expect(runPlace('/repo/build/wasm')).toEqual({
+      module: '/repo/build/wasm/irv-emerald.js',
+      runDir: '/repo/build/wasm/run',
+    })
+  })
+
+  it('is the sanitized module under build/wasm/sanitize with --sanitize (#44)', () => {
+    expect(runPlace('/repo/build/wasm', 'shift')).toEqual({
+      module: '/repo/build/wasm/sanitize/irv-emerald.js',
+      runDir: '/repo/build/wasm/sanitize/run',
+    })
   })
 })

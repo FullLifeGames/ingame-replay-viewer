@@ -16,6 +16,11 @@
 //                                       flag and VCOUNT each, zeros after the last)
 //  10 trace                            (a frame as 8 does, then its trace: struct IrvPixelTrace
 //                                       per pixel, irv_render.h)
+//  11 psgreset rate                    (IrvPsg_Reset)
+//  12 psgframe count                   (IrvPsg_Frame; appends its count pairs of floats)
+//  13 sound   call a b                 (HostSoundCall, irv_layer_host_mp2k.c: 0 the players, 1-4
+//                                       the sequencer's calls, 5 SoundMain, 6 m4aSoundVSync,
+//                                       7 SoundMainBTM; appends its result word if it gives one)
 // The result holds the handler's calls in its upper half and the OR of their flags in its lower.
 #include <stdlib.h>
 #include <string.h>
@@ -24,6 +29,7 @@
 #include "irv_gba.h"
 #include "irv_irq.h"
 #include "irv_layer_host.h"
+#include "irv_psg.h"
 #include "irv_render.h"
 
 uint8_t *gIrvHostMemory;
@@ -150,6 +156,32 @@ static void TraceFrame(struct Script *script, struct HostCall *call)
     Append(script, call, sTrace, sizeof(sTrace));
 }
 
+static void PsgFrame(struct Script *script, struct HostCall *call)
+{
+    uint32_t count = NextWord(script);
+    float *pairs;
+
+    if (count > call->destLength / (2 * sizeof(float)))
+        Fail("a PSG frame of more pairs than the destination holds");
+    pairs = malloc(count * 2 * sizeof(float));
+    if (pairs == NULL)
+        Fail("out of memory");
+    IrvPsg_Frame(pairs, count);
+    Append(script, call, pairs, count * 2 * sizeof(float));
+    free(pairs);
+}
+
+static void Sound(struct Script *script, struct HostCall *call)
+{
+    uint32_t which = NextWord(script);
+    uint32_t a = NextWord(script);
+    uint32_t b = NextWord(script);
+    uint32_t result;
+
+    if (HostSoundCall(which, a, b, &result))
+        Append(script, call, &result, sizeof(result));
+}
+
 static void Log(struct Script *script, struct HostCall *call)
 {
     uint32_t max = NextWord(script);
@@ -217,6 +249,15 @@ static void RunOperation(struct Script *script, struct HostCall *call)
         break;
     case 10:
         TraceFrame(script, call);
+        break;
+    case 11:
+        IrvPsg_Reset(NextWord(script));
+        break;
+    case 12:
+        PsgFrame(script, call);
+        break;
+    case 13:
+        Sound(script, call);
         break;
     default:
         Fail("an unknown operation in the script");

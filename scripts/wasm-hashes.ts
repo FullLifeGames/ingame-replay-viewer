@@ -10,6 +10,8 @@ import { parseArgs } from 'node:util'
 import { crc32 } from 'node:zlib'
 
 import { FRAME_HEIGHT, FRAME_WIDTH } from '../src/web/wasm/frame.ts'
+import { parseSanitizer } from './wasm-compile.ts'
+import type { Sanitizer } from './wasm-compile.ts'
 import { LINK_OUTPUTS } from './wasm-link.ts'
 
 const LINE_BYTES = FRAME_WIDTH * 2
@@ -134,12 +136,18 @@ export interface RunArgs {
   /** plain: scenes only; baseline: save the module and its hashes; against: compare with them. */
   mode: 'plain' | 'baseline' | 'against'
   names: string[]
+  /** Plays the sanitized module of build/wasm/sanitize (#44). */
+  sanitize?: Sanitizer
 }
 
 export function parseRunArgs(argv: string[]): RunArgs {
   const { values, positionals } = parseArgs({
     args: argv,
-    options: { baseline: { type: 'boolean' }, 'against-baseline': { type: 'boolean' } },
+    options: {
+      baseline: { type: 'boolean' },
+      'against-baseline': { type: 'boolean' },
+      sanitize: { type: 'string' },
+    },
     allowPositionals: true,
   })
   if (values.baseline === true && values['against-baseline'] === true) {
@@ -147,7 +155,10 @@ export function parseRunArgs(argv: string[]): RunArgs {
   }
   const mode =
     values.baseline === true ? 'baseline' : values['against-baseline'] ? 'against' : 'plain'
-  return { mode, names: positionals }
+  if (values.sanitize === undefined) return { mode, names: positionals }
+  // The baseline holds the normal module; a sanitized one never takes its place.
+  if (mode === 'baseline') throw new Error('a sanitized run never saves the baseline')
+  return { mode, names: positionals, sanitize: parseSanitizer(values.sanitize) }
 }
 
 const baselineDir = (out: string) => join(out, 'baseline')

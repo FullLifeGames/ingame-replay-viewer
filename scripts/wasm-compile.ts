@@ -1,10 +1,11 @@
 // One command line per C file of the WebAssembly build (#35), as the expansion's Makefile compiles
 // it (`$(CPP) $(CPPFLAGS) $< | $(PREPROC) -i -g $(ASSETS_DIR_NAME) $< charmap.txt | $(CC1)`), with
 // emcc in place of the ARM tools. Every command runs in the tree; its object lands in build/wasm.
-import { readdirSync } from 'node:fs'
+import { readdirSync, realpathSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { basename, isAbsolute, join, normalize, relative, sep } from 'node:path'
 
+import type { RomRoots } from './rom-paths.ts'
 import type { WasmConfig } from './wasm-config.ts'
 import { LAYER_DIR } from './wasm-layer.ts'
 
@@ -13,9 +14,10 @@ export interface WasmPaths {
   out: string
   obj: string
   shadow: string
-  // Patched copies: upstream files from rom/gen3/wasm/patches, platform files from platform-patches.
+  // Patched copies of upstream files, from rom/gen3/wasm/patches.
   overlay: string
-  platform: string
+  // The data objects of npm run wasm:convert, which a sanitized build links too.
+  asm: string
   emcc: string
 }
 
@@ -29,6 +31,7 @@ export interface CompileCommand {
 
 export interface CompileOptions {
   optimise: '-O0' | '-O2'
+  sanitize?: Sanitizer | undefined
   // Sources of the tree that compile from their patched copy under build/wasm/overlay.
   overlay?: readonly string[]
 }
@@ -45,11 +48,37 @@ interface Unit {
 }
 
 // The Makefile's CPPFLAGS with TEST=0 and GAME_VERSION=EMERALD, plus our own marker.
-const CPPFLAGS = ['-Wno-trigraphs', '-DMODERN=1', '-DTESTING=0', '-DEMERALD', '-std=gnu17']
+export const CPPFLAGS = ['-Wno-trigraphs', '-DMODERN=1', '-DTESTING=0', '-DEMERALD', '-std=gnu17']
 // The Makefile's CFLAGS without the ARM target flags and without -Werror: clang's own errors
 // (incompatible function pointers, implicit declarations) are what the census must see.
 const CFLAGS = ['-std=gnu17', '-Wall', '-Wno-strict-aliasing', '-Wno-pointer-to-int-cast']
 const ASSETS_DIR = 'build/assets'
+
+// The checks of a sanitized build (#44): clang's shift check, logged by UBSan's runtime with the
+// file and line of each site, once per site, and the run goes on.
+const SANITIZERS = ['shift'] as const
+export type Sanitizer = (typeof SANITIZERS)[number]
+
+export function parseSanitizer(check: string | undefined): Sanitizer {
+  const known = SANITIZERS.find((name) => name === check)
+  if (known === undefined) {
+    const named = check === undefined ? 'no check' : `no check ${check}`
+    throw new Error(`--sanitize knows ${named}; it takes ${SANITIZERS.join(', ')}`)
+  }
+  return known
+}
+
+/** emcc's flags for a check, at the compile and at the link. */
+export const sanitizeFlags = (check?: Sanitizer): string[] =>
+  check === undefined ? [] : [`-fsanitize=${check}`]
+
+/** Where a sanitized build keeps its records, objects, copies, module and runs. */
+export const sanitizedDir = (out: string): string => join(out, 'sanitize')
+
+export function sanitizedPaths(paths: WasmPaths): WasmPaths {
+  const out = sanitizedDir(paths.out)
+  return { ...paths, out, obj: join(out, 'obj'), overlay: join(out, 'overlay') }
+}
 const PREPROC = 'tools/preproc/preproc'
 
 export function wasmPaths(
@@ -65,9 +94,16 @@ export function wasmPaths(
     obj: join(out, 'obj'),
     shadow: join(repoDir, 'rom', 'gen3', 'wasm', 'include'),
     overlay: join(out, 'overlay'),
-    platform: join(out, 'platform'),
+    asm: join(out, 'asm'),
     emcc: join(emsdk, 'upstream', 'emscripten', 'emcc'),
   }
+}
+
+// The folders the build may delete inside: the delete guard of rom-paths.ts takes them as it takes
+// the ROM build's.
+export function wasmRoots(repoDir: string): RomRoots {
+  const repo = realpathSync(repoDir)
+  return { cache: join(repo, '.cache', 'wasm'), out: join(repo, 'build', 'wasm') }
 }
 
 // An exclude or a define that names no file of the tree would change nothing, silently.
@@ -105,6 +141,7 @@ function command(paths: WasmPaths, unit: Unit, options: CompileOptions): Compile
       'c',
       '-c',
       options.optimise,
+      ...sanitizeFlags(options.sanitize),
       ...CFLAGS,
       ...unit.flags,
       '-o',
@@ -142,33 +179,9 @@ export function compileCommands(
   })
 }
 
-// The C files of the platform layer, from their patched copies under build/wasm/platform. Its own
-// headers (platform/dma.h) come after the tree's include, so global.h stays the expansion's.
-export function platformCommands(
-  config: WasmConfig,
-  paths: WasmPaths,
-  options: CompileOptions = { optimise: '-O2' },
-): CompileCommand[] {
-  return config.platform.files
-    .filter((file) => file.endsWith('.c'))
-    .map((file) => {
-      const source = `platform/${file}`
-      const unit = {
-        source,
-        input: join(paths.platform, file),
-        object: objectPath(paths, source),
-        defines: config.platform.defines,
-        flags: [],
-        after: [join(paths.platform, 'include')],
-      }
-      return command(paths, unit, options)
-    })
-}
-
 // The glue's own C files (rom/gen3/wasm/src) and our platform layer's (rom/gen3/wasm/layer),
-// given as absolute paths. They include the borrowed sound headers, but compile as files of the
-// game, so the platform defines stay off. The layer's headers come before the
-// borrowed ones, so the glue reaches our layer first.
+// given as absolute paths. They compile as files of the game; the layer's headers come after the
+// tree's include.
 export function glueCommands(
   paths: WasmPaths,
   sources: readonly string[],
@@ -182,7 +195,7 @@ export function glueCommands(
       object: objectPath(paths, source),
       defines: [],
       flags: [],
-      after: [LAYER_DIR, join(paths.platform, 'include')],
+      after: [LAYER_DIR],
     }
     return command(paths, unit, options)
   })
