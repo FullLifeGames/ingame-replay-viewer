@@ -8,27 +8,48 @@ export type Sound = AudioContext | string
 
 /**
  * The page's one audio context. When it fails to open, the run plays without sound, and the next
- * Start tries again.
+ * Start tries again. Once the context is open, open(), resumeNow() and suspend() call it before
+ * they return, so a click's resume() runs inside the click: a phone browser may refuse one that
+ * runs in a later microtask.
  */
 export class AudioOpener {
   private readonly create: () => Promise<AudioContext>
-  private context: Promise<AudioContext> | undefined
+  private pending: Promise<AudioContext> | undefined
+  private opened: AudioContext | undefined
 
   constructor(create: () => Promise<AudioContext>) {
     this.create = create
   }
 
-  async open(): Promise<Sound> {
-    this.context ??= this.create()
-    let opened: AudioContext
-    try {
-      opened = await this.context
-    } catch (error: unknown) {
-      this.context = undefined
-      return `the page could not open its audio: ${messageOf(error)}`
-    }
-    return opened.resume().then(
-      () => opened,
+  /** The open context, resumed, or the line that says why a run plays without sound. */
+  open(): Promise<Sound> {
+    if (this.opened !== undefined) return this.started(this.opened)
+    this.pending ??= this.create()
+    return this.pending.then(
+      (context) => {
+        this.opened = context
+        return this.started(context)
+      },
+      (error: unknown) => {
+        this.pending = undefined
+        return `the page could not open its audio: ${messageOf(error)}`
+      },
+    )
+  }
+
+  /** Resumes the open context at once and returns its promise; nothing before the first open. */
+  resumeNow(): Promise<void> {
+    return this.opened?.resume() ?? Promise.resolve()
+  }
+
+  /** Suspends the open context; the ring keeps its samples for the next resume. */
+  suspend(): Promise<void> {
+    return this.opened?.suspend() ?? Promise.resolve()
+  }
+
+  private started(context: AudioContext): Promise<Sound> {
+    return this.resumeNow().then(
+      () => context,
       (error: unknown) => `the audio did not start: ${messageOf(error)}`,
     )
   }
