@@ -1,9 +1,7 @@
-// stdlib.h before global.h, whose abs macro would break the prototype of abs.
-#include <stdlib.h>
 #include "global.h"
 #include "irv_wasm_sound.h"
+#include "irv_wasm_stop.h"
 #include <emscripten/em_js.h>
-#include <stdio.h>
 
 // The WebAssembly build (#35, #43) plays sound through our platform layer: its sequencer, PCM
 // mixer and PSG (rom/gen3/wasm/layer/irv_mp2k_*.c, irv_psg.c) take the place of m4a_1.s and the
@@ -21,9 +19,6 @@ EM_JS(void, IrvWasm_HandOverAudio, (const float *samples, int count, int rate), 
 void IrvSound_HandOver(const float *pairs, u32 count, s32 rate)
 {
     if (rate != IRV_WASM_MIXER_RATE)
-    {
-        printf("irv-emerald: the mixer runs at %d Hz, the page expects %d Hz\n", (int)rate, IRV_WASM_MIXER_RATE);
-        abort();
-    }
+        IrvWasm_Stop("the mixer runs at %d Hz, the page expects %d Hz", (int)rate, IRV_WASM_MIXER_RATE);
     IrvWasm_HandOverAudio(pairs, count * 2, rate);
 }
