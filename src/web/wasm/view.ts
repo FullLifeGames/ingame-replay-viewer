@@ -10,6 +10,7 @@ import {
 } from '../replay-view'
 import type { PanelText } from '../status'
 import type { VisitorLine } from '../visitor'
+import type { PauseButton } from './pause'
 import { SPEEDS, type Speed } from './protocol'
 
 const PAGE = 'index.html'
@@ -33,6 +34,21 @@ function findPanel(): (text: PanelText) => void {
     for (const [key, line] of lines) {
       if (line.textContent !== text[key]) line.textContent = text[key]
     }
+  }
+}
+
+/**
+ * The Pause button (#57) and the call that shows its label and state. The loop calls it on each
+ * frame, so it writes only a change.
+ */
+function findPause() {
+  const pause = element('pause', HTMLButtonElement)
+  return {
+    pause,
+    showPause: ({ label, disabled }: PauseButton): void => {
+      if (pause.textContent !== label) pause.textContent = label
+      if (pause.disabled !== disabled) pause.disabled = disabled
+    },
   }
 }
 
@@ -65,6 +81,7 @@ export function findSpikeView() {
     replayFile: element('replay-file', HTMLInputElement),
     start: element('start', HTMLButtonElement),
     restart: element('restart', HTMLButtonElement),
+    ...findPause(),
     canvas: element('screen', HTMLCanvasElement),
     speed: checkedSpeed,
     /** Checks the radio of `speed`, as when the page leaves fast at END; fires no change. */

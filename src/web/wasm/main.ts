@@ -4,7 +4,8 @@
 // runs the picked stream in a worker (run.ts). The page allows the worker's frames by the
 // tick rule (clock.ts) and draws the newest whole frame (frame-swap.ts) on each animation
 // frame. The game's sound goes from the worker through the audio ring to an audio worklet
-// (audio.ts), at 1x and 2x; fast stays silent. The dump stays in this tab.
+// (audio.ts), at 1x and 2x; fast stays silent. Pause and the Space key hold the running replay
+// and its sound until Play (pause.ts). The dump stays in this tab.
 import { environmentProblem, startsModuleWorkers } from '../environment'
 import { fetchJson } from '../fetch'
 import {
@@ -22,6 +23,7 @@ import { environmentLine } from '../visitor'
 import { AudioOpener, type Sound } from './audio-opener'
 import { FRAME_HEIGHT, FRAME_WIDTH } from './frame'
 import { readFrame } from './frame-swap'
+import { pauseButton, spaceToggles, togglePause } from './pause'
 import { grant, readStatus, type Speed, writePace } from './protocol'
 import {
   type Built,
@@ -67,6 +69,7 @@ function drawLoop(
         run && { summary: run.summary, turn: readStatus(run.control).turn },
       ),
     )
+    view.showPause(pauseButton(run))
     if (run === undefined) return
     // The clock grants from the frame the game reached, so a game that fell behind never races.
     const status = readStatus(run.control)
@@ -153,6 +156,8 @@ function createSpike(view: SpikeView) {
     /** The stream that ran last, from its start; the picked replay when none ran yet. */
     restart: () => play(last),
     changeSpeed,
+    /** Pauses or plays the current run; the sound's call runs inside the caller's event. */
+    togglePause: () => togglePause(runs.current, audio, performance.now()),
     /** The test hook of e2e/wasm-spike.spec.ts: the run's status, its sound and the run counts. */
     status: () =>
       runs.current === undefined ? undefined : { ...hookStatus(runs.current), runs: runs.counts },
@@ -173,6 +178,24 @@ function act(view: SpikeView, work: () => Promise<string | undefined>): void {
   )
 }
 
+/**
+ * The Pause button and the Space key (#57). Both call the toggle in their own event, with no
+ * `act`, so the sound resumes inside it. A refused suspend or resume shows no line: the clock
+ * holds or plays the game, and the next press asks the audio again (S5-16).
+ */
+function wirePause(spike: Spike, view: SpikeView): void {
+  const toggle = () => {
+    spike.togglePause().catch(() => undefined)
+  }
+  view.pause.addEventListener('click', toggle)
+  document.addEventListener('keydown', (event) => {
+    if (!spaceToggles(event)) return
+    toggle()
+    // The page does not scroll on the Space that toggled.
+    event.preventDefault()
+  })
+}
+
 function wire(spike: Spike, view: SpikeView): void {
   view.dump.addEventListener('change', () => {
     const file = view.dump.files?.[0]
@@ -186,6 +209,7 @@ function wire(spike: Spike, view: SpikeView): void {
   view.restart.addEventListener('click', () => {
     act(view, () => spike.restart())
   })
+  wirePause(spike, view)
   view.onSpeed((speed) => {
     spike.changeSpeed(speed)
   })

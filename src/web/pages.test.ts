@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import LICENSE from '../../LICENSE?raw'
 import LICENCES from './public/licences.html?raw'
 import { PLAYED_FORMATS } from './visitor'
+import { pauseButton } from './wasm/pause'
 
 // Every page in src/web, by its address: the viewer at index.html runs the WebAssembly build, and
 // the emulator page at emulator.html is its fallback (U1 a, user 23.11.2026).
@@ -95,6 +96,26 @@ describe('the replay file input', () => {
 
   it('is not on the emulator page', () => {
     expect(page(EMULATOR)).not.toContain('replay-file')
+  })
+})
+
+// #57: the viewer's third button pauses and plays the running replay. The page opens with the
+// button as pause.ts shows it before the first run; the emulator page keeps Start and Restart.
+describe('the pause button', () => {
+  it('sits between Start and Restart on the viewer, as it reads before the first run', () => {
+    const { label, disabled } = pauseButton(undefined)
+    expect(disabled).toBe(true)
+    expect(page(VIEWER)).toMatch(
+      new RegExp(
+        `<button id="start" type="button">Start</button>\\s*` +
+          `<button id="pause" type="button" disabled>${label}</button>\\s*` +
+          `<button id="restart" type="button">Restart</button>`,
+      ),
+    )
+  })
+
+  it('is not on the emulator page', () => {
+    expect(page(EMULATOR)).not.toContain('id="pause"')
   })
 })
 

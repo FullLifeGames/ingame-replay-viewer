@@ -65,6 +65,8 @@ interface Status {
   /** The turn the game reached, 0 before turn 1. */
   turn: number
   finished: boolean
+  /** Whether the viewer's Pause holds the run (#57). */
+  paused: boolean
   speed: string
   wallMs: number
   finishedMs: number | undefined

@@ -216,6 +216,7 @@ export function hookStatus(run: Run) {
   return {
     ...readStatus(run.control),
     speed: run.clock.speed,
+    paused: run.clock.paused,
     wallMs: performance.now() - run.startedAt,
     finishedMs: run.finishedMs,
     failure: run.failure,
