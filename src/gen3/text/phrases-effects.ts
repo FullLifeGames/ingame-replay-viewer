@@ -66,6 +66,10 @@ export const EFFECT_TEMPLATES = {
   quicksand: tagged('STRINGID_PKMNTRAPPEDBYSANDTOMB', start('became trapped by the quicksand!')),
   // `BattleScript_EffectMeanLook` (data/battle_scripts_1.s), with the target as B_DEF.
   cantEscape: tagged('STRINGID_TARGETCANTESCAPENOW', start('can no longer escape!')),
+  // `BattleScript_EffectDisable`, with the target as B_DEF and its move as B_BUFF1.
+  disabled: tagged('STRINGID_PKMNMOVEWASDISABLED', (who: Mon, move: string) => {
+    return `${ownerAtStart(who)} ${move} was disabled!`
+  }),
 }
 
 const E = EFFECT_TEMPLATES
@@ -107,15 +111,29 @@ function startText(who: Mon, id: string, source: Mon | undefined): string | unde
   return STARTS[id]?.(who) ?? screenRaised(who.side, id)
 }
 
+/** The start lines that name the effect's detail, by the effect's id. */
+const STARTS_WITH_DETAIL: Readonly<Record<string, (who: Mon, detail: string) => string>> = {
+  disable: (who, move) => E.disabled.render(who, moveName(move)),
+}
+
 /**
  * An effect that starts on `who`; `source` is the Pokémon of `[of]`: Curse's user, or the
- * trapper of a partial trap.
+ * trapper of a partial trap. `detail` is what the line names beside the effect (Disable's move);
+ * a line that does not use it lists it, so it never goes unseen.
  */
-export function effectStarted(who: Mon, effect: Effect, source: Mon | undefined): Phrase {
-  const text = startText(who, toID(effect.name), source)
-  if (text !== undefined) return { text }
-  const own = `${nameAtStart(who)} is under ${held(effect.name)}!`
-  return ownPhrase(own, `${effect.name} starting`)
+export function effectStarted(
+  who: Mon,
+  effect: Effect,
+  source: Mon | undefined,
+  detail?: string,
+): Phrase {
+  const id = toID(effect.name)
+  const withDetail = STARTS_WITH_DETAIL[id]
+  if (detail !== undefined && withDetail !== undefined) return { text: withDetail(who, detail) }
+  const game = startText(who, id, source)
+  const text = game ?? `${nameAtStart(who)} is under ${held(effect.name)}!`
+  if (detail !== undefined) return ownPhrase(text, `${effect.name} starting with ${detail}`)
+  return game === undefined ? ownPhrase(text, `${effect.name} starting`) : { text }
 }
 
 const ACTS: Readonly<Record<string, Line>> = {

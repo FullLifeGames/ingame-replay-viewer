@@ -62,3 +62,23 @@ describe("Haze's reset of every stat stage", () => {
     expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
   })
 })
+
+describe("Disable's move, the third argument of `-start` (D14)", () => {
+  it('reads the move as the detail of the effect', () => {
+    const script = scriptOf(
+      '|move|p2a: Tyranitar|Disable|p1a: Dugtrio',
+      '|-start|p1a: Dugtrio|Disable|Body Slam',
+    )
+
+    expect(eventsAt(script, NEXT + 1)).toEqual([
+      {
+        kind: 'effectStart',
+        line: NEXT + 1,
+        who: DUGTRIO,
+        effect: { name: 'Disable' },
+        detail: 'Body Slam',
+      },
+    ])
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
+})

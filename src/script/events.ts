@@ -247,6 +247,8 @@ interface EffectStartEvent extends Caused {
   readonly line: number
   readonly who: PokemonRef
   readonly effect: Effect
+  /** What the effect names beside it, such as the move Disable disabled. */
+  readonly detail?: string
   readonly silent?: true
 }
 

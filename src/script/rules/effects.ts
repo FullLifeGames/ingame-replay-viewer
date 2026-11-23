@@ -6,15 +6,17 @@ import type { Rules } from './index'
 
 export const EFFECT_RULES = {
   // A partial trap starts as `-activate|…|move: Fire Spin|[of] …`; the parser turns it into this.
+  // The third argument is what the effect names beside it, such as Disable's move (plan D14).
   '|-start|': {
-    arity: 2,
+    arity: 3,
     reads: ['from', 'of', 'silent'],
-    build: ({ line, args: [, who, effect], kwArgs, battle }) => [
+    build: ({ line, args: [, who, effect, detail], kwArgs, battle }) => [
       {
         kind: 'effectStart',
         line,
         who: refOf(battle, who, line),
         effect: effectOf(effect),
+        ...(detail ? { detail } : {}),
         ...causeOf(kwArgs, battle, line),
         ...flagsOf(kwArgs, ['silent']),
       },

@@ -117,3 +117,32 @@ describe('Haze (Gen 1 to 3)', () => {
     expect(fallbacksOf(...lines)).toEqual([])
   })
 })
+
+describe('Disable (Gen 1 to 3)', () => {
+  it('names the move it disabled, as the expansion does', () => {
+    const lines = [
+      '|move|p2a: Tyranitar|Disable|p1a: Dugtrio',
+      '|-start|p1a: Dugtrio|Disable|Body Slam',
+    ]
+
+    expect(sceneOf(...lines).map(plain)).toEqual([
+      'The opposing Tyranitar used Disable!',
+      { op: 'move', user: 'far', target: 'near', move: expect.any(Number) as number },
+      "Dugtrio's Body Slam was disabled!",
+    ])
+    expect(fallbacksOf(...lines)).toEqual([])
+  })
+
+  it('lists the detail of any other effect, whose line does not use it', () => {
+    expect(sceneOf('|-start|p1a: Dugtrio|confusion|Body Slam').map(plain)).toEqual([
+      'Dugtrio became confused!',
+    ])
+    expect(fallbacksOf('|-start|p1a: Dugtrio|confusion|Body Slam')).toEqual([
+      {
+        line: NEXT,
+        kind: 'phrase',
+        detail: 'no game message for confusion starting with Body Slam',
+      },
+    ])
+  })
+})

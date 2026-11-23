@@ -55,7 +55,8 @@ export function effectStart(event: EventOf<'effectStart'>, ctx: Context): void {
 /** The line of an effect that starts; a perish count at 0 then drains the bar. */
 function startLine(event: EventOf<'effectStart'>, ctx: Context): void {
   const { who, effect, line } = event
-  ctx.print(line, effectStarted(ctx.mon(who), effect, event.source && ctx.mon(event.source)))
+  const source = event.source && ctx.mon(event.source)
+  ctx.print(line, effectStarted(ctx.mon(who), effect, source, event.detail))
   if (toID(effect.name) === PERISH_ZERO) drain(who, line, ctx)
 }
 
