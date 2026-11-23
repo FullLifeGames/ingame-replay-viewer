@@ -2,7 +2,7 @@
 // the user's dump with the module patch, picks a test replay or loads one by link or ID and lists
 // what the game does not show, as the emulator page does (replay-choice.ts, replay-view.ts), and
 // runs the picked stream in a worker (run.ts). The page allows the worker's frames by the
-// tick rule (protocol.ts) and draws the newest whole frame (frame-swap.ts) on each animation
+// tick rule (clock.ts) and draws the newest whole frame (frame-swap.ts) on each animation
 // frame. The game's sound goes from the worker through the audio ring to an audio worklet
 // (audio.ts), at 1x and 2x; fast stays silent. The dump stays in this tab.
 import { environmentProblem, startsModuleWorkers } from '../environment'
@@ -19,11 +19,11 @@ import {
 import { wireReplayFile, wireReplays } from '../replay-view'
 import { BUILDING_LINE, BUILT_LINE, endedLine, panelText, READY_LINE } from '../status'
 import { environmentLine } from '../visitor'
+import { AudioOpener, type Sound } from './audio-opener'
 import { FRAME_HEIGHT, FRAME_WIDTH } from './frame'
 import { readFrame } from './frame-swap'
 import { grant, readStatus, type Speed, writePace } from './protocol'
 import {
-  AudioOpener,
   type Built,
   buildModule,
   hookStatus,
@@ -31,8 +31,8 @@ import {
   progressLine,
   reachEnd,
   type Run,
+  openAudioContext,
   runningLine,
-  type Sound,
   startRun,
   stopRun,
   watchRun,
@@ -106,7 +106,7 @@ function createSpike(view: SpikeView) {
   let last: ListedPick | undefined
   const choice = createReplayChoice(fetchJson)
   const runs = new Runs<NamedRun>(stopRun)
-  const audio = new AudioOpener()
+  const audio = new AudioOpener(openAudioContext)
 
   const changeSpeed = (speed: Speed) => {
     const run = runs.current

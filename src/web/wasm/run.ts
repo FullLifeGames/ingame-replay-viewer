@@ -15,7 +15,9 @@ import {
   type AudioProcessorOptions,
   soundLine,
 } from './audio'
+import type { Sound } from './audio-opener'
 import workletUrl from './audio-worklet.ts?worker&url'
+import { TickClock } from './clock'
 import { buildFailure, type FailedReport, RunFailure, workerFailure } from './failures'
 import { WASM_FILES } from './files'
 import type { StartMessage, WorkerReport } from './messages'
@@ -27,7 +29,6 @@ import {
   type RunStatus,
   type Speed,
   speedAtEnd,
-  TickClock,
   writePace,
 } from './protocol'
 import { AudioRing } from './ring'
@@ -52,9 +53,6 @@ export interface Picked {
   readonly id: string
   readonly stream: Uint8Array
 }
-
-/** The page's audio context, or the line that says why a run plays without sound. */
-export type Sound = AudioContext | string
 
 /** One run of the game: its worker, its shared buffers, its clock and its sound, if any. */
 export interface Run {
@@ -88,33 +86,11 @@ export async function buildModule(dump: Uint8Array): Promise<Built> {
   }
 }
 
-/**
- * The page's one audio context, opened on the first Start, the user's gesture that lets a page
- * play sound. When it fails to open, the run plays without sound, and the next Start tries again.
- */
-export class AudioOpener {
-  private context: Promise<AudioContext> | undefined
-
-  async open(): Promise<Sound> {
-    this.context ??= AudioOpener.load()
-    let opened: AudioContext
-    try {
-      opened = await this.context
-    } catch (error: unknown) {
-      this.context = undefined
-      return `the page could not open its audio: ${messageOf(error)}`
-    }
-    return opened.resume().then(
-      () => opened,
-      (error: unknown) => `the audio did not start: ${messageOf(error)}`,
-    )
-  }
-
-  private static async load(): Promise<AudioContext> {
-    const context = new AudioContext()
-    await context.audioWorklet.addModule(workletUrl)
-    return context
-  }
+/** Opens the page's audio context with the worklet that plays the ring (AudioOpener's factory). */
+export async function openAudioContext(): Promise<AudioContext> {
+  const context = new AudioContext()
+  await context.audioWorklet.addModule(workletUrl)
+  return context
 }
 
 /** The run's sound: a processor that plays the ring into the context, or why there is none. */
