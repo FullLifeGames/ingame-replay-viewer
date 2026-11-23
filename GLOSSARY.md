@@ -97,7 +97,7 @@ _Avoid_: engine, VM
 ## The WebAssembly build
 
 **WebAssembly build**:
-The expansion with our C files, compiled by Emscripten into a WebAssembly module that the page runs in a worker, without an emulator. A spike so far (#35, `docs/wasm-spike.md`).
+The expansion with our C files, compiled by Emscripten into a WebAssembly module that the viewer runs in a worker, without an emulator (#35, #43, `docs/wasm-spike.md`).
 _Avoid_: native build, port, recompilation
 
 **Platform layer**:

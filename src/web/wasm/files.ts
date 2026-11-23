@@ -1,4 +1,4 @@
-// The build outputs the WebAssembly spike page fetches, as paths relative to the page, and the
+// The build outputs the viewer fetches, as paths relative to the page, and the
 // build that makes them. The dev server plugin (scripts/web-server.ts) serves exactly these from
 // build/wasm/; its spec ties each to the build's names in scripts/wasm-link.ts and
 // scripts/wasm-outputs.ts. The module itself is never served: the page rebuilds it from the

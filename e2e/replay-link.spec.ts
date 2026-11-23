@@ -1,4 +1,5 @@
-// A replay by link or ID (plan S5b §5). Showdown is a route that answers from the test fixture,
+// A replay by link or ID in the viewer at / (plan S5b §5; the emulator page shares the form and
+// wasm-page.spec.ts compares its list). Showdown is a route that answers from the test fixture,
 // so no request leaves devbox; the page needs no dump for this.
 import { expect, test } from '@playwright/test'
 

@@ -1,4 +1,4 @@
-// The WebAssembly spike page (#35): wires the controls of wasm.html. It rebuilds the module from
+// The viewer (#35): wires the controls of index.html. It rebuilds the module from
 // the user's dump with the module patch, picks a test replay or loads one by link or ID and lists
 // what the game does not show, as the emulator page does (replay-choice.ts, replay-view.ts), and
 // runs the picked stream in a worker (run.ts). The page allows the worker's frames by the
