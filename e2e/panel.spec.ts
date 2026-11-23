@@ -67,7 +67,7 @@ test('the panel names the first pick by side and fits a phone-wide screen', asyn
   await expect(turn).toHaveText(PRESS_START)
   expect.soft(await scrollWidth(page)).toBeLessThanOrEqual(WIDTH)
 
-  await page.getByLabel('Test replay').selectOption(OTHER)
+  await page.getByLabel('Example replay').selectOption(OTHER)
   await expect(far).toHaveText('Far side: Halbert Simpson')
   await expect(near).toHaveText('Near side: dataexpunged')
   expect(notSameOriginGets).toEqual([])
@@ -138,7 +138,7 @@ test('the panel follows the game turn by turn and asks for Start after another p
   expect(turns.at(-1)).toBeGreaterThan(turns[0] ?? 0)
   expect(await scrollWidth(page)).toBeLessThanOrEqual(WIDTH)
 
-  await page.getByLabel('Test replay').selectOption(OTHER)
+  await page.getByLabel('Example replay').selectOption(OTHER)
   await expect(far).toHaveText('Far side: Halbert Simpson')
   await expect(near).toHaveText('Near side: dataexpunged')
   await expect(turn).toHaveText(PRESS_START)

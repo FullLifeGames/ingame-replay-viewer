@@ -1,6 +1,7 @@
 // A replay by link or ID in the viewer at / (plan S5b §5; the emulator page shares the form and
 // wasm-page.spec.ts compares its list). Showdown is a route that answers from the test fixture,
-// so no request leaves devbox; the page needs no dump for this.
+// so no request leaves the machine; the page needs no dump for this. A failure shows its visitor
+// line, the module's words under "Details" and, where the line offers one, the report link (#59).
 import { expect, test } from '@playwright/test'
 
 import { notShownCount } from './page-text.ts'
@@ -9,7 +10,10 @@ import { loadReplay, routeShowdown, showdownUrl } from './showdown.ts'
 
 const FIRST = 'smogtours-gen3ou-994052'
 const LINKED = 'smogtours-gen3ou-994176'
+const OTHER = 'smogtours-gen3ou-994086'
 const SHOWDOWN = showdownUrl(LINKED)
+/** The line of a failure the page has no line for, such as an example it could not load. */
+const NO_LINE = 'The page hit a problem it has no line for. Report it with the link below.'
 
 test('a replay loaded by its link fills the list, and only Showdown is asked', async ({
   page,
@@ -24,6 +28,14 @@ test('a replay loaded by its link fills the list, and only Showdown is asked', a
   await loadReplay(page, 'https://example.com/smogtours-gen3ou-994176')
   await expect(page.getByRole('status')).toHaveText(/^Could not read the replay link: /)
   await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
+
+  // A link with markup in it shows as text: the page writes no line as HTML.
+  await loadReplay(page, '<img id=injected src=x>')
+  await expect(page.getByRole('status')).toHaveText(
+    /^Could not read the replay link: "<img id=injected src=x>" is not a replay ID/,
+  )
+  await expect(page.locator('#injected')).toHaveCount(0)
+  await expect(page.locator('#report')).toBeHidden()
 
   await loadReplay(page, `https://replay.pokemonshowdown.com/${LINKED}`)
   await expect(summary).toHaveText(new RegExp(`^${LINKED}: \\d+ instructions`))
@@ -41,7 +53,7 @@ test('after a new pick or a Load the page asks for Start and shows which replay 
   await routeShowdown(page, LINKED)
   await page.goto('/')
   const status = page.getByRole('status')
-  const testReplay = page.getByLabel('Test replay')
+  const testReplay = page.getByLabel('Example replay')
   await expect(status).toHaveText(/^Pick your US Emerald dump/)
 
   await testReplay.selectOption('smogtours-gen3ou-994086')
@@ -72,16 +84,25 @@ test('a test replay that fails to load leaves the select on the replay the page 
   const testReplay = page.locator('#test-replay')
   await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
 
-  await testReplay.selectOption('smogtours-gen3ou-994086')
-  await expect(status).toHaveText(/^Could not load the test replay smogtours-gen3ou-994086: /)
+  const detail = page.locator('#status-detail')
+  const report = page.locator('#report')
+  await testReplay.selectOption(OTHER)
+  await expect(status).toHaveText(NO_LINE)
+  await expect(detail).toHaveText(new RegExp(`^Could not load the test replay ${OTHER}: `))
+  await expect(detail).toBeHidden()
+  await expect(report).toBeVisible()
+  expect(await report.getAttribute('href')).toContain(`&replay=${OTHER}&line=The%20page%20hit`)
   expect(aborted.length).toBeGreaterThan(0)
   await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
   await expect(testReplay).toHaveValue(FIRST)
 
+  // A line that went well clears the old failure's words and its report link.
   await loadReplay(page, LINKED)
   await expect(status).toHaveText(new RegExp(`^Picked ${LINKED}\\. Press Start`))
-  await testReplay.selectOption('smogtours-gen3ou-994086')
-  await expect(status).toHaveText(/^Could not load the test replay smogtours-gen3ou-994086: /)
+  await expect(detail).toHaveText('')
+  await expect(report).toBeHidden()
+  await testReplay.selectOption(OTHER)
+  await expect(status).toHaveText(NO_LINE)
   await expect(summary).toHaveText(new RegExp(`^${LINKED}: `))
   await expect(testReplay).toHaveValue('')
 })

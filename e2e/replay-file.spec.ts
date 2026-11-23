@@ -15,6 +15,10 @@ import { guardRequests } from './requests.ts'
 import { loadReplay, routeShowdown, showdownUrl } from './showdown.ts'
 
 const FIRST = 'smogtours-gen3ou-994052'
+/** The visitor line for a file that holds no replay (#59). */
+const FILE_LINE =
+  'This file holds no Showdown replay. The viewer reads a replay saved with "Download replay", ' +
+  "a saved replay page, a battle log, or a replay's JSON file."
 const OTHER = 'smogtours-gen3ou-994086'
 const REPLAY = readReplay(
   JSON.parse(readFileSync(join(REPO_DIR, 'test', 'fixtures', 'replays', `${FIRST}.json`), 'utf8')),
@@ -76,7 +80,7 @@ test('each kind of saved file fills the list as the replay loaded by link does',
   expect(notSameOriginGets).toEqual([`GET ${showdownUrl(FIRST)}`])
 })
 
-test('a file of no kind the viewer reads leaves the list on the replay the page holds', async ({
+test('a file of no kind the viewer reads gets its line and leaves the list on the replay the page holds', async ({
   page,
   baseURL,
 }) => {
@@ -87,9 +91,21 @@ test('a file of no kind the viewer reads leaves the list on the replay the page 
   const before = await notShownList(page)
 
   await pickFile(page, { name: 'notes.txt', mimeType: 'text/plain', text: 'Bring snacks.\n' })
-  await expect(status).toHaveText(/^Could not read the replay file notes\.txt: /)
+  await expect(status).toHaveText(FILE_LINE)
+  await expect(page.locator('#status-detail')).toHaveText(
+    /^Could not read the replay file notes\.txt: /,
+  )
+  await expect(page.locator('#report')).toBeHidden()
   expect(await notShownList(page)).toEqual(before)
   await expect(page.locator('#test-replay')).toHaveValue(FIRST)
+
+  // A file name with markup shows as text under "Details" (#59): the page writes no line as HTML.
+  const marked = '<img id=injected src=x>.txt'
+  await pickFile(page, { name: marked, mimeType: 'text/plain', text: 'Bring snacks.\n' })
+  await expect(page.locator('#status-detail')).toContainText(
+    `Could not read the replay file ${marked}: `,
+  )
+  await expect(page.locator('#injected')).toHaveCount(0)
 
   // The input forgets each file it read, so the same file picked again fires a change.
   await pickFile(page, DOWNLOADED)

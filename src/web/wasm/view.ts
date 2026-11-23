@@ -1,8 +1,15 @@
 // The viewer's DOM: the elements of index.html and what main.ts shows in them.
 // The replay controls and the list come from replay-view.ts, as on the emulator page.
-import type { ReplaySummary } from '../replay-choice'
-import { element as pageElement, findReplayView } from '../replay-view'
+import type { ReplayPlace, ReplaySummary } from '../replay-choice'
+import {
+  findReplayView,
+  element as pageElement,
+  showFailure,
+  showLine,
+  showOnly,
+} from '../replay-view'
 import type { PanelText } from '../status'
+import type { VisitorLine } from '../visitor'
 import { SPEEDS, type Speed } from './protocol'
 
 const PAGE = 'index.html'
@@ -46,7 +53,6 @@ function findShownReplayView() {
 
 /** The page's controls, and the calls that show the run's state. */
 export function findSpikeView() {
-  const status = element('status', HTMLParagraphElement)
   const progress = element('progress', HTMLParagraphElement)
   const speeds = element('speed', HTMLFieldSetElement)
   const checkedSpeed = (): Speed => {
@@ -71,17 +77,19 @@ export function findSpikeView() {
         handler(checkedSpeed())
       })
     },
-    /** Hides everything but `line`, for a browser that cannot run the worker. */
-    showOnly: (line: string): void => {
-      const environment = element('environment', HTMLParagraphElement)
-      environment.textContent = line
-      environment.hidden = false
-      element('app', HTMLDivElement).hidden = true
+    /** Hides everything but `shown`, for a browser that cannot run the worker. */
+    showOnly: (shown: VisitorLine): void => {
+      showOnly(PAGE, shown)
     },
     status: (line: string): void => {
-      status.textContent = line
+      showLine(PAGE, line)
+    },
+    /** A failure's visitor line; a run's failure names the place of the pick it plays. */
+    failure: (error: unknown, place?: ReplayPlace): void => {
+      showFailure(PAGE, error, place)
     },
     panel: findPanel(),
+    /** The run's numbers for the developer, under "Details" (#59). */
     progress: (line: string): void => {
       if (progress.textContent !== line) progress.textContent = line
     },

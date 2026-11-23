@@ -1,17 +1,64 @@
-// The replay controls both pages share (#52): the test replay select, the form "Replay link or ID"
-// and the "Not shown in the game" list under the game. A pick or a Load fills the list before
-// Start; the texts come from status.ts, and the flow's rules from replay-choice.ts. The viewer
-// alone reads a replay file (#56).
-import { messageOf } from './message'
-import type { ReplayChoice, ReplaySummary } from './replay-choice'
+// The replay controls both pages share (#52): the "Example replay" select, the form "Replay link
+// or ID" and the "Not shown in the game" list under the game. A pick or a Load fills the list
+// before Start; the texts come from status.ts, and the flow's rules from replay-choice.ts. The
+// viewer alone reads a replay file (#56). Both pages write their status line here (#59): a
+// failure's visitor line, its module's words under "Details", and the report link under it.
+import type { ReplayChoice, ReplayPlace, ReplaySummary } from './replay-choice'
 import { FIRST_REPLAY, TEST_REPLAYS } from './replays'
+import { reportLink } from './report-link'
 import { countText, notShownHeading, pickedLine, replayLine, rowText } from './status'
+import { type VisitorLine, visitorLine } from './visitor'
 
 /** The element `#id` of `page`, which must be a `type`. */
 export function element<T extends HTMLElement>(page: string, id: string, type: new () => T): T {
   const found = document.getElementById(id)
   if (!(found instanceof type)) throw new Error(`${page} lacks the ${type.name} #${id}`)
   return found
+}
+
+/** The elements a line fills: the line, the words under its "Details", and its report link. */
+interface LineParts {
+  readonly line: string
+  readonly detail: string
+  readonly report: string
+}
+
+const STATUS_PARTS: LineParts = { line: 'status', detail: 'status-detail', report: 'report' }
+const ENVIRONMENT_PARTS: LineParts = {
+  line: 'environment-line',
+  detail: 'environment-detail',
+  report: 'environment-report',
+}
+
+/**
+ * Writes `shown` as text, never as markup: its values come from other people's replays, links
+ * and files. The report link gets its address from reportLink alone, and hides when the line
+ * offers none, so an old failure never sits under a new line.
+ */
+function writeLine(page: string, parts: LineParts, shown: VisitorLine): void {
+  element(page, parts.line, HTMLParagraphElement).textContent = shown.line
+  element(page, parts.detail, HTMLParagraphElement).textContent = shown.detail
+  const report = element(page, parts.report, HTMLAnchorElement)
+  if (shown.report) report.href = reportLink(shown)
+  else report.removeAttribute('href')
+  report.hidden = !shown.report
+}
+
+/** A line of the page's own, such as a step that went well: no detail and no report link. */
+export function showLine(page: string, line: string): void {
+  writeLine(page, STATUS_PARTS, { line, detail: '', report: false })
+}
+
+/** A failure as its visitor line (visitor.ts); `place` names the replay when the error names none. */
+export function showFailure(page: string, error: unknown, place?: ReplayPlace): void {
+  writeLine(page, STATUS_PARTS, visitorLine(error, place))
+}
+
+/** Hides everything but `shown`, for a browser that cannot run the game. */
+export function showOnly(page: string, shown: VisitorLine): void {
+  writeLine(page, ENVIRONMENT_PARTS, shown)
+  element(page, 'environment', HTMLDivElement).hidden = false
+  element(page, 'app', HTMLDivElement).hidden = true
 }
 
 function fill(list: HTMLElement, texts: readonly string[]): void {
@@ -52,8 +99,11 @@ export function findReplayView(page: string) {
 
 type ReplayView = ReturnType<typeof findReplayView>
 
-/** The replay controls with the page's status line. */
-type StatusView = ReplayView & { readonly status: (line: string) => void }
+/** The replay controls with the page's status line and its failures. */
+type StatusView = ReplayView & {
+  readonly status: (line: string) => void
+  readonly failure: (error: unknown) => void
+}
 
 /** What the controls ask of a page's flow: the session's or the WebAssembly page's picks. */
 type ReplayChooser = Pick<ReplayChoice, 'pickTestReplay' | 'loadReplay'>
@@ -78,7 +128,7 @@ function showPick(
     })
     .catch((error: unknown) => {
       view.restorePick()
-      view.status(messageOf(error))
+      view.failure(error)
     })
 }
 

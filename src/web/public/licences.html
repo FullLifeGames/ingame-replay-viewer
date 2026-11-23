@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ingame Replay Viewer: licences</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+      }
+      pre {
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Ingame Replay Viewer: licences</h1>
+    <p><a href="./">Back to the viewer</a></p>
+
+    <h2>The viewer</h2>
+    <p>
+      The viewer's code, our platform layer in the game module among it, comes under the MIT
+      licence:
+    </p>
+    <pre>
+MIT License
+
+Copyright (c) 2026 FullLifeGames
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</pre>
+
+    <h2>What the game files carry</h2>
+    <p>
+      The viewer builds the game in your tab from your US Emerald dump and two files the site
+      serves: the module patch and Emscripten's glue. They carry code from these projects:
+    </p>
+    <ul>
+      <li>
+        Emscripten 7.0.0: the glue is Emscripten's runtime. Emscripten offers the MIT licence and
+        the University of Illinois/NCSA Open Source License.
+      </li>
+      <li>
+        musl: its formatted printing and stdio writers, linked into the module, under the MIT
+        licence.
+      </li>
+      <li>
+        Emscripten's <code>setjmp</code>, <code>longjmp</code> and stack helpers, linked into the
+        module, under the MIT and NCSA licences.
+      </li>
+      <li>
+        pokeemerald-expansion: it publishes no licence, so its authors keep all rights to it. The
+        patches carry its compiled code, as
+        <a
+          href="https://github.com/FullLifeGames/ingame-replay-viewer/blob/master/docs/adr/0002-patch-for-user-supplied-rom.md"
+          >ADR 0002</a
+        >
+        and
+        <a
+          href="https://github.com/FullLifeGames/ingame-replay-viewer/blob/master/docs/adr/0007-no-forks.md"
+          >ADR 0007</a
+        >
+        record.
+      </li>
+    </ul>
+
+    <h2>The emulator page</h2>
+    <p>
+      The emulator page runs mGBA, under the Mozilla Public License 2.0 (MPL-2.0). Its source:
+      <a href="https://github.com/mgba-emu/mgba">https://github.com/mgba-emu/mgba</a>. The page
+      loads <code>@thenick775/mgba-wasm</code> 2.6.0, built from
+      <a href="https://github.com/thenick775/mgba">https://github.com/thenick775/mgba</a>, MPL-2.0
+      as well.
+    </p>
+
+    <h2>The battle data</h2>
+    <p>
+      The pages read battle logs, species and moves through the @pkmn libraries
+      <code>@pkmn/client</code>, <code>@pkmn/data</code>, <code>@pkmn/dex</code> and
+      <code>@pkmn/protocol</code>, under the MIT licence. Their source:
+      <a href="https://github.com/pkmn/ps">https://github.com/pkmn/ps</a>.
+    </p>
+  </body>
+</html>

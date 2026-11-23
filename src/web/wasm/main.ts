@@ -7,17 +7,18 @@
 // (audio.ts), at 1x and 2x; fast stays silent. The dump stays in this tab.
 import { environmentProblem, startsModuleWorkers } from '../environment'
 import { fetchJson } from '../fetch'
-import { messageOf } from '../message'
 import {
   createReplayChoice,
   PICK_DUMP,
   PICK_REPLAY,
   type ReplayChoice,
+  type ReplayPlace,
   type ReplaySummary,
   SessionError,
 } from '../replay-choice'
 import { wireReplayFile, wireReplays } from '../replay-view'
-import { endedLine, panelText, READY_LINE } from '../status'
+import { BUILDING_LINE, BUILT_LINE, endedLine, panelText, READY_LINE } from '../status'
+import { environmentLine } from '../visitor'
 import { FRAME_HEIGHT, FRAME_WIDTH } from './frame'
 import { readFrame } from './frame-swap'
 import { grant, readStatus, type Speed, writePace } from './protocol'
@@ -39,8 +40,11 @@ import {
 import { Runs } from './runs'
 import { findSpikeView, type SpikeView } from './view'
 
-/** A pick with the summary the list shows for it; the hook's own stream has none. */
-type ListedPick = Picked & { readonly summary?: ReplaySummary }
+/**
+ * A pick with the summary the list shows for it and the place it came from, which a failed run
+ * reports (S5-11); the hook's own stream has neither.
+ */
+type ListedPick = Picked & { readonly summary?: ReplaySummary; readonly place?: ReplayPlace }
 
 /** A run with the id of the replay it plays, for the status line at END, and its summary. */
 type NamedRun = Run & { readonly id: string; readonly summary: ReplaySummary | undefined }
@@ -71,7 +75,7 @@ function drawLoop(
       // At END fast gives way to 1x (speedAtEnd), and the speed control shows it.
       const speed = reachEnd(run, now)
       // The draw loop looks at the current run only, so a later Start never gets this line.
-      view.status(endedLine(run.id))
+      view.status(endedLine(run.id, run.silence))
       if (speed !== run.clock.speed) {
         changeSpeed(speed)
         view.showSpeed(speed)
@@ -93,7 +97,7 @@ async function pickedStream(choice: ReplayChoice): Promise<ListedPick | undefine
   const chosen = await choice.chosen()
   return chosen === undefined
     ? undefined
-    : { id: chosen.summary.id, stream: chosen.bytes, summary: chosen.summary }
+    : { id: chosen.summary.id, stream: chosen.bytes, summary: chosen.summary, place: chosen.place }
 }
 
 /** The page's state and its actions; the view's events call them. */
@@ -113,10 +117,10 @@ function createSpike(view: SpikeView) {
   drawLoop(view, runs, changeSpeed)
 
   const begin = (module: Built, chosen: ListedPick, sound: Sound): Run => {
-    const { id, summary } = chosen
+    const { id, summary, place } = chosen
     const run = Object.assign(startRun(module, chosen, view.speed(), sound), { id, summary })
-    watchRun(run, (line) => {
-      if (runs.current === run) view.status(line)
+    watchRun(run, (failure) => {
+      if (runs.current === run) view.failure(failure, place)
     })
     runs.replace(run)
     return run
@@ -140,11 +144,7 @@ function createSpike(view: SpikeView) {
     pickDump: (dump: Blob) => {
       const mark = runs.mark()
       built = dump.arrayBuffer().then((bytes) => buildModule(new Uint8Array(bytes)))
-      return built.then(({ bytes }) =>
-        runs.startedSince(mark)
-          ? undefined
-          : `Your dump is US Emerald, and the page built the module (${String(bytes)} bytes). Press Start.`,
-      )
+      return built.then(() => (runs.startedSince(mark) ? undefined : BUILT_LINE))
     },
     pickTestReplay: choice.pickTestReplay,
     loadReplay: choice.loadReplay,
@@ -161,14 +161,14 @@ function createSpike(view: SpikeView) {
 
 type Spike = ReturnType<typeof createSpike>
 
-/** Runs a handler's work; its line or its failure becomes the status line. */
+/** Runs a handler's work; its line or its failure's visitor line becomes the status line. */
 function act(view: SpikeView, work: () => Promise<string | undefined>): void {
   work().then(
     (line) => {
       if (line !== undefined) view.status(line)
     },
     (error: unknown) => {
-      view.status(messageOf(error))
+      view.failure(error)
     },
   )
 }
@@ -177,7 +177,7 @@ function wire(spike: Spike, view: SpikeView): void {
   view.dump.addEventListener('change', () => {
     const file = view.dump.files?.[0]
     if (file === undefined) return
-    view.status('Checking your dump and building the module. This takes a few seconds.')
+    view.status(BUILDING_LINE)
     act(view, () => spike.pickDump(file))
   })
   view.start.addEventListener('click', () => {
@@ -214,5 +214,5 @@ if (problem === undefined) {
     },
   })
 } else {
-  view.showOnly(problem.detail)
+  view.showOnly(environmentLine(problem, location))
 }
