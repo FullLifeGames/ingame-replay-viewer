@@ -4,6 +4,7 @@ import { toID } from '@pkmn/dex'
 
 import type { Effect } from '../../script/types'
 import { held, type Mon, moveName, nameAtStart, nameInside, ownerAtStart } from './names'
+import { screenRaised } from './phrases-field'
 import { isTrapping } from './phrases-hp'
 import { ownPhrase, type Phrase, tagged } from './template'
 
@@ -99,7 +100,7 @@ function startText(who: Mon, id: string, source: Mon | undefined): string | unde
   if (id === 'curse') return source && E.cursed.render(source, who)
   const trapped = TRAPPED_BY[id]
   if (trapped !== undefined) return source && trapped(who, source)
-  return STARTS[id]?.(who)
+  return STARTS[id]?.(who) ?? screenRaised(who.side, id)
 }
 
 /**

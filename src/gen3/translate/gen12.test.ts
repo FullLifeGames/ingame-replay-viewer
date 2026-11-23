@@ -25,3 +25,24 @@ describe('a miss without a target (Gen 1 and 2)', () => {
     ])
   })
 })
+
+describe("Gen 1's Reflect and Light Screen, which last on their user", () => {
+  it("say the side message of the user's side", () => {
+    const lines = [
+      '|move|p1a: Dugtrio|Reflect|p1a: Dugtrio',
+      '|-start|p1a: Dugtrio|Reflect',
+      '|move|p2a: Tyranitar|Light Screen|p2a: Tyranitar',
+      '|-start|p2a: Tyranitar|Light Screen',
+    ]
+
+    expect(sceneOf(...lines).map(plain)).toEqual([
+      'Dugtrio used Reflect!',
+      { op: 'move', user: 'near', target: 'near', move: expect.any(Number) as number },
+      'Reflect made your side stronger against physical moves!',
+      'The opposing Tyranitar used Light Screen!',
+      { op: 'move', user: 'far', target: 'far', move: expect.any(Number) as number },
+      'Light Screen made the opposing side stronger against special moves!',
+    ])
+    expect(fallbacksOf(...lines)).toEqual([])
+  })
+})
