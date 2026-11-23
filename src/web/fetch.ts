@@ -1,6 +1,6 @@
 // The page's GETs: the build outputs from its own server and a replay JSON from Showdown. A failed
 // request or an answer other than 2xx becomes one line that names the URL and keeps the server's
-// own words, so the dev server's "run npm run rom:build" reaches the status line.
+// own words, so the dev server's "run npm run rom:build" reaches "Details" under the status line.
 import { messageOf } from './message'
 
 /** A request that failed, or an answer the page cannot use. */

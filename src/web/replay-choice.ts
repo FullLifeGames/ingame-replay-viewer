@@ -1,7 +1,8 @@
 // The replay choice both pages share (#52): a test replay, a replay by link or ID, or a saved
-// replay file (#56) turned into its stream and the summary of what the game does not show. The page lists the summary and Start
-// plays the same stream, so both pages show the same counts. Each failure reaches the page as one
-// line that names the step and keeps the module's own words.
+// replay file (#56) turned into its stream and the summary of what the game does not show. The
+// page lists the summary and Start plays the same stream, so both pages show the same counts. Each
+// failure becomes a `SessionError` that names the step and keeps the module's own words, which
+// the page shows under "Details" below the visitor line (#59).
 import type { Replay } from '../script/replay'
 import { readSavedFile, type SavedKind } from '../script/saved-replay'
 import type { Side } from '../script/types'
