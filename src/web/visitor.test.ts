@@ -87,14 +87,14 @@ describe('visitorLine for the replay', () => {
     expect(line.length).toBeLessThan(250)
   })
 
-  it('gives a link whose JSON holds no replay the link line, and names the link', async () => {
+  it('gives a link whose JSON holds no replay the link line, and names the trimmed link', async () => {
     const choice = createReplayChoice(() => Promise.resolve({ id: 'x' }))
     const refusal = await refusalOf(choice.loadReplay(' gen3ou-1 '))
     expect(visitorLine(refusal)).toEqual({
       line: 'Showdown sent no replay for this link. Check the link and try again.',
       detail: messageOf(refusal),
       report: false,
-      replay: ' gen3ou-1 ',
+      replay: 'gen3ou-1',
     })
   })
 
