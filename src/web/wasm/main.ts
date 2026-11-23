@@ -23,7 +23,7 @@ import { environmentLine } from '../visitor'
 import { AudioOpener, type Sound } from './audio-opener'
 import { FRAME_HEIGHT, FRAME_WIDTH } from './frame'
 import { readFrame } from './frame-swap'
-import { pauseButton, spaceToggles, togglePause } from './pause'
+import { type KeyPress, pauseButton, soundForNewRun, spaceToggles, togglePause } from './pause'
 import { grant, readStatus, type Speed, writePace } from './protocol'
 import {
   type Built,
@@ -126,6 +126,8 @@ function createSpike(view: SpikeView) {
       if (runs.current === run) view.failure(failure, place)
     })
     runs.replace(run)
+    // A refused resume shows no line, as for Play (S5-16).
+    soundForNewRun(run, audio).catch(() => undefined)
     return run
   }
 
@@ -158,6 +160,7 @@ function createSpike(view: SpikeView) {
     changeSpeed,
     /** Pauses or plays the current run; the sound's call runs inside the caller's event. */
     togglePause: () => togglePause(runs.current, audio, performance.now()),
+    spaceToggles: (press: KeyPress) => spaceToggles(press, runs.current),
     /** The test hook of e2e/wasm-spike.spec.ts: the run's status, its sound and the run counts. */
     status: () =>
       runs.current === undefined ? undefined : { ...hookStatus(runs.current), runs: runs.counts },
@@ -189,7 +192,7 @@ function wirePause(spike: Spike, view: SpikeView): void {
   }
   view.pause.addEventListener('click', toggle)
   document.addEventListener('keydown', (event) => {
-    if (!spaceToggles(event)) return
+    if (!spike.spaceToggles(event)) return
     toggle()
     // The page does not scroll on the Space that toggled.
     event.preventDefault()

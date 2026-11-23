@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { TickClock } from './clock'
-import { pauseButton, spaceToggles, togglePause } from './pause'
+import { pauseButton, soundForNewRun, spaceToggles, togglePause } from './pause'
 import { CONTROL, createShared, readStatus, writeStatus } from './protocol'
 
 const progress = { done: 3, total: 34, turn: 1, error: 0, finished: false, playing: true }
@@ -65,33 +65,47 @@ describe('the pause button', () => {
 // link follows its own rule; the page acts only where Space has no use of its own.
 describe('the Space key', () => {
   it.each(['BODY', 'CANVAS', 'body', 'P'])('toggles the pause on a %s target', (tagName) => {
-    expect(spaceToggles(press({ tagName }))).toBe(true)
+    expect(spaceToggles(press({ tagName }), playing())).toBe(true)
   })
 
   it('toggles the pause with no target', () => {
-    expect(spaceToggles(press(null))).toBe(true)
+    expect(spaceToggles(press(null), playing())).toBe(true)
   })
 
   it.each(['A', 'BUTTON', 'INPUT', 'SELECT', 'SUMMARY', 'TEXTAREA', 'input'])(
     'leaves Space alone on a target of the tag %s',
     (tagName) => {
-      expect(spaceToggles(press({ tagName }))).toBe(false)
+      expect(spaceToggles(press({ tagName }), playing())).toBe(false)
     },
   )
 
   it('leaves an editable target alone', () => {
-    expect(spaceToggles(press({ tagName: 'DIV', isContentEditable: true }))).toBe(false)
+    expect(spaceToggles(press({ tagName: 'DIV', isContentEditable: true }), playing())).toBe(false)
   })
 
   it.each(['repeat', 'ctrlKey', 'altKey', 'metaKey'] as const)(
     'leaves a press with %s alone',
     (flag) => {
-      expect(spaceToggles({ ...press({ tagName: 'BODY' }), [flag]: true })).toBe(false)
+      expect(spaceToggles({ ...press({ tagName: 'BODY' }), [flag]: true }, playing())).toBe(false)
     },
   )
 
+  // Before the first run there is nothing to pause, so Space scrolls the page as the browser does.
+  it.each([{ tagName: 'BODY' }, null])(
+    'leaves Space to the browser before the first run',
+    (target) => {
+      expect(spaceToggles(press(target), undefined)).toBe(false)
+    },
+  )
+
+  it('toggles a paused run too', () => {
+    const run = playing()
+    run.clock.pause(40)
+    expect(spaceToggles(press({ tagName: 'BODY' }), run)).toBe(true)
+  })
+
   it.each(['Enter', 'k', 'Spacebar', 'p'])('leaves the %s key alone', (key) => {
-    expect(spaceToggles(press({ tagName: 'BODY' }, key))).toBe(false)
+    expect(spaceToggles(press({ tagName: 'BODY' }, key), playing())).toBe(false)
   })
 })
 
@@ -144,5 +158,28 @@ describe('the toggle', () => {
     const run = playing()
     const audio = { ...fakeAudio([]), suspend: () => Promise.reject(new Error('refused')) }
     await expect(togglePause(run, audio, 1500)).rejects.toThrow('refused')
+  })
+})
+
+// #57, M2 of the second review: a Pause pressed while a Start waited suspended the sound for the
+// old run, and the new run plays.
+describe('the sound of a new run', () => {
+  it('asks the sound back for a run that plays', async () => {
+    const log: string[] = []
+    await soundForNewRun(playing(), fakeAudio(log))
+    expect(log).toEqual(['resumeNow'])
+  })
+
+  it('leaves the sound alone for a run that stands paused', async () => {
+    const log: string[] = []
+    const run = playing()
+    run.clock.pause(40)
+    await soundForNewRun(run, fakeAudio(log))
+    expect(log).toEqual([])
+  })
+
+  it('hands on the promise of the sound', async () => {
+    const audio = { ...fakeAudio([]), resumeNow: () => Promise.reject(new Error('refused')) }
+    await expect(soundForNewRun(playing(), audio)).rejects.toThrow('refused')
   })
 })

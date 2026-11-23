@@ -50,12 +50,12 @@ function ownsSpace(target: object | null): boolean {
 }
 
 /**
- * Whether a key press toggles the pause: Space with no repeat and no modifier, on a target that has
- * no use of its own for it.
+ * Whether a key press toggles the pause of `run`: Space with no repeat and no modifier, on a target
+ * that has no use of its own for it. Before the first run Space keeps the browser's own use.
  */
-export function spaceToggles(press: KeyPress): boolean {
+export function spaceToggles(press: KeyPress, run: Pick<PausedRun, 'clock'> | undefined): boolean {
   const plain = !press.repeat && !press.ctrlKey && !press.altKey && !press.metaKey
-  return press.key === ' ' && plain && !ownsSpace(press.target)
+  return run !== undefined && press.key === ' ' && plain && !ownsSpace(press.target)
 }
 
 /**
@@ -79,4 +79,16 @@ export function togglePause(
   run.clock.play(now)
   grant(run.control, run.clock.allowed(now, frame))
   return resumed
+}
+
+/**
+ * Asks the sound back for a run that Start or Restart put in place, unless it stands paused: a
+ * Pause pressed for the old run while the new one waited suspended the shared sound. Returns the
+ * sound's promise.
+ */
+export function soundForNewRun(
+  run: Pick<PausedRun, 'clock'>,
+  audio: Pick<AudioOpener, 'resumeNow'>,
+): Promise<void> {
+  return run.clock.paused ? Promise.resolve() : audio.resumeNow()
 }
