@@ -1,6 +1,7 @@
 // The WebAssembly page's test hook for the e2e: the module's build outputs and the dump the page
-// needs, the run's status through `irvWasmSpike`, its pace and sound over a stretch of wall time,
-// and the report line. Only numbers leave this module; the frames and the sound stay in the page.
+// needs, the run's status through `irvWasmSpike`, its pace and sound over a stretch of wall time
+// against the tick rule, and the report line. Only numbers leave this module; the frames and the
+// sound stay in the page.
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -13,7 +14,7 @@ import { readPreflightInput } from '../scripts/rom-preflight.ts'
 import { wasmPaths } from '../scripts/wasm-compile.ts'
 import { LINK_OUTPUTS } from '../scripts/wasm-link.ts'
 import { WASM_OUTPUT_NAMES } from '../scripts/wasm-outputs.ts'
-import { MIXER_RATE } from '../src/web/wasm/protocol.ts'
+import { GBA_FRAMES_PER_SECOND, MIXER_RATE } from '../src/web/wasm/protocol.ts'
 
 /** The user's US Emerald, found by the build's rule. */
 export const DUMP = readPreflightInput(process.env, loadBuildConfig().baseRom.sha1).baseRomPath
@@ -123,4 +124,34 @@ export async function rate(page: Page, ms: number) {
 
 export const report = (numbers: Record<string, number | string>): void => {
   process.stdout.write(`wasm-spike: ${JSON.stringify(numbers)}\n`)
+}
+
+type Measured = Awaited<ReturnType<typeof rate>>
+
+/**
+ * The tick rule's pace at `factor` times the game's own, and the sound written into the ring at
+ * the mixer's rate: at 2x the worker filters twice the frames and keeps one pair of each two, so
+ * the ring fills as fast as at 1x.
+ */
+function expectPace({ paced, written, rms }: Measured, factor: number): void {
+  expect(paced / GBA_FRAMES_PER_SECOND).toBeGreaterThan(factor * 0.95)
+  expect(paced / GBA_FRAMES_PER_SECOND).toBeLessThan(factor * 1.05)
+  expect(written).toBeGreaterThan(0.95)
+  expect(written).toBeLessThan(1.05)
+  expect(rms).toBeGreaterThan(0)
+}
+
+/** 2 s after a start or a switch, the next 5 s of `stream` against `factor`, reported as `speed`. */
+export async function measure(
+  page: Page,
+  stream: string,
+  speed: string,
+  factor: number,
+): Promise<Measured> {
+  await page.waitForTimeout(2_000)
+  const measured = await rate(page, 5_000)
+  const { paced, written, read, played, rms } = measured
+  report({ stream, speed, paced, written, read, played, rms })
+  expectPace(measured, factor)
+  return measured
 }

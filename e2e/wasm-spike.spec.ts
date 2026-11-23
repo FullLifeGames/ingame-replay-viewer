@@ -1,8 +1,9 @@
 // The WebAssembly spike page in Chromium (#35, plan B5). It reads the user's US Emerald by the
 // build's rule and skips without it or without the build outputs. It plays the hand-made battle
-// at 1x, switches it to 2x and back while it runs (#50), and plays 994052 at fast. It reads the
-// run's status through the page's test hook (wasm-hook.ts) and checks the tick rule's pace at 1x
-// and 2x. The game's sound plays at 1x and 2x and stays silent at fast; the test counts the samples
+// at 1x, switches it to 2x and back while it runs (#50), plays a short window of 994052 at 1x and
+// at 2x (#43), and plays 994052 at fast. It reads the run's status through the page's test hook
+// (wasm-hook.ts) and checks the tick rule's pace at 1x and 2x on both streams. The game's sound
+// plays at 1x and 2x and stays silent at fast; the test counts the samples
 // that pass the audio ring and measures their loudness. Two Start presses during the build start
 // one run, and at END the page leaves fast for 1x. A second test measures mGBA on the emulator page
 // at fast-forward, for the write-up's speed comparison (B7).
@@ -17,14 +18,13 @@ import { buildPaths } from '../scripts/rom-paths.ts'
 import { PROGRESS_HEADER_PATH, readProgressLayout } from '../scripts/rom-shot-run.ts'
 import { planStreams } from '../scripts/rom-shot.ts'
 import { WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'
-import { GBA_FRAMES_PER_SECOND } from '../src/web/wasm/protocol.ts'
 import { frame } from './frames.ts'
 import {
   DUMP,
   finished,
+  measure,
   missingForModule,
   playStream,
-  rate,
   report,
   SLOT,
   status,
@@ -42,31 +42,6 @@ const EXPOSE_CORE =
   'const irvExposeCore=async(options)=>{const core=await mGBA(options);' +
   'globalThis.irvMgbaCore=core;return core};export default irvExposeCore;'
 
-type Measured = Awaited<ReturnType<typeof rate>>
-
-/**
- * The tick rule's pace at `factor` times the game's own, and the sound written into the ring at
- * the mixer's rate: at 2x the worker filters twice the frames and keeps one pair of each two, so
- * the ring fills as fast as at 1x.
- */
-function expectPace({ paced, written, rms }: Measured, factor: number): void {
-  expect(paced / GBA_FRAMES_PER_SECOND).toBeGreaterThan(factor * 0.95)
-  expect(paced / GBA_FRAMES_PER_SECOND).toBeLessThan(factor * 1.05)
-  expect(written).toBeGreaterThan(0.95)
-  expect(written).toBeLessThan(1.05)
-  expect(rms).toBeGreaterThan(0)
-}
-
-/** 2 s after a start or a switch, the next 5 s against `factor`, reported under `label`. */
-async function measure(page: Page, label: string, factor: number): Promise<Measured> {
-  await page.waitForTimeout(2_000)
-  const measured = await rate(page, 5_000)
-  const { paced, written, read, played, rms } = measured
-  report({ stream: HAND_MADE, speed: label, paced, written, read, played, rms })
-  expectPace(measured, factor)
-  return measured
-}
-
 async function handMadeBytes(): Promise<number[]> {
   const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
   const [plan] = await planStreams([HAND_MADE], layout)
@@ -77,7 +52,7 @@ async function handMadeBytes(): Promise<number[]> {
 // the ring and out to the worklet, and its loudness during the battle's music.
 async function startHandMade(page: Page, bytes: number[]): Promise<void> {
   await playStream(page, HAND_MADE, bytes)
-  const { read, written, sound } = await measure(page, '1x', 1)
+  const { read, written, sound } = await measure(page, HAND_MADE, '1x', 1)
   expect((await frame(page)).colours).toBeGreaterThan(1)
   expect(sound.silence).toBeUndefined()
   // #47: a phone has no developer tools, so the progress line gives the sound's counts.
@@ -95,9 +70,9 @@ async function startHandMade(page: Page, bytes: number[]): Promise<void> {
 async function switchWhileRunning(page: Page): Promise<void> {
   const before = (await status(page))?.runs
   await page.getByLabel('2x').check()
-  await measure(page, '2x, switched while running', 2)
+  await measure(page, HAND_MADE, '2x, switched while running', 2)
   await page.getByLabel('1x').check()
-  await measure(page, '1x, switched back', 1)
+  await measure(page, HAND_MADE, '1x, switched back', 1)
   const now = await status(page)
   expect(now?.runs).toEqual(before)
   expect(now?.speed).toBe('1x')
@@ -123,7 +98,7 @@ async function restartAt2x(page: Page): Promise<void> {
   await page.getByLabel('2x').check()
   await page.getByRole('button', { name: 'Restart' }).click()
   await expect(line).toHaveText(new RegExp(`^Running ${HAND_MADE}`))
-  await measure(page, '2x', 2)
+  await measure(page, HAND_MADE, '2x', 2)
   const end = await finished(page, 180_000)
   await expect(line).toHaveText(`Played ${HAND_MADE} to the end of the battle.`)
   const seconds = (end.finishedMs ?? 0) / 1000
@@ -132,9 +107,32 @@ async function restartAt2x(page: Page): Promise<void> {
   expect((await status(page))?.speed).toBe('2x')
 }
 
+// Starts the picked test replay and waits until its run replaced the one before.
+async function startFirst(page: Page): Promise<void> {
+  await expect(page.getByLabel('Test replay')).toHaveValue(FIRST)
+  const before = (await status(page))?.runs.started ?? 0
+  await page.getByRole('button', { name: 'Start', exact: true }).click()
+  await expect
+    .poll(async () => (await status(page))?.runs.started, { timeout: 60_000, intervals: [500] })
+    .toBe(before + 1)
+  await expect(page.getByRole('status')).toHaveText(new RegExp(`^Running ${FIRST}`))
+}
+
+// #43: 994052 plays with its sound at 1x and at 2x too, a short window of each; the switch comes
+// while it runs. The fast step after it starts the replay again from its start.
+async function firstWithSound(page: Page): Promise<void> {
+  await page.getByLabel('1x').check()
+  await startFirst(page)
+  const { sound } = await measure(page, FIRST, '1x', 1)
+  expect(sound.silence).toBeUndefined()
+  await page.getByLabel('2x').check()
+  await measure(page, FIRST, '2x, switched while running', 2)
+  expect((await status(page))?.finished).toBe(false)
+}
+
 test.use({ launchOptions: { args: ['--autoplay-policy=no-user-gesture-required'] } })
 
-test('the spike page plays hand-made at 1x and 2x, switches the speed while it runs, and 994052 at fast', async ({
+test('the spike page plays hand-made and 994052 at 1x and 2x, switches the speed while they run, and 994052 at fast', async ({
   page,
 }) => {
   const missing = missingForModule()
@@ -150,7 +148,6 @@ test('the spike page plays hand-made at 1x and 2x, switches the speed while it r
 
   await page.goto('/wasm.html')
   expect(await page.evaluate('[isSecureContext, crossOriginIsolated]')).toEqual([true, true])
-  const line = page.getByRole('status')
   await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles(DUMP)
 
   await test.step('two Start presses during the build start one run', async () => {
@@ -179,11 +176,13 @@ test('the spike page plays hand-made at 1x and 2x, switches the speed while it r
     await restartAt2x(page)
   })
 
+  await test.step('994052 runs at 1x and 2x, with its sound', async () => {
+    await firstWithSound(page)
+  })
+
   await test.step('994052 reaches END at fast', async () => {
     await page.getByLabel('Fast').check()
-    await expect(page.getByLabel('Test replay')).toHaveValue(FIRST)
-    await page.getByRole('button', { name: 'Start', exact: true }).click()
-    await expect(line).toHaveText(new RegExp(`^Running ${FIRST}`))
+    await startFirst(page)
     const end = await finished(page, 600_000)
     const seconds = (end.finishedMs ?? 0) / 1000
     const fps = Math.round(end.finishedAt / seconds)
