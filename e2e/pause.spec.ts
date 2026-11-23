@@ -103,6 +103,9 @@ test('Pause holds the hand-made battle at 1x for 3 s, and Play reaches the END o
     await playStream(page, HAND_MADE, handMade)
     const end = await finished(page, 180_000)
     await expect(page.getByLabel('1x')).toBeChecked()
+    // A finished battle has nothing left to hold: the button rests as before a run.
+    await expect(pause).toHaveText('Pause')
+    await expect(pause).toBeDisabled()
     return end.finishedAt
   })
 

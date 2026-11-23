@@ -15,6 +15,13 @@ function playing(speed: '1x' | 'fast' = '1x') {
   return { clock, control }
 }
 
+/** A run whose game reached END: its interpreter reported finished at frame 2916. */
+function ended() {
+  const run = playing()
+  writeStatus(run.control, 2916, { ...progress, done: 34, finished: true, playing: false })
+  return run
+}
+
 /** A fake opener that logs its calls. */
 function fakeAudio(log: string[]) {
   return {
@@ -50,6 +57,11 @@ describe('the pause button', () => {
     expect(pauseButton(run)).toEqual({ label: 'Play', disabled: false })
     run.clock.play(2000)
     expect(pauseButton(run)).toEqual({ label: 'Pause', disabled: false })
+  })
+
+  // #57: a finished battle has nothing left to hold, so the button rests as before a run.
+  it('reads "Pause" and stays disabled once the run reached END', () => {
+    expect(pauseButton(ended())).toEqual({ label: 'Pause', disabled: true })
   })
 
   // Start or Restart during a pause begins a run with a clock of its own, which plays.
@@ -95,6 +107,13 @@ describe('the Space key', () => {
     'leaves Space to the browser before the first run',
     (target) => {
       expect(spaceToggles(press(target), undefined)).toBe(false)
+    },
+  )
+
+  it.each([{ tagName: 'BODY' }, null])(
+    'leaves Space to the browser once the run reached END',
+    (target) => {
+      expect(spaceToggles(press(target), ended())).toBe(false)
     },
   )
 
@@ -146,6 +165,16 @@ describe('the toggle', () => {
     expect(Atomics.load(run.control, CONTROL.fast)).toBe(0)
     void togglePause(run, fakeAudio([]), 2000)
     expect(Atomics.load(run.control, CONTROL.fast)).toBe(1)
+  })
+
+  it('leaves a run that reached END as it is', async () => {
+    const log: string[] = []
+    const run = ended()
+    const before = Atomics.load(run.control, CONTROL.allowed)
+    await togglePause(run, fakeAudio(log), 1500)
+    expect(run.clock.paused).toBe(false)
+    expect(Atomics.load(run.control, CONTROL.allowed)).toBe(before)
+    expect(log).toEqual([])
   })
 
   it('does nothing before the first run', async () => {

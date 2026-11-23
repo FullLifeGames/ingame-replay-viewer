@@ -20,9 +20,12 @@ export interface PausedRun {
   readonly control: Int32Array
 }
 
-/** The button for the current run; disabled before the first run. */
-export function pauseButton(run: Pick<PausedRun, 'clock'> | undefined): PauseButton {
-  if (run === undefined) return { label: PAUSE_LABEL, disabled: true }
+/** Whether the run's game reached END: a finished battle has nothing left to pause. */
+const reachedEnd = (run: PausedRun): boolean => readStatus(run.control).finished
+
+/** The button for the current run; disabled before the first run and once it reached END. */
+export function pauseButton(run: PausedRun | undefined): PauseButton {
+  if (run === undefined || reachedEnd(run)) return { label: PAUSE_LABEL, disabled: true }
   return { label: run.clock.paused ? PLAY_LABEL : PAUSE_LABEL, disabled: false }
 }
 
@@ -51,25 +54,27 @@ function ownsSpace(target: object | null): boolean {
 
 /**
  * Whether a key press toggles the pause of `run`: Space with no repeat and no modifier, on a target
- * that has no use of its own for it. Before the first run Space keeps the browser's own use.
+ * that has no use of its own for it. Before the first run and once it reached END, Space keeps the
+ * browser's own use.
  */
-export function spaceToggles(press: KeyPress, run: Pick<PausedRun, 'clock'> | undefined): boolean {
+export function spaceToggles(press: KeyPress, run: PausedRun | undefined): boolean {
   const plain = !press.repeat && !press.ctrlKey && !press.altKey && !press.metaKey
-  return run !== undefined && press.key === ' ' && plain && !ownsSpace(press.target)
+  if (run === undefined || reachedEnd(run)) return false
+  return press.key === ' ' && plain && !ownsSpace(press.target)
 }
 
 /**
  * Pauses a playing run at the frame its game reports and suspends the sound, or plays a paused run
  * on: the sound resumes first, inside the caller's click, then the clock counts on. Writes the
  * grant at once, so the worker stops or goes on before the next animation frame. Returns the
- * sound's promise; nothing happens before the first run.
+ * sound's promise; nothing happens before the first run or once the run reached END.
  */
 export function togglePause(
   run: PausedRun | undefined,
   audio: Pick<AudioOpener, 'resumeNow' | 'suspend'>,
   now: number,
 ): Promise<void> {
-  if (run === undefined) return Promise.resolve()
+  if (run === undefined || reachedEnd(run)) return Promise.resolve()
   const { frame } = readStatus(run.control)
   if (!run.clock.paused) {
     grant(run.control, run.clock.pause(frame))
