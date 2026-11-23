@@ -1,12 +1,14 @@
 // The viewer's Pause and Play (#57) in Chromium. Each test reads the user's US Emerald by the
 // build's rule and skips without it or without the module. A pause holds the hand-made battle's
 // frame and its sound counts, and Play takes the battle to the END frame an unpaused run reaches.
-// Start plays a replay picked during a run, and during a pause too. Space toggles the pause on the
+// Start plays a replay picked during a run, and during a pause too. A mouse click on Start hands
+// the focus to Pause once the run begins, so Space pauses that run. Space toggles the pause on the
 // page's body and through the focused button, and leaves a focused radio its own use. The tests
-// leave 994086 within its first seconds; the frames and the sound stay in the page.
+// leave 994086 within its first seconds; no request leaves the page.
 import { expect, type Page, test } from '@playwright/test'
 
 import { WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'
+import { guardRequests } from './requests.ts'
 import {
   DUMP,
   finished,
@@ -34,8 +36,11 @@ async function read(page: Page) {
   return now
 }
 
-/** Skips without the dump or the module, opens the viewer and builds the game from the dump. */
-async function openWithDump(page: Page): Promise<string[]> {
+/**
+ * Skips without the dump or the module, opens the viewer and builds the game from the dump. Returns
+ * the page's errors and the requests that left it (`guardRequests`); each test ends with both empty.
+ */
+async function openWithDump(page: Page, baseURL: string | undefined) {
   const missing = missingForModule()
   test.skip(
     missing.length > 0,
@@ -43,6 +48,7 @@ async function openWithDump(page: Page): Promise<string[]> {
   )
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
+  const requests = await guardRequests(page, baseURL)
   await page.goto('/')
   // Before the first run the button reads "Pause" and does nothing.
   await expect(pauseButton(page)).toHaveText('Pause')
@@ -51,7 +57,7 @@ async function openWithDump(page: Page): Promise<string[]> {
   await expect(page.getByRole('status')).toHaveText(/^Your dump is US Emerald/, {
     timeout: 180_000,
   })
-  return errors
+  return { errors, requests }
 }
 
 /** Picks the example replay `id`, presses Start and waits for its running line. */
@@ -85,9 +91,10 @@ async function standing(page: Page) {
 
 test('Pause holds the hand-made battle at 1x for 3 s, and Play reaches the END of an unpaused run', async ({
   page,
+  baseURL,
 }) => {
   test.setTimeout(480_000)
-  const errors = await openWithDump(page)
+  const { errors, requests } = await openWithDump(page, baseURL)
   const handMade = await handMadeBytes()
   const pause = pauseButton(page)
 
@@ -121,7 +128,15 @@ test('Pause holds the hand-made battle at 1x for 3 s, and Play reaches the END o
     await pause.click()
     await expect(pause).toHaveText('Pause')
     await waitFor(page, (now) => now.frame > held.frame, 10_000)
-    expect((await read(page)).audio.state).toBe('running')
+    const played = await read(page)
+    expect(played.audio.state).toBe('running')
+    // The ring kept its samples across the pause, so Play counts no dry spell (#57).
+    report({
+      stream: HAND_MADE,
+      underrunsHeld: held.audio.underruns,
+      played: played.audio.underruns,
+    })
+    expect(played.audio.underruns).toBe(held.audio.underruns)
     // A pause leaves the frames the game plays as they were, so fast takes it to the same END.
     await page.getByLabel('Fast').check()
     const end = await finished(page, 180_000)
@@ -130,21 +145,26 @@ test('Pause holds the hand-made battle at 1x for 3 s, and Play reaches the END o
     expect(end.finishedAt).toBe(unpaused)
   })
   expect(errors).toEqual([])
+  expect(requests).toEqual([])
 })
 
-test('Start plays a replay picked during a run', async ({ page }) => {
+test('Start plays a replay picked during a run', async ({ page, baseURL }) => {
   test.setTimeout(300_000)
-  const errors = await openWithDump(page)
+  const { errors, requests } = await openWithDump(page, baseURL)
   await startReplay(page, FIRST)
   await waitFor(page, (now) => now.frame > 60, 30_000)
   await startReplay(page, OTHER)
   await expect(pauseButton(page)).toHaveText('Pause')
   expect(errors).toEqual([])
+  expect(requests).toEqual([])
 })
 
-test('a pick during a pause leaves the run paused, and Start plays the pick', async ({ page }) => {
+test('a pick during a pause leaves the run paused, and Start plays the pick', async ({
+  page,
+  baseURL,
+}) => {
   test.setTimeout(300_000)
-  const errors = await openWithDump(page)
+  const { errors, requests } = await openWithDump(page, baseURL)
   const pause = pauseButton(page)
   await startReplay(page, FIRST)
   await waitFor(page, (now) => now.frame > 60, 30_000)
@@ -161,7 +181,10 @@ test('a pick during a pause leaves the run paused, and Start plays the pick', as
   await startReplay(page, OTHER)
   await expect(pause).toHaveText('Pause')
   expect((await read(page)).paused).toBe(false)
+  // Start opens the sound again inside its click, so the new run plays with it.
+  await expect.poll(async () => (await read(page)).audio.state).toBe('running')
   expect(errors).toEqual([])
+  expect(requests).toEqual([])
 })
 
 /** What the page's window offers to `page.evaluate`; the e2e compiles without the DOM types. */
@@ -169,17 +192,32 @@ interface PageWindow {
   document: { activeElement: { blur(): void } | null }
 }
 
-test('Space toggles the pause on the body and through the button, and leaves a radio its own use', async ({
+test('Space pauses the run a click on Start began, toggles on the body and through the button, and leaves a radio its own use', async ({
   page,
+  baseURL,
 }) => {
   test.setTimeout(300_000)
-  const errors = await openWithDump(page)
+  const { errors, requests } = await openWithDump(page, baseURL)
   const pause = pauseButton(page)
   const paused = async () => (await read(page)).paused
   await expect(page.getByLabel('1x')).toBeChecked()
   await startReplay(page, FIRST)
+  await waitFor(page, (now) => now.frame > 60, 30_000)
+  const before = await read(page)
 
-  // Start keeps the focus after its click; with no focus the key goes to the body.
+  // The mouse click leaves the focus on Start, and the run's begin moves it to Pause (S5-17), so
+  // Space pauses the run instead of starting it over.
+  await page.keyboard.press('Space')
+  await expect.poll(paused).toBe(true)
+  const held = await standing(page)
+  report({ stream: FIRST, spaceAfterStartAt: before.frame, standsAt: held.frame })
+  expect(held.frame).toBeGreaterThanOrEqual(before.frame)
+  expect(held.runs).toEqual(before.runs)
+  await expect(pause).toBeFocused()
+  await page.keyboard.press('Space')
+  await expect.poll(paused).toBe(false)
+
+  // With no focus the key goes to the body.
   await page.evaluate(() => {
     ;(globalThis as unknown as PageWindow).document.activeElement?.blur()
   })
@@ -201,4 +239,5 @@ test('Space toggles the pause on the body and through the button, and leaves a r
   expect(await paused()).toBe(true)
   await expect(pause).toHaveText('Play')
   expect(errors).toEqual([])
+  expect(requests).toEqual([])
 })

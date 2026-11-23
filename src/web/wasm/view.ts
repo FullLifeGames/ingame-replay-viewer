@@ -38,8 +38,8 @@ function findPanel(): (text: PanelText) => void {
 }
 
 /**
- * The Pause button (#57) and the call that shows its label and state. The loop calls it on each
- * frame, so it writes only a change.
+ * The Pause button (#57), the call that shows its label and state, and the one that focuses it.
+ * The loop calls the first on each frame, so it writes only a change.
  */
 function findPause() {
   const pause = element('pause', HTMLButtonElement)
@@ -48,6 +48,11 @@ function findPause() {
     showPause: ({ label, disabled }: PauseButton): void => {
       if (pause.textContent !== label) pause.textContent = label
       if (pause.disabled !== disabled) pause.disabled = disabled
+    },
+    /** Moves the focus to Pause; a disabled button takes no focus, so it enables it first. */
+    focusPause: (): void => {
+      pause.disabled = false
+      pause.focus()
     },
   }
 }

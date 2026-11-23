@@ -199,6 +199,22 @@ function wirePause(spike: Spike, view: SpikeView): void {
   })
 }
 
+/**
+ * Runs a press on Start or Restart. Once its run begins and the button still holds the focus, the
+ * focus moves to Pause, so Space pauses the run instead of starting it over (S5-17).
+ */
+function playFrom(
+  view: SpikeView,
+  button: HTMLButtonElement,
+  play: () => Promise<string | undefined>,
+): void {
+  act(view, async () => {
+    const line = await play()
+    if (line !== undefined && document.activeElement === button) view.focusPause()
+    return line
+  })
+}
+
 function wire(spike: Spike, view: SpikeView): void {
   view.dump.addEventListener('change', () => {
     const file = view.dump.files?.[0]
@@ -207,10 +223,10 @@ function wire(spike: Spike, view: SpikeView): void {
     act(view, () => spike.pickDump(file))
   })
   view.start.addEventListener('click', () => {
-    act(view, () => spike.play())
+    playFrom(view, view.start, () => spike.play())
   })
   view.restart.addEventListener('click', () => {
-    act(view, () => spike.restart())
+    playFrom(view, view.restart, () => spike.restart())
   })
   wirePause(spike, view)
   view.onSpeed((speed) => {
