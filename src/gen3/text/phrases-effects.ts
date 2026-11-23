@@ -64,6 +64,8 @@ export const EFFECT_TEMPLATES = {
     return `${nameAtStart(trapper)} clamped down on ${nameInside(who)}!`
   }),
   quicksand: tagged('STRINGID_PKMNTRAPPEDBYSANDTOMB', start('became trapped by the quicksand!')),
+  // `BattleScript_EffectMeanLook` (data/battle_scripts_1.s), with the target as B_DEF.
+  cantEscape: tagged('STRINGID_TARGETCANTESCAPENOW', start('can no longer escape!')),
 }
 
 const E = EFFECT_TEMPLATES
@@ -81,6 +83,8 @@ const STARTS: Readonly<Record<string, Line>> = {
   firespin: E.vortex.render,
   whirlpool: E.vortex.render,
   sandtomb: E.quicksand.render,
+  // Mean Look's `-activate|<target>|trapped`, which the parser reads as a start.
+  trapped: E.cantEscape.render,
 }
 
 /**

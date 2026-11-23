@@ -65,3 +65,19 @@ describe('Belly Drum (Gen 2 and 3)', () => {
     expect(fallbacksOf(...lines)).toEqual([])
   })
 })
+
+describe("Mean Look's trap", () => {
+  it('says its target can no longer escape', () => {
+    const lines = [
+      '|move|p1a: Dugtrio|Mean Look|p2a: Tyranitar',
+      '|-activate|p2a: Tyranitar|trapped',
+    ]
+
+    expect(sceneOf(...lines).map(plain)).toEqual([
+      'Dugtrio used Mean Look!',
+      { op: 'move', user: 'near', target: 'far', move: expect.any(Number) as number },
+      'The opposing Tyranitar can no longer escape!',
+    ])
+    expect(fallbacksOf(...lines)).toEqual([])
+  })
+})
