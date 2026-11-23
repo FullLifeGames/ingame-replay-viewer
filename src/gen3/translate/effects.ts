@@ -5,7 +5,11 @@
 // are a line each; a silent one the stream has no state for is a mechanic fallback. The log puts
 // Destiny Bond's line before both faints; the game says it after the holder's faint, then drains
 // the attacker's bar (`BattleScript_DestinyBondTakesLife`), so the line waits for that faint. A
-// perish count at 0 drains the bar after its line (`BattleScript_PerishSongTakesLife`).
+// perish count at 0 drains the bar after its line (`BattleScript_PerishSongTakesLife`). Pursuit's
+// activation shows nothing (`PURSUIT`). Transform says the species its user turned into
+// (`BattleScript_EffectTransform`). The MOVE op's animation turns the sprite into the target's
+// species, read from its party mon; nothing sets the transform volatiles, so a shiny target's copy
+// takes the plain colours, a mechanic fallback.
 import { toID } from '@pkmn/dex'
 
 import type { PokemonRef } from '../../script/types'
@@ -17,6 +21,7 @@ import {
   effectEnded,
   effectStarted,
   singleTurn as lastsTheTurn,
+  transformed,
 } from '../text/phrases-effects'
 import { type Context, type EventOf, sameMon } from './context'
 import { hit, hitLines } from './hits'
@@ -24,8 +29,22 @@ import { bar, drain, isSubstituteCost } from './hp'
 
 const VOLATILES: Partial<Readonly<Record<string, Volatile>>> = { substitute: 'substitute' }
 
+/**
+ * Starts the expansion shows as the move alone: Bide's first turn plays its animation and says
+ * nothing (`BattleScript_SetUpBide`); its later turns say their lines.
+ */
+const SILENT_STARTS: ReadonlySet<string> = new Set(['bide'])
+
 const DESTINY_BOND = 'destinybond'
 const PERISH_ZERO = 'perish0'
+
+/**
+ * Pursuit on a Pokémon that switches out: the game says "X, come back!" (`STRINGID_RETURNMON`,
+ * `BattleScript_ActionSwitch`) before the hit. Our withdraw says it at the switch after the hit,
+ * and not at all when the hit knocks the Pokémon out (the log then sends the next one in after
+ * the faint). The activation shows nothing and names the mechanic.
+ */
+const PURSUIT = 'pursuit'
 
 const SINGLE_TURN_ANIM: Partial<Readonly<Record<string, Anim>>> = {
   focuspunch: 'focusPunchSetup',
@@ -39,14 +58,16 @@ export function effectStart(event: EventOf<'effectStart'>, ctx: Context): void {
   }
   const cost = ctx.near(1)
   if (cost?.kind === 'damage' && isSubstituteCost(event, cost)) bar(cost, ctx)
-  if (!event.silent) startLine(event, ctx)
+  const silent = event.silent ?? SILENT_STARTS.has(toID(effect.name))
+  if (!silent) startLine(event, ctx)
   else if (volatile === undefined) ctx.note(line, mechanicGap(effect.name, 'starting'))
 }
 
 /** The line of an effect that starts; a perish count at 0 then drains the bar. */
 function startLine(event: EventOf<'effectStart'>, ctx: Context): void {
   const { who, effect, line } = event
-  ctx.print(line, effectStarted(ctx.mon(who), effect, event.source && ctx.mon(event.source)))
+  const source = event.source && ctx.mon(event.source)
+  ctx.print(line, effectStarted(ctx.mon(who), effect, source, event.detail))
   if (toID(effect.name) === PERISH_ZERO) drain(who, line, ctx)
 }
 
@@ -80,6 +101,10 @@ function substituteBreaks(event: EventOf<'effectEnd'>, ctx: Context): void {
 /** A substitute that takes a hit (`[damage]`) plays the hit first; any other effect is a line. */
 export function effectActivate(event: EventOf<'effectActivate'>, ctx: Context): void {
   const { who, effect, line } = event
+  if (toID(effect.name) === PURSUIT) {
+    ctx.note(line, mechanicGap(effect.name, 'acting'))
+    return
+  }
   if (who !== undefined && takesDown(event, who, ctx)) {
     ctx.takenDown = { ...event, who }
     return
@@ -106,6 +131,12 @@ export function takeDown(who: PokemonRef, line: number, ctx: Context): void {
   ctx.takenDown = undefined
   ctx.print(held.line, effectActivated(ctx.mon(held.who), held.effect))
   drain(who, line, ctx)
+}
+
+export function transform({ who, into, line }: EventOf<'transform'>, ctx: Context): void {
+  const target = ctx.revealed(into)
+  ctx.print(line, transformed(ctx.mon(who), target.species))
+  if (target.shiny) ctx.note(line, mechanicGap('Transform', "copying the target's shiny colours"))
 }
 
 export function singleTurn({ who, effect, line }: EventOf<'singleTurn'>, ctx: Context): void {

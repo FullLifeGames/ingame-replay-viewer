@@ -1,0 +1,78 @@
+// The battle script's events for the effects on one Pokémon, items and abilities. `events.ts`
+// holds the other events and the union of them all.
+
+import type { Caused, Hit } from './events'
+import type { Effect, PokemonRef } from './types'
+
+export interface EffectStartEvent extends Caused {
+  readonly kind: 'effectStart'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly effect: Effect
+  /** What the effect names beside it, such as the move Disable disabled. */
+  readonly detail?: string
+  readonly silent?: true
+}
+
+/** A Substitute that breaks is a hit. */
+export interface EffectEndEvent extends Caused, Hit {
+  readonly kind: 'effectEnd'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly effect: Effect
+  readonly silent?: true
+}
+
+/**
+ * A Substitute that takes a hit is one (`[damage]`). Splash's `|-nothing` is one on no Pokémon:
+ * the parser reads it as `-activate||move: Splash`, and the game says "But nothing happened!".
+ */
+export interface EffectActivateEvent extends Hit {
+  readonly kind: 'effectActivate'
+  readonly line: number
+  readonly who?: PokemonRef
+  readonly effect: Effect
+  readonly damage?: true
+}
+
+/** `who` turns into a copy of `into` (Transform). */
+export interface TransformEvent {
+  readonly kind: 'transform'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly into: PokemonRef
+}
+
+/** An effect that lasts the turn: Protect, Endure, Focus Punch's focus. */
+export interface SingleTurnEvent {
+  readonly kind: 'singleTurn'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly effect: Effect
+}
+
+export interface ItemEvent extends Caused {
+  readonly kind: 'item'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly item: string
+}
+
+export interface ItemEndEvent extends Caused {
+  readonly kind: 'itemEnd'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly item: string
+  /** A berry eaten (`[eat]`). */
+  readonly eaten?: true
+  readonly silent?: true
+}
+
+export interface AbilityEvent extends Caused {
+  readonly kind: 'ability'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly ability: string
+  /** What the ability did, such as `boost` for Intimidate. */
+  readonly detail?: string
+}

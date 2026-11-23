@@ -1,8 +1,10 @@
 // npm run rom:shots [-- <name>...] (#7, plan section 7): plays streams in the built ROM from boot
 // to END in headless mGBA and checks named scenes in its frames. A name is a test replay id (its
 // stream comes from the Gen 3 game backend; 994052 when no name is given, S2a D5) or hand-made (a
-// short battle written with the stream encoder). Two refusal runs follow: the built ROM's empty
-// slot (refused as EMPTY) and the hand-made stream with an unknown version (refused as VERSION).
+// short battle written with the stream encoder). When hand-made is named, hand-made-b follows it:
+// the same stream with B held from the frame after END, which must keep the last scene (#30). Two
+// refusal runs follow: the built ROM's empty slot (refused as EMPTY) and the hand-made stream with
+// an unknown version (refused as VERSION).
 // Frames, the ROMs and report.json go to build/rom/shots/. Needs a ROM from npm run rom:build and
 // libmgba-dev.
 import { createHash } from 'node:crypto'
@@ -83,7 +85,22 @@ export interface StreamPlan {
   expect: Expected
 }
 
-interface RunPlan extends StreamPlan {
+/** A stream plan as the shot tool plays it: mGBA can press B, the WebAssembly module cannot. */
+export interface ShotPlan extends StreamPlan {
+  /** Hold B from this many frames after END to the run's end. */
+  holdBFromEnd?: number
+}
+
+const HELD_B = `${HAND_MADE}-b`
+
+/** The plans with hand-made-b after hand-made: B held from the frame after END (#30). */
+export function withHeldB(plans: readonly StreamPlan[]): ShotPlan[] {
+  return plans.flatMap((plan) =>
+    plan.name === HAND_MADE ? [plan, { ...plan, name: HELD_B, holdBFromEnd: 1 }] : [plan],
+  )
+}
+
+interface RunPlan extends ShotPlan {
   /** The ROM bytes, or undefined for the built ROM as it is. */
   rom: Uint8Array | undefined
 }
@@ -171,7 +188,7 @@ async function planRuns(
   names: readonly string[],
   layout: ProgressLayout,
 ): Promise<RunPlan[]> {
-  const plans = await planStreams(names, layout)
+  const plans = withHeldB(await planStreams(names, layout))
   const { rom, description } = readBuiltRom(paths)
   return plans.map((plan) => ({
     ...plan,
@@ -210,6 +227,7 @@ function playRun(context: Context, plan: RunPlan): RunReport {
     address: context.address,
     frameDir,
     shots: shotArgs(plan.scenes),
+    ...(plan.holdBFromEnd === undefined ? {} : { holdBFromEnd: plan.holdBFromEnd }),
   })
   const seconds = Math.round((performance.now() - start) / 100) / 10
   return reportRun({ plan, output, frames: readFrames(frameDir), errors: context.errors, seconds })

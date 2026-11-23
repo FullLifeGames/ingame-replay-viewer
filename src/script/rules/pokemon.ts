@@ -1,4 +1,4 @@
-// Rules for the lines about one Pokémon: switches, drags, faints, HP, status and stat changes.
+// Rules for the lines about one Pokémon: switches, drags, faints, HP, status and stat stages.
 
 import type { Pokemon } from '@pkmn/client'
 
@@ -84,6 +84,22 @@ function statChange({ line, args, kwArgs, battle }: RuleInput<StatKey>): ScriptE
   return [{ kind: 'statChange', line, who, stat, stages: sign * stages, ...cause }]
 }
 
+/**
+ * A stage set outright (Belly Drum) changes the stat by the stages from the one before the line,
+ * which `before` keeps, to the line's number; no change is a stat at its limit.
+ */
+function statSet({ line, args, kwArgs, battle, before }: RuleInput<'|-setboost|'>): ScriptEvent[] {
+  const [, ident, stat, amount] = args
+  const who = refOf(battle, ident, line)
+  const cause = kwArgs.from ? { cause: effectOf(kwArgs.from) } : {}
+  const set = numberOf(amount, line)
+  const stages = set - (before.boosts[who.side][stat] ?? 0)
+  if (stages === 0) {
+    return [{ kind: 'statLimit', line, who, stat, direction: set < 0 ? 'down' : 'up', ...cause }]
+  }
+  return [{ kind: 'statChange', line, who, stat, stages, ...cause }]
+}
+
 export const POKEMON_RULES = {
   '|switch|': { arity: 3, reads: ['from'], build: switchIn },
   '|drag|': { arity: 3, reads: [], build: switchIn },
@@ -143,4 +159,7 @@ export const POKEMON_RULES = {
   },
   '|-boost|': { arity: 3, reads: ['from'], build: statChange },
   '|-unboost|': { arity: 3, reads: ['from'], build: statChange },
+  '|-setboost|': { arity: 3, reads: ['from'], build: statSet },
+  // Haze: the line names no Pokémon; the client resets the stages of every active one.
+  '|-clearallboost|': { arity: 0, reads: [], build: ({ line }) => [{ kind: 'statReset', line }] },
 } satisfies Rules

@@ -9,6 +9,8 @@
 // (patch 0001), and each frame it runs one step of the current instruction.
 
 // Why the interpreter refuses a stream. It checks the whole stream before a battle starts.
+// REPLAY_ERROR_ORDER stays last: the refusal texts (replay_refusal.c), their STATIC_ASSERT and
+// their test count the codes up to it.
 enum ReplayError
 {
     REPLAY_ERROR_NONE,

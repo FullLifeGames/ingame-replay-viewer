@@ -10,7 +10,12 @@ describe('the player rule', () => {
       args: ['player', 'p2'] as const,
       kwArgs: {},
       battle: newBattle(),
-      before: { active: { near: null, far: null }, weather: undefined, players: {} },
+      before: {
+        active: { near: null, far: null },
+        boosts: { near: {}, far: {} },
+        weather: undefined,
+        players: {},
+      },
     }
 
     expect(() => BATTLE_RULES['|player|'].build(input)).toThrow(/^line 4: /)

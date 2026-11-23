@@ -4,11 +4,13 @@ import { readReplay } from '../script/replay'
 import { FIRST_REPLAY, TEST_REPLAYS } from './replays'
 
 describe('TEST_REPLAYS', () => {
-  it('lists the six test replays, 994052 first', () => {
+  it('lists the eight test replays, 994052 first', () => {
     expect(FIRST_REPLAY).toBe('smogtours-gen3ou-994052')
     expect(TEST_REPLAYS.map(({ id }) => id)).toEqual([
       'smogtours-gen3ou-994052',
       'gen3ou-2717564545',
+      'smogtours-gen1ou-995161',
+      'smogtours-gen2ou-993907',
       'smogtours-gen3ou-994086',
       'smogtours-gen3ou-994128',
       'smogtours-gen3ou-994141',

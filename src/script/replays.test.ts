@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { buildBattleScript } from './build'
+import { NAMED_KINDS } from './census'
 import type { BattleScript } from './events'
 import { readLines } from './lines'
 import { REPLAYS } from './testing'
+import type { DroppedLine } from './types'
 
 const replays = REPLAYS.map(({ id, log }) => ({ id, log, script: buildBattleScript(log) }))
 
@@ -15,6 +17,16 @@ function ownLines(script: BattleScript): Set<number> {
 /** The lines the events folded, once per fold, so a line folded twice shows twice. */
 function foldedLines(script: BattleScript): number[] {
   return script.events.flatMap((event) => ('folded' in event ? (event.folded ?? []) : []))
+}
+
+/**
+ * A line of a kind the named list keeps as "no rule yet" (#60): it may stand in a test replay as
+ * an `unsupported` drop, since the list gives its reason. Every other such drop fails.
+ */
+function isNamedGap({ reason, detail }: DroppedLine): boolean {
+  const kind = /^no rule for (\|.+\|)$/.exec(detail ?? '')?.[1]
+  const named = Object.entries(NAMED_KINDS).find(([key]) => key === kind)?.[1]
+  return reason === 'unsupported' && named?.group === 'no rule yet'
 }
 
 function isSorted(numbers: readonly number[]): boolean {
@@ -51,7 +63,7 @@ describe.each(replays)('the battle script of $id', ({ id, log, script }) => {
 
   it('has no line it cannot show', () => {
     const failing = script.dropped.filter(
-      ({ reason }) => reason === 'unknown' || reason === 'unsupported',
+      (drop) => (drop.reason === 'unknown' || drop.reason === 'unsupported') && !isNamedGap(drop),
     )
 
     expect(failing, `lines it cannot show:\n${failing.map(({ text }) => text).join('\n')}`).toEqual(

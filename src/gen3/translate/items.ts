@@ -3,9 +3,11 @@
 // gone is said, then cleared. An eaten berry shows its pop-up and plays its animation instead
 // (`BattleScript_ItemPopUp_Scripting`, then `B_ANIM_HELD_ITEM_BERRY` in
 // `BattleScript_BerryCureStatusRet`, `BattleScript_ItemHealHP_RemoveBerry` and
-// `BattleScript_ConsumableBerryStatRaise`); the cure or heal after it names the berry. An item the
+// `BattleScript_ConsumableBerryStatRaise`); the cure or heal after it names the berry. An item
+// used for the stat change the next line makes, such as Berserk Gene, shows its pop-up and plays
+// the held item animation (`BattleScript_BerserkGene`); the change names the item. An item the
 // expansion lacks is text alone (plan §4) and shows no pop-up.
-import { toID } from '@pkmn/dex'
+import { Dex, toID } from '@pkmn/dex'
 
 import type { PokemonRef } from '../../script/types'
 import { itemOf } from '../tables/lookup'
@@ -73,12 +75,17 @@ export function item(event: EventOf<'item'>, ctx: Context): void {
   ctx.print(line, itemShown(ctx.mon(who), event.item, cause, source && ctx.mon(source)))
 }
 
+/** An item used up, neither eaten nor taken, that @pkmn gives stat changes (`boosts`). */
+const usedForBoosts = ({ item, cause, eaten, silent }: EventOf<'itemEnd'>) =>
+  !eaten && !silent && cause === undefined && Boolean(Dex.items.get(item).boosts)
+
 export function itemEnd(event: EventOf<'itemEnd'>, ctx: Context): void {
   const { who, cause, source, line } = event
   const number = heldItem(ctx, line, event.item)
-  if (event.eaten) {
+  if (event.eaten || usedForBoosts(event)) {
     showPopUp(who, event.item, line, ctx)
-    ctx.emit(line, { op: 'anim', side: ctx.activeSide(who), anim: 'heldItemBerry' })
+    const anim = event.eaten ? 'heldItemBerry' : 'heldItemEffect'
+    ctx.emit(line, { op: 'anim', side: ctx.activeSide(who), anim })
   } else if (!event.silent) {
     ctx.print(line, itemRemoved(ctx.mon(who), event.item, cause, source && ctx.mon(source)))
   }

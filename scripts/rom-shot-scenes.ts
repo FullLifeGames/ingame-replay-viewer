@@ -276,11 +276,13 @@ export function missingScenes(stream: Stream): string[] {
 }
 
 /**
- * A refused stream: the tool's last frame shows the refusal screen, one colour (CB2_ReplayRefused
- * in rom/gen3/src/replay_boot.c; the colour comes from replay_progress.h through readProgressLayout).
+ * A refused stream: the tool's last frame shows the refusal screen, its reason in text on the
+ * refusal colour (CB2_ReplayRefused in rom/gen3/src/replay_boot.c, #30; the colour comes from
+ * replay_progress.h through readProgressLayout). The probe needs no place for the text: the colour
+ * must cover most of the screen, and the text's pixels stand on it.
  */
 export function refusalScenes(colour: number): Scene[] {
-  const check: Check = { probe: 'blank', shot: 'final', region: SCREEN.screen, colour }
+  const check: Check = { probe: 'text', shot: 'final', region: SCREEN.screen, background: colour }
   return [{ name: 'refused', shots: [], check }]
 }
 

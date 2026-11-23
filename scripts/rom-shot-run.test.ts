@@ -95,6 +95,20 @@ describe('the shot tool', () => {
     expect(toolArgs(run)).toEqual(['r.gba', '0x10', 'f', ...clock, '--state-every', '60'])
   })
 
+  it('holds B from N frames after END only for a run that asks for it (#30)', () => {
+    const run = { tool: 't', rom: 'r.gba', address: 16, frameDir: 'f', shots: ['a:1:2'] }
+    expect(toolArgs({ ...run, holdBFromEnd: 1 })).toEqual([
+      'r.gba',
+      '0x10',
+      'f',
+      ...clock,
+      '--hold-b-from-end',
+      '1',
+      'a:1:2',
+    ])
+    expect(toolArgs(run)).not.toContain('--hold-b-from-end')
+  })
+
   it("fixes mGBA's cartridge clock at the module's time, so that two runs play alike", () => {
     const stubs = readFileSync(join(ROM_DIR, 'wasm', 'src', 'irv_wasm_stubs.c'), 'utf8')
     const fixed = /sFixedTime =\s*\{([^}]*)\}/.exec(stubs)?.[1] ?? ''
@@ -178,9 +192,9 @@ describe('judging a run', () => {
       shots: [],
       status: { status: 'error', frame: 44, done: 0, total: 0, turn: 0, error: 2 },
     }
-    const scenes = [{ name: 'refused', pass: false, detail: 'one colour, 0xffffff, not 0x630000' }]
+    const scenes = [{ name: 'refused', pass: false, detail: '0 text pixels on 0x630000' }]
     expect(judgeRun({ expect: 'VERSION', output, scenes, errors: ERRORS })).toEqual([
-      'scene refused: one colour, 0xffffff, not 0x630000',
+      'scene refused: 0 text pixels on 0x630000',
     ])
   })
 })

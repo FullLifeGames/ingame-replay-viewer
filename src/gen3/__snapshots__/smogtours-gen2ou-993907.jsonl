@@ -1,0 +1,1558 @@
+{"length":19026,"crc32":"8ac42eb4","trainers":{"near":{"name":"dark premonitions","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"tylerkehne","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":243,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Raikou"},{"species":145,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zapdos"},{"species":91,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Cloyster"},{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"},{"species":94,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gengar"},{"species":143,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Snorlax"}],"far":[{"species":103,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Exeggutor"},{"species":143,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Snorlax"},{"species":145,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zapdos"},{"species":94,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gengar"},{"species":205,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Forretress"},{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"}]}}
+{"line":20,"op":"intro"}
+{"line":20,"op":"print","text":"You are challenged by tylerkehne!"}
+{"line":22,"op":"print","text":"tylerkehne sent out Exeggutor!"}
+{"line":22,"op":"sendOut","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":21,"op":"print","text":"Go! Raikou!"}
+{"line":21,"op":"sendOut","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":23,"op":"turn","number":1}
+{"line":27,"op":"print","text":"Raikou, come back!"}
+{"line":27,"op":"withdraw","side":"near"}
+{"line":27,"op":"print","text":"Go! Zapdos!"}
+{"line":27,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":28,"op":"print","text":"tylerkehne withdrew Exeggutor!"}
+{"line":28,"op":"withdraw","side":"far"}
+{"line":28,"op":"print","text":"tylerkehne sent out Snorlax!"}
+{"line":28,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":31,"op":"turn","number":2}
+{"line":34,"op":"print","text":"Zapdos used Reflect!"}
+{"line":34,"op":"move","user":"near","target":"near","move":115}
+{"line":35,"op":"print","text":"Reflect made your side stronger against physical moves!"}
+{"line":36,"op":"print","text":"The opposing Snorlax used Double-Edge!"}
+{"line":36,"op":"move","user":"far","target":"near","move":38}
+{"line":37,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":37,"op":"hp","side":"near","hp":78}
+{"line":38,"op":"hp","side":"far","hp":97}
+{"line":38,"op":"print","text":"The opposing Snorlax was damaged by the recoil!"}
+{"line":40,"op":"itemPopUp","side":"near","item":472}
+{"line":40,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":40,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":40,"op":"hp","side":"near","hp":84}
+{"line":41,"op":"itemPopUp","side":"far","item":472}
+{"line":41,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":41,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":41,"op":"hp","side":"far","hp":100}
+{"line":43,"op":"turn","number":3}
+{"line":46,"op":"print","text":"Zapdos, come back!"}
+{"line":46,"op":"withdraw","side":"near"}
+{"line":46,"op":"print","text":"Go! Cloyster!"}
+{"line":46,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":47,"op":"print","text":"tylerkehne withdrew Snorlax!"}
+{"line":47,"op":"withdraw","side":"far"}
+{"line":47,"op":"print","text":"tylerkehne sent out Zapdos!"}
+{"line":47,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":50,"op":"turn","number":4}
+{"line":53,"op":"print","text":"tylerkehne withdrew Zapdos!"}
+{"line":53,"op":"withdraw","side":"far"}
+{"line":53,"op":"print","text":"tylerkehne sent out Exeggutor!"}
+{"line":53,"op":"switchIn","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":54,"op":"print","text":"Cloyster, come back!"}
+{"line":54,"op":"withdraw","side":"near"}
+{"line":54,"op":"print","text":"Go! Raikou!"}
+{"line":54,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":57,"op":"turn","number":5}
+{"line":60,"op":"print","text":"Raikou used Hidden Power!"}
+{"line":60,"op":"move","user":"near","target":"far","move":237}
+{"line":62,"op":"hit","side":"far","effectiveness":"super"}
+{"line":62,"op":"hp","side":"far","hp":62}
+{"line":62,"op":"print","text":"It's super effective!"}
+{"line":63,"op":"print","text":"The opposing Exeggutor used Sleep Powder!"}
+{"line":63,"op":"move","user":"far","target":"near","move":79}
+{"line":64,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":64,"op":"print","text":"Raikou fell asleep!"}
+{"line":64,"op":"status","side":"near","slot":0,"status":"slp"}
+{"line":66,"op":"itemPopUp","side":"far","item":472}
+{"line":66,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":66,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":66,"op":"hp","side":"far","hp":68}
+{"line":68,"op":"turn","number":6}
+{"line":71,"op":"print","text":"Raikou is fast asleep."}
+{"line":71,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":72,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":72,"op":"move","user":"near","target":"near","move":214}
+{"line":73,"op":"print","text":"Raikou used Hidden Power!"}
+{"line":73,"op":"move","user":"near","target":"far","move":237}
+{"line":75,"op":"hit","side":"far","effectiveness":"super"}
+{"line":75,"op":"hp","side":"far","hp":28}
+{"line":75,"op":"print","text":"It's super effective!"}
+{"line":76,"op":"print","text":"The opposing Exeggutor used Psychic!"}
+{"line":76,"op":"move","user":"far","target":"near","move":94}
+{"line":77,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":77,"op":"hp","side":"near","hp":69}
+{"line":79,"op":"itemPopUp","side":"near","item":472}
+{"line":79,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":79,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":79,"op":"hp","side":"near","hp":75}
+{"line":80,"op":"itemPopUp","side":"far","item":472}
+{"line":80,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":80,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":80,"op":"hp","side":"far","hp":34}
+{"line":81,"op":"print","text":"Your side's Reflect wore off!"}
+{"line":83,"op":"turn","number":7}
+{"line":86,"op":"print","text":"Raikou, come back!"}
+{"line":86,"op":"withdraw","side":"near"}
+{"line":86,"op":"print","text":"Go! Tyranitar!"}
+{"line":86,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":87,"op":"print","text":"tylerkehne withdrew Exeggutor!"}
+{"line":87,"op":"withdraw","side":"far"}
+{"line":87,"op":"print","text":"tylerkehne sent out Snorlax!"}
+{"line":87,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":90,"op":"turn","number":8}
+{"line":93,"op":"print","text":"Tyranitar, come back!"}
+{"line":93,"op":"withdraw","side":"near"}
+{"line":93,"op":"print","text":"Go! Cloyster!"}
+{"line":93,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":94,"op":"print","text":"The opposing Snorlax used Earthquake!"}
+{"line":94,"op":"move","user":"far","target":"near","move":89}
+{"line":95,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":95,"op":"hp","side":"near","hp":81}
+{"line":97,"op":"itemPopUp","side":"near","item":472}
+{"line":97,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":97,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":97,"op":"hp","side":"near","hp":87}
+{"line":99,"op":"turn","number":9}
+{"line":102,"op":"print","text":"tylerkehne withdrew Snorlax!"}
+{"line":102,"op":"withdraw","side":"far"}
+{"line":102,"op":"print","text":"tylerkehne sent out Exeggutor!"}
+{"line":102,"op":"switchIn","side":"far","slot":0,"hp":34,"status":"none"}
+{"line":103,"op":"print","text":"Cloyster used Spikes!"}
+{"line":103,"op":"move","user":"near","target":"far","move":191}
+{"line":104,"op":"print","text":"Spikes were scattered on the ground all around the opposing side!"}
+{"line":106,"op":"itemPopUp","side":"near","item":472}
+{"line":106,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":106,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":106,"op":"hp","side":"near","hp":93}
+{"line":107,"op":"itemPopUp","side":"far","item":472}
+{"line":107,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":107,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":107,"op":"hp","side":"far","hp":40}
+{"line":109,"op":"turn","number":10}
+{"line":112,"op":"print","text":"Cloyster, come back!"}
+{"line":112,"op":"withdraw","side":"near"}
+{"line":112,"op":"print","text":"Go! Tyranitar!"}
+{"line":112,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":113,"op":"print","text":"The opposing Exeggutor used Giga Drain!"}
+{"line":113,"op":"move","user":"far","target":"near","move":202}
+{"line":115,"op":"hit","side":"near","effectiveness":"super"}
+{"line":115,"op":"hp","side":"near","hp":58}
+{"line":115,"op":"print","text":"It's super effective!"}
+{"line":116,"op":"hp","side":"far","hp":62}
+{"line":116,"op":"print","text":"Tyranitar had its energy drained!"}
+{"line":118,"op":"itemPopUp","side":"near","item":472}
+{"line":118,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":118,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":118,"op":"hp","side":"near","hp":65}
+{"line":119,"op":"itemPopUp","side":"far","item":472}
+{"line":119,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":119,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":119,"op":"hp","side":"far","hp":68}
+{"line":121,"op":"turn","number":11}
+{"line":124,"op":"print","text":"Tyranitar used Fire Blast!"}
+{"line":124,"op":"move","user":"near","target":"far","move":126}
+{"line":126,"op":"hit","side":"far","effectiveness":"super"}
+{"line":126,"op":"hp","side":"far","hp":3}
+{"line":126,"op":"print","text":"It's super effective!"}
+{"line":127,"op":"print","text":"The opposing Exeggutor used Giga Drain!"}
+{"line":127,"op":"move","user":"far","target":"near","move":202}
+{"line":129,"op":"hit","side":"near","effectiveness":"super"}
+{"line":129,"op":"hp","side":"near","hp":21}
+{"line":129,"op":"print","text":"It's super effective!"}
+{"line":130,"op":"hp","side":"far","hp":25}
+{"line":130,"op":"print","text":"Tyranitar had its energy drained!"}
+{"line":132,"op":"itemPopUp","side":"near","item":472}
+{"line":132,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":132,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":132,"op":"hp","side":"near","hp":27}
+{"line":133,"op":"itemPopUp","side":"far","item":472}
+{"line":133,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":133,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":133,"op":"hp","side":"far","hp":31}
+{"line":135,"op":"turn","number":12}
+{"line":140,"op":"print","text":"Tyranitar used Pursuit!"}
+{"line":140,"op":"move","user":"near","target":"far","move":228}
+{"line":142,"op":"hit","side":"far","effectiveness":"super"}
+{"line":142,"op":"hp","side":"far","hp":0}
+{"line":142,"op":"print","text":"It's super effective!"}
+{"line":143,"op":"faint","side":"far"}
+{"line":143,"op":"print","text":"The opposing Exeggutor fainted!"}
+{"line":145,"op":"print","text":"tylerkehne sent out Snorlax!"}
+{"line":145,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":146,"op":"hp","side":"far","hp":88}
+{"line":146,"op":"print","text":"The opposing Snorlax was hurt by the spikes!"}
+{"line":148,"op":"itemPopUp","side":"near","item":472}
+{"line":148,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":148,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":148,"op":"hp","side":"near","hp":34}
+{"line":149,"op":"itemPopUp","side":"far","item":472}
+{"line":149,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":149,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":149,"op":"hp","side":"far","hp":94}
+{"line":151,"op":"turn","number":13}
+{"line":155,"op":"print","text":"Tyranitar, come back!"}
+{"line":155,"op":"withdraw","side":"near"}
+{"line":155,"op":"print","text":"Go! Cloyster!"}
+{"line":155,"op":"switchIn","side":"near","slot":2,"hp":93,"status":"none"}
+{"line":156,"op":"print","text":"The opposing Snorlax used Double-Edge!"}
+{"line":156,"op":"move","user":"far","target":"near","move":38}
+{"line":157,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":157,"op":"hp","side":"near","hp":60}
+{"line":158,"op":"hp","side":"far","hp":89}
+{"line":158,"op":"print","text":"The opposing Snorlax was damaged by the recoil!"}
+{"line":160,"op":"itemPopUp","side":"near","item":472}
+{"line":160,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":160,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":160,"op":"hp","side":"near","hp":66}
+{"line":161,"op":"itemPopUp","side":"far","item":472}
+{"line":161,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":161,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":161,"op":"hp","side":"far","hp":96}
+{"line":163,"op":"turn","number":14}
+{"line":167,"op":"print","text":"tylerkehne withdrew Snorlax!"}
+{"line":167,"op":"withdraw","side":"far"}
+{"line":167,"op":"print","text":"tylerkehne sent out Gengar!"}
+{"line":167,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":168,"op":"hp","side":"far","hp":88}
+{"line":168,"op":"print","text":"The opposing Gengar was hurt by the spikes!"}
+{"line":169,"op":"print","text":"Cloyster used Toxic!"}
+{"line":170,"op":"print","text":"It doesn't affect the opposing Gengar…"}
+{"line":172,"op":"itemPopUp","side":"far","item":472}
+{"line":172,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":172,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":172,"op":"hp","side":"far","hp":94}
+{"line":173,"op":"itemPopUp","side":"near","item":472}
+{"line":173,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":173,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":173,"op":"hp","side":"near","hp":71}
+{"line":175,"op":"turn","number":15}
+{"line":178,"op":"print","text":"tylerkehne withdrew Gengar!"}
+{"line":178,"op":"withdraw","side":"far"}
+{"line":178,"op":"print","text":"tylerkehne sent out Snorlax!"}
+{"line":178,"op":"switchIn","side":"far","slot":1,"hp":96,"status":"none"}
+{"line":179,"op":"hp","side":"far","hp":83}
+{"line":179,"op":"print","text":"The opposing Snorlax was hurt by the spikes!"}
+{"line":180,"op":"print","text":"Cloyster, come back!"}
+{"line":180,"op":"withdraw","side":"near"}
+{"line":180,"op":"print","text":"Go! Raikou!"}
+{"line":180,"op":"switchIn","side":"near","slot":0,"hp":75,"status":"slp"}
+{"line":182,"op":"itemPopUp","side":"near","item":472}
+{"line":182,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":182,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":182,"op":"hp","side":"near","hp":81}
+{"line":183,"op":"itemPopUp","side":"far","item":472}
+{"line":183,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":183,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":183,"op":"hp","side":"far","hp":89}
+{"line":185,"op":"turn","number":16}
+{"line":188,"op":"print","text":"Raikou, come back!"}
+{"line":188,"op":"withdraw","side":"near"}
+{"line":188,"op":"print","text":"Go! Cloyster!"}
+{"line":188,"op":"switchIn","side":"near","slot":2,"hp":71,"status":"none"}
+{"line":189,"op":"print","text":"The opposing Snorlax used Double-Edge!"}
+{"line":189,"op":"move","user":"far","target":"near","move":38}
+{"line":190,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":190,"op":"hp","side":"near","hp":40}
+{"line":191,"op":"hp","side":"far","hp":85}
+{"line":191,"op":"print","text":"The opposing Snorlax was damaged by the recoil!"}
+{"line":193,"op":"itemPopUp","side":"near","item":472}
+{"line":193,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":193,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":193,"op":"hp","side":"near","hp":46}
+{"line":194,"op":"itemPopUp","side":"far","item":472}
+{"line":194,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":194,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":194,"op":"hp","side":"far","hp":91}
+{"line":196,"op":"turn","number":17}
+{"line":199,"op":"print","text":"Cloyster, come back!"}
+{"line":199,"op":"withdraw","side":"near"}
+{"line":199,"op":"print","text":"Go! Gengar!"}
+{"line":199,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":200,"op":"print","text":"tylerkehne withdrew Snorlax!"}
+{"line":200,"op":"withdraw","side":"far"}
+{"line":200,"op":"print","text":"tylerkehne sent out Zapdos!"}
+{"line":200,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":203,"op":"turn","number":18}
+{"line":206,"op":"print","text":"Gengar, come back!"}
+{"line":206,"op":"withdraw","side":"near"}
+{"line":206,"op":"print","text":"Go! Raikou!"}
+{"line":206,"op":"switchIn","side":"near","slot":0,"hp":81,"status":"slp"}
+{"line":207,"op":"print","text":"The opposing Zapdos used Thunder!"}
+{"line":207,"op":"move","user":"far","target":"near","move":87}
+{"line":209,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":209,"op":"hp","side":"near","hp":59}
+{"line":209,"op":"print","text":"It's not very effective…"}
+{"line":211,"op":"itemPopUp","side":"near","item":472}
+{"line":211,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":211,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":211,"op":"hp","side":"near","hp":65}
+{"line":213,"op":"turn","number":19}
+{"line":217,"op":"print","text":"tylerkehne withdrew Zapdos!"}
+{"line":217,"op":"withdraw","side":"far"}
+{"line":217,"op":"print","text":"tylerkehne sent out Snorlax!"}
+{"line":217,"op":"switchIn","side":"far","slot":1,"hp":91,"status":"none"}
+{"line":218,"op":"hp","side":"far","hp":78}
+{"line":218,"op":"print","text":"The opposing Snorlax was hurt by the spikes!"}
+{"line":219,"op":"print","text":"Raikou is fast asleep."}
+{"line":219,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":220,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":220,"op":"move","user":"near","target":"near","move":214}
+{"line":221,"op":"print","text":"Raikou used Rest!"}
+{"line":221,"op":"move","user":"near","target":"near","move":156}
+{"line":222,"op":"print","text":"Raikou slept and restored its HP!"}
+{"line":222,"op":"status","side":"near","slot":0,"status":"slp"}
+{"line":223,"op":"hp","side":"near","hp":100}
+{"line":225,"op":"itemPopUp","side":"far","item":472}
+{"line":225,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":225,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":225,"op":"hp","side":"far","hp":84}
+{"line":227,"op":"turn","number":20}
+{"line":230,"op":"print","text":"Raikou, come back!"}
+{"line":230,"op":"withdraw","side":"near"}
+{"line":230,"op":"print","text":"Go! Cloyster!"}
+{"line":230,"op":"switchIn","side":"near","slot":2,"hp":46,"status":"none"}
+{"line":231,"op":"print","text":"The opposing Snorlax used Earthquake!"}
+{"line":231,"op":"move","user":"far","target":"near","move":89}
+{"line":232,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":232,"op":"hp","side":"near","hp":26}
+{"line":234,"op":"itemPopUp","side":"near","item":472}
+{"line":234,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":234,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":234,"op":"hp","side":"near","hp":32}
+{"line":235,"op":"itemPopUp","side":"far","item":472}
+{"line":235,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":235,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":235,"op":"hp","side":"far","hp":91}
+{"line":237,"op":"turn","number":21}
+{"line":241,"op":"print","text":"Cloyster, come back!"}
+{"line":241,"op":"withdraw","side":"near"}
+{"line":241,"op":"print","text":"Go! Zapdos!"}
+{"line":241,"op":"switchIn","side":"near","slot":1,"hp":84,"status":"none"}
+{"line":242,"op":"print","text":"tylerkehne withdrew Snorlax!"}
+{"line":242,"op":"withdraw","side":"far"}
+{"line":242,"op":"print","text":"tylerkehne sent out Gengar!"}
+{"line":242,"op":"switchIn","side":"far","slot":3,"hp":94,"status":"none"}
+{"line":243,"op":"hp","side":"far","hp":82}
+{"line":243,"op":"print","text":"The opposing Gengar was hurt by the spikes!"}
+{"line":245,"op":"itemPopUp","side":"far","item":472}
+{"line":245,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":245,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":245,"op":"hp","side":"far","hp":88}
+{"line":246,"op":"itemPopUp","side":"near","item":472}
+{"line":246,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":246,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":246,"op":"hp","side":"near","hp":90}
+{"line":248,"op":"turn","number":22}
+{"line":252,"op":"print","text":"Zapdos, come back!"}
+{"line":252,"op":"withdraw","side":"near"}
+{"line":252,"op":"print","text":"Go! Raikou!"}
+{"line":252,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"slp"}
+{"line":253,"op":"print","text":"The opposing Gengar used Ice Punch!"}
+{"line":253,"op":"move","user":"far","target":"near","move":8}
+{"line":254,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":254,"op":"hp","side":"near","hp":81}
+{"line":256,"op":"itemPopUp","side":"near","item":472}
+{"line":256,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":256,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":256,"op":"hp","side":"near","hp":87}
+{"line":257,"op":"itemPopUp","side":"far","item":472}
+{"line":257,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":257,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":257,"op":"hp","side":"far","hp":94}
+{"line":259,"op":"turn","number":23}
+{"line":262,"op":"print","text":"Raikou, come back!"}
+{"line":262,"op":"withdraw","side":"near"}
+{"line":262,"op":"print","text":"Go! Zapdos!"}
+{"line":262,"op":"switchIn","side":"near","slot":1,"hp":90,"status":"none"}
+{"line":263,"op":"print","text":"tylerkehne withdrew Gengar!"}
+{"line":263,"op":"withdraw","side":"far"}
+{"line":263,"op":"print","text":"tylerkehne sent out Snorlax!"}
+{"line":263,"op":"switchIn","side":"far","slot":1,"hp":91,"status":"none"}
+{"line":264,"op":"hp","side":"far","hp":78}
+{"line":264,"op":"print","text":"The opposing Snorlax was hurt by the spikes!"}
+{"line":266,"op":"itemPopUp","side":"near","item":472}
+{"line":266,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":266,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":266,"op":"hp","side":"near","hp":96}
+{"line":267,"op":"itemPopUp","side":"far","item":472}
+{"line":267,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":267,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":267,"op":"hp","side":"far","hp":84}
+{"line":269,"op":"turn","number":24}
+{"line":272,"op":"print","text":"tylerkehne withdrew Snorlax!"}
+{"line":272,"op":"withdraw","side":"far"}
+{"line":272,"op":"print","text":"tylerkehne sent out Zapdos!"}
+{"line":272,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":273,"op":"print","text":"Zapdos used Reflect!"}
+{"line":273,"op":"move","user":"near","target":"near","move":115}
+{"line":274,"op":"print","text":"Reflect made your side stronger against physical moves!"}
+{"line":276,"op":"itemPopUp","side":"near","item":472}
+{"line":276,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":276,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":276,"op":"hp","side":"near","hp":100}
+{"line":278,"op":"turn","number":25}
+{"line":281,"op":"print","text":"Zapdos, come back!"}
+{"line":281,"op":"withdraw","side":"near"}
+{"line":281,"op":"print","text":"Go! Raikou!"}
+{"line":281,"op":"switchIn","side":"near","slot":0,"hp":87,"status":"slp"}
+{"line":282,"op":"print","text":"The opposing Zapdos used Thunder!"}
+{"line":283,"op":"print","text":"Raikou avoided the attack!"}
+{"line":285,"op":"itemPopUp","side":"near","item":472}
+{"line":285,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":285,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":285,"op":"hp","side":"near","hp":93}
+{"line":287,"op":"turn","number":26}
+{"line":290,"op":"print","text":"Raikou is fast asleep."}
+{"line":290,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":291,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":291,"op":"move","user":"near","target":"near","move":214}
+{"line":292,"op":"print","text":"Raikou used Rest!"}
+{"line":292,"op":"move","user":"near","target":"near","move":156}
+{"line":293,"op":"print","text":"Raikou slept and restored its HP!"}
+{"line":293,"op":"status","side":"near","slot":0,"status":"slp"}
+{"line":294,"op":"hp","side":"near","hp":100}
+{"line":295,"op":"print","text":"The opposing Zapdos used Thunder!"}
+{"line":295,"op":"move","user":"far","target":"near","move":87}
+{"line":297,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":297,"op":"hp","side":"near","hp":78}
+{"line":297,"op":"print","text":"It's not very effective…"}
+{"line":299,"op":"itemPopUp","side":"near","item":472}
+{"line":299,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":299,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":299,"op":"hp","side":"near","hp":84}
+{"line":301,"op":"turn","number":27}
+{"line":304,"op":"print","text":"Raikou is fast asleep."}
+{"line":304,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":305,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":305,"op":"move","user":"near","target":"near","move":214}
+{"line":306,"op":"print","text":"Raikou used Rest!"}
+{"line":306,"op":"move","user":"near","target":"near","move":156}
+{"line":307,"op":"print","text":"Raikou slept and restored its HP!"}
+{"line":307,"op":"status","side":"near","slot":0,"status":"slp"}
+{"line":308,"op":"hp","side":"near","hp":100}
+{"line":309,"op":"print","text":"The opposing Zapdos used Thunder!"}
+{"line":310,"op":"print","text":"Raikou avoided the attack!"}
+{"line":313,"op":"turn","number":28}
+{"line":316,"op":"print","text":"tylerkehne withdrew Zapdos!"}
+{"line":316,"op":"withdraw","side":"far"}
+{"line":316,"op":"print","text":"tylerkehne sent out Snorlax!"}
+{"line":316,"op":"switchIn","side":"far","slot":1,"hp":84,"status":"none"}
+{"line":317,"op":"hp","side":"far","hp":72}
+{"line":317,"op":"print","text":"The opposing Snorlax was hurt by the spikes!"}
+{"line":318,"op":"print","text":"Raikou is fast asleep."}
+{"line":318,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":319,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":319,"op":"move","user":"near","target":"near","move":214}
+{"line":320,"op":"print","text":"Raikou used Hidden Power!"}
+{"line":320,"op":"move","user":"near","target":"far","move":237}
+{"line":321,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":321,"op":"hp","side":"far","hp":61}
+{"line":323,"op":"itemPopUp","side":"far","item":472}
+{"line":323,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":323,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":323,"op":"hp","side":"far","hp":67}
+{"line":324,"op":"print","text":"Your side's Reflect wore off!"}
+{"line":326,"op":"turn","number":29}
+{"line":329,"op":"print","text":"Raikou, come back!"}
+{"line":329,"op":"withdraw","side":"near"}
+{"line":329,"op":"print","text":"Go! Zapdos!"}
+{"line":329,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":330,"op":"print","text":"The opposing Snorlax used Earthquake!"}
+{"line":331,"op":"print","text":"It doesn't affect Zapdos…"}
+{"line":333,"op":"itemPopUp","side":"far","item":472}
+{"line":333,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":333,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":333,"op":"hp","side":"far","hp":73}
+{"line":335,"op":"turn","number":30}
+{"line":338,"op":"print","text":"tylerkehne withdrew Snorlax!"}
+{"line":338,"op":"withdraw","side":"far"}
+{"line":338,"op":"print","text":"tylerkehne sent out Zapdos!"}
+{"line":338,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":339,"op":"print","text":"Zapdos used Reflect!"}
+{"line":339,"op":"move","user":"near","target":"near","move":115}
+{"line":340,"op":"print","text":"Reflect made your side stronger against physical moves!"}
+{"line":343,"op":"turn","number":31}
+{"line":346,"op":"print","text":"Zapdos, come back!"}
+{"line":346,"op":"withdraw","side":"near"}
+{"line":346,"op":"print","text":"Go! Raikou!"}
+{"line":346,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"slp"}
+{"line":347,"op":"print","text":"The opposing Zapdos used Thunder!"}
+{"line":348,"op":"print","text":"Raikou avoided the attack!"}
+{"line":351,"op":"turn","number":32}
+{"line":354,"op":"print","text":"tylerkehne withdrew Zapdos!"}
+{"line":354,"op":"withdraw","side":"far"}
+{"line":354,"op":"print","text":"tylerkehne sent out Snorlax!"}
+{"line":354,"op":"switchIn","side":"far","slot":1,"hp":73,"status":"none"}
+{"line":355,"op":"hp","side":"far","hp":61}
+{"line":355,"op":"print","text":"The opposing Snorlax was hurt by the spikes!"}
+{"line":356,"op":"print","text":"Raikou is fast asleep."}
+{"line":356,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":357,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":357,"op":"move","user":"near","target":"near","move":214}
+{"line":358,"op":"print","text":"Raikou used Thunder!"}
+{"line":359,"op":"print","text":"The opposing Snorlax avoided the attack!"}
+{"line":361,"op":"itemPopUp","side":"far","item":472}
+{"line":361,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":361,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":361,"op":"hp","side":"far","hp":67}
+{"line":363,"op":"turn","number":33}
+{"line":366,"op":"print","text":"Raikou woke up!"}
+{"line":366,"op":"status","side":"near","slot":0,"status":"none"}
+{"line":367,"op":"print","text":"Raikou used Thunder!"}
+{"line":367,"op":"move","user":"near","target":"far","move":87}
+{"line":368,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":368,"op":"hp","side":"far","hp":40}
+{"line":369,"op":"print","text":"The opposing Snorlax used Rest!"}
+{"line":369,"op":"move","user":"far","target":"far","move":156}
+{"line":370,"op":"print","text":"The opposing Snorlax slept and restored its HP!"}
+{"line":370,"op":"status","side":"far","slot":1,"status":"slp"}
+{"line":371,"op":"hp","side":"far","hp":100}
+{"line":374,"op":"turn","number":34}
+{"line":377,"op":"print","text":"Raikou, come back!"}
+{"line":377,"op":"withdraw","side":"near"}
+{"line":377,"op":"print","text":"Go! Zapdos!"}
+{"line":377,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":378,"op":"print","text":"The opposing Snorlax is fast asleep."}
+{"line":378,"op":"anim","side":"far","anim":"statusSlp"}
+{"line":379,"op":"print","text":"The opposing Snorlax used Sleep Talk!"}
+{"line":379,"op":"move","user":"far","target":"far","move":214}
+{"line":380,"op":"print","text":"The opposing Snorlax used Rest!"}
+{"line":381,"op":"print","text":"But it failed!"}
+{"line":383,"op":"print","text":"Your side's Reflect wore off!"}
+{"line":385,"op":"turn","number":35}
+{"line":388,"op":"print","text":"tylerkehne withdrew Snorlax!"}
+{"line":388,"op":"withdraw","side":"far"}
+{"line":388,"op":"print","text":"tylerkehne sent out Zapdos!"}
+{"line":388,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":389,"op":"print","text":"Zapdos used Reflect!"}
+{"line":389,"op":"move","user":"near","target":"near","move":115}
+{"line":390,"op":"print","text":"Reflect made your side stronger against physical moves!"}
+{"line":393,"op":"turn","number":36}
+{"line":396,"op":"print","text":"Zapdos, come back!"}
+{"line":396,"op":"withdraw","side":"near"}
+{"line":396,"op":"print","text":"Go! Raikou!"}
+{"line":396,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":397,"op":"print","text":"The opposing Zapdos used Thunder!"}
+{"line":397,"op":"move","user":"far","target":"near","move":87}
+{"line":399,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":399,"op":"hp","side":"near","hp":79}
+{"line":399,"op":"print","text":"It's not very effective…"}
+{"line":401,"op":"itemPopUp","side":"near","item":472}
+{"line":401,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":401,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":401,"op":"hp","side":"near","hp":85}
+{"line":403,"op":"turn","number":37}
+{"line":406,"op":"print","text":"tylerkehne withdrew Zapdos!"}
+{"line":406,"op":"withdraw","side":"far"}
+{"line":406,"op":"print","text":"tylerkehne sent out Snorlax!"}
+{"line":406,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"slp"}
+{"line":407,"op":"hp","side":"far","hp":88}
+{"line":407,"op":"print","text":"The opposing Snorlax was hurt by the spikes!"}
+{"line":408,"op":"print","text":"Raikou used Thunder!"}
+{"line":409,"op":"print","text":"The opposing Snorlax avoided the attack!"}
+{"line":411,"op":"itemPopUp","side":"near","item":472}
+{"line":411,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":411,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":411,"op":"hp","side":"near","hp":91}
+{"line":412,"op":"itemPopUp","side":"far","item":472}
+{"line":412,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":412,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":412,"op":"hp","side":"far","hp":94}
+{"line":414,"op":"turn","number":38}
+{"line":417,"op":"print","text":"Raikou used Thunder!"}
+{"line":417,"op":"move","user":"near","target":"far","move":87}
+{"line":418,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":418,"op":"hp","side":"far","hp":66}
+{"line":419,"op":"print","text":"The opposing Snorlax is fast asleep."}
+{"line":419,"op":"anim","side":"far","anim":"statusSlp"}
+{"line":421,"op":"itemPopUp","side":"near","item":472}
+{"line":421,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":421,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":421,"op":"hp","side":"near","hp":97}
+{"line":422,"op":"itemPopUp","side":"far","item":472}
+{"line":422,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":422,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":422,"op":"hp","side":"far","hp":72}
+{"line":424,"op":"turn","number":39}
+{"line":427,"op":"print","text":"Raikou, come back!"}
+{"line":427,"op":"withdraw","side":"near"}
+{"line":427,"op":"print","text":"Go! Zapdos!"}
+{"line":427,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":428,"op":"print","text":"The opposing Snorlax woke up!"}
+{"line":428,"op":"status","side":"far","slot":1,"status":"none"}
+{"line":429,"op":"print","text":"The opposing Snorlax used Earthquake!"}
+{"line":430,"op":"print","text":"It doesn't affect Zapdos…"}
+{"line":432,"op":"itemPopUp","side":"far","item":472}
+{"line":432,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":432,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":432,"op":"hp","side":"far","hp":78}
+{"line":433,"op":"print","text":"Your side's Reflect wore off!"}
+{"line":435,"op":"turn","number":40}
+{"line":438,"op":"print","text":"tylerkehne withdrew Snorlax!"}
+{"line":438,"op":"withdraw","side":"far"}
+{"line":438,"op":"print","text":"tylerkehne sent out Zapdos!"}
+{"line":438,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":439,"op":"print","text":"Zapdos used Reflect!"}
+{"line":439,"op":"move","user":"near","target":"near","move":115}
+{"line":440,"op":"print","text":"Reflect made your side stronger against physical moves!"}
+{"line":443,"op":"turn","number":41}
+{"line":446,"op":"print","text":"Zapdos, come back!"}
+{"line":446,"op":"withdraw","side":"near"}
+{"line":446,"op":"print","text":"Go! Raikou!"}
+{"line":446,"op":"switchIn","side":"near","slot":0,"hp":97,"status":"none"}
+{"line":447,"op":"print","text":"tylerkehne withdrew Zapdos!"}
+{"line":447,"op":"withdraw","side":"far"}
+{"line":447,"op":"print","text":"tylerkehne sent out Snorlax!"}
+{"line":447,"op":"switchIn","side":"far","slot":1,"hp":78,"status":"none"}
+{"line":448,"op":"hp","side":"far","hp":66}
+{"line":448,"op":"print","text":"The opposing Snorlax was hurt by the spikes!"}
+{"line":450,"op":"itemPopUp","side":"near","item":472}
+{"line":450,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":450,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":450,"op":"hp","side":"near","hp":100}
+{"line":451,"op":"itemPopUp","side":"far","item":472}
+{"line":451,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":451,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":451,"op":"hp","side":"far","hp":72}
+{"line":453,"op":"turn","number":42}
+{"line":456,"op":"print","text":"Raikou, come back!"}
+{"line":456,"op":"withdraw","side":"near"}
+{"line":456,"op":"print","text":"Go! Snorlax!"}
+{"line":456,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
+{"line":457,"op":"print","text":"The opposing Snorlax used Double-Edge!"}
+{"line":457,"op":"move","user":"far","target":"near","move":38}
+{"line":458,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":458,"op":"hp","side":"near","hp":83}
+{"line":459,"op":"hp","side":"far","hp":67}
+{"line":459,"op":"print","text":"The opposing Snorlax was damaged by the recoil!"}
+{"line":461,"op":"itemPopUp","side":"far","item":472}
+{"line":461,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":461,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":461,"op":"hp","side":"far","hp":74}
+{"line":462,"op":"itemPopUp","side":"near","item":472}
+{"line":462,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":462,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":462,"op":"hp","side":"near","hp":89}
+{"line":464,"op":"turn","number":43}
+{"line":467,"op":"print","text":"tylerkehne withdrew Snorlax!"}
+{"line":467,"op":"withdraw","side":"far"}
+{"line":467,"op":"print","text":"tylerkehne sent out Forretress!"}
+{"line":467,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":468,"op":"hp","side":"far","hp":88}
+{"line":468,"op":"print","text":"The opposing Forretress was hurt by the spikes!"}
+{"line":469,"op":"print","text":"Snorlax used Belly Drum!"}
+{"line":469,"op":"move","user":"near","target":"near","move":187}
+{"line":470,"op":"hp","side":"near","hp":40}
+{"line":471,"op":"stat","side":"near","stat":"atk","stages":6,"arrows":"one"}
+{"line":471,"op":"print","text":"Snorlax cut its own HP and maximized its Attack!"}
+{"line":473,"op":"itemPopUp","side":"far","item":472}
+{"line":473,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":473,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":473,"op":"hp","side":"far","hp":94}
+{"line":474,"op":"itemPopUp","side":"near","item":472}
+{"line":474,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":474,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":474,"op":"hp","side":"near","hp":46}
+{"line":476,"op":"turn","number":44}
+{"line":480,"op":"print","text":"The opposing Forretress used Toxic!"}
+{"line":480,"op":"move","user":"far","target":"near","move":92}
+{"line":481,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":481,"op":"print","text":"Snorlax was badly poisoned!"}
+{"line":481,"op":"status","side":"near","slot":5,"status":"tox"}
+{"line":482,"op":"print","text":"Snorlax used Earthquake!"}
+{"line":482,"op":"move","user":"near","target":"far","move":89}
+{"line":483,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":483,"op":"hp","side":"far","hp":38}
+{"line":484,"op":"print","text":"Snorlax was hurt by its poisoning!"}
+{"line":484,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":484,"op":"hp","side":"near","hp":40}
+{"line":486,"op":"itemPopUp","side":"far","item":472}
+{"line":486,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":486,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":486,"op":"hp","side":"far","hp":45}
+{"line":487,"op":"itemPopUp","side":"near","item":472}
+{"line":487,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":487,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":487,"op":"hp","side":"near","hp":46}
+{"line":488,"op":"print","text":"Your side's Reflect wore off!"}
+{"line":490,"op":"turn","number":45}
+{"line":494,"op":"print","text":"tylerkehne withdrew Forretress!"}
+{"line":494,"op":"withdraw","side":"far"}
+{"line":494,"op":"print","text":"tylerkehne sent out Zapdos!"}
+{"line":494,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":495,"op":"print","text":"Snorlax, come back!"}
+{"line":495,"op":"withdraw","side":"near"}
+{"line":495,"op":"print","text":"Go! Gengar!"}
+{"line":495,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":498,"op":"turn","number":46}
+{"line":502,"op":"print","text":"Gengar, come back!"}
+{"line":502,"op":"withdraw","side":"near"}
+{"line":502,"op":"print","text":"Go! Raikou!"}
+{"line":502,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":503,"op":"print","text":"The opposing Zapdos used Thunder!"}
+{"line":504,"op":"print","text":"Raikou avoided the attack!"}
+{"line":507,"op":"turn","number":47}
+{"line":510,"op":"print","text":"tylerkehne withdrew Zapdos!"}
+{"line":510,"op":"withdraw","side":"far"}
+{"line":510,"op":"print","text":"tylerkehne sent out Snorlax!"}
+{"line":510,"op":"switchIn","side":"far","slot":1,"hp":74,"status":"none"}
+{"line":511,"op":"hp","side":"far","hp":61}
+{"line":511,"op":"print","text":"The opposing Snorlax was hurt by the spikes!"}
+{"line":512,"op":"print","text":"Raikou used Thunder!"}
+{"line":513,"op":"print","text":"The opposing Snorlax avoided the attack!"}
+{"line":515,"op":"itemPopUp","side":"far","item":472}
+{"line":515,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":515,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":515,"op":"hp","side":"far","hp":67}
+{"line":517,"op":"turn","number":48}
+{"line":520,"op":"print","text":"Raikou used Thunder!"}
+{"line":520,"op":"move","user":"near","target":"far","move":87}
+{"line":521,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":521,"op":"hp","side":"far","hp":37}
+{"line":522,"op":"print","text":"The opposing Snorlax used Double-Edge!"}
+{"line":522,"op":"move","user":"far","target":"near","move":38}
+{"line":523,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":523,"op":"hp","side":"near","hp":51}
+{"line":524,"op":"hp","side":"far","hp":28}
+{"line":524,"op":"print","text":"The opposing Snorlax was damaged by the recoil!"}
+{"line":526,"op":"itemPopUp","side":"near","item":472}
+{"line":526,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":526,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":526,"op":"hp","side":"near","hp":57}
+{"line":527,"op":"itemPopUp","side":"far","item":472}
+{"line":527,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":527,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":527,"op":"hp","side":"far","hp":34}
+{"line":529,"op":"turn","number":49}
+{"line":532,"op":"print","text":"Raikou, come back!"}
+{"line":532,"op":"withdraw","side":"near"}
+{"line":532,"op":"print","text":"Go! Zapdos!"}
+{"line":532,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":533,"op":"print","text":"The opposing Snorlax used Rest!"}
+{"line":533,"op":"move","user":"far","target":"far","move":156}
+{"line":534,"op":"print","text":"The opposing Snorlax slept and restored its HP!"}
+{"line":534,"op":"status","side":"far","slot":1,"status":"slp"}
+{"line":535,"op":"hp","side":"far","hp":100}
+{"line":538,"op":"turn","number":50}
+{"line":542,"op":"print","text":"tylerkehne withdrew Snorlax!"}
+{"line":542,"op":"withdraw","side":"far"}
+{"line":542,"op":"print","text":"tylerkehne sent out Zapdos!"}
+{"line":542,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":543,"op":"print","text":"Zapdos used Reflect!"}
+{"line":543,"op":"move","user":"near","target":"near","move":115}
+{"line":544,"op":"print","text":"Reflect made your side stronger against physical moves!"}
+{"line":547,"op":"turn","number":51}
+{"line":551,"op":"print","text":"tylerkehne withdrew Zapdos!"}
+{"line":551,"op":"withdraw","side":"far"}
+{"line":551,"op":"print","text":"tylerkehne sent out Snorlax!"}
+{"line":551,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"slp"}
+{"line":552,"op":"hp","side":"far","hp":88}
+{"line":552,"op":"print","text":"The opposing Snorlax was hurt by the spikes!"}
+{"line":553,"op":"print","text":"Zapdos, come back!"}
+{"line":553,"op":"withdraw","side":"near"}
+{"line":553,"op":"print","text":"Go! Raikou!"}
+{"line":553,"op":"switchIn","side":"near","slot":0,"hp":57,"status":"none"}
+{"line":555,"op":"itemPopUp","side":"near","item":472}
+{"line":555,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":555,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":555,"op":"hp","side":"near","hp":63}
+{"line":556,"op":"itemPopUp","side":"far","item":472}
+{"line":556,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":556,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":556,"op":"hp","side":"far","hp":94}
+{"line":558,"op":"turn","number":52}
+{"line":561,"op":"print","text":"Raikou, come back!"}
+{"line":561,"op":"withdraw","side":"near"}
+{"line":561,"op":"print","text":"Go! Gengar!"}
+{"line":561,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":562,"op":"print","text":"The opposing Snorlax is fast asleep."}
+{"line":562,"op":"anim","side":"far","anim":"statusSlp"}
+{"line":563,"op":"print","text":"The opposing Snorlax used Sleep Talk!"}
+{"line":563,"op":"move","user":"far","target":"far","move":214}
+{"line":564,"op":"print","text":"The opposing Snorlax used Double-Edge!"}
+{"line":565,"op":"print","text":"It doesn't affect Gengar…"}
+{"line":567,"op":"itemPopUp","side":"far","item":472}
+{"line":567,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":567,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":567,"op":"hp","side":"far","hp":99}
+{"line":569,"op":"turn","number":53}
+{"line":572,"op":"print","text":"Gengar used Mean Look!"}
+{"line":572,"op":"move","user":"near","target":"far","move":212}
+{"line":573,"op":"print","text":"The opposing Snorlax can no longer escape!"}
+{"line":574,"op":"print","text":"The opposing Snorlax is fast asleep."}
+{"line":574,"op":"anim","side":"far","anim":"statusSlp"}
+{"line":575,"op":"print","text":"The opposing Snorlax used Sleep Talk!"}
+{"line":575,"op":"move","user":"far","target":"far","move":214}
+{"line":576,"op":"print","text":"The opposing Snorlax used Double-Edge!"}
+{"line":577,"op":"print","text":"It doesn't affect Gengar…"}
+{"line":579,"op":"itemPopUp","side":"far","item":472}
+{"line":579,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":579,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":579,"op":"hp","side":"far","hp":100}
+{"line":581,"op":"turn","number":54}
+{"line":584,"op":"print","text":"Gengar used Perish Song!"}
+{"line":584,"op":"move","user":"near","target":"near","move":195}
+{"line":587,"op":"print","text":"All Pokémon that heard the song will faint in three turns!"}
+{"line":588,"op":"print","text":"The opposing Snorlax woke up!"}
+{"line":588,"op":"status","side":"far","slot":1,"status":"none"}
+{"line":589,"op":"print","text":"The opposing Snorlax used Earthquake!"}
+{"line":589,"op":"move","user":"far","target":"near","move":89}
+{"line":591,"op":"hit","side":"near","effectiveness":"super"}
+{"line":591,"op":"hp","side":"near","hp":62}
+{"line":591,"op":"print","text":"It's super effective!"}
+{"line":593,"op":"print","text":"Gengar's perish count fell to 3!"}
+{"line":594,"op":"print","text":"The opposing Snorlax's perish count fell to 3!"}
+{"line":595,"op":"itemPopUp","side":"near","item":472}
+{"line":595,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":595,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":595,"op":"hp","side":"near","hp":68}
+{"line":596,"op":"print","text":"Your side's Reflect wore off!"}
+{"line":598,"op":"turn","number":55}
+{"line":601,"op":"print","text":"Gengar used Protect!"}
+{"line":601,"op":"move","user":"near","target":"near","move":182}
+{"line":602,"op":"print","text":"Gengar protected itself!"}
+{"line":603,"op":"print","text":"The opposing Snorlax used Earthquake!"}
+{"line":604,"op":"print","text":"Gengar protected itself!"}
+{"line":606,"op":"print","text":"Gengar's perish count fell to 2!"}
+{"line":607,"op":"print","text":"The opposing Snorlax's perish count fell to 2!"}
+{"line":608,"op":"itemPopUp","side":"near","item":472}
+{"line":608,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":608,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":608,"op":"hp","side":"near","hp":74}
+{"line":610,"op":"turn","number":56}
+{"line":613,"op":"print","text":"Gengar used Thunderbolt!"}
+{"line":613,"op":"move","user":"near","target":"far","move":85}
+{"line":614,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":614,"op":"hp","side":"far","hp":86}
+{"line":615,"op":"print","text":"The opposing Snorlax used Earthquake!"}
+{"line":615,"op":"move","user":"far","target":"near","move":89}
+{"line":617,"op":"hit","side":"near","effectiveness":"super"}
+{"line":617,"op":"hp","side":"near","hp":4}
+{"line":617,"op":"print","text":"It's super effective!"}
+{"line":619,"op":"print","text":"Gengar's perish count fell to 1!"}
+{"line":620,"op":"print","text":"The opposing Snorlax's perish count fell to 1!"}
+{"line":621,"op":"itemPopUp","side":"near","item":472}
+{"line":621,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":621,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":621,"op":"hp","side":"near","hp":10}
+{"line":622,"op":"itemPopUp","side":"far","item":472}
+{"line":622,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":622,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":622,"op":"hp","side":"far","hp":92}
+{"line":624,"op":"turn","number":57}
+{"line":627,"op":"print","text":"Gengar, come back!"}
+{"line":627,"op":"withdraw","side":"near"}
+{"line":627,"op":"print","text":"Go! Zapdos!"}
+{"line":627,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":628,"op":"print","text":"The opposing Snorlax used Double-Edge!"}
+{"line":628,"op":"move","user":"far","target":"near","move":38}
+{"line":629,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":629,"op":"hp","side":"near","hp":57}
+{"line":630,"op":"hp","side":"far","hp":84}
+{"line":630,"op":"print","text":"The opposing Snorlax was damaged by the recoil!"}
+{"line":632,"op":"print","text":"The opposing Snorlax's perish count fell to 0!"}
+{"line":632,"op":"hp","side":"far","hp":0}
+{"line":633,"op":"itemPopUp","side":"near","item":472}
+{"line":633,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":633,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":633,"op":"hp","side":"near","hp":63}
+{"line":634,"op":"faint","side":"far"}
+{"line":634,"op":"print","text":"The opposing Snorlax fainted!"}
+{"line":639,"op":"print","text":"tylerkehne sent out Gengar!"}
+{"line":639,"op":"switchIn","side":"far","slot":3,"hp":94,"status":"none"}
+{"line":640,"op":"hp","side":"far","hp":81}
+{"line":640,"op":"print","text":"The opposing Gengar was hurt by the spikes!"}
+{"line":641,"op":"turn","number":58}
+{"line":644,"op":"print","text":"The opposing Gengar used Hypnosis!"}
+{"line":644,"op":"move","user":"far","target":"near","move":95}
+{"line":645,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":645,"op":"print","text":"Zapdos fell asleep!"}
+{"line":645,"op":"status","side":"near","slot":1,"status":"slp"}
+{"line":646,"op":"print","text":"Zapdos is fast asleep."}
+{"line":646,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":648,"op":"itemPopUp","side":"far","item":472}
+{"line":648,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":648,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":648,"op":"hp","side":"far","hp":87}
+{"line":649,"op":"itemPopUp","side":"near","item":472}
+{"line":649,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":649,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":649,"op":"hp","side":"near","hp":69}
+{"line":651,"op":"turn","number":59}
+{"line":654,"op":"print","text":"Zapdos, come back!"}
+{"line":654,"op":"withdraw","side":"near"}
+{"line":654,"op":"print","text":"Go! Raikou!"}
+{"line":654,"op":"switchIn","side":"near","slot":0,"hp":63,"status":"none"}
+{"line":655,"op":"print","text":"The opposing Gengar used Ice Punch!"}
+{"line":655,"op":"move","user":"far","target":"near","move":8}
+{"line":656,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":656,"op":"hp","side":"near","hp":45}
+{"line":658,"op":"itemPopUp","side":"near","item":472}
+{"line":658,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":658,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":658,"op":"hp","side":"near","hp":51}
+{"line":659,"op":"itemPopUp","side":"far","item":472}
+{"line":659,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":659,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":659,"op":"hp","side":"far","hp":93}
+{"line":661,"op":"turn","number":60}
+{"line":665,"op":"print","text":"tylerkehne withdrew Gengar!"}
+{"line":665,"op":"withdraw","side":"far"}
+{"line":665,"op":"print","text":"tylerkehne sent out Forretress!"}
+{"line":665,"op":"switchIn","side":"far","slot":4,"hp":45,"status":"none"}
+{"line":666,"op":"hp","side":"far","hp":32}
+{"line":666,"op":"print","text":"The opposing Forretress was hurt by the spikes!"}
+{"line":667,"op":"print","text":"Raikou used Rest!"}
+{"line":667,"op":"move","user":"near","target":"near","move":156}
+{"line":668,"op":"print","text":"Raikou slept and restored its HP!"}
+{"line":668,"op":"status","side":"near","slot":0,"status":"slp"}
+{"line":669,"op":"hp","side":"near","hp":100}
+{"line":671,"op":"itemPopUp","side":"far","item":472}
+{"line":671,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":671,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":671,"op":"hp","side":"far","hp":38}
+{"line":673,"op":"turn","number":61}
+{"line":676,"op":"print","text":"Raikou, come back!"}
+{"line":676,"op":"withdraw","side":"near"}
+{"line":676,"op":"print","text":"Go! Gengar!"}
+{"line":676,"op":"switchIn","side":"near","slot":4,"hp":10,"status":"none"}
+{"line":677,"op":"print","text":"The opposing Forretress used Spikes!"}
+{"line":677,"op":"move","user":"far","target":"near","move":191}
+{"line":678,"op":"print","text":"Spikes were scattered on the ground all around your side!"}
+{"line":680,"op":"itemPopUp","side":"near","item":472}
+{"line":680,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":680,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":680,"op":"hp","side":"near","hp":16}
+{"line":681,"op":"itemPopUp","side":"far","item":472}
+{"line":681,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":681,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":681,"op":"hp","side":"far","hp":45}
+{"line":683,"op":"turn","number":62}
+{"line":687,"op":"print","text":"tylerkehne withdrew Forretress!"}
+{"line":687,"op":"withdraw","side":"far"}
+{"line":687,"op":"print","text":"tylerkehne sent out Tyranitar!"}
+{"line":687,"op":"switchIn","side":"far","slot":5,"hp":100,"status":"none"}
+{"line":688,"op":"hp","side":"far","hp":88}
+{"line":688,"op":"print","text":"The opposing Tyranitar was hurt by the spikes!"}
+{"line":689,"op":"print","text":"Gengar used Thunderbolt!"}
+{"line":689,"op":"move","user":"near","target":"far","move":85}
+{"line":690,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":690,"op":"hp","side":"far","hp":65}
+{"line":692,"op":"itemPopUp","side":"near","item":472}
+{"line":692,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":692,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":692,"op":"hp","side":"near","hp":22}
+{"line":693,"op":"itemPopUp","side":"far","item":472}
+{"line":693,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":693,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":693,"op":"hp","side":"far","hp":71}
+{"line":695,"op":"turn","number":63}
+{"line":698,"op":"print","text":"Gengar used Thunderbolt!"}
+{"line":698,"op":"move","user":"near","target":"far","move":85}
+{"line":699,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":699,"op":"hp","side":"far","hp":50}
+{"line":700,"op":"print","text":"The opposing Tyranitar used Earthquake!"}
+{"line":700,"op":"move","user":"far","target":"near","move":89}
+{"line":702,"op":"hit","side":"near","effectiveness":"super"}
+{"line":702,"op":"hp","side":"near","hp":0}
+{"line":702,"op":"print","text":"It's super effective!"}
+{"line":703,"op":"faint","side":"near"}
+{"line":703,"op":"print","text":"Gengar fainted!"}
+{"line":706,"op":"print","text":"Go! Cloyster!"}
+{"line":706,"op":"switchIn","side":"near","slot":2,"hp":32,"status":"none"}
+{"line":707,"op":"hp","side":"near","hp":20}
+{"line":707,"op":"print","text":"Cloyster was hurt by the spikes!"}
+{"line":709,"op":"itemPopUp","side":"near","item":472}
+{"line":709,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":709,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":709,"op":"hp","side":"near","hp":26}
+{"line":710,"op":"itemPopUp","side":"far","item":472}
+{"line":710,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":710,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":710,"op":"hp","side":"far","hp":57}
+{"line":712,"op":"turn","number":64}
+{"line":715,"op":"print","text":"tylerkehne withdrew Tyranitar!"}
+{"line":715,"op":"withdraw","side":"far"}
+{"line":715,"op":"print","text":"tylerkehne sent out Zapdos!"}
+{"line":715,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":716,"op":"print","text":"Cloyster used Surf!"}
+{"line":716,"op":"move","user":"near","target":"far","move":57}
+{"line":717,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":717,"op":"hp","side":"far","hp":73}
+{"line":719,"op":"itemPopUp","side":"far","item":472}
+{"line":719,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":719,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":719,"op":"hp","side":"far","hp":79}
+{"line":720,"op":"itemPopUp","side":"near","item":472}
+{"line":720,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":720,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":720,"op":"hp","side":"near","hp":32}
+{"line":722,"op":"turn","number":65}
+{"line":725,"op":"print","text":"tylerkehne withdrew Zapdos!"}
+{"line":725,"op":"withdraw","side":"far"}
+{"line":725,"op":"print","text":"tylerkehne sent out Forretress!"}
+{"line":725,"op":"switchIn","side":"far","slot":4,"hp":45,"status":"none"}
+{"line":726,"op":"hp","side":"far","hp":32}
+{"line":726,"op":"print","text":"The opposing Forretress was hurt by the spikes!"}
+{"line":727,"op":"print","text":"Cloyster, come back!"}
+{"line":727,"op":"withdraw","side":"near"}
+{"line":727,"op":"print","text":"Go! Raikou!"}
+{"line":727,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"slp"}
+{"line":728,"op":"hp","side":"near","hp":88}
+{"line":728,"op":"print","text":"Raikou was hurt by the spikes!"}
+{"line":730,"op":"itemPopUp","side":"near","item":472}
+{"line":730,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":730,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":730,"op":"hp","side":"near","hp":94}
+{"line":731,"op":"itemPopUp","side":"far","item":472}
+{"line":731,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":731,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":731,"op":"hp","side":"far","hp":38}
+{"line":733,"op":"turn","number":66}
+{"line":736,"op":"print","text":"Raikou, come back!"}
+{"line":736,"op":"withdraw","side":"near"}
+{"line":736,"op":"print","text":"Go! Tyranitar!"}
+{"line":736,"op":"switchIn","side":"near","slot":3,"hp":34,"status":"none"}
+{"line":737,"op":"hp","side":"near","hp":21}
+{"line":737,"op":"print","text":"Tyranitar was hurt by the spikes!"}
+{"line":738,"op":"print","text":"The opposing Forretress used Rapid Spin!"}
+{"line":738,"op":"move","user":"far","target":"near","move":229}
+{"line":740,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":740,"op":"hp","side":"near","hp":20}
+{"line":740,"op":"print","text":"It's not very effective…"}
+{"line":741,"op":"print","text":"The opposing Forretress blew away Spikes!"}
+{"line":743,"op":"itemPopUp","side":"near","item":472}
+{"line":743,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":743,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":743,"op":"hp","side":"near","hp":26}
+{"line":744,"op":"itemPopUp","side":"far","item":472}
+{"line":744,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":744,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":744,"op":"hp","side":"far","hp":45}
+{"line":746,"op":"turn","number":67}
+{"line":752,"op":"print","text":"tylerkehne withdrew Forretress!"}
+{"line":752,"op":"withdraw","side":"far"}
+{"line":752,"op":"print","text":"tylerkehne sent out Gengar!"}
+{"line":752,"op":"switchIn","side":"far","slot":3,"hp":93,"status":"none"}
+{"line":753,"op":"print","text":"Tyranitar used Fire Blast!"}
+{"line":753,"op":"move","user":"near","target":"far","move":126}
+{"line":754,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":754,"op":"hp","side":"far","hp":59}
+{"line":756,"op":"itemPopUp","side":"far","item":472}
+{"line":756,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":756,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":756,"op":"hp","side":"far","hp":65}
+{"line":757,"op":"itemPopUp","side":"near","item":472}
+{"line":757,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":757,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":757,"op":"hp","side":"near","hp":32}
+{"line":759,"op":"turn","number":68}
+{"line":763,"op":"print","text":"The opposing Gengar used Hidden Power!"}
+{"line":763,"op":"move","user":"far","target":"near","move":237}
+{"line":765,"op":"hit","side":"near","effectiveness":"super"}
+{"line":765,"op":"hp","side":"near","hp":0}
+{"line":765,"op":"print","text":"It's super effective!"}
+{"line":766,"op":"faint","side":"near"}
+{"line":766,"op":"print","text":"Tyranitar fainted!"}
+{"line":769,"op":"print","text":"Go! Raikou!"}
+{"line":769,"op":"switchIn","side":"near","slot":0,"hp":94,"status":"slp"}
+{"line":770,"op":"hp","side":"near","hp":82}
+{"line":770,"op":"print","text":"Raikou was hurt by the spikes!"}
+{"line":772,"op":"itemPopUp","side":"near","item":472}
+{"line":772,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":772,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":772,"op":"hp","side":"near","hp":88}
+{"line":773,"op":"itemPopUp","side":"far","item":472}
+{"line":773,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":773,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":773,"op":"hp","side":"far","hp":71}
+{"line":775,"op":"turn","number":69}
+{"line":778,"op":"print","text":"tylerkehne withdrew Gengar!"}
+{"line":778,"op":"withdraw","side":"far"}
+{"line":778,"op":"print","text":"tylerkehne sent out Forretress!"}
+{"line":778,"op":"switchIn","side":"far","slot":4,"hp":45,"status":"none"}
+{"line":779,"op":"print","text":"Raikou is fast asleep."}
+{"line":779,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":780,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":780,"op":"move","user":"near","target":"near","move":214}
+{"line":781,"op":"print","text":"Raikou used Thunder!"}
+{"line":781,"op":"move","user":"near","target":"far","move":87}
+{"line":782,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":782,"op":"hp","side":"far","hp":0}
+{"line":783,"op":"faint","side":"far"}
+{"line":783,"op":"print","text":"The opposing Forretress fainted!"}
+{"line":786,"op":"print","text":"tylerkehne sent out Tyranitar!"}
+{"line":786,"op":"switchIn","side":"far","slot":5,"hp":57,"status":"none"}
+{"line":788,"op":"itemPopUp","side":"near","item":472}
+{"line":788,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":788,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":788,"op":"hp","side":"near","hp":94}
+{"line":789,"op":"itemPopUp","side":"far","item":472}
+{"line":789,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":789,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":789,"op":"hp","side":"far","hp":63}
+{"line":791,"op":"turn","number":70}
+{"line":794,"op":"print","text":"Raikou, come back!"}
+{"line":794,"op":"withdraw","side":"near"}
+{"line":794,"op":"print","text":"Go! Zapdos!"}
+{"line":794,"op":"switchIn","side":"near","slot":1,"hp":69,"status":"slp"}
+{"line":795,"op":"print","text":"The opposing Tyranitar used Earthquake!"}
+{"line":796,"op":"print","text":"It doesn't affect Zapdos…"}
+{"line":798,"op":"itemPopUp","side":"near","item":472}
+{"line":798,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":798,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":798,"op":"hp","side":"near","hp":75}
+{"line":799,"op":"itemPopUp","side":"far","item":472}
+{"line":799,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":799,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":799,"op":"hp","side":"far","hp":69}
+{"line":801,"op":"turn","number":71}
+{"line":804,"op":"print","text":"Zapdos woke up!"}
+{"line":804,"op":"status","side":"near","slot":1,"status":"none"}
+{"line":805,"op":"print","text":"Zapdos used Reflect!"}
+{"line":805,"op":"move","user":"near","target":"near","move":115}
+{"line":806,"op":"print","text":"Reflect made your side stronger against physical moves!"}
+{"line":807,"op":"print","text":"The opposing Tyranitar used Rock Slide!"}
+{"line":807,"op":"move","user":"far","target":"near","move":157}
+{"line":809,"op":"hit","side":"near","effectiveness":"super"}
+{"line":809,"op":"hp","side":"near","hp":41}
+{"line":809,"op":"print","text":"It's super effective!"}
+{"line":811,"op":"itemPopUp","side":"near","item":472}
+{"line":811,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":811,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":811,"op":"hp","side":"near","hp":47}
+{"line":812,"op":"itemPopUp","side":"far","item":472}
+{"line":812,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":812,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":812,"op":"hp","side":"far","hp":75}
+{"line":814,"op":"turn","number":72}
+{"line":817,"op":"print","text":"tylerkehne withdrew Tyranitar!"}
+{"line":817,"op":"withdraw","side":"far"}
+{"line":817,"op":"print","text":"tylerkehne sent out Zapdos!"}
+{"line":817,"op":"switchIn","side":"far","slot":2,"hp":79,"status":"none"}
+{"line":818,"op":"print","text":"Zapdos used Thunderbolt!"}
+{"line":818,"op":"move","user":"near","target":"far","move":85}
+{"line":819,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":819,"op":"hp","side":"far","hp":41}
+{"line":821,"op":"itemPopUp","side":"near","item":472}
+{"line":821,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":821,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":821,"op":"hp","side":"near","hp":53}
+{"line":822,"op":"itemPopUp","side":"far","item":472}
+{"line":822,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":822,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":822,"op":"hp","side":"far","hp":47}
+{"line":824,"op":"turn","number":73}
+{"line":827,"op":"print","text":"Zapdos, come back!"}
+{"line":827,"op":"withdraw","side":"near"}
+{"line":827,"op":"print","text":"Go! Raikou!"}
+{"line":827,"op":"switchIn","side":"near","slot":0,"hp":94,"status":"slp"}
+{"line":828,"op":"hp","side":"near","hp":82}
+{"line":828,"op":"print","text":"Raikou was hurt by the spikes!"}
+{"line":829,"op":"print","text":"The opposing Zapdos used Hidden Power!"}
+{"line":829,"op":"move","user":"far","target":"near","move":237}
+{"line":830,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":830,"op":"hp","side":"near","hp":64}
+{"line":832,"op":"itemPopUp","side":"near","item":472}
+{"line":832,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":832,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":832,"op":"hp","side":"near","hp":70}
+{"line":833,"op":"itemPopUp","side":"far","item":472}
+{"line":833,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":833,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":833,"op":"hp","side":"far","hp":53}
+{"line":835,"op":"turn","number":74}
+{"line":839,"op":"print","text":"Raikou is fast asleep."}
+{"line":839,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":840,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":840,"op":"move","user":"near","target":"near","move":214}
+{"line":841,"op":"print","text":"Raikou used Rest!"}
+{"line":841,"op":"move","user":"near","target":"near","move":156}
+{"line":842,"op":"print","text":"Raikou slept and restored its HP!"}
+{"line":842,"op":"status","side":"near","slot":0,"status":"slp"}
+{"line":843,"op":"hp","side":"near","hp":100}
+{"line":844,"op":"print","text":"The opposing Zapdos used Hidden Power!"}
+{"line":844,"op":"move","user":"far","target":"near","move":237}
+{"line":845,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":845,"op":"hp","side":"near","hp":83}
+{"line":847,"op":"itemPopUp","side":"near","item":472}
+{"line":847,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":847,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":847,"op":"hp","side":"near","hp":89}
+{"line":848,"op":"itemPopUp","side":"far","item":472}
+{"line":848,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":848,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":848,"op":"hp","side":"far","hp":59}
+{"line":850,"op":"turn","number":75}
+{"line":853,"op":"print","text":"tylerkehne withdrew Zapdos!"}
+{"line":853,"op":"withdraw","side":"far"}
+{"line":853,"op":"print","text":"tylerkehne sent out Tyranitar!"}
+{"line":853,"op":"switchIn","side":"far","slot":5,"hp":75,"status":"none"}
+{"line":854,"op":"print","text":"Raikou is fast asleep."}
+{"line":854,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":855,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":855,"op":"move","user":"near","target":"near","move":214}
+{"line":856,"op":"print","text":"Raikou used Hidden Power!"}
+{"line":856,"op":"move","user":"near","target":"far","move":237}
+{"line":857,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":857,"op":"hp","side":"far","hp":59}
+{"line":859,"op":"itemPopUp","side":"near","item":472}
+{"line":859,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":859,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":859,"op":"hp","side":"near","hp":95}
+{"line":860,"op":"itemPopUp","side":"far","item":472}
+{"line":860,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":860,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":860,"op":"hp","side":"far","hp":65}
+{"line":861,"op":"print","text":"Your side's Reflect wore off!"}
+{"line":863,"op":"turn","number":76}
+{"line":866,"op":"print","text":"Raikou is fast asleep."}
+{"line":866,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":867,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":867,"op":"move","user":"near","target":"near","move":214}
+{"line":868,"op":"print","text":"Raikou used Rest!"}
+{"line":868,"op":"move","user":"near","target":"near","move":156}
+{"line":869,"op":"print","text":"Raikou slept and restored its HP!"}
+{"line":869,"op":"status","side":"near","slot":0,"status":"slp"}
+{"line":870,"op":"hp","side":"near","hp":100}
+{"line":871,"op":"print","text":"The opposing Tyranitar used Earthquake!"}
+{"line":871,"op":"move","user":"far","target":"near","move":89}
+{"line":873,"op":"hit","side":"near","effectiveness":"super"}
+{"line":873,"op":"hp","side":"near","hp":44}
+{"line":873,"op":"print","text":"It's super effective!"}
+{"line":875,"op":"itemPopUp","side":"near","item":472}
+{"line":875,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":875,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":875,"op":"hp","side":"near","hp":50}
+{"line":876,"op":"itemPopUp","side":"far","item":472}
+{"line":876,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":876,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":876,"op":"hp","side":"far","hp":71}
+{"line":878,"op":"turn","number":77}
+{"line":881,"op":"print","text":"Raikou, come back!"}
+{"line":881,"op":"withdraw","side":"near"}
+{"line":881,"op":"print","text":"Go! Snorlax!"}
+{"line":881,"op":"switchIn","side":"near","slot":5,"hp":46,"status":"psn"}
+{"line":882,"op":"hp","side":"near","hp":33}
+{"line":882,"op":"print","text":"Snorlax was hurt by the spikes!"}
+{"line":883,"op":"print","text":"Snorlax was hurt by its poisoning!"}
+{"line":883,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":883,"op":"hp","side":"near","hp":21}
+{"line":884,"op":"print","text":"The opposing Tyranitar used Earthquake!"}
+{"line":884,"op":"move","user":"far","target":"near","move":89}
+{"line":885,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":885,"op":"hp","side":"near","hp":0}
+{"line":886,"op":"faint","side":"near"}
+{"line":886,"op":"print","text":"Snorlax fainted!"}
+{"line":889,"op":"print","text":"Go! Zapdos!"}
+{"line":889,"op":"switchIn","side":"near","slot":1,"hp":53,"status":"none"}
+{"line":891,"op":"itemPopUp","side":"near","item":472}
+{"line":891,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":891,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":891,"op":"hp","side":"near","hp":59}
+{"line":892,"op":"itemPopUp","side":"far","item":472}
+{"line":892,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":892,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":892,"op":"hp","side":"far","hp":78}
+{"line":894,"op":"turn","number":78}
+{"line":898,"op":"print","text":"Zapdos used Reflect!"}
+{"line":898,"op":"move","user":"near","target":"near","move":115}
+{"line":899,"op":"print","text":"Reflect made your side stronger against physical moves!"}
+{"line":900,"op":"print","text":"The opposing Tyranitar used Rock Slide!"}
+{"line":900,"op":"move","user":"far","target":"near","move":157}
+{"line":903,"op":"hit","side":"near","effectiveness":"super"}
+{"line":903,"op":"hp","side":"near","hp":0}
+{"line":903,"op":"print","text":"A critical hit!"}
+{"line":903,"op":"print","text":"It's super effective!"}
+{"line":904,"op":"faint","side":"near"}
+{"line":904,"op":"print","text":"Zapdos fainted!"}
+{"line":907,"op":"print","text":"Go! Cloyster!"}
+{"line":907,"op":"switchIn","side":"near","slot":2,"hp":32,"status":"none"}
+{"line":908,"op":"hp","side":"near","hp":20}
+{"line":908,"op":"print","text":"Cloyster was hurt by the spikes!"}
+{"line":910,"op":"itemPopUp","side":"near","item":472}
+{"line":910,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":910,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":910,"op":"hp","side":"near","hp":26}
+{"line":911,"op":"itemPopUp","side":"far","item":472}
+{"line":911,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":911,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":911,"op":"hp","side":"far","hp":84}
+{"line":913,"op":"turn","number":79}
+{"line":918,"op":"print","text":"Cloyster, come back!"}
+{"line":918,"op":"withdraw","side":"near"}
+{"line":918,"op":"print","text":"Go! Raikou!"}
+{"line":918,"op":"switchIn","side":"near","slot":0,"hp":50,"status":"slp"}
+{"line":919,"op":"hp","side":"near","hp":38}
+{"line":919,"op":"print","text":"Raikou was hurt by the spikes!"}
+{"line":920,"op":"print","text":"tylerkehne withdrew Tyranitar!"}
+{"line":920,"op":"withdraw","side":"far"}
+{"line":920,"op":"print","text":"tylerkehne sent out Zapdos!"}
+{"line":920,"op":"switchIn","side":"far","slot":2,"hp":59,"status":"none"}
+{"line":922,"op":"itemPopUp","side":"near","item":472}
+{"line":922,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":922,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":922,"op":"hp","side":"near","hp":44}
+{"line":923,"op":"itemPopUp","side":"far","item":472}
+{"line":923,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":923,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":923,"op":"hp","side":"far","hp":65}
+{"line":925,"op":"turn","number":80}
+{"line":929,"op":"print","text":"Raikou is fast asleep."}
+{"line":929,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":930,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":930,"op":"move","user":"near","target":"near","move":214}
+{"line":931,"op":"print","text":"Raikou used Hidden Power!"}
+{"line":931,"op":"move","user":"near","target":"far","move":237}
+{"line":933,"op":"hit","side":"far","effectiveness":"super"}
+{"line":933,"op":"hp","side":"far","hp":33}
+{"line":933,"op":"print","text":"It's super effective!"}
+{"line":934,"op":"print","text":"The opposing Zapdos used Thunder!"}
+{"line":934,"op":"move","user":"far","target":"near","move":87}
+{"line":936,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":936,"op":"hp","side":"near","hp":21}
+{"line":936,"op":"print","text":"It's not very effective…"}
+{"line":938,"op":"itemPopUp","side":"near","item":472}
+{"line":938,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":938,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":938,"op":"hp","side":"near","hp":27}
+{"line":939,"op":"itemPopUp","side":"far","item":472}
+{"line":939,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":939,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":939,"op":"hp","side":"far","hp":39}
+{"line":941,"op":"turn","number":81}
+{"line":944,"op":"print","text":"Raikou is fast asleep."}
+{"line":944,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":945,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":945,"op":"move","user":"near","target":"near","move":214}
+{"line":946,"op":"print","text":"Raikou used Rest!"}
+{"line":946,"op":"move","user":"near","target":"near","move":156}
+{"line":947,"op":"print","text":"Raikou slept and restored its HP!"}
+{"line":947,"op":"status","side":"near","slot":0,"status":"slp"}
+{"line":948,"op":"hp","side":"near","hp":100}
+{"line":949,"op":"print","text":"The opposing Zapdos used Hidden Power!"}
+{"line":949,"op":"move","user":"far","target":"near","move":237}
+{"line":950,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":950,"op":"hp","side":"near","hp":82}
+{"line":952,"op":"itemPopUp","side":"near","item":472}
+{"line":952,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":952,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":952,"op":"hp","side":"near","hp":88}
+{"line":953,"op":"itemPopUp","side":"far","item":472}
+{"line":953,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":953,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":953,"op":"hp","side":"far","hp":45}
+{"line":955,"op":"turn","number":82}
+{"line":958,"op":"print","text":"Raikou is fast asleep."}
+{"line":958,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":959,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":959,"op":"move","user":"near","target":"near","move":214}
+{"line":960,"op":"print","text":"Raikou used Thunder!"}
+{"line":960,"op":"move","user":"near","target":"far","move":87}
+{"line":961,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":961,"op":"hp","side":"far","hp":3}
+{"line":962,"op":"print","text":"The opposing Zapdos used Hidden Power!"}
+{"line":962,"op":"move","user":"far","target":"near","move":237}
+{"line":963,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":963,"op":"hp","side":"near","hp":72}
+{"line":965,"op":"itemPopUp","side":"near","item":472}
+{"line":965,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":965,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":965,"op":"hp","side":"near","hp":78}
+{"line":966,"op":"itemPopUp","side":"far","item":472}
+{"line":966,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":966,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":966,"op":"hp","side":"far","hp":9}
+{"line":967,"op":"print","text":"Your side's Reflect wore off!"}
+{"line":969,"op":"turn","number":83}
+{"line":973,"op":"print","text":"Raikou is fast asleep."}
+{"line":973,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":974,"op":"print","text":"The opposing Zapdos used Rest!"}
+{"line":974,"op":"move","user":"far","target":"far","move":156}
+{"line":975,"op":"print","text":"The opposing Zapdos slept and restored its HP!"}
+{"line":975,"op":"status","side":"far","slot":2,"status":"slp"}
+{"line":976,"op":"hp","side":"far","hp":100}
+{"line":978,"op":"itemPopUp","side":"near","item":472}
+{"line":978,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":978,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":978,"op":"hp","side":"near","hp":84}
+{"line":980,"op":"turn","number":84}
+{"line":983,"op":"print","text":"Raikou woke up!"}
+{"line":983,"op":"status","side":"near","slot":0,"status":"none"}
+{"line":984,"op":"print","text":"Raikou used Hidden Power!"}
+{"line":984,"op":"move","user":"near","target":"far","move":237}
+{"line":987,"op":"hit","side":"far","effectiveness":"super"}
+{"line":987,"op":"hp","side":"far","hp":32}
+{"line":987,"op":"print","text":"A critical hit!"}
+{"line":987,"op":"print","text":"It's super effective!"}
+{"line":988,"op":"print","text":"The opposing Zapdos is fast asleep."}
+{"line":988,"op":"anim","side":"far","anim":"statusSlp"}
+{"line":989,"op":"print","text":"The opposing Zapdos used Sleep Talk!"}
+{"line":989,"op":"move","user":"far","target":"far","move":214}
+{"line":990,"op":"print","text":"The opposing Zapdos used Thunder!"}
+{"line":991,"op":"print","text":"Raikou avoided the attack!"}
+{"line":993,"op":"itemPopUp","side":"near","item":472}
+{"line":993,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":993,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":993,"op":"hp","side":"near","hp":90}
+{"line":994,"op":"itemPopUp","side":"far","item":472}
+{"line":994,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":994,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":994,"op":"hp","side":"far","hp":38}
+{"line":996,"op":"turn","number":85}
+{"line":1000,"op":"print","text":"Raikou used Thunder!"}
+{"line":1000,"op":"move","user":"near","target":"far","move":87}
+{"line":1001,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1001,"op":"hp","side":"far","hp":0}
+{"line":1002,"op":"faint","side":"far"}
+{"line":1002,"op":"print","text":"The opposing Zapdos fainted!"}
+{"line":1006,"op":"print","text":"tylerkehne sent out Tyranitar!"}
+{"line":1006,"op":"switchIn","side":"far","slot":5,"hp":84,"status":"none"}
+{"line":1008,"op":"itemPopUp","side":"near","item":472}
+{"line":1008,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1008,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1008,"op":"hp","side":"near","hp":96}
+{"line":1009,"op":"itemPopUp","side":"far","item":472}
+{"line":1009,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1009,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1009,"op":"hp","side":"far","hp":90}
+{"line":1011,"op":"turn","number":86}
+{"line":1014,"op":"print","text":"Raikou used Thunder!"}
+{"line":1014,"op":"move","user":"near","target":"far","move":87}
+{"line":1015,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1015,"op":"hp","side":"far","hp":54}
+{"line":1016,"op":"print","text":"The opposing Tyranitar used Earthquake!"}
+{"line":1016,"op":"move","user":"far","target":"near","move":89}
+{"line":1018,"op":"hit","side":"near","effectiveness":"super"}
+{"line":1018,"op":"hp","side":"near","hp":31}
+{"line":1018,"op":"print","text":"It's super effective!"}
+{"line":1020,"op":"itemPopUp","side":"near","item":472}
+{"line":1020,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1020,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1020,"op":"hp","side":"near","hp":37}
+{"line":1021,"op":"itemPopUp","side":"far","item":472}
+{"line":1021,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1021,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1021,"op":"hp","side":"far","hp":60}
+{"line":1023,"op":"turn","number":87}
+{"line":1026,"op":"print","text":"Raikou used Rest!"}
+{"line":1026,"op":"move","user":"near","target":"near","move":156}
+{"line":1027,"op":"print","text":"Raikou slept and restored its HP!"}
+{"line":1027,"op":"status","side":"near","slot":0,"status":"slp"}
+{"line":1028,"op":"hp","side":"near","hp":100}
+{"line":1029,"op":"print","text":"The opposing Tyranitar used Earthquake!"}
+{"line":1029,"op":"move","user":"far","target":"near","move":89}
+{"line":1031,"op":"hit","side":"near","effectiveness":"super"}
+{"line":1031,"op":"hp","side":"near","hp":41}
+{"line":1031,"op":"print","text":"It's super effective!"}
+{"line":1033,"op":"itemPopUp","side":"near","item":472}
+{"line":1033,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1033,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1033,"op":"hp","side":"near","hp":47}
+{"line":1034,"op":"itemPopUp","side":"far","item":472}
+{"line":1034,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1034,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1034,"op":"hp","side":"far","hp":66}
+{"line":1036,"op":"turn","number":88}
+{"line":1039,"op":"print","text":"Raikou is fast asleep."}
+{"line":1039,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1040,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":1040,"op":"move","user":"near","target":"near","move":214}
+{"line":1041,"op":"print","text":"Raikou used Rest!"}
+{"line":1041,"op":"move","user":"near","target":"near","move":156}
+{"line":1042,"op":"print","text":"Raikou slept and restored its HP!"}
+{"line":1042,"op":"status","side":"near","slot":0,"status":"slp"}
+{"line":1043,"op":"hp","side":"near","hp":100}
+{"line":1044,"op":"print","text":"The opposing Tyranitar used Earthquake!"}
+{"line":1044,"op":"move","user":"far","target":"near","move":89}
+{"line":1046,"op":"hit","side":"near","effectiveness":"super"}
+{"line":1046,"op":"hp","side":"near","hp":38}
+{"line":1046,"op":"print","text":"It's super effective!"}
+{"line":1048,"op":"itemPopUp","side":"near","item":472}
+{"line":1048,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1048,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1048,"op":"hp","side":"near","hp":44}
+{"line":1049,"op":"itemPopUp","side":"far","item":472}
+{"line":1049,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1049,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1049,"op":"hp","side":"far","hp":72}
+{"line":1051,"op":"turn","number":89}
+{"line":1054,"op":"print","text":"Raikou is fast asleep."}
+{"line":1054,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1055,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":1055,"op":"move","user":"near","target":"near","move":214}
+{"line":1056,"op":"print","text":"Raikou used Rest!"}
+{"line":1056,"op":"move","user":"near","target":"near","move":156}
+{"line":1057,"op":"print","text":"Raikou slept and restored its HP!"}
+{"line":1057,"op":"status","side":"near","slot":0,"status":"slp"}
+{"line":1058,"op":"hp","side":"near","hp":100}
+{"line":1059,"op":"print","text":"The opposing Tyranitar used Earthquake!"}
+{"line":1059,"op":"move","user":"far","target":"near","move":89}
+{"line":1061,"op":"hit","side":"near","effectiveness":"super"}
+{"line":1061,"op":"hp","side":"near","hp":39}
+{"line":1061,"op":"print","text":"It's super effective!"}
+{"line":1063,"op":"itemPopUp","side":"near","item":472}
+{"line":1063,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1063,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1063,"op":"hp","side":"near","hp":45}
+{"line":1064,"op":"itemPopUp","side":"far","item":472}
+{"line":1064,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1064,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1064,"op":"hp","side":"far","hp":78}
+{"line":1066,"op":"turn","number":90}
+{"line":1069,"op":"print","text":"Raikou is fast asleep."}
+{"line":1069,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1070,"op":"print","text":"Raikou used Sleep Talk!"}
+{"line":1070,"op":"move","user":"near","target":"near","move":214}
+{"line":1071,"op":"print","text":"Raikou used Thunder!"}
+{"line":1071,"op":"move","user":"near","target":"far","move":87}
+{"line":1072,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1072,"op":"hp","side":"far","hp":42}
+{"line":1073,"op":"print","text":"The opposing Tyranitar used Earthquake!"}
+{"line":1073,"op":"move","user":"far","target":"near","move":89}
+{"line":1075,"op":"hit","side":"near","effectiveness":"super"}
+{"line":1075,"op":"hp","side":"near","hp":0}
+{"line":1075,"op":"print","text":"It's super effective!"}
+{"line":1076,"op":"faint","side":"near"}
+{"line":1076,"op":"print","text":"Raikou fainted!"}
+{"line":1079,"op":"print","text":"Go! Cloyster!"}
+{"line":1079,"op":"switchIn","side":"near","slot":2,"hp":26,"status":"none"}
+{"line":1080,"op":"hp","side":"near","hp":13}
+{"line":1080,"op":"print","text":"Cloyster was hurt by the spikes!"}
+{"line":1082,"op":"itemPopUp","side":"near","item":472}
+{"line":1082,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1082,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1082,"op":"hp","side":"near","hp":19}
+{"line":1083,"op":"itemPopUp","side":"far","item":472}
+{"line":1083,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1083,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1083,"op":"hp","side":"far","hp":48}
+{"line":1085,"op":"turn","number":91}
+{"line":1088,"op":"print","text":"Cloyster used Surf!"}
+{"line":1088,"op":"move","user":"near","target":"far","move":57}
+{"line":1090,"op":"hit","side":"far","effectiveness":"super"}
+{"line":1090,"op":"hp","side":"far","hp":0}
+{"line":1090,"op":"print","text":"It's super effective!"}
+{"line":1091,"op":"faint","side":"far"}
+{"line":1091,"op":"print","text":"The opposing Tyranitar fainted!"}
+{"line":1094,"op":"print","text":"tylerkehne sent out Gengar!"}
+{"line":1094,"op":"switchIn","side":"far","slot":3,"hp":71,"status":"none"}
+{"line":1096,"op":"itemPopUp","side":"far","item":472}
+{"line":1096,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1096,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1096,"op":"hp","side":"far","hp":77}
+{"line":1097,"op":"itemPopUp","side":"near","item":472}
+{"line":1097,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1097,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1097,"op":"hp","side":"near","hp":25}
+{"line":1099,"op":"turn","number":92}
+{"line":1102,"op":"print","text":"The opposing Gengar used Hidden Power!"}
+{"line":1102,"op":"move","user":"far","target":"near","move":237}
+{"line":1104,"op":"hit","side":"near","effectiveness":"super"}
+{"line":1104,"op":"hp","side":"near","hp":0}
+{"line":1104,"op":"print","text":"It's super effective!"}
+{"line":1105,"op":"faint","side":"near"}
+{"line":1105,"op":"print","text":"Cloyster fainted!"}
+{"line":1107,"op":"print","text":"tylerkehne won the battle!"}
+{"line":1107,"op":"end","outcome":"farWon"}
+{"line":139,"fallback":"mechanic","detail":"no state in the stream for Pursuit acting"}
+{"line":585,"fallback":"mechanic","detail":"no state in the stream for perish3 starting"}
+{"line":586,"fallback":"mechanic","detail":"no state in the stream for perish3 starting"}

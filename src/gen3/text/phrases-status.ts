@@ -135,6 +135,12 @@ const CANT_MOVE: Readonly<Record<string, (who: Mon, move: string) => string>> = 
   disable: CANT_TEMPLATES.disabled.render,
 }
 
+/**
+ * Gen 1's partial trap keeps its target from moving (`cant|…|partiallytrapped`). The expansion's
+ * partial traps never stop a move, so it has no line for this scene, and ours stands in.
+ */
+const PARTIALLY_TRAPPED = 'partiallytrapped'
+
 /** A Pokémon that cannot move, for the reason the log gives and the move it could not use. */
 export function cant(who: Mon, reason: Effect, move: string | undefined): Phrase {
   const id = toID(reason.name)
@@ -142,5 +148,6 @@ export function cant(who: Mon, reason: Effect, move: string | undefined): Phrase
   const text = bound && move !== undefined ? bound(who, moveName(move)) : CANT[id]?.(who)
   if (text !== undefined) return { text }
   const own = `${nameAtStart(who)} couldn't move!`
+  if (id === PARTIALLY_TRAPPED) return ownPhrase(own, 'a Pokémon a partial trap keeps from moving')
   return ownPhrase(own, `a Pokémon held back by ${reason.name}`)
 }

@@ -1,0 +1,432 @@
+{"length":6700,"crc32":"2745006c","trainers":{"near":{"name":"DADDY TAUROS","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"koalacancee","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":145,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zapdos"},{"species":103,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Exeggutor"},{"species":143,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Snorlax"},{"species":124,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Jynx"},{"species":65,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Alakazam"},{"species":128,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Tauros"}],"far":[{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":113,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Chansey"},{"species":128,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Tauros"},{"species":145,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zapdos"},{"species":143,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Snorlax"},{"species":103,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Exeggutor"}]}}
+{"line":19,"op":"intro"}
+{"line":19,"op":"print","text":"You are challenged by koalacancee!"}
+{"line":21,"op":"print","text":"koalacancee sent out Starmie!"}
+{"line":21,"op":"sendOut","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":20,"op":"print","text":"Go! Zapdos!"}
+{"line":20,"op":"sendOut","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":22,"op":"turn","number":1}
+{"line":27,"op":"print","text":"koalacancee withdrew Starmie!"}
+{"line":27,"op":"withdraw","side":"far"}
+{"line":27,"op":"print","text":"koalacancee sent out Chansey!"}
+{"line":27,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":28,"op":"print","text":"Zapdos used Thunder!"}
+{"line":29,"op":"print","text":"The opposing Chansey avoided the attack!"}
+{"line":32,"op":"turn","number":2}
+{"line":35,"op":"print","text":"Zapdos used Thunder Wave!"}
+{"line":35,"op":"move","user":"near","target":"far","move":86}
+{"line":36,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":36,"op":"print","text":"The opposing Chansey is paralyzed, so it may be unable to move!"}
+{"line":36,"op":"status","side":"far","slot":1,"status":"par"}
+{"line":37,"op":"print","text":"The opposing Chansey used Sing!"}
+{"line":37,"op":"move","user":"far","target":"near","move":47}
+{"line":38,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":38,"op":"print","text":"Zapdos fell asleep!"}
+{"line":38,"op":"status","side":"near","slot":0,"status":"slp"}
+{"line":41,"op":"turn","number":3}
+{"line":44,"op":"print","text":"koalacancee withdrew Chansey!"}
+{"line":44,"op":"withdraw","side":"far"}
+{"line":44,"op":"print","text":"koalacancee sent out Tauros!"}
+{"line":44,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":45,"op":"print","text":"Zapdos is fast asleep."}
+{"line":45,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":48,"op":"turn","number":4}
+{"line":52,"op":"print","text":"Zapdos, come back!"}
+{"line":52,"op":"withdraw","side":"near"}
+{"line":52,"op":"print","text":"Go! Exeggutor!"}
+{"line":52,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":53,"op":"print","text":"The opposing Tauros used Body Slam!"}
+{"line":53,"op":"move","user":"far","target":"near","move":34}
+{"line":54,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":54,"op":"hp","side":"near","hp":73}
+{"line":57,"op":"turn","number":5}
+{"line":60,"op":"print","text":"koalacancee withdrew Tauros!"}
+{"line":60,"op":"withdraw","side":"far"}
+{"line":60,"op":"print","text":"koalacancee sent out Chansey!"}
+{"line":60,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"par"}
+{"line":61,"op":"print","text":"Exeggutor used Psychic!"}
+{"line":61,"op":"move","user":"near","target":"far","move":94}
+{"line":63,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":63,"op":"hp","side":"far","hp":68}
+{"line":63,"op":"print","text":"A critical hit!"}
+{"line":66,"op":"turn","number":6}
+{"line":69,"op":"print","text":"Exeggutor used Psychic!"}
+{"line":69,"op":"move","user":"near","target":"far","move":94}
+{"line":70,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":70,"op":"hp","side":"far","hp":50}
+{"line":71,"op":"print","text":"The opposing Chansey used Thunder Wave!"}
+{"line":71,"op":"move","user":"far","target":"near","move":86}
+{"line":72,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":72,"op":"print","text":"Exeggutor is paralyzed, so it may be unable to move!"}
+{"line":72,"op":"status","side":"near","slot":1,"status":"par"}
+{"line":75,"op":"turn","number":7}
+{"line":78,"op":"print","text":"Exeggutor used Psychic!"}
+{"line":78,"op":"move","user":"near","target":"far","move":94}
+{"line":79,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":79,"op":"hp","side":"far","hp":34}
+{"line":80,"op":"print","text":"The opposing Chansey couldn't move because it's paralyzed!"}
+{"line":80,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":83,"op":"turn","number":8}
+{"line":86,"op":"print","text":"Exeggutor used Psychic!"}
+{"line":86,"op":"move","user":"near","target":"far","move":94}
+{"line":87,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":87,"op":"hp","side":"far","hp":18}
+{"line":88,"op":"stat","side":"far","stat":"spa","stages":-1,"arrows":"several"}
+{"line":88,"op":"print","text":"The opposing Chansey's Sp. Atk fell!"}
+{"line":89,"op":"stat","side":"far","stat":"spd","stages":-1,"arrows":"none"}
+{"line":89,"op":"print","text":"The opposing Chansey's Sp. Def fell!"}
+{"line":90,"op":"print","text":"The opposing Chansey used Soft-Boiled!"}
+{"line":90,"op":"move","user":"far","target":"far","move":135}
+{"line":91,"op":"hp","side":"far","hp":68}
+{"line":91,"op":"print","text":"The opposing Chansey's HP was restored."}
+{"line":94,"op":"turn","number":9}
+{"line":97,"op":"print","text":"koalacancee withdrew Chansey!"}
+{"line":97,"op":"withdraw","side":"far"}
+{"line":97,"op":"print","text":"koalacancee sent out Starmie!"}
+{"line":97,"op":"switchIn","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":98,"op":"print","text":"Exeggutor used Psychic!"}
+{"line":98,"op":"move","user":"near","target":"far","move":94}
+{"line":101,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":101,"op":"hp","side":"far","hp":63}
+{"line":101,"op":"print","text":"A critical hit!"}
+{"line":101,"op":"print","text":"It's not very effective…"}
+{"line":102,"op":"stat","side":"far","stat":"spa","stages":-1,"arrows":"several"}
+{"line":102,"op":"print","text":"The opposing Starmie's Sp. Atk fell!"}
+{"line":103,"op":"stat","side":"far","stat":"spd","stages":-1,"arrows":"none"}
+{"line":103,"op":"print","text":"The opposing Starmie's Sp. Def fell!"}
+{"line":106,"op":"turn","number":10}
+{"line":109,"op":"print","text":"koalacancee withdrew Starmie!"}
+{"line":109,"op":"withdraw","side":"far"}
+{"line":109,"op":"print","text":"koalacancee sent out Chansey!"}
+{"line":109,"op":"switchIn","side":"far","slot":1,"hp":68,"status":"par"}
+{"line":110,"op":"print","text":"Exeggutor used Double-Edge!"}
+{"line":110,"op":"move","user":"near","target":"far","move":38}
+{"line":112,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":112,"op":"hp","side":"far","hp":11}
+{"line":112,"op":"print","text":"A critical hit!"}
+{"line":113,"op":"hp","side":"near","hp":48}
+{"line":113,"op":"print","text":"Exeggutor was damaged by the recoil!"}
+{"line":116,"op":"turn","number":11}
+{"line":119,"op":"print","text":"Exeggutor used Psychic!"}
+{"line":119,"op":"move","user":"near","target":"far","move":94}
+{"line":120,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":120,"op":"hp","side":"far","hp":0}
+{"line":121,"op":"faint","side":"far"}
+{"line":121,"op":"print","text":"The opposing Chansey fainted!"}
+{"line":124,"op":"print","text":"koalacancee sent out Zapdos!"}
+{"line":124,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":125,"op":"turn","number":12}
+{"line":128,"op":"print","text":"Exeggutor, come back!"}
+{"line":128,"op":"withdraw","side":"near"}
+{"line":128,"op":"print","text":"Go! Snorlax!"}
+{"line":128,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":129,"op":"print","text":"The opposing Zapdos used Drill Peck!"}
+{"line":129,"op":"move","user":"far","target":"near","move":65}
+{"line":130,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":130,"op":"hp","side":"near","hp":78}
+{"line":133,"op":"turn","number":13}
+{"line":136,"op":"print","text":"koalacancee withdrew Zapdos!"}
+{"line":136,"op":"withdraw","side":"far"}
+{"line":136,"op":"print","text":"koalacancee sent out Snorlax!"}
+{"line":136,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":137,"op":"print","text":"Snorlax used Body Slam!"}
+{"line":137,"op":"move","user":"near","target":"far","move":34}
+{"line":138,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":138,"op":"hp","side":"far","hp":75}
+{"line":141,"op":"turn","number":14}
+{"line":144,"op":"print","text":"Snorlax used Reflect!"}
+{"line":144,"op":"move","user":"near","target":"near","move":115}
+{"line":145,"op":"print","text":"Reflect made your side stronger against physical moves!"}
+{"line":146,"op":"print","text":"The opposing Snorlax used Body Slam!"}
+{"line":146,"op":"move","user":"far","target":"near","move":34}
+{"line":147,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":147,"op":"hp","side":"near","hp":64}
+{"line":150,"op":"turn","number":15}
+{"line":153,"op":"print","text":"Snorlax used Body Slam!"}
+{"line":153,"op":"move","user":"near","target":"far","move":34}
+{"line":154,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":154,"op":"hp","side":"far","hp":47}
+{"line":155,"op":"print","text":"The opposing Snorlax used Reflect!"}
+{"line":155,"op":"move","user":"far","target":"far","move":115}
+{"line":156,"op":"print","text":"Reflect made the opposing side stronger against physical moves!"}
+{"line":159,"op":"turn","number":16}
+{"line":162,"op":"print","text":"The opposing Snorlax used Body Slam!"}
+{"line":162,"op":"move","user":"far","target":"near","move":34}
+{"line":163,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":163,"op":"hp","side":"near","hp":52}
+{"line":164,"op":"print","text":"Snorlax used Body Slam!"}
+{"line":164,"op":"move","user":"near","target":"far","move":34}
+{"line":165,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":165,"op":"hp","side":"far","hp":35}
+{"line":168,"op":"turn","number":17}
+{"line":171,"op":"print","text":"The opposing Snorlax used Body Slam!"}
+{"line":171,"op":"move","user":"far","target":"near","move":34}
+{"line":172,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":172,"op":"hp","side":"near","hp":39}
+{"line":173,"op":"print","text":"Snorlax used Body Slam!"}
+{"line":173,"op":"move","user":"near","target":"far","move":34}
+{"line":175,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":175,"op":"hp","side":"far","hp":0}
+{"line":175,"op":"print","text":"A critical hit!"}
+{"line":176,"op":"faint","side":"far"}
+{"line":176,"op":"print","text":"The opposing Snorlax fainted!"}
+{"line":179,"op":"print","text":"koalacancee sent out Zapdos!"}
+{"line":179,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":180,"op":"turn","number":18}
+{"line":183,"op":"print","text":"The opposing Zapdos used Thunderbolt!"}
+{"line":183,"op":"move","user":"far","target":"near","move":85}
+{"line":184,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":184,"op":"hp","side":"near","hp":8}
+{"line":185,"op":"print","text":"Snorlax used Body Slam!"}
+{"line":185,"op":"move","user":"near","target":"far","move":34}
+{"line":186,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":186,"op":"hp","side":"far","hp":68}
+{"line":189,"op":"turn","number":19}
+{"line":192,"op":"print","text":"The opposing Zapdos used Drill Peck!"}
+{"line":192,"op":"move","user":"far","target":"near","move":65}
+{"line":193,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":193,"op":"hp","side":"near","hp":0}
+{"line":194,"op":"faint","side":"near"}
+{"line":194,"op":"print","text":"Snorlax fainted!"}
+{"line":197,"op":"print","text":"Go! Jynx!"}
+{"line":197,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":198,"op":"turn","number":20}
+{"line":201,"op":"print","text":"The opposing Zapdos used Thunder Wave!"}
+{"line":201,"op":"move","user":"far","target":"near","move":86}
+{"line":202,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":202,"op":"print","text":"Jynx is paralyzed, so it may be unable to move!"}
+{"line":202,"op":"status","side":"near","slot":3,"status":"par"}
+{"line":203,"op":"print","text":"Jynx couldn't move because it's paralyzed!"}
+{"line":203,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":206,"op":"turn","number":21}
+{"line":209,"op":"print","text":"The opposing Zapdos used Drill Peck!"}
+{"line":209,"op":"move","user":"far","target":"near","move":65}
+{"line":210,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":210,"op":"hp","side":"near","hp":52}
+{"line":211,"op":"print","text":"Jynx used Lovely Kiss!"}
+{"line":211,"op":"move","user":"near","target":"far","move":142}
+{"line":212,"op":"anim","side":"far","anim":"statusSlp"}
+{"line":212,"op":"print","text":"The opposing Zapdos fell asleep!"}
+{"line":212,"op":"status","side":"far","slot":3,"status":"slp"}
+{"line":215,"op":"turn","number":22}
+{"line":218,"op":"print","text":"koalacancee withdrew Zapdos!"}
+{"line":218,"op":"withdraw","side":"far"}
+{"line":218,"op":"print","text":"koalacancee sent out Starmie!"}
+{"line":218,"op":"switchIn","side":"far","slot":0,"hp":63,"status":"none"}
+{"line":219,"op":"print","text":"Jynx used Blizzard!"}
+{"line":220,"op":"print","text":"The opposing Starmie avoided the attack!"}
+{"line":223,"op":"turn","number":23}
+{"line":226,"op":"print","text":"The opposing Starmie used Psychic!"}
+{"line":226,"op":"move","user":"far","target":"near","move":94}
+{"line":228,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":228,"op":"hp","side":"near","hp":37}
+{"line":228,"op":"print","text":"It's not very effective…"}
+{"line":229,"op":"print","text":"Jynx used Blizzard!"}
+{"line":229,"op":"move","user":"near","target":"far","move":59}
+{"line":232,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":232,"op":"hp","side":"far","hp":21}
+{"line":232,"op":"print","text":"A critical hit!"}
+{"line":232,"op":"print","text":"It's not very effective…"}
+{"line":235,"op":"turn","number":24}
+{"line":238,"op":"print","text":"The opposing Starmie used Recover!"}
+{"line":238,"op":"move","user":"far","target":"far","move":105}
+{"line":239,"op":"hp","side":"far","hp":71}
+{"line":239,"op":"print","text":"The opposing Starmie's HP was restored."}
+{"line":240,"op":"print","text":"Jynx used Blizzard!"}
+{"line":240,"op":"move","user":"near","target":"far","move":59}
+{"line":242,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":242,"op":"hp","side":"far","hp":48}
+{"line":242,"op":"print","text":"It's not very effective…"}
+{"line":245,"op":"turn","number":25}
+{"line":248,"op":"print","text":"The opposing Starmie used Recover!"}
+{"line":248,"op":"move","user":"far","target":"far","move":105}
+{"line":249,"op":"hp","side":"far","hp":98}
+{"line":249,"op":"print","text":"The opposing Starmie's HP was restored."}
+{"line":250,"op":"print","text":"Jynx used Blizzard!"}
+{"line":250,"op":"move","user":"near","target":"far","move":59}
+{"line":252,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":252,"op":"hp","side":"far","hp":76}
+{"line":252,"op":"print","text":"It's not very effective…"}
+{"line":255,"op":"turn","number":26}
+{"line":258,"op":"print","text":"The opposing Starmie used Psychic!"}
+{"line":258,"op":"move","user":"far","target":"near","move":94}
+{"line":260,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":260,"op":"hp","side":"near","hp":21}
+{"line":260,"op":"print","text":"It's not very effective…"}
+{"line":261,"op":"stat","side":"near","stat":"spa","stages":-1,"arrows":"several"}
+{"line":261,"op":"print","text":"Jynx's Sp. Atk fell!"}
+{"line":262,"op":"stat","side":"near","stat":"spd","stages":-1,"arrows":"none"}
+{"line":262,"op":"print","text":"Jynx's Sp. Def fell!"}
+{"line":263,"op":"print","text":"Jynx used Rest!"}
+{"line":263,"op":"move","user":"near","target":"near","move":156}
+{"line":264,"op":"print","text":"Jynx slept and restored its HP!"}
+{"line":264,"op":"status","side":"near","slot":3,"status":"slp"}
+{"line":265,"op":"hp","side":"near","hp":100}
+{"line":268,"op":"turn","number":27}
+{"line":271,"op":"print","text":"koalacancee withdrew Starmie!"}
+{"line":271,"op":"withdraw","side":"far"}
+{"line":271,"op":"print","text":"koalacancee sent out Tauros!"}
+{"line":271,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":272,"op":"print","text":"Jynx, come back!"}
+{"line":272,"op":"withdraw","side":"near"}
+{"line":272,"op":"print","text":"Go! Alakazam!"}
+{"line":272,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":275,"op":"turn","number":28}
+{"line":278,"op":"print","text":"koalacancee withdrew Tauros!"}
+{"line":278,"op":"withdraw","side":"far"}
+{"line":278,"op":"print","text":"koalacancee sent out Starmie!"}
+{"line":278,"op":"switchIn","side":"far","slot":0,"hp":76,"status":"none"}
+{"line":279,"op":"print","text":"Alakazam used Thunder Wave!"}
+{"line":279,"op":"move","user":"near","target":"far","move":86}
+{"line":280,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":280,"op":"print","text":"The opposing Starmie is paralyzed, so it may be unable to move!"}
+{"line":280,"op":"status","side":"far","slot":0,"status":"par"}
+{"line":283,"op":"turn","number":29}
+{"line":286,"op":"print","text":"Alakazam, come back!"}
+{"line":286,"op":"withdraw","side":"near"}
+{"line":286,"op":"print","text":"Go! Jynx!"}
+{"line":286,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"slp"}
+{"line":287,"op":"print","text":"The opposing Starmie used Thunder Wave!"}
+{"line":288,"op":"print","text":"But it failed!"}
+{"line":291,"op":"turn","number":30}
+{"line":294,"op":"print","text":"Jynx, come back!"}
+{"line":294,"op":"withdraw","side":"near"}
+{"line":294,"op":"print","text":"Go! Exeggutor!"}
+{"line":294,"op":"switchIn","side":"near","slot":1,"hp":48,"status":"par"}
+{"line":295,"op":"print","text":"koalacancee withdrew Starmie!"}
+{"line":295,"op":"withdraw","side":"far"}
+{"line":295,"op":"print","text":"koalacancee sent out Tauros!"}
+{"line":295,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":298,"op":"turn","number":31}
+{"line":301,"op":"print","text":"koalacancee withdrew Tauros!"}
+{"line":301,"op":"withdraw","side":"far"}
+{"line":301,"op":"print","text":"koalacancee sent out Starmie!"}
+{"line":301,"op":"switchIn","side":"far","slot":0,"hp":76,"status":"par"}
+{"line":302,"op":"print","text":"Exeggutor used Stun Spore!"}
+{"line":303,"op":"print","text":"The opposing Starmie is already paralyzed!"}
+{"line":306,"op":"turn","number":32}
+{"line":309,"op":"print","text":"koalacancee withdrew Starmie!"}
+{"line":309,"op":"withdraw","side":"far"}
+{"line":309,"op":"print","text":"koalacancee sent out Zapdos!"}
+{"line":309,"op":"switchIn","side":"far","slot":3,"hp":68,"status":"slp"}
+{"line":310,"op":"print","text":"Exeggutor used Double-Edge!"}
+{"line":310,"op":"move","user":"near","target":"far","move":38}
+{"line":311,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":311,"op":"hp","side":"far","hp":47}
+{"line":312,"op":"hp","side":"near","hp":43}
+{"line":312,"op":"print","text":"Exeggutor was damaged by the recoil!"}
+{"line":315,"op":"turn","number":33}
+{"line":318,"op":"print","text":"koalacancee withdrew Zapdos!"}
+{"line":318,"op":"withdraw","side":"far"}
+{"line":318,"op":"print","text":"koalacancee sent out Starmie!"}
+{"line":318,"op":"switchIn","side":"far","slot":0,"hp":76,"status":"par"}
+{"line":319,"op":"print","text":"Exeggutor, come back!"}
+{"line":319,"op":"withdraw","side":"near"}
+{"line":319,"op":"print","text":"Go! Tauros!"}
+{"line":319,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
+{"line":322,"op":"turn","number":34}
+{"line":325,"op":"print","text":"Tauros, come back!"}
+{"line":325,"op":"withdraw","side":"near"}
+{"line":325,"op":"print","text":"Go! Jynx!"}
+{"line":325,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"slp"}
+{"line":326,"op":"print","text":"The opposing Starmie couldn't move because it's paralyzed!"}
+{"line":326,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":329,"op":"turn","number":35}
+{"line":332,"op":"print","text":"Jynx, come back!"}
+{"line":332,"op":"withdraw","side":"near"}
+{"line":332,"op":"print","text":"Go! Exeggutor!"}
+{"line":332,"op":"switchIn","side":"near","slot":1,"hp":43,"status":"par"}
+{"line":333,"op":"print","text":"koalacancee withdrew Starmie!"}
+{"line":333,"op":"withdraw","side":"far"}
+{"line":333,"op":"print","text":"koalacancee sent out Tauros!"}
+{"line":333,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":336,"op":"turn","number":36}
+{"line":339,"op":"print","text":"The opposing Tauros used Hyper Beam!"}
+{"line":339,"op":"move","user":"far","target":"near","move":63}
+{"line":340,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":340,"op":"hp","side":"near","hp":0}
+{"line":341,"op":"faint","side":"near"}
+{"line":341,"op":"print","text":"Exeggutor fainted!"}
+{"line":344,"op":"print","text":"Go! Tauros!"}
+{"line":344,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
+{"line":345,"op":"turn","number":37}
+{"line":348,"op":"print","text":"Tauros used Body Slam!"}
+{"line":348,"op":"move","user":"near","target":"far","move":34}
+{"line":349,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":349,"op":"hp","side":"far","hp":69}
+{"line":350,"op":"print","text":"The opposing Tauros used Body Slam!"}
+{"line":350,"op":"move","user":"far","target":"near","move":34}
+{"line":351,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":351,"op":"hp","side":"near","hp":69}
+{"line":354,"op":"turn","number":38}
+{"line":357,"op":"print","text":"Tauros used Body Slam!"}
+{"line":357,"op":"move","user":"near","target":"far","move":34}
+{"line":358,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":358,"op":"hp","side":"far","hp":42}
+{"line":359,"op":"print","text":"The opposing Tauros used Body Slam!"}
+{"line":359,"op":"move","user":"far","target":"near","move":34}
+{"line":361,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":361,"op":"hp","side":"near","hp":14}
+{"line":361,"op":"print","text":"A critical hit!"}
+{"line":364,"op":"turn","number":39}
+{"line":367,"op":"print","text":"koalacancee withdrew Tauros!"}
+{"line":367,"op":"withdraw","side":"far"}
+{"line":367,"op":"print","text":"koalacancee sent out Zapdos!"}
+{"line":367,"op":"switchIn","side":"far","slot":3,"hp":47,"status":"slp"}
+{"line":368,"op":"print","text":"Tauros used Hyper Beam!"}
+{"line":368,"op":"move","user":"near","target":"far","move":63}
+{"line":369,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":369,"op":"hp","side":"far","hp":0}
+{"line":370,"op":"faint","side":"far"}
+{"line":370,"op":"print","text":"The opposing Zapdos fainted!"}
+{"line":373,"op":"print","text":"koalacancee sent out Exeggutor!"}
+{"line":373,"op":"switchIn","side":"far","slot":5,"hp":100,"status":"none"}
+{"line":374,"op":"turn","number":40}
+{"line":377,"op":"print","text":"Tauros used Hyper Beam!"}
+{"line":377,"op":"move","user":"near","target":"far","move":63}
+{"line":379,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":379,"op":"hp","side":"far","hp":10}
+{"line":379,"op":"print","text":"A critical hit!"}
+{"line":381,"op":"print","text":"The opposing Exeggutor used Psychic!"}
+{"line":381,"op":"move","user":"far","target":"near","move":94}
+{"line":382,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":382,"op":"hp","side":"near","hp":0}
+{"line":383,"op":"faint","side":"near"}
+{"line":383,"op":"print","text":"Tauros fainted!"}
+{"line":386,"op":"print","text":"Go! Alakazam!"}
+{"line":386,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":387,"op":"turn","number":41}
+{"line":390,"op":"print","text":"koalacancee withdrew Exeggutor!"}
+{"line":390,"op":"withdraw","side":"far"}
+{"line":390,"op":"print","text":"koalacancee sent out Starmie!"}
+{"line":390,"op":"switchIn","side":"far","slot":0,"hp":76,"status":"par"}
+{"line":391,"op":"print","text":"Alakazam used Seismic Toss!"}
+{"line":391,"op":"move","user":"near","target":"far","move":69}
+{"line":392,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":392,"op":"hp","side":"far","hp":45}
+{"line":395,"op":"turn","number":42}
+{"line":398,"op":"print","text":"Alakazam used Seismic Toss!"}
+{"line":398,"op":"move","user":"near","target":"far","move":69}
+{"line":399,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":399,"op":"hp","side":"far","hp":14}
+{"line":400,"op":"print","text":"The opposing Starmie couldn't move because it's paralyzed!"}
+{"line":400,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":403,"op":"turn","number":43}
+{"line":406,"op":"print","text":"Alakazam used Seismic Toss!"}
+{"line":406,"op":"move","user":"near","target":"far","move":69}
+{"line":407,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":407,"op":"hp","side":"far","hp":0}
+{"line":408,"op":"faint","side":"far"}
+{"line":408,"op":"print","text":"The opposing Starmie fainted!"}
+{"line":411,"op":"print","text":"koalacancee sent out Tauros!"}
+{"line":411,"op":"switchIn","side":"far","slot":2,"hp":42,"status":"none"}
+{"line":412,"op":"turn","number":44}
+{"line":415,"op":"print","text":"Alakazam used Psychic!"}
+{"line":415,"op":"move","user":"near","target":"far","move":94}
+{"line":416,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":416,"op":"hp","side":"far","hp":0}
+{"line":417,"op":"faint","side":"far"}
+{"line":417,"op":"print","text":"The opposing Tauros fainted!"}
+{"line":418,"op":"print","text":"koalacancee forfeited."}
+{"line":420,"op":"print","text":"DADDY TAUROS won the battle!"}
+{"line":420,"op":"end","outcome":"nearWon"}

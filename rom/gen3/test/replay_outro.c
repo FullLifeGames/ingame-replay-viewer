@@ -4,6 +4,7 @@
 #include "data.h"
 #include "m4a.h"
 #include "palette.h"
+#include "recorded_battle.h"
 #include "sound.h"
 #include "sprite.h"
 #include "test/replay_test.h"
@@ -243,4 +244,17 @@ REPLAY_TEST("END counts as done and finished before the outro starts")
         EXPECT_EQ(atOutro->done, 4);
         EXPECT(atOutro->finished);
     }
+}
+
+// A recorded battle leaves on a held B while RecordedBattle_CanStopPlayback() says so
+// (BattleMainCB2). After END the outro plays out and the screen holds, as with no press.
+REPLAY_TEST("B cannot leave the replay after END")
+{
+    STREAM
+    {
+        ReplayTest_PlayOutro();
+        StartBattle();
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    THEN { EXPECT(!RecordedBattle_CanStopPlayback()); }
 }

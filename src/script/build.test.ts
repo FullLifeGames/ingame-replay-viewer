@@ -150,11 +150,11 @@ describe('buildBattleScript: lines it cannot show', () => {
   })
 
   it('lists a line without a rule as unsupported', () => {
-    expect(scriptOf('|-transform|p1a: Dugtrio|p2a: Tyranitar').dropped.at(-1)).toEqual({
+    expect(scriptOf('|-prepare|p1a: Dugtrio|Solar Beam').dropped.at(-1)).toEqual({
       line: NEXT,
-      text: '|-transform|p1a: Dugtrio|p2a: Tyranitar',
+      text: '|-prepare|p1a: Dugtrio|Solar Beam',
       reason: 'unsupported',
-      detail: 'no rule for |-transform|',
+      detail: 'no rule for |-prepare|',
     })
   })
 
