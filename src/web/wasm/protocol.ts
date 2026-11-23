@@ -26,9 +26,19 @@ export function ticksPerSecond(speed: Speed): number | undefined {
 export const speedAtEnd = (speed: Speed): Speed => (speed === 'fast' ? '1x' : speed)
 
 /**
+ * How far the grant may run ahead of the frame the game has reached, in seconds of play: 6 frames
+ * at 1x, 12 at 2x. A page that asks every 16 ms grants 1 or 2 frames at a time, so a game that
+ * keeps up never meets this lead, and a few late animation frames still pass. A game that fell
+ * further behind (a slow start, a busy machine, a phone that stalls) loses the older debt instead
+ * of racing to pay it back; 0.1 s of sound in one burst stays within the sound ring's reserve.
+ */
+const LEAD_SECONDS = 0.1
+
+/**
  * The tick rule: how many frames the game may have played by a moment, in milliseconds. The
- * count runs on from the start or the last change, so a game that falls behind catches up.
- * After a pause (resume) the count goes on from what it allowed before the pause.
+ * count runs on from the start or the last change, but never more than LEAD_SECONDS ahead of the
+ * game's frame, so a game that falls behind goes on at its pace from where it is. After a pause
+ * (resume) the count goes on from what it allowed before the pause.
  */
 export class TickClock {
   private current: Speed
@@ -47,11 +57,15 @@ export class TickClock {
     return this.current
   }
 
-  /** The frames allowed by `now`; undefined at fast. */
-  allowed(now: number): number | undefined {
+  /** The frames allowed by `now` to a game at `frame`; undefined at fast. */
+  allowed(now: number, frame: number): number | undefined {
     const rate = ticksPerSecond(this.current)
     if (rate === undefined) return undefined
-    this.granted = this.base + Math.floor(((now - this.since) * rate) / 1000)
+    const due = this.base + Math.floor(((now - this.since) * rate) / 1000)
+    const most = frame + Math.ceil(rate * LEAD_SECONDS)
+    // Moving the base drops the debt beyond the lead and keeps the fraction of a frame in hand.
+    if (due > most) this.base -= due - most
+    this.granted = Math.max(this.granted, Math.min(due, most))
     return this.granted
   }
 

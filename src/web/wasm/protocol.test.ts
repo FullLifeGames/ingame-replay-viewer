@@ -19,11 +19,33 @@ import {
 } from './protocol'
 import { AudioRing } from './ring'
 
-/** Asks the clock every animation frame of 16 ms from `from` to `to`; returns the last answer. */
-function walk(clock: TickClock, from: number, to: number): number | undefined {
-  let allowed: number | undefined
-  for (let now = from; now < to; now += 16) allowed = clock.allowed(now)
-  return clock.allowed(to) ?? allowed
+/**
+ * Asks the clock every animation frame of 16 ms from `from` to `to` for a game that keeps up: it
+ * is at `frame` at the first ask and has played every frame granted by each later one. Returns
+ * the last answer.
+ */
+function walk(clock: TickClock, from: number, to: number, frame = 0): number | undefined {
+  let granted = clock.allowed(from, frame) ?? frame
+  for (let now = from + 16; now < to; now += 16) granted = clock.allowed(now, granted) ?? granted
+  return clock.allowed(to, granted)
+}
+
+/** The most the clock grants ahead of the game's frame: 0.1 s of frames, rounded up. */
+const LEAD = { '1x': 6, '2x': 12 } as const
+
+/**
+ * Plays `speed` for 1 s, stalls the game for 2 s (it reports one frame), then keeps up for 1 s.
+ * Checks the lead at every ask of the stall; returns the frame the stall held and the grants at
+ * the stall's end and 1 s later.
+ */
+function stall(speed: '1x' | '2x'): { held: number; after: number; later: number } {
+  const clock = new TickClock(speed, 0)
+  const held = walk(clock, 0, 1000) ?? 0
+  for (let now = 1016; now < 3000; now += 16) {
+    expect(clock.allowed(now, held)).toBeLessThanOrEqual(held + LEAD[speed])
+  }
+  const after = clock.allowed(3000, held) ?? 0
+  return { held, after, later: walk(clock, 3000, 4000, after) ?? 0 }
 }
 
 const progress = { done: 3, total: 34, turn: 1, error: 0, finished: false, playing: true }
@@ -43,22 +65,28 @@ describe('the tick rule', () => {
 
   it('allows the frames that the elapsed time pays for, counted from its start', () => {
     const clock = new TickClock('1x', 1000)
-    expect(clock.allowed(1000)).toBe(0)
-    expect(clock.allowed(1016)).toBe(0)
-    expect(clock.allowed(1017)).toBe(1)
-    expect(walk(clock, 1017, 2000)).toBe(59)
-    expect(walk(clock, 2000, 61_000)).toBe(3583)
+    expect(clock.allowed(1000, 0)).toBe(0)
+    expect(clock.allowed(1016, 0)).toBe(0)
+    expect(clock.allowed(1017, 0)).toBe(1)
+    expect(walk(clock, 1017, 2000, 1)).toBe(59)
+    expect(walk(clock, 2000, 61_000, 59)).toBe(3583)
+  })
+
+  it('grants a game that keeps up 119 or 120 frames per second at 2x', () => {
+    const clock = new TickClock('2x', 0)
+    expect(walk(clock, 0, 1000)).toBe(119)
+    expect(walk(clock, 1000, 61_000, 119)).toBe(7286)
   })
 
   it('sets no limit at fast, and counts from the frame the game is at after a change', () => {
     const clock = new TickClock('fast', 0)
-    expect(clock.allowed(5000)).toBeUndefined()
+    expect(clock.allowed(5000, 0)).toBeUndefined()
     clock.change('2x', 5000, 1234)
     expect(clock.speed).toBe('2x')
-    expect(clock.allowed(5000)).toBe(1234)
-    expect(walk(clock, 5000, 6000)).toBe(1234 + 119)
+    expect(clock.allowed(5000, 1234)).toBe(1234)
+    expect(walk(clock, 5000, 6000, 1234)).toBe(1234 + 119)
     clock.change('1x', 6000, 1300)
-    expect(walk(clock, 6000, 7000)).toBe(1300 + 59)
+    expect(walk(clock, 6000, 7000, 1300)).toBe(1300 + 59)
   })
 
   // After END the game plays on; at fast that would keep a core busy until Restart.
@@ -73,16 +101,43 @@ describe('the tick rule', () => {
     const clock = new TickClock('1x', 0)
     expect(walk(clock, 0, 1000)).toBe(59)
     clock.resume(9000)
-    expect(clock.allowed(9000)).toBe(59)
-    expect(clock.allowed(9200)).toBe(59 + 11)
-    expect(walk(clock, 9200, 10_000)).toBe(59 + 59)
+    expect(clock.allowed(9000, 59)).toBe(59)
+    expect(walk(clock, 9000, 9200, 59)).toBe(59 + 11)
+    expect(walk(clock, 9200, 10_000, 59 + 11)).toBe(59 + 59)
   })
 
-  // A busy page can miss animation frames while the tab stays in view; the game catches up.
-  it('catches up after a late ask while the page is in view', () => {
+  // A slow start, a busy machine or a phone can hold the game back while the tab stays in view.
+  // The clock drops that debt: the game goes on at its pace from the frame it reached, and never
+  // races to catch up, which would also overflow the sound ring.
+  it('grants a game that stalled 2 s at 1x no more than 6 frames ahead, then 60 per second', () => {
+    const { held, after, later } = stall('1x')
+    expect(held).toBe(59)
+    expect(after).toBe(held + LEAD['1x'])
+    expect(later - after).toBeGreaterThanOrEqual(59)
+    expect(later - after).toBeLessThanOrEqual(60)
+  })
+
+  it('grants a game that stalled 2 s at 2x no more than 12 frames ahead, then 120 per second', () => {
+    const { held, after, later } = stall('2x')
+    expect(held).toBe(119)
+    expect(after).toBe(held + LEAD['2x'])
+    expect(later - after).toBeGreaterThanOrEqual(119)
+    expect(later - after).toBeLessThanOrEqual(120)
+  })
+
+  it('grants no burst after a late ask while the page is in view', () => {
     const clock = new TickClock('1x', 0)
     expect(walk(clock, 0, 1000)).toBe(59)
-    expect(clock.allowed(1600)).toBe(95)
+    expect(clock.allowed(1600, 59)).toBe(59 + LEAD['1x'])
+    expect(clock.allowed(1616, 65)).toBe(66)
+  })
+
+  it('never takes back a frame it granted', () => {
+    const clock = new TickClock('1x', 0)
+    walk(clock, 0, 1000)
+    expect(clock.allowed(2000, 59)).toBe(65)
+    expect(clock.allowed(2016, 59)).toBe(65)
+    expect(clock.allowed(2032, 60)).toBe(66)
   })
 })
 
