@@ -18,6 +18,6 @@ describe('the player rule', () => {
       },
     }
 
-    expect(() => BATTLE_RULES['|player|'].build(input)).toThrow(/^line 4: /)
+    expect(() => BATTLE_RULES['|player|'].build(input)).toThrow(/^line 5: /)
   })
 })

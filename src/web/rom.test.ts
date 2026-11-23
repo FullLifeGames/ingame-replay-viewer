@@ -3,7 +3,14 @@ import { describe, expect, it } from 'vitest'
 import build from '../../rom/gen3/build.json'
 import { createBps } from '../patch/bps-create'
 import type { SlotDescription } from '../patch/slot'
-import { checkBaseRom, patchBaseRom, readSlotDescription, RomError } from './rom'
+import {
+  BuildMismatchError,
+  checkBaseRom,
+  DumpRefusal,
+  patchBaseRom,
+  readSlotDescription,
+  RomError,
+} from './rom'
 import { sha1Hex } from './sha1'
 
 // Synthetic bytes only: a small "base ROM" and a "built ROM" that differs in a few places.
@@ -42,6 +49,8 @@ describe('checkBaseRom', () => {
     const otherSha1 = await sha1Hex(other)
     const refusal = checkBaseRom(other, BASE_SHA1)
     await expect(refusal).rejects.toThrow(RomError)
+    await expect(refusal).rejects.toBeInstanceOf(DumpRefusal)
+    await expect(refusal).rejects.toMatchObject({ name: 'DumpRefusal' })
     await expect(refusal).rejects.toThrow(
       `This file is not the US Emerald dump the patch fits: its SHA1 is ${otherSha1}, ` +
         `US Emerald's is ${BASE_SHA1}. Pick your US Emerald dump.`,
@@ -63,6 +72,8 @@ describe('patchBaseRom', () => {
     const stale = { ...DESCRIPTION, romSha1: BASE_SHA1 }
     const refusal = patchBaseRom(BASE, PATCH, stale)
     await expect(refusal).rejects.toThrow(RomError)
+    await expect(refusal).rejects.toBeInstanceOf(BuildMismatchError)
+    await expect(refusal).rejects.toMatchObject({ name: 'BuildMismatchError' })
     await expect(refusal).rejects.toThrow(
       `The patched ROM's SHA1 is ${DESCRIPTION.romSha1}, replay-slot.json names ${BASE_SHA1}: ` +
         'the patch and replay-slot.json come from different builds. Run npm run rom:build again.',
@@ -101,6 +112,15 @@ describe('readSlotDescription', () => {
     expect(() => readSlotDescription(wrong)).toThrow(
       'replay-slot.json lacks "magic", "offset", "size" or holds the wrong type there',
     )
+  })
+
+  // S5-11 (a): replay-slot.json is the site's file, not the visitor's, so a broken one is a build
+  // mismatch, and the visitor reads that line with the module's words under "Details".
+  it("refuses a broken description as the site's build mismatch", () => {
+    expect(() => readSlotDescription({ ...DESCRIPTION, offset: '0x100' })).toThrow(
+      BuildMismatchError,
+    )
+    expect(() => readSlotDescription(null)).toThrow(BuildMismatchError)
   })
 
   it('refuses JSON that is not an object', () => {

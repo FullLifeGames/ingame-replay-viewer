@@ -11,6 +11,16 @@ export class RomError extends Error {
   override name = 'RomError'
 }
 
+/** A file the visitor picked as the dump that is not US Emerald; the message names both SHA1s. */
+export class DumpRefusal extends RomError {
+  override name = 'DumpRefusal'
+}
+
+/** The site's own files do not fit: the patch and replay-slot.json, or replay-slot.json itself. */
+export class BuildMismatchError extends RomError {
+  override name = 'BuildMismatchError'
+}
+
 const isCount = (value: unknown): boolean => Number.isSafeInteger(value) && Number(value) >= 0
 const isText = (value: unknown): boolean => typeof value === 'string'
 
@@ -43,14 +53,19 @@ function isDescription(json: Json): json is Json & SlotDescription {
   return wrongFields(json).length === 0
 }
 
-/** Checks the fetched replay-slot.json and keeps the fields of a slot description. */
+/**
+ * Checks the fetched replay-slot.json and keeps the fields of a slot description. The site serves
+ * the file with its build, so a broken one is a build mismatch, never the visitor's fault.
+ */
 export function readSlotDescription(json: unknown): SlotDescription {
   if (!isObject(json)) {
-    throw new RomError('replay-slot.json is not an object')
+    throw new BuildMismatchError('replay-slot.json is not an object')
   }
   if (!isDescription(json)) {
     const names = wrongFields(json).map((key) => `"${key}"`)
-    throw new RomError(`replay-slot.json lacks ${names.join(', ')} or holds the wrong type there`)
+    throw new BuildMismatchError(
+      `replay-slot.json lacks ${names.join(', ')} or holds the wrong type there`,
+    )
   }
   const entries = Object.keys(FIELD_CHECKS).map((key) => [key, json[key]])
   return Object.fromEntries(entries) as SlotDescription
@@ -66,7 +81,7 @@ export async function checkBaseRom(
 ): Promise<void> {
   const found = await sha1Hex(base)
   if (found !== baseSha1) {
-    throw new RomError(
+    throw new DumpRefusal(
       `This file is not the US Emerald dump the patch fits: its SHA1 is ${found}, ` +
         `US Emerald's is ${baseSha1}. Pick your US Emerald dump.`,
     )
@@ -85,7 +100,7 @@ export async function patchBaseRom(
   const rom = applyBps(patch, base)
   const built = await sha1Hex(rom)
   if (built !== description.romSha1) {
-    throw new RomError(
+    throw new BuildMismatchError(
       `The patched ROM's SHA1 is ${built}, replay-slot.json names ${description.romSha1}: ` +
         'the patch and replay-slot.json come from different builds. Run npm run rom:build again.',
     )

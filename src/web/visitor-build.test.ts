@@ -1,0 +1,167 @@
+import { describe, expect, it } from 'vitest'
+
+import { BpsError } from '../patch/bps-format'
+import { SlotMismatchError } from '../patch/slot'
+import { EmulatorError } from './emulator'
+import { messageOf } from './message'
+import {
+  createReplayChoice,
+  failed,
+  LARGEST_FILE,
+  PICK_DUMP,
+  type ReplayPlace,
+  SessionError,
+  step,
+} from './replay-choice'
+import build from '../../rom/gen3/build.json'
+import { BuildMismatchError, checkBaseRom, patchBaseRom, readSlotDescription } from './rom'
+import { BASE, DESCRIPTION, PATCH } from './session-testing'
+import { visitorLine } from './visitor'
+import { buildFailure, RunFailure, workerFailure } from './wasm/failures'
+
+const REPORT = 'Report it with the link below.'
+const RELOAD = 'Reload the page. If it fails again, report it with the link below.'
+const EXAMPLE: ReplayPlace = { source: 'example', replay: 'smogtours-gen3ou-994052' }
+
+/** The refusal of a pick or a build that fails. */
+const refusalOf = (work: Promise<unknown>): Promise<unknown> =>
+  work.then(
+    () => {
+      throw new Error('the work did not fail')
+    },
+    (error: unknown) => error,
+  )
+
+/** replay-slot.json of another build: the patched ROM's SHA1 is not the one it names. */
+const OTHER_BUILD = { ...DESCRIPTION, romSha1: '0'.repeat(40) }
+
+function slotFileRefusal(): unknown {
+  try {
+    return readSlotDescription({ ...DESCRIPTION, capacity: 'all' })
+  } catch (error: unknown) {
+    return error
+  }
+}
+
+const offline = () => createReplayChoice(() => Promise.reject(new Error('offline')))
+
+describe('visitorLine for the game and the build', () => {
+  const MISMATCH = `The site's game files do not match each other. ${RELOAD}`
+
+  it.each<[string, () => unknown]>([
+    ['BuildMismatchError', () => refusalOf(patchBaseRom(BASE, PATCH, OTHER_BUILD))],
+    ['SlotMismatchError', () => new SlotMismatchError('the slot header names another build')],
+    ['BpsError', () => new BpsError('BPS: the target checksum differs from the one in the patch')],
+    ['CompileError', () => new WebAssembly.CompileError('bad magic')],
+    ['worker mismatch', () => new RunFailure({ kind: 'mismatch', line: 'slot header' })],
+    ['worker instantiate', () => new RunFailure({ kind: 'instantiate', line: 'link error' })],
+    // S5-11 (a): the site's broken replay-slot.json, as the step that reads it hands it on.
+    ['broken slot file', () => failed('Could not read replay-slot.json', slotFileRefusal())],
+  ])('gives a %s the build mismatch line', async (name, make) => {
+    const error = await make()
+    if (name === 'BuildMismatchError') expect(error).toBeInstanceOf(BuildMismatchError)
+    expect(visitorLine(error)).toEqual({ line: MISMATCH, detail: messageOf(error), report: true })
+  })
+
+  it("gives the worker's own error the game stop line (S5-11)", () => {
+    const run = new RunFailure(workerFailure('Uncaught TypeError: x is undefined'))
+    expect(visitorLine(run, EXAMPLE)).toEqual({
+      line: `The game stopped during this replay. ${REPORT}`,
+      detail: 'The worker failed: Uncaught TypeError: x is undefined',
+      report: true,
+      replay: EXAMPLE.replay,
+    })
+  })
+
+  it.each(['stopped', 'returned'] as const)('gives a run that %s the game stop line', (kind) => {
+    const run = new RunFailure({ kind, line: 'The game stopped: unreachable' })
+    expect(visitorLine(run, EXAMPLE)).toEqual({
+      line: `The game stopped during this replay. ${REPORT}`,
+      detail: 'The game stopped: unreachable',
+      report: true,
+      replay: EXAMPLE.replay,
+    })
+  })
+
+  it('gives a file over the bound its size and the bound', async () => {
+    const big = { name: 'big.log', size: LARGEST_FILE + 1, text: () => Promise.resolve('') }
+    const refusal = await refusalOf(offline().loadFile(big))
+    expect(visitorLine(refusal)).toMatchObject({
+      line: 'big.log holds 5.1 MB, and the viewer reads replay files up to 5 MB. Pick the replay file you saved from Showdown.',
+      report: false,
+    })
+  })
+})
+
+/** `size` bytes that look random, as a file that is no dump at all. */
+function noise(size: number): Uint8Array {
+  const bytes = new Uint8Array(size)
+  let seed = 0x2545f491
+  for (let index = 0; index < size; index += 1) {
+    seed = (seed * 1_103_515_245 + 12_345) >>> 0
+    bytes[index] = seed >>> 24
+  }
+  return bytes
+}
+
+describe('visitorLine for a file that is not US Emerald (#59)', () => {
+  const SHA1 = /[0-9a-f]{40}/
+
+  // The tester's two files: a 1000-byte file, which no dump is, and 16 MiB of random bytes.
+  it.each([
+    ['a tiny file', 1000],
+    ['a file of random bytes', 16 * 1024 * 1024],
+  ])('gives %s one plain line and keeps both SHA1s for "Details"', async (_, size) => {
+    const refusal = await refusalOf(
+      step('Could not patch your dump', () => checkBaseRom(noise(size))),
+    )
+    const shown = visitorLine(refusal)
+    expect(shown).toEqual({
+      line: 'This file is not US Emerald. Pick your US Emerald dump.',
+      detail: messageOf(refusal),
+      report: false,
+    })
+    expect(shown.line).not.toMatch(SHA1)
+    expect(shown.detail).toContain(`US Emerald's is ${build.baseRom.sha1}`)
+    expect(shown.detail.match(new RegExp(SHA1, 'g'))).toHaveLength(2)
+  })
+})
+
+describe('visitorLine keeps the lines that speak to visitors', () => {
+  it.each([
+    ['Start', () => Promise.resolve(new SessionError(PICK_DUMP))],
+    [
+      'the emulator',
+      () => Promise.resolve(new EmulatorError('The emulator did not accept the ROM.')),
+    ],
+    ['the build memory', () => Promise.resolve(buildFailure(new RangeError('Out of memory')))],
+    [
+      'the run memory',
+      () =>
+        Promise.resolve(
+          new RunFailure({
+            kind: 'memory',
+            line: 'This browser did not give the game the memory.',
+          }),
+        ),
+    ],
+  ])('of %s as they are', async (_, make) => {
+    const error = await make()
+    expect(visitorLine(error)).toMatchObject({
+      line: messageOf(error),
+      detail: messageOf(error),
+      report: false,
+    })
+  })
+
+  it.each([new Error('x'), 'a thrown text', undefined])(
+    'has a line for a value with no rule: %s',
+    (value) => {
+      expect(visitorLine(value)).toEqual({
+        line: `The page hit a problem it has no line for. ${REPORT}`,
+        detail: messageOf(value),
+        report: true,
+      })
+    },
+  )
+})

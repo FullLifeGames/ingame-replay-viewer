@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { buildBattleScript } from './build'
 import { GameTypeRefusal, ScriptError } from './errors'
 import type { ScriptEvent } from './events'
+import { lineNumber } from './lines'
 import { NEXT, replayScript, scriptOf } from './testing'
 
 // Built once, outside the specs' time limit.
@@ -187,7 +188,7 @@ describe('buildBattleScript: lines it cannot show', () => {
 describe('buildBattleScript: logs it refuses', () => {
   it('refuses doubles', () => {
     expect(() => buildBattleScript('|gametype|doubles\n')).toThrow(ScriptError)
-    expect(() => buildBattleScript('|gametype|doubles\n')).toThrow(/^line 0: .*doubles/)
+    expect(() => buildBattleScript('|gametype|doubles\n')).toThrow(/^line 1: .*doubles/)
   })
 
   it('refuses doubles with a GameTypeRefusal that carries the game type (#59)', () => {
@@ -198,15 +199,15 @@ describe('buildBattleScript: logs it refuses', () => {
         name: 'GameTypeRefusal',
         gameType: 'doubles',
         line: 0,
-        message: 'line 0: the game type "doubles" is not singles',
+        message: 'line 1: the game type "doubles" is not singles',
       }),
     )
   })
 
   it('refuses a faint of a Pokémon that never appeared, with its line', () => {
-    expect(() => buildBattleScript('|start\n|faint|p1a: Mew\n')).toThrow(/^line 1: /)
+    expect(() => buildBattleScript('|start\n|faint|p1a: Mew\n')).toThrow(/^line 2: /)
     expect(() => scriptOf('|faint|p1a: Mew')).toThrow(
-      new RegExp(`^line ${String(NEXT)}: .*p1a: Mew`),
+      new RegExp(`^line ${String(lineNumber(NEXT))}: .*p1a: Mew`),
     )
   })
 

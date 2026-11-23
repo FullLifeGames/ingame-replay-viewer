@@ -21,6 +21,10 @@ const EMULATOR = '/emulator.html'
 const FIRST = 'smogtours-gen3ou-994052'
 const SECOND = 'smogtours-gen3ou-994086'
 const BASE_SHA1 = loadBuildConfig().baseRom.sha1
+// Words for the developer, which a visitor line never holds (#59).
+const DEVELOPER_WORDS = /npm run|localhost|devbox|tailscale|README/
+const REPORT_FORM_URL =
+  'https://github.com/FullLifeGames/ingame-replay-viewer/issues/new?template=replay-problem.yml'
 const DUMP = readPreflightInput(process.env, BASE_SHA1).baseRomPath
 const PATCH = join(buildPaths().outDir, OUTPUT_NAMES.patch)
 const SLOT = join(buildPaths().outDir, OUTPUT_NAMES.slot)
@@ -48,7 +52,7 @@ test('the page is cross-origin isolated and offers 994052 first', async ({ page 
   await expect(page.getByRole('link', { name: 'viewer' })).toHaveAttribute('href', './')
   await expect(page.getByRole('status')).toHaveText(/Pick your US Emerald dump/)
   await expect(page.getByLabel('Your US Emerald (stays in this tab)')).toBeEnabled()
-  await expect(page.getByLabel('Test replay')).toHaveValue(FIRST)
+  await expect(page.getByLabel('Example replay')).toHaveValue(FIRST)
   await expect(page.getByRole('heading', { name: /^Not shown in the game \(\d+\)/ })).toBeVisible()
   expect(await notShownCount(page)).toBeGreaterThan(0)
   await test.step('a phone-wide page shows the whole screen at 3:2', async () => {
@@ -69,7 +73,22 @@ test('a page without COOP and COEP shows only the environment line', async ({ pa
     await route.fulfill({ response, headers })
   })
   await page.goto(EMULATOR)
-  await expect(page.getByText(/not cross-origin isolated/)).toBeVisible()
+  const line = page.locator('#environment-line')
+  await expect(line).toHaveText(
+    'Your browser did not isolate this page, so the game cannot run. Reload the page. If it ' +
+      'fails again, report it with the link below.',
+  )
+  await expect(line).toBeVisible()
+  expect(await line.textContent()).not.toMatch(DEVELOPER_WORDS)
+  // The module's words wait under the closed "Details" for whoever runs the dev server.
+  const detail = page.locator('#environment-detail')
+  await expect(detail).toHaveText(/^This page is not cross-origin isolated/)
+  await expect(detail).toBeHidden()
+  const report = page.getByRole('link', { name: 'Report this problem' })
+  await expect(report).toBeVisible()
+  expect(await report.getAttribute('href')).toMatch(
+    `${REPORT_FORM_URL}&line=Your%20browser%20did%20not%20isolate`,
+  )
   await expect(page.getByLabel('Your US Emerald (stays in this tab)')).toBeHidden()
   await expect(page.getByRole('button', { name: 'Start', exact: true })).toBeHidden()
 })
@@ -85,7 +104,15 @@ test('a file that is not US Emerald is refused before the patch is fetched', asy
     mimeType: 'application/octet-stream',
     buffer: Buffer.alloc(16 * 1024 * 1024),
   })
-  await expect(page.getByRole('status')).toHaveText(new RegExp(BASE_SHA1), { timeout: 60_000 })
+  // One plain line for the visitor (#59); both SHA1s wait under the closed "Details".
+  await expect(page.getByRole('status')).toHaveText(
+    'This file is not US Emerald. Pick your US Emerald dump.',
+    { timeout: 60_000 },
+  )
+  await expect(page.locator('#status-detail')).toContainText(`US Emerald's is ${BASE_SHA1}`)
+  await expect(page.locator('#status-detail')).toBeHidden()
+  expect(await page.getByRole('status').textContent()).not.toMatch(DEVELOPER_WORDS)
+  await expect(page.locator('#report')).toBeHidden()
   await expect(page.getByRole('button', { name: 'Restart' })).toBeDisabled()
   expect(romRequests).toEqual([])
 })
@@ -109,7 +136,7 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
   const status = page.getByRole('status')
   await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles(DUMP)
   await expect(status).toHaveText(new RegExp(romSha1), { timeout: 90_000 })
-  await expect(page.getByLabel('Test replay')).toHaveValue(FIRST)
+  await expect(page.getByLabel('Example replay')).toHaveValue(FIRST)
   await page.getByRole('button', { name: 'Start', exact: true }).click()
   await expect(status).toHaveText(new RegExp(`Running ${FIRST}.*${String(streamBytes)} bytes`), {
     timeout: 60_000,
@@ -134,7 +161,7 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
   // A new image for the same emulator: quitGame, the old file removed, loadGame again.
   await test.step('a second Start runs another test replay', async () => {
     const before = await frame(page)
-    await page.getByLabel('Test replay').selectOption(SECOND)
+    await page.getByLabel('Example replay').selectOption(SECOND)
     await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${SECOND}: `))
     await page.getByRole('button', { name: 'Start', exact: true }).click()
     await expect(status).toHaveText(new RegExp(`^Running ${SECOND}: `), { timeout: 60_000 })

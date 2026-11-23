@@ -15,6 +15,15 @@
         image-rendering: pixelated;
         background: #000;
       }
+      #status,
+      #status-detail,
+      #replay-summary {
+        overflow-wrap: anywhere;
+      }
+      #panel p {
+        margin: 0.25em 0;
+        overflow-wrap: anywhere;
+      }
       fieldset {
         display: inline;
         border: none;
@@ -25,17 +34,37 @@
   <body>
     <h1>Ingame Replay Viewer</h1>
     <p>
+      Watch a Pokémon Showdown replay play out inside Pokémon Emerald. The page builds the game from
+      your own US Emerald dump, then plays the replay you pick: an example, a replay link, or a
+      saved replay file.
+    </p>
+    <p>Your dump and your replay files stay in this tab. The page uploads nothing.</p>
+    <p>The viewer plays Gen 1 to 3 singles for now.</p>
+    <p>
       The game runs in your browser as WebAssembly, without an emulator. If it fails here, try the
       <a href="./emulator.html">emulator page</a>.
     </p>
-    <p id="environment" hidden></p>
+    <p>
+      <a href="./licences.html">Licences</a> ·
+      <a href="https://github.com/FullLifeGames/ingame-replay-viewer">Source code</a>
+    </p>
+    <div id="environment" hidden>
+      <p id="environment-line"></p>
+      <p>
+        <a id="environment-report" target="_blank" rel="noopener" hidden>Report this problem</a>
+      </p>
+      <details>
+        <summary>Details</summary>
+        <p id="environment-detail"></p>
+      </details>
+    </div>
     <div id="app">
       <p>
         <label for="dump">Your US Emerald (stays in this tab)</label>
         <input id="dump" type="file" />
       </p>
       <p>
-        <label for="test-replay">Test replay</label>
+        <label for="test-replay">Example replay</label>
         <select id="test-replay"></select>
       </p>
       <form id="replay-form">
@@ -43,6 +72,10 @@
         <input id="replay-input" type="text" placeholder="smogtours-gen3ou-994052" />
         <button type="submit">Load</button>
       </form>
+      <p>
+        <label for="replay-file">Replay file</label>
+        <input id="replay-file" type="file" />
+      </p>
       <div>
         <fieldset id="speed">
           <legend>Speed</legend>
@@ -53,11 +86,22 @@
       </div>
       <p>
         <button id="start" type="button">Start</button>
+        <button id="pause" type="button" disabled>Pause</button>
         <button id="restart" type="button">Restart</button>
       </p>
       <p id="status" role="status"></p>
+      <p><a id="report" target="_blank" rel="noopener" hidden>Report this problem</a></p>
+      <details id="details">
+        <summary>Details</summary>
+        <p id="status-detail"></p>
+        <p id="progress"></p>
+      </details>
+      <div id="panel">
+        <p id="panel-far"></p>
+        <p id="panel-near"></p>
+        <p id="panel-turn"></p>
+      </div>
       <canvas id="screen" width="240" height="160"></canvas>
-      <p id="progress"></p>
       <p id="replay-summary"></p>
       <h2 id="not-shown">Not shown in the game (0)</h2>
       <ul id="not-shown-counts"></ul>

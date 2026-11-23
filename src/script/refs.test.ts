@@ -21,7 +21,7 @@ describe('sideOf', () => {
 
   it('refuses a third player with the line number', () => {
     expect(() => sideOf('p3', 7)).toThrow(ScriptError)
-    expect(() => sideOf('p3', 7)).toThrow(/^line 7: /)
+    expect(() => sideOf('p3', 7)).toThrow(/^line 8: /)
   })
 })
 
@@ -66,11 +66,11 @@ describe('refOf', () => {
   })
 
   it('refuses a Pokémon that never appeared, with the line number', () => {
-    expect(() => refOf(battleAfter(intro), 'p2: Skarmory', 40)).toThrow(/^line 40: .*p2: Skarmory/)
+    expect(() => refOf(battleAfter(intro), 'p2: Skarmory', 40)).toThrow(/^line 41: .*p2: Skarmory/)
   })
 
   it('refuses a name that is not the active Pokémon', () => {
-    expect(() => refOf(battleAfter(intro), 'p1a: Mew', 41)).toThrow(/^line 41: .*p1a: Mew/)
+    expect(() => refOf(battleAfter(intro), 'p1a: Mew', 41)).toThrow(/^line 42: .*p1a: Mew/)
   })
 })
 
@@ -87,7 +87,7 @@ describe('healthOf', () => {
 
   it.each(['', 'lots', 'x/100'])('refuses the HP string %j with the line number', (text) => {
     expect(() => healthOf(text, 100, 9)).toThrow(ScriptError)
-    expect(() => healthOf(text, 100, 9)).toThrow(/^line 9: /)
+    expect(() => healthOf(text, 100, 9)).toThrow(/^line 10: /)
   })
 })
 

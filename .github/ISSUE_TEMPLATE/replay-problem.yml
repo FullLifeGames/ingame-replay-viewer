@@ -1,0 +1,25 @@
+name: Replay problem
+description: A replay the viewer cannot play, or a line on the page that went wrong.
+title: 'Replay problem: '
+labels: ['needs triage']
+body:
+  - type: input
+    id: replay
+    attributes:
+      label: Replay
+      description: The replay's link, or the kind of file you loaded. Leave it empty if the problem came before you picked a replay. A private replay's link arrives without its password, because this issue is public.
+    validations:
+      required: false
+  - type: textarea
+    id: line
+    attributes:
+      label: What the page said
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: The text under Details on the page, if you opened it.
+    validations:
+      required: false

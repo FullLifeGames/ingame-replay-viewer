@@ -2,7 +2,7 @@
 // needs, the run's status through `irvWasmSpike`, its pace and sound over a stretch of wall time
 // against the tick rule, and the report line. Only numbers leave this module; the frames and the
 // sound stay in the page.
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { expect, type Page } from '@playwright/test'
@@ -11,6 +11,8 @@ import { loadBuildConfig } from '../scripts/rom-config.ts'
 import { OUTPUT_NAMES } from '../scripts/rom-outputs.ts'
 import { buildPaths, REPO_DIR } from '../scripts/rom-paths.ts'
 import { readPreflightInput } from '../scripts/rom-preflight.ts'
+import { PROGRESS_HEADER_PATH, readProgressLayout } from '../scripts/rom-shot-run.ts'
+import { planStreams } from '../scripts/rom-shot.ts'
 import { wasmPaths } from '../scripts/wasm-compile.ts'
 import { LINK_OUTPUTS } from '../scripts/wasm-link.ts'
 import { WASM_OUTPUT_NAMES } from '../scripts/wasm-outputs.ts'
@@ -28,6 +30,16 @@ const NEEDED = [
 /** What the WebAssembly page needs to run a replay and is not there: the dump or a build output. */
 export const missingForModule = (): string[] =>
   [DUMP, ...NEEDED].filter((path) => !existsSync(path))
+
+/** The hand-made battle's id, as the shot tool plans it. */
+export const HAND_MADE = 'hand-made'
+
+/** The hand-made battle's instruction stream, which the test hook plays without a pick. */
+export async function handMadeBytes(): Promise<number[]> {
+  const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
+  const [plan] = await planStreams([HAND_MADE], layout)
+  return [...(plan?.stream ?? [])]
+}
 
 /** The run's sound: samples through the ring, left and right counted apart. */
 interface Sound {
@@ -50,7 +62,11 @@ interface Status {
   finishedAt: number
   done: number
   total: number
+  /** The turn the game reached, 0 before turn 1. */
+  turn: number
   finished: boolean
+  /** Whether the viewer's Pause holds the run (#57). */
+  paused: boolean
   speed: string
   wallMs: number
   finishedMs: number | undefined

@@ -15,13 +15,13 @@ import { expect, test, type Page } from '@playwright/test'
 
 import { OUTPUT_NAMES } from '../scripts/rom-outputs.ts'
 import { buildPaths } from '../scripts/rom-paths.ts'
-import { PROGRESS_HEADER_PATH, readProgressLayout } from '../scripts/rom-shot-run.ts'
-import { planStreams } from '../scripts/rom-shot.ts'
 import { WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'
 import { frame } from './frames.ts'
 import {
   DUMP,
   finished,
+  HAND_MADE,
+  handMadeBytes,
   measure,
   missingForModule,
   playStream,
@@ -31,7 +31,6 @@ import {
 } from './wasm-hook.ts'
 
 const FIRST = 'smogtours-gen3ou-994052'
-const HAND_MADE = 'hand-made'
 const ROM_PATCH = join(buildPaths().outDir, OUTPUT_NAMES.patch)
 /** mGBA's fast-forward multipliers the probe runs 994052 at, one window each. */
 const MULTIPLIERS = [1, 16, 64, 256]
@@ -41,12 +40,6 @@ const WINDOW_MS = 10_000
 const EXPOSE_CORE =
   'const irvExposeCore=async(options)=>{const core=await mGBA(options);' +
   'globalThis.irvMgbaCore=core;return core};export default irvExposeCore;'
-
-async function handMadeBytes(): Promise<number[]> {
-  const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
-  const [plan] = await planStreams([HAND_MADE], layout)
-  return [...(plan?.stream ?? [])]
-}
 
 // The hand-made battle at 1x through the test hook: the tick rule's pace, the sound's pace into
 // the ring and out to the worklet, and its loudness during the battle's music.
@@ -109,7 +102,7 @@ async function restartAt2x(page: Page): Promise<void> {
 
 // Starts the picked test replay and waits until its run replaced the one before.
 async function startFirst(page: Page): Promise<void> {
-  await expect(page.getByLabel('Test replay')).toHaveValue(FIRST)
+  await expect(page.getByLabel('Example replay')).toHaveValue(FIRST)
   const before = (await status(page))?.runs.started ?? 0
   await page.getByRole('button', { name: 'Start', exact: true }).click()
   await expect
@@ -241,7 +234,7 @@ test('mGBA on the emulator page plays 994052 at fast-forward (B7 measurement)', 
   const line = page.getByRole('status')
   await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles(DUMP)
   await expect(line).toHaveText(new RegExp(romSha1), { timeout: 90_000 })
-  await expect(page.getByLabel('Test replay')).toHaveValue(FIRST)
+  await expect(page.getByLabel('Example replay')).toHaveValue(FIRST)
   await page.getByRole('button', { name: 'Start', exact: true }).click()
   await expect(line).toHaveText(new RegExp(`^Running ${FIRST}`), { timeout: 60_000 })
   await page.evaluate(() => {

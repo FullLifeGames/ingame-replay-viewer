@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { lineNumber } from '../lines'
 import { eventsAt, eventsFrom, NEXT, refIn, replayScript, scriptOf } from '../testing'
 
 // Built once, outside the specs' time limit.
@@ -47,7 +48,7 @@ describe('the HP rules', () => {
 
   it('refuses a wisher who never appeared', () => {
     expect(() => scriptOf('|-heal|p1a: Dugtrio|100/100|[from] move: Wish|[wisher] Mew')).toThrow(
-      new RegExp(`^line ${String(NEXT)}: .*Mew`),
+      new RegExp(`^line ${String(lineNumber(NEXT))}: .*Mew`),
     )
   })
 

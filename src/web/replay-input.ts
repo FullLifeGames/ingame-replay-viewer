@@ -1,17 +1,19 @@
 // A replay the user names in the page (plan "Replay input (v1)"): an ID or a link to
 // replay.pokemonshowdown.com, read as the URL of the replay's JSON there, which answers with open
 // CORS.
+import { isReplayId } from '../script/replay-id'
 
 /** Input that names no replay on replay.pokemonshowdown.com. */
 export class ReplayInputError extends Error {
   override name = 'ReplayInputError'
 }
 
-const REPLAY_HOST = 'replay.pokemonshowdown.com'
+/** Showdown's replay host, which the page asks for a replay's JSON. */
+export const REPLAY_HOST = 'replay.pokemonshowdown.com'
+/** The replay ID that the page's words and the link field's placeholder show as an example. */
+export const EXAMPLE_ID = 'smogtours-gen3ou-994052'
 const ASK = `paste a replay ID or a link to ${REPLAY_HOST}`
 
-/** Showdown's replay IDs: lowercase words joined by single hyphens, as gen3ou-1234567890. */
-const REPLAY_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const SCHEME = /^[a-z][a-z0-9+.-]*:/i
 
 /** The path of a link to a replay, after the host; a link without a scheme reads as https. */
@@ -34,9 +36,9 @@ function pathOfLink(text: string): string {
 function idOf(text: string): string {
   const path = text.includes('/') ? pathOfLink(text) : text.replace(/[?#].*$/, '')
   const id = path.replace(/\/$/, '').replace(/\.(?:json|log)$/, '')
-  if (!REPLAY_ID.test(id)) {
+  if (!isReplayId(id)) {
     throw new ReplayInputError(
-      `"${id}" is not a replay ID: replay IDs look like smogtours-gen3ou-994052; ${ASK}`,
+      `"${id}" is not a replay ID: replay IDs look like ${EXAMPLE_ID}; ${ASK}`,
     )
   }
   return id
