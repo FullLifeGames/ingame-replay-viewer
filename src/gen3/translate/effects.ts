@@ -30,8 +30,9 @@ const PERISH_ZERO = 'perish0'
 
 /**
  * Pursuit on a Pokémon that switches out: the game says "X, come back!" (`STRINGID_RETURNMON`,
- * `BattleScript_ActionSwitch`) before the hit, and our withdraw says it at the switch after the
- * hit, so the activation shows nothing and names the mechanic.
+ * `BattleScript_ActionSwitch`) before the hit. Our withdraw says it at the switch after the hit,
+ * and not at all when the hit knocks the Pokémon out (the log then sends the next one in after
+ * the faint). The activation shows nothing and names the mechanic.
  */
 const PURSUIT = 'pursuit'
 
