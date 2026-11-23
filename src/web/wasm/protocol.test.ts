@@ -48,7 +48,7 @@ const paid = (speed: '1x' | '2x', from: number, now: number, frame = 0): number 
   frame + Math.floor(((now - from) * (ticksPerSecond(speed) ?? 0)) / 1000)
 
 /** The most the clock grants ahead of the game's frame and the frames owed since the last ask. */
-const LEAD = { '1x': 6, '2x': 12 } as const
+const LEAD = { '1x': 30, '2x': 60 } as const
 
 /**
  * Plays `speed` for 1 s, stalls the game for 2 s (it reports one frame) with an ask every `gap`
@@ -177,12 +177,25 @@ describe('the tick rule', () => {
     expect(clock.allowed(1616, 95)).toBe(96)
   })
 
+  // The probe of S4-15: animation frames up to 450 ms apart in a loaded headless Chromium, and a
+  // game still 28 frames behind its grant at the next ask, as it works through the late burst.
+  it.each(['1x', '2x'] as const)(
+    'loses no frame at %s when the next ask finds the game 28 frames behind',
+    (speed) => {
+      const clock = new TickClock(speed, 0)
+      const held = walk(clock, 0, 1000) ?? 0
+      expect(clock.allowed(1450, held)).toBe(paid(speed, 0, 1450))
+      expect(clock.allowed(1480, paid(speed, 0, 1480) - 28)).toBe(paid(speed, 0, 1480))
+      expect(walk(clock, 1480, 2480, paid(speed, 0, 1480))).toBe(paid(speed, 0, 2480))
+    },
+  )
+
   it('drops only the frames the game left unused before a late ask', () => {
     const clock = new TickClock('1x', 0)
     expect(walk(clock, 0, 1000)).toBe(59)
-    // 19 of the 59 granted frames lay unused: the game gets the 36 frames since and the lead.
-    expect(clock.allowed(1600, 40)).toBe(40 + 36 + LEAD['1x'])
-    expect(clock.allowed(1616, 82)).toBe(83)
+    // 39 of the 59 granted frames lay unused: the game gets the 36 frames since and the lead.
+    expect(clock.allowed(1600, 20)).toBe(20 + 36 + LEAD['1x'])
+    expect(clock.allowed(1616, 86)).toBe(87)
   })
 
   it('never takes back a frame it granted', () => {

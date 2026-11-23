@@ -27,13 +27,15 @@ export const speedAtEnd = (speed: Speed): Speed => (speed === 'fast' ? '1x' : sp
 
 /**
  * How far the grant may run ahead of the frame the game has reached, beyond the frames owed since
- * the page's previous ask, in seconds of play: 6 frames at 1x, 12 at 2x. A late animation frame
- * owes the game every frame since the previous ask, so it costs no play time. A game that fell
- * behind its previous grant (a slow start, a busy machine, a phone that stalls) loses that unused
- * debt instead of racing to pay it back; 0.1 s of sound in one burst stays within the sound
- * ring's reserve.
+ * the page's previous ask, in seconds of play: 30 frames at 1x, 60 at 2x. A late animation frame
+ * owes the game every frame since the previous ask, so it costs no play time. On a loaded machine
+ * the page's animation frames come up to about 450 ms apart, and the next ask finds the game still
+ * playing the burst the late one granted, up to 28 frames behind; a lead of 0.1 s dropped those
+ * frames. A game that fell further behind its previous grant (a slow start, a phone that stalls)
+ * loses that unused debt instead of racing to pay it back. A burst of one gap's frames plus the
+ * lead fits the sound ring, and the worklet skips what passes its latency cap and counts it.
  */
-const LEAD_SECONDS = 0.1
+const LEAD_SECONDS = 0.5
 
 /**
  * The tick rule: how many frames the game may have played by a moment, in milliseconds. The
