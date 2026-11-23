@@ -146,3 +146,42 @@ describe('Disable (Gen 1 to 3)', () => {
     ])
   })
 })
+
+describe('Transform (Gen 1 to 3)', () => {
+  const lines = [
+    '|move|p1a: Dugtrio|Transform|p2a: Tyranitar',
+    '|-transform|p1a: Dugtrio|p2a: Tyranitar',
+  ]
+
+  it('says the species it turned into, as the expansion does', () => {
+    expect(sceneOf(...lines).map(plain)).toEqual([
+      'Dugtrio used Transform!',
+      { op: 'move', user: 'near', target: 'far', move: expect.any(Number) as number },
+      'Dugtrio transformed into Tyranitar!',
+    ])
+  })
+
+  it("names the species, not the target's nickname", () => {
+    const named = [
+      '|switch|p2a: Rocky|Tyranitar, M|100/100',
+      '|move|p1a: Dugtrio|Transform|p2a: Rocky',
+      '|-transform|p1a: Dugtrio|p2a: Rocky',
+    ]
+
+    expect(
+      sceneOf(...named)
+        .map(plain)
+        .at(-1),
+    ).toBe('Dugtrio transformed into Tyranitar!')
+  })
+
+  it('names the sprite change, which the stream cannot hold', () => {
+    expect(fallbacksOf(...lines)).toEqual([
+      {
+        line: NEXT + 1,
+        kind: 'mechanic',
+        detail: 'no state in the stream for Transform changing the sprite',
+      },
+    ])
+  })
+})

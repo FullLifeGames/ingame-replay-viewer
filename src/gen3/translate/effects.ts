@@ -6,7 +6,8 @@
 // Destiny Bond's line before both faints; the game says it after the holder's faint, then drains
 // the attacker's bar (`BattleScript_DestinyBondTakesLife`), so the line waits for that faint. A
 // perish count at 0 drains the bar after its line (`BattleScript_PerishSongTakesLife`). Pursuit's
-// activation shows nothing (`PURSUIT`).
+// activation shows nothing (`PURSUIT`). Transform says the species its user turned into
+// (`BattleScript_EffectTransform`); the sprite stays, since the stream holds no op that changes it.
 import { toID } from '@pkmn/dex'
 
 import type { PokemonRef } from '../../script/types'
@@ -18,6 +19,7 @@ import {
   effectEnded,
   effectStarted,
   singleTurn as lastsTheTurn,
+  transformed,
 } from '../text/phrases-effects'
 import { type Context, type EventOf, sameMon } from './context'
 import { hit, hitLines } from './hits'
@@ -120,6 +122,11 @@ export function takeDown(who: PokemonRef, line: number, ctx: Context): void {
   ctx.takenDown = undefined
   ctx.print(held.line, effectActivated(ctx.mon(held.who), held.effect))
   drain(who, line, ctx)
+}
+
+export function transform({ who, into, line }: EventOf<'transform'>, ctx: Context): void {
+  ctx.print(line, transformed(ctx.mon(who), ctx.species(into)))
+  ctx.note(line, mechanicGap('Transform', 'changing the sprite'))
 }
 
 export function singleTurn({ who, effect, line }: EventOf<'singleTurn'>, ctx: Context): void {

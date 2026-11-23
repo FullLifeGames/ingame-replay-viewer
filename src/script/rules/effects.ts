@@ -53,6 +53,14 @@ export const EFFECT_RULES = {
       ]
     },
   },
+  // The client copies the target's boosts, types and moves; the script keeps who turned into whom.
+  '|-transform|': {
+    arity: 2,
+    reads: [],
+    build: ({ line, args: [, who, into], battle }) => [
+      { kind: 'transform', line, who: refOf(battle, who, line), into: refOf(battle, into, line) },
+    ],
+  },
   '|-singleturn|': {
     arity: 2,
     reads: [],

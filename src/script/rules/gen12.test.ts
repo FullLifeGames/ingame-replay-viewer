@@ -82,3 +82,17 @@ describe("Disable's move, the third argument of `-start` (D14)", () => {
     expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
   })
 })
+
+describe('Transform', () => {
+  it('gives the Pokémon that transforms and the one it turns into', () => {
+    const script = scriptOf(
+      '|move|p1a: Dugtrio|Transform|p2a: Tyranitar',
+      '|-transform|p1a: Dugtrio|p2a: Tyranitar',
+    )
+
+    expect(eventsAt(script, NEXT + 1)).toEqual([
+      { kind: 'transform', line: NEXT + 1, who: DUGTRIO, into: { side: 'far', index: 0 } },
+    ])
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
+})

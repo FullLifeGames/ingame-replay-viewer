@@ -3,7 +3,15 @@
 import { toID } from '@pkmn/dex'
 
 import type { Effect } from '../../script/types'
-import { held, type Mon, moveName, nameAtStart, nameInside, ownerAtStart } from './names'
+import {
+  held,
+  type Mon,
+  moveName,
+  nameAtStart,
+  nameInside,
+  ownerAtStart,
+  speciesName,
+} from './names'
 import { screenRaised } from './phrases-field'
 import { isTrapping } from './phrases-hp'
 import { ownPhrase, type Phrase, tagged } from './template'
@@ -69,6 +77,10 @@ export const EFFECT_TEMPLATES = {
   // `BattleScript_EffectDisable`, with the target as B_DEF and its move as B_BUFF1.
   disabled: tagged('STRINGID_PKMNMOVEWASDISABLED', (who: Mon, move: string) => {
     return `${ownerAtStart(who)} ${move} was disabled!`
+  }),
+  // B_MSG_TRANSFORMED in `gTransformUsedStringIds`; B_BUFF1 is the target's species.
+  transformed: tagged('STRINGID_PKMNTRANSFORMEDINTO', (who: Mon, species: string) => {
+    return `${nameAtStart(who)} transformed into ${species}!`
   }),
 }
 
@@ -183,6 +195,10 @@ export function singleTurn(who: Mon, effect: Effect): Phrase {
   const own = `${nameAtStart(who)} is ready with ${held(effect.name)}!`
   return ownPhrase(own, `${effect.name} for one turn`)
 }
+
+/** `who` turned into the species `species`, by the expansion's name for it. */
+export const transformed = (who: Mon, species: string) =>
+  E.transformed.render(who, speciesName(species))
 
 /** A move `who` kept off, such as by Protect. */
 export function blocked(who: Mon, effect: Effect): Phrase {

@@ -23,6 +23,7 @@ describe('Context', () => {
   it('refuses a team member the log never showed and a side with no player', () => {
     const ctx = new Context(buildBattleScript('|gen|3\n|start\n'))
     expect(() => ctx.mon({ side: 'near', index: 0 })).toThrow(Gen3Error)
+    expect(() => ctx.species({ side: 'far', index: 0 })).toThrow(/no team member 0 on the far/)
     expect(() => ctx.player('far')).toThrow(/no player on the far side/)
   })
 })

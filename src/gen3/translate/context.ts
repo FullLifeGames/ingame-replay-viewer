@@ -142,6 +142,14 @@ export class Context {
     return this.member(ref).mon
   }
 
+  /** The species of the team member, as the log names it. */
+  species(ref: PokemonRef): string {
+    const member = this.script.teams[ref.side][ref.index]
+    if (member === undefined)
+      throw new Gen3Error(`no team member ${String(ref.index)} on the ${ref.side} side`)
+    return member.species
+  }
+
   player(side: Side): Player {
     const player = this.players[side]
     if (player === undefined) throw new Gen3Error(`the log names no player on the ${side} side`)

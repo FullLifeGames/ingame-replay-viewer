@@ -12,6 +12,7 @@ import type {
   ItemEndEvent,
   ItemEvent,
   SingleTurnEvent,
+  TransformEvent,
 } from './effect-events'
 import type { DroppedLine, Effect, HpFraction, PokemonRef, Side, TeamMember } from './types'
 
@@ -302,6 +303,7 @@ export type ScriptEvent =
   | EffectStartEvent
   | EffectEndEvent
   | EffectActivateEvent
+  | TransformEvent
   | SingleTurnEvent
   | WeatherEvent
   | SideConditionEvent

@@ -5,7 +5,7 @@ import type { Fallback } from '../fallbacks'
 import type { Stream } from '../stream/instructions'
 import { ability, closePopUp, inCausePopUp } from './abilities'
 import { Context, type EventOf, type Placed } from './context'
-import { block, effectActivate, effectEnd, effectStart, singleTurn } from './effects'
+import { block, effectActivate, effectEnd, effectStart, singleTurn, transform } from './effects'
 import { message, tie, win } from './end'
 import { fieldActivate, sideEnd, sideStart, weather } from './field'
 import { item, itemEnd } from './items'
@@ -49,6 +49,7 @@ const HANDLERS = {
   effectStart,
   effectEnd,
   effectActivate,
+  transform,
   singleTurn,
   weather,
   sideStart,

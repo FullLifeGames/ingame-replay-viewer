@@ -118,7 +118,6 @@ export const NAMED_KINDS: Readonly<Partial<Record<Protocol.ArgName, NamedKind>>>
   '|-sethp|': noRule("a Pokémon's HP set outright, as when two Pokémon share their HP"),
   '|-copyboost|': noRule("one Pokémon's stat stages copied to another"),
   '|-clearnegativeboost|': noRule("one Pokémon's lowered stat stages reset"),
-  '|-transform|': noRule('a Pokémon transforming into another'),
   '|-prepare|': noRule('the charging turn of a two-turn move'),
   '|-singlemove|': noRule("a move whose effect lasts until the user's next move"),
   '|-anim|': noRule("a move's animation without the move's effects"),

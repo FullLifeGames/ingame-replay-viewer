@@ -35,6 +35,14 @@ export interface EffectActivateEvent extends Hit {
   readonly damage?: true
 }
 
+/** `who` turns into a copy of `into` (Transform). */
+export interface TransformEvent {
+  readonly kind: 'transform'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly into: PokemonRef
+}
+
 /** An effect that lasts the turn: Protect, Endure, Focus Punch's focus. */
 export interface SingleTurnEvent {
   readonly kind: 'singleTurn'
