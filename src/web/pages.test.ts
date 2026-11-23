@@ -208,6 +208,16 @@ describe('the licence page', () => {
     }
   })
 
+  // The tester's three developer words (#59) each come with what they are.
+  it('says what its decision records, the module patch and the glue are', () => {
+    const text = squeezed(LICENCES.replace(/<[^>]*>/g, ''))
+    expect(text).toContain("as the project's decision records ADR 0002 and ADR 0007 state.")
+    expect(text).toContain(
+      'the module patch, the file that turns your dump into the game the viewer runs,',
+    )
+    expect(text).toContain("Emscripten's glue, the script that starts that game.")
+  })
+
   it('links back to the viewer and names no machine of ours', () => {
     expect(LICENCES).toContain('<a href="./">')
     expect(LICENCES).not.toMatch(/localhost|devbox|tailscale|\/home\/|npm run|README/i)

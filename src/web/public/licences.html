@@ -47,8 +47,9 @@ SOFTWARE.</pre>
 
     <h2>What the game files carry</h2>
     <p>
-      The viewer builds the game in your tab from your US Emerald dump with the module patch, and
-      runs it with Emscripten's glue. Those two files carry code from these projects:
+      The viewer builds the game in your tab from your US Emerald dump. Two files do it: the module
+      patch, the file that turns your dump into the game the viewer runs, and Emscripten's glue, the
+      script that starts that game. Both files carry code from these projects:
     </p>
     <ul>
       <li>
@@ -65,7 +66,7 @@ SOFTWARE.</pre>
       </li>
       <li>
         pokeemerald-expansion: it publishes no licence, so its authors keep all rights to it. The
-        patches carry its compiled code, as
+        patches carry its compiled code, as the project's decision records
         <a
           href="https://github.com/FullLifeGames/ingame-replay-viewer/blob/master/docs/adr/0002-patch-for-user-supplied-rom.md"
           >ADR 0002</a
@@ -75,7 +76,7 @@ SOFTWARE.</pre>
           href="https://github.com/FullLifeGames/ingame-replay-viewer/blob/master/docs/adr/0007-no-forks.md"
           >ADR 0007</a
         >
-        record.
+        state.
       </li>
     </ul>
 
