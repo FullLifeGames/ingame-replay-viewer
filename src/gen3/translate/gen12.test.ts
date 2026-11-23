@@ -104,3 +104,16 @@ describe("Pursuit's activation on a Pokémon that switches out (Gen 2 and 3)", (
     ])
   })
 })
+
+describe('Haze (Gen 1 to 3)', () => {
+  it('says every stat change is gone and plays no stat animation, as the expansion does', () => {
+    const lines = ['|move|p2a: Tyranitar|Haze|p2a: Tyranitar', '|-clearallboost']
+
+    expect(sceneOf(...lines).map(plain)).toEqual([
+      'The opposing Tyranitar used Haze!',
+      { op: 'move', user: 'far', target: 'far', move: expect.any(Number) as number },
+      'All stat changes were eliminated!',
+    ])
+    expect(fallbacksOf(...lines)).toEqual([])
+  })
+})

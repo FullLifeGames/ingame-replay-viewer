@@ -213,6 +213,12 @@ interface StatLimitEvent {
   readonly cause?: Effect
 }
 
+/** Every stat stage of every active Pokémon back to 0 (Haze). */
+interface StatResetEvent {
+  readonly kind: 'statReset'
+  readonly line: number
+}
+
 /** A critical hit that no hit absorbed. */
 interface CritEvent {
   readonly kind: 'crit'
@@ -343,6 +349,7 @@ export type ScriptEvent =
   | CureTeamEvent
   | StatChangeEvent
   | StatLimitEvent
+  | StatResetEvent
   | CritEvent
   | EffectivenessEvent
   | HitCountEvent

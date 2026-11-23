@@ -88,6 +88,8 @@ export const STAT_TEMPLATES = {
   maxedAttack: tagged('STRINGID_PKMNCUTHPMAXEDATTACK', (who: Mon) => {
     return `${nameAtStart(who)} cut its own HP and maximized its Attack!`
   }),
+  // `BattleScript_EffectHaze` (data/battle_scripts_1.s) prints it after the move's animation.
+  changesGone: tagged('STRINGID_STATCHANGESGONE', () => 'All stat changes were eliminated!'),
 }
 
 export function usedMove(user: Mon, move: string): string {
@@ -159,6 +161,9 @@ export function statChanged(who: Mon, stat: BoostID, stages: number, cause?: Eff
   const template = stages > 0 ? STAT_TEMPLATES.rose : STAT_TEMPLATES.fell
   return template.render(who, statName(stat), how)
 }
+
+/** Haze's line: every stat stage back to 0. */
+export const statChangesGone = () => STAT_TEMPLATES.changesGone.render()
 
 export function statWontChange(who: Mon, stat: BoostID, direction: 'up' | 'down'): string {
   const template = direction === 'up' ? STAT_TEMPLATES.wontRise : STAT_TEMPLATES.wontFall

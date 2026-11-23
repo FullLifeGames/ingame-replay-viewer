@@ -53,3 +53,12 @@ describe('a stat stage set outright (Belly Drum)', () => {
     ])
   })
 })
+
+describe("Haze's reset of every stat stage", () => {
+  it('gives one event for the line, which names no Pokémon', () => {
+    const script = scriptOf('|move|p2a: Tyranitar|Haze|p2a: Tyranitar', '|-clearallboost')
+
+    expect(eventsAt(script, NEXT + 1)).toEqual([{ kind: 'statReset', line: NEXT + 1 }])
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
+})

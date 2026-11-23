@@ -160,4 +160,6 @@ export const POKEMON_RULES = {
   '|-boost|': { arity: 3, reads: ['from'], build: statChange },
   '|-unboost|': { arity: 3, reads: ['from'], build: statChange },
   '|-setboost|': { arity: 3, reads: ['from'], build: statSet },
+  // Haze: the line names no Pokémon; the client resets the stages of every active one.
+  '|-clearallboost|': { arity: 0, reads: [], build: ({ line }) => [{ kind: 'statReset', line }] },
 } satisfies Rules

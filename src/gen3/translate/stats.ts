@@ -6,9 +6,10 @@
 // `IncreaseStat` picks `STRINGID_STATSWONTINCREASE` "{B_SCR_NAME_WITH_PREFIX}'s {B_BUFF1} won't go
 // any higher!" and `DecreaseStat` `STRINGID_STATSWONTDECREASE` "… won't go any lower!"
 // (`battle_stat_change.c`, `battle_message.c`). Belly Drum plays its arrows like any change, then
-// says the maxed Attack, its own message (`B_MSG_STAT_CHANGED_BELLY_DRUM`).
+// says the maxed Attack, its own message (`B_MSG_STAT_CHANGED_BELLY_DRUM`). Haze resets every
+// stage with no stat animation and says so once (`BattleScript_EffectHaze`).
 import type { ScriptEvent } from '../../script/events'
-import { statChanged, statWontChange } from '../text/phrases'
+import { statChanged, statChangesGone, statWontChange } from '../text/phrases'
 import { type Context, type EventOf, sameMon } from './context'
 
 type StatChangeEvent = EventOf<'statChange'>
@@ -31,4 +32,8 @@ export function statLimit(
   ctx: Context,
 ): void {
   ctx.print(line, statWontChange(ctx.mon(who), stat, direction))
+}
+
+export function statReset({ line }: EventOf<'statReset'>, ctx: Context): void {
+  ctx.print(line, statChangesGone())
 }
