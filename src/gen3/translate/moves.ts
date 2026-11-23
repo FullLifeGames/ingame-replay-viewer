@@ -22,6 +22,7 @@
 // which sets MOVE_RESULT_FAILED. Showdown logs it as a heal of the target by its ability right
 // after the move, or an `-immune` at full HP. The rule reads no ability names.
 import type { ScriptEvent } from '../../script/events'
+import type { PokemonRef } from '../../script/types'
 import type { Instruction } from '../stream/instructions'
 import { moveOf } from '../tables/lookup'
 import { critical, effective, failed, immune, missed, usedMove } from '../text/phrases'
@@ -96,8 +97,19 @@ export function move(event: EventOf<'move'>, ctx: Context): void {
   startMove(eventsOfMove(ctx, event), played, ctx)
 }
 
-export function miss({ user, target, line }: EventOf<'miss'>, ctx: Context): void {
-  ctx.print(line, missed(ctx.mon(user), target && ctx.mon(target)))
+/**
+ * Gen 1 and 2 log a miss with no target (`|-miss|<user>`) right after the move, which names
+ * one: the miss takes the move's target, so the game's "avoided" line fits.
+ */
+function targetOfMiss({ user, target }: EventOf<'miss'>, ctx: Context): PokemonRef | undefined {
+  if (target !== undefined) return target
+  const before = ctx.near(-1)
+  return before?.kind === 'move' && sameMon(before.user, user) ? before.target : undefined
+}
+
+export function miss(event: EventOf<'miss'>, ctx: Context): void {
+  const target = targetOfMiss(event, ctx)
+  ctx.print(event.line, missed(ctx.mon(event.user), target && ctx.mon(target)))
 }
 
 export function immunity({ who, effect, line }: EventOf<'immune'>, ctx: Context): void {
