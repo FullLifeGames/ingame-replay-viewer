@@ -5,7 +5,8 @@
 // are a line each; a silent one the stream has no state for is a mechanic fallback. The log puts
 // Destiny Bond's line before both faints; the game says it after the holder's faint, then drains
 // the attacker's bar (`BattleScript_DestinyBondTakesLife`), so the line waits for that faint. A
-// perish count at 0 drains the bar after its line (`BattleScript_PerishSongTakesLife`).
+// perish count at 0 drains the bar after its line (`BattleScript_PerishSongTakesLife`). Pursuit's
+// activation shows nothing (`PURSUIT`).
 import { toID } from '@pkmn/dex'
 
 import type { PokemonRef } from '../../script/types'
@@ -26,6 +27,13 @@ const VOLATILES: Partial<Readonly<Record<string, Volatile>>> = { substitute: 'su
 
 const DESTINY_BOND = 'destinybond'
 const PERISH_ZERO = 'perish0'
+
+/**
+ * Pursuit on a Pokémon that switches out: the game says "X, come back!" (`STRINGID_RETURNMON`,
+ * `BattleScript_ActionSwitch`) before the hit, and our withdraw says it at the switch after the
+ * hit, so the activation shows nothing and names the mechanic.
+ */
+const PURSUIT = 'pursuit'
 
 const SINGLE_TURN_ANIM: Partial<Readonly<Record<string, Anim>>> = {
   focuspunch: 'focusPunchSetup',
@@ -80,6 +88,10 @@ function substituteBreaks(event: EventOf<'effectEnd'>, ctx: Context): void {
 /** A substitute that takes a hit (`[damage]`) plays the hit first; any other effect is a line. */
 export function effectActivate(event: EventOf<'effectActivate'>, ctx: Context): void {
   const { who, effect, line } = event
+  if (toID(effect.name) === PURSUIT) {
+    ctx.note(line, mechanicGap(effect.name, 'acting'))
+    return
+  }
   if (who !== undefined && takesDown(event, who, ctx)) {
     ctx.takenDown = { ...event, who }
     return

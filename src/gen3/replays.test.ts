@@ -31,10 +31,14 @@ const HEADER_KINDS: ReadonlySet<ScriptEvent['kind']> = new Set(['player', 'teamS
 const charsetRead = (text: string) => decodeText(encodeText(text))
 
 /**
- * The mechanic fallbacks the test replays may take, each a silent line the game shows nothing for:
- * Perish Song's first count, whose later counts print. A new one fails until it is named here.
+ * The mechanic fallbacks the test replays may take, each a line the game shows nothing for:
+ * Perish Song's first count, whose later counts print, and Pursuit's activation, whose withdraw
+ * line the switch after the hit prints. A new one fails until it is named here.
  */
-const NAMED_MECHANICS: ReadonlySet<string> = new Set([mechanicGap('perish3', 'starting').detail])
+const NAMED_MECHANICS: ReadonlySet<string> = new Set([
+  mechanicGap('perish3', 'starting').detail,
+  mechanicGap('Pursuit', 'acting').detail,
+])
 
 const replays = REPLAYS.map(({ id }) => {
   const script = replayScript(id)

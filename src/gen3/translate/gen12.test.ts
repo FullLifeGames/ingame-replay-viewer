@@ -81,3 +81,26 @@ describe("Mean Look's trap", () => {
     expect(fallbacksOf(...lines)).toEqual([])
   })
 })
+
+describe("Pursuit's activation on a Pokémon that switches out (Gen 2 and 3)", () => {
+  const lines = [
+    '|-activate|p2a: Tyranitar|move: Pursuit',
+    '|move|p1a: Dugtrio|Pursuit|p2a: Tyranitar|[from] Pursuit',
+    '|-damage|p2a: Tyranitar|80/100',
+  ]
+
+  it('prints nothing before the hit, which the withdraw follows', () => {
+    expect(sceneOf(...lines).map(plain)).toEqual([
+      'Dugtrio used Pursuit!',
+      { op: 'move', user: 'near', target: 'far', move: expect.any(Number) as number },
+      { op: 'hit', side: 'far', effectiveness: 'normal' },
+      { op: 'hp', side: 'far', hp: 80 },
+    ])
+  })
+
+  it('names the mechanic the stream holds no state for', () => {
+    expect(fallbacksOf(...lines)).toEqual([
+      { line: NEXT, kind: 'mechanic', detail: 'no state in the stream for Pursuit acting' },
+    ])
+  })
+})
