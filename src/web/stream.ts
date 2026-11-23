@@ -5,7 +5,7 @@ import { buildGen3Stream, type Gen3Stream } from '../gen3/backend'
 import { showsInPlace, type Fallback } from '../gen3/fallbacks'
 import { buildBattleScript } from '../script/build'
 import type { ScriptEvent } from '../script/events'
-import { readLines, type LogLine } from '../script/lines'
+import { lineNumber, readLines, type LogLine } from '../script/lines'
 import { readReplay, type Replay } from '../script/replay'
 import type { Side } from '../script/types'
 
@@ -66,7 +66,9 @@ const withDetail = (detail: string | undefined) => (detail === undefined ? {} : 
 function lineText(lines: readonly LogLine[], fallback: Fallback): string {
   const line = lines[fallback.line]
   if (line === undefined) {
-    throw new Error(`a fallback points at line ${String(fallback.line)}, past the battle log's end`)
+    throw new Error(
+      `a fallback points at line ${String(lineNumber(fallback.line))}, past the battle log's end`,
+    )
   }
   return line.text
 }
@@ -75,14 +77,14 @@ function lineText(lines: readonly LogLine[], fallback: Fallback): string {
 export function notShown(replay: Replay, stream: Gen3Stream): NotShownRow[] {
   const lines = readLines(replay.log)
   const dropped = stream.dropped.map(({ line, reason, text, detail }): NotShownRow => ({
-    line: line + 1,
+    line: lineNumber(line),
     what: `dropped: ${reason}`,
     text,
     ...withDetail(detail),
     standIn: false,
   }))
   const fallbacks = stream.fallbacks.map((fallback): NotShownRow => ({
-    line: fallback.line + 1,
+    line: lineNumber(fallback.line),
     what: `fallback: ${fallback.kind}`,
     text: lineText(lines, fallback),
     detail: fallback.detail,

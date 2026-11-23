@@ -8,6 +8,7 @@ import { Gen3Error, GenerationRefusal } from '../gen3/errors'
 import { BpsError } from '../patch/bps-format'
 import { SlotError, SlotMismatchError } from '../patch/slot'
 import { GameTypeRefusal, ScriptError } from '../script/errors'
+import { lineNumber } from '../script/lines'
 import { ReplayError } from '../script/replay'
 import { EmulatorError } from './emulator'
 import type { EnvironmentProblem } from './environment'
@@ -192,7 +193,7 @@ const RULES: readonly Rule[] = [
   },
   (error) =>
     error instanceof ScriptError
-      ? { name: 'scriptLine', values: { line: String(error.line + 1) } }
+      ? { name: 'scriptLine', values: { line: String(lineNumber(error.line)) } }
       : undefined,
   named('buildMismatch', (error) => isOne(error, MISMATCHES) || isCompileError(error)),
   named('game', (error) => error instanceof Gen3Error || error instanceof SlotError),

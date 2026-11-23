@@ -138,7 +138,7 @@ describe('notShown', () => {
       dropped: [],
     }
     expect(() => notShown(replay, stream)).toThrow(
-      "a fallback points at line 1, past the battle log's end",
+      "a fallback points at line 2, past the battle log's end",
     )
   })
 })

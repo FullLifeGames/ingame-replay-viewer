@@ -12,6 +12,12 @@ export interface LogLine {
 }
 
 /**
+ * The number a person reads for the line at 0-based `index`: battle log lines count from 1 in
+ * every message and on every page. Data keeps the index.
+ */
+export const lineNumber = (index: number): number => index + 1
+
+/**
  * Splits a battle log into its lines. `Protocol.parse` skips empty lines and so loses the
  * indices; this keeps every line. The empty string after a final newline is not a line.
  */

@@ -135,15 +135,42 @@ describe('visitorLine for the replay', () => {
     })
   })
 
-  it('counts the line of a ScriptError from one', () => {
+  it('counts the line of a ScriptError from one, in the line and in "Details"', () => {
     const refusal = failed(STREAM, new ScriptError(41, 'the HP "x" does not parse'), EXAMPLE)
     expect(visitorLine(refusal)).toEqual({
       line: `The viewer cannot follow line 42 of this replay's battle log. ${REPORT}`,
-      detail: `${STREAM}: line 41: the HP "x" does not parse`,
+      detail: `${STREAM}: line 42: the HP "x" does not parse`,
       report: true,
       replay: EXAMPLE.replay,
     })
   })
+
+  // The tester's two scenes (#59), by link and as a JSON file: one number for one line.
+  const NOBODY = {
+    ...replay994052,
+    log: replay994052.log.replace('|turn|1\n', '|turn|1\n|-damage|p1a: Nobody|50/100\n'),
+  }
+  const DOUBLES = {
+    ...replay994052,
+    log: replay994052.log.replace('|gametype|singles', '|gametype|doubles'),
+  }
+  it.each([
+    ['a Pokémon that never appeared', 29, NOBODY, 'no Pokémon "p1a: Nobody" has appeared'],
+    ['the game type doubles', 3, DOUBLES, 'the game type "doubles" is not singles'],
+  ])(
+    'gives %s on line %i the same number in the line and in "Details"',
+    async (_, number, json, reason) => {
+      expect(json.log.split('\n')[number - 1]).toMatch(/^\|(?:-damage|gametype)\|/)
+      const choice = createReplayChoice(() => Promise.resolve(json))
+      const file = fileOf('mine.json', jsonFile(readReplay(json)))
+      for (const pick of [() => choice.loadReplay('gen3ou-1'), () => choice.loadFile(file)]) {
+        const { line, detail } = visitorLine(await refusalOf(pick()))
+        if (number === 29)
+          expect(line).toContain(`line ${String(number)} of this replay's battle log`)
+        expect(detail).toContain(`line ${String(number)}: ${reason}`)
+      }
+    },
+  )
 
   it('gives any other Gen3Error and a stream the slot cannot hold the game line', () => {
     const game = `The game cannot show this replay. ${REPORT}`

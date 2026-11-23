@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { readLines } from './lines'
+import { lineNumber, readLines } from './lines'
 
 describe('readLines', () => {
   it('keeps the index of each line', () => {
@@ -38,5 +38,18 @@ describe('readLines', () => {
 
     expect(line?.key).toBeUndefined()
     expect(line?.text).toBe('|-foo|bar')
+  })
+})
+
+// A person reads a battle log from its first line as line 1 (#59); LogLine.index stays 0-based.
+describe('lineNumber', () => {
+  it('counts the line at index 0 as line 1', () => {
+    expect(lineNumber(0)).toBe(1)
+    expect(lineNumber(28)).toBe(29)
+  })
+
+  it('numbers each line of a log as a person counts it', () => {
+    const numbers = readLines('|start\n|\n|turn|1\n').map(({ index }) => lineNumber(index))
+    expect(numbers).toEqual([1, 2, 3])
   })
 })
