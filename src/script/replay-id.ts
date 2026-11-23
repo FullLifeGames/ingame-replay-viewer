@@ -16,9 +16,10 @@ export const LONGEST_REPLAY_ID = 120
 /**
  * A private replay's password part: Showdown's server/replays.ts writes the ID as the public one,
  * a hyphen, a password of 31 lowercase letters and digits, and "pw". It follows the battle's
- * number and ends the ID, before a link's path, query, hash or `.json`.
+ * number and ends the ID, before a link's path, query, hash, `.json` or whitespace (a phone keyboard
+ * adds a space after a pasted word).
  */
-const PASSWORD_PART = /(-\d+)-[a-z0-9]+pw(?=$|[/?#.])/gi
+const PASSWORD_PART = /(-\d+)-[a-z0-9]+pw(?=$|[/?#.\s])/gi
 
 /** Whether `text` has the shape and the length of a Showdown replay ID. */
 export function isReplayId(text: string): boolean {

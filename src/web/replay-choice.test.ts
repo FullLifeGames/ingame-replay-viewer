@@ -13,6 +13,7 @@ import {
   SessionError,
   step,
 } from './replay-choice'
+import { reportLink } from './report-link'
 import { REPLAY_994052, REPLAY_994086, SHOWDOWN_994176, STREAM_994052 } from './session-testing'
 import { notShown, notShownCounts, streamOfReplay } from './stream'
 
@@ -84,6 +85,21 @@ describe('a replay choice', () => {
     await choice.loadFile(savedFile('Jane Doe vs. Rival.log', rawLog(REPLAY)).file)
     expect((await choice.chosen())?.place).toEqual({ source: 'file', replay: 'a battle log' })
   })
+
+  // #59: a phone keyboard adds a space after a pasted link, and the report is public.
+  it.each([' ', '\n', '\t', '\u00a0'])(
+    'reports a link typed with %j after it as the trimmed link, without its password',
+    async (space) => {
+      const { choice } = showdown()
+      const link = `https://replay.pokemonshowdown.com/gen3ou-1-${'a1'.repeat(15)}apw`
+      const error: unknown = await choice.loadReplay(`${link}${space}`).catch((e: unknown) => e)
+      expect(error).toBeInstanceOf(SessionError)
+      expect((error as SessionError).replay).toBe(link)
+      const report = reportLink({ replay: (error as SessionError).replay, line: 'A line.' })
+      const cut = encodeURIComponent('https://replay.pokemonshowdown.com/gen3ou-1')
+      expect(report).toContain(`&replay=${cut}&line=`)
+    },
+  )
 
   it('has no replay before the first pick', async () => {
     expect(await showdown().choice.chosen()).toBeUndefined()

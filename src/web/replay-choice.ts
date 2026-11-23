@@ -142,7 +142,7 @@ async function chooseShowdownReplay(
   fetchJson: (url: string) => Promise<unknown>,
   input: string,
 ): Promise<Chosen> {
-  const place: ReplayPlace = { source: 'link', replay: input }
+  const place: ReplayPlace = { source: 'link', replay: input.trim() }
   const url = await step('Could not read the replay link', () => replayJsonUrl(input), place)
   const json = await step('Could not fetch the replay', () => fetchJson(url), place)
   return step(STREAM_STEP, () => choose(json, place), place)

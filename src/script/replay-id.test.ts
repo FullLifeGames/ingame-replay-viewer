@@ -61,6 +61,23 @@ describe('withoutPassword', () => {
     expect(withoutPassword(`${link}${rest}`)).toBe(`${host}gen3ou-2345678901${rest}`)
   })
 
+  // A phone keyboard adds a space after a pasted word; a paste can bring a newline or a tab.
+  const WHITESPACE = [
+    ['a space', ' '],
+    ['a newline', '\n'],
+    ['a tab', '\t'],
+    ['a no-break space', '\u00a0'],
+  ]
+
+  it.each(WHITESPACE)('cuts it from an ID followed by %s', (_name, space) => {
+    expect(withoutPassword(`${PRIVATE}${space}`)).toBe(`gen3ou-2345678901${space}`)
+  })
+
+  it.each(WHITESPACE)('cuts it from a link followed by %s', (_name, space) => {
+    const host = 'https://replay.pokemonshowdown.com/'
+    expect(withoutPassword(`${host}${PRIVATE}${space}`)).toBe(`${host}gen3ou-2345678901${space}`)
+  })
+
   it('cuts it from a link typed in capitals', () => {
     expect(withoutPassword(`HTTPS://Replay.PokemonShowdown.com/GEN3OU-1-ABCPW`)).toBe(
       'HTTPS://Replay.PokemonShowdown.com/GEN3OU-1',
