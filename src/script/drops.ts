@@ -10,6 +10,7 @@ type NamedPlayerArgs = Extract<Protocol.Args['|player|'], { length: 5 }>
 const REASONS: Partial<Record<Protocol.ArgName, DropReason>> = {
   '|done|': 'spacer',
   '|t:|': 'timestamp',
+  '|:|': 'timestamp',
   '|chat|': 'chat',
   '|c:|': 'chat',
   '|join|': 'chat',
@@ -23,11 +24,20 @@ const REASONS: Partial<Record<Protocol.ArgName, DropReason>> = {
   '|tier|': 'metadata',
   '|rated|': 'metadata',
   '|seed|': 'metadata',
+  '|badge|': 'metadata',
   '|upkeep|': 'upkeep',
   '|raw|': 'room',
   '|html|': 'room',
   '|uhtml|': 'room',
   '|uhtmlchange|': 'room',
+  '|error|': 'room',
+  '|bigerror|': 'room',
+  '|chatmsg|': 'room',
+  '|chatmsg-raw|': 'room',
+  '|hidelines|': 'room',
+  '|unlink|': 'room',
+  '|notify|': 'room',
+  '|warning|': 'room',
   '|-hint|': 'hint',
   '|debug|': 'debug',
 }
@@ -48,5 +58,10 @@ export function dropReasonOf(line: LogLine, started: boolean): DropReason | unde
   if (line.key === '|player|') {
     return started || !isNamedPlayer(line.args) ? 'room' : undefined
   }
-  return line.key && REASONS[line.key]
+  return line.key && dropReasonOfKind(line.key)
+}
+
+/** Why every line of a kind is a dropped line, or undefined when the kind alone does not say. */
+export function dropReasonOfKind(key: Protocol.ArgName): DropReason | undefined {
+  return REASONS[key]
 }
