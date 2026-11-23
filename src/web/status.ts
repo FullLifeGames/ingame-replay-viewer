@@ -1,5 +1,6 @@
 // The page's own words: the status line after each step, and the texts of the "Not shown in the
 // game" list. The failures keep the words of the step that failed (replay-choice.ts, session.ts).
+import { plainText } from './markup'
 import type { ReplaySummary } from './replay-choice'
 import type { DumpSummary, StartSummary } from './session'
 import type { NotShownCount, NotShownRow } from './stream'
@@ -33,9 +34,12 @@ export const notShownHeading = (rows: number): string => `Not shown in the game 
 
 export const countText = ({ what, count }: NotShownCount): string => `${what} (${String(count)})`
 
-/** One row of the list: its 1-based line, what happened, the log line and any detail. */
+/**
+ * One row of the list: its 1-based line, what happened, the log line and any detail, the last two
+ * without Showdown's markup (#31).
+ */
 export function rowText({ line, what, text, detail, standIn }: NotShownRow): string {
   const shown = standIn ? `${what}, a stand-in shows` : what
-  const logLine = text === '' ? '' : `: ${text}`
-  return `Line ${String(line)}, ${shown}${logLine}${detail === undefined ? '' : `; ${detail}`}`
+  const logLine = text === '' ? '' : `: ${plainText(text)}`
+  return `Line ${String(line)}, ${shown}${logLine}${detail === undefined ? '' : `; ${plainText(detail)}`}`
 }

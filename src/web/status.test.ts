@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import replay994086 from '../../test/fixtures/replays/smogtours-gen3ou-994086.json'
 import {
   countText,
   dumpLine,
@@ -12,6 +13,7 @@ import {
   rowText,
   startLine,
 } from './status'
+import { notShown, streamOfReplay } from './stream'
 
 const ROM_SHA1 = '0123456789abcdef0123456789abcdef01234567'
 const ID = 'smogtours-gen3ou-994052'
@@ -89,5 +91,28 @@ describe('the list of what the game does not show', () => {
       standIn: true,
     }
     expect(rowText(row)).toBe('Line 40, fallback: move, a stand-in shows: |move|p1a: X|Y|p2a: Z; Y')
+  })
+
+  // 994086's line 741 is a chat line with a team in Showdown's HTML (#31).
+  it('shows a chat line as text without its markup', () => {
+    const { replay, stream } = streamOfReplay(replay994086)
+    const row = notShown(replay, stream).find(({ line }) => line === 741)
+    if (row === undefined) throw new Error('994086 lacks a row for line 741')
+    const text = rowText(row)
+    expect(text).toContain('Magma Flows (Moltres) @ Leftovers Ability: Pressure')
+    expect(text).toContain('EVs: 48 HP / 180 SpA / 44 SpD / 236 Spe')
+    expect(text).not.toContain('<')
+    expect(text).not.toContain('&#x2f;')
+  })
+
+  it('drops the markup from the detail as well', () => {
+    const row = {
+      line: 9,
+      what: 'dropped: raw',
+      text: '|raw|<b>x</b>',
+      detail: 'a &amp; b',
+      standIn: false,
+    }
+    expect(rowText(row)).toBe('Line 9, dropped: raw: |raw| x; a & b')
   })
 })
