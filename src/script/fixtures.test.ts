@@ -35,17 +35,28 @@ function kindOf(line: string): string | undefined {
 
 const kinds = new Set(replays.flatMap(({ replay }) => replay.log.split('\n').map(kindOf)))
 
+/** The format an id names: `gen1ou` for `smogtours-gen1ou-995161`. */
+const formatOf = (id: string) => /^(?:smogtours-)?(gen[123]ou)-\d+$/.exec(id)?.[1]
+
 describe('the test replays', () => {
-  // Five from Smogon tournaments (#2), and a ladder replay with a multi-hit move (#15).
-  it('are five tournament replays and one from the ladder', () => {
-    expect(replays.filter(({ file }) => file.startsWith('smogtours-'))).toHaveLength(5)
-    expect(replays).toHaveLength(6)
+  // Five Gen 3 replays from Smogon tournaments (#2), a Gen 3 ladder replay with a multi-hit move
+  // (#15), and one Gen 1 and one Gen 2 replay from Smogon tournaments (#60).
+  it('are seven tournament replays and one from the ladder', () => {
+    expect(replays.filter(({ file }) => file.startsWith('smogtours-'))).toHaveLength(7)
+    expect(replays).toHaveLength(8)
   })
 
-  it.each(replays)('$file is a saved ADV OU replay', ({ file, replay }) => {
+  it('hold six Gen 3 replays, one Gen 1 and one Gen 2', () => {
+    const formats = replays.map(({ file }) => formatOf(file))
+    expect(formats.filter((format) => format === 'gen3ou')).toHaveLength(6)
+    expect(formats.filter((format) => format === 'gen1ou')).toHaveLength(1)
+    expect(formats.filter((format) => format === 'gen2ou')).toHaveLength(1)
+  })
+
+  it.each(replays)('$file is a saved Gen 1, 2 or 3 OU singles replay', ({ file, replay }) => {
     expect(replay.id).toBe(file)
-    expect(replay.id).toMatch(/^(smogtours-)?gen3ou-\d+$/)
-    expect(replay.formatid).toBe('gen3ou')
+    expect(replay.id).toMatch(/^(smogtours-)?gen[123]ou-\d+$/)
+    expect(replay.formatid).toBe(formatOf(file))
     expect(replay.log.split('\n')).toContain('|gametype|singles')
   })
 
