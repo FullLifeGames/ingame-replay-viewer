@@ -7,6 +7,7 @@
 #include "line_break.h"
 #include "palette.h"
 #include "pokemon.h"
+#include "recorded_battle.h"
 #include "replay_interpreter.h"
 #include "replay_ops.h"
 #include "replay_stream.h"
@@ -250,11 +251,13 @@ static void Replay_Exit(void)
 }
 
 // END: gBattleOutcome, then, from the next frame, once END counts as done, the outro
-// (replay_outro.c) or, in most tests, the way out of the battle.
+// (replay_outro.c) or, in most tests, the way out of the battle. The playback counts as finished,
+// as at the end of a real battle, so a held B no longer leaves the replay (BattleMainCB2, #30).
 static bool32 Op_End(const volatile u8 *operands, u32 step)
 {
     gBattleOutcome = sOutcomes[operands[0]];
     gReplayProgress.finished = TRUE;
+    RecordedBattle_SetPlaybackFinished();
     if (sReplay.end == REPLAY_EXIT_AT_END)
         gBattleMainFunc = Replay_Exit;
     else

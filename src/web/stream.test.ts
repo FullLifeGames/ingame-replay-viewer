@@ -7,7 +7,7 @@ import { Gen3Error } from '../gen3/errors'
 import { showsInPlace } from '../gen3/fallbacks'
 import { buildBattleScript } from '../script/build'
 import { readReplay, ReplayError } from '../script/replay'
-import { notShown, notShownCounts, streamOfReplay } from './stream'
+import { notShown, notShownCounts, streamOfLoaded, streamOfReplay } from './stream'
 
 const lines = (log: string) => log.split('\n')
 
@@ -28,6 +28,43 @@ describe('streamOfReplay', () => {
     const noLog = Object.fromEntries(Object.entries(replay994052).filter(([key]) => key !== 'log'))
     expect(() => streamOfReplay(noLog)).toThrow(ReplayError)
     expect(() => streamOfReplay(noLog)).toThrow('replay JSON lacks "log"')
+  })
+})
+
+describe('streamOfLoaded', () => {
+  it('gives a replay read elsewhere the stream that its JSON gives', () => {
+    const replay = readReplay(replay994052)
+    const loaded = streamOfLoaded(replay)
+    expect(loaded.replay).toBe(replay)
+    expect(loaded).toEqual(streamOfReplay(replay994052))
+  })
+
+  it('lets the backend refuse a Gen 9 replay', () => {
+    const replay = readReplay(replay994052)
+    const gen9 = { ...replay, log: replay.log.replace('|gen|3\n', '|gen|9\n') }
+    expect(() => streamOfLoaded(gen9)).toThrow(Gen3Error)
+  })
+})
+
+describe('the players of a replay stream', () => {
+  const withLog = (log: string) => streamOfLoaded({ ...readReplay(replay994052), log })
+
+  it('names the two players of 994052 by side, player 1 on the near side', () => {
+    expect(streamOfReplay(replay994052).players).toEqual({
+      near: 'A Welcome Guest',
+      far: 'xXEricXx',
+    })
+  })
+
+  it('keeps the name of the intro when a player line after the start names another', () => {
+    const log = replay994052.log.replace('|turn|1\n', '|player|p2|Someone Else|\n|turn|1\n')
+    expect(withLog(log).players.far).toBe('xXEricXx')
+  })
+
+  // So the panel never shows a side without its name.
+  it('leaves a log that names no player for a side to the backend, which refuses it', () => {
+    const log = replay994052.log.replace('|player|p2|xXEricXx|red|\n', '')
+    expect(() => withLog(log)).toThrow('the log names no player on the far side')
   })
 })
 
@@ -101,7 +138,7 @@ describe('notShown', () => {
       dropped: [],
     }
     expect(() => notShown(replay, stream)).toThrow(
-      "a fallback points at line 1, past the battle log's end",
+      "a fallback points at line 2, past the battle log's end",
     )
   })
 })

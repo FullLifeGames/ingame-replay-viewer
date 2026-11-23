@@ -6,7 +6,7 @@ import type { Protocol } from '@pkmn/protocol'
 
 import { newBattle } from './client'
 import { dropReasonOf } from './drops'
-import { ScriptError } from './errors'
+import { GameTypeRefusal, ScriptError } from './errors'
 import { HitFolder } from './hits'
 import { readLines } from './lines'
 import { bySide } from './refs'
@@ -33,13 +33,14 @@ function drop(build: Build, line: LogLine, reason: DropReason, detail?: string):
 function refuseGameType(line: LogLine): void {
   const [, gameType] = line.args as Protocol.Args['|gametype|']
   if (line.key === '|gametype|' && gameType !== 'singles') {
-    throw new ScriptError(line.index, `the game type "${gameType}" is not singles`)
+    throw new GameTypeRefusal(line.index, gameType)
   }
 }
 
 function beforeOf({ battle, players }: Build): Before {
   const active = bySide(battle, (side) => side.active[0] ?? null)
-  return { active, weather: battle.field.weather, players: { ...players } }
+  const boosts = bySide(battle, (side) => ({ ...side.active[0]?.boosts }))
+  return { active, boosts, weather: battle.field.weather, players: { ...players } }
 }
 
 /** Keeps the names the intro shows, for the win to match against. */

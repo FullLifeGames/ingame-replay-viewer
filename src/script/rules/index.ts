@@ -2,6 +2,7 @@
 // line with anything more becomes an `unsupported` dropped line instead of losing a part.
 
 import type { Battle, Pokemon, WeatherName } from '@pkmn/client'
+import type { BoostID } from '@pkmn/data'
 import type { Protocol } from '@pkmn/protocol'
 
 import type { LogLine } from '../lines'
@@ -17,6 +18,11 @@ import { POKEMON_RULES } from './pokemon'
 export interface Before {
   /** The client's active Pokémon. */
   readonly active: Readonly<Record<Side, Pokemon | null>>
+  /**
+   * A copy of the boosts of each active Pokémon: the client changes its Pokémon in place, so a
+   * rule reads the stages before its line here (`-setboost`).
+   */
+  readonly boosts: Readonly<Record<Side, Readonly<Partial<Record<BoostID, number>>>>>
   /** The client's weather. */
   readonly weather: WeatherName | undefined
   /** The player names the intro showed; a player line after the start changes none. */

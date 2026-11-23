@@ -7,6 +7,7 @@ import { fetchBytes, fetchJson } from '../fetch'
 import { messageOf } from '../message'
 import { checkBaseRom, readSlotDescription } from '../rom'
 import { ROM_FILES } from '../rom-files'
+import { silenceText } from '../status'
 import {
   AUDIO_PROCESSOR,
   AUDIO_STOP,
@@ -14,8 +15,10 @@ import {
   type AudioProcessorOptions,
   soundLine,
 } from './audio'
+import type { Sound } from './audio-opener'
 import workletUrl from './audio-worklet.ts?worker&url'
-import { buildFailure } from './failures'
+import { TickClock } from './clock'
+import { buildFailure, type FailedReport, RunFailure, workerFailure } from './failures'
 import { WASM_FILES } from './files'
 import type { StartMessage, WorkerReport } from './messages'
 import {
@@ -26,7 +29,6 @@ import {
   type RunStatus,
   type Speed,
   speedAtEnd,
-  TickClock,
   writePace,
 } from './protocol'
 import { AudioRing } from './ring'
@@ -45,16 +47,12 @@ const MEASURED_SAMPLES = 8192
 export interface Built {
   readonly module: WebAssembly.Module
   readonly slot: SlotDescription
-  readonly bytes: number
 }
 
 export interface Picked {
   readonly id: string
   readonly stream: Uint8Array
 }
-
-/** The page's audio context, or the line that says why a run plays without sound. */
-export type Sound = AudioContext | string
 
 /** One run of the game: its worker, its shared buffers, its clock and its sound, if any. */
 export interface Run {
@@ -82,39 +80,17 @@ export async function buildModule(dump: Uint8Array): Promise<Built> {
   try {
     const bytes = applyBps(patch, dump)
     const module = await WebAssembly.compile(bytes as Uint8Array<ArrayBuffer>)
-    return { module, slot, bytes: bytes.length }
+    return { module, slot }
   } catch (error: unknown) {
     throw buildFailure(error)
   }
 }
 
-/**
- * The page's one audio context, opened on the first Start, the user's gesture that lets a page
- * play sound. When it fails to open, the run plays without sound, and the next Start tries again.
- */
-export class AudioOpener {
-  private context: Promise<AudioContext> | undefined
-
-  async open(): Promise<Sound> {
-    this.context ??= AudioOpener.load()
-    let opened: AudioContext
-    try {
-      opened = await this.context
-    } catch (error: unknown) {
-      this.context = undefined
-      return `the page could not open its audio: ${messageOf(error)}`
-    }
-    return opened.resume().then(
-      () => opened,
-      (error: unknown) => `the audio did not start: ${messageOf(error)}`,
-    )
-  }
-
-  private static async load(): Promise<AudioContext> {
-    const context = new AudioContext()
-    await context.audioWorklet.addModule(workletUrl)
-    return context
-  }
+/** Opens the page's audio context with the worklet that plays the ring (AudioOpener's factory). */
+export async function openAudioContext(): Promise<AudioContext> {
+  const context = new AudioContext()
+  await context.audioWorklet.addModule(workletUrl)
+  return context
 }
 
 /** The run's sound: a processor that plays the ring into the context, or why there is none. */
@@ -170,17 +146,20 @@ export function startRun(built: Built, picked: Picked, speed: Speed, sound: Soun
   }
 }
 
-/** Keeps the worker's failure line in the run and hands it to `show`. */
-export function watchRun(run: Run, show: (line: string) => void): void {
-  const fail = (line: string) => {
-    run.failure = line
-    show(line)
+/**
+ * Keeps the worker's failure line in the run, for the test hook, and hands the failure to `show`.
+ * An error event, a throw the worker did not catch, reads as the game's stop (S5-11).
+ */
+export function watchRun(run: Run, show: (failure: RunFailure) => void): void {
+  const fail = (report: FailedReport) => {
+    run.failure = report.line
+    show(new RunFailure(report))
   }
   run.worker.onmessage = (event: MessageEvent<WorkerReport>) => {
-    if (event.data.type === 'failed') fail(event.data.line)
+    if (event.data.type === 'failed') fail(event.data)
   }
   run.worker.onerror = (event) => {
-    fail(`The worker failed: ${event.message}`)
+    fail(workerFailure(event.message))
   }
 }
 
@@ -208,10 +187,8 @@ export const progressLine = (status: RunStatus, run: Run): string => {
   return `Frame ${String(status.frame)}, instruction ${String(status.done)} of ${String(status.total)}, turn ${String(status.turn)}.${finished}${sound}`
 }
 
-export const runningLine = (picked: Picked, run: Run): string => {
-  const silent = run.silence === undefined ? '' : ` It plays without sound: ${run.silence}.`
-  return `Running ${picked.id}: ${String(picked.stream.length)} bytes of instruction stream.${silent}`
-}
+export const runningLine = (picked: Picked, run: Run): string =>
+  `Running ${picked.id}: ${String(picked.stream.length)} bytes of instruction stream.${silenceText(run.silence, 'plays')}`
 
 /** The sound's numbers for the test hook: what went through the ring and how loud it was. */
 function audioStatus(run: Run) {
@@ -239,6 +216,7 @@ export function hookStatus(run: Run) {
   return {
     ...readStatus(run.control),
     speed: run.clock.speed,
+    paused: run.clock.paused,
     wallMs: performance.now() - run.startedAt,
     finishedMs: run.finishedMs,
     failure: run.failure,

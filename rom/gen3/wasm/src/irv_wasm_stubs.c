@@ -1,5 +1,3 @@
-// stdlib.h before global.h, whose abs macro would break the prototype of abs.
-#include <stdlib.h>
 #include "global.h"
 #include "agb_flash.h"
 #include "crt0.h"
@@ -23,7 +21,9 @@
 // - Link and multiboot calls report success with 0. A replay reaches only the ones InitRFU makes
 //   at boot, which irv_wasm_stub_list.h lists (#46); each logs once. Any other stops the run.
 // - A call that cannot work here (a soft reset, the crash screen) stops the run.
-// - DebugPrintf and the asserts print to the console, as mGBA's log does.
+// - DebugPrintf and the asserts print to the console, as mGBA's log does. An assert that stops
+//   the program then stops the run with its file, line and expression (irv_wasm_stop.c); a
+//   warning prints and the run carries on.
 
 // A stub off the list ends the run with its name (irv_wasm_stop.c).
 static void StopAtStub(const char *name)
@@ -237,7 +237,8 @@ void MgbaAssert(const char *pFile, s32 nLine, const char *pExpression, bool32 nS
     if (nStopProgram)
     {
         MgbaPrintf(MGBA_LOG_ERROR, "ASSERTION FAILED  FILE=[%s] LINE=[%d]  EXP=[%s]", pFile, nLine, pExpression);
-        abort();
+        // File and line come first, so a cut at the end of the line drops only the expression's end.
+        IrvWasm_Stop("assert failed at %s line %d: %s", pFile, nLine, pExpression);
     }
     else
     {

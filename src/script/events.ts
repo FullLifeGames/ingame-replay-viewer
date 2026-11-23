@@ -4,10 +4,20 @@
 import type { WeatherName } from '@pkmn/client'
 import type { BoostID, StatusName } from '@pkmn/data'
 
+import type {
+  AbilityEvent,
+  EffectActivateEvent,
+  EffectEndEvent,
+  EffectStartEvent,
+  ItemEndEvent,
+  ItemEvent,
+  SingleTurnEvent,
+  TransformEvent,
+} from './effect-events'
 import type { DroppedLine, Effect, HpFraction, PokemonRef, Side, TeamMember } from './types'
 
 /** What `[from]` and `[of]` name: the effect behind a line and the Pokémon it came from. */
-interface Caused {
+export interface Caused {
   readonly cause?: Effect
   readonly source?: PokemonRef
 }
@@ -16,7 +26,7 @@ interface Caused {
 type Effectiveness = 'super' | 'resisted'
 
 /** A hit takes the critical hit and effectiveness lines before it (plan D1, `hits.ts`). */
-interface Hit {
+export interface Hit {
   readonly crit?: true
   readonly effectiveness?: Effectiveness
   /** The lines of the modifiers this hit absorbed. */
@@ -213,6 +223,12 @@ interface StatLimitEvent {
   readonly cause?: Effect
 }
 
+/** Every stat stage of every active Pokémon back to 0 (Haze). */
+interface StatResetEvent {
+  readonly kind: 'statReset'
+  readonly line: number
+}
+
 /** A critical hit that no hit absorbed. */
 interface CritEvent {
   readonly kind: 'crit'
@@ -236,43 +252,6 @@ interface HitCountEvent {
   readonly hits: number
 }
 
-interface EffectStartEvent extends Caused {
-  readonly kind: 'effectStart'
-  readonly line: number
-  readonly who: PokemonRef
-  readonly effect: Effect
-  readonly silent?: true
-}
-
-/** A Substitute that breaks is a hit. */
-interface EffectEndEvent extends Caused, Hit {
-  readonly kind: 'effectEnd'
-  readonly line: number
-  readonly who: PokemonRef
-  readonly effect: Effect
-  readonly silent?: true
-}
-
-/**
- * A Substitute that takes a hit is one (`[damage]`). Splash's `|-nothing` is one on no Pokémon:
- * the parser reads it as `-activate||move: Splash`, and the game says "But nothing happened!".
- */
-interface EffectActivateEvent extends Hit {
-  readonly kind: 'effectActivate'
-  readonly line: number
-  readonly who?: PokemonRef
-  readonly effect: Effect
-  readonly damage?: true
-}
-
-/** An effect that lasts the turn: Protect, Endure, Focus Punch's focus. */
-interface SingleTurnEvent {
-  readonly kind: 'singleTurn'
-  readonly line: number
-  readonly who: PokemonRef
-  readonly effect: Effect
-}
-
 interface WeatherEvent extends Caused {
   readonly kind: 'weather'
   readonly line: number
@@ -292,32 +271,6 @@ interface FieldActivateEvent {
   readonly kind: 'fieldActivate'
   readonly line: number
   readonly effect: Effect
-}
-
-interface ItemEvent extends Caused {
-  readonly kind: 'item'
-  readonly line: number
-  readonly who: PokemonRef
-  readonly item: string
-}
-
-interface ItemEndEvent extends Caused {
-  readonly kind: 'itemEnd'
-  readonly line: number
-  readonly who: PokemonRef
-  readonly item: string
-  /** A berry eaten (`[eat]`). */
-  readonly eaten?: true
-  readonly silent?: true
-}
-
-interface AbilityEvent extends Caused {
-  readonly kind: 'ability'
-  readonly line: number
-  readonly who: PokemonRef
-  readonly ability: string
-  /** What the ability did, such as `boost` for Intimidate. */
-  readonly detail?: string
 }
 
 export type ScriptEvent =
@@ -343,12 +296,14 @@ export type ScriptEvent =
   | CureTeamEvent
   | StatChangeEvent
   | StatLimitEvent
+  | StatResetEvent
   | CritEvent
   | EffectivenessEvent
   | HitCountEvent
   | EffectStartEvent
   | EffectEndEvent
   | EffectActivateEvent
+  | TransformEvent
   | SingleTurnEvent
   | WeatherEvent
   | SideConditionEvent

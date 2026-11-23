@@ -2,8 +2,10 @@
 // events themselves are in `events.ts`.
 
 /**
- * Why a battle log line is a dropped line. `unknown` and `unsupported` mark lines the battle
- * script cannot show yet; no test replay may contain them.
+ * Why a battle log line is a dropped line. `state` marks a line whose state the client keeps and
+ * a later line shows (`-mustrecharge`: the next turn's `cant`). `unknown` and `unsupported` mark
+ * lines the battle script cannot show yet; no test replay may contain them, except an
+ * `unsupported` line of a kind the named list keeps as "no rule yet" (`census.ts`).
  */
 export type DropReason =
   | 'spacer'
@@ -16,6 +18,7 @@ export type DropReason =
   | 'room'
   | 'hint'
   | 'debug'
+  | 'state'
   | 'unknown'
   | 'unsupported'
 

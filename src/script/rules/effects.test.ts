@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { lineNumber } from '../lines'
 import { eventsAt, eventsFrom, NEXT, refIn, replayScript, scriptOf } from '../testing'
 
 // Built once, outside the specs' time limit.
@@ -41,7 +42,9 @@ describe('the weather rule', () => {
   })
 
   it('refuses weather that ends when none was active', () => {
-    expect(() => scriptOf('|-weather|none')).toThrow(new RegExp(`^line ${String(NEXT)}: `))
+    expect(() => scriptOf('|-weather|none')).toThrow(
+      new RegExp(`^line ${String(lineNumber(NEXT))}: `),
+    )
   })
 })
 

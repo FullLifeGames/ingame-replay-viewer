@@ -17,6 +17,9 @@ import {
   world,
 } from './session-testing'
 
+/** The place of the test replay `broken` (SessionError's `source` and `replay`). */
+const BROKEN = { source: 'example', replay: 'broken' } as const
+
 describe('a replay from Showdown', () => {
   it('fetches the JSON that an ID names and gives its stream', async () => {
     const { session, fetched } = world()
@@ -32,6 +35,8 @@ describe('a replay from Showdown', () => {
       new SessionError(
         'Could not read the replay link: example.com is not replay.pokemonshowdown.com: ' +
           'paste a replay ID or a link to replay.pokemonshowdown.com',
+        undefined,
+        { source: 'link', replay: 'https://example.com/gen3ou-1' },
       ),
     )
     expect(fetched).toEqual([])
@@ -41,7 +46,10 @@ describe('a replay from Showdown', () => {
     const { session } = world()
     const url = 'https://replay.pokemonshowdown.com/gen3ou-1.json'
     await expect(session.loadReplay('gen3ou-1')).rejects.toThrow(
-      new SessionError(`Could not fetch the replay: ${url} answered 404`),
+      new SessionError(`Could not fetch the replay: ${url} answered 404`, undefined, {
+        source: 'link',
+        replay: 'gen3ou-1',
+      }),
     )
   })
 
@@ -52,15 +60,17 @@ describe('a replay from Showdown', () => {
     await expect(session.loadReplay('smogtours-gen3ou-994176')).rejects.toThrow(
       new SessionError(
         'Could not turn the replay into a stream: the stream plays Gen 3 battles, this one is Gen 9',
+        undefined,
+        { source: 'link', replay: 'smogtours-gen3ou-994176' },
       ),
     )
   })
 
-  it('names the test replay that does not load', async () => {
+  it('names the example replay that does not load', async () => {
     const { session } = world()
     const broken: TestReplay = { id: 'broken', load: () => Promise.reject(new Error('chunk gone')) }
     await expect(session.pickTestReplay(broken)).rejects.toThrow(
-      new SessionError('Could not load the test replay broken: chunk gone'),
+      new SessionError('Could not load the example replay broken: chunk gone', undefined, BROKEN),
     )
   })
 
@@ -72,7 +82,7 @@ describe('a replay from Showdown', () => {
       load: () => Promise.reject('offline'),
     }
     await expect(session.pickTestReplay(broken)).rejects.toThrow(
-      new SessionError('Could not load the test replay broken: offline'),
+      new SessionError('Could not load the example replay broken: offline', undefined, BROKEN),
     )
   })
 })
@@ -81,7 +91,10 @@ describe('a step that fails', () => {
   // build/rom/ lacks the patch: the dev server's 404 line reaches the page.
   it("names the patch fetch and keeps the server's line, then fetches again", async () => {
     const { session, answers, fetched } = world()
-    answers.set(ROM_FILES.patch, new FetchError(`${ROM_FILES.patch} answered 404: ${MISSING}`))
+    answers.set(
+      ROM_FILES.patch,
+      new FetchError(`${ROM_FILES.patch} answered 404: ${MISSING}`, ROM_FILES.patch, 404),
+    )
     await expect(session.pickDump(BASE)).rejects.toThrow(
       new SessionError(`Could not fetch the patch: ${ROM_FILES.patch} answered 404: ${MISSING}`),
     )
@@ -92,7 +105,10 @@ describe('a step that fails', () => {
 
   it('names replay-slot.json when it fails to fetch or to read', async () => {
     const { session, answers } = world()
-    answers.set(ROM_FILES.slot, new FetchError(`${ROM_FILES.slot} answered 404`))
+    answers.set(
+      ROM_FILES.slot,
+      new FetchError(`${ROM_FILES.slot} answered 404`, ROM_FILES.slot, 404),
+    )
     await expect(session.pickDump(BASE)).rejects.toThrow(
       new SessionError(`Could not fetch replay-slot.json: ${ROM_FILES.slot} answered 404`),
     )
@@ -150,6 +166,6 @@ describe('a step that fails', () => {
     const { session } = world()
     const refusal = await session.pickDump(OTHER_DUMP).catch((error: unknown) => error)
     expect(refusal).toBeInstanceOf(SessionError)
-    expect((refusal as SessionError).cause).toMatchObject({ name: 'RomError' })
+    expect((refusal as SessionError).cause).toMatchObject({ name: 'DumpRefusal' })
   })
 })

@@ -2,10 +2,9 @@ import { readFileSync } from 'node:fs'
 
 import { describe, expect, it } from 'vitest'
 
-import { checkShots } from './rom-shot-probes.ts'
+import { checkShots, SCREEN } from './rom-shot-probes.ts'
 import { PROGRESS_HEADER_PATH, readProgressLayout } from './rom-shot-run.ts'
 import type { ProgressLayout } from './rom-shot-run.ts'
-import { refusalScenes } from './rom-shot-scenes.ts'
 import type { Scene } from './rom-shot-scenes.ts'
 import { GBA_ROM_BASE, loadSlotLayout } from './rom-slot.ts'
 import { MIXER_RATE } from '../src/web/wasm/protocol.ts'
@@ -184,8 +183,9 @@ describe('playing a stream in the module', () => {
     }))
     const run = await playModule(fake.factory, { stream: undefined, scenes: [], layout: LAYOUT })
     expect(run.output.status).toMatchObject({ status: 'error', frame: 38, error: 1 })
-    const [refused] = refusalScenes(LAYOUT.refusedColour)
-    expect(checkShots((refused as Scene).check, run.frames)).toEqual({
+    // The fake draws one colour, so it shows no refusal text; its last frame is the backdrop.
+    const backdrop = { probe: 'blank', shot: 'final', region: SCREEN.screen } as const
+    expect(checkShots({ ...backdrop, colour: LAYOUT.refusedColour }, run.frames)).toEqual({
       pass: true,
       detail: 'one colour, 0x630000',
     })

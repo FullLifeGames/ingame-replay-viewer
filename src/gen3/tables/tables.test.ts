@@ -1,7 +1,5 @@
 // The committed tables against the pin and against @pkmn's data. These run in CI, which has no
 // checkout of the expansion; scripts/gen3-tables.test.ts regenerates the tables on devbox.
-import { Generations } from '@pkmn/data'
-import { Dex } from '@pkmn/dex'
 import { describe, expect, it } from 'vitest'
 
 import build from '../../../rom/gen3/build.json'
@@ -9,12 +7,10 @@ import { REPLAYS, replayScript } from '../../script/testing'
 import { abilityOf, itemOf, moveOf, speciesOf } from './lookup'
 import type { Found } from './lookup'
 import meta from './meta.json'
+import { gens, itemGaps, names } from './testing'
 
-type GenerationsDex = ConstructorParameters<typeof Generations>[0]
-const gens = new Generations(Dex as GenerationsDex)
 const GENS = [1, 2, 3] as const
 
-const names = (list: Iterable<{ readonly name: string }>) => [...list].map((entry) => entry.name)
 const misses = (list: string[], lookup: (name: string) => Found) =>
   list.filter((name) => lookup(name).fallback !== undefined)
 
@@ -33,20 +29,10 @@ describe('Gen 1 to 3 per @pkmn/data (T5)', () => {
     expect(misses(names(data.abilities), abilityOf)).toEqual([])
   })
 
-  // The expansion has every item that a generation from 3 on has, except the plain Mail: it has
-  // the Gen 3 mails by their own names. Of the items @pkmn keeps in Gen 2 alone, it carries
-  // Berserk Gene (ITEM_BERSERK_GENE) and none of the others.
-  const EXPANSION_KEEPS = ['Berserk Gene']
   it.each(GENS)(
     'misses only the Gen 2 items no later generation kept, and Mail, in Gen %i',
     (gen) => {
-      const later = [3, 4, 5, 6, 7, 8, 9].map((number) => gens.get(number))
-      const items = names(gens.get(gen).items)
-      const gen2Only = (name: string) => later.every((data) => data.items.get(name) === undefined)
-      const expected = items.filter(
-        (name) => name === 'Mail' || (gen2Only(name) && !EXPANSION_KEEPS.includes(name)),
-      )
-      expect(misses(items, itemOf)).toEqual(expected)
+      expect(misses(names(gens.get(gen).items), itemOf)).toEqual(itemGaps(gen))
     },
   )
 

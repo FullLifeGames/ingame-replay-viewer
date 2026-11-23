@@ -8,3 +8,4 @@
 0008-m4a-platform-mixer.patch
 0009-random-no-naked-asm.patch
 0010-battle-anim-shake-pointer-sign.patch
+0011-pokemon-anim-shake-zero-divisor.patch

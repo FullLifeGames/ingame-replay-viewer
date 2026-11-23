@@ -12,6 +12,14 @@ _Avoid_: battle video, recording (those are the games' own format)
 The ordered protocol lines of a replay (`|switch|`, `|move|`, `|-damage|`, …), describing what a spectator saw.
 _Avoid_: input log, replay log
 
+**Replay ID**:
+Showdown's name for a replay, such as `smogtours-gen3ou-994052`. A private replay's ID ends in a password part, and a report leaves that part out.
+_Avoid_: replay name, slug
+
+**Saved replay**:
+A replay the viewer reads from a file: Showdown's downloaded replay, a saved replay page, a battle log, or a replay's JSON file.
+_Avoid_: uploaded replay (the file stays in the browser)
+
 **Simulator**:
 Showdown's battle engine, whose results the battle log records. The only source of truth for every outcome.
 _Avoid_: server, engine
@@ -23,7 +31,7 @@ _Avoid_: replay
 ## Games
 
 **Target game**:
-A game this project renders into: pokeemerald-expansion first, then Black 2/White 2, later a Gen 9 game.
+A game this project renders into: pokeemerald-expansion first, then Black 2/White 2, later the 3D games Pokémon XD and a Gen 9 game.
 _Avoid_: base game, host game
 
 **Renderer**:
@@ -94,6 +102,10 @@ _Avoid_: buffer, mailbox
 Whatever inside the target game reads the instruction stream and hands each instruction to the controller. That's either the game's own code or a small piece of ours.
 _Avoid_: engine, VM
 
+**Refusal screen**:
+What the game shows for an instruction stream it refuses: the reason in words and the error's number.
+_Avoid_: error screen, red screen
+
 ## The WebAssembly build
 
 **WebAssembly build**:
@@ -138,6 +150,46 @@ _Avoid_: WebAssembly page, spike page (its names before it moved to `/`); for a 
 The page at `/emulator.html`, the fallback. It patches the base ROM with the patch and plays the replay in mGBA.
 _Avoid_: old page, mGBA page
 
+**Example replay**:
+A test replay that both pages offer in their select.
+_Avoid_: demo, sample
+
+**Panel**:
+The lines above the game on the viewer: the two players' names by side and the turn the game has reached.
+_Avoid_: HUD, scoreboard
+
+**Pause**:
+The viewer's Pause and Play button. It holds the running replay at its frame and suspends its sound until Play.
+_Avoid_: stop, freeze
+
+**Visitor line**:
+The line a page shows for a failure: what went wrong and what to do next. The failing code's own words sit under "Details".
+_Avoid_: error message, toast
+
+**Report link**:
+The link under a visitor line that opens the repository's issue form "Replay problem" with the replay and the line filled in.
+_Avoid_: feedback link, bug button
+
+**Audio ring**:
+The shared buffer between the worker and the audio worklet: the worker writes each frame's samples into it, and the worklet plays them from it.
+_Avoid_: audio buffer, queue
+
+**Reserve**:
+The samples that must wait in the audio ring before the worklet plays, at the start and after each dry spell, so a frame that comes a little late still plays on time.
+_Avoid_: pre-buffer, headroom
+
+**Dry spell**:
+A stretch in which the audio ring is empty and the worklet plays silence. The viewer counts each one once and reports it as "ran out of sound".
+_Avoid_: glitch, dropout
+
+**Latency cap**:
+The most samples that may wait in the audio ring. The worklet skips what waits beyond it, so the sound stays close to the picture.
+_Avoid_: buffer limit
+
+**Tick rule**:
+The rule that says how many frames the game may have played by a moment, from the speed and the time since the viewer last asked. It caps what one ask grants, so a game that fell behind goes on at its pace.
+_Avoid_: frame limiter, throttle
+
 ## Scope
 
 **Era-matched replay**:
@@ -145,8 +197,16 @@ A replay whose format's generation is no newer than the target game's, so every 
 _Avoid_: native replay
 
 **Dropped line**:
-A battle log line deliberately not shown in the game, such as chat or timer messages. Every line is either shown or a dropped line, never silently skipped.
+A battle log line deliberately not shown in the game, such as chat or timer messages. Every line is either shown or a dropped line, never silently skipped. Each dropped line carries its reason; the reason `state` marks a line whose state a later line shows, such as the recharge turn that the next turn's "must recharge" line tells.
 _Avoid_: ignored line, skipped event
+
+**Kind census**:
+The check that walks every kind of battle log line the protocol library knows and finds each exactly one place: a rule, a drop reason or the named list.
+_Avoid_: coverage list
+
+**Named list**:
+The kinds of battle log line the battle script has no rule for, in three groups, each with its reason: kinds a replay's log never holds, kinds of formats the viewer refuses, and kinds with no rule yet.
+_Avoid_: named gap list, allow list
 
 **Content gap**:
 Anything in a replay that the target game lacks: a species, move, ability, mechanic or animation. Each one needs a fallback.

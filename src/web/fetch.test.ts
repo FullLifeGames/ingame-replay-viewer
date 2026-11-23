@@ -33,14 +33,18 @@ describe('fetchBytes', () => {
     const page = `${'x'.repeat(300)}\nsecond line`
     const { fetcher } = answering(new Response(page, { status: 500 }))
     await expect(fetchBytes('rom/irv-emerald.bps', fetcher)).rejects.toThrow(
-      new FetchError(`rom/irv-emerald.bps answered 500: ${'x'.repeat(200)}`),
+      new FetchError(
+        `rom/irv-emerald.bps answered 500: ${'x'.repeat(200)}`,
+        'rom/irv-emerald.bps',
+        500,
+      ),
     )
   })
 
   it('names the status alone when the answer has no text', async () => {
     const { fetcher } = answering(new Response(null, { status: 503 }))
     await expect(fetchBytes('rom/irv-emerald.bps', fetcher)).rejects.toThrow(
-      new FetchError('rom/irv-emerald.bps answered 503'),
+      new FetchError('rom/irv-emerald.bps answered 503', 'rom/irv-emerald.bps', 503),
     )
   })
 
@@ -48,7 +52,10 @@ describe('fetchBytes', () => {
   it('names the URL when the request fails', async () => {
     const { fetcher } = answering(new TypeError('Failed to fetch'))
     await expect(fetchBytes('rom/irv-emerald.bps', fetcher)).rejects.toThrow(
-      new FetchError('rom/irv-emerald.bps could not be fetched: Failed to fetch'),
+      new FetchError(
+        'rom/irv-emerald.bps could not be fetched: Failed to fetch',
+        'rom/irv-emerald.bps',
+      ),
     )
   })
 
@@ -57,7 +64,7 @@ describe('fetchBytes', () => {
     // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors -- the case under test
     const fetcher = (): Promise<Response> => Promise.reject('offline')
     await expect(fetchBytes('rom/irv-emerald.bps', fetcher)).rejects.toThrow(
-      new FetchError('rom/irv-emerald.bps could not be fetched: offline'),
+      new FetchError('rom/irv-emerald.bps could not be fetched: offline', 'rom/irv-emerald.bps'),
     )
   })
 
@@ -86,11 +93,32 @@ describe('fetchJson', () => {
     const url = 'https://replay.pokemonshowdown.com/gen3ou-1.json'
     const { fetcher } = answering(new Response('404 Not Found', { status: 404 }))
     await expect(fetchJson(url, fetcher)).rejects.toThrow(
-      new FetchError(`${url} answered 404: 404 Not Found`),
+      new FetchError(`${url} answered 404: 404 Not Found`, url, 404),
     )
   })
 
   it("uses the browser's fetch by default", async () => {
     await expect(fetchJson('http://127.0.0.1:1/rom/replay-slot.json')).rejects.toThrow(FetchError)
+  })
+})
+
+// The visitor line (visitor.ts) reads the URL and the status, never the message.
+describe('a FetchError', () => {
+  const url = 'https://replay.pokemonshowdown.com/gen3ou-1.json'
+  const refusal = (answer: Response | Error) =>
+    fetchJson(url, answering(answer).fetcher).catch((error: unknown) => error)
+
+  it('carries the URL and the status of a refused answer', async () => {
+    const error = await refusal(new Response('<!DOCTYPE html>', { status: 404 }))
+    expect(error).toMatchObject({ url, status: 404 })
+  })
+
+  it('carries the URL and no status when no answer came', async () => {
+    const error = await refusal(new TypeError('Failed to fetch'))
+    expect(error).toMatchObject({ url, status: undefined })
+  })
+
+  it('carries the status of an answer that is not JSON', async () => {
+    expect(await refusal(new Response('oops'))).toMatchObject({ url, status: 200 })
   })
 })

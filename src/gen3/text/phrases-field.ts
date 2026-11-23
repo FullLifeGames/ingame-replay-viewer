@@ -113,6 +113,14 @@ const SIDE_STARTS: Readonly<Record<string, (side: Side) => string>> = {
   safeguard: (side) => T.safeguard.render(teamAtStart(side)),
 }
 
+/**
+ * The screens Gen 1 sets on their user (`|-start|<mon>|Reflect`) say the side message of the
+ * user's side, as in Gen 3, where they guard the whole side.
+ */
+export function screenRaised(side: Side, id: string): string | undefined {
+  return id === 'reflect' || id === 'lightscreen' ? SIDE_STARTS[id]?.(side) : undefined
+}
+
 /** A condition set on one side, such as Spikes on the side they hurt. */
 export function sideStarted(side: Side, condition: Effect): Phrase {
   const text = SIDE_STARTS[toID(condition.name)]?.(side)

@@ -4,18 +4,18 @@
 import { type AudioHandOver, audioHandOver, loadEmulator } from './emulator'
 import { environmentProblem } from './environment'
 import { fetchBytes, fetchJson } from './fetch'
-import { messageOf } from './message'
 import { wireReplays } from './replay-view'
 import { createSession, type Session } from './session'
 import * as say from './status'
 import { findView, type View } from './view'
+import { environmentLine } from './visitor'
 
-/** Runs a handler's work; a failure becomes the status line. */
+/** Runs a handler's work; a failure becomes its visitor line, with the module's words as detail. */
 function act(view: View, work: () => unknown): void {
   Promise.resolve()
     .then(work)
     .catch((error: unknown) => {
-      view.status(messageOf(error))
+      view.failure(error)
     })
 }
 
@@ -69,5 +69,5 @@ if (problem === undefined) {
   wireReplays(session, view)
   wireRun(session, view, audio)
 } else {
-  view.showOnly(problem)
+  view.showOnly(environmentLine(problem, location))
 }

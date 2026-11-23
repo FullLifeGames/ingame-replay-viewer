@@ -68,7 +68,7 @@ describe('the full flow', () => {
 
   it("gives a replay's stream size and what the game does not show", async () => {
     const { session } = world()
-    const { replay, stream } = streamOfReplay(replay994052)
+    const { replay, stream, players } = streamOfReplay(replay994052)
     const rows = notShown(replay, stream)
     expect(await session.pickTestReplay(REPLAY_994052)).toEqual({
       id: 'smogtours-gen3ou-994052',
@@ -76,6 +76,7 @@ describe('the full flow', () => {
       instructions: stream.instructions.length,
       rows,
       counts: notShownCounts(rows),
+      players,
     })
     expect(rows.length).toBeGreaterThan(0)
   })

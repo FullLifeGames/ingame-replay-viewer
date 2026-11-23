@@ -23,3 +23,7 @@ Black 2/White 2 (Gen 5, NDS), the generation whose sprites Showdown's own client
 
 - Game-side code does not carry over between target games; only what lives outside the ROM does (ADR 0004).
 - On each target game, era-matched replays come first and newer formats follow.
+
+## Amendment, 23.11.2026: Pokémon XD
+
+Pokémon XD: Gale of Darkness joins the roadmap as a second 3D target game (user, 23.11.2026). It would run through its native PC port, which compiles the game's decompilation and reads the user's own disc image. Its place in the order is open, and `docs/plan.md` holds what is known about the port.

@@ -8,6 +8,8 @@ import { crc32 } from '../patch/crc32'
 import { buildGen3Stream, type Gen3Stream } from './backend'
 import { mechanicGap, showsInPlace } from './fallbacks'
 import { decodeStream } from './stream/decode'
+import { itemOf } from './tables/lookup'
+import { itemGaps } from './tables/testing'
 import { decodeText, encodeText } from './text/charset'
 import { translate, type Translation } from './translate'
 
@@ -31,10 +33,23 @@ const HEADER_KINDS: ReadonlySet<ScriptEvent['kind']> = new Set(['player', 'teamS
 const charsetRead = (text: string) => decodeText(encodeText(text))
 
 /**
- * The mechanic fallbacks the test replays may take, each a silent line the game shows nothing for:
- * Perish Song's first count, whose later counts print. A new one fails until it is named here.
+ * The mechanic fallbacks the test replays may take, each a line the game shows nothing for:
+ * Perish Song's first count, whose later counts print; Pursuit's activation, whose withdraw
+ * line the switch after the hit prints (none after a knockout); Bide's first turn, which the
+ * expansion shows as the move alone. A new one fails until it is named here.
  */
-const NAMED_MECHANICS: ReadonlySet<string> = new Set([mechanicGap('perish3', 'starting').detail])
+const NAMED_MECHANICS: ReadonlySet<string> = new Set([
+  mechanicGap('perish3', 'starting').detail,
+  mechanicGap('Pursuit', 'acting').detail,
+  mechanicGap('Bide', 'starting').detail,
+])
+
+/**
+ * The item fallbacks a test replay may take: the items of its generation the expansion lacks
+ * (`itemGaps`), which play as text alone. Any other content gap fails.
+ */
+const itemGapDetails = (gen: number): ReadonlySet<string> =>
+  new Set(itemGaps(gen).flatMap((name) => itemOf(name).fallback?.detail ?? []))
 
 const replays = REPLAYS.map(({ id }) => {
   const script = replayScript(id)
@@ -62,7 +77,11 @@ describe.each(replays)('the instruction stream of $id', ({ id, script, stream, t
   })
 
   it('takes no fallback that shows something in place of a content gap', () => {
-    const gaps = stream.fallbacks.filter(showsInPlace)
+    const items = itemGapDetails(script.gen)
+    const gaps = stream.fallbacks.filter(
+      (fallback) =>
+        showsInPlace(fallback) && !(fallback.kind === 'item' && items.has(fallback.detail)),
+    )
     expect(gaps, gaps.map(({ line, detail }) => `${String(line)}: ${detail}`).join('\n')).toEqual(
       [],
     )

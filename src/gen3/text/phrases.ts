@@ -5,7 +5,7 @@ import { toID } from '@pkmn/dex'
 
 import type { Effect } from '../../script/types'
 import { Gen3Error } from '../errors'
-import { held, type Mon, moveName, nameAtStart, nameInside, ownerAtStart } from './names'
+import { held, itemName, type Mon, moveName, nameAtStart, nameInside, ownerAtStart } from './names'
 import { ownPhrase, type Phrase, tagged } from './template'
 
 export const MOVE_TEMPLATES = {
@@ -83,6 +83,28 @@ export const STAT_TEMPLATES = {
   wontFall: tagged('STRINGID_STATSWONTDECREASE', (who: Mon, stat: string) => {
     return `${ownerAtStart(who)} ${stat} won't go any lower!`
   }),
+  // B_MSG_STAT_CHANGED_BELLY_DRUM: `ChangeStatBuffs` (src/battle_stat_change.c) picks it for
+  // EFFECT_BELLY_DRUM in place of the "rose" line.
+  maxedAttack: tagged('STRINGID_PKMNCUTHPMAXEDATTACK', (who: Mon) => {
+    return `${nameAtStart(who)} cut its own HP and maximized its Attack!`
+  }),
+  // B_MSG_STAT_CHANGED_ITEM: `StatChanged` (src/battle_stat_change.c) picks it for a change an
+  // item makes (`STAT_CHANGE_ITEM`), as Gen 3's berries and Berserk Gene do; B_BUFF2 is the
+  // "sharply" or "harshly" of the stages.
+  itemRose: tagged(
+    'STRINGID_USINGITEMSTATOFPKMNROSE',
+    (who: Mon, item: string, stat: string, how: string) => {
+      return `The ${item}${how} boosted ${nameInside(who)}'s ${stat}!`
+    },
+  ),
+  itemFell: tagged(
+    'STRINGID_USINGITEMSTATOFPKMNFELL',
+    (who: Mon, item: string, stat: string, how: string) => {
+      return `The ${item}${how} lowered ${nameInside(who)}'s ${stat}!`
+    },
+  ),
+  // `BattleScript_EffectHaze` (data/battle_scripts_1.s) prints it after the move's animation.
+  changesGone: tagged('STRINGID_STATCHANGESGONE', () => 'All stat changes were eliminated!'),
 }
 
 export function usedMove(user: Mon, move: string): string {
@@ -140,15 +162,32 @@ const statName = (stat: BoostID) => held(STAT_TEMPLATES[stat].render())
 const RISES = ['', STAT_TEMPLATES.sharply.render(), STAT_TEMPLATES.drastically.render()]
 const FALLS = ['', STAT_TEMPLATES.harshly.render(), STAT_TEMPLATES.severely.render()]
 
-/** "rose", "rose sharply", "rose drastically" for 1, 2, 3 or more stages; the same for falls. */
-export function statChanged(who: Mon, stat: BoostID, stages: number): string {
+/** The word for 1, 2, 3 or more stages: "", "sharply", "drastically"; the same for falls. */
+function howMuch(stages: number): string {
+  const words = stages > 0 ? RISES : FALLS
+  return held(words[Math.min(Math.abs(stages), words.length) - 1] ?? '')
+}
+
+/**
+ * "rose", "rose sharply", "rose drastically" for 1, 2, 3 or more stages; the same for falls.
+ * By its `cause`, Belly Drum's change says the maxed Attack instead, and an item's says the item.
+ */
+export function statChanged(who: Mon, stat: BoostID, stages: number, cause?: Effect): string {
+  if (cause !== undefined && toID(cause.name) === 'bellydrum')
+    return STAT_TEMPLATES.maxedAttack.render(who)
   if (stages === 0)
     throw new Gen3Error(`a change of 0 stages has no direction; ${stat} of ${who.name}`)
-  const words = stages > 0 ? RISES : FALLS
-  const how = held(words[Math.min(Math.abs(stages), words.length) - 1] ?? '')
+  const how = howMuch(stages)
+  if (cause?.kind === 'item') {
+    const template = stages > 0 ? STAT_TEMPLATES.itemRose : STAT_TEMPLATES.itemFell
+    return template.render(who, itemName(cause.name), statName(stat), how)
+  }
   const template = stages > 0 ? STAT_TEMPLATES.rose : STAT_TEMPLATES.fell
   return template.render(who, statName(stat), how)
 }
+
+/** Haze's line: every stat stage back to 0. */
+export const statChangesGone = () => STAT_TEMPLATES.changesGone.render()
 
 export function statWontChange(who: Mon, stat: BoostID, direction: 'up' | 'down'): string {
   const template = direction === 'up' ? STAT_TEMPLATES.wontRise : STAT_TEMPLATES.wontFall

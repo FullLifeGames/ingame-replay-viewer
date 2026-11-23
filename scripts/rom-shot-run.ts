@@ -135,12 +135,20 @@ export interface ToolRun {
   shots: string[]
   /** Dump the video state and the frame every N frames, for the mGBA oracle (#43). */
   stateEvery?: number
+  /** Hold B from N frames after the replay reports finished to the run's end (#30). */
+  holdBFromEnd?: number
 }
 
+const option = (name: string, value: number | undefined) =>
+  value === undefined ? [] : [name, String(value)]
+
 export function toolArgs(run: ToolRun): string[] {
-  const states = run.stateEvery === undefined ? [] : ['--state-every', String(run.stateEvery)]
-  const clock = ['--clock', String(TOOL_CLOCK)]
-  return [run.rom, `0x${run.address.toString(16)}`, run.frameDir, ...clock, ...states, ...run.shots]
+  const options = [
+    ...option('--clock', TOOL_CLOCK),
+    ...option('--state-every', run.stateEvery),
+    ...option('--hold-b-from-end', run.holdBFromEnd),
+  ]
+  return [run.rom, `0x${run.address.toString(16)}`, run.frameDir, ...options, ...run.shots]
 }
 
 export function runTool(run: ToolRun): ToolOutput {

@@ -15,6 +15,11 @@
         image-rendering: pixelated;
         background: #000;
       }
+      #status,
+      #status-detail,
+      #replay-summary {
+        overflow-wrap: anywhere;
+      }
     </style>
   </head>
   <body>
@@ -22,14 +27,23 @@
     <p>
       This page runs the game in the mGBA emulator, the fallback for the <a href="./">viewer</a>.
     </p>
-    <p id="environment" hidden></p>
+    <div id="environment" hidden>
+      <p id="environment-line"></p>
+      <p>
+        <a id="environment-report" target="_blank" rel="noopener" hidden>Report this problem</a>
+      </p>
+      <details>
+        <summary>Details</summary>
+        <p id="environment-detail"></p>
+      </details>
+    </div>
     <div id="app">
       <p>
         <label for="dump">Your US Emerald (stays in this tab)</label>
         <input id="dump" type="file" />
       </p>
       <p>
-        <label for="test-replay">Test replay</label>
+        <label for="test-replay">Example replay</label>
         <select id="test-replay"></select>
       </p>
       <form id="replay-form">
@@ -42,6 +56,11 @@
         <button id="restart" type="button" disabled>Restart</button>
       </p>
       <p id="status" role="status"></p>
+      <p><a id="report" target="_blank" rel="noopener" hidden>Report this problem</a></p>
+      <details id="details">
+        <summary>Details</summary>
+        <p id="status-detail"></p>
+      </details>
       <canvas id="screen" width="240" height="160"></canvas>
       <p id="replay-summary"></p>
       <h2 id="not-shown">Not shown in the game (0)</h2>

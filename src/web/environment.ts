@@ -13,33 +13,39 @@ export interface PageEnvironment {
   readonly moduleWorkers?: boolean
 }
 
+/** What keeps `runner` from running, and the words for whoever runs the dev server. */
+export interface EnvironmentProblem {
+  readonly kind: 'insecure' | 'isolation' | 'workers'
+  readonly detail: string
+}
+
 /**
- * The line the page shows instead of its controls, or undefined when `runner` can run: the
- * emulator on the emulator page, the game in the viewer.
+ * What the page shows instead of its controls, or undefined when `runner` can run: the
+ * emulator on the emulator page, the game in the viewer. visitor.ts gives each kind its line.
  */
 export function environmentProblem(
   environment: PageEnvironment,
   runner = 'the emulator',
-): string | undefined {
+): EnvironmentProblem | undefined {
   if (!environment.isSecureContext) {
-    return (
+    const detail =
       `This page is not a secure context, so ${runner} cannot run. Open it on devbox at ` +
       'http://localhost:5177, or over the HTTPS address that tailscale serve gives it ' +
       '(see src/web/README.md).'
-    )
+    return { kind: 'insecure', detail }
   }
   if (!environment.crossOriginIsolated) {
-    return (
+    const detail =
       `This page is not cross-origin isolated, so ${runner} cannot run: serve it with ` +
       'Cross-Origin-Opener-Policy: same-origin and Cross-Origin-Embedder-Policy: require-corp, ' +
       'as npm run dev does.'
-    )
+    return { kind: 'isolation', detail }
   }
   if (environment.moduleWorkers === false) {
-    return (
+    const detail =
       `This browser cannot start a module worker, so ${runner} cannot run. Firefox 114, ` +
       'Chrome 80, Safari 15 and their later versions can.'
-    )
+    return { kind: 'workers', detail }
   }
   return undefined
 }

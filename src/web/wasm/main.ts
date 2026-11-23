@@ -2,26 +2,30 @@
 // the user's dump with the module patch, picks a test replay or loads one by link or ID and lists
 // what the game does not show, as the emulator page does (replay-choice.ts, replay-view.ts), and
 // runs the picked stream in a worker (run.ts). The page allows the worker's frames by the
-// tick rule (protocol.ts) and draws the newest whole frame (frame-swap.ts) on each animation
+// tick rule (clock.ts) and draws the newest whole frame (frame-swap.ts) on each animation
 // frame. The game's sound goes from the worker through the audio ring to an audio worklet
-// (audio.ts), at 1x and 2x; fast stays silent. The dump stays in this tab.
+// (audio.ts), at 1x and 2x; fast stays silent. Pause and the Space key hold the running replay
+// and its sound until Play (pause.ts). The dump stays in this tab.
 import { environmentProblem, startsModuleWorkers } from '../environment'
 import { fetchJson } from '../fetch'
-import { messageOf } from '../message'
 import {
   createReplayChoice,
   PICK_DUMP,
   PICK_REPLAY,
   type ReplayChoice,
+  type ReplayPlace,
+  type ReplaySummary,
   SessionError,
 } from '../replay-choice'
-import { wireReplays } from '../replay-view'
-import { endedLine, READY_LINE } from '../status'
+import { wireReplayFile, wireReplays } from '../replay-view'
+import { BUILDING_LINE, BUILT_LINE, endedLine, panelText, READY_LINE } from '../status'
+import { environmentLine } from '../visitor'
+import { AudioOpener, type Sound } from './audio-opener'
 import { FRAME_HEIGHT, FRAME_WIDTH } from './frame'
 import { readFrame } from './frame-swap'
+import { type KeyPress, pauseButton, soundForNewRun, spaceToggles, togglePause } from './pause'
 import { grant, readStatus, type Speed, writePace } from './protocol'
 import {
-  AudioOpener,
   type Built,
   buildModule,
   hookStatus,
@@ -29,8 +33,8 @@ import {
   progressLine,
   reachEnd,
   type Run,
+  openAudioContext,
   runningLine,
-  type Sound,
   startRun,
   stopRun,
   watchRun,
@@ -38,8 +42,14 @@ import {
 import { Runs } from './runs'
 import { findSpikeView, type SpikeView } from './view'
 
-/** A run with the id of the replay it plays, for the status line at END. */
-type NamedRun = Run & { readonly id: string }
+/**
+ * A pick with the summary the list shows for it and the place it came from, which a failed run
+ * reports (S5-11); the hook's own stream has neither.
+ */
+type ListedPick = Picked & { readonly summary?: ReplaySummary; readonly place?: ReplayPlace }
+
+/** A run with the id of the replay it plays, for the status line at END, and its summary. */
+type NamedRun = Run & { readonly id: string; readonly summary: ReplaySummary | undefined }
 
 /** The animation-frame loop: grants the run its frames, draws the newest and shows the progress. */
 function drawLoop(
@@ -52,6 +62,14 @@ function drawLoop(
   const draw = (now: number) => {
     requestAnimationFrame(draw)
     const run = runs.current
+    // Before the run check, so a pick shows its names before the first Start.
+    view.panel(
+      panelText(
+        view.shownReplay(),
+        run && { summary: run.summary, turn: readStatus(run.control).turn },
+      ),
+    )
+    view.showPause(pauseButton(run))
     if (run === undefined) return
     // The clock grants from the frame the game reached, so a game that fell behind never races.
     const status = readStatus(run.control)
@@ -60,7 +78,7 @@ function drawLoop(
       // At END fast gives way to 1x (speedAtEnd), and the speed control shows it.
       const speed = reachEnd(run, now)
       // The draw loop looks at the current run only, so a later Start never gets this line.
-      view.status(endedLine(run.id))
+      view.status(endedLine(run.id, run.silence))
       if (speed !== run.clock.speed) {
         changeSpeed(speed)
         view.showSpeed(speed)
@@ -78,18 +96,20 @@ function drawLoop(
 }
 
 /** The newest pick's stream with its replay's id: what the list under the game describes. */
-async function pickedStream(choice: ReplayChoice): Promise<Picked | undefined> {
+async function pickedStream(choice: ReplayChoice): Promise<ListedPick | undefined> {
   const chosen = await choice.chosen()
-  return chosen === undefined ? undefined : { id: chosen.summary.id, stream: chosen.bytes }
+  return chosen === undefined
+    ? undefined
+    : { id: chosen.summary.id, stream: chosen.bytes, summary: chosen.summary, place: chosen.place }
 }
 
 /** The page's state and its actions; the view's events call them. */
 function createSpike(view: SpikeView) {
   let built: Promise<Built> | undefined
-  let last: Picked | undefined
+  let last: ListedPick | undefined
   const choice = createReplayChoice(fetchJson)
   const runs = new Runs<NamedRun>(stopRun)
-  const audio = new AudioOpener()
+  const audio = new AudioOpener(openAudioContext)
 
   const changeSpeed = (speed: Speed) => {
     const run = runs.current
@@ -99,16 +119,19 @@ function createSpike(view: SpikeView) {
   }
   drawLoop(view, runs, changeSpeed)
 
-  const begin = (module: Built, chosen: Picked, sound: Sound): Run => {
-    const run = Object.assign(startRun(module, chosen, view.speed(), sound), { id: chosen.id })
-    watchRun(run, (line) => {
-      if (runs.current === run) view.status(line)
+  const begin = (module: Built, chosen: ListedPick, sound: Sound): Run => {
+    const { id, summary, place } = chosen
+    const run = Object.assign(startRun(module, chosen, view.speed(), sound), { id, summary })
+    watchRun(run, (failure) => {
+      if (runs.current === run) view.failure(failure, place)
     })
     runs.replace(run)
+    // A refused resume shows no line, as for Play (S5-16).
+    soundForNewRun(run, audio).catch(() => undefined)
     return run
   }
 
-  const play = async (stream?: Picked): Promise<string | undefined> => {
+  const play = async (stream?: ListedPick): Promise<string | undefined> => {
     const ticket = runs.nextPlay()
     const picked = stream ?? pickedStream(choice)
     const [module, chosen, sound] = await Promise.all([built, picked, audio.open()])
@@ -126,18 +149,18 @@ function createSpike(view: SpikeView) {
     pickDump: (dump: Blob) => {
       const mark = runs.mark()
       built = dump.arrayBuffer().then((bytes) => buildModule(new Uint8Array(bytes)))
-      return built.then(({ bytes }) =>
-        runs.startedSince(mark)
-          ? undefined
-          : `Your dump is US Emerald, and the page built the module (${String(bytes)} bytes). Press Start.`,
-      )
+      return built.then(() => (runs.startedSince(mark) ? undefined : BUILT_LINE))
     },
     pickTestReplay: choice.pickTestReplay,
     loadReplay: choice.loadReplay,
+    loadFile: choice.loadFile,
     play,
     /** The stream that ran last, from its start; the picked replay when none ran yet. */
     restart: () => play(last),
     changeSpeed,
+    /** Pauses or plays the current run; the sound's call runs inside the caller's event. */
+    togglePause: () => togglePause(runs.current, audio, performance.now()),
+    spaceToggles: (press: KeyPress) => spaceToggles(press, runs.current),
     /** The test hook of e2e/wasm-spike.spec.ts: the run's status, its sound and the run counts. */
     status: () =>
       runs.current === undefined ? undefined : { ...hookStatus(runs.current), runs: runs.counts },
@@ -146,35 +169,71 @@ function createSpike(view: SpikeView) {
 
 type Spike = ReturnType<typeof createSpike>
 
-/** Runs a handler's work; its line or its failure becomes the status line. */
+/** Runs a handler's work; its line or its failure's visitor line becomes the status line. */
 function act(view: SpikeView, work: () => Promise<string | undefined>): void {
   work().then(
     (line) => {
       if (line !== undefined) view.status(line)
     },
     (error: unknown) => {
-      view.status(messageOf(error))
+      view.failure(error)
     },
   )
+}
+
+/**
+ * The Pause button and the Space key (#57). Both call the toggle in their own event, with no
+ * `act`, so the sound resumes inside it. A refused suspend or resume shows no line: the clock
+ * holds or plays the game, and the next press asks the audio again (S5-16).
+ */
+function wirePause(spike: Spike, view: SpikeView): void {
+  const toggle = () => {
+    spike.togglePause().catch(() => undefined)
+  }
+  view.pause.addEventListener('click', toggle)
+  document.addEventListener('keydown', (event) => {
+    if (!spike.spaceToggles(event)) return
+    toggle()
+    // The page does not scroll on the Space that toggled.
+    event.preventDefault()
+  })
+}
+
+/**
+ * Runs a press on Start or Restart. Once its run begins and the button still holds the focus, the
+ * focus moves to Pause, so Space pauses the run instead of starting it over (S5-17).
+ */
+function playFrom(
+  view: SpikeView,
+  button: HTMLButtonElement,
+  play: () => Promise<string | undefined>,
+): void {
+  act(view, async () => {
+    const line = await play()
+    if (line !== undefined && document.activeElement === button) view.focusPause()
+    return line
+  })
 }
 
 function wire(spike: Spike, view: SpikeView): void {
   view.dump.addEventListener('change', () => {
     const file = view.dump.files?.[0]
     if (file === undefined) return
-    view.status('Checking your dump and building the module. This takes a few seconds.')
+    view.status(BUILDING_LINE)
     act(view, () => spike.pickDump(file))
   })
   view.start.addEventListener('click', () => {
-    act(view, () => spike.play())
+    playFrom(view, view.start, () => spike.play())
   })
   view.restart.addEventListener('click', () => {
-    act(view, () => spike.restart())
+    playFrom(view, view.restart, () => spike.restart())
   })
+  wirePause(spike, view)
   view.onSpeed((speed) => {
     spike.changeSpeed(speed)
   })
   wireReplays(spike, view)
+  wireReplayFile(spike, view)
 }
 
 const view = findSpikeView()
@@ -198,5 +257,5 @@ if (problem === undefined) {
     },
   })
 } else {
-  view.showOnly(problem)
+  view.showOnly(environmentLine(problem, location))
 }

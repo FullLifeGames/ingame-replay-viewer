@@ -6,7 +6,9 @@ describe('environmentProblem', () => {
   // Opened as http://100.x.y.z:5177 over Tailscale: not a secure context, so no SharedArrayBuffer.
   // The user reads this line on their own phone or PC, where localhost is not devbox.
   it('names devbox, its localhost address and the tailnet HTTPS route on an insecure page', () => {
-    const line = environmentProblem({ isSecureContext: false, crossOriginIsolated: false })
+    const problem = environmentProblem({ isSecureContext: false, crossOriginIsolated: false })
+    expect(problem?.kind).toBe('insecure')
+    const line = problem?.detail
     expect(line).toContain('secure context')
     expect(line).toContain('on devbox at http://localhost:5177')
     expect(line).toContain('tailscale serve')
@@ -14,7 +16,9 @@ describe('environmentProblem', () => {
   })
 
   it('names the COOP and COEP headers on a secure page that is not cross-origin isolated', () => {
-    const line = environmentProblem({ isSecureContext: true, crossOriginIsolated: false })
+    const problem = environmentProblem({ isSecureContext: true, crossOriginIsolated: false })
+    expect(problem?.kind).toBe('isolation')
+    const line = problem?.detail
     expect(line).toContain('cross-origin isolated')
     expect(line).toContain('Cross-Origin-Opener-Policy: same-origin')
     expect(line).toContain('Cross-Origin-Embedder-Policy: require-corp')
@@ -24,7 +28,7 @@ describe('environmentProblem', () => {
   it('names what the page runs', () => {
     for (const isSecureContext of [false, true]) {
       const environment = { isSecureContext, crossOriginIsolated: false }
-      const line = environmentProblem(environment, 'the game')
+      const line = environmentProblem(environment, 'the game')?.detail
       expect(line).toContain('so the game cannot run')
       expect(line).not.toContain('emulator')
     }
@@ -38,17 +42,19 @@ describe('environmentProblem', () => {
   // page and then nothing after Start (#49).
   it('names the module worker and the browsers that start one when the browser cannot', () => {
     const environment = { isSecureContext: true, crossOriginIsolated: true, moduleWorkers: false }
-    expect(environmentProblem(environment, 'the game')).toBe(
-      'This browser cannot start a module worker, so the game cannot run. Firefox 114, ' +
+    expect(environmentProblem(environment, 'the game')).toEqual({
+      kind: 'workers',
+      detail:
+        'This browser cannot start a module worker, so the game cannot run. Firefox 114, ' +
         'Chrome 80, Safari 15 and their later versions can.',
-    )
+    })
   })
 
   it('names the secure context and the isolation before the module worker', () => {
     const insecure = { isSecureContext: false, crossOriginIsolated: false, moduleWorkers: false }
-    expect(environmentProblem(insecure, 'the game')).toContain('secure context')
+    expect(environmentProblem(insecure, 'the game')?.kind).toBe('insecure')
     const open = { isSecureContext: true, crossOriginIsolated: false, moduleWorkers: false }
-    expect(environmentProblem(open, 'the game')).toContain('cross-origin isolated')
+    expect(environmentProblem(open, 'the game')?.kind).toBe('isolation')
   })
 
   it('has no line when the browser starts module workers', () => {

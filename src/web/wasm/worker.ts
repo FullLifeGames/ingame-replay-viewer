@@ -8,9 +8,8 @@
 import header from '../../../rom/gen3/include/replay_progress.h?raw'
 import slotHeader from '../../../rom/gen3/include/replay_slot.h?raw'
 import { readSlotHeaderLayout } from '../../patch/slot'
-import { messageOf } from '../message'
 import { audioHandler } from './audio'
-import { instantiateFailureLine } from './failures'
+import { instantiateFailure, RETURNED, stopFailure, writeFailure } from './failures'
 import { frameHandler, type GameModule, type ModuleHooks, writeStream } from './game'
 import type { StartMessage, WorkerReport } from './messages'
 import { readProgressLayout } from './progress'
@@ -50,7 +49,7 @@ async function run(start: StartMessage): Promise<void> {
     },
     instantiateWasm: (imports, receive) => {
       void WebAssembly.instantiate(start.module, imports).then(receive, (error: unknown) => {
-        report({ type: 'failed', line: instantiateFailureLine(error) })
+        report(instantiateFailure(error))
       })
       return {}
     },
@@ -58,20 +57,17 @@ async function run(start: StartMessage): Promise<void> {
   try {
     writeStream(game, start.slot, start.stream, readSlotHeaderLayout(slotHeader))
   } catch (error) {
-    report({
-      type: 'failed',
-      line: `Could not write the replay into the module: ${messageOf(error)}`,
-    })
+    report(writeFailure(error))
     return
   }
   report({ type: 'running' })
   game._AgbMain()
-  report({ type: 'failed', line: 'AgbMain returned, which the game never does' })
+  report(RETURNED)
 }
 
 scope.onmessage = (event) => {
   scope.onmessage = null
   run(event.data).catch((error: unknown) => {
-    report({ type: 'failed', line: `The game stopped: ${messageOf(error)}` })
+    report(stopFailure(error))
   })
 }

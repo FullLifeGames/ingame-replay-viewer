@@ -69,6 +69,7 @@ export function nameTrainer(name: string): Fitted {
   return fallback === undefined ? { text: held(text) } : { text: held(text), fallback }
 }
 
+export const speciesName = (name: string) => held(speciesOf(name).name)
 export const moveName = (name: string) => held(moveOf(name).name)
 export const itemName = (name: string) => held(itemOf(name).name)
 export const abilityName = (name: string) => held(abilityOf(name).name)
