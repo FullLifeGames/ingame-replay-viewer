@@ -123,16 +123,29 @@ describe('visitorLine for the replay', () => {
     expect(visitorLine(refusal).line).toMatch(/^This replay is a Gen 9 battle\./)
   })
 
-  it('names the example when its replay does not load, and offers the report', async () => {
+  // A phone that drops the network while the page fetches the example's file (#59).
+  it('asks for the example again when its file does not load, with no report', async () => {
     const choice = createReplayChoice(() => Promise.reject(new Error('offline')))
-    const broken = { id: 'broken', load: () => Promise.reject(new Error('chunk gone')) }
+    const gone = new TypeError('Failed to fetch dynamically imported module: /fixture.json')
+    const broken = { id: 'broken', load: () => Promise.reject(gone) }
     const refusal = await refusalOf(choice.pickTestReplay(broken))
     expect(visitorLine(refusal)).toEqual({
-      line: `The page hit a problem it has no line for. ${REPORT}`,
-      detail: 'Could not load the test replay broken: chunk gone',
-      report: true,
+      line: 'The page could not load this example. Check your connection and pick it again.',
+      detail: `Could not load the example replay broken: ${gone.message}`,
+      report: false,
       replay: 'broken',
     })
+  })
+
+  it('keeps the line of an example that loads but holds a log the viewer cannot follow', async () => {
+    const choice = createReplayChoice(() => Promise.reject(new Error('offline')))
+    const doubles = replay994052.log.replace('|gametype|singles', '|gametype|doubles')
+    const example = {
+      id: 'doubles',
+      load: () => Promise.resolve({ ...replay994052, log: doubles }),
+    }
+    const refusal = await refusalOf(choice.pickTestReplay(example))
+    expect(visitorLine(refusal).line).toMatch(/^This replay is not a singles battle /)
   })
 
   it('counts the line of a ScriptError from one, in the line and in "Details"', () => {

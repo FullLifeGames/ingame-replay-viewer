@@ -12,8 +12,9 @@ const FIRST = 'smogtours-gen3ou-994052'
 const LINKED = 'smogtours-gen3ou-994176'
 const OTHER = 'smogtours-gen3ou-994086'
 const SHOWDOWN = showdownUrl(LINKED)
-/** The line of a failure the page has no line for, such as an example it could not load. */
-const NO_LINE = 'The page hit a problem it has no line for. Report it with the link below.'
+/** The line of an example whose file did not arrive (#59). */
+const EXAMPLE_LINE =
+  'The page could not load this example. Check your connection and pick it again.'
 /** The line of every refusal of the link field (#59). */
 const LINK_LINE =
   '"Replay link or ID" takes a replay ID such as smogtours-gen3ou-994052, or a link to a replay ' +
@@ -82,7 +83,7 @@ test('after a new pick or a Load the page asks for Start and shows which replay 
   await expect(status).toHaveText(new RegExp(`^Picked ${FIRST}\\. Press Start`))
 })
 
-test('a test replay that fails to load leaves the select on the replay the page holds', async ({
+test('an example replay that fails to load leaves the select on the replay the page holds', async ({
   page,
   baseURL,
 }) => {
@@ -102,22 +103,23 @@ test('a test replay that fails to load leaves the select on the replay the page 
   const detail = page.locator('#status-detail')
   const report = page.locator('#report')
   await testReplay.selectOption(OTHER)
-  await expect(status).toHaveText(NO_LINE)
-  await expect(detail).toHaveText(new RegExp(`^Could not load the test replay ${OTHER}: `))
+  await expect(status).toHaveText(EXAMPLE_LINE)
+  await expect(detail).toHaveText(new RegExp(`^Could not load the example replay ${OTHER}: `))
   await expect(detail).toBeHidden()
-  await expect(report).toBeVisible()
-  expect(await report.getAttribute('href')).toContain(`&replay=${OTHER}&line=The%20page%20hit`)
+  await expect(page.locator('#details')).toBeVisible()
+  await expect(report).toBeHidden()
   expect(aborted.length).toBeGreaterThan(0)
   await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
   await expect(testReplay).toHaveValue(FIRST)
 
-  // A line that went well clears the old failure's words and its report link.
+  // A line that went well clears the old failure's words, and "Details" hides with nothing in it.
   await loadReplay(page, LINKED)
   await expect(status).toHaveText(new RegExp(`^Picked ${LINKED}\\. Press Start`))
   await expect(detail).toHaveText('')
+  await expect(page.locator('#details')).toBeHidden()
   await expect(report).toBeHidden()
   await testReplay.selectOption(OTHER)
-  await expect(status).toHaveText(NO_LINE)
+  await expect(status).toHaveText(EXAMPLE_LINE)
   await expect(summary).toHaveText(new RegExp(`^${LINKED}: `))
   await expect(testReplay).toHaveValue('')
   expect(notSameOriginGets).toEqual([`GET ${SHOWDOWN}`])

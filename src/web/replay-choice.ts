@@ -132,9 +132,23 @@ const chooseReplay = (replay: Replay, place: ReplayPlace): Chosen =>
 
 const STREAM_STEP = 'Could not turn the replay into a stream'
 
+/** The file of an example replay did not arrive, as when a phone drops the network. */
+export class ExampleLoadError extends Error {
+  override name = 'ExampleLoadError'
+}
+
+async function loadExample(replay: TestReplay): Promise<unknown> {
+  try {
+    return await replay.load()
+  } catch (error) {
+    throw new ExampleLoadError(messageOf(error), { cause: error })
+  }
+}
+
 async function chooseTestReplay(replay: TestReplay): Promise<Chosen> {
   const place: ReplayPlace = { source: 'example', replay: replay.id }
-  const json = await step(`Could not load the test replay ${replay.id}`, replay.load, place)
+  const load = `Could not load the example replay ${replay.id}`
+  const json = await step(load, () => loadExample(replay), place)
   return step(STREAM_STEP, () => choose(json, place), place)
 }
 

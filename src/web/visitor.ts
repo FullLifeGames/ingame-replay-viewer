@@ -15,6 +15,7 @@ import type { EnvironmentProblem } from './environment'
 import { FetchError } from './fetch'
 import { messageOf } from './message'
 import {
+  ExampleLoadError,
   FileSizeError,
   LARGEST_FILE_MB,
   type ReplayPlace,
@@ -50,6 +51,10 @@ export const VISITOR_LINES = {
   },
   linkInput: {
     text: `"Replay link or ID" takes a replay ID such as ${EXAMPLE_ID}, or a link to a replay on ${REPLAY_HOST}.`,
+    report: false,
+  },
+  exampleLoad: {
+    text: 'The page could not load this example. Check your connection and pick it again.',
     report: false,
   },
   linkReplay: {
@@ -199,6 +204,7 @@ const RULES: readonly Rule[] = [
   named('game', (error) => error instanceof Gen3Error || error instanceof SlotError),
   named('wrongDump', (error) => error instanceof DumpRefusal),
   named('linkInput', (error) => error instanceof ReplayInputError),
+  named('exampleLoad', (error) => error instanceof ExampleLoadError),
   (error) => (error instanceof FetchError ? fetchMatch(error) : undefined),
   (error, { words }) =>
     error instanceof RunFailure ? { name: RUN_LINES[error.kind], values: { words } } : undefined,

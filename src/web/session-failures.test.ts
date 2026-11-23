@@ -66,11 +66,11 @@ describe('a replay from Showdown', () => {
     )
   })
 
-  it('names the test replay that does not load', async () => {
+  it('names the example replay that does not load', async () => {
     const { session } = world()
     const broken: TestReplay = { id: 'broken', load: () => Promise.reject(new Error('chunk gone')) }
     await expect(session.pickTestReplay(broken)).rejects.toThrow(
-      new SessionError('Could not load the test replay broken: chunk gone', undefined, BROKEN),
+      new SessionError('Could not load the example replay broken: chunk gone', undefined, BROKEN),
     )
   })
 
@@ -82,7 +82,7 @@ describe('a replay from Showdown', () => {
       load: () => Promise.reject('offline'),
     }
     await expect(session.pickTestReplay(broken)).rejects.toThrow(
-      new SessionError('Could not load the test replay broken: offline', undefined, BROKEN),
+      new SessionError('Could not load the example replay broken: offline', undefined, BROKEN),
     )
   })
 })
