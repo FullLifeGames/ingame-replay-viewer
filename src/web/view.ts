@@ -1,4 +1,4 @@
-// The page's DOM: the elements of index.html and what main.ts shows in them. It holds no rule of
+// The page's DOM: the elements of emulator.html and what main.ts shows in them. It holds no rule of
 // the flow; the replay controls and the list come from replay-view.ts.
 import { element, findReplayView } from './replay-view'
 

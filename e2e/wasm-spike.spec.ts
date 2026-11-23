@@ -1,4 +1,4 @@
-// The WebAssembly spike page in Chromium (#35, plan B5). It reads the user's US Emerald by the
+// The viewer at / in Chromium (#35, plan B5). It reads the user's US Emerald by the
 // build's rule and skips without it or without the build outputs. It plays the hand-made battle
 // at 1x, switches it to 2x and back while it runs (#50), plays a short window of 994052 at 1x and
 // at 2x (#43), and plays 994052 at fast. It reads the run's status through the page's test hook
@@ -132,7 +132,7 @@ async function firstWithSound(page: Page): Promise<void> {
 
 test.use({ launchOptions: { args: ['--autoplay-policy=no-user-gesture-required'] } })
 
-test('the spike page plays hand-made and 994052 at 1x and 2x, switches the speed while they run, and 994052 at fast', async ({
+test('the viewer plays hand-made and 994052 at 1x and 2x, switches the speed while they run, and 994052 at fast', async ({
   page,
 }) => {
   const missing = missingForModule()
@@ -146,7 +146,7 @@ test('the spike page plays hand-made and 994052 at 1x and 2x, switches the speed
   page.on('pageerror', (error) => errors.push(error.message))
   const handMade = await handMadeBytes()
 
-  await page.goto('/wasm.html')
+  await page.goto('/')
   expect(await page.evaluate('[isSecureContext, crossOriginIsolated]')).toEqual([true, true])
   await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles(DUMP)
 
@@ -237,7 +237,7 @@ test('mGBA on the emulator page plays 994052 at fast-forward (B7 measurement)', 
   })
   const { romSha1 } = JSON.parse(readFileSync(SLOT, 'utf8')) as { romSha1: string }
 
-  await page.goto('/')
+  await page.goto('/emulator.html')
   const line = page.getByRole('status')
   await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles(DUMP)
   await expect(line).toHaveText(new RegExp(romSha1), { timeout: 90_000 })

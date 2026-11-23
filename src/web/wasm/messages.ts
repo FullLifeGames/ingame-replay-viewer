@@ -1,4 +1,4 @@
-// The messages between the WebAssembly spike page and its worker (#35). The page sends one start
+// The messages between the viewer and its worker (#35). The page sends one start
 // message to a fresh worker; after it, frames and progress go through the shared buffers of
 // protocol.ts, since AgbMain never returns and the worker reads no further message.
 import type { SlotDescription } from '../../patch/slot'

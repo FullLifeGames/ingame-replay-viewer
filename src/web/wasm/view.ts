@@ -1,9 +1,9 @@
-// The DOM of the WebAssembly spike page: the elements of wasm.html and what main.ts shows in them.
+// The viewer's DOM: the elements of index.html and what main.ts shows in them.
 // The replay controls and the list come from replay-view.ts, as on the emulator page.
 import { element as pageElement, findReplayView } from '../replay-view'
 import { SPEEDS, type Speed } from './protocol'
 
-const PAGE = 'wasm.html'
+const PAGE = 'index.html'
 
 const element = <T extends HTMLElement>(id: string, type: new () => T): T =>
   pageElement(PAGE, id, type)

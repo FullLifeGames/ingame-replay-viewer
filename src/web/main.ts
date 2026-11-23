@@ -1,5 +1,6 @@
-// The dev page (#8): wires the controls of index.html to the session. The user's dump stays in
-// this tab; nothing is stored, and the only requests are same-origin GETs and Showdown's replay.
+// The emulator page (#8): wires the controls of emulator.html to the session. The user's dump
+// stays in this tab; nothing is stored, and the only requests are same-origin GETs and Showdown's
+// replay.
 import { type AudioHandOver, audioHandOver, loadEmulator } from './emulator'
 import { environmentProblem } from './environment'
 import { fetchBytes, fetchJson } from './fetch'

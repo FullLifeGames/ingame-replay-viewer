@@ -1,4 +1,4 @@
-// The WebAssembly page's replay controls (#52): a replay by link or ID fills the "Not shown in the
+// The viewer's replay controls (#52): a replay by link or ID fills the "Not shown in the
 // game" list before Start, with the same counts as the emulator page. Showdown is a route that
 // answers from the test fixture; the page needs no dump and no module for this. With the dump and
 // the module, the replay by link starts at fast and plays its first instructions (#50).
@@ -14,13 +14,13 @@ import { DUMP, missingForModule, waitFor } from './wasm-hook.ts'
 const FIRST = 'smogtours-gen3ou-994052'
 const LINKED = 'smogtours-gen3ou-994176'
 
-test('a replay loaded by link on the WebAssembly page lists what the emulator page lists', async ({
+test('a replay loaded by link in the viewer lists what the emulator page lists', async ({
   page,
   baseURL,
 }) => {
   const notSameOriginGets = await guardRequests(page, baseURL)
   await routeShowdown(page, LINKED)
-  await page.goto('/wasm.html')
+  await page.goto('/')
   const summary = page.locator('#replay-summary')
   const status = page.getByRole('status')
   await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
@@ -38,29 +38,38 @@ test('a replay loaded by link on the WebAssembly page lists what the emulator pa
   expect(await notShownCount(page)).toBeGreaterThan(0)
   expect(onWasm.rows).toHaveLength(await notShownCount(page))
 
-  await page.goto('/')
+  await page.goto('/emulator.html')
   await loadReplay(page, LINKED)
   await expect(summary).toHaveText(new RegExp(`^${LINKED}: `))
   expect(await notShownList(page)).toEqual(onWasm)
   expect(notSameOriginGets).toEqual([`GET ${showdownUrl(LINKED)}`, `GET ${showdownUrl(LINKED)}`])
 })
 
-test('a test replay picked on the WebAssembly page shows its list and asks for Start', async ({
+test('a test replay picked in the viewer shows its list and asks for Start, and the pages link each other', async ({
   page,
   baseURL,
 }) => {
   const notSameOriginGets = await guardRequests(page, baseURL)
-  await page.goto('/wasm.html')
+  await page.goto('/')
   const second = 'smogtours-gen3ou-994086'
   await page.getByLabel('Test replay').selectOption(second)
   await expect(page.getByRole('status')).toHaveText(new RegExp(`^Picked ${second}\\. Press Start`))
   await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${second}: `))
+
+  await test.step('the viewer links the emulator page as the fallback, and it links back', async () => {
+    await page.getByRole('link', { name: 'emulator page' }).click()
+    await expect(page).toHaveURL(/\/emulator\.html$/)
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/emulator page$/)
+    await page.getByRole('link', { name: 'viewer' }).click()
+    await expect(page).toHaveURL(/\/$/)
+    await expect(page.getByLabel('Fast')).toBeVisible()
+  })
   expect(notSameOriginGets).toEqual([])
 })
 
 // #50 with the module: the replay loaded by link starts at fast, as Start plays what the list
 // describes, and the game works through its instructions. The spike test covers END at fast.
-test('a replay loaded by link starts at fast on the WebAssembly page and plays its instructions', async ({
+test('a replay loaded by link starts at fast in the viewer and plays its instructions', async ({
   page,
   baseURL,
 }) => {
@@ -74,7 +83,7 @@ test('a replay loaded by link starts at fast on the WebAssembly page and plays i
   page.on('pageerror', (error) => errors.push(error.message))
   const notSameOriginGets = await guardRequests(page, baseURL)
   await routeShowdown(page, LINKED)
-  await page.goto('/wasm.html')
+  await page.goto('/')
   const line = page.getByRole('status')
   await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles(DUMP)
   await expect(line).toHaveText(/^Your dump is US Emerald/, { timeout: 180_000 })

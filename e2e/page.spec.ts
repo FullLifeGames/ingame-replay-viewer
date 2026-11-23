@@ -1,4 +1,4 @@
-// The dev page in Chromium (plan S5b §5). Tests 1 to 3 need no dump; test 4 reads the user's
+// The emulator page in Chromium (plan S5b §5). Tests 1 to 3 need no dump; test 4 reads the user's
 // US Emerald by the build's own rule and skips without it or without the built patch, and fails
 // on a build that lacks part of the patch series. It shows that the emulator runs the replay's
 // ROM; that the replay plays to its end, and that Restart starts it over, is the tester's.
@@ -17,6 +17,7 @@ import { differ, frame } from './frames.ts'
 import { notShownCount } from './page-text.ts'
 import { guardRequests } from './requests.ts'
 
+const EMULATOR = '/emulator.html'
 const FIRST = 'smogtours-gen3ou-994052'
 const SECOND = 'smogtours-gen3ou-994086'
 const BASE_SHA1 = loadBuildConfig().baseRom.sha1
@@ -42,8 +43,9 @@ function snapshotLength(): number {
 }
 
 test('the page is cross-origin isolated and offers 994052 first', async ({ page }) => {
-  await page.goto('/')
+  await page.goto(EMULATOR)
   expect(await page.evaluate('[isSecureContext, crossOriginIsolated]')).toEqual([true, true])
+  await expect(page.getByRole('link', { name: 'viewer' })).toHaveAttribute('href', './')
   await expect(page.getByRole('status')).toHaveText(/Pick your US Emerald dump/)
   await expect(page.getByLabel('Your US Emerald (stays in this tab)')).toBeEnabled()
   await expect(page.getByLabel('Test replay')).toHaveValue(FIRST)
@@ -59,14 +61,14 @@ test('the page is cross-origin isolated and offers 994052 first', async ({ page 
 })
 
 test('a page without COOP and COEP shows only the environment line', async ({ page }) => {
-  await page.route('/', async (route) => {
+  await page.route(EMULATOR, async (route) => {
     const response = await route.fetch()
     const headers = { ...response.headers() }
     delete headers['cross-origin-opener-policy']
     delete headers['cross-origin-embedder-policy']
     await route.fulfill({ response, headers })
   })
-  await page.goto('/')
+  await page.goto(EMULATOR)
   await expect(page.getByText(/not cross-origin isolated/)).toBeVisible()
   await expect(page.getByLabel('Your US Emerald (stays in this tab)')).toBeHidden()
   await expect(page.getByRole('button', { name: 'Start', exact: true })).toBeHidden()
@@ -77,7 +79,7 @@ test('a file that is not US Emerald is refused before the patch is fetched', asy
   page.on('request', (request) => {
     if (new URL(request.url()).pathname.startsWith('/rom/')) romRequests.push(request.url())
   })
-  await page.goto('/')
+  await page.goto(EMULATOR)
   await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles({
     name: 'not-emerald.gba',
     mimeType: 'application/octet-stream',
@@ -103,7 +105,7 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
   page.on('pageerror', (error) => errors.push(error.message))
   const notSameOriginGets = await guardRequests(page, baseURL)
 
-  await page.goto('/')
+  await page.goto(EMULATOR)
   const status = page.getByRole('status')
   await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles(DUMP)
   await expect(status).toHaveText(new RegExp(romSha1), { timeout: 90_000 })

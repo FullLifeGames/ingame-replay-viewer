@@ -1,6 +1,6 @@
 // What the page needs from the browser before the emulator can run: mGBA's threads need
 // SharedArrayBuffer, which a browser grants only to a secure, cross-origin isolated page. The
-// SHA1 check (crypto.subtle) needs the secure context as well. The WebAssembly spike page needs
+// SHA1 check (crypto.subtle) needs the secure context as well. The viewer needs
 // the same for its worker and names the game instead. It runs the game in a module worker, which
 // an older browser cannot start: the page would load, and Start would show nothing (#49). A
 // missing audio worklet is no such case: the game plays without sound and says why (run.ts).
@@ -15,7 +15,7 @@ export interface PageEnvironment {
 
 /**
  * The line the page shows instead of its controls, or undefined when `runner` can run: the
- * emulator on the emulator page, the game on the spike page.
+ * emulator on the emulator page, the game in the viewer.
  */
 export function environmentProblem(
   environment: PageEnvironment,
