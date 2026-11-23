@@ -22,6 +22,7 @@ function fill(list: HTMLElement, texts: readonly string[]): void {
 /** The replay controls of `page`, and the call that shows a replay's summary and list. */
 export function findReplayView(page: string) {
   const testReplay = element(page, 'test-replay', HTMLSelectElement)
+  let held = testReplay.selectedIndex
   return {
     testReplay,
     replayForm: element(page, 'replay-form', HTMLFormElement),
@@ -37,6 +38,14 @@ export function findReplayView(page: string) {
       fill(element(page, 'not-shown-counts', HTMLUListElement), summary.counts.map(countText))
       fill(element(page, 'not-shown-rows', HTMLOListElement), summary.rows.map(rowText))
     },
+    /** Notes where the select stands for the replay the page now holds (#32). */
+    keepPick: (): void => {
+      held = testReplay.selectedIndex
+    },
+    /** Puts the select back on the replay the page holds, after a pick failed. */
+    restorePick: (): void => {
+      testReplay.selectedIndex = held
+    },
   }
 }
 
@@ -47,7 +56,8 @@ type ReplayChooser = Pick<ReplayChoice, 'pickTestReplay' | 'loadReplay'>
 
 /**
  * Offers the test replays and picks the first, so the list shows at once; a later pick or Load
- * shows its list and asks for Start. A failure becomes the status line.
+ * shows its list and asks for Start. A failure becomes the status line and puts the select back
+ * on the replay the page holds.
  */
 export function wireReplays(
   chooser: ReplayChooser,
@@ -60,8 +70,10 @@ export function wireReplays(
         if (summary === undefined) return
         view.showReplay(summary)
         then?.(summary)
+        view.keepPick()
       })
       .catch((error: unknown) => {
+        view.restorePick()
         view.status(messageOf(error))
       })
   }

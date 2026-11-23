@@ -106,6 +106,20 @@ describe('the newest pick', () => {
     await expect(failing).rejects.toThrow('refused')
     await expect(dropped.get()).rejects.toThrow('refused')
   })
+
+  it("a pick that a newer one replaced never becomes Start's replay when the newer one fails", async () => {
+    const picks = newest<string>(true)
+    await picks.pick(Promise.resolve('shown'))
+    const replaced = deferred<string>()
+    const failing = deferred<string>()
+    const second = picks.pick(replaced.promise)
+    const third = picks.pick(failing.promise)
+    replaced.resolve('replaced')
+    expect(await second).toBeUndefined()
+    failing.reject(new Error('refused'))
+    await expect(third).rejects.toThrow('refused')
+    expect(await picks.get()).toBe('shown')
+  })
 })
 
 describe('a step', () => {

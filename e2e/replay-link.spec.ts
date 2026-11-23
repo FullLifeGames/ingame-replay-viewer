@@ -54,3 +54,34 @@ test('after a new pick or a Load the page asks for Start and shows which replay 
   await testReplay.selectOption(FIRST)
   await expect(status).toHaveText(new RegExp(`^Picked ${FIRST}\\. Press Start`))
 })
+
+test('a test replay that fails to load leaves the select on the replay the page holds', async ({
+  page,
+  baseURL,
+}) => {
+  await guardRequests(page, baseURL)
+  await routeShowdown(page, LINKED)
+  const aborted: string[] = []
+  await page.route(/smogtours-gen3ou-994086\.json/, (route) => {
+    aborted.push(route.request().url())
+    return route.abort()
+  })
+  await page.goto('/')
+  const status = page.getByRole('status')
+  const summary = page.locator('#replay-summary')
+  const testReplay = page.locator('#test-replay')
+  await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
+
+  await testReplay.selectOption('smogtours-gen3ou-994086')
+  await expect(status).toHaveText(/^Could not load the test replay smogtours-gen3ou-994086: /)
+  expect(aborted.length).toBeGreaterThan(0)
+  await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
+  await expect(testReplay).toHaveValue(FIRST)
+
+  await loadReplay(page, LINKED)
+  await expect(status).toHaveText(new RegExp(`^Picked ${LINKED}\\. Press Start`))
+  await testReplay.selectOption('smogtours-gen3ou-994086')
+  await expect(status).toHaveText(/^Could not load the test replay smogtours-gen3ou-994086: /)
+  await expect(summary).toHaveText(new RegExp(`^${LINKED}: `))
+  await expect(testReplay).toHaveValue('')
+})

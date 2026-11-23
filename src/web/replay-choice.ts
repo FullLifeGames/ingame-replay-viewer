@@ -51,19 +51,22 @@ export async function step<T>(name: string, work: () => T | Promise<T>): Promise
 
 /**
  * The newest pick of one kind; an older pick that settles later counts for nothing. With
- * `keepEarlier`, a pick that fails hands the next Start the pick before it, or `undefined`.
+ * `keepEarlier`, a pick that fails hands the next Start the last pick that settled while it was
+ * the newest (the one the page shows), or `undefined`.
  */
 export function newest<T>(keepEarlier: boolean) {
   let current: Promise<T | undefined> | undefined
+  let shown: Promise<T | undefined> | undefined
   return {
     get: () => current,
     pick: async (work: Promise<T>): Promise<T | undefined> => {
-      const earlier = current
-      const held = keepEarlier ? work.catch(() => earlier) : work
+      const held = keepEarlier ? work.catch(() => shown) : work
       current = held
       try {
         const value = await work
-        return current === held ? value : undefined
+        if (current !== held) return undefined
+        shown = held
+        return value
       } catch (error) {
         if (current === held) throw error
         return undefined
