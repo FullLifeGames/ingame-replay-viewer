@@ -11,8 +11,10 @@ import {
   PICK_DUMP,
   type ReplayPlace,
   SessionError,
+  step,
 } from './replay-choice'
-import { BuildMismatchError, patchBaseRom, readSlotDescription, RomError } from './rom'
+import build from '../../rom/gen3/build.json'
+import { BuildMismatchError, checkBaseRom, patchBaseRom, readSlotDescription } from './rom'
 import { BASE, DESCRIPTION, PATCH } from './session-testing'
 import { visitorLine } from './visitor'
 import { buildFailure, RunFailure, workerFailure } from './wasm/failures'
@@ -91,19 +93,43 @@ describe('visitorLine for the game and the build', () => {
   })
 })
 
+/** `size` bytes that look random, as a file that is no dump at all. */
+function noise(size: number): Uint8Array {
+  const bytes = new Uint8Array(size)
+  let seed = 0x2545f491
+  for (let index = 0; index < size; index += 1) {
+    seed = (seed * 1_103_515_245 + 12_345) >>> 0
+    bytes[index] = seed >>> 24
+  }
+  return bytes
+}
+
+describe('visitorLine for a file that is not US Emerald (#59)', () => {
+  const SHA1 = /[0-9a-f]{40}/
+
+  // The tester's two files: a 1000-byte file, which no dump is, and 16 MiB of random bytes.
+  it.each([
+    ['a tiny file', 1000],
+    ['a file of random bytes', 16 * 1024 * 1024],
+  ])('gives %s one plain line and keeps both SHA1s for "Details"', async (_, size) => {
+    const refusal = await refusalOf(
+      step('Could not patch your dump', () => checkBaseRom(noise(size))),
+    )
+    const shown = visitorLine(refusal)
+    expect(shown).toEqual({
+      line: 'This file is not US Emerald. Pick your US Emerald dump.',
+      detail: messageOf(refusal),
+      report: false,
+    })
+    expect(shown.line).not.toMatch(SHA1)
+    expect(shown.detail).toContain(`US Emerald's is ${build.baseRom.sha1}`)
+    expect(shown.detail.match(new RegExp(SHA1, 'g'))).toHaveLength(2)
+  })
+})
+
 describe('visitorLine keeps the lines that speak to visitors', () => {
   it.each([
     ['the link input', () => refusalOf(offline().loadReplay('xz abc'))],
-    [
-      'the dump',
-      () =>
-        Promise.resolve(
-          failed(
-            'Could not patch your dump',
-            new RomError('This file is not the US Emerald dump the patch fits.'),
-          ),
-        ),
-    ],
     ['Start', () => Promise.resolve(new SessionError(PICK_DUMP))],
     [
       'the emulator',

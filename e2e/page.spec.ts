@@ -104,7 +104,13 @@ test('a file that is not US Emerald is refused before the patch is fetched', asy
     mimeType: 'application/octet-stream',
     buffer: Buffer.alloc(16 * 1024 * 1024),
   })
-  await expect(page.getByRole('status')).toHaveText(new RegExp(BASE_SHA1), { timeout: 60_000 })
+  // One plain line for the visitor (#59); both SHA1s wait under the closed "Details".
+  await expect(page.getByRole('status')).toHaveText(
+    'This file is not US Emerald. Pick your US Emerald dump.',
+    { timeout: 60_000 },
+  )
+  await expect(page.locator('#status-detail')).toContainText(`US Emerald's is ${BASE_SHA1}`)
+  await expect(page.locator('#status-detail')).toBeHidden()
   expect(await page.getByRole('status').textContent()).not.toMatch(DEVELOPER_WORDS)
   await expect(page.locator('#report')).toBeHidden()
   await expect(page.getByRole('button', { name: 'Restart' })).toBeDisabled()

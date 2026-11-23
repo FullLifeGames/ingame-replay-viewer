@@ -22,7 +22,7 @@ import {
 } from './replay-choice'
 import { REPLAY_HOST, ReplayInputError } from './replay-input'
 import { clip } from './report-link'
-import { BuildMismatchError, RomError } from './rom'
+import { BuildMismatchError, DumpRefusal } from './rom'
 import { MemoryRefusal, RunFailure, type RunFailureKind } from './wasm/failures'
 
 /** The formats the viewer plays; the viewer's intro names them too. */
@@ -57,6 +57,7 @@ export const VISITOR_LINES = {
       "a saved replay page, a battle log, or a replay's JSON file.",
     report: false,
   },
+  wrongDump: { text: 'This file is not US Emerald. Pick your US Emerald dump.', report: false },
   scriptLine: {
     text: `The viewer cannot follow line {line} of this replay's battle log. ${REPORT}`,
     report: true,
@@ -86,7 +87,7 @@ export const VISITOR_LINES = {
     text: '{file} holds {size} MB, and the viewer reads replay files up to {largest} MB. Pick the replay file you saved from Showdown.',
     report: false,
   },
-  /** A module's words that speak to visitors already: the link input, the dump, Start, memory. */
+  /** A module's words that speak to visitors already: Start, memory, the emulator. */
   kept: { text: '{words}', report: false },
   unknown: { text: `The page hit a problem it has no line for. ${REPORT}`, report: true },
 } as const satisfies Record<string, VisitorEntry>
@@ -158,7 +159,7 @@ function fetchMatch({ url, status }: FetchError): Match {
   return { name: 'showdownRefused', values: { status: String(status) } }
 }
 
-const KEPT = [ReplayInputError, RomError, MemoryRefusal, EmulatorError, SessionError]
+const KEPT = [ReplayInputError, MemoryRefusal, EmulatorError, SessionError]
 const MISMATCHES = [BuildMismatchError, SlotMismatchError, BpsError]
 // By its name: a browser without WebAssembly still loads this module and shows its lines.
 const isCompileError = (error: unknown): boolean =>
@@ -191,6 +192,7 @@ const RULES: readonly Rule[] = [
       : undefined,
   named('buildMismatch', (error) => isOne(error, MISMATCHES) || isCompileError(error)),
   named('game', (error) => error instanceof Gen3Error || error instanceof SlotError),
+  named('wrongDump', (error) => error instanceof DumpRefusal),
   (error) => (error instanceof FetchError ? fetchMatch(error) : undefined),
   (error, { words }) =>
     error instanceof RunFailure ? { name: RUN_LINES[error.kind], values: { words } } : undefined,

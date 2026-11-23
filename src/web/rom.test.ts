@@ -6,6 +6,7 @@ import type { SlotDescription } from '../patch/slot'
 import {
   BuildMismatchError,
   checkBaseRom,
+  DumpRefusal,
   patchBaseRom,
   readSlotDescription,
   RomError,
@@ -48,6 +49,8 @@ describe('checkBaseRom', () => {
     const otherSha1 = await sha1Hex(other)
     const refusal = checkBaseRom(other, BASE_SHA1)
     await expect(refusal).rejects.toThrow(RomError)
+    await expect(refusal).rejects.toBeInstanceOf(DumpRefusal)
+    await expect(refusal).rejects.toMatchObject({ name: 'DumpRefusal' })
     await expect(refusal).rejects.toThrow(
       `This file is not the US Emerald dump the patch fits: its SHA1 is ${otherSha1}, ` +
         `US Emerald's is ${BASE_SHA1}. Pick your US Emerald dump.`,

@@ -47,8 +47,8 @@ describe('the pages', () => {
 
 // The user reported on 22.11.2026 that a phone would not let them pick their dump. Phone file
 // pickers grey out files whose extension they cannot map to a type, and `.gba` maps to none, so an
-// `accept` filter shuts the dump out. The page checks the dump by its SHA1 (rom.ts) and names the
-// SHA1 of any other file it refuses, so the picker takes any file.
+// `accept` filter shuts the dump out. The page checks the dump by its SHA1 (rom.ts) and names, under
+// "Details", the SHA1 of any other file it refuses, so the picker takes any file.
 function dumpInput(name: string): string {
   const input = /<input id="dump"[^>]*>/.exec(page(name))
   if (input === null) throw new Error(`${name} has no dump input`)

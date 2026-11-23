@@ -166,6 +166,6 @@ describe('a step that fails', () => {
     const { session } = world()
     const refusal = await session.pickDump(OTHER_DUMP).catch((error: unknown) => error)
     expect(refusal).toBeInstanceOf(SessionError)
-    expect((refusal as SessionError).cause).toMatchObject({ name: 'RomError' })
+    expect((refusal as SessionError).cause).toMatchObject({ name: 'DumpRefusal' })
   })
 })

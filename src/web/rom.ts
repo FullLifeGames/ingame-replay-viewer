@@ -11,6 +11,11 @@ export class RomError extends Error {
   override name = 'RomError'
 }
 
+/** A file the visitor picked as the dump that is not US Emerald; the message names both SHA1s. */
+export class DumpRefusal extends RomError {
+  override name = 'DumpRefusal'
+}
+
 /** The site's own files do not fit: the patch and replay-slot.json, or replay-slot.json itself. */
 export class BuildMismatchError extends RomError {
   override name = 'BuildMismatchError'
@@ -76,7 +81,7 @@ export async function checkBaseRom(
 ): Promise<void> {
   const found = await sha1Hex(base)
   if (found !== baseSha1) {
-    throw new RomError(
+    throw new DumpRefusal(
       `This file is not the US Emerald dump the patch fits: its SHA1 is ${found}, ` +
         `US Emerald's is ${baseSha1}. Pick your US Emerald dump.`,
     )
