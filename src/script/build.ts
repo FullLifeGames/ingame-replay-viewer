@@ -6,7 +6,7 @@ import type { Protocol } from '@pkmn/protocol'
 
 import { newBattle } from './client'
 import { dropReasonOf } from './drops'
-import { ScriptError } from './errors'
+import { GameTypeRefusal, ScriptError } from './errors'
 import { HitFolder } from './hits'
 import { readLines } from './lines'
 import { bySide } from './refs'
@@ -33,7 +33,7 @@ function drop(build: Build, line: LogLine, reason: DropReason, detail?: string):
 function refuseGameType(line: LogLine): void {
   const [, gameType] = line.args as Protocol.Args['|gametype|']
   if (line.key === '|gametype|' && gameType !== 'singles') {
-    throw new ScriptError(line.index, `the game type "${gameType}" is not singles`)
+    throw new GameTypeRefusal(line.index, gameType)
   }
 }
 
