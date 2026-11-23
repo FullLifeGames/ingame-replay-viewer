@@ -2,7 +2,7 @@
 // out, with the fallbacks it took and the battle script's dropped lines beside it.
 import type { BattleScript } from '../script/events'
 import type { DroppedLine } from '../script/types'
-import { Gen3Error } from './errors'
+import { GenerationRefusal } from './errors'
 import type { Fallback } from './fallbacks'
 import { encodeStream } from './stream/encode'
 import type { Placed } from './translate/context'
@@ -22,9 +22,7 @@ export interface Gen3Stream {
 
 export function buildGen3Stream(script: BattleScript): Gen3Stream {
   if (script.gen > NEWEST_GEN) {
-    throw new Gen3Error(
-      `the stream plays Gen ${String(NEWEST_GEN)} battles, this one is Gen ${String(script.gen)}`,
-    )
+    throw new GenerationRefusal(script.gen, NEWEST_GEN)
   }
   const { trainers, parties, instructions, fallbacks } = translate(script)
   const bytes = encodeStream({

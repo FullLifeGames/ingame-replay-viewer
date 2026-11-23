@@ -12,3 +12,14 @@ export class ScriptError extends Error {
     this.line = line
   }
 }
+
+/** A battle log whose game type is not singles; carries the game type from its `|gametype|` line. */
+export class GameTypeRefusal extends ScriptError {
+  override name = 'GameTypeRefusal'
+  readonly gameType: string
+
+  constructor(line: number, gameType: string) {
+    super(line, `the game type "${gameType}" is not singles`)
+    this.gameType = gameType
+  }
+}
