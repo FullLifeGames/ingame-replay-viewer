@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import { EmulatorError, NOT_STARTED_LINE } from './emulator'
+import { environmentProblem } from './environment'
 import { messageOf } from './message'
 import { createReplayChoice, PICK_DUMP, PICK_REPLAY, SessionError } from './replay-choice'
-import { detailShown, visitorLine } from './visitor'
+import { detailShown, environmentLine, visitorLine } from './visitor'
+import { buildFailure, instantiateFailure, RunFailure } from './wasm/failures'
 
 const LINK_LINE =
   '"Replay link or ID" takes a replay ID such as smogtours-gen3ou-994052, or a link to a replay ' +
@@ -62,5 +65,33 @@ describe('detailShown', () => {
   it('keeps a detail that differs from its line by a single character', () => {
     const shown = { line: 'Pick a replay.', detail: 'Pick a replay', report: false }
     expect(detailShown(shown)).toBe('Pick a replay')
+  })
+})
+
+// The render walk of visitor-report.test.ts covers the table; a kept line shows a module's words.
+describe('the kept lines', () => {
+  const workers = environmentProblem(
+    { isSecureContext: true, crossOriginIsolated: true, moduleWorkers: false },
+    'the game',
+  )
+  it.each<[string, () => string]>([
+    ['Start without a dump', () => visitorLine(new SessionError(PICK_DUMP)).line],
+    ['Start without a replay', () => visitorLine(new SessionError(PICK_REPLAY)).line],
+    ['the emulator', () => visitorLine(new EmulatorError(NOT_STARTED_LINE)).line],
+    ['the build memory', () => visitorLine(buildFailure(new RangeError('Out of memory'))).line],
+    [
+      'the run memory',
+      () => visitorLine(new RunFailure(instantiateFailure(new RangeError('Out of memory')))).line,
+    ],
+    [
+      'the module worker',
+      () =>
+        workers === undefined ? '' : environmentLine(workers, { host: 'x', pathname: '/' }).line,
+    ],
+  ])('hold no developer word: %s', (_, lineOf) => {
+    const line = lineOf()
+    expect(line).not.toBe('')
+    expect(line).not.toMatch(FORBIDDEN)
+    expect(line).not.toMatch(/[0-9a-f]{40}/)
   })
 })
