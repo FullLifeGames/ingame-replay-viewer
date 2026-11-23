@@ -76,3 +76,11 @@ Order after milestone 2 (user, 22.11.2026): milestone 3 starts first, and Gen 5 
    - Candidate: Boundless Black 2 by magickappy, due on 28.11.2026 (user's pointer, 21.11.2026). The hack puts all 1,025 species into Black 2, with regional forms, the Fairy type, Megas, modern moves, abilities and items, and animated Gen 5-style sprites. Its engine is White2Upgrade (721 species and the Fairy type), expanded to 1,025. A fan site says the developer plans to open the source a few weeks after release; nobody has named a licence or the build method yet. Once the source is out, check whether it builds from pokebw2 or patches the binary, and whether its licence allows a pinned build as ADR 0007 describes.
 9. **3D (Gen 9).** Scarlet/Violet.
    - Open: everything.
+10. **3D (Pokémon XD).** Pokémon XD: Gale of Darkness, through its native PC port (user's pointer, 23.11.2026).
+    - The port: imyourhuckleberryponcho/Pokemon-XD-PC-Port, version 0.7.0, a public beta under MIT. It compiles the Pokémon XD decompilation (CC0) for 64-bit Windows, with test builds for Linux and macOS, and draws with Direct3D 12, Vulkan or Direct3D 11. Its README (read on 23.11.2026) calls it playable from New Game into the story, with known bugs.
+    - It reads everything from the user's own disc image (USA, `GXXE01`) while it runs, and its repository holds no game data. That fits ADR 0002.
+    - Battles: singles and doubles, the port's own battle replays with pause, speed control and a free camera (0.7.0), and mods that script battle effects in Luau.
+    - Open: everything. A spike comes first, on three questions:
+      - how a battle script reaches the game while the game stays a renderer (ADR 0001) and we keep no fork (ADR 0007);
+      - whether the port can run in a browser, or whether this target ships as a desktop viewer;
+      - where it sits in the order. XD fights doubles in its story, so it meets milestone 4.

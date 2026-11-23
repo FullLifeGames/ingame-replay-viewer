@@ -23,7 +23,7 @@ _Avoid_: replay
 ## Games
 
 **Target game**:
-A game this project renders into: pokeemerald-expansion first, then Black 2/White 2, later a Gen 9 game.
+A game this project renders into: pokeemerald-expansion first, then Black 2/White 2, later the 3D games Pokémon XD and a Gen 9 game.
 _Avoid_: base game, host game
 
 **Renderer**:
