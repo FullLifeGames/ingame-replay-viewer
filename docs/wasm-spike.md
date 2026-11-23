@@ -29,7 +29,7 @@ Our renderer (#43) draws every frame. `npm run wasm:diff` counts the pixels wher
 
 ### Sound
 
-Sound plays, from our own sequencer, mixer and PSG. The module mixes 704 left and right pairs per frame at 42048 Hz, the expansion's own top rate, in Node and in Chromium, and hands each frame's pairs to the page at the end of the game's `SoundMain`. In Chromium the worker writes 1.001 of the mixer's rate into the audio ring at 1x, and the worklet reads 0.976 (B7's e2e; at 2x 0.999 and 0.969). At 2x the page plays the game's sound at double pace and pitch; at fast it stays silent.
+Sound plays, from our own sequencer, mixer and PSG. The module mixes 704 left and right pairs per frame at 42048 Hz, the expansion's own top rate, in Node and in Chromium, and hands each frame's pairs to the page at the end of the game's `SoundMain`. In Chromium the worker writes 0.992 of the mixer's rate into the audio ring at 1x, and the worklet reads 0.991 (B9's e2e on hand-made, after our mixer took over; at 2x 1.016 and 0.999). At 2x the page plays the game's sound at double pace and pitch; at fast it stays silent.
 
 Our mixer adds the two FIFOs and the PSG in GBATEK's output units, adds the bias, clips to 10 bits and maps the result to -1..1. That is the GBA's own level, and wave 4 keeps it (S4-10 in the wave 4 booking): RMS 0.148 on hand-made and 0.158 on 994052. Hand-made peaks at 0.86, and on 994052 8 of 57.7 million samples reach the clip. One constant in the mixer's output sets another level. The mixer that wave 3 borrowed played about 8 times quieter, and over 30-frame windows of hand-made its output correlated with ours at 0.55 to 0.78, ours one frame ahead because the module hands each frame over at the end of `SoundMain`, no longer at line 150. On the stage 4 page, at a load of 5 to 7 from another session, the spike e2e reached END at 2916 at 1x with a switch to 2x and back, and at 2916 at 2x; the worker wrote 0.992 of the mixer's rate and the worklet played 0.930 at 1x, 1.016 and 0.979 at 2x. Over the 1x run with its switches the worklet skipped 491,524 samples and ran dry 10 times.
 
@@ -86,23 +86,23 @@ The mGBA probe (`e2e/wasm-spike.spec.ts`, its second test) plays 994052 on the e
 
 ## Download size
 
-Bytes, with gzip at level 9 and brotli at quality 11 from Node's zlib (`scripts/patch-sizes.ts`). The module's rows measure stage 4's build of wave 4: stream format 2, our whole platform layer, the stub list, patch 0010. The emulator page's rows are stage 3's, whose files stage 4 left unchanged:
+Bytes, with gzip at level 9 and brotli at quality 11 from Node's zlib (`scripts/patch-sizes.ts`). The module's rows measure stage 4's build of wave 4: stream format 2, our whole platform layer, the stub list and the one stop, patch 0010. The emulator page's rows are stage 3's, whose files stage 4 left unchanged. Take the brotli numbers as about ±0.3 %: at quality 11 with Node's default window, a change that shifts the bytes after it moves them by tens of KB. In stage 4 a build 7 bytes larger raw gave a module patch 46,860 bytes larger with brotli and 16 bytes larger with gzip.
 
 | File                                  | Raw            | gzip           | brotli         |
 | ------------------------------------- | -------------- | -------------- | -------------- |
-| `irv-emerald-wasm.bps` (module patch) | 20,966,484     | 15,594,661     | 14,202,138     |
-| `irv-emerald.js` (Emscripten's glue)  | 8,696          | 3,167          | 2,865          |
-| **WebAssembly page**                  | **20,975,180** | **15,597,828** | **14,205,003** |
+| `irv-emerald-wasm.bps` (module patch) | 20,970,753     | 15,596,063     | 14,203,531     |
+| `irv-emerald.js` (Emscripten's glue)  | 8,635          | 3,135          | 2,837          |
+| **WebAssembly page**                  | **20,979,388** | **15,599,198** | **14,206,368** |
 | `mgba.wasm`                           | 1,852,041      | 597,591        | 463,184        |
 | `mgba.js`                             | 248,854        | 57,127         | 48,706         |
 | `irv-emerald.bps` (ROM patch)         | 18,391,067     | 15,762,689     | 14,487,718     |
 | **Emulator page**                     | **20,491,962** | **16,417,407** | **14,999,608** |
 
-Raw, the WebAssembly page fetches 0.48 MB more. Compressed, it fetches 0.82 MB less with gzip and 0.79 MB less with brotli. The dev server sends both pages' files uncompressed; a real host picks the encoding (M2).
+Raw, the WebAssembly page fetches 0.49 MB more. Compressed, it fetches 0.82 MB less with gzip and 0.79 MB less with brotli. The dev server sends both pages' files uncompressed; a real host picks the encoding (M2).
 
 In wave 3 the module patch copied 5,815,589 of the module's 25,977,583 bytes (22.4 %) from the dump and carried 20,143,848 bytes as literals. For comparison, the ROM patch copied 8,069,773 of the ROM's 33,554,432 bytes (24.0 %) from the dump (the BPS actions SourceRead and SourceCopy, counted in both patches).
 
-The module itself, `irv-emerald.wasm` (25,968,950 bytes), never leaves devbox: the server answers 404 for it, and the page rebuilds it from the dump.
+The module itself, `irv-emerald.wasm` (25,973,555 bytes), never leaves devbox: the server answers 404 for it, and the page rebuilds it from the dump.
 
 ## What it means for the speed options and for #17
 
