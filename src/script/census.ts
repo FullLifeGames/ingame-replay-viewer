@@ -116,7 +116,6 @@ export const NAMED_KINDS: Readonly<Partial<Record<Protocol.ArgName, NamedKind>>>
   '|-formechange|': noRule('a forme change that ends when the Pokémon leaves'),
   '|-notarget|': noRule('a move that fails for want of a target'),
   '|-sethp|': noRule("a Pokémon's HP set outright, as when two Pokémon share their HP"),
-  '|-setboost|': noRule('a stat stage set outright'),
   '|-copyboost|': noRule("one Pokémon's stat stages copied to another"),
   '|-clearallboost|': noRule("every active Pokémon's stat stages reset"),
   '|-clearnegativeboost|': noRule("one Pokémon's lowered stat stages reset"),

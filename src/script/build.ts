@@ -39,7 +39,8 @@ function refuseGameType(line: LogLine): void {
 
 function beforeOf({ battle, players }: Build): Before {
   const active = bySide(battle, (side) => side.active[0] ?? null)
-  return { active, weather: battle.field.weather, players: { ...players } }
+  const boosts = bySide(battle, (side) => ({ ...side.active[0]?.boosts }))
+  return { active, boosts, weather: battle.field.weather, players: { ...players } }
 }
 
 /** Keeps the names the intro shows, for the win to match against. */

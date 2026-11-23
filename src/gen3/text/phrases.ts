@@ -83,6 +83,11 @@ export const STAT_TEMPLATES = {
   wontFall: tagged('STRINGID_STATSWONTDECREASE', (who: Mon, stat: string) => {
     return `${ownerAtStart(who)} ${stat} won't go any lower!`
   }),
+  // B_MSG_STAT_CHANGED_BELLY_DRUM: `ChangeStatBuffs` (src/battle_stat_change.c) picks it for
+  // EFFECT_BELLY_DRUM in place of the "rose" line.
+  maxedAttack: tagged('STRINGID_PKMNCUTHPMAXEDATTACK', (who: Mon) => {
+    return `${nameAtStart(who)} cut its own HP and maximized its Attack!`
+  }),
 }
 
 export function usedMove(user: Mon, move: string): string {
@@ -140,8 +145,13 @@ const statName = (stat: BoostID) => held(STAT_TEMPLATES[stat].render())
 const RISES = ['', STAT_TEMPLATES.sharply.render(), STAT_TEMPLATES.drastically.render()]
 const FALLS = ['', STAT_TEMPLATES.harshly.render(), STAT_TEMPLATES.severely.render()]
 
-/** "rose", "rose sharply", "rose drastically" for 1, 2, 3 or more stages; the same for falls. */
-export function statChanged(who: Mon, stat: BoostID, stages: number): string {
+/**
+ * "rose", "rose sharply", "rose drastically" for 1, 2, 3 or more stages; the same for falls.
+ * Belly Drum's change, by its `cause`, says the maxed Attack instead.
+ */
+export function statChanged(who: Mon, stat: BoostID, stages: number, cause?: Effect): string {
+  if (cause !== undefined && toID(cause.name) === 'bellydrum')
+    return STAT_TEMPLATES.maxedAttack.render(who)
   if (stages === 0)
     throw new Gen3Error(`a change of 0 stages has no direction; ${stat} of ${who.name}`)
   const words = stages > 0 ? RISES : FALLS

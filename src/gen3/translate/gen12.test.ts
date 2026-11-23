@@ -46,3 +46,22 @@ describe("Gen 1's Reflect and Light Screen, which last on their user", () => {
     expect(fallbacksOf(...lines)).toEqual([])
   })
 })
+
+describe('Belly Drum (Gen 2 and 3)', () => {
+  it('cuts the HP, plays the arrows and says the maxed Attack, as the expansion does', () => {
+    const lines = [
+      '|move|p1a: Dugtrio|Belly Drum|p1a: Dugtrio',
+      '|-damage|p1a: Dugtrio|50/100',
+      '|-setboost|p1a: Dugtrio|atk|6|[from] move: Belly Drum',
+    ]
+
+    expect(sceneOf(...lines).map(plain)).toEqual([
+      'Dugtrio used Belly Drum!',
+      { op: 'move', user: 'near', target: 'near', move: expect.any(Number) as number },
+      { op: 'hp', side: 'near', hp: 50 },
+      { op: 'stat', side: 'near', stat: 'atk', stages: 6, arrows: 'one' },
+      'Dugtrio cut its own HP and maximized its Attack!',
+    ])
+    expect(fallbacksOf(...lines)).toEqual([])
+  })
+})
