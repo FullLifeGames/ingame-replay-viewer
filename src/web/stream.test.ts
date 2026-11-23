@@ -46,6 +46,28 @@ describe('streamOfLoaded', () => {
   })
 })
 
+describe('the players of a replay stream', () => {
+  const withLog = (log: string) => streamOfLoaded({ ...readReplay(replay994052), log })
+
+  it('names the two players of 994052 by side, player 1 on the near side', () => {
+    expect(streamOfReplay(replay994052).players).toEqual({
+      near: 'A Welcome Guest',
+      far: 'xXEricXx',
+    })
+  })
+
+  it('keeps the name of the intro when a player line after the start names another', () => {
+    const log = replay994052.log.replace('|turn|1\n', '|player|p2|Someone Else|\n|turn|1\n')
+    expect(withLog(log).players.far).toBe('xXEricXx')
+  })
+
+  // So the panel never shows a side without its name.
+  it('leaves a log that names no player for a side to the backend, which refuses it', () => {
+    const log = replay994052.log.replace('|player|p2|xXEricXx|red|\n', '')
+    expect(() => withLog(log)).toThrow('the log names no player on the far side')
+  })
+})
+
 describe('notShown', () => {
   it('lists every dropped line of 994052 by its 1-based line, with its reason and text', () => {
     const { replay, stream } = streamOfReplay(replay994052)

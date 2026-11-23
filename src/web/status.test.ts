@@ -6,6 +6,7 @@ import {
   dumpLine,
   endedLine,
   notShownHeading,
+  panelText,
   pickedLine,
   READY_LINE,
   replayLine,
@@ -13,6 +14,7 @@ import {
   rowText,
   startLine,
 } from './status'
+import type { ReplaySummary } from './replay-choice'
 import { notShown, streamOfReplay } from './stream'
 
 const ROM_SHA1 = '0123456789abcdef0123456789abcdef01234567'
@@ -114,5 +116,56 @@ describe('the list of what the game does not show', () => {
       standIn: false,
     }
     expect(rowText(row)).toBe('Line 9, dropped: raw: |raw| x; a & b')
+  })
+})
+
+describe('the panel', () => {
+  const summary = (near: string, far: string): ReplaySummary => ({
+    id: ID,
+    streamBytes: 8346,
+    instructions: 461,
+    rows: [],
+    counts: [],
+    players: { near, far },
+  })
+  const picked = summary('A Welcome Guest', 'xXEricXx')
+  const names = { far: 'Far side: xXEricXx', near: 'Near side: A Welcome Guest' }
+
+  it('names the players by side and leaves the turn empty before turn 1', () => {
+    expect(panelText(picked, { summary: picked, turn: 0 })).toEqual({ ...names, turn: '' })
+  })
+
+  it('shows the turn the game reached while the run plays the pick', () => {
+    expect(panelText(picked, { summary: picked, turn: 1 })).toEqual({ ...names, turn: 'Turn 1' })
+    expect(panelText(picked, { summary: picked, turn: 28 })).toEqual({ ...names, turn: 'Turn 28' })
+  })
+
+  // The names of the pick never stand beside the turn of another battle.
+  it('asks for Start when the run plays another replay or none', () => {
+    const other = summary('A Welcome Guest', 'xXEricXx')
+    const start = { ...names, turn: 'Press Start to play it.' }
+    expect(panelText(picked, { summary: other, turn: 12 })).toEqual(start)
+    expect(panelText(picked, { summary: undefined, turn: 12 })).toEqual(start)
+    expect(panelText(picked, undefined)).toEqual(start)
+  })
+
+  it('shares the words of the status line that asks for Start', () => {
+    expect(pickedLine(ID)).toBe(`Picked ${ID}. ${panelText(picked, undefined).turn}`)
+  })
+
+  it('stays empty while the page holds no replay', () => {
+    const empty = { far: '', near: '', turn: '' }
+    expect(panelText(undefined, undefined)).toEqual(empty)
+    expect(panelText(undefined, { summary: picked, turn: 3 })).toEqual(empty)
+  })
+
+  // The names come from other people's replays; the panel writes them as text (wasm/view.ts).
+  it('writes a long name or one with markup as it stands', () => {
+    const long = 'W'.repeat(80)
+    const odd = summary(long, '<b>x</b> &amp;')
+    expect(panelText(odd, undefined)).toMatchObject({
+      far: 'Far side: <b>x</b> &amp;',
+      near: `Near side: ${long}`,
+    })
   })
 })

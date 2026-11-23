@@ -15,6 +15,10 @@
         image-rendering: pixelated;
         background: #000;
       }
+      #panel p {
+        margin: 0.25em 0;
+        overflow-wrap: anywhere;
+      }
       fieldset {
         display: inline;
         border: none;
@@ -60,6 +64,11 @@
         <button id="restart" type="button">Restart</button>
       </p>
       <p id="status" role="status"></p>
+      <div id="panel">
+        <p id="panel-far"></p>
+        <p id="panel-near"></p>
+        <p id="panel-turn"></p>
+      </div>
       <canvas id="screen" width="240" height="160"></canvas>
       <p id="progress"></p>
       <p id="replay-summary"></p>

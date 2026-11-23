@@ -4,6 +4,7 @@
 // line that names the step and keeps the module's own words.
 import type { Replay } from '../script/replay'
 import { readSavedReplay } from '../script/saved-replay'
+import type { Side } from '../script/types'
 import { messageOf } from './message'
 import { replayJsonUrl } from './replay-input'
 import type { TestReplay } from './replays'
@@ -33,6 +34,8 @@ export interface ReplaySummary {
   /** What the game does not show, by line. */
   readonly rows: readonly NotShownRow[]
   readonly counts: readonly NotShownCount[]
+  /** The players by side, from the battle log, for the panel (#58). */
+  readonly players: Readonly<Record<Side, string>>
 }
 
 /** A picked replay: the stream Start plays, and the summary the page lists. */
@@ -79,7 +82,7 @@ export function newest<T>(keepEarlier: boolean) {
   }
 }
 
-function chosenOf({ replay, stream }: ReplayStream): Chosen {
+function chosenOf({ replay, stream, players }: ReplayStream): Chosen {
   const rows = notShown(replay, stream)
   const summary: ReplaySummary = {
     id: replay.id,
@@ -87,6 +90,7 @@ function chosenOf({ replay, stream }: ReplayStream): Chosen {
     instructions: stream.instructions.length,
     rows,
     counts: notShownCounts(rows),
+    players,
   }
   return { bytes: stream.bytes, summary }
 }

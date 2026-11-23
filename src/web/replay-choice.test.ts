@@ -51,6 +51,7 @@ describe('a replay choice', () => {
       instructions: stream.instructions.length,
       rows,
       counts: notShownCounts(rows),
+      players: { near: 'A Welcome Guest', far: 'xXEricXx' },
     })
     const chosen = await choice.chosen()
     expect(chosen?.bytes).toEqual(STREAM_994052)
@@ -108,6 +109,11 @@ describe('a replay file', () => {
     const summary = await choice.loadFile(savedFile(name, text).file)
     expect(summary).toEqual(await showdown().choice.pickTestReplay(REPLAY_994052))
     expect((await choice.chosen())?.bytes).toEqual(STREAM_994052)
+  })
+
+  it.each(SHAPES)('names the players of a %s from its battle log', async (_, name, text) => {
+    const summary = await showdown().choice.loadFile(savedFile(name, text).file)
+    expect(summary?.players).toEqual({ near: 'A Welcome Guest', far: 'xXEricXx' })
   })
 
   it('keeps the earlier replay when a file holds no replay, and names the step', async () => {

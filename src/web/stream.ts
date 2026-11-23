@@ -1,15 +1,19 @@
 // A replay on its way into the game: its battle script and instruction stream, and the list of
 // what the game does not show (plan "No silent drops"): the battle script's dropped lines and the
-// backend's fallbacks, by log line.
+// backend's fallbacks, by log line. The names of the two players come from the battle script too.
 import { buildGen3Stream, type Gen3Stream } from '../gen3/backend'
 import { showsInPlace, type Fallback } from '../gen3/fallbacks'
 import { buildBattleScript } from '../script/build'
+import type { ScriptEvent } from '../script/events'
 import { readLines, type LogLine } from '../script/lines'
 import { readReplay, type Replay } from '../script/replay'
+import type { Side } from '../script/types'
 
 export interface ReplayStream {
   readonly replay: Replay
   readonly stream: Gen3Stream
+  /** The players by side, as the log's intro names them; player 1 is the near side. */
+  readonly players: Readonly<Record<Side, string>>
 }
 
 /** One row of the page's "Not shown in the game" list. */
@@ -36,7 +40,20 @@ export interface NotShownCount {
  * or `Gen3Error` passes through with its message.
  */
 export function streamOfLoaded(replay: Replay): ReplayStream {
-  return { replay, stream: buildGen3Stream(buildBattleScript(replay.log)) }
+  const script = buildBattleScript(replay.log)
+  return { replay, stream: buildGen3Stream(script), players: playersOf(script.events) }
+}
+
+/**
+ * The first name the battle script's `player` events give each side. The backend refuses a log
+ * that names no player for a side, so a stream always carries both names.
+ */
+function playersOf(events: readonly ScriptEvent[]): Record<Side, string> {
+  const players: Record<Side, string> = { near: '', far: '' }
+  for (const event of events.toReversed()) {
+    if (event.kind === 'player') players[event.side] = event.name
+  }
+  return players
 }
 
 /** The instruction stream of a parsed replay JSON; a `ReplayError` passes through as well. */

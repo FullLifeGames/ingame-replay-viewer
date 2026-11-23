@@ -13,10 +13,11 @@ import {
   PICK_DUMP,
   PICK_REPLAY,
   type ReplayChoice,
+  type ReplaySummary,
   SessionError,
 } from '../replay-choice'
 import { wireReplayFile, wireReplays } from '../replay-view'
-import { endedLine, READY_LINE } from '../status'
+import { endedLine, panelText, READY_LINE } from '../status'
 import { FRAME_HEIGHT, FRAME_WIDTH } from './frame'
 import { readFrame } from './frame-swap'
 import { grant, readStatus, type Speed, writePace } from './protocol'
@@ -38,8 +39,11 @@ import {
 import { Runs } from './runs'
 import { findSpikeView, type SpikeView } from './view'
 
-/** A run with the id of the replay it plays, for the status line at END. */
-type NamedRun = Run & { readonly id: string }
+/** A pick with the summary the list shows for it; the hook's own stream has none. */
+type ListedPick = Picked & { readonly summary?: ReplaySummary }
+
+/** A run with the id of the replay it plays, for the status line at END, and its summary. */
+type NamedRun = Run & { readonly id: string; readonly summary: ReplaySummary | undefined }
 
 /** The animation-frame loop: grants the run its frames, draws the newest and shows the progress. */
 function drawLoop(
@@ -52,6 +56,13 @@ function drawLoop(
   const draw = (now: number) => {
     requestAnimationFrame(draw)
     const run = runs.current
+    // Before the run check, so a pick shows its names before the first Start.
+    view.panel(
+      panelText(
+        view.shownReplay(),
+        run && { summary: run.summary, turn: readStatus(run.control).turn },
+      ),
+    )
     if (run === undefined) return
     // The clock grants from the frame the game reached, so a game that fell behind never races.
     const status = readStatus(run.control)
@@ -78,15 +89,17 @@ function drawLoop(
 }
 
 /** The newest pick's stream with its replay's id: what the list under the game describes. */
-async function pickedStream(choice: ReplayChoice): Promise<Picked | undefined> {
+async function pickedStream(choice: ReplayChoice): Promise<ListedPick | undefined> {
   const chosen = await choice.chosen()
-  return chosen === undefined ? undefined : { id: chosen.summary.id, stream: chosen.bytes }
+  return chosen === undefined
+    ? undefined
+    : { id: chosen.summary.id, stream: chosen.bytes, summary: chosen.summary }
 }
 
 /** The page's state and its actions; the view's events call them. */
 function createSpike(view: SpikeView) {
   let built: Promise<Built> | undefined
-  let last: Picked | undefined
+  let last: ListedPick | undefined
   const choice = createReplayChoice(fetchJson)
   const runs = new Runs<NamedRun>(stopRun)
   const audio = new AudioOpener()
@@ -99,8 +112,9 @@ function createSpike(view: SpikeView) {
   }
   drawLoop(view, runs, changeSpeed)
 
-  const begin = (module: Built, chosen: Picked, sound: Sound): Run => {
-    const run = Object.assign(startRun(module, chosen, view.speed(), sound), { id: chosen.id })
+  const begin = (module: Built, chosen: ListedPick, sound: Sound): Run => {
+    const { id, summary } = chosen
+    const run = Object.assign(startRun(module, chosen, view.speed(), sound), { id, summary })
     watchRun(run, (line) => {
       if (runs.current === run) view.status(line)
     })
@@ -108,7 +122,7 @@ function createSpike(view: SpikeView) {
     return run
   }
 
-  const play = async (stream?: Picked): Promise<string | undefined> => {
+  const play = async (stream?: ListedPick): Promise<string | undefined> => {
     const ticket = runs.nextPlay()
     const picked = stream ?? pickedStream(choice)
     const [module, chosen, sound] = await Promise.all([built, picked, audio.open()])

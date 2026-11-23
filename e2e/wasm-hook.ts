@@ -50,6 +50,8 @@ interface Status {
   finishedAt: number
   done: number
   total: number
+  /** The turn the game reached, 0 before turn 1. */
+  turn: number
   finished: boolean
   speed: string
   wallMs: number
