@@ -185,3 +185,18 @@ describe('Transform (Gen 1 to 3)', () => {
     ])
   })
 })
+
+describe("Gen 1's partial trap, which keeps its target from moving", () => {
+  it("keeps our line and names the scene the expansion's traps never make", () => {
+    const line = '|cant|p1a: Dugtrio|partiallytrapped'
+
+    expect(sceneOf(line).map(plain)).toEqual(["Dugtrio couldn't move!"])
+    expect(fallbacksOf(line)).toEqual([
+      {
+        line: NEXT,
+        kind: 'phrase',
+        detail: 'no game message for a Pokémon a partial trap keeps from moving',
+      },
+    ])
+  })
+})
