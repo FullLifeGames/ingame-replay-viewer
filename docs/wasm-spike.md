@@ -10,7 +10,7 @@ Two things stood between it and a public build in wave 3: a platform layer we ma
 
 ## What the build is
 
-- Emscripten 7.0.0 (pinned in `rom/gen3/wasm/wasm.json`, installed under `~/tools/emsdk`) compiles 386 C files, the tree's, our replay files among them and seven from patched copies. All 386 compile at `-O2`, and so do the 25 C files of our glue and our platform layer. In wave 3 the build also compiled six platform files borrowed from pokeemerald-multiplatform; #43 replaced them all, and the build fetches nothing of that repository now. The census before any fix had 373 of 395 passing. It applies no overlay patch, so it still counts the files that one fixes, `random.c` among them, as failing.
+- Emscripten 7.0.0 (pinned in `rom/gen3/wasm/wasm.json`, installed under `~/tools/emsdk`) compiles 386 C files, the tree's, our replay files among them and eight from patched copies. All 386 compile at `-O2`, and so do the 25 C files of our glue and our platform layer. In wave 3 the build also compiled six platform files borrowed from pokeemerald-multiplatform; #43 replaced them all, and the build fetches nothing of that repository now. The census before any fix had 373 of 395 passing. It applies no overlay patch, so it still counts the files that one fixes, `random.c` among them, as failing.
 - The 544 data objects that the ROM build assembles with ARM `as` (battle scripts, animation scripts, event scripts, songs) go through a converter (`scripts/wasm-convert.ts`). It reads each ARM ELF object and writes LLVM's WebAssembly assembly with the same bytes and relocations. All 544 assemble.
 - The GBA's addresses map one to one into linear memory: EWRAM at 0x02000000, IO at 0x04000000, VRAM at 0x06000000, static data from 0x08000000, where the ROM would sit. The memory is a fixed 256 MB.
 - Our platform layer (`rom/gen3/wasm/layer/`, #43: 17 C files and 11 headers) stands in for the GBA's hardware. It makes the BIOS calls, runs DMA and the interrupts, drives the display line by line and draws each line: text and affine backgrounds, sprites, windows, blending and mosaic. It also plays the sound: the game's music players and the PCM mixer (`irv_mp2k_*.c`, written from a functional spec of the game's sound engine) and the four PSG channels, synthesised from the sound registers (`irv_psg.c`). We wrote it from GBATEK and the game's own sources. It includes no header of the expansion, so a native harness (`layer/host/`) runs the same files in the specs, in CI too.
@@ -57,7 +57,11 @@ A held B would end the replay before END in both builds: the replay plays as a r
 | ----------------------------- | ----------------- | --------------------- | ----------------- |
 | hand-made (34 ops)            | 2916              | 2916                  | 2923              |
 | 994052 (494 ops)              | 40981             | 40981                 | 40974             |
+| 995161 (431 ops)              | 32711             | not run               | 32784             |
+| 993907 (1554 ops)             | 133202            | not run               | 132991            |
 | refusals (`EMPTY`, `VERSION`) | error at frame 31 | not run               | error at frame 44 |
+
+995161 (Gen 1) and 993907 (Gen 2) joined in stage 5. The module reached END on them once patch 0011 was in, with 12 scenes passing on each and `weather-start` missing, as in mGBA, since neither stream has weather. On 23.11.2026 the five other replay fixtures, all Gen 3 (2717564545, 994086, 994128, 994141, 994176), also reached END in the module, and every scene of each passed; 2717564545 has no weather either. From stage 5 on, every test replay plays through the module at each lane end that changes the module or a stream rule, and at the stage end: `npm run wasm:run -- <id>` once per fixture, since a run stops at its first failed stream.
 
 Stage 5 measured them again on the module with the refusal screen (#30) and the assert stop (#61), with the same counts. Wave 4 measured these on stage 3's merged tree: stream format 2, the first part of our platform layer, the outro, and mGBA on the fixed clock. In format 1, 994052's stream held 461 ops. Two `rom:shots` runs of hand-made wrote the same 20 frames byte for byte and reached END at the same frame, and mGBA reached END on 994052 at 40974 in both the oracle's run and `rom:shots`'. The e2e plays hand-made at 1x and 2x and 994052 at fast in Chromium, and the page reaches END at the Node harness's frames. On stage 4's merged tree it also plays 5 s of 994052 at 1x and 5 s at 2x before fast, both with sound, at 59.78 and 118.57 frames per second (1.001 and 1.985 times the GBA's pace). Our own sound engine (#43's second part) kept both counts: every frame of all four streams equals the frame of stage 3's module, which played the borrowed sound files.
 
@@ -86,13 +90,13 @@ The mGBA probe (`e2e/wasm-spike.spec.ts`, its second test) plays 994052 on the e
 
 ## Download size
 
-Bytes, with gzip at level 9 and brotli at quality 11 from Node's zlib (`scripts/patch-sizes.ts`). The module's rows measure stage 5's build of wave 4: stream format 2, our whole platform layer, the stub list, the one stop with the assert in it, patch 0010 and the refusal screen. The ROM patch's row measures the ROM of the same stage, with the refusal screen. mGBA's rows are stage 3's, whose files later stages left unchanged. Take the brotli numbers as about ±0.3 %: at quality 11 with Node's default window, a change that shifts the bytes after it moves them by tens of KB. In stage 4 a build 7 bytes larger raw gave a module patch 46,860 bytes larger with brotli and 16 bytes larger with gzip.
+Bytes, with gzip at level 9 and brotli at quality 11 from Node's zlib (`scripts/patch-sizes.ts`). The module's rows measure stage 5's build of wave 4: stream format 2, our whole platform layer, the stub list, the one stop with the assert in it, patches 0010 and 0011, and the refusal screen. The ROM patch's row measures the ROM of the same stage, with the refusal screen. mGBA's rows are stage 3's, whose files later stages left unchanged. Take the brotli numbers as about ±0.3 %: at quality 11 with Node's default window, a change that shifts the bytes after it moves them by tens of KB. In stage 4 a build 7 bytes larger raw gave a module patch 46,860 bytes larger with brotli and 16 bytes larger with gzip.
 
 | File                                  | Raw            | gzip           | brotli         |
 | ------------------------------------- | -------------- | -------------- | -------------- |
-| `irv-emerald-wasm.bps` (module patch) | 20,971,027     | 15,597,479     | 14,203,578     |
+| `irv-emerald-wasm.bps` (module patch) | 20,970,945     | 15,597,563     | 14,202,743     |
 | `irv-emerald.js` (Emscripten's glue)  | 8,635          | 3,135          | 2,837          |
-| **WebAssembly page**                  | **20,979,662** | **15,600,614** | **14,206,415** |
+| **WebAssembly page**                  | **20,979,580** | **15,600,698** | **14,205,580** |
 | `mgba.wasm`                           | 1,852,041      | 597,591        | 463,184        |
 | `mgba.js`                             | 248,854        | 57,127         | 48,706         |
 | `irv-emerald.bps` (ROM patch)         | 18,391,834     | 15,762,743     | 14,485,705     |
@@ -102,7 +106,7 @@ Raw, the WebAssembly page fetches 0.49 MB more. Compressed, it fetches 0.82 MB l
 
 In wave 3 the module patch copied 5,815,589 of the module's 25,977,583 bytes (22.4 %) from the dump and carried 20,143,848 bytes as literals. For comparison, the ROM patch copied 8,069,773 of the ROM's 33,554,432 bytes (24.0 %) from the dump (the BPS actions SourceRead and SourceCopy, counted in both patches).
 
-The module itself, `irv-emerald.wasm` (25,973,746 bytes), never leaves devbox: the server answers 404 for it, and the page rebuilds it from the dump.
+The module itself, `irv-emerald.wasm` (25,973,610 bytes), never leaves devbox: the server answers 404 for it, and the page rebuilds it from the dump.
 
 ## What it means for the speed options and for #17
 
@@ -116,16 +120,16 @@ The module does not solve #17. Its patch is 20.97 MB raw and 14.20 MB with brotl
 
 Every change against upstream sits in our tree as a patch, a shadow header or a per-file flag. The ROM build sees none of them, so they leave the ROM byte for byte the same. Wave 3 checked it on the ROM of stream format 1: SHA1 779ba38d… with and without them.
 
-| Kind                                     | Count        | What                                                                                                                                                                       |
-| ---------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Overlay patch (`rom/gen3/wasm/patches/`) | 9            | 83 added and 5 removed lines against copies of `script.c` (2), `decompress.c`, `m4a.c` (2), `bg.c`, `text.c`, `random.c` and `battle_anim_normal.c`, each under `IRV_WASM` |
-| Shadow header (`rom/gen3/wasm/include/`) | 5            | `global.h`, `limits.h`, `gba/syscall.h`, `gba/macro.h`, `gba/m4a_internal.h`; each includes upstream's and adds defines                                                    |
-| Own header                               | 1            | `irv_wasm_sound.h` (the mixer rate and the sound's hand-over to the page)                                                                                                  |
-| Per-file define or flag (`wasm.json`)    | 2 on 2 files | `recorded_battle.c` (1 define), `ow_abilities.c` (1 compiler flag)                                                                                                         |
-| Excluded file                            | 11           | flash, real-time clock, link cable (RFU), multiboot, the debug printer; the glue stubs their functions                                                                     |
-| Our own header changed for both builds   | 1            | `struct ReplayProgress` gets explicit padding                                                                                                                              |
+| Kind                                     | Count        | What                                                                                                                                                                                              |
+| ---------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Overlay patch (`rom/gen3/wasm/patches/`) | 10           | 93 added and 5 removed lines against copies of `script.c` (2), `decompress.c`, `m4a.c` (2), `bg.c`, `text.c`, `random.c`, `battle_anim_normal.c` and `pokemon_animation.c`, each under `IRV_WASM` |
+| Shadow header (`rom/gen3/wasm/include/`) | 5            | `global.h`, `limits.h`, `gba/syscall.h`, `gba/macro.h`, `gba/m4a_internal.h`; each includes upstream's and adds defines                                                                           |
+| Own header                               | 1            | `irv_wasm_sound.h` (the mixer rate and the sound's hand-over to the page)                                                                                                                         |
+| Per-file define or flag (`wasm.json`)    | 2 on 2 files | `recorded_battle.c` (1 define), `ow_abilities.c` (1 compiler flag)                                                                                                                                |
+| Excluded file                            | 11           | flash, real-time clock, link cable (RFU), multiboot, the debug printer; the glue stubs their functions                                                                                            |
+| Our own header changed for both builds   | 1            | `struct ReplayProgress` gets explicit padding                                                                                                                                                     |
 
-The plan's stop rule allowed 15 overlay patches; the spike used 9, B8 of #43 dropped 0007, and the shift check of #44 added 0010.
+The plan's stop rule allowed 15 overlay patches; the spike used 9, B8 of #43 dropped 0007, the shift check of #44 added 0010, and stage 5 of wave 4 added 0011 for a zero divisor.
 
 ## Bugs the port found
 
@@ -140,6 +144,8 @@ Each one passed on the GBA and broke the module; each fix stays inside the WebAs
 - **The rename that renamed the callers.** `random.c` writes `Random32` as Thumb assembly in a naked function, which clang cannot compile for wasm32. The first build renamed it with `-DRandom32=IrvWasm_UnusedRandom32` and emptied its body, so that the glue's C `Random32` would serve every call. A `-D` rename also renames the file's own calls, the inline `Random()` among them. `RandomUniform` and the other helpers of `random.c` reached the empty copy: `RandomUniform` always returned its lower bound, and `AdvanceRandom`, called once per frame, never stepped the RNG. The review found it in the compiled object. Patch 0009 leaves the naked function out under `IRV_WASM`, the rename and the emptied body are gone, and the helpers call the glue's `Random32`. `wasm-config.ts` now refuses a define that renames a name. After the fix both streams reach END at the same frames as before, and all 13 scenes pass.
 
 - **The sign in the shake animation's address.** `AnimShakeMonOrBattlePlatforms` (`battle_anim_normal.c`) rebuilds the address of the value it shakes from the sprite's `data[6]` and `data[7]`, two `s16`, and does not cast the low half to `u16`. At an address with bit 15 set, the sign fills the upper half with ones. The ROM's four targets lie between 0x0200018c and 0x02034e8e with bit 15 clear, and the normal module reads its own without a trap. The sanitized build of #44 moved the static data, and its first shake read out of bounds at frame 1120 of hand-made. Patch 0010 casts the low half to `u16`, as `battle_anim_mons.c` and `task.c` do; at an address with bit 15 clear the result stays the same. A search of the tree found no other such join without the cast. With patch 0010 the normal module plays all four runs with every frame equal to the baseline, and the oracle finds 48 of 48 and 682 of 682 states equal.
+
+- **The zero divisor in the shake animations.** `VerticalShakeTwice` and `VerticalShakeLowTwice` (`pokemon_animation.c`) step through `sVerticalShakeData`, whose end row is `{-1, 0}`. On that row each divides 0 by the row's length, 0, and drops the result as it ends the animation. The ROM links libgcc's `__divsi3`, which returns 0 for 0 / 0, `0x7fffffff` for a positive numerator and `0x80000000` for a negative one, all without a fault. WebAssembly's `i32.div_s` traps on a zero divisor. The module stopped with "divide by zero" at the first send-out of a species that plays either animation: far and near Tauros in 995161, near Tyranitar in 993907, 994086 and 994176. Neither baseline stream sends out such a species, so the trap stayed hidden until stage 5 played 995161 and 993907. Patch 0011 gives 0 for a zero divisor at both sites, the GBA's result for 0 / 0. With it every frame of the four baseline runs stays equal, and every fixture reaches END in the module.
 
 Smaller ones: `script.c` breaks out of its effect analysis with `__builtin_setjmp`, which clang refuses on wasm32 (patch 0001, libc's `setjmp`); `REG_DISPCNT` must start in forced blank as the BIOS leaves it, or the first DISPSTAT write stays buffered and VBlank never fires.
 
@@ -163,6 +169,8 @@ It found 32 sites of the check's other half: a left shift that moves a bit into 
 | A negative value                                                   | 3     | `battle_anim_mons.c:990` and `:991` (a negative distance `<< 8`), `battle_interface.c:2303` (`Q_24_8` of a negative bar value)                                                                         |
 
 Our layer reports no site. Four of its files carry the check (`irv_dma.c`, `irv_mp2k_main.c`, `irv_render.c`, `irv_render_blend.c`); the others hold no shift that needs one. The run found one more bug, which no shift caused: the shake animation's address (patch 0010, above).
+
+Division by zero is a second class. The GBA's division helpers from libgcc return a value for a zero divisor and go on; WebAssembly's integer division and remainder trap. Neither Emscripten 7.0.0 nor Binaryen 133 has a switch that changes this: Emscripten refuses `-sBINARYEN_TRAP_MODE=clamp`, and `wasm-opt` knows no `--trap-mode-clamp`. Clang's `-fsanitize=integer-divide-by-zero` logs a site and then lets the division trap, so a sanitized run names one site and stops. The game's objects hold about 490 divisions and remainders by a divisor they compute. Patch 0011 fixes the two sites the fixtures reached. A read of the other computed divisors in `pokemon_animation.c` found none that a battle can bring to 0.
 
 ## Licences
 

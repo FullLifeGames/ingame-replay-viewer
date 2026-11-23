@@ -1,0 +1,40 @@
+VerticalShakeTwice and VerticalShakeLowTwice walk sVerticalShakeData, whose end row is {-1, 0}.
+On that row each computes (var6 - data[6]) * var5 / var6 with var6 == 0; data[6] is 0 there,
+since every row change resets it. The result goes unused: the next test sees -1 and ends the
+animation. The ROM links libgcc 14.2.1, whose __divsi3 returns without a fault on a zero divisor
+(0 for 0 / 0, 0x7fffffff for a positive numerator, 0x80000000 for a negative one) and then calls
+__aeabi_idiv0, a bare return. WebAssembly's i32.div_s traps on a zero divisor, so the module
+stopped with "divide by zero" at the end of either animation. The fixtures 995161 (far and near
+Tauros), 993907, 994086 and 994176 (near Tyranitar) sent out such a species.
+Under IRV_WASM a zero divisor gives 0, the GBA's result for 0 / 0; every other row divides as
+before.
+
+diff --git a/src/pokemon_animation.c b/src/pokemon_animation.c
+--- a/src/pokemon_animation.c
++++ b/src/pokemon_animation.c
+@@ -1240,7 +1240,12 @@ static void VerticalShakeTwice(struct Sprite *sprite)
+     u8 amplitude = 0;
+ 
+     if (var5 != (u8)-2)
++#ifdef IRV_WASM
++        // The end row {-1, 0} lasts 0 frames: the GBA's __divsi3 answers 0 / 0 with 0, WebAssembly traps.
++        amplitude = var6 == 0 ? 0 : (var6 - var7) * var5 / var6;
++#else
+         amplitude = (var6 - var7) * var5 / var6;
++#endif
+     else
+         amplitude = 0;
+ 
+@@ -3671,7 +3676,12 @@ static void VerticalShakeLowTwice(struct Sprite *sprite)
+     var6 = sVerticalShakeData[sprite->data[5]][1];
+     var7 = 0;
+     if (sVerticalShakeData[sprite->data[5]][0] != (u8)-2)
++#ifdef IRV_WASM
++        // The end row {-1, 0} lasts 0 frames: the GBA's __divsi3 answers 0 / 0 with 0, WebAssembly traps.
++        var7 = var6 == 0 ? 0 : (var6 - var9) * var5 / var6;
++#else
+         var7 = (var6 - var9) * var5 / var6;
++#endif
+     else
+         var7 = 0;
+ 
