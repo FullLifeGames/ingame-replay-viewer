@@ -43,7 +43,7 @@ Fix step 11's e2e ran beside another session's Playwright tests (load average 4.
 
 ### Timing
 
-The page ticks at the GBA's 59.7275 frames per second. The e2e measures 1x within 5 % of that and 2x within 5 % of twice that. Fast runs the worker as fast as it goes, and at END the page leaves fast for 1x, so no core spins while the game plays on after the replay. A hidden tab gets no animation frame, so the game pauses there at 1x and 2x. When the tab comes back into view, the page resumes the tick clock, and the game goes on from where it paused. A page that misses animation frames while in view still catches up.
+The page ticks at the GBA's 59.7275 frames per second. The e2e measures 1x within 5 % of that and 2x within 5 % of twice that. Fast runs the worker as fast as it goes, and at END the page leaves fast for 1x, so no core spins while the game plays on after the replay. A hidden tab gets no animation frame, so the game pauses there at 1x and 2x. When the tab comes back into view, the page resumes the tick clock, and the game goes on from where it paused. In view, the page grants the game at most half a second of frames past the frame it has reached, plus the frames owed since the page last asked. A late animation frame loses nothing. A stall longer than half a second drops the rest, and the game goes on at its pace instead of racing to make up the time.
 
 ### Input
 
@@ -59,7 +59,7 @@ A held B would end the replay in both builds: the replay plays as a recorded bat
 | 994052 (494 ops)              | 40981             | 40981                 | 40974             |
 | refusals (`EMPTY`, `VERSION`) | error at frame 31 | not run               | error at frame 44 |
 
-Wave 4 measured these on stage 3's merged tree: stream format 2, the first part of our platform layer, the outro, and mGBA on the fixed clock. In format 1, 994052's stream held 461 ops. Two `rom:shots` runs of hand-made wrote the same 20 frames byte for byte and reached END at the same frame, and mGBA reached END on 994052 at 40974 in both the oracle's run and `rom:shots`'. The e2e plays hand-made at 1x and 2x and 994052 at fast in Chromium, and the page reaches END at the Node harness's frames. Before fast, it plays 5 s of 994052 at 1x and 5 s at 2x, both with sound, at 59.78 and 118.57 frames per second (1.001 and 1.985 times the GBA's pace). Our own sound engine (#43's second part) kept both counts: every frame of all four streams equals the frame of stage 3's module, which played the borrowed sound files.
+Wave 4 measured these on stage 3's merged tree: stream format 2, the first part of our platform layer, the outro, and mGBA on the fixed clock. In format 1, 994052's stream held 461 ops. Two `rom:shots` runs of hand-made wrote the same 20 frames byte for byte and reached END at the same frame, and mGBA reached END on 994052 at 40974 in both the oracle's run and `rom:shots`'. The e2e plays hand-made at 1x and 2x and 994052 at fast in Chromium, and the page reaches END at the Node harness's frames. On stage 4's merged tree it also plays 5 s of 994052 at 1x and 5 s at 2x before fast, both with sound, at 59.78 and 118.57 frames per second (1.001 and 1.985 times the GBA's pace). Our own sound engine (#43's second part) kept both counts: every frame of all four streams equals the frame of stage 3's module, which played the borrowed sound files.
 
 Three things move the counts:
 
