@@ -1,16 +1,15 @@
 #include "global.h"
-#include "gpu_regs.h"
 #include "load_save.h"
 #include "m4a.h"
 #include "main.h"
 #include "malloc.h"
 #include "new_game.h"
 #include "replay_interpreter.h"
+#include "replay_refusal.h"
 #include "replay_slot.h"
 #include "save.h"
 #include "sound.h"
 #include "constants/characters.h"
-#include "constants/rgb.h"
 #include "constants/songs.h"
 
 // The ROM's first callback: patch 0003 makes it gInitialMainCB2, so the replay in the slot starts
@@ -74,18 +73,19 @@ void CB2_ReplayBoot(void)
     PlayBGM(MUS_VS_TRAINER);
 }
 
-// A refused stream (plan D8): every layer off, so the screen shows the backdrop colour alone.
-// gReplayProgress.error says why; the page checks a stream with the same rules before it boots.
+// A refused slot or stream: the refusal screen (replay_refusal.c, #30) names the reason of
+// gReplayProgress.error in text on the backdrop of replay_progress.h. The page checks a stream
+// with the same rules before it boots.
 static void CB2_ReplayRefused(void)
 {
     SetVBlankCallback(NULL);
-    SetGpuReg(REG_OFFSET_DISPCNT, 0);
-    *(vu16 *)PLTT = RGB(REPLAY_REFUSED_RED, 0, 0);
+    Replay_ShowRefusal(gReplayProgress.error);
     DebugPrintf("replay refused: error %d", gReplayProgress.error);
     SetMainCallback2(CB2_ReplayStopped);
 }
 
-// After a B press has left the playback (BattleMainCB2): the screen stays black from the fade.
+// After a B press has left the playback before END (BattleMainCB2): the screen stays black from
+// the fade.
 static void CB2_ReplayLeft(void)
 {
     SetVBlankCallback(NULL);

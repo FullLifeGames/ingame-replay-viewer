@@ -15,7 +15,7 @@
 #define REPLAY_PROGRESS_OFFSET_PLAYING  8
 #define REPLAY_PROGRESS_SIZE            12 // the build's -mabi=apcs-gnu rounds a struct up to 4 bytes
 
-// The refusal screen (CB2_ReplayRefused in replay_boot.c) shows the backdrop RGB(REPLAY_REFUSED_RED, 0, 0).
+// The refusal screen (replay_refusal.c) shows its text on the backdrop RGB(REPLAY_REFUSED_RED, 0, 0).
 #define REPLAY_REFUSED_RED 12
 
 #endif // GUARD_REPLAY_PROGRESS_H
