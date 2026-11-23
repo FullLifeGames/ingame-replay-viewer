@@ -125,6 +125,33 @@ describe('reportLink', () => {
     expect(url.hash).toBe('')
   })
 
+  // The issue is public: a private replay's link reaches it without its password part.
+  describe("leaves a private replay's password out", () => {
+    const HOST = 'https://replay.pokemonshowdown.com'
+    const PRIVATE = 'gen3ou-2345678901-0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5pw'
+    const replayOf = (replay: string) =>
+      new URL(reportLink({ replay, line: 'x' })).searchParams.get('replay')
+
+    it.each(['smogtours-gen3ou-994052', `${HOST}/smogtours-gen3ou-994052?p2`])(
+      'keeps the public %s as it is',
+      (replay) => {
+        expect(replayOf(replay)).toBe(replay)
+      },
+    )
+
+    it('cuts the password part from an ID', () => {
+      expect(replayOf(PRIVATE)).toBe('gen3ou-2345678901')
+    })
+
+    it('cuts it from a link and keeps the host, the ID and the rest', () => {
+      expect(replayOf(`${HOST}/${PRIVATE}?p2#turn-3`)).toBe(`${HOST}/gen3ou-2345678901?p2#turn-3`)
+    })
+
+    it('keeps an ID whose last part ends in pw after no number part', () => {
+      expect(replayOf('smogtours-gen3ou-abcpw')).toBe('smogtours-gen3ou-abcpw')
+    })
+  })
+
   it('leaves the replay out when the line names none', () => {
     expect(reportLink({ line: 'x' })).toBe(`${NEW_ISSUE}?template=${REPORT_FORM}&line=x`)
   })
@@ -156,6 +183,12 @@ describe('the issue form', () => {
 
   it.each(Object.values(REPORT_FIELDS))('holds the field %s as an input or a textarea', (id) => {
     expect(form).toMatch(new RegExp(`^ {2}- type: (?:input|textarea)\\n {4}id: ${id}$`, 'm'))
+  })
+
+  it("says that a private replay's link arrives without its password, in a public issue", () => {
+    const replay = form.slice(form.indexOf('id: replay'), form.indexOf('id: line'))
+    expect(replay).toMatch(/private replay's link arrives without its password/)
+    expect(replay).toMatch(/public/)
   })
 
   it('sets the label needs triage', () => {

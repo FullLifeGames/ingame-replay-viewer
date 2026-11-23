@@ -7,7 +7,7 @@ body:
     id: replay
     attributes:
       label: Replay
-      description: The replay's link, or the kind of file you loaded. Leave it empty if the problem came before you picked a replay.
+      description: The replay's link, or the kind of file you loaded. Leave it empty if the problem came before you picked a replay. A private replay's link arrives without its password, because this issue is public.
     validations:
       required: false
   - type: textarea
