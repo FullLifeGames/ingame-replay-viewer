@@ -7,7 +7,9 @@
 // the attacker's bar (`BattleScript_DestinyBondTakesLife`), so the line waits for that faint. A
 // perish count at 0 drains the bar after its line (`BattleScript_PerishSongTakesLife`). Pursuit's
 // activation shows nothing (`PURSUIT`). Transform says the species its user turned into
-// (`BattleScript_EffectTransform`); the sprite stays, since the stream holds no op that changes it.
+// (`BattleScript_EffectTransform`). The MOVE op's animation turns the sprite into the target's
+// species, read from its party mon; nothing sets the transform volatiles, so a shiny target's copy
+// takes the plain colours, a mechanic fallback.
 import { toID } from '@pkmn/dex'
 
 import type { PokemonRef } from '../../script/types'
@@ -132,8 +134,9 @@ export function takeDown(who: PokemonRef, line: number, ctx: Context): void {
 }
 
 export function transform({ who, into, line }: EventOf<'transform'>, ctx: Context): void {
-  ctx.print(line, transformed(ctx.mon(who), ctx.species(into)))
-  ctx.note(line, mechanicGap('Transform', 'changing the sprite'))
+  const target = ctx.revealed(into)
+  ctx.print(line, transformed(ctx.mon(who), target.species))
+  if (target.shiny) ctx.note(line, mechanicGap('Transform', "copying the target's shiny colours"))
 }
 
 export function singleTurn({ who, effect, line }: EventOf<'singleTurn'>, ctx: Context): void {

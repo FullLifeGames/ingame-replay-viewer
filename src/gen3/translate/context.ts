@@ -2,7 +2,7 @@
 // of the team members, the active Pokémon, and the output with its fallbacks. Handlers read and
 // write it; the rules of each scene live in their own modules.
 import type { BattleScript, ScriptEvent } from '../../script/events'
-import type { PokemonRef, Side } from '../../script/types'
+import type { PokemonRef, Side, TeamMember } from '../../script/types'
 import { Gen3Error } from '../errors'
 import type { Fallback, Noted } from '../fallbacks'
 import type { Instruction } from '../stream/instructions'
@@ -142,12 +142,12 @@ export class Context {
     return this.member(ref).mon
   }
 
-  /** The species of the team member, as the log names it. */
-  species(ref: PokemonRef): string {
+  /** The team member as the log reveals it: its species by the log's name, its shininess. */
+  revealed(ref: PokemonRef): TeamMember {
     const member = this.script.teams[ref.side][ref.index]
     if (member === undefined)
       throw new Gen3Error(`no team member ${String(ref.index)} on the ${ref.side} side`)
-    return member.species
+    return member
   }
 
   player(side: Side): Player {

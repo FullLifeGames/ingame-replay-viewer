@@ -175,12 +175,22 @@ describe('Transform (Gen 1 to 3)', () => {
     ).toBe('Dugtrio transformed into Tyranitar!')
   })
 
-  it('names the sprite change, which the stream cannot hold', () => {
-    expect(fallbacksOf(...lines)).toEqual([
+  it("turns the sprite through the move's animation, so a plain target takes no fallback", () => {
+    expect(fallbacksOf(...lines)).toEqual([])
+  })
+
+  it("names the shiny colours of a shiny target, which the game's copy lacks", () => {
+    const shiny = [
+      '|switch|p2a: Gleam|Tyranitar, shiny|100/100',
+      '|move|p1a: Dugtrio|Transform|p2a: Gleam',
+      '|-transform|p1a: Dugtrio|p2a: Gleam',
+    ]
+
+    expect(fallbacksOf(...shiny)).toEqual([
       {
-        line: NEXT + 1,
+        line: NEXT + 2,
         kind: 'mechanic',
-        detail: 'no state in the stream for Transform changing the sprite',
+        detail: "no state in the stream for Transform copying the target's shiny colours",
       },
     ])
   })
