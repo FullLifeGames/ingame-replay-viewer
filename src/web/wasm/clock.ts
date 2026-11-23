@@ -6,12 +6,13 @@ import { type Speed, ticksPerSecond } from './protocol'
 /**
  * How far the grant may run ahead of the frame the game has reached, beyond the frames owed since
  * the page's previous ask, in seconds of play: 30 frames at 1x, 60 at 2x. A late animation frame
- * owes the game every frame since the previous ask, so it costs no play time. On a loaded machine
- * the page's animation frames come up to about 450 ms apart, and the next ask finds the game still
- * playing the burst the late one granted, up to 28 frames behind; a lead of 0.1 s dropped those
- * frames. A game that fell further behind its previous grant (a slow start, a phone that stalls)
- * loses that unused debt instead of racing to pay it back. A burst of one gap's frames plus the
- * lead fits the sound ring, and the worklet skips what passes its latency cap and counts it.
+ * up to about 1.5 s apart owes the game every frame since the previous ask, so it costs no play
+ * time. On a loaded machine the page's animation frames come up to about 450 ms apart, and the
+ * next ask finds the game still playing the burst the late one granted, up to 28 frames behind; a
+ * lead of 0.1 s dropped those frames. A game that fell further behind its previous grant (a slow
+ * start, a phone that stalls) loses that unused debt instead of racing to pay it back. A burst of
+ * one gap's frames plus the lead fits the sound ring, and the worklet skips what passes its
+ * latency cap and counts it.
  */
 const LEAD_SECONDS = 0.5
 
