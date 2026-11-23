@@ -7,7 +7,7 @@ import { Gen3Error } from '../gen3/errors'
 import { showsInPlace } from '../gen3/fallbacks'
 import { buildBattleScript } from '../script/build'
 import { readReplay, ReplayError } from '../script/replay'
-import { notShown, notShownCounts, streamOfReplay } from './stream'
+import { notShown, notShownCounts, streamOfLoaded, streamOfReplay } from './stream'
 
 const lines = (log: string) => log.split('\n')
 
@@ -28,6 +28,21 @@ describe('streamOfReplay', () => {
     const noLog = Object.fromEntries(Object.entries(replay994052).filter(([key]) => key !== 'log'))
     expect(() => streamOfReplay(noLog)).toThrow(ReplayError)
     expect(() => streamOfReplay(noLog)).toThrow('replay JSON lacks "log"')
+  })
+})
+
+describe('streamOfLoaded', () => {
+  it('gives a replay read elsewhere the stream that its JSON gives', () => {
+    const replay = readReplay(replay994052)
+    const loaded = streamOfLoaded(replay)
+    expect(loaded.replay).toBe(replay)
+    expect(loaded).toEqual(streamOfReplay(replay994052))
+  })
+
+  it('lets the backend refuse a Gen 9 replay', () => {
+    const replay = readReplay(replay994052)
+    const gen9 = { ...replay, log: replay.log.replace('|gen|3\n', '|gen|9\n') }
+    expect(() => streamOfLoaded(gen9)).toThrow(Gen3Error)
   })
 })
 

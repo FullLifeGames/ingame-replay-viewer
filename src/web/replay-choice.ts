@@ -1,7 +1,9 @@
-// The replay choice both pages share (#52): a test replay or a replay by link or ID turned into its
-// stream and the summary of what the game does not show. The page lists the summary and Start
+// The replay choice both pages share (#52): a test replay, a replay by link or ID, or a saved
+// replay file (#56) turned into its stream and the summary of what the game does not show. The page lists the summary and Start
 // plays the same stream, so both pages show the same counts. Each failure reaches the page as one
 // line that names the step and keeps the module's own words.
+import type { Replay } from '../script/replay'
+import { readSavedReplay } from '../script/saved-replay'
 import { messageOf } from './message'
 import { replayJsonUrl } from './replay-input'
 import type { TestReplay } from './replays'
@@ -10,6 +12,8 @@ import {
   notShownCounts,
   type NotShownCount,
   type NotShownRow,
+  type ReplayStream,
+  streamOfLoaded,
   streamOfReplay,
 } from './stream'
 
@@ -75,8 +79,7 @@ export function newest<T>(keepEarlier: boolean) {
   }
 }
 
-function choose(json: unknown): Chosen {
-  const { replay, stream } = streamOfReplay(json)
+function chosenOf({ replay, stream }: ReplayStream): Chosen {
   const rows = notShown(replay, stream)
   const summary: ReplaySummary = {
     id: replay.id,
@@ -87,6 +90,9 @@ function choose(json: unknown): Chosen {
   }
   return { bytes: stream.bytes, summary }
 }
+
+const choose = (json: unknown): Chosen => chosenOf(streamOfReplay(json))
+const chooseReplay = (replay: Replay): Chosen => chosenOf(streamOfLoaded(replay))
 
 const STREAM_STEP = 'Could not turn the replay into a stream'
 
@@ -104,6 +110,43 @@ async function chooseShowdownReplay(
   return step(STREAM_STEP, () => choose(json))
 }
 
+/** A file the visitor picked, as the page's file input hands it on: `File` has these three. */
+export interface SavedFile {
+  readonly name: string
+  /** In bytes. */
+  readonly size: number
+  text(): Promise<string>
+}
+
+const MB = 1024 * 1024
+/** The largest replay file the viewer reads, in bytes: 5 MB. */
+export const LARGEST_FILE = 5 * MB
+
+/** A replay file over `LARGEST_FILE`, refused by its size before the page reads it. */
+export class FileSizeError extends Error {
+  override name = 'FileSizeError'
+  /** The file's size in bytes. */
+  readonly size: number
+
+  constructor(fileName: string, size: number) {
+    const holds = (Math.ceil((size / MB) * 10) / 10).toFixed(1)
+    super(
+      `${fileName} holds ${holds} MB, and the viewer reads replay files up to ${String(LARGEST_FILE / MB)} MB`,
+    )
+    this.size = size
+  }
+}
+
+async function readFile(file: SavedFile): Promise<Replay> {
+  if (file.size > LARGEST_FILE) throw new FileSizeError(file.name, file.size)
+  return readSavedReplay(await file.text(), file.name)
+}
+
+async function chooseFile(file: SavedFile): Promise<Chosen> {
+  const replay = await step(`Could not read the replay file ${file.name}`, () => readFile(file))
+  return step(STREAM_STEP, () => chooseReplay(replay))
+}
+
 /**
  * The picks of a page. A pick resolves to `undefined` when a newer pick replaced it; one that
  * fails leaves the replay picked before it, which the page still shows and Start still plays.
@@ -117,6 +160,9 @@ export function createReplayChoice(fetchJson: (url: string) => Promise<unknown>)
     /** A replay ID or a link to replay.pokemonshowdown.com. */
     loadReplay: (input: string): Promise<ReplaySummary | undefined> =>
       summaryOf(replays.pick(chooseShowdownReplay(fetchJson, input))),
+    /** A saved replay file: Showdown's download, a saved replay page, a battle log or JSON. */
+    loadFile: (file: SavedFile): Promise<ReplaySummary | undefined> =>
+      summaryOf(replays.pick(chooseFile(file))),
     /** The newest pick that did not fail, for Start; it never rejects. */
     chosen: async (): Promise<Chosen | undefined> => replays.get(),
   }

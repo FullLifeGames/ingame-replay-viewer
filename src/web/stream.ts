@@ -32,12 +32,16 @@ export interface NotShownCount {
 }
 
 /**
- * The instruction stream of a parsed replay JSON. A `ReplayError`, `ScriptError` or `Gen3Error`
- * passes through with its message.
+ * The instruction stream of a replay read from JSON or from a saved file (#56). A `ScriptError`
+ * or `Gen3Error` passes through with its message.
  */
-export function streamOfReplay(json: unknown): ReplayStream {
-  const replay = readReplay(json)
+export function streamOfLoaded(replay: Replay): ReplayStream {
   return { replay, stream: buildGen3Stream(buildBattleScript(replay.log)) }
+}
+
+/** The instruction stream of a parsed replay JSON; a `ReplayError` passes through as well. */
+export function streamOfReplay(json: unknown): ReplayStream {
+  return streamOfLoaded(readReplay(json))
 }
 
 const withDetail = (detail: string | undefined) => (detail === undefined ? {} : { detail })
