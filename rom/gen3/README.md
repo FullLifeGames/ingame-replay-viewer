@@ -29,7 +29,7 @@ The ROM interpreter (`src/replay_interpreter.c`, `src/replay_setup.c`) plays an 
 
 - 0001 hands it the battle main loop.
 - 0002 hides the near side's HP numbers while a replay runs.
-- 0003 makes the ROM boot straight into it. `src/replay_boot.c` starts the stream in the replay slot with no save file and no button press, When the ROM refuses the slot or its stream, `src/replay_refusal.c` shows the refusal screen: the reason in text on a dark red backdrop, with the error's number.
+- 0003 makes the ROM boot straight into it. `src/replay_boot.c` starts the stream in the replay slot with no save file and no button press. When the ROM refuses the slot or its stream, `src/replay_refusal.c` shows the refusal screen: the reason in text on a dark red backdrop, with the error's number.
 - 0004 makes the recorded controllers draw each side's trainer pic from the stream. They ask `Replay_GetTrainerPic` (`src/replay_setup.c`), which gives their own pick in every other battle.
 
 `src/replay_stream_check.c` checks the whole stream before a battle starts, in two passes: first each instruction alone, then the order rules in the header comment of `include/replay_stream.h` (no MOVE before its user is sent out, no HP for a side whose battler fainted, and the rest). The first pass refuses a trainer pic the side cannot draw as `TEAM`: the near side draws a back pic, which only 11 pics have, and the far side a front pic, which POKEDUDE and OLD_MAN lack. The encoder refuses the same pics (`src/gen3/stream/teams.ts`). `src/replay_stream.c` reads the stream. The ops share `include/replay_ops.h` with the main loop:
