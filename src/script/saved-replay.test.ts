@@ -2,10 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import fixture from '../../test/fixtures/replays/smogtours-gen3ou-994052.json'
 import { type Replay, readReplay, ReplayError } from './replay'
-import { readSavedReplay, savedKind } from './saved-replay'
+import { LONGEST_REPLAY_ID } from './replay-id'
+import { readSavedFile } from './saved-replay'
 import { downloadedFile, jsonFile, rawLog, replayPage } from './saved-replay-testing'
 
 const REPLAY = readReplay(fixture)
+const readSavedReplay = (text: string, fileName: string) => readSavedFile(text, fileName).replay()
+const savedKind = (text: string) => readSavedFile(text, 'x').kind
 const LOG_NAME = 'smogtours-gen3ou-994052.log'
 
 const SHAPES = [
@@ -68,6 +71,9 @@ describe('readSavedReplay turns "\\/" back into "/"', () => {
   })
 })
 
+const LONGEST_ID = 'w'.repeat(LONGEST_REPLAY_ID)
+const LONG_ID = `${LONGEST_ID}w`
+
 describe('readSavedReplay picks the id', () => {
   const page = replayPage(REPLAY)
   const element = '<script type="text/plain" class="log" id="replaylog-smogtours-gen3ou-994052">'
@@ -84,7 +90,7 @@ describe('readSavedReplay picks the id', () => {
   })
 
   it('takes the file name without its extension when the page names no id', () => {
-    expect(readSavedReplay(page.replace(element, bare), 'saved.page.html').id).toBe('saved.page')
+    expect(readSavedReplay(page.replace(element, bare), 'saved-page.html').id).toBe('saved-page')
     expect(readSavedReplay(page.replace(element, bare), 'saved').id).toBe('saved')
   })
 
@@ -95,6 +101,38 @@ describe('readSavedReplay picks the id', () => {
 
   it('gives a battle log the file name as its id', () => {
     expect(readSavedReplay(rawLog(REPLAY), 'battle.log').id).toBe('battle')
+  })
+  it.each([
+    ['an element id of another shape', element.replace('replaylog-', 'replaylog-Not.An.')],
+    ['an element id over the longest', element.replace('replaylog-', `replaylog-${LONG_ID}`)],
+  ])('passes over %s to the replayid input', (_, other) => {
+    const text = `<input type="hidden" name="replayid" value="from-input" />\n${page}`
+    expect(readSavedReplay(text.replace(element, other), 'from-name.html').id).toBe('from-input')
+  })
+
+  it('takes an element id of the longest length', () => {
+    const text = page.replace(element, element.replace('smogtours-gen3ou-994052', LONGEST_ID))
+    expect(readSavedReplay(text, 'from-name.html').id).toBe(LONGEST_ID)
+  })
+
+  it('passes over a replayid input of another shape to the file name', () => {
+    const text = `<input type="hidden" name="replayid" value="from input" />\n${page}`
+    expect(readSavedReplay(text.replace(element, bare), 'from-name.html').id).toBe('from-name')
+  })
+
+  it("passes over a JSON file's id of another shape to the file name", () => {
+    const text = jsonFile({ ...REPLAY, id: '<b>994052</b>' })
+    expect(readSavedReplay(text, 'from-name.json').id).toBe('from-name')
+  })
+
+  it.each([
+    ['downloaded', downloadedFile({ ...REPLAY, id: '' }), 'downloaded-replay'],
+    ['page', page.replace(element, bare), 'replay-page'],
+    ['log', rawLog(REPLAY), 'battle-log'],
+    ['json', jsonFile({ ...REPLAY, id: 'Not an id' }), 'replay-json'],
+  ])('names a "%s" file with no usable id after its kind', (_, text, id) => {
+    expect(readSavedReplay(text, 'My replay (1).txt').id).toBe(id)
+    expect(readSavedReplay(text, `${LONG_ID}.txt`).id).toBe(id)
   })
 })
 
@@ -192,11 +230,20 @@ describe('readSavedReplay refuses', () => {
   it('names no kind for an HTML file without a log element', () => {
     expect(savedKind('<p>|turn|1</p>')).toBeUndefined()
   })
+
+  it('names the kind of a file it then refuses', () => {
+    expect(readSavedFile('{"id": ', 'x.json').kind).toBe('json')
+    expect(readSavedFile('<script class="log">\n</script>', 'x.html').kind).toBe('page')
+  })
 })
 
 // The reader runs on files from anywhere: every scan runs once over the text.
 describe('readSavedReplay on long hostile files', () => {
   const LONG = 200_000
+  const FIVE_MB = 5 * 1024 * 1024
+  const BARE_LOG = '<script class="log">|t|</script>'
+  const fill = (unit: string, head = '') =>
+    head + unit.repeat(Math.floor((FIVE_MB - head.length) / unit.length))
 
   function timed(text: string): number {
     const start = Date.now()
@@ -216,6 +263,9 @@ describe('readSavedReplay on long hostile files', () => {
     ['attribute names without values', `<script ${'class '.repeat(LONG)}>`],
     ['unclosed inputs', `${'<input name=replayid'.repeat(LONG)}<script class="log">|t|</script>`],
     ['newlines', `${'\n'.repeat(LONG)}x${'\n'.repeat(LONG)}`],
+    ['5 MB of empty scripts', fill('<script></script>')],
+    ['5 MB of inputs after a log element without an id', fill('<input name=a>', BARE_LOG)],
+    ['5 MB of empty inputs before a log element without an id', `${fill('<input >')}${BARE_LOG}`],
   ])('reads %s at once', (_, text) => {
     expect(timed(text)).toBeLessThan(1000)
   })

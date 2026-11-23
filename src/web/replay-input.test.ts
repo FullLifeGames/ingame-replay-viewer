@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { LONGEST_REPLAY_ID } from '../script/replay-id'
 import { replayJsonUrl, ReplayInputError } from './replay-input'
 
 const JSON_URL = 'https://replay.pokemonshowdown.com/smogtours-gen3ou-994052.json'
@@ -65,5 +66,11 @@ describe('replayJsonUrl', () => {
     'Smogtours-Gen3ou-994052',
   ])('refuses %j, which holds no replay ID', (input) => {
     expect(() => replayJsonUrl(input)).toThrow(/is not a replay ID: replay IDs look like /)
+  })
+
+  it('refuses an ID longer than the longest Showdown writes', () => {
+    const id = 'w'.repeat(LONGEST_REPLAY_ID)
+    expect(replayJsonUrl(id)).toBe(`https://replay.pokemonshowdown.com/${id}.json`)
+    expect(() => replayJsonUrl(`${id}w`)).toThrow(/is not a replay ID: replay IDs look like /)
   })
 })

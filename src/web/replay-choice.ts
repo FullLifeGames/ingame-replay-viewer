@@ -3,7 +3,7 @@
 // plays the same stream, so both pages show the same counts. Each failure reaches the page as one
 // line that names the step and keeps the module's own words.
 import type { Replay } from '../script/replay'
-import { readSavedReplay, type SavedKind, savedKind } from '../script/saved-replay'
+import { readSavedFile, type SavedKind } from '../script/saved-replay'
 import type { Side } from '../script/types'
 import { messageOf } from './message'
 import { replayJsonUrl } from './replay-input'
@@ -197,12 +197,12 @@ async function readFile(file: SavedFile): Promise<string> {
 async function chooseFile(file: SavedFile): Promise<Chosen> {
   const read = `Could not read the replay file ${file.name}`
   const text = await step(read, () => readFile(file), { source: 'file', replay: NO_KIND })
-  const kind = savedKind(text)
+  const saved = readSavedFile(text, file.name)
   const place: ReplayPlace = {
     source: 'file',
-    replay: kind === undefined ? NO_KIND : KIND_NAMES[kind],
+    replay: saved.kind === undefined ? NO_KIND : KIND_NAMES[saved.kind],
   }
-  const replay = await step(read, () => readSavedReplay(text, file.name), place)
+  const replay = await step(read, saved.replay, place)
   return step(STREAM_STEP, () => chooseReplay(replay, place), place)
 }
 
