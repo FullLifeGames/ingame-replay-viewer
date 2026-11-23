@@ -242,8 +242,8 @@ describe('readSavedReplay on long hostile files', () => {
   const LONG = 200_000
   const FIVE_MB = 5 * 1024 * 1024
   const BARE_LOG = '<script class="log">|t|</script>'
-  const fill = (unit: string, head = '') =>
-    head + unit.repeat(Math.floor((FIVE_MB - head.length) / unit.length))
+  const fill = (size: number, unit: string, head = '') =>
+    head + unit.repeat(Math.floor((size - head.length) / unit.length))
 
   function timed(text: string): number {
     const start = Date.now()
@@ -263,10 +263,40 @@ describe('readSavedReplay on long hostile files', () => {
     ['attribute names without values', `<script ${'class '.repeat(LONG)}>`],
     ['unclosed inputs', `${'<input name=replayid'.repeat(LONG)}<script class="log">|t|</script>`],
     ['newlines', `${'\n'.repeat(LONG)}x${'\n'.repeat(LONG)}`],
-    ['5 MB of empty scripts', fill('<script></script>')],
-    ['5 MB of inputs after a log element without an id', fill('<input name=a>', BARE_LOG)],
-    ['5 MB of empty inputs before a log element without an id', `${fill('<input >')}${BARE_LOG}`],
   ])('reads %s at once', (_, text) => {
     expect(timed(text)).toBeLessThan(1000)
   })
+
+  // A wall-clock bound fails on a loaded machine (S5-18), so these compare two sizes of one shape
+  // in the same test: the best of three reads of each, taken in turns. A reader that scans the
+  // text once takes about ten times as long on ten times the text; one that scans again from the
+  // start for each tag takes about a hundred times. 10 s stops a runaway; the test's own timeout
+  // leaves room for six reads on a loaded machine.
+  it.each([
+    ['empty scripts', (size: number) => fill(size, '<script></script>')],
+    [
+      'inputs after a log element without an id',
+      (size: number) => fill(size, '<input name=a>', BARE_LOG),
+    ],
+    [
+      'empty inputs before a log element without an id',
+      (size: number) => `${fill(size, '<input >')}${BARE_LOG}`,
+    ],
+  ])(
+    'reads 5 MB of %s in at most forty times the time of 0.5 MB',
+    (_, shape) => {
+      const [small, large] = [shape(FIVE_MB / 10), shape(FIVE_MB)]
+      const smallTimes: number[] = []
+      const largeTimes: number[] = []
+      for (let round = 0; round < 3; round += 1) {
+        smallTimes.push(timed(small))
+        largeTimes.push(timed(large))
+      }
+      const [smallBest, largeBest] = [Math.min(...smallTimes), Math.min(...largeTimes)]
+      const times = `0.5 MB ${String(smallBest)} ms, 5 MB ${String(largeBest)} ms`
+      expect(largeBest, times).toBeLessThan(10_000)
+      expect(largeBest, times).toBeLessThan(40 * Math.max(smallBest, 1))
+    },
+    60_000,
+  )
 })
