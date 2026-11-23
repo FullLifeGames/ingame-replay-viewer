@@ -75,3 +75,44 @@ describe("Heal Bell's activation (Gen 5 and later shape)", () => {
     expect(fallbacksOf(...lines)).toEqual([])
   })
 })
+
+describe('Berserk Gene (Gen 2)', () => {
+  const lines = [
+    '|-enditem|p1a: Dugtrio|Berserk Gene',
+    '|-boost|p1a: Dugtrio|atk|2|[from] item: Berserk Gene',
+    '|-start|p1a: Dugtrio|confusion',
+  ]
+
+  it('shows its pop-up and animation, then says the item raised the stat, as the expansion does', () => {
+    expect(sceneOf(...lines).map(plain)).toEqual([
+      { op: 'itemPopUp', side: 'near', item: expect.any(Number) as number },
+      { op: 'anim', side: 'near', anim: 'heldItemEffect' },
+      { op: 'item', side: 'near', slot: 0, item: 0 },
+      { op: 'stat', side: 'near', stat: 'atk', stages: 2, arrows: 'one' },
+      "The Berserk Gene sharply boosted Dugtrio's Attack!",
+      'Dugtrio became confused!',
+    ])
+    expect(fallbacksOf(...lines)).toEqual([])
+  })
+})
+
+describe('a stat change an item makes (Gen 2 and 3)', () => {
+  it("says the item's line for a berry's raise", () => {
+    const lines = [
+      '|-enditem|p2a: Tyranitar|Liechi Berry|[eat]',
+      '|-boost|p2a: Tyranitar|atk|1|[from] item: Liechi Berry',
+    ]
+
+    expect(
+      sceneOf(...lines)
+        .map(plain)
+        .at(-1),
+    ).toBe("The Liechi Berry boosted the opposing Tyranitar's Attack!")
+  })
+
+  it("says the item's line for a drop", () => {
+    const line = '|-unboost|p1a: Dugtrio|spe|1|[from] item: Room Service'
+
+    expect(sceneOf(line).map(plain).at(-1)).toBe("The Room Service lowered Dugtrio's Speed!")
+  })
+})

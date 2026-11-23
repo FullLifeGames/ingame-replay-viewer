@@ -70,6 +70,14 @@ export const SAMPLES: Readonly<Record<string, Sample>> = {
     args: [FAR, 'Attack', nb('harshly ')],
     fill: { B_BUFF1: 'Attack', B_BUFF2: nb('harshly ') },
   },
+  'stats.itemRose': {
+    args: [FAR, nb('Berserk Gene'), 'Attack', nb(' sharply')],
+    fill: { B_LAST_ITEM: nb('Berserk Gene'), B_BUFF1: 'Attack', B_BUFF2: nb(' sharply') },
+  },
+  'stats.itemFell': {
+    args: [FAR, nb('Room Service'), 'Speed', ''],
+    fill: { B_LAST_ITEM: nb('Room Service'), B_BUFF1: 'Speed', B_BUFF2: '' },
+  },
   'stats.wontRise': withValue('B_BUFF1', 'Speed', FAR),
   'stats.wontFall': withValue('B_BUFF1', nb('Sp. Def'), FAR),
   'hp.trapped': withValue('B_BUFF1', nb('Fire Spin'), FAR),
