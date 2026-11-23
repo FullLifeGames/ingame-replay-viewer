@@ -53,8 +53,9 @@ function drawLoop(
     requestAnimationFrame(draw)
     const run = runs.current
     if (run === undefined) return
-    grant(run.control, run.clock.allowed(now))
+    // The clock grants from the frame the game reached, so a game that fell behind never races.
     const status = readStatus(run.control)
+    grant(run.control, run.clock.allowed(now, status.frame))
     if (status.finished && run.finishedMs === undefined) {
       // At END fast gives way to 1x (speedAtEnd), and the speed control shows it.
       const speed = reachEnd(run, now)
