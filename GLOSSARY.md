@@ -170,6 +170,26 @@ _Avoid_: error message, toast
 The link under a visitor line that opens the repository's issue form "Replay problem" with the replay and the line filled in.
 _Avoid_: feedback link, bug button
 
+**Audio ring**:
+The shared buffer between the worker and the audio worklet: the worker writes each frame's samples into it, and the worklet plays them from it.
+_Avoid_: audio buffer, queue
+
+**Reserve**:
+The samples that must wait in the audio ring before the worklet plays, at the start and after each dry spell, so a frame that comes a little late still plays on time.
+_Avoid_: pre-buffer, headroom
+
+**Dry spell**:
+A stretch in which the audio ring is empty and the worklet plays silence. The viewer counts each one once and reports it as "ran out of sound".
+_Avoid_: glitch, dropout
+
+**Latency cap**:
+The most samples that may wait in the audio ring. The worklet skips what waits beyond it, so the sound stays close to the picture.
+_Avoid_: buffer limit
+
+**Tick rule**:
+The rule that says how many frames the game may have played by a moment, from the speed and the time since the viewer last asked. It caps what one ask grants, so a game that fell behind goes on at its pace.
+_Avoid_: frame limiter, throttle
+
 ## Scope
 
 **Era-matched replay**:
