@@ -71,7 +71,7 @@ test('a test replay that fails to load leaves the select on the replay the page 
   page,
   baseURL,
 }) => {
-  await guardRequests(page, baseURL)
+  const notSameOriginGets = await guardRequests(page, baseURL)
   await routeShowdown(page, LINKED)
   const aborted: string[] = []
   await page.route(/smogtours-gen3ou-994086\.json/, (route) => {
@@ -105,4 +105,5 @@ test('a test replay that fails to load leaves the select on the replay the page 
   await expect(status).toHaveText(NO_LINE)
   await expect(summary).toHaveText(new RegExp(`^${LINKED}: `))
   await expect(testReplay).toHaveValue('')
+  expect(notSameOriginGets).toEqual([`GET ${SHOWDOWN}`])
 })
