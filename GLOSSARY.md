@@ -105,12 +105,20 @@ The C code that stands in for the GBA's hardware in the WebAssembly build: the B
 _Avoid_: emulator, HAL, backend (a game backend is ours)
 
 **Glue**:
-Our C files for the WebAssembly build only (`rom/gen3/wasm/src/`): the frame loop, the interrupts, the hand-over of frames and sound to JavaScript, and the stubs for hardware the viewer does not use. Emscripten's own JavaScript runtime is "Emscripten's glue".
+Our C files for the WebAssembly build only (`rom/gen3/wasm/src/`). They have the platform layer run each frame, pass each interrupt to the game, hand frames and sound to JavaScript, stub the hardware the viewer does not use, and stop a run that must not go on. Emscripten's own JavaScript runtime is "Emscripten's glue".
 _Avoid_: shim, wrapper
+
+**Stub list**:
+The stubs of the glue that a replay run may call: the calls the game makes at boot to set up its wireless adapter. A call to any other stub stops the run with the stub's name (#46).
+_Avoid_: allow list, whitelist
 
 **Module patch**:
 The BPS patch from the base ROM to the WebAssembly module (`irv-emerald-wasm.bps`). The page applies it to the user's dump, as it applies the patch for the ROM image.
 _Avoid_: wasm patch, module download
+
+**Sanitized module**:
+A WebAssembly module built with one of clang's runtime checks, so that a replay run reports every place in the game's C that breaks the check (#44: shifts). It stays on devbox beside the module the page loads and has no module patch.
+_Avoid_: debug build, test module
 
 **Overlay patch**:
 A change to a copy of an upstream file that only the WebAssembly build compiles. The ROM build never sees it.
