@@ -20,7 +20,7 @@ import {
   type ReplaySource,
   SessionError,
 } from './replay-choice'
-import { REPLAY_HOST, ReplayInputError } from './replay-input'
+import { EXAMPLE_ID, REPLAY_HOST, ReplayInputError } from './replay-input'
 import { clip } from './report-link'
 import { BuildMismatchError, DumpRefusal } from './rom'
 import { MemoryRefusal, RunFailure, type RunFailureKind } from './wasm/failures'
@@ -45,6 +45,10 @@ export const VISITOR_LINES = {
   },
   gameType: {
     text: 'This replay is not a singles battle (Showdown calls it "{gameType}"). The viewer plays singles for now.',
+    report: false,
+  },
+  linkInput: {
+    text: `"Replay link or ID" takes a replay ID such as ${EXAMPLE_ID}, or a link to a replay on ${REPLAY_HOST}.`,
     report: false,
   },
   linkReplay: {
@@ -159,7 +163,7 @@ function fetchMatch({ url, status }: FetchError): Match {
   return { name: 'showdownRefused', values: { status: String(status) } }
 }
 
-const KEPT = [ReplayInputError, MemoryRefusal, EmulatorError, SessionError]
+const KEPT = [MemoryRefusal, EmulatorError, SessionError]
 const MISMATCHES = [BuildMismatchError, SlotMismatchError, BpsError]
 // By its name: a browser without WebAssembly still loads this module and shows its lines.
 const isCompileError = (error: unknown): boolean =>
@@ -193,6 +197,7 @@ const RULES: readonly Rule[] = [
   named('buildMismatch', (error) => isOne(error, MISMATCHES) || isCompileError(error)),
   named('game', (error) => error instanceof Gen3Error || error instanceof SlotError),
   named('wrongDump', (error) => error instanceof DumpRefusal),
+  named('linkInput', (error) => error instanceof ReplayInputError),
   (error) => (error instanceof FetchError ? fetchMatch(error) : undefined),
   (error, { words }) =>
     error instanceof RunFailure ? { name: RUN_LINES[error.kind], values: { words } } : undefined,
@@ -246,6 +251,13 @@ export function visitorLine(error: unknown, place?: ReplayPlace): VisitorLine {
   const replay = at === undefined ? {} : { replay: at.replay }
   return { line, detail: messageOf(error), report: entry.report, ...replay }
 }
+
+/**
+ * The words "Details" shows under `shown`: its detail, or none when the detail repeats the line
+ * word for word, as a kept line's does. Both pages show a line through this rule.
+ */
+export const detailShown = ({ line, detail }: VisitorLine): string =>
+  detail === line ? '' : detail
 
 const ENVIRONMENT_LINES: Readonly<Record<EnvironmentProblem['kind'], LineName>> = {
   insecure: 'insecure',

@@ -10,6 +10,8 @@ export class ReplayInputError extends Error {
 
 /** Showdown's replay host, which the page asks for a replay's JSON. */
 export const REPLAY_HOST = 'replay.pokemonshowdown.com'
+/** The replay ID that the page's words and the link field's placeholder show as an example. */
+export const EXAMPLE_ID = 'smogtours-gen3ou-994052'
 const ASK = `paste a replay ID or a link to ${REPLAY_HOST}`
 
 const SCHEME = /^[a-z][a-z0-9+.-]*:/i
@@ -36,7 +38,7 @@ function idOf(text: string): string {
   const id = path.replace(/\/$/, '').replace(/\.(?:json|log)$/, '')
   if (!isReplayId(id)) {
     throw new ReplayInputError(
-      `"${id}" is not a replay ID: replay IDs look like smogtours-gen3ou-994052; ${ASK}`,
+      `"${id}" is not a replay ID: replay IDs look like ${EXAMPLE_ID}; ${ASK}`,
     )
   }
   return id

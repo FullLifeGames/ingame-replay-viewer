@@ -7,7 +7,7 @@ import type { ReplayChoice, ReplayPlace, ReplaySummary } from './replay-choice'
 import { FIRST_REPLAY, TEST_REPLAYS } from './replays'
 import { reportLink } from './report-link'
 import { countText, notShownHeading, pickedLine, replayLine, rowText } from './status'
-import { type VisitorLine, visitorLine } from './visitor'
+import { detailShown, type VisitorLine, visitorLine } from './visitor'
 
 /** The element `#id` of `page`, which must be a `type`. */
 export function element<T extends HTMLElement>(page: string, id: string, type: new () => T): T {
@@ -31,13 +31,26 @@ const ENVIRONMENT_PARTS: LineParts = {
 }
 
 /**
+ * Shows the "Details" around `part` only while one of its paragraphs holds words: a closed
+ * disclosure with nothing new inside tells a visitor nothing.
+ */
+export function fitDetails(part: HTMLElement): void {
+  const details = part.closest('details')
+  if (details === null) return
+  details.hidden = [...details.querySelectorAll('p')].every((words) => words.textContent === '')
+}
+
+/**
  * Writes `shown` as text, never as markup: its values come from other people's replays, links
- * and files. The report link gets its address from reportLink alone, and hides when the line
- * offers none, so an old failure never sits under a new line.
+ * and files. "Details" holds the detail unless it repeats the line (detailShown). The report link
+ * gets its address from reportLink alone, and hides when the line offers none, so an old failure
+ * never sits under a new line.
  */
 function writeLine(page: string, parts: LineParts, shown: VisitorLine): void {
   element(page, parts.line, HTMLParagraphElement).textContent = shown.line
-  element(page, parts.detail, HTMLParagraphElement).textContent = shown.detail
+  const detail = element(page, parts.detail, HTMLParagraphElement)
+  detail.textContent = detailShown(shown)
+  fitDetails(detail)
   const report = element(page, parts.report, HTMLAnchorElement)
   if (shown.report) report.href = reportLink(shown)
   else report.removeAttribute('href')

@@ -135,11 +135,13 @@ test.describe('on a phone-wide screen', () => {
     await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${id}: `))
     expect(await scrollWidth(page)).toBeLessThanOrEqual(WIDTH)
 
-    await page.locator('#details summary').click()
+    // "Details" shows once it holds words (#59): the failed file's.
     await pickFile(page, { name: `${id}.txt`, mimeType: 'text/plain', text: 'Bring snacks.\n' })
     await expect(page.locator('#status-detail')).toHaveText(
       new RegExp(`^Could not read the replay file ${id}\\.txt: `),
     )
+    await page.locator('#details summary').click()
+    await expect(page.locator('#status-detail')).toBeVisible()
     expect(await scrollWidth(page)).toBeLessThanOrEqual(WIDTH)
     expect(notSameOriginGets).toEqual([])
   })

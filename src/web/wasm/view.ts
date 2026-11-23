@@ -3,6 +3,7 @@
 import type { ReplayPlace, ReplaySummary } from '../replay-choice'
 import {
   findReplayView,
+  fitDetails,
   element as pageElement,
   showFailure,
   showLine,
@@ -113,7 +114,9 @@ export function findSpikeView() {
     panel: findPanel(),
     /** The run's numbers for the developer, under "Details" (#59). */
     progress: (line: string): void => {
-      if (progress.textContent !== line) progress.textContent = line
+      if (progress.textContent === line) return
+      progress.textContent = line
+      fitDetails(progress)
     },
   }
 }

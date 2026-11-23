@@ -129,7 +129,6 @@ describe('visitorLine for a file that is not US Emerald (#59)', () => {
 
 describe('visitorLine keeps the lines that speak to visitors', () => {
   it.each([
-    ['the link input', () => refusalOf(offline().loadReplay('xz abc'))],
     ['Start', () => Promise.resolve(new SessionError(PICK_DUMP))],
     [
       'the emulator',

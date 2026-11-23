@@ -36,7 +36,7 @@ test('a replay loaded by link in the viewer lists what the emulator page lists',
   await expect(status).toHaveText(/^Pick your US Emerald dump/)
 
   await loadReplay(page, 'https://example.com/smogtours-gen3ou-994176')
-  await expect(status).toHaveText(/^Could not read the replay link: /)
+  await expect(status).toHaveText(/^"Replay link or ID" takes a replay ID such as /)
   await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
 
   await loadReplay(page, `https://replay.pokemonshowdown.com/${LINKED}`)

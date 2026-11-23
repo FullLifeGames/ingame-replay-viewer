@@ -14,6 +14,10 @@ const OTHER = 'smogtours-gen3ou-994086'
 const SHOWDOWN = showdownUrl(LINKED)
 /** The line of a failure the page has no line for, such as an example it could not load. */
 const NO_LINE = 'The page hit a problem it has no line for. Report it with the link below.'
+/** The line of every refusal of the link field (#59). */
+const LINK_LINE =
+  '"Replay link or ID" takes a replay ID such as smogtours-gen3ou-994052, or a link to a replay ' +
+  'on replay.pokemonshowdown.com.'
 
 test('a replay loaded by its link fills the list, and only Showdown is asked', async ({
   page,
@@ -25,13 +29,24 @@ test('a replay loaded by its link fills the list, and only Showdown is asked', a
   const summary = page.locator('#replay-summary')
   await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
 
+  const status = page.getByRole('status')
+  const detail = page.locator('#status-detail')
+  const details = page.locator('#details')
+  // Start without a dump: the line says it all, so the page shows no "Details" (#59).
+  await page.getByRole('button', { name: 'Start', exact: true }).click()
+  await expect(status).toHaveText('Pick your US Emerald dump first, then press Start.')
+  await expect(details).toBeHidden()
+
   await loadReplay(page, 'https://example.com/smogtours-gen3ou-994176')
-  await expect(page.getByRole('status')).toHaveText(/^Could not read the replay link: /)
+  await expect(status).toHaveText(LINK_LINE)
+  await expect(detail).toHaveText(/^Could not read the replay link: example\.com is not /)
+  await expect(details).toBeVisible()
   await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
 
   // A link with markup in it shows as text: the page writes no line as HTML.
   await loadReplay(page, '<img id=injected src=x>')
-  await expect(page.getByRole('status')).toHaveText(
+  await expect(status).toHaveText(LINK_LINE)
+  await expect(detail).toHaveText(
     /^Could not read the replay link: "<img id=injected src=x>" is not a replay ID/,
   )
   await expect(page.locator('#injected')).toHaveCount(0)
