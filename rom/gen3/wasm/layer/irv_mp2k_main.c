@@ -88,8 +88,9 @@ static bool RunCommand(struct IrvSoundPlayer *player, struct IrvSoundTrack *trac
     }
     else
     {
-        // A data byte before any running status: the spec names no command for it, so the
-        // track ends as at FINE rather than read the byte for ever.
+        // A data byte before any running status. The engine reads a wait from the byte 128 before
+        // gClockTable and stalls or hangs on that byte (spec 12.2), and no song reaches it. Our
+        // deviation (S4-8): the track ends as at FINE.
         ply_fine(player, track);
         return false;
     }

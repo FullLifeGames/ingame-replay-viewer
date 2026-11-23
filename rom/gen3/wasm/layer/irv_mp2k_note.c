@@ -134,9 +134,9 @@ static struct IrvSoundChannel *ChoosePcmChannel(const struct Note *note, uint32_
     return best;
 }
 
-// MP2K spec 5.6 step 1: the channel leaves its old track's chain and heads this one's.
-// The spec lists the channel's own links; the old head's prev pointing back to the channel is
-// ours, so that RealClearChain (5.7) finds a whole chain.
+// MP2K spec 5.6 step 1: the channel leaves its old track's chain and heads this one's. The old
+// head's prev points back to the channel, as the engine sets it (spec 12.1), so that
+// RealClearChain (5.7) finds a whole chain.
 static void LinkChannel(struct IrvSoundChannel *chan, struct IrvSoundTrack *track)
 {
     struct IrvSoundChannel *head;
