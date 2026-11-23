@@ -11,7 +11,7 @@ export class RomError extends Error {
   override name = 'RomError'
 }
 
-/** The site's patch and replay-slot.json come from different builds. */
+/** The site's own files do not fit: the patch and replay-slot.json, or replay-slot.json itself. */
 export class BuildMismatchError extends RomError {
   override name = 'BuildMismatchError'
 }
@@ -48,14 +48,19 @@ function isDescription(json: Json): json is Json & SlotDescription {
   return wrongFields(json).length === 0
 }
 
-/** Checks the fetched replay-slot.json and keeps the fields of a slot description. */
+/**
+ * Checks the fetched replay-slot.json and keeps the fields of a slot description. The site serves
+ * the file with its build, so a broken one is a build mismatch, never the visitor's fault.
+ */
 export function readSlotDescription(json: unknown): SlotDescription {
   if (!isObject(json)) {
-    throw new RomError('replay-slot.json is not an object')
+    throw new BuildMismatchError('replay-slot.json is not an object')
   }
   if (!isDescription(json)) {
     const names = wrongFields(json).map((key) => `"${key}"`)
-    throw new RomError(`replay-slot.json lacks ${names.join(', ')} or holds the wrong type there`)
+    throw new BuildMismatchError(
+      `replay-slot.json lacks ${names.join(', ')} or holds the wrong type there`,
+    )
   }
   const entries = Object.keys(FIELD_CHECKS).map((key) => [key, json[key]])
   return Object.fromEntries(entries) as SlotDescription

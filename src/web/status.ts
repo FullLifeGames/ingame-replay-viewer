@@ -1,5 +1,6 @@
 // The page's own words: the status line after each step, the panel above the game, and the texts
-// of the "Not shown in the game" list. The failures keep the words of the step that failed (replay-choice.ts, session.ts).
+// of the "Not shown in the game" list. A failure's line comes from visitor.ts, and the words of
+// the step that failed (replay-choice.ts, session.ts) become its detail.
 import { plainText } from './markup'
 import type { ReplaySummary } from './replay-choice'
 import type { DumpSummary, StartSummary } from './session'
@@ -15,8 +16,24 @@ export const dumpLine = ({ romSha1 }: DumpSummary): string =>
 export const startLine = ({ id, streamBytes }: StartSummary): string =>
   `Running ${id}: ${String(streamBytes)} bytes of instruction stream.`
 
-/** Once the game reached END, at the win or tie line; the outro that follows belongs to no line. */
-export const endedLine = (id: string): string => `Played ${id} to the end of the battle.`
+/** The viewer's lines while it builds the game from the dump, and once it did. */
+export const BUILDING_LINE = 'Checking your dump and building the game. This takes a few seconds.'
+export const BUILT_LINE =
+  'Your dump is US Emerald, and the page built the game from it. Press Start.'
+
+/**
+ * Why a run plays or played without sound, as the end of its line; empty for a run with sound.
+ * The running line and the END line share it (#59).
+ */
+export const silenceText = (silence: string | undefined, verb: 'plays' | 'played'): string =>
+  silence === undefined ? '' : ` It ${verb} without sound: ${silence}.`
+
+/**
+ * Once the game reached END, at the win or tie line; the outro that follows belongs to no line.
+ * It replaces the running line, so it keeps the reason a run had no sound.
+ */
+export const endedLine = (id: string, silence?: string): string =>
+  `Played ${id} to the end of the battle.${silenceText(silence, 'played')}`
 
 const PRESS_START = 'Press Start to play it.'
 

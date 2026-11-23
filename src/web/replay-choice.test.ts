@@ -68,6 +68,23 @@ describe('a replay choice', () => {
     expect(fetched).toEqual([SHOWDOWN_994176])
   })
 
+  // S5-11 (c): a run's failure reports the place of the pick it plays, never a name of its own.
+  it('hands Start the place each pick came from', async () => {
+    const { choice } = showdown()
+    await choice.pickTestReplay(REPLAY_994086)
+    expect((await choice.chosen())?.place).toEqual({
+      source: 'example',
+      replay: 'smogtours-gen3ou-994086',
+    })
+    await choice.loadReplay('smogtours-gen3ou-994176')
+    expect((await choice.chosen())?.place).toEqual({
+      source: 'link',
+      replay: 'smogtours-gen3ou-994176',
+    })
+    await choice.loadFile(savedFile('Jane Doe vs. Rival.log', rawLog(REPLAY)).file)
+    expect((await choice.chosen())?.place).toEqual({ source: 'file', replay: 'a battle log' })
+  })
+
   it('has no replay before the first pick', async () => {
     expect(await showdown().choice.chosen()).toBeUndefined()
   })

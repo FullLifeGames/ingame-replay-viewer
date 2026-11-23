@@ -10,6 +10,7 @@ import {
   RETURNED,
   RunFailure,
   stopFailure,
+  workerFailure,
   writeFailure,
 } from './failures'
 
@@ -128,6 +129,16 @@ describe("the worker's failed reports", () => {
       type: 'failed',
       kind: 'returned',
       line: 'AgbMain returned, which the game never does',
+    })
+  })
+
+  // S5-11 (b): the worker's error event comes from a throw the worker did not catch, so the page
+  // reads it as the game's stop, with the event's words as the line.
+  it("reads the worker's own error as the game's stop", () => {
+    expect(workerFailure('Uncaught RangeError: offset is out of bounds')).toEqual({
+      type: 'failed',
+      kind: 'stopped',
+      line: 'The worker failed: Uncaught RangeError: offset is out of bounds',
     })
   })
 

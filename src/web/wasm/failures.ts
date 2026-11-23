@@ -69,6 +69,16 @@ export const stopFailure = (error: unknown): FailedReport => ({
   line: `The game stopped: ${messageOf(error)}`,
 })
 
+/**
+ * The page's report when the worker fired an error event, a throw it did not catch: the game
+ * stopped (S5-11), in the event's words.
+ */
+export const workerFailure = (message: string): FailedReport => ({
+  type: 'failed',
+  kind: 'stopped',
+  line: `The worker failed: ${message}`,
+})
+
 /** The worker's report when AgbMain returned. */
 export const RETURNED: FailedReport = {
   type: 'failed',

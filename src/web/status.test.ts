@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import replay994086 from '../../test/fixtures/replays/smogtours-gen3ou-994086.json'
 import {
+  BUILDING_LINE,
+  BUILT_LINE,
   countText,
   dumpLine,
   endedLine,
@@ -12,6 +14,7 @@ import {
   replayLine,
   restartLine,
   rowText,
+  silenceText,
   startLine,
 } from './status'
 import type { ReplaySummary } from './replay-choice'
@@ -50,6 +53,32 @@ describe('the status lines', () => {
   // The game reaches END at the win or tie line; the outro after it belongs to no battle line.
   it('says the replay played to the end of the battle once the game reached END', () => {
     expect(endedLine(ID)).toBe(`Played ${ID} to the end of the battle.`)
+    expect(endedLine(ID, undefined)).toBe(`Played ${ID} to the end of the battle.`)
+  })
+
+  // #59: the END line replaces the running line, so it keeps the reason a run had no sound.
+  it('keeps at END the reason a run played without sound', () => {
+    expect(endedLine(ID, 'the audio did not start: refused for the test')).toBe(
+      `Played ${ID} to the end of the battle. It played without sound: the audio did not start: refused for the test.`,
+    )
+  })
+
+  it('gives the running line and the END line one rule for the reason', () => {
+    expect(silenceText(undefined, 'plays')).toBe('')
+    expect(silenceText('no context', 'plays')).toBe(' It plays without sound: no context.')
+    expect(endedLine(ID, 'no context')).toBe(
+      `Played ${ID} to the end of the battle.${silenceText('no context', 'played')}`,
+    )
+  })
+
+  // The viewer's dump line names no byte count: a visitor has no use for the module's size.
+  it("tells the viewer's visitor that the page built the game from the dump", () => {
+    expect(BUILDING_LINE).toBe(
+      'Checking your dump and building the game. This takes a few seconds.',
+    )
+    expect(BUILT_LINE).toBe(
+      'Your dump is US Emerald, and the page built the game from it. Press Start.',
+    )
   })
 
   it('says a Restart plays the replay from the start', () => {

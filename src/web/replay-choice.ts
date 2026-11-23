@@ -57,10 +57,14 @@ export interface ReplaySummary {
   readonly players: Readonly<Record<Side, string>>
 }
 
-/** A picked replay: the stream Start plays, and the summary the page lists. */
+/**
+ * A picked replay: the stream Start plays, the summary the page lists, and where it came from, so
+ * a run's failure reports the pick's place (S5-11).
+ */
 export interface Chosen {
   readonly bytes: Uint8Array
   readonly summary: ReplaySummary
+  readonly place: ReplayPlace
 }
 
 export const failed = (step: string, error: unknown, place?: ReplayPlace): SessionError =>
@@ -108,7 +112,7 @@ export function newest<T>(keepEarlier: boolean) {
   }
 }
 
-function chosenOf({ replay, stream, players }: ReplayStream): Chosen {
+function chosenOf({ replay, stream, players }: ReplayStream, place: ReplayPlace): Chosen {
   const rows = notShown(replay, stream)
   const summary: ReplaySummary = {
     id: replay.id,
@@ -118,18 +122,19 @@ function chosenOf({ replay, stream, players }: ReplayStream): Chosen {
     counts: notShownCounts(rows),
     players,
   }
-  return { bytes: stream.bytes, summary }
+  return { bytes: stream.bytes, summary, place }
 }
 
-const choose = (json: unknown): Chosen => chosenOf(streamOfReplay(json))
-const chooseReplay = (replay: Replay): Chosen => chosenOf(streamOfLoaded(replay))
+const choose = (json: unknown, place: ReplayPlace): Chosen => chosenOf(streamOfReplay(json), place)
+const chooseReplay = (replay: Replay, place: ReplayPlace): Chosen =>
+  chosenOf(streamOfLoaded(replay), place)
 
 const STREAM_STEP = 'Could not turn the replay into a stream'
 
 async function chooseTestReplay(replay: TestReplay): Promise<Chosen> {
   const place: ReplayPlace = { source: 'example', replay: replay.id }
   const json = await step(`Could not load the test replay ${replay.id}`, replay.load, place)
-  return step(STREAM_STEP, () => choose(json), place)
+  return step(STREAM_STEP, () => choose(json, place), place)
 }
 
 async function chooseShowdownReplay(
@@ -139,7 +144,7 @@ async function chooseShowdownReplay(
   const place: ReplayPlace = { source: 'link', replay: input }
   const url = await step('Could not read the replay link', () => replayJsonUrl(input), place)
   const json = await step('Could not fetch the replay', () => fetchJson(url), place)
-  return step(STREAM_STEP, () => choose(json), place)
+  return step(STREAM_STEP, () => choose(json, place), place)
 }
 
 /** A file the visitor picked, as the page's file input hands it on: `File` has these three. */
@@ -198,7 +203,7 @@ async function chooseFile(file: SavedFile): Promise<Chosen> {
     replay: kind === undefined ? NO_KIND : KIND_NAMES[kind],
   }
   const replay = await step(read, () => readSavedReplay(text, file.name), place)
-  return step(STREAM_STEP, () => chooseReplay(replay), place)
+  return step(STREAM_STEP, () => chooseReplay(replay, place), place)
 }
 
 /**

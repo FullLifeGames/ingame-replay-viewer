@@ -12,10 +12,10 @@ import {
   type ReplayPlace,
   SessionError,
 } from './replay-choice'
-import { BuildMismatchError, patchBaseRom, RomError } from './rom'
+import { BuildMismatchError, patchBaseRom, readSlotDescription, RomError } from './rom'
 import { BASE, DESCRIPTION, PATCH } from './session-testing'
 import { visitorLine } from './visitor'
-import { buildFailure, RunFailure } from './wasm/failures'
+import { buildFailure, RunFailure, workerFailure } from './wasm/failures'
 
 const REPORT = 'Report it with the link below.'
 const RELOAD = 'Reload the page. If it fails again, report it with the link below.'
@@ -33,6 +33,14 @@ const refusalOf = (work: Promise<unknown>): Promise<unknown> =>
 /** replay-slot.json of another build: the patched ROM's SHA1 is not the one it names. */
 const OTHER_BUILD = { ...DESCRIPTION, romSha1: '0'.repeat(40) }
 
+function slotFileRefusal(): unknown {
+  try {
+    return readSlotDescription({ ...DESCRIPTION, capacity: 'all' })
+  } catch (error: unknown) {
+    return error
+  }
+}
+
 const offline = () => createReplayChoice(() => Promise.reject(new Error('offline')))
 
 describe('visitorLine for the game and the build', () => {
@@ -45,10 +53,22 @@ describe('visitorLine for the game and the build', () => {
     ['CompileError', () => new WebAssembly.CompileError('bad magic')],
     ['worker mismatch', () => new RunFailure({ kind: 'mismatch', line: 'slot header' })],
     ['worker instantiate', () => new RunFailure({ kind: 'instantiate', line: 'link error' })],
+    // S5-11 (a): the site's broken replay-slot.json, as the step that reads it hands it on.
+    ['broken slot file', () => failed('Could not read replay-slot.json', slotFileRefusal())],
   ])('gives a %s the build mismatch line', async (name, make) => {
     const error = await make()
     if (name === 'BuildMismatchError') expect(error).toBeInstanceOf(BuildMismatchError)
     expect(visitorLine(error)).toEqual({ line: MISMATCH, detail: messageOf(error), report: true })
+  })
+
+  it("gives the worker's own error the game stop line (S5-11)", () => {
+    const run = new RunFailure(workerFailure('Uncaught TypeError: x is undefined'))
+    expect(visitorLine(run, EXAMPLE)).toEqual({
+      line: `The game stopped during this replay. ${REPORT}`,
+      detail: 'The worker failed: Uncaught TypeError: x is undefined',
+      report: true,
+      replay: EXAMPLE.replay,
+    })
   })
 
   it.each(['stopped', 'returned'] as const)('gives a run that %s the game stop line', (kind) => {

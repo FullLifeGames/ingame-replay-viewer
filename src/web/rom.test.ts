@@ -111,6 +111,15 @@ describe('readSlotDescription', () => {
     )
   })
 
+  // S5-11 (a): replay-slot.json is the site's file, not the visitor's, so a broken one is a build
+  // mismatch, and the visitor reads that line with the module's words under "Details".
+  it("refuses a broken description as the site's build mismatch", () => {
+    expect(() => readSlotDescription({ ...DESCRIPTION, offset: '0x100' })).toThrow(
+      BuildMismatchError,
+    )
+    expect(() => readSlotDescription(null)).toThrow(BuildMismatchError)
+  })
+
   it('refuses JSON that is not an object', () => {
     expect(() => readSlotDescription([DESCRIPTION])).toThrow(RomError)
     expect(() => readSlotDescription(null)).toThrow('replay-slot.json is not an object')
