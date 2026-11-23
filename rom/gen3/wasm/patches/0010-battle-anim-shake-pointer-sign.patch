@@ -1,0 +1,48 @@
+AnimShakeMonOrBattlePlatforms joins the address of the value it shakes from sprite data[6] and
+data[7], which are s16. data[6] is not cast to u16, so at an address whose bit 15 is set its sign
+fills the upper half and the address becomes 0xFFFFxxxx. The ROM's four targets (gBattle_BG3_X,
+gBattle_BG3_Y, gSpriteCoordOffsetX, gSpriteCoordOffsetY) lie at 0x0200018c to 0x02034e8e, all
+with bit 15 clear, and the normal module reads its own without a trap. The module built with
+-fsanitize=shift (#44) moves its static data, and its first shake read out of bounds at frame 1120
+of hand-made.
+Under IRV_WASM the low half is cast to u16, as battle_anim_mons.c and task.c do it; at every
+address with bit 15 clear the result is the same.
+
+diff --git a/src/battle_anim_normal.c b/src/battle_anim_normal.c
+--- a/src/battle_anim_normal.c
++++ b/src/battle_anim_normal.c
+@@ -963,7 +963,12 @@ static void AnimShakeMonOrBattlePlatforms(struct Sprite *sprite)
+         break;
+     }
+ 
++#ifdef IRV_WASM
++    // data[6] is an s16: at an address whose bit 15 is set, its sign fills the upper half.
++    sprite->sOriginalValue = *(u16 *)((u16)sprite->sShakePtrLo | (sprite->sShakePtrHi << 16));
++#else
+     sprite->sOriginalValue = *(u16 *)(sprite->sShakePtrLo | (sprite->sShakePtrHi << 16));
++#endif
+     sprite->sType = cmd->type;
+     if (sprite->sType == SHAKE_MON_X || sprite->sType == SHAKE_MON_Y)
+         AnimShakeMonOrBattlePlatforms_UpdateCoordOffsetEnabled();
+@@ -983,13 +988,21 @@ static void AnimShakeMonOrBattlePlatforms_Step(struct Sprite *sprite)
+         else
+         {
+             sprite->sShakeTimer = sprite->sShakeDuration;
++#ifdef IRV_WASM
++            *(u16 *)((u16)sprite->sShakePtrLo | (sprite->sShakePtrHi << 16)) += sprite->sShakeVelocity;
++#else
+             *(u16 *)(sprite->sShakePtrLo | (sprite->sShakePtrHi << 16)) += sprite->sShakeVelocity;
++#endif
+             sprite->sShakeVelocity = -sprite->sShakeVelocity;
+         }
+     }
+     else
+     {
++#ifdef IRV_WASM
++        *(u16 *)((u16)sprite->sShakePtrLo | (sprite->sShakePtrHi << 16)) = sprite->sOriginalValue;
++#else
+         *(u16 *)(sprite->sShakePtrLo | (sprite->sShakePtrHi << 16)) = sprite->sOriginalValue;
++#endif
+         if (sprite->sType == SHAKE_MON_X || sprite->sType == SHAKE_MON_Y)
+         {
+             for (enum BattlerId i = 0; i < gBattlersCount; i++)
