@@ -22,7 +22,7 @@ export default defineConfig({
     // The WebAssembly spike page (#35) sits beside the emulator page.
     rolldownOptions: {
       input: {
-        main: resolve(import.meta.dirname, 'src/web/index.html'),
+        emulator: resolve(import.meta.dirname, 'src/web/emulator.html'),
         wasm: resolve(import.meta.dirname, 'src/web/wasm.html'),
       },
     },
