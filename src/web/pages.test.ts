@@ -72,3 +72,20 @@ describe('the replay form and the "Not shown" list', () => {
     })
   }
 })
+
+// #56: the viewer reads a replay from a saved file. Its input sits outside the replay form, so the
+// form reads the same on both pages, and takes any file, as the dump input does: the reader tells
+// the kinds apart by their text. The emulator page keeps the link form and the test replays.
+describe('the replay file input', () => {
+  it('takes any file on the viewer, outside the replay form', () => {
+    const input = /<input id="replay-file"[^>]*>/.exec(page(VIEWER))?.[0]
+    expect(input).toBeDefined()
+    expect(input).toContain('type="file"')
+    expect(input).not.toContain('accept=')
+    expect(REPLAY_PARTS['the replay form']?.exec(page(VIEWER))?.[0]).not.toContain('replay-file')
+  })
+
+  it('is not on the emulator page', () => {
+    expect(page(EMULATOR)).not.toContain('replay-file')
+  })
+})

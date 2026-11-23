@@ -1,6 +1,7 @@
 // The replay controls both pages share (#52): the test replay select, the form "Replay link or ID"
 // and the "Not shown in the game" list under the game. A pick or a Load fills the list before
-// Start; the texts come from status.ts, and the flow's rules from replay-choice.ts.
+// Start; the texts come from status.ts, and the flow's rules from replay-choice.ts. The viewer
+// alone reads a replay file (#56).
 import { messageOf } from './message'
 import type { ReplayChoice, ReplaySummary } from './replay-choice'
 import { FIRST_REPLAY, TEST_REPLAYS } from './replays'
@@ -51,52 +52,81 @@ export function findReplayView(page: string) {
 
 type ReplayView = ReturnType<typeof findReplayView>
 
+/** The replay controls with the page's status line. */
+type StatusView = ReplayView & { readonly status: (line: string) => void }
+
 /** What the controls ask of a page's flow: the session's or the WebAssembly page's picks. */
 type ReplayChooser = Pick<ReplayChoice, 'pickTestReplay' | 'loadReplay'>
 
+type Then = (summary: ReplaySummary) => void
+
 /**
- * Offers the test replays and picks the first, so the list shows at once; a later pick or Load
- * shows its list and asks for Start. A failure becomes the status line and puts the select back
- * on the replay the page holds.
+ * Shows the list of a pick, a Load or a file once it settles, then runs `then`. A failure becomes
+ * the status line and puts the select back on the replay the page holds (#32).
  */
-export function wireReplays(
-  chooser: ReplayChooser,
-  view: ReplayView & { readonly status: (line: string) => void },
+function showPick(
+  view: StatusView,
+  pending: Promise<ReplaySummary | undefined>,
+  then?: Then,
 ): void {
-  type Then = (summary: ReplaySummary) => void
-  const show = (pending: Promise<ReplaySummary | undefined>, then?: Then): void => {
-    pending
-      .then((summary) => {
-        if (summary === undefined) return
-        view.showReplay(summary)
-        then?.(summary)
-        view.keepPick()
-      })
-      .catch((error: unknown) => {
-        view.restorePick()
-        view.status(messageOf(error))
-      })
-  }
-  const picked: Then = (summary) => {
+  pending
+    .then((summary) => {
+      if (summary === undefined) return
+      view.showReplay(summary)
+      then?.(summary)
+      view.keepPick()
+    })
+    .catch((error: unknown) => {
+      view.restorePick()
+      view.status(messageOf(error))
+    })
+}
+
+/** After a Load or a file: no test replay is picked, and the page asks for Start. */
+const loadedFrom =
+  (view: StatusView): Then =>
+  (summary) => {
+    view.testReplay.selectedIndex = -1
     view.status(pickedLine(summary.id))
   }
+
+/**
+ * Offers the test replays and picks the first, so the list shows at once; a later pick or Load
+ * shows its list and asks for Start.
+ */
+export function wireReplays(chooser: ReplayChooser, view: StatusView): void {
   const pick = (id: string, then?: Then): void => {
     const replay = TEST_REPLAYS.find((test) => test.id === id)
-    if (replay !== undefined) show(chooser.pickTestReplay(replay), then)
+    if (replay !== undefined) showPick(view, chooser.pickTestReplay(replay), then)
   }
   view.testReplay.addEventListener('change', () => {
-    pick(view.testReplay.value, picked)
+    pick(view.testReplay.value, (summary) => {
+      view.status(pickedLine(summary.id))
+    })
   })
   view.replayForm.addEventListener('submit', (event) => {
     event.preventDefault()
-    show(chooser.loadReplay(view.replayInput.value), (summary) => {
-      view.testReplay.selectedIndex = -1
-      picked(summary)
-    })
+    showPick(view, chooser.loadReplay(view.replayInput.value), loadedFrom(view))
   })
   view.offer(
     TEST_REPLAYS.map((test) => test.id),
     FIRST_REPLAY,
   )
   pick(FIRST_REPLAY)
+}
+
+/**
+ * Reads the file picked in "Replay file" (#56) as a Load reads a link. The input forgets the file
+ * at once, so the same file picked again fires a change; the file stays in the tab.
+ */
+export function wireReplayFile(
+  chooser: Pick<ReplayChoice, 'loadFile'>,
+  view: StatusView & { readonly replayFile: HTMLInputElement },
+): void {
+  view.replayFile.addEventListener('change', () => {
+    const file = view.replayFile.files?.[0]
+    if (file === undefined) return
+    view.replayFile.value = ''
+    showPick(view, chooser.loadFile(file), loadedFrom(view))
+  })
 }

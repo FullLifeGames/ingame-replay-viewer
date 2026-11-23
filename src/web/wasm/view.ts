@@ -22,6 +22,7 @@ export function findSpikeView() {
   return {
     ...findReplayView(PAGE),
     dump: element('dump', HTMLInputElement),
+    replayFile: element('replay-file', HTMLInputElement),
     start: element('start', HTMLButtonElement),
     restart: element('restart', HTMLButtonElement),
     canvas: element('screen', HTMLCanvasElement),

@@ -15,7 +15,7 @@ import {
   type ReplayChoice,
   SessionError,
 } from '../replay-choice'
-import { wireReplays } from '../replay-view'
+import { wireReplayFile, wireReplays } from '../replay-view'
 import { endedLine, READY_LINE } from '../status'
 import { FRAME_HEIGHT, FRAME_WIDTH } from './frame'
 import { readFrame } from './frame-swap'
@@ -134,6 +134,7 @@ function createSpike(view: SpikeView) {
     },
     pickTestReplay: choice.pickTestReplay,
     loadReplay: choice.loadReplay,
+    loadFile: choice.loadFile,
     play,
     /** The stream that ran last, from its start; the picked replay when none ran yet. */
     restart: () => play(last),
@@ -175,6 +176,7 @@ function wire(spike: Spike, view: SpikeView): void {
     spike.changeSpeed(speed)
   })
   wireReplays(spike, view)
+  wireReplayFile(spike, view)
 }
 
 const view = findSpikeView()
