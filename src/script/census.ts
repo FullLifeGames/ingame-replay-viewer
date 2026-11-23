@@ -122,7 +122,6 @@ export const NAMED_KINDS: Readonly<Partial<Record<Protocol.ArgName, NamedKind>>>
   '|-clearnegativeboost|': noRule("one Pokémon's lowered stat stages reset"),
   '|-transform|': noRule('a Pokémon transforming into another'),
   '|-prepare|': noRule('the charging turn of a two-turn move'),
-  '|-mustrecharge|': noRule('a Pokémon that must recharge on its next turn'),
   '|-singlemove|': noRule("a move whose effect lasts until the user's next move"),
   '|-anim|': noRule("a move's animation without the move's effects"),
   '|-ohko|': noRule('a one-hit knockout'),

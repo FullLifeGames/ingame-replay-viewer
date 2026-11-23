@@ -40,6 +40,8 @@ const REASONS: Partial<Record<Protocol.ArgName, DropReason>> = {
   '|warning|': 'room',
   '|-hint|': 'hint',
   '|debug|': 'debug',
+  // The client keeps the volatile; the next turn's `|cant|…|recharge` says it.
+  '|-mustrecharge|': 'state',
 }
 
 /** A `|player|` line that names its player, as the intro shows it. */
