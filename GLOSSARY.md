@@ -12,6 +12,14 @@ _Avoid_: battle video, recording (those are the games' own format)
 The ordered protocol lines of a replay (`|switch|`, `|move|`, `|-damage|`, …), describing what a spectator saw.
 _Avoid_: input log, replay log
 
+**Replay ID**:
+Showdown's name for a replay, such as `smogtours-gen3ou-994052`. A private replay's ID ends in a password part, and a report leaves that part out.
+_Avoid_: replay name, slug
+
+**Saved replay**:
+A replay the viewer reads from a file: Showdown's downloaded replay, a saved replay page, a battle log, or a replay's JSON file.
+_Avoid_: uploaded replay (the file stays in the browser)
+
 **Simulator**:
 Showdown's battle engine, whose results the battle log records. The only source of truth for every outcome.
 _Avoid_: server, engine
@@ -141,6 +149,26 @@ _Avoid_: WebAssembly page, spike page (its names before it moved to `/`); for a 
 **Emulator page**:
 The page at `/emulator.html`, the fallback. It patches the base ROM with the patch and plays the replay in mGBA.
 _Avoid_: old page, mGBA page
+
+**Example replay**:
+A test replay that both pages offer in their select.
+_Avoid_: demo, sample
+
+**Panel**:
+The lines above the game on the viewer: the two players' names by side and the turn the game has reached.
+_Avoid_: HUD, scoreboard
+
+**Pause**:
+The viewer's Pause and Play button. It holds the running replay at its frame and suspends its sound until Play.
+_Avoid_: stop, freeze
+
+**Visitor line**:
+The line a page shows for a failure: what went wrong and what to do next. The failing code's own words sit under "Details".
+_Avoid_: error message, toast
+
+**Report link**:
+The link under a visitor line that opens the repository's issue form "Replay problem" with the replay and the line filled in.
+_Avoid_: feedback link, bug button
 
 ## Scope
 
