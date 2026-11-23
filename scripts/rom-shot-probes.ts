@@ -95,7 +95,13 @@ export type Check =
   | { probe: 'same'; before: string; after: string; region: Region }
   | { probe: 'blank'; shot: string; region: Region; colour?: number }
   | { probe: 'bar'; shot: string; bar: HpBar; filled: number }
-  | { probe: 'text'; shot: string; region: Region }
+  | {
+      probe: 'text'
+      shot: string
+      region: Region
+      /** The colour the text must stand on: the region's most common colour. */
+      background?: number
+    }
   | { probe: 'balls'; shot: string; cells: readonly Region[]; colour: number; balls: number }
 
 export interface Verdict {
@@ -157,12 +163,18 @@ export function filledBarPixels(frame: Frame, bar: HpBar): number {
   return row.filter((colour) => !bar.empty.includes(colour)).length
 }
 
+/** The window's most common colour, its background, and how many pixels show it. */
+function commonColour(frame: Frame, region: Region): { colour: number; count: number } {
+  const counts = new Map<number, number>()
+  for (const colour of coloursIn(frame, region)) counts.set(colour, (counts.get(colour) ?? 0) + 1)
+  let common = { colour: 0, count: 0 }
+  for (const [colour, count] of counts) if (count > common.count) common = { colour, count }
+  return common
+}
+
 /** The pixels unlike the window's most common colour, which is its background. */
 export function textPixels(frame: Frame, region: Region): number {
-  const counts = new Map<number, number>()
-  const colours = coloursIn(frame, region)
-  for (const colour of colours) counts.set(colour, (counts.get(colour) ?? 0) + 1)
-  return colours.length - Math.max(...counts.values())
+  return region.width * region.height - commonColour(frame, region).count
 }
 
 const hexColour = (colour: number) => `0x${colour.toString(16).padStart(6, '0')}`
@@ -222,6 +234,18 @@ function differsVerdict(
 // A message of the battle text box has far more glyph pixels than this.
 const MIN_TEXT_PIXELS = 20
 
+function textVerdict(frame: Frame, check: Extract<Check, { probe: 'text' }>): Verdict {
+  const count = textPixels(frame, check.region)
+  const detail = `${String(count)} text pixels`
+  if (check.background === undefined) return { pass: count >= MIN_TEXT_PIXELS, detail }
+  const { colour } = commonColour(frame, check.region)
+  if (colour !== check.background) {
+    const found = `the most common colour is ${hexColour(colour)}`
+    return { pass: false, detail: `${found}, not ${hexColour(check.background)}` }
+  }
+  return { pass: count >= MIN_TEXT_PIXELS, detail: `${detail} on ${hexColour(colour)}` }
+}
+
 function verdictOf(check: Check, frame: (name: string) => Frame): Verdict {
   switch (check.probe) {
     case 'differs':
@@ -237,10 +261,8 @@ function verdictOf(check: Check, frame: (name: string) => Frame): Verdict {
       const detail = `${String(filled)} of ${String(check.bar.width)} pixels filled, ${String(check.filled)} expected`
       return { pass: filled === check.filled, detail }
     }
-    case 'text': {
-      const count = textPixels(frame(check.shot), check.region)
-      return { pass: count >= MIN_TEXT_PIXELS, detail: `${String(count)} text pixels` }
-    }
+    case 'text':
+      return textVerdict(frame(check.shot), check)
     case 'balls':
       return ballsVerdict(frame(check.shot), check)
   }
