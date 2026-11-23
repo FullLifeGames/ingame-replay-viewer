@@ -26,19 +26,21 @@ export function ticksPerSecond(speed: Speed): number | undefined {
 export const speedAtEnd = (speed: Speed): Speed => (speed === 'fast' ? '1x' : speed)
 
 /**
- * How far the grant may run ahead of the frame the game has reached, in seconds of play: 6 frames
- * at 1x, 12 at 2x. A page that asks every 16 ms grants 1 or 2 frames at a time, so a game that
- * keeps up never meets this lead, and a few late animation frames still pass. A game that fell
- * further behind (a slow start, a busy machine, a phone that stalls) loses the older debt instead
- * of racing to pay it back; 0.1 s of sound in one burst stays within the sound ring's reserve.
+ * How far the grant may run ahead of the frame the game has reached, beyond the frames owed since
+ * the page's previous ask, in seconds of play: 6 frames at 1x, 12 at 2x. A late animation frame
+ * owes the game every frame since the previous ask, so it costs no play time. A game that fell
+ * behind its previous grant (a slow start, a busy machine, a phone that stalls) loses that unused
+ * debt instead of racing to pay it back; 0.1 s of sound in one burst stays within the sound
+ * ring's reserve.
  */
 const LEAD_SECONDS = 0.1
 
 /**
  * The tick rule: how many frames the game may have played by a moment, in milliseconds. The
- * count runs on from the start or the last change, but never more than LEAD_SECONDS ahead of the
- * game's frame, so a game that falls behind goes on at its pace from where it is. After a pause
- * (resume) the count goes on from what it allowed before the pause.
+ * count runs on from the start or the last change. At each ask the game gets the frames owed
+ * since the previous ask, but never more than those plus LEAD_SECONDS ahead of its frame, so a
+ * game that falls behind goes on at its pace from where it is. After a pause (resume) the count
+ * goes on from what it allowed before the pause.
  */
 export class TickClock {
   private current: Speed
@@ -61,12 +63,14 @@ export class TickClock {
   allowed(now: number, frame: number): number | undefined {
     const rate = ticksPerSecond(this.current)
     if (rate === undefined) return undefined
+    // The count stands at the grant after each ask, so what it adds is owed since the last ask.
     const due = this.base + Math.floor(((now - this.since) * rate) / 1000)
-    const most = frame + Math.ceil(rate * LEAD_SECONDS)
-    // Moving the base drops the debt beyond the lead and keeps the fraction of a frame in hand.
-    if (due > most) this.base -= due - most
-    this.granted = Math.max(this.granted, Math.min(due, most))
-    return this.granted
+    const most = frame + (due - this.granted) + Math.ceil(rate * LEAD_SECONDS)
+    const next = Math.max(this.granted, Math.min(due, most))
+    // Moving the base drops the unused debt and keeps the fraction of a frame in hand.
+    this.base -= due - next
+    this.granted = next
+    return next
   }
 
   /** The page is back in view at `now`: count on from the frames allowed before it was hidden. */
