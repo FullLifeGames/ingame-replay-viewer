@@ -65,6 +65,8 @@ export interface Player {
   readonly header: string
   /** For text: fitted, no-break spaces. */
   readonly text: string
+  /** The Showdown avatar of the player line, which picks the trainer pic (#20). */
+  readonly avatar: string | undefined
 }
 
 export class Context {

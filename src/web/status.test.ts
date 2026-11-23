@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   countText,
   dumpLine,
+  endedLine,
   notShownHeading,
   pickedLine,
   READY_LINE,
@@ -40,6 +41,11 @@ describe('the status lines', () => {
 
   it('writes large byte counts without separators, as the specs and the snapshot do', () => {
     expect(startLine({ id: ID, streamBytes: 30914 })).toContain('30914 bytes')
+  })
+
+  // The game reaches END at the win or tie line; the outro after it belongs to no battle line.
+  it('says the replay played to the end of the battle once the game reached END', () => {
+    expect(endedLine(ID)).toBe(`Played ${ID} to the end of the battle.`)
   })
 
   it('says a Restart plays the replay from the start', () => {

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { streamOf } from '../src/gen3/stream/testing.ts'
+
 import {
   checkShots,
   differingPixels,
@@ -7,8 +9,10 @@ import {
   isBlank,
   readPpm,
   textPixels,
+  SCREEN,
 } from './rom-shot-probes.ts'
 import type { Frame, HpBar, Region } from './rom-shot-probes.ts'
+import { scenesOf } from './rom-shot-scenes.ts'
 
 const WIDTH = 24
 const HEIGHT = 16
@@ -131,6 +135,52 @@ describe('checking the shots of a scene', () => {
     expect(checkShots(check, drawn)).toEqual({ pass: true, detail: '4 pixels differ' })
   })
 
+  describe('a change that must keep a region as the frame before shows it (the outro)', () => {
+    const trainer = { x: 0, y: 0, width: 8, height: 8 }
+    const textBox = { x: 0, y: 8, width: 24, height: 8 }
+    const withText = () => {
+      const frame = paint(frameOf(0x506070), textBox, 0xf8f8f8)
+      return paint(frame, { x: 2, y: 10, width: 5, height: 3 }, 0x484848)
+    }
+    const win = withText()
+    const slidIn = paint(withText(), { x: 1, y: 1, width: 6, height: 6 }, 0xc08040)
+    // A palette fade to black on its way: every colour at half its brightness.
+    const halfFaded = { ...slidIn, rgb: slidIn.rgb.map((channel) => channel >> 1) }
+    const check = {
+      probe: 'differs',
+      before: 'win',
+      after: 'outro',
+      region: trainer,
+      kept: textBox,
+    } as const
+    const verdict = (outro: Frame) =>
+      checkShots(
+        check,
+        new Map([
+          ['win', win],
+          ['outro', outro],
+        ]),
+      )
+
+    it('passes the frame with the trainer slid in and the text box as it was', () => {
+      expect(verdict(slidIn)).toEqual({ pass: true, detail: '36 pixels differ' })
+    })
+
+    it('fails a black frame, which differs in the trainer region too', () => {
+      expect(verdict(frameOf(0x000000))).toEqual({
+        pass: false,
+        detail: '64 pixels differ, but 192 pixels of the kept region differ too',
+      })
+    })
+
+    it('fails a frame on its way to black', () => {
+      expect(verdict(halfFaded)).toEqual({
+        pass: false,
+        detail: '64 pixels differ, but 192 pixels of the kept region differ too',
+      })
+    })
+  })
+
   it('fails a scene whose frames show nothing new', () => {
     expect(checkShots({ probe: 'differs', before: 'before', after: 'before' }, frames)).toEqual({
       pass: false,
@@ -227,5 +277,47 @@ describe('checking the shots of a scene', () => {
       pass: false,
       detail: 'no frame "win": the replay never reached it',
     })
+  })
+})
+
+describe("the outro scene's check on frames of a near win", () => {
+  const [outro] = scenesOf(
+    streamOf([
+      { op: 'intro' },
+      { op: 'print', text: 'Alice won!' },
+      { op: 'end', outcome: 'nearWon' },
+    ]),
+  ).filter(({ name }) => name === 'outro')
+  // The field in green, the win line in the text box, and a sprite where the near trainer stands.
+  const screen = (sprite?: number) => {
+    const rgb = new Uint8Array(240 * 160 * 3)
+    const frame = paint({ width: 240, height: 160, rgb }, SCREEN.screen, 0x40a040)
+    paint(frame, { ...SCREEN.message, width: 40 }, 0xf8f8f8)
+    return sprite === undefined
+      ? frame
+      : paint(frame, { x: 64, y: 56, width: 32, height: 48 }, sprite)
+  }
+  const TRAINER = 0xd06030
+  const check = (after: Frame) =>
+    checkShots(
+      outro?.check ?? { probe: 'blank', shot: 'none', region: SCREEN.screen },
+      new Map([
+        ['intro', screen(TRAINER)],
+        ['win', screen(0x3060d0)],
+        ['outro', after],
+      ]),
+    ).pass
+
+  it('passes a frame that shows the trainer as the intro drew it', () => {
+    expect(check(screen(TRAINER))).toBe(true)
+  })
+
+  it('fails a frame where the mon went back and no trainer came in', () => {
+    expect(check(screen())).toBe(false)
+  })
+
+  it('fails a frame on its way to black', () => {
+    const frame = screen(TRAINER)
+    expect(check({ ...frame, rgb: frame.rgb.map((channel) => channel >> 1) })).toBe(false)
   })
 })

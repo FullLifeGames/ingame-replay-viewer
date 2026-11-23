@@ -128,7 +128,8 @@ async function handMadeBytes(): Promise<number[]> {
 }
 
 // The hand-made battle at 1x through the test hook: the tick rule's pace, the sound's pace into
-// the ring and out to the worklet, its loudness during the battle's music, and END.
+// the ring and out to the worklet, its loudness during the battle's music, and END with its status
+// line, which still holds while the outro plays.
 async function playHandMade(page: Page, bytes: number[]): Promise<void> {
   await page.evaluate(
     async ([id, stream]) =>
@@ -139,6 +140,7 @@ async function playHandMade(page: Page, bytes: number[]): Promise<void> {
   const { paced, written, read, played, rms, sound } = await rate(page, 5_000)
   expect((await frame(page)).colours).toBeGreaterThan(1)
   const end = await finished(page, 240_000)
+  await expect(page.getByRole('status')).toHaveText(`Played ${HAND_MADE} to the end of the battle.`)
   const seconds = (end.finishedMs ?? 0) / 1000
   report({ stream: HAND_MADE, speed: '1x', toEnd: end.finishedAt, seconds, paced })
   const { overruns, skipped, underruns, state } = end.audio

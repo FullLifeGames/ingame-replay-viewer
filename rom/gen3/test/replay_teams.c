@@ -1,7 +1,10 @@
 #include "global.h"
 #include "battle.h"
+#include "data.h"
 #include "link.h"
 #include "pokemon.h"
+#include "sprite.h"
+#include "trainer.h"
 #include "test/replay_test.h"
 #include "constants/global.h"
 #include "constants/pokemon.h"
@@ -9,8 +12,7 @@
 #include "constants/trainers.h"
 
 // The battle's trainers and teams come from the stream's tables (#6): each mon's gender and
-// shininess, and each link player's gender, from which the recorded controllers pick the
-// trainer pic (BRENDAN for male, MAY for female).
+// shininess, and each link player's gender (male for BRENDAN, female for MAY).
 
 static void SetTrainerPics(u32 nearPic, u32 farPic)
 {
@@ -58,7 +60,7 @@ REPLAY_TEST("Other trainer pics give the near side male and the far side female"
 {
     STREAM
     {
-        SetTrainerPics(TRAINER_PIC_HIKER, TRAINER_PIC_NONE);
+        SetTrainerPics(TRAINER_PIC_STEVEN, TRAINER_PIC_NONE);
         ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
     }
     THEN
@@ -66,6 +68,72 @@ REPLAY_TEST("Other trainer pics give the near side male and the far side female"
         EXPECT_EQ(gLinkPlayers[REPLAY_SIDE_NEAR].gender, MALE);
         EXPECT_EQ(gLinkPlayers[REPLAY_SIDE_FAR].gender, FEMALE);
     }
+}
+
+// The recorded controllers draw each side's trainer pic from the stream (#20, patch 0004): the
+// near side its back pic, the far side its front pic. INTRO draws both trainers and the first
+// SEND_OUT (op 1) starts while both still stand; its ball throw frees the sprite.
+
+REPLAY_TEST("A far trainer pic of RED draws Red")
+{
+    STREAM
+    {
+        SetTrainerPics(TRAINER_PIC_BRENDAN, TRAINER_PIC_RED);
+        ReplayStream_Intro();
+        ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    THEN
+    {
+        const struct ReplayTestTrainerSprite *trainer = ReplayTest_TrainerSpriteAtOpStart(1, REPLAY_SIDE_FAR);
+
+        EXPECT(trainer->inUse);
+        EXPECT_EQ(trainer->affineParam, TRAINER_PIC_RED);
+        EXPECT_EQ(trainer->paletteTag, GetTrainerPicTag(TRAINER_PIC_RED, TRUE));
+    }
+}
+
+REPLAY_TEST("A near trainer pic of STEVEN draws Steven's back pic")
+{
+    STREAM
+    {
+        SetTrainerPics(TRAINER_PIC_STEVEN, TRAINER_PIC_MAY);
+        ReplayStream_Intro();
+        ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    THEN
+    {
+        const struct ReplayTestTrainerSprite *trainer = ReplayTest_TrainerSpriteAtOpStart(1, REPLAY_SIDE_NEAR);
+
+        EXPECT(trainer->inUse);
+        EXPECT(trainer->images == GetTrainerBackPicImage(TRAINER_PIC_STEVEN));
+        EXPECT_EQ(trainer->paletteTag, GetTrainerPicTag(TRAINER_PIC_STEVEN, FALSE));
+    }
+}
+
+REPLAY_TEST("Replay_GetTrainerPic gives each side's pic while the replay is loaded")
+{
+    STREAM
+    {
+        SetTrainerPics(TRAINER_PIC_STEVEN, TRAINER_PIC_RED);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    THEN
+    {
+        EXPECT_EQ(Replay_GetTrainerPic(GetBattlerAtPosition(B_POSITION_PLAYER_LEFT), TRAINER_PIC_HIKER), TRAINER_PIC_STEVEN);
+        EXPECT_EQ(Replay_GetTrainerPic(GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT), TRAINER_PIC_HIKER), TRAINER_PIC_RED);
+    }
+}
+
+// Every other battle, the expansion's own tests among them, keeps the pic its controller picks.
+TEST("Replay: Replay_GetTrainerPic gives the fallback with no replay loaded")
+{
+    Replay_Unload();
+    EXPECT_EQ(Replay_GetTrainerPic(B_BATTLER_0, TRAINER_PIC_HIKER), TRAINER_PIC_HIKER);
+    EXPECT_EQ(Replay_GetTrainerPic(B_BATTLER_1, TRAINER_PIC_LEAF), TRAINER_PIC_LEAF);
 }
 
 // A team size above the revealed mons gives the side unrevealed team members (#21): the intro's

@@ -16,6 +16,7 @@ import {
 import type { CompileCommand, WasmPaths } from './wasm-compile.ts'
 import { loadWasmConfig } from './wasm-config.ts'
 import type { WasmConfig } from './wasm-config.ts'
+import { LAYER_DIR } from './wasm-layer.ts'
 
 const paths: WasmPaths = {
   tree: '/repo/.cache/rom/expansion',
@@ -218,6 +219,11 @@ describe('the glue commands', () => {
   it('reach the platform headers after the tree include, as the platform files do', () => {
     const { preprocess } = only(glueCommands(paths, glue))
     expect(pairs(preprocess, '-iquote').at(-1)).toBe(`${paths.platform}/include`)
+  })
+
+  it("reach our platform layer's headers before the borrowed ones", () => {
+    const quoted = pairs(only(glueCommands(paths, glue)).preprocess, '-iquote')
+    expect(quoted.indexOf(LAYER_DIR)).toBe(quoted.indexOf(`${paths.platform}/include`) - 1)
   })
 })
 

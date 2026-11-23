@@ -36,6 +36,7 @@ struct ReplayState
     u8 step;
     u8 lastOp; // the op that ended last, REPLAY_OP_END (0) before the first
     u8 end; // enum ReplayEnd
+    u8 sidesOut; // a bit for each REPLAY_SIDE_* whose battler is out
     bool8 loaded;
 };
 
@@ -181,6 +182,24 @@ static bool32 Replay_WaitsForKOAnimation(u32 op, u32 step)
     return op != REPLAY_OP_PRINT || sReplay.lastOp != REPLAY_OP_FAINT;
 }
 
+// Which sides have their battler out, for the outro. The order rules (include/replay_stream.h),
+// which Replay_Load checked, let SEND_OUT and SWITCH_IN put a side's battler out and WITHDRAW and
+// FAINT take it off; the side is the first operand of all four.
+static void KeepSidesOut(const volatile u8 *instruction)
+{
+    switch (instruction[0])
+    {
+    case REPLAY_OP_SEND_OUT:
+    case REPLAY_OP_SWITCH_IN:
+        sReplay.sidesOut |= 1u << instruction[REPLAY_INSTRUCTION_HEADER_SIZE];
+        break;
+    case REPLAY_OP_WITHDRAW:
+    case REPLAY_OP_FAINT:
+        sReplay.sidesOut &= ~(1u << instruction[REPLAY_INSTRUCTION_HEADER_SIZE]);
+        break;
+    }
+}
+
 static void Replay_RunBattle(void)
 {
     const volatile u8 *instruction;
@@ -205,12 +224,13 @@ static void Replay_RunBattle(void)
         return;
     }
     gReplayProgress.done++;
+    KeepSidesOut(instruction);
     sReplay.lastOp = instruction[0];
     sReplay.step = 0;
     sReplay.at += REPLAY_INSTRUCTION_HEADER_SIZE + instruction[1];
 }
 
-// After END: the battle stays on screen and nothing runs in its main loop.
+// After the outro: the screen stays black and nothing runs in the battle's main loop.
 static void Replay_Hold(void)
 {
 }
@@ -229,8 +249,8 @@ static void Replay_Exit(void)
     SetMainCallback2(CB2_QuitRecordedBattle);
 }
 
-// END: gBattleOutcome, then hold the scene or, on the next frame, once END counts as done, leave
-// the battle.
+// END: gBattleOutcome, then, from the next frame, once END counts as done, the outro
+// (replay_outro.c) or, in most tests, the way out of the battle.
 static bool32 Op_End(const volatile u8 *operands, u32 step)
 {
     gBattleOutcome = sOutcomes[operands[0]];
@@ -238,8 +258,16 @@ static bool32 Op_End(const volatile u8 *operands, u32 step)
     if (sReplay.end == REPLAY_EXIT_AT_END)
         gBattleMainFunc = Replay_Exit;
     else
-        gBattleMainFunc = Replay_Hold;
+        Replay_StartOutro(operands[0], sReplay.sidesOut);
     return TRUE;
+}
+
+void Replay_EndOutro(void)
+{
+    if (sReplay.end == REPLAY_OUTRO_THEN_EXIT)
+        gBattleMainFunc = Replay_Exit;
+    else
+        gBattleMainFunc = Replay_Hold;
 }
 
 // TURN: the number of the turn that starts. No move of the last turn is still in action, as
@@ -304,12 +332,25 @@ bool32 Replay_PrintText(const volatile u8 *text, u32 frames)
     return TRUE;
 }
 
+// The instruction after the current one. The stream ends with END, so every other op has one.
+static const volatile u8 *GetNextInstruction(void)
+{
+    const volatile u8 *instruction = sReplay.instructions + sReplay.at;
+
+    return instruction + REPLAY_INSTRUCTION_HEADER_SIZE + instruction[1];
+}
+
 // PRINT: the backend's finished text. The op ends once the printer is done and B_WAIT_TIME_LONG
-// frames have passed, as after a battle script's waitmessage.
+// frames have passed, as after a battle script's waitmessage. The PRINT right before END, the end
+// line, may start the victory music first.
 static bool32 Op_Print(const volatile u8 *operands, u32 step)
 {
+    const volatile u8 *next = GetNextInstruction();
+
     if (step != 0)
         return TRUE;
+    if (next[0] == REPLAY_OP_END)
+        Replay_StartVictoryMusic(next[REPLAY_INSTRUCTION_HEADER_SIZE]);
     return !Replay_PrintText(operands, B_WAIT_TIME_LONG);
 }
 

@@ -10,6 +10,16 @@
 // below can read them. The instructions after the tables are byte-packed: read them byte by byte.
 // The interpreter refuses a version it does not know, an unknown op, and an op with a fixed size
 // whose size byte differs.
+//
+// The order rules (#18), which the interpreter's validator and the decoder hold alike:
+// 1. INTRO comes at most once, as the first instruction.
+// 2. SEND_OUT needs INTRO before it and a side that has had no battler out yet.
+// 3. SWITCH_IN needs a side whose battler left by WITHDRAW or FAINT.
+// 4. Each side operand of the ops in REPLAY_ORDER_ON_FIELD_OPS names a side with a battler out;
+//    WITHDRAW and FAINT take it off. An ANIM of REPLAY_ORDER_FREE_ANIMS is free: the game plays
+//    the weather animations with no battler out, after a double KO.
+// 5. Every other op is free: PRINT, TURN, WEATHER, END, FLUSH_TEXT_BOX, and STATUS and ITEM,
+//    which name a party slot (Heal Bell reaches the whole party).
 
 #define REPLAY_STREAM_VERSION        2
 #define REPLAY_STREAM_HEADER_SIZE    0x10
@@ -173,6 +183,13 @@
 #define REPLAY_ANIM_STATUS_PRZ          15
 #define REPLAY_ANIM_STATUS_FRZ          16
 #define REPLAY_ANIM_SIMPLE_HEAL         17
+
+// The masks of the order rules, a bit per REPLAY_OP_* and REPLAY_ANIM_* number:
+// WITHDRAW, MOVE, HIT, HP, FAINT, STAT, ANIM, VOLATILE, ABILITY, ITEM_POP_UP and TRAP_TURN, whose
+// side operands name a side with a battler out, and the four weather animations, which need none.
+// replay_stream_check.c asserts each against the names.
+#define REPLAY_ORDER_ON_FIELD_OPS 0xDB7A0
+#define REPLAY_ORDER_FREE_ANIMS   0xF0
 
 struct ReplayStreamHeader
 {

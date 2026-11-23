@@ -12,7 +12,7 @@ Decisions from the design session on 2026-11-20 that are not ADRs, plus the road
 - **Replay input (v1)**: a replay URL or ID from replay.pokemonshowdown.com, or an uploaded file (Showdown's downloaded replay HTML, or a raw log). The browser fetches the replay JSON directly; no proxy is needed.
 - **Viewer controls (v1)**: play/pause, speed (1×/2×/fast), restart, and a small panel with player names and the turn number. Player 1 is always the near side.
 - **Presentation (v1)**:
-  - trainer sprites picked from the Showdown avatar, falling back to a generic trainer class
+  - trainer sprites picked from the Showdown avatar, falling back to Brendan on the near side and May on the far side; the near side shows an avatar only if the game has its back sprite
   - the intro with the Poké Ball team display, in the expansion's wording ("You are challenged by Bob!")
   - trainer battle music
   - an outro with the winner
@@ -57,6 +57,7 @@ Order after milestone 2 (user, 22.11.2026): milestone 3 starts first, and Gen 5 
 
 2. **Gen 3 web tool v1.** Public on fulllifegames.com/Tools/, with replay URL and upload, the v1 controls and presentation, and Gen 1–3 singles formats.
    - Ships the WebAssembly build, with the emulator page as the fallback until #43 is done. Milestone 2 closes every open Gen 3 issue before the work moves on (user, 22.11.2026).
+   - Download size (#17, user 22.11.2026): the host serves the module patch as it is, compressed with brotli. `scripts/patch-sizes.ts` measured it on 22.11.2026 on the module of wave 4's stage 3 (stream version 2, the first part of our platform layer), with Node's zlib (gzip at level 9, brotli at quality 11): the module patch is 20,977,267 bytes raw, 15,605,329 with gzip and 14,159,223 with brotli. With Emscripten's glue (2,803 bytes with brotli), a visitor to the WebAssembly page fetches 14,162,026 bytes of game files. The brotli figures hold for files the host compresses ahead of time; a host that compresses on the fly at a lower quality sends more. The ROM patch measures 18,391,067, 15,762,689 and 14,487,718. By ELF symbol size the ROM holds 26.82 MB, and the cries (1.62 MB) and Pokémon graphics (1.15 MB) of species up to 386 hold 2.77 MB of it. The census gave only these two classes a retail share: it did not count songs, trainer graphics, battle animation graphics or tilesets, and it counts symbol bytes, not the patch's literal bytes, so the patch may copy some of them from the dump. The 2.77 MB is the species assets' share, not a bound on what per-asset extraction could save. Extracting the species assets would save less than their 2.77 MB: the build draws Gen 1–3 Pokémon in the Gen 4/5 style, which retail Emerald lacks, and nobody has checked whether the expansion's cries match retail's. The user parked extraction until visitors report slow loading after the deploy.
    - Open: how it is deployed to vserver, including the COOP/COEP headers the page needs for `SharedArrayBuffer`.
 3. **Newer formats on Gen 3.** Gen 4–9 singles, including Tera, Mega Evolution, Z-Moves and Dynamax.
    - Open: which formats besides Gen 9 OU come first.

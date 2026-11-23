@@ -1,0 +1,48 @@
+The recorded controllers draw each side's trainer pic from the replay (#20):
+RecordedPlayerHandleDrawTrainerPic and RecordedOpponentHandleDrawTrainerPic ask
+Replay_GetTrainerPic (src/replay_setup.c), which gives back their own pick unless a replay is
+loaded, so every other battle, the expansion's own tests among them, keeps its pic. The near
+side's yPos stays the one computed for that pick: every back pic has size 8 (TRAINER_BACK_PIC in
+src/data/graphics/trainers.h). The intro ball throw needs no hunk: the throw animates the sprite
+the draw made, and BtlController_HandleIntroTrainerBallThrow ignores its palette arguments.
+
+diff --git a/src/battle_controller_recorded_opponent.c b/src/battle_controller_recorded_opponent.c
+index 252bc9a8..66962f42 100644
+--- a/src/battle_controller_recorded_opponent.c
++++ b/src/battle_controller_recorded_opponent.c
+@@ -20,6 +20,7 @@
+ #include "pokeball.h"
+ #include "pokemon.h"
+ #include "recorded_battle.h"
++#include "replay_interpreter.h"
+ #include "reshow_battle_screen.h"
+ #include "sound.h"
+ #include "string_util.h"
+@@ -322,6 +323,7 @@ static void RecordedOpponentHandleDrawTrainerPic(enum BattlerId battler)
+         }
+     }
+ 
++    trainerPicId = Replay_GetTrainerPic(battler, trainerPicId);
+     BtlController_HandleDrawTrainerPic(battler, trainerPicId, TRUE, xPos, 40, -1);
+ }
+ 
+diff --git a/src/battle_controller_recorded_player.c b/src/battle_controller_recorded_player.c
+index 3ec0d6aa..3e48850a 100644
+--- a/src/battle_controller_recorded_player.c
++++ b/src/battle_controller_recorded_player.c
+@@ -16,6 +16,7 @@
+ #include "pokeball.h"
+ #include "pokemon.h"
+ #include "recorded_battle.h"
++#include "replay_interpreter.h"
+ #include "reshow_battle_screen.h"
+ #include "sound.h"
+ #include "string_util.h"
+@@ -322,6 +323,7 @@ static void RecordedPlayerHandleDrawTrainerPic(enum BattlerId battler)
+         }
+     }
+ 
++    trainerPicId = Replay_GetTrainerPic(battler, trainerPicId);
+     if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER && !TESTING)
+         isFrontPic = TRUE;
+     else

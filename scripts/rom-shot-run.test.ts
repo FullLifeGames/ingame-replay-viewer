@@ -9,6 +9,9 @@ import {
   progressAddress,
   readErrorNames,
   readToolOutput,
+  TOOL_CLOCK,
+  TOOL_SOURCES,
+  toolArgs,
   toolBuildArgs,
 } from './rom-shot-run.ts'
 import { ROM_DIR } from './rom-config.ts'
@@ -57,8 +60,14 @@ describe('the address of gReplayProgress', () => {
 })
 
 describe('the shot tool', () => {
-  it('is built from its one C file and our headers against libmgba', () => {
-    expect(toolBuildArgs('/src/replay_shot.c', '/out/replay_shot')).toEqual([
+  it('is built from its C files and our headers against libmgba', () => {
+    expect(TOOL_SOURCES.map((source) => source.slice(ROM_DIR.length + 1))).toEqual([
+      'shot/replay_shot.c',
+      'shot/replay_state.c',
+    ])
+    expect(
+      toolBuildArgs(['/src/replay_shot.c', '/src/replay_state.c'], '/out/replay_shot'),
+    ).toEqual([
       '-std=gnu11',
       '-O2',
       '-Wall',
@@ -69,8 +78,35 @@ describe('the shot tool', () => {
       '-o',
       '/out/replay_shot',
       '/src/replay_shot.c',
+      '/src/replay_state.c',
       '-lmgba',
     ])
+  })
+
+  const clock = ['--clock', String(TOOL_CLOCK)]
+
+  it('takes the ROM, the address in hex, the frame folder, the clock and the shots', () => {
+    const run = { tool: 't', rom: 'r.gba', address: 0x2024abc, frameDir: 'f', shots: ['a:1:2'] }
+    expect(toolArgs(run)).toEqual(['r.gba', '0x2024abc', 'f', ...clock, 'a:1:2'])
+  })
+
+  it('asks for a video state every N frames before the shots, for the mGBA oracle', () => {
+    const run = { tool: 't', rom: 'r.gba', address: 16, frameDir: 'f', shots: [], stateEvery: 60 }
+    expect(toolArgs(run)).toEqual(['r.gba', '0x10', 'f', ...clock, '--state-every', '60'])
+  })
+
+  it("fixes mGBA's cartridge clock at the module's time, so that two runs play alike", () => {
+    const stubs = readFileSync(join(ROM_DIR, 'wasm', 'src', 'irv_wasm_stubs.c'), 'utf8')
+    const fixed = /sFixedTime =\s*\{([^}]*)\}/.exec(stubs)?.[1] ?? ''
+    const bcd = (field: string) => {
+      const digits = new RegExp(`\\.${field} = 0x(\\d\\d)`).exec(fixed)?.[1]
+      if (digits === undefined) throw new Error(`sFixedTime has no ${field}`)
+      return Number(digits)
+    }
+    const fields = ['year', 'month', 'day', 'hour', 'minute', 'second'].map(bcd)
+    const [year = 0, month = 1, day = 1, hour = 0, minute = 0, second = 0] = fields
+    const module = Date.UTC(2000 + year, month - 1, day, hour, minute, second) / 1000
+    expect(TOOL_CLOCK).toBe(module)
   })
 
   it('reports shots and a final status, one JSON object per line', () => {

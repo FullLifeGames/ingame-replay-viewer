@@ -3,10 +3,13 @@
 // ROM's replay slot, runs it and checks the frames. It is a host program: the build never copies
 // it into the expansion's tree.
 //
-//     replay_shot <rom> <progress address> <frame dir> [<name>:<done>:<frames> ...]
+//     replay_shot <rom> <progress address> <frame dir> [--clock <seconds>] [--state-every <n>]
+//                 [<name>:<done>:<frames> ...]
 //
 // It loads the ROM with no save file and no BIOS file, so mGBA keeps the save in memory and runs
-// its own BIOS, and runs frames as fast as it can. After each frame it reads gReplayProgress
+// its own BIOS, and runs frames as fast as it can. With --clock the cartridge's real-time clock
+// stands still at that many seconds since 1970, read in UTC; else mGBA follows the host's clock,
+// and two runs of one ROM part where the game reads the clock (#43, step B4: at frame 10). After each frame it reads gReplayProgress
 // (rom/gen3/include/replay_interpreter.h) at the given address. A shot <name>:<done>:<frames> is
 // taken <frames> frames after the first frame on which the interpreter plays and `done` equals
 // <done>, and goes to
@@ -16,6 +19,15 @@
 // no button, so an op that waits for one stalls. The frame it stops on goes to
 // <frame dir>/final.ppm.
 //
+// With --state-every <n> (the mGBA oracle of the WebAssembly build, #43) it also writes, on each
+// frame that is a multiple of n, the video state as <frame dir>/state-<frame>.bin
+// (replay_state.c) and the frame as frame-<frame>.ppm, and the frame after it as
+// frame-<frame + 1>.ppm, so the oracle can tell which frame a state belongs to. The probe of
+// #43's step B3 found that a state belongs to the frame of its own number: runFrame returns
+// after line 159 and before the game's VBlank handler runs (42 of 48 states of hand-made and 585
+// of 660 of 994052 equal their own frame, 21 and 334 the next one, and DMA0's internal source
+// stands 160 units past the SAD the game wrote).
+//
 // Output on stdout, one JSON object per line: {"shot":...} for each shot, then {"status":...}.
 // Exit code 0 when the run reached a status, 2 on a usage or emulator error.
 
@@ -23,6 +35,7 @@
 #include <mgba/core/core.h>
 #include <mgba/core/interface.h>
 #include <mgba/core/log.h>
+#include <mgba/core/serialize.h>
 
 #include <errno.h>
 #include <stdarg.h>
@@ -31,10 +44,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 // The offsets of struct ReplayProgress, which the ROM checks against the struct. scripts/rom-shot.ts
 // checks the symbol's size against REPLAY_PROGRESS_SIZE before it runs this tool.
 #include "replay_progress.h"
+#include "replay_state.h"
 
 #define STALL_FRAMES 3600
 #define ERROR_FRAMES 30
@@ -72,6 +87,46 @@ struct Run
     const char *frameDir;
     struct Shot shots[MAX_SHOTS];
     int shotCount;
+    unsigned long stateEvery;
+    bool fixedClock;
+    time_t clock;
+};
+
+// The cartridge clock of --clock: mGBA asks the core's RTC source for the time, and this one
+// answers the same instant every time. It keeps nothing for a save state.
+struct FixedClock
+{
+    struct mRTCSource d;
+    time_t time;
+};
+
+static void SampleClock(struct mRTCSource *source)
+{
+    (void)source;
+}
+
+static time_t ClockTime(struct mRTCSource *source)
+{
+    return ((struct FixedClock *)source)->time;
+}
+
+static void SaveClock(struct mRTCSource *source, struct mStateExtdataItem *item)
+{
+    (void)source;
+    item->size = 0;
+    item->data = NULL;
+    item->clean = NULL;
+}
+
+static bool LoadClock(struct mRTCSource *source, const struct mStateExtdataItem *item)
+{
+    (void)source;
+    (void)item;
+    return true;
+}
+
+static struct FixedClock sClock = {
+    .d = { .sample = SampleClock, .unixTime = ClockTime, .serialize = SaveClock, .deserialize = LoadClock },
 };
 
 // mGBA logs every DMA and BIOS call by default; only its errors reach stderr here.
@@ -199,6 +254,19 @@ static void DropAudio(struct mCore *core)
     blip_clear(core->getAudioChannel(core, 1));
 }
 
+// The oracle's dump: the state and the frame on each multiple of stateEvery, and the frame after.
+static bool DumpState(struct Run *run, unsigned long frame)
+{
+    char name[MAX_NAME];
+
+    if (run->stateEvery == 0 || (run->stateEvery > 1 && frame % run->stateEvery > 1))
+        return true;
+    if (frame % run->stateEvery == 0 && !WriteVideoState(run->core, run->frameDir, frame))
+        return false;
+    snprintf(name, sizeof(name), "frame-%lu", frame);
+    return WriteFrame(run, name);
+}
+
 static const char *Play(struct Run *run, unsigned long *frame, struct Progress *progress)
 {
     unsigned lastDone = 0;
@@ -208,6 +276,8 @@ static const char *Play(struct Run *run, unsigned long *frame, struct Progress *
     {
         run->core->runFrame(run->core);
         DropAudio(run->core);
+        if (!DumpState(run, *frame))
+            return NULL;
         *progress = ReadProgress(run);
         if (!TakeShots(run, *progress, *frame))
             return NULL;
@@ -227,21 +297,50 @@ static const char *Play(struct Run *run, unsigned long *frame, struct Progress *
     }
 }
 
+// --clock <seconds> and --state-every <n>, each with its number.
+static bool ParseOption(struct Run *run, const char *name, const char *value)
+{
+    char *end;
+    unsigned long long number;
+
+    errno = 0;
+    number = strtoull(value, &end, 10);
+    if (errno != 0 || *end != '\0' || end == value)
+        return false;
+    if (strcmp(name, "--clock") == 0)
+    {
+        run->fixedClock = true;
+        run->clock = (time_t)number;
+        return true;
+    }
+    if (strcmp(name, "--state-every") == 0 && number != 0)
+    {
+        run->stateEvery = (unsigned long)number;
+        return true;
+    }
+    return false;
+}
+
 static int ParseArgs(struct Run *run, int argc, char **argv)
 {
     char *end;
     int i;
 
     if (argc < 4)
-        return Fail("usage: replay_shot <rom> <progress address> <frame dir> [<name>:<done>:<frames> ...]", NULL);
+        return Fail("usage: replay_shot <rom> <progress address> <frame dir> [--clock <seconds>] [--state-every <n>] [<name>:<done>:<frames> ...]", NULL);
     errno = 0;
     run->progressAddress = (uint32_t)strtoul(argv[2], &end, 0);
     if (errno != 0 || *end != '\0' || run->progressAddress == 0)
         return Fail("not an address", argv[2]);
     run->frameDir = argv[3];
-    if (argc - 4 > MAX_SHOTS)
+    for (i = 4; i < argc && strncmp(argv[i], "--", 2) == 0; i += 2)
+    {
+        if (i + 1 == argc || !ParseOption(run, argv[i], argv[i + 1]))
+            return Fail("not an option with its number", argv[i]);
+    }
+    if (argc - i > MAX_SHOTS)
         return Fail("too many shots", NULL);
-    for (i = 4; i < argc; i++)
+    for (; i < argc; i++)
     {
         if (!ParseShot(argv[i], &run->shots[run->shotCount++]))
             return Fail("not a shot <name>:<done>:<frames>", argv[i]);
@@ -261,6 +360,14 @@ static int StartCore(struct Run *run, const char *romPath)
     if (!core->init(core))
         return Fail("the core does not start", NULL);
     mCoreInitConfig(core, NULL);
+    if (run->fixedClock)
+    {
+        // mGBA may turn the time into a date in local time; UTC keeps the date the same on every host.
+        setenv("TZ", "UTC", 1);
+        tzset();
+        sClock.time = run->clock;
+        mCoreSetRTC(core, &sClock.d);
+    }
     core->desiredVideoDimensions(core, &run->width, &run->height);
     run->pixels = calloc((size_t)run->width * run->height, BYTES_PER_PIXEL);
     if (!run->pixels)

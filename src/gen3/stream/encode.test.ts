@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { Gen3Error } from '../errors'
 import counts from '../tables/counts.json'
+import trainerPics from '../tables/trainer-pics.json'
 import { encodeInstruction, encodeStream } from './encode'
 import { fieldSize } from './fields'
 import { MON, MON_OFFSET, OP_SIZE, STREAM, TRAINER, TRAINER_OFFSET } from './format'
@@ -12,7 +13,7 @@ import {
   type StreamMon,
   TRAINER_FIELDS,
 } from './instructions'
-import { DUGTRIO, streamOf } from './testing'
+import { DUGTRIO, streamOf, streamWithLeads } from './testing'
 
 const END: Instruction = { op: 'end', outcome: 'nearWon' }
 
@@ -55,6 +56,44 @@ describe('encodeStream', () => {
     expect(() => encodeStream(streamOf([]))).toThrow(Gen3Error)
     expect(() => encodeStream(streamOf([END, { op: 'intro' }]))).toThrow(/END/)
     expect(() => encodeStream(streamOf([END, END]))).toThrow(/END/)
+  })
+
+  it('refuses a MOVE before any SEND_OUT, as the ROM does (#18)', () => {
+    const move: Instruction = { op: 'move', user: 'near', target: 'far', move: 1 }
+    expect(() => encodeStream(streamOf([{ op: 'intro' }, move, END]))).toThrow(
+      'move at 1 names the near side, which has no battler out',
+    )
+    expect(() => encodeStream(streamWithLeads([move, END]))).not.toThrow()
+  })
+
+  it('refuses a near trainer pic without a back pic, as the ROM will (#20)', () => {
+    const stream = streamOf([END])
+    const near = (trainerPic: number) => ({
+      ...stream,
+      trainers: { ...stream.trainers, near: { ...stream.trainers.near, trainerPic } },
+    })
+    expect(() => encodeStream(near(trainerPics.TRAINER_PIC_LEADER_NORMAN))).toThrow(
+      `the near trainer pic ${String(trainerPics.TRAINER_PIC_LEADER_NORMAN)} has no back pic`,
+    )
+    expect(() => encodeStream(near(trainerPics.TRAINER_PIC_RED))).not.toThrow()
+    const far = (trainerPic: number) => ({
+      ...stream,
+      trainers: { ...stream.trainers, far: { ...stream.trainers.far, trainerPic } },
+    })
+    expect(() => encodeStream(far(trainerPics.TRAINER_PIC_LEADER_NORMAN))).not.toThrow()
+  })
+
+  it('refuses a far trainer pic without a front pic, as the ROM will (S3-2)', () => {
+    const stream = streamOf([END])
+    const far = (trainerPic: number) => ({
+      ...stream,
+      trainers: { ...stream.trainers, far: { ...stream.trainers.far, trainerPic } },
+    })
+    expect(() => encodeStream(far(trainerPics.TRAINER_PIC_POKEDUDE))).toThrow(
+      `the far trainer pic ${String(trainerPics.TRAINER_PIC_POKEDUDE)} has no front pic`,
+    )
+    expect(() => encodeStream(far(trainerPics.TRAINER_PIC_OLD_MAN))).toThrow(/has no front pic/)
+    expect(() => encodeStream(far(trainerPics.TRAINER_PIC_STEVEN))).not.toThrow()
   })
 
   it('refuses a party that is not six slots', () => {

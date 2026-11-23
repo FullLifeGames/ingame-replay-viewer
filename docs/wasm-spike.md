@@ -10,20 +10,23 @@ Two things stand between it and a public build. The borrowed platform layer has 
 
 ## What the build is
 
-- Emscripten 7.0.0 (pinned in `rom/gen3/wasm/wasm.json`, installed under `~/tools/emsdk`) compiles 390 C files: 384 tree files, our replay files among them and six from patched copies, plus the six borrowed platform files. All 390 compile at `-O2`. The census before any fix had 373 of 395 passing. It applies no overlay patch, so it still counts the files that one fixes, `random.c` among them, as failing.
+- Emscripten 7.0.0 (pinned in `rom/gen3/wasm/wasm.json`, installed under `~/tools/emsdk`) compiles 388 C files: 385 tree files, our replay files among them and six from patched copies, plus the three borrowed sound files. All 388 compile at `-O2`, and so do the 18 C files of our glue and our platform layer. In wave 3 the build compiled six borrowed files; #43 took out three. The census before any fix had 373 of 395 passing. It applies no overlay patch, so it still counts the files that one fixes, `random.c` among them, as failing.
 - The 544 data objects that the ROM build assembles with ARM `as` (battle scripts, animation scripts, event scripts, songs) go through a converter (`scripts/wasm-convert.ts`). It reads each ARM ELF object and writes LLVM's WebAssembly assembly with the same bytes and relocations. All 544 assemble.
 - The GBA's addresses map one to one into linear memory: EWRAM at 0x02000000, IO at 0x04000000, VRAM at 0x06000000, static data from 0x08000000, where the ROM would sit. The memory is a fixed 256 MB.
-- The platform layer, borrowed from pokeemerald-multiplatform at db1cab3d, stands in for the hardware: the BIOS calls (`bios.c`), DMA (`dma.c`), a scanline renderer (`gba_easy_draw.c`) and the sound (`sound_mixer.c`, `music_player.c`, `cgb_audio.c`). `npm run wasm:build` fetches it into `.cache/wasm/platform/`; git never sees it.
-- Our glue (`rom/gen3/wasm/src/`, six files, 719 lines) blocks in `VBlankIntrWait`, draws the frame, raises the interrupts, and hands each frame and its sound to JavaScript. It also stubs flash, the clock, the link cable and multiboot, and its compile checks the offset and size of every field that the port's sound structs share with the expansion's.
+- Our platform layer (`rom/gen3/wasm/layer/`, #43: 11 C files and 8 headers) stands in for the GBA's hardware. It makes the BIOS calls, runs DMA and the interrupts, drives the display line by line and draws each line: text and affine backgrounds, sprites, windows, blending and mosaic. We wrote it from GBATEK and the game's own sources. It includes no header of the expansion, so a native harness (`layer/host/`) runs the same files in the specs, in CI too.
+- Three sound files stay borrowed from pokeemerald-multiplatform at db1cab3d: `sound_mixer.c`, `music_player.c` and `cgb_audio.c`, with six headers. `npm run wasm:build` fetches them into `.cache/wasm/platform/`; git never sees them. `bios.c`, `dma.c` and the renderer `gba_easy_draw.c` left the build in #43's first part, and the sound files go in its second.
+- Our glue (`rom/gen3/wasm/src/`, seven files, 769 lines) blocks in `VBlankIntrWait`, has our layer run the frame, passes each interrupt to the game's handler, and hands each frame and its sound to JavaScript. It also stubs flash, the clock, the link cable and multiboot. Its compile checks the offset and size of every field that the port's sound structs and our layer's structs share with the expansion's.
 - The page (`src/web/wasm.html`) rebuilds the module from your dump with a BPS patch, the way the emulator page rebuilds the ROM. A worker runs the game, the page allows its frames at 1x, 2x or fast, and an audio worklet plays its sound.
 
 ## What works
 
 ### Graphics
 
-All 13 scenes of `rom:shots` pass in the Node harness (`npm run wasm:run`) on hand-made and on 994052, with the same probes and thresholds as on mGBA, and both refusals show their colour. After the two drawing fixes below, the scene frames of `send-outs`, `level`, `first-hp`, `first-status` and most others match mGBA's to the pixel. The frames that still differ were taken mid-animation, where the two engines stand a few frames apart (see Timing).
+All 13 scenes of `rom:shots` pass in the Node harness (`npm run wasm:run`) on hand-made and on 994052, with the same probes and thresholds as on mGBA, and both refusals show their colour.
 
-The renderer covers text and affine backgrounds, sprites, windows, blending, brightness and mosaic. No scene compares mosaic or affine sprites with mGBA.
+Our renderer (#43) draws every frame. `npm run wasm:diff` counts the pixels where a scene frame of the module differs from mGBA's. With our renderer and the two fixes to the game's drawing code below (`bg.c`, `text.c`), most scene frames of both streams match mGBA's to the pixel. `outro` is one of them on both streams: 150 frames after END the module's frame equals mGBA's, with the winner's trainer slid in, the text box and the field. The others catch a sprite in motion, and the two engines stand a few frames apart there (see Timing): `intro-before` (882 pixels) and `weather-start` (20,849) on both streams, as with the borrowed renderer in wave 3; `first-faint` (791 on 994052, 1,584 on hand-made), where the faint slide stands a step apart; and on hand-made `win` (803), where the player's Magneton stands at another point of its motion. Hand-made's `first-faint` and `win` matched in wave 4's step B4 and differ since the shot tool's mGBA runs on the module's fixed clock (see Frames to END), with our frames unchanged. Stage 3's merged tree (stream format 2, the outro) gave the same counts. In #43's first part the module of wave 3 with the borrowed renderer drew all 40 scene frames of both streams byte for byte as ours does, so each count above comes from where mGBA stands, and our layer adds none.
+
+`npm run wasm:oracle` checks the renderer against mGBA without that gap. The shot tool dumps mGBA's own video state every 60 frames; the oracle draws each state with our layer in the native harness and compares the result with mGBA's frame of the same instant. On stage 3's merged tree each sampled state matched its mGBA frame: 48 of 48 on hand-made and 682 of 682 on 994052. mGBA blends its colours on 8-bit channels, so the oracle holds a blended pixel against mGBA's arithmetic on our choice of layers and coefficients. It also holds the pixel our layer drew against GBATEK's 5-bit arithmetic on the same choice, which the blend specs pin. At no frame's end did either stream show an affine background, mosaic, WIN1 or a 256-colour tile (#43's census), and no sampled state brightens (BLDCNT mode 2), so only their specs check those.
 
 ### Sound
 
@@ -47,21 +50,21 @@ A held B would end the replay in both builds: the replay plays as a recorded bat
 
 ## Frames to END
 
-| Stream                        | WebAssembly, Node | mGBA, headless    | WebAssembly before sound (B4) |
-| ----------------------------- | ----------------- | ----------------- | ----------------------------- |
-| hand-made (34 ops)            | 2916              | 2910              | 2876                          |
-| 994052 (461 ops)              | 39637             | 39630             | 38942                         |
-| refusals (`EMPTY`, `VERSION`) | error at frame 31 | error at frame 44 | 31                            |
+| Stream                        | WebAssembly, Node | WebAssembly, Chromium | mGBA, headless    |
+| ----------------------------- | ----------------- | --------------------- | ----------------- |
+| hand-made (34 ops)            | 2916              | 2916                  | 2923              |
+| 994052 (494 ops)              | 40981             | 40981                 | 40974             |
+| refusals (`EMPTY`, `VERSION`) | error at frame 31 | not run               | error at frame 44 |
 
-Each engine ran both streams twice in B7, interleaved, and each pair of runs gave the same frames. The page in Chromium reaches END at the same frames as the Node harness (2916 for hand-made, 39637 for 994052), so both hosts play the same game.
+Wave 4 measured these on stage 3's merged tree: stream format 2, the first part of our platform layer, the outro, and mGBA on the fixed clock. In format 1, 994052's stream held 461 ops. Two `rom:shots` runs of hand-made wrote the same 20 frames byte for byte and reached END at the same frame, and mGBA reached END on 994052 at 40974 in both the oracle's run and `rom:shots`'. The e2e plays hand-made at 1x and 994052 at fast in Chromium, and the page reaches END at the Node harness's frames.
 
 Three things move the counts:
 
 - Boot. mGBA spends 13 frames before the game's first frame, which the module skips: it calls `AgbMain` straight away. The refusals show it (44 against 31).
-- The silent stubs before B6. Until the module had sound, every cry and fanfare that the game waits for ended at once, and in B4 994052 reached END 767 frames before mGBA. With the mixer in, the module ends 7 frames after mGBA.
-- VBlank overruns. On the GBA a frame whose work runs past the next VBlank misses it and takes two. The module's work takes no display time, so its frames never overrun, which would let it finish earlier. After the 13 boot frames, the module still takes about 20 frames more than mGBA on both streams. So mGBA's overruns cost it fewer frames than something else costs the module, the mixer's timing of the cry waits being the first candidate. The spike did not measure the split.
+- The silent stubs before B6. Until the module had sound, every cry and fanfare that the game waits for ended at once, and in the spike's step B4 the module reached END at 2876 on hand-made and 38942 on 994052, 767 frames before mGBA. With the mixer in, the module ends 7 frames after mGBA on 994052 and 7 before it on hand-made.
+- VBlank overruns. On the GBA a frame whose work runs past the next VBlank misses it and takes two. The module's work takes no display time, so its frames never overrun, which would let it finish earlier. After the 13 boot frames, the module takes 6 frames more than mGBA on hand-made and 20 more on 994052. So mGBA's overruns cost it fewer frames than something else costs the module, the mixer's timing of the cry waits being the first candidate. The spike did not measure the split.
 
-mGBA itself varies between sessions on the same ROM: 994052 reached END at frame 39709 in B4 and 39734 in fix step 6, against 39630 in both runs of B7, and hand-made at 2947 in fix step 6 against 2910. That spread of 104 frames is larger than the gap between the engines. mGBA reads the host's clock for the cartridge's real-time clock, while the module's clock stays at 2000-01-01 12:00; that is the first suspect, unmeasured.
+On the host's clock and stream format 1, mGBA varied between sessions on the same ROM: 994052 reached END at frame 39709 in B4 and 39734 in fix step 6, against 39630 in both runs of B7, and hand-made at 2947 in fix step 6 against 2910. That spread of 104 frames is larger than the gap between the engines. The clock caused it. mGBA's cartridge clock followed the host's, and the game reads it at boot: in #43 two runs of hand-made parted at frame 10, in the clock's seconds. Since #43 the shot tool stops mGBA's clock at the module's time, noon on 1 January 2000 UTC. Two oracle runs of hand-made then dumped byte-identical states and frames, and two runs of 994052 (the oracle's and `rom:shots`') reached END at the same frame. With that clock and format 1, mGBA reached END at frame 2923 on hand-made and 39629 on 994052, and the module at 2916 and 39637.
 
 ## Speed
 
@@ -80,21 +83,21 @@ The mGBA probe (`e2e/wasm-spike.spec.ts`, its second test) plays 994052 on the e
 
 ## Download size
 
-Bytes, with gzip at level 9 and brotli at quality 11 from Node's zlib:
+Bytes, with gzip at level 9 and brotli at quality 11 from Node's zlib (`scripts/patch-sizes.ts`, stage 3's merged tree of wave 4: stream format 2, our platform layer's first part):
 
 | File                                  | Raw            | gzip           | brotli         |
 | ------------------------------------- | -------------- | -------------- | -------------- |
-| `irv-emerald-wasm.bps` (module patch) | 20,975,219     | 15,603,390     | 14,183,001     |
+| `irv-emerald-wasm.bps` (module patch) | 20,977,267     | 15,605,329     | 14,159,223     |
 | `irv-emerald.js` (Emscripten's glue)  | 8,458          | 3,094          | 2,803          |
-| **WebAssembly page**                  | **20,983,677** | **15,606,484** | **14,185,804** |
+| **WebAssembly page**                  | **20,985,725** | **15,608,423** | **14,162,026** |
 | `mgba.wasm`                           | 1,852,041      | 597,591        | 463,184        |
 | `mgba.js`                             | 248,854        | 57,127         | 48,706         |
-| `irv-emerald.bps` (ROM patch)         | 18,388,891     | 15,757,973     | 14,486,382     |
-| **Emulator page**                     | **20,489,786** | **16,412,691** | **14,998,272** |
+| `irv-emerald.bps` (ROM patch)         | 18,391,067     | 15,762,689     | 14,487,718     |
+| **Emulator page**                     | **20,491,962** | **16,417,407** | **14,999,608** |
 
-Raw, the WebAssembly page fetches 0.49 MB more. Compressed, it fetches 0.81 MB less with either method. The dev server sends both pages' files uncompressed; a real host picks the encoding (M2).
+Raw, the WebAssembly page fetches 0.49 MB more. Compressed, it fetches 0.81 MB less with gzip and 0.84 MB less with brotli. The dev server sends both pages' files uncompressed; a real host picks the encoding (M2).
 
-The module patch copies 5,815,589 of the module's 25,977,583 bytes (22.4 %) from the dump and carries 20,143,848 bytes as literals. For comparison, the ROM patch copies 8,069,773 of the ROM's 33,554,432 bytes (24.0 %) from the dump (the BPS actions SourceRead and SourceCopy, counted in both patches).
+In wave 3 the module patch copied 5,815,589 of the module's 25,977,583 bytes (22.4 %) from the dump and carried 20,143,848 bytes as literals. For comparison, the ROM patch copied 8,069,773 of the ROM's 33,554,432 bytes (24.0 %) from the dump (the BPS actions SourceRead and SourceCopy, counted in both patches).
 
 The module itself, `irv-emerald.wasm` (25,977,583 bytes), never leaves devbox: the server answers 404 for it, and the page rebuilds it from the dump.
 
@@ -104,16 +107,16 @@ The module itself, `irv-emerald.wasm` (25,977,583 bytes), never leaves devbox: t
 
 The speed options go into our own frame loop if milestone 2 ships the module. The page already grants the worker its frames by the tick rule (`src/web/wasm/protocol.ts`), so 1x, 2x and fast are one factor each, the sound follows at 1x and 2x, and fast gives way to 1x at END. If milestone 2 keeps mGBA, the options go to mGBA's fast-forward multiplier instead. In Chromium that tops out near 314 frames per second, where the module's fast averaged 330 to 348 in B6 and B7.
 
-The module does not solve #17. Its patch is 20.98 MB raw and 14.18 MB with brotli, against 18.39 MB and 14.49 MB for the ROM patch. Each copies under a quarter of its bytes from the dump and carries the rest itself. A visitor fetches 0.81 MB less on the WebAssembly page with either compression, and the host's compression saves more than the switch: brotli takes 3.90 MB off the ROM patch. Per-asset extraction (below, "Nintendo's assets from the dump") is the one lever the spike found that shrinks the module patch itself, by the retail assets the expansion recompresses. The expansion's new assets stay in the patch on either route.
+The module does not solve #17. Its patch is 20.98 MB raw and 14.16 MB with brotli, against 18.39 MB and 14.49 MB for the ROM patch. Each copies under a quarter of its bytes from the dump and carries the rest itself. A visitor fetches 0.81 MB less on the WebAssembly page with gzip and 0.84 MB less with brotli, and the host's compression saves more than the switch: brotli takes 3.90 MB off the ROM patch. Per-asset extraction (below, "Nintendo's assets from the dump") is the one lever the spike found that shrinks the module patch itself, by the retail assets the expansion recompresses. The expansion's new assets stay in the patch on either route.
 
 ## Patches, shadow headers and flags
 
-Every change against upstream sits in our tree as a patch, a shadow header or a per-file flag. The ROM build sees none of them and stays byte for byte the same (ROM SHA1 779ba38d… before and after).
+Every change against upstream sits in our tree as a patch, a shadow header or a per-file flag. The ROM build sees none of them, so they leave the ROM byte for byte the same. Wave 3 checked it on the ROM of stream format 1: SHA1 779ba38d… with and without them.
 
 | Kind                                               | Count        | What                                                                                                                                                                                     |
 | -------------------------------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Overlay patch (`rom/gen3/wasm/patches/`)           | 9            | 122 added and 5 removed lines against copies of `script.c` (2), `decompress.c`, `m4a.c` (2), `bg.c`, `text.c`, `random.c` and `include/gba/m4a_internal.h`, each under `IRV_WASM`        |
-| Platform patch (`rom/gen3/wasm/platform-patches/`) | 4            | 9 added and 15 removed lines against copies of `bios.c`, `include/platform/dma.h`, `gba_easy_draw.c` and `cgb_audio.c`                                                                   |
+| Platform patch (`rom/gen3/wasm/platform-patches/`) | 1            | 2 added and 2 removed lines against a copy of `cgb_audio.c`; the patches against `bios.c`, `include/platform/dma.h` and `gba_easy_draw.c` went with those files (#43)                    |
 | Shadow header (`rom/gen3/wasm/include/`)           | 5            | `global.h`, `limits.h`, `gba/syscall.h`, `gba/macro.h`, `gba/m4a_internal.h`; each includes upstream's and adds defines, and `global.h` the includes and types the platform files expect |
 | Own header                                         | 1            | `irv_wasm_sound.h` (the mixer rate, the sound entry points `m4a.c` calls)                                                                                                                |
 | Per-file define or flag (`wasm.json`)              | 2 on 2 files | `recorded_battle.c` (1 define), `ow_abilities.c` (1 compiler flag)                                                                                                                       |
@@ -148,8 +151,9 @@ Each claim names its source. "No licence" means GitHub's API reports none and no
 - **pret/pokeemerald**: no licence (`gh api repos/pret/pokeemerald --jq .license`: null).
 - **Kurausukun/pokeemerald**, branch `pc_port` (11658255, 22.08.2026): no licence (`--jq .license`: null; the contents API answers 404 for `LICENSE` on `pc_port`). That branch already holds all six borrowed files: `src/platform/bios.c`, `dma.c`, `gba_easy_draw.c`, `cgb_audio.c`, `src/sound_mixer.c` and `src/music_player.c` (`gh api repos/Kurausukun/pokeemerald/contents/<file>?ref=pc_port`).
 - **pokeemerald-multiplatform** (gradenGnostic, db1cab3d): its `LICENSE` is an MIT text that grants rights only to "the original multiplatform-port modifications contributed through this fork". Its Scope section adds that it "does not grant rights to, or relicense: The upstream pokeemerald decompilation or contributions from its authors". GitHub reports `NOASSERTION`. The README credits "the existing pokeemerald PC/SDL port work by Kurausukun, NT_x86, Normmatt, camthesaxman and other contributors". So the MIT grant covers the fork's own changes to the six files, its audio fixes among them, and not the files as such. The three sound files share that unlicensed lineage.
-- **VBA-M**: `bios.c` says "BIOS function implementations are based on the VBA-M source code." (line 2 at db1cab3d; line 4 of Kurausukun's copy). VBA-M's `LICENSE` is the GNU General Public License, version 2 of June 1991, and GitHub reports `GPL-2.0` (visualboyadvance-m/visualboyadvance-m at 05cf257a, 21.11.2026). The line names no function and no version of VBA-M. If `bios.c` copies VBA-M's code, GPL-2.0 terms reach it on top of the missing licence.
-- **Our platform patches** carry 15 removed lines and 30 context lines of the borrowed files: 45 lines of unlicensed text in our tracked tree, `bios.c`'s ten memory arrays among them. Five added lines are borrowed lines with a cast added; with them the count is 50.
+- **VBA-M**: `bios.c` says "BIOS function implementations are based on the VBA-M source code." (line 2 at db1cab3d; line 4 of Kurausukun's copy). VBA-M's `LICENSE` is the GNU General Public License, version 2 of June 1991, and GitHub reports `GPL-2.0` (visualboyadvance-m/visualboyadvance-m at 05cf257a, 21.11.2026). The line names no function and no version of VBA-M. If `bios.c` copied VBA-M's code, GPL-2.0 terms reached it on top of the missing licence. `bios.c` left the build in #43, so the question no longer reaches the module.
+- **Our platform layer** (`rom/gen3/wasm/layer/`) is ours, under the repository's MIT licence. Its builders wrote it from GBATEK's descriptions and the expansion's sources. They opened none of the borrowed files, no VBA-M code and no mGBA source: they compared mGBA's frames and dumped states, and read libmgba's installed headers for field names only. Of the borrowed files, the module still holds the three sound files.
+- **Our platform patch** 0004 carries 2 removed lines and 6 context lines of `cgb_audio.c`: 8 lines of unlicensed text in our tracked tree. Its 2 added lines are borrowed lines with a cast added; with them the count is 10. In wave 3 four patches carried 50 such lines, `bios.c`'s ten memory arrays among them; three patches went with their files.
 - **Emscripten 7.0.0**: its `LICENSE` offers the MIT license and the University of Illinois/NCSA Open Source License. The glue `irv-emerald.js` is Emscripten's runtime.
 - **Linked into the module** from Emscripten's system libraries: musl's formatted printing and stdio writers (`printf_core`, `__fwritex`, `puts` and a few more), MIT by musl's `COPYRIGHT` ("musl as a whole is licensed under the following standard MIT license"), and Emscripten's `setjmp`, `longjmp` and stack helpers from `system/lib/libemcc`, MIT and NCSA by their headers. The module keeps its function names (`--profiling-funcs`), and `llvm-nm` lists no libc++ function, no allocator and no compiler-rt arithmetic: of the libraries the plan expected, compiler-rt (Apache-2.0 with LLVM exceptions, its `LICENSE.TXT`) and libc++ do not reach the module.
 - **mGBA** (the emulator the page runs today, and a source for a clean layer): MPL-2.0 (`gh api repos/mgba-emu/mgba --jq .license.spdx_id`; the header of `src/gba/bios.c`). `@thenick775/mgba-wasm` builds from thenick775/mgba, MPL-2.0 as well.
@@ -160,11 +164,13 @@ Two questions stand between the spike and a public build (plan D5 and D7). Each 
 
 ### A platform layer we may ship
 
-The module patch holds the borrowed files compiled. No licence allows us to serve them, and `bios.c` adds the VBA-M question.
+The module patch holds the borrowed sound files compiled. No licence allows us to serve them. In wave 3 it also held `bios.c`, `dma.c` and the renderer, and `bios.c` added the VBA-M question.
 
 - **(a) Keep the borrowed layer.** It works today, but it ships code nobody licensed to us. Only a licence from the pc_port authors (Kurausukun, NT_x86, Normmatt, camthesaxman and others) would change that. Cost: no steps, a request with an open answer.
 - **(b) Our own layer, MIT.** BIOS calls (about ten: CpuSet, CpuFastSet, LZ77 and RL decompression, BgAffineSet, ObjAffineSet, Div, Sqrt, ArcTan2) and DMA from GBATEK's descriptions; a scanline renderer for text and affine backgrounds, sprites, windows, blending and mosaic; an MP2K sequencer, a PCM mixer and the PSG channels. The spike's glue keeps the entry points (`DrawFrame`, `RunDMAs`, the BIOS names, `SoundMain` and the `ply_*` table), so a swap stays local, and `wasm:run` with its 13 scenes and a pixel diff against mGBA tests each piece. Cost: BIOS and DMA one step, the renderer two or three, sound two or three: five to seven steps.
 - **(c) mGBA's code for graphics and the BIOS, our own sound.** mGBA's software renderer (`src/gba/renderers/video-software.c`, `software-bg.c`, `software-obj.c`) and its high-level BIOS (`src/gba/bios.c`) are MPL-2.0: we would ship those files under MPL-2.0 with their source, beside our MIT code. They expect mGBA's own structs (`struct GBA`, `struct GBAVideo`), so an adapter is needed. mGBA emulates the sound hardware, and the game's own mixer and sequencer run on it as ARM code, which the module cannot run. mGBA's README also lists "MP2k audio mixing"; the spike did not check whether that code could drive the module's sound without an emulated CPU, so count the sound as ours. Cost: the adapter and the renderer two or three steps, sound two or three: four to six steps.
+
+The wave 3 gate chose (b) (answer 3a). In wave 4 the first part of #43 replaced the BIOS calls, DMA, the interrupts, the frame driver and the renderer with our layer, in five builder steps: the BIOS calls and DMA one each, the renderer three. The scenes still pass. On each state the oracle samples, our layer picks the layers, windows, effect and coefficients that mGBA's frame shows, and each pixel it draws is GBATEK's 5-bit result of that choice. The second part replaces the sound: an MP2K sequencer, a PCM mixer and the PSG channels. Then no borrowed file stays in the module.
 
 ### Nintendo's assets from the dump
 
@@ -197,11 +203,18 @@ The gate accepted both drafts on 22.11.2026 (answers 2a and 4a): the amendment n
 - `-fsanitize=shift`: one full compile to list the shifts by 32 or more that the battle path reaches.
 - Phones: 256 MB of fixed linear memory, a module worker, `SharedArrayBuffer` and an audio worklet. Not tried on a phone.
 - Input: no key reaches the game. Leaving with B and live play need key input.
-- The clock: the module's real-time clock stays at 2000-01-01 12:00, while mGBA reads the host's. A time-of-day difference in a scene is possible.
-- mGBA's frames to END differ between sessions on the same ROM (up to 104 frames on 994052), cause unmeasured.
+- The clock: the module's real-time clock and the shot tool's mGBA both stand still at noon on 1 January 2000. The emulator page sets no clock for its mGBA, and native mGBA follows the host's clock by default, so a scene there can show another time of day than the module.
 - 2x keeps every other sample pair without a low-pass filter, so some aliasing reaches the ear.
 - The frame buffer has no double buffering, so a frame can tear. The e2e counts colours and saw nothing; nobody has looked.
-- The 45 lines of borrowed text in the platform patches (50 with the five changed ones), if the layer stays borrowed.
+- Bitmap modes 3 to 5 and the prohibited modes 6 and 7: the layer fills each line with the backdrop, draws no OBJs and logs the mode once. GBATEK would draw the bitmap and the OBJs from tiles 512 to 1023. No battle file sets these modes.
+- Brightening (BLDCNT mode 2): no state of either stream that the oracle sampled brightens, so the oracle's model of mGBA's arithmetic there is a guess, and only the blend specs check ours.
+- The affine reference point restarts when the game writes a new value to BG2X, BG2Y, BG3X or BG3Y. A write of the same value in mid-frame leaves the point where it stands. The battle sets no affine mode.
+- An interrupt that IME or IE holds back stays in IF, and the layer never delivers it later; GBATEK says the CPU takes it once both allow it. The battle path does not reach this: VBlank runs with IME forced on, VCount stays enabled, and the DMA interrupts go to `IntrDummy`.
+- RL decompression and Div are not built. The module has no caller for them, and a new caller fails the link.
+- ArcTan2 and the sine table follow the formulas, not the BIOS's own approximation and table. The A/B against the borrowed build hides a difference of one in Q14 behind the `>> 14`.
+- The OBJ cycle budget per line follows GBATEK's counts, and no oracle state is known to reach it.
+- The window edges with X1 > X2 or Y1 > Y2 read as X2 = 240 and Y2 = 160, as GBATEK says, with no wrap. The oracle saw three WIN0 ranges and no WIN1, so only the specs check this. The animations of Memento, Curse and Fake Out build WIN0H from moving values (`battle_anim_dark.c`, `battle_anim_ghost.c`, `battle_anim_effects_2.c`); an oracle run every frame across one of them would settle it.
+- The 8 lines of borrowed text in platform patch 0004 (10 with its two changed lines), until the sound files leave in #43's second part.
 - Nothing ties the module to `build/rom/replay-slot.json` beyond the slot's magic. A ROM rebuilt with another slot layout beside a stale module would let the page write past the module's slot; the module could export its slot's size for the page to check.
 - An unexpected stub call (the link cable, multiboot) only logs to the console. For milestone 2, a list of allowed stubs that fails a run would catch one.
 - `docs/plan.md` said the page hands the stream over instead of through the replay slot, while the ADR 0008 draft kept the slot in linear memory. The gate took the draft (ADR 0009), and the plan now says so.

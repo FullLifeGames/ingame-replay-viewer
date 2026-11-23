@@ -219,7 +219,33 @@ TEST("Replay: a trainer pic at or above TRAINER_PIC_COUNT is refused")
     EXPECT_EQ(Validate(), REPLAY_ERROR_TEAM);
     ReplayStream_SetU16(ReplayStream_TrainerOffset(REPLAY_SIDE_FAR) + REPLAY_TRAINER_OFFSET_TRAINER_PIC, 0xFFFF);
     EXPECT_EQ(Validate(), REPLAY_ERROR_TEAM);
-    ReplayStream_SetU16(ReplayStream_TrainerOffset(REPLAY_SIDE_NEAR) + REPLAY_TRAINER_OFFSET_TRAINER_PIC, TRAINER_PIC_COUNT - 1);
     ReplayStream_SetU16(ReplayStream_TrainerOffset(REPLAY_SIDE_FAR) + REPLAY_TRAINER_OFFSET_TRAINER_PIC, TRAINER_PIC_COUNT - 1);
     EXPECT_EQ(Validate(), REPLAY_ERROR_NONE);
+}
+
+// The near side draws a back pic and the far side a front pic (#20, S3-2); gTrainerPicInfo holds
+// a back pic for 11 pics only, and no front pic for POKEDUDE and OLD_MAN.
+static enum ReplayError ValidateTrainerPics(u32 nearPic, u32 farPic)
+{
+    ReplayStream_Begin();
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    ReplayStream_SetU16(ReplayStream_TrainerOffset(REPLAY_SIDE_NEAR) + REPLAY_TRAINER_OFFSET_TRAINER_PIC, nearPic);
+    ReplayStream_SetU16(ReplayStream_TrainerOffset(REPLAY_SIDE_FAR) + REPLAY_TRAINER_OFFSET_TRAINER_PIC, farPic);
+    return Validate();
+}
+
+TEST("Replay: a near trainer pic without a back pic is refused")
+{
+    EXPECT_EQ(ValidateTrainerPics(TRAINER_PIC_LEADER_NORMAN, TRAINER_PIC_MAY), REPLAY_ERROR_TEAM);
+    EXPECT_EQ(ValidateTrainerPics(TRAINER_PIC_COUNT - 1, TRAINER_PIC_MAY), REPLAY_ERROR_TEAM);
+    EXPECT_EQ(ValidateTrainerPics(TRAINER_PIC_STEVEN, TRAINER_PIC_MAY), REPLAY_ERROR_NONE);
+    EXPECT_EQ(ValidateTrainerPics(TRAINER_PIC_POKEDUDE, TRAINER_PIC_MAY), REPLAY_ERROR_NONE);
+}
+
+TEST("Replay: a far trainer pic without a front pic is refused")
+{
+    EXPECT_EQ(ValidateTrainerPics(TRAINER_PIC_BRENDAN, TRAINER_PIC_POKEDUDE), REPLAY_ERROR_TEAM);
+    EXPECT_EQ(ValidateTrainerPics(TRAINER_PIC_BRENDAN, TRAINER_PIC_OLD_MAN), REPLAY_ERROR_TEAM);
+    EXPECT_EQ(ValidateTrainerPics(TRAINER_PIC_BRENDAN, TRAINER_PIC_LEADER_NORMAN), REPLAY_ERROR_NONE);
+    EXPECT_EQ(ValidateTrainerPics(TRAINER_PIC_BRENDAN, TRAINER_PIC_STEVEN), REPLAY_ERROR_NONE);
 }
