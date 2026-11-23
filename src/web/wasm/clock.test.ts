@@ -34,6 +34,9 @@ const paid = (speed: '1x' | '2x', from: number, now: number, frame = 0): number 
 /** The most the clock grants ahead of the game's frame and the frames owed since the last ask. */
 const LEAD = { '1x': 30, '2x': 60 } as const
 
+/** The most the clock pays per ask of the frames owed since the last one: one second of play. */
+const SECOND = { '1x': 60, '2x': 120 } as const
+
 /**
  * Plays `speed` for 1 s, stalls the game for 2 s (it reports one frame) with an ask every `gap`
  * ms, then keeps up for 1 s. Checks at every ask of the stall that the grant stays within the
@@ -97,9 +100,13 @@ describe('the tick rule', () => {
     ['1x', 16],
     ['1x', 150],
     ['1x', 400],
+    ['1x', 450],
+    ['1x', 1000],
     ['2x', 16],
     ['2x', 150],
     ['2x', 400],
+    ['2x', 450],
+    ['2x', 1000],
   ] as const)(
     'grants a game that keeps up at %s every frame the time pays for, asked every %i ms',
     (speed, gap) => {
@@ -163,7 +170,7 @@ describe('the tick rule', () => {
     expect(clock.allowed(1616, 86)).toBe(87)
   })
 
-  it('never takes back a frame it granted', () => {
+  it('never takes back a frame it granted at one speed', () => {
     const clock = new TickClock('1x', 0)
     walk(clock, 0, 1000)
     expect(clock.allowed(2000, 59)).toBe(119)
@@ -183,5 +190,59 @@ describe('the tick rule', () => {
       expect(next).toBeGreaterThanOrEqual(granted)
       granted = next
     }
+  })
+
+  // The page itself can stop asking while the tab stays in view: a busy main thread, such as a
+  // dump picked during a run. One ask then owes the game the whole gap; the clock pays one second
+  // of it, so the burst fits the sound ring, and drops the rest.
+  it.each(['1x', '2x'] as const)('pays one second of a 5 s gap in the asks at %s', (speed) => {
+    const clock = new TickClock(speed, 0)
+    const held = walk(clock, 0, 1000) ?? 0
+    const capped = held + SECOND[speed] + LEAD[speed]
+    expect(clock.allowed(6000, held)).toBe(capped)
+    const later = walk(clock, 6000, 7000, capped) ?? 0
+    expect(later - capped).toBeGreaterThanOrEqual(SECOND[speed] - 1)
+    expect(later - capped).toBeLessThanOrEqual(SECOND[speed])
+  })
+
+  // A first animation frame after a hidden spell can come before visibilitychange calls resume.
+  it('pays one second to an ask 10 s after the tab hid that comes before resume', () => {
+    const clock = new TickClock('1x', 0)
+    expect(walk(clock, 0, 1000)).toBe(59)
+    const capped = 59 + SECOND['1x'] + LEAD['1x']
+    expect(clock.allowed(11_000, 59)).toBe(capped)
+    clock.resume(11_010)
+    expect(clock.allowed(11_010, capped)).toBe(capped)
+    expect(walk(clock, 11_010, 12_010, capped)).toBe(capped + 59)
+  })
+
+  // A switch drops what the game owes and the lead: the new pace counts from the game's frame,
+  // so the grant can fall. The worker only waits for its grant, so it loses nothing it played.
+  it.each([
+    ['2x', '1x'],
+    ['1x', '2x'],
+  ] as const)('counts from the frame of a game 50 frames behind after %s to %s', (from, to) => {
+    const clock = new TickClock(from, 0)
+    const frame = (walk(clock, 0, 1000) ?? 0) - 50
+    clock.change(to, 1000, frame)
+    expect(clock.speed).toBe(to)
+    expect(clock.allowed(1000, frame)).toBe(frame)
+    const most = frame + Math.ceil((16 * (ticksPerSecond(to) ?? 0)) / 1000) + LEAD[to]
+    for (let now = 1016; now < 2000; now += 16) {
+      expect(clock.allowed(now, frame)).toBeLessThanOrEqual(most)
+    }
+  })
+
+  // An animation frame's time stamp can lie before the performance.now() that the start, a change
+  // or resume read; the clock counts such an ask as one at its own start.
+  it('counts an ask before its start or its resume as an ask at that moment', () => {
+    const clock = new TickClock('1x', 1000)
+    expect(clock.allowed(990, 0)).toBe(0)
+    expect(clock.allowed(1016, 0)).toBe(0)
+    expect(clock.allowed(1017, 0)).toBe(1)
+    expect(walk(clock, 1017, 2000, 1)).toBe(59)
+    clock.resume(5000)
+    expect(clock.allowed(4990, 59)).toBe(59)
+    expect(walk(clock, 5000, 6000, 59)).toBe(59 + 59)
   })
 })
