@@ -53,7 +53,7 @@ The replay side drawn at the bottom of the screen, with back sprites. Player 1 u
 _Avoid_: player side, own side
 
 **Far side**:
-The other replay side, drawn at the top facing the viewer. The game's text names its Pokémon with "The opposing", as in "The opposing Skarmory used Spikes!".
+The other replay side, drawn at the top of the screen, with front sprites. The game's text names its Pokémon with "The opposing", as in "The opposing Skarmory used Spikes!".
 _Avoid_: opponent, enemy
 
 **Intro**:
@@ -127,6 +127,16 @@ _Avoid_: wasm patch (that name fits the module patch too)
 **Shadow header**:
 Our header that the WebAssembly build finds before the upstream header of the same name. It includes upstream's and adds to it, mostly defines.
 _Avoid_: override, stub header
+
+## The pages
+
+**Viewer**:
+The page at `/`. It runs the WebAssembly build in a worker and plays the replay there, without an emulator.
+_Avoid_: WebAssembly page, spike page (its names before it moved to `/`); for a person who watches, say visitor
+
+**Emulator page**:
+The page at `/emulator.html`, the fallback. It patches the base ROM with the patch and plays the replay in mGBA.
+_Avoid_: old page, mGBA page
 
 ## Scope
 
