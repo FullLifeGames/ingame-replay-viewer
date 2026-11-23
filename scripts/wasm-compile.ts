@@ -48,7 +48,7 @@ interface Unit {
 }
 
 // The Makefile's CPPFLAGS with TEST=0 and GAME_VERSION=EMERALD, plus our own marker.
-const CPPFLAGS = ['-Wno-trigraphs', '-DMODERN=1', '-DTESTING=0', '-DEMERALD', '-std=gnu17']
+export const CPPFLAGS = ['-Wno-trigraphs', '-DMODERN=1', '-DTESTING=0', '-DEMERALD', '-std=gnu17']
 // The Makefile's CFLAGS without the ARM target flags and without -Werror: clang's own errors
 // (incompatible function pointers, implicit declarations) are what the census must see.
 const CFLAGS = ['-std=gnu17', '-Wall', '-Wno-strict-aliasing', '-Wno-pointer-to-int-cast']
