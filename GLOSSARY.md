@@ -94,6 +94,10 @@ _Avoid_: buffer, mailbox
 Whatever inside the target game reads the instruction stream and hands each instruction to the controller. That's either the game's own code or a small piece of ours.
 _Avoid_: engine, VM
 
+**Refusal screen**:
+What the game shows for an instruction stream it refuses: the reason in words and the error's number.
+_Avoid_: error screen, red screen
+
 ## The WebAssembly build
 
 **WebAssembly build**:
@@ -145,8 +149,16 @@ A replay whose format's generation is no newer than the target game's, so every 
 _Avoid_: native replay
 
 **Dropped line**:
-A battle log line deliberately not shown in the game, such as chat or timer messages. Every line is either shown or a dropped line, never silently skipped.
+A battle log line deliberately not shown in the game, such as chat or timer messages. Every line is either shown or a dropped line, never silently skipped. Each dropped line carries its reason; the reason `state` marks a line whose state a later line shows, such as the recharge turn that the next turn's "must recharge" line tells.
 _Avoid_: ignored line, skipped event
+
+**Kind census**:
+The check that walks every kind of battle log line the protocol library knows and finds each exactly one place: a rule, a drop reason or the named list.
+_Avoid_: coverage list
+
+**Named list**:
+The kinds of battle log line the battle script has no rule for, in three groups, each with its reason: kinds a replay's log never holds, kinds of formats the viewer refuses, and kinds with no rule yet.
+_Avoid_: named gap list, allow list
 
 **Content gap**:
 Anything in a replay that the target game lacks: a species, move, ability, mechanic or animation. Each one needs a fallback.
