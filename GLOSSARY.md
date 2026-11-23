@@ -101,23 +101,31 @@ The expansion with our C files, compiled by Emscripten into a WebAssembly module
 _Avoid_: native build, port, recompilation
 
 **Platform layer**:
-The C code that stands in for the GBA's hardware in the WebAssembly build: the BIOS calls, DMA, the interrupts, the frame driver, the scanline renderer and the sound. Ours lives in `rom/gen3/wasm/layer/` under the repository's MIT licence (#43). The sound still comes from three files borrowed from a pinned commit of pokeemerald-multiplatform; they stay out of git, and one platform patch carries 8 of their lines.
+The C code that stands in for the GBA's hardware in the WebAssembly build: the BIOS calls, DMA, the interrupts, the frame driver, the scanline renderer and the sound. Ours lives in `rom/gen3/wasm/layer/` under the repository's MIT licence (#43). It took the place of the files the spike borrowed from pokeemerald-multiplatform.
 _Avoid_: emulator, HAL, backend (a game backend is ours)
 
 **Glue**:
-Our C files for the WebAssembly build only (`rom/gen3/wasm/src/`): the frame loop, the interrupts, the hand-over of frames and sound to JavaScript, and the stubs for hardware the viewer does not use. Emscripten's own JavaScript runtime is "Emscripten's glue".
+Our C files for the WebAssembly build only (`rom/gen3/wasm/src/`). They have the platform layer run each frame, pass each interrupt to the game, hand frames and sound to JavaScript, stub the hardware the viewer does not use, and stop a run that must not go on. Emscripten's own JavaScript runtime is "Emscripten's glue".
 _Avoid_: shim, wrapper
+
+**Stub list**:
+The stubs of the glue that a replay run may call: the calls the game makes at boot to set up its wireless adapter. A call to any other stub stops the run with the stub's name (#46).
+_Avoid_: allow list, whitelist
 
 **Module patch**:
 The BPS patch from the base ROM to the WebAssembly module (`irv-emerald-wasm.bps`). The page applies it to the user's dump, as it applies the patch for the ROM image.
 _Avoid_: wasm patch, module download
+
+**Sanitized module**:
+A WebAssembly module built with one of clang's runtime checks, so that a replay run reports every place in the game's C that breaks the check (#44: shifts). It stays on devbox beside the module the page loads and has no module patch.
+_Avoid_: debug build, test module
 
 **Overlay patch**:
 A change to a copy of an upstream file that only the WebAssembly build compiles. The ROM build never sees it.
 _Avoid_: wasm patch (that name fits the module patch too)
 
 **Shadow header**:
-Our header that the WebAssembly build finds before the upstream header of the same name. It includes upstream's and adds to it: defines, and in `global.h` the includes and types the platform files expect.
+Our header that the WebAssembly build finds before the upstream header of the same name. It includes upstream's and adds to it, mostly defines.
 _Avoid_: override, stub header
 
 ## Scope

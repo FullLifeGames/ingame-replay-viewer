@@ -1,6 +1,6 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { basename, join } from 'node:path'
 
 import { afterAll, describe, expect, it } from 'vitest'
 
@@ -40,6 +40,18 @@ describe('the C files of our platform layer', () => {
       expect.arrayContaining([expect.stringMatching(/src\/irv_wasm_frame\.c$/)]),
     )
     expect(sources.some((source) => source.includes('/host/'))).toBe(false)
+  })
+
+  it('bring the sound engine and its layout check into the module and the harness (B8b)', () => {
+    const engine = layerSources().filter((source) => source.includes('/irv_mp2k_'))
+    expect(engine.map((source) => basename(source))).toEqual(
+      expect.arrayContaining(['irv_mp2k_main.c', 'irv_mp2k_mixer.c', 'irv_mp2k_sound.c']),
+    )
+    expect(glueSources()).toEqual(
+      expect.arrayContaining([...engine, expect.stringMatching(/src\/irv_wasm_mp2k_layout\.c$/)]),
+    )
+    expect(glueSources().some((source) => source.endsWith('irv_wasm_sound_layout.c'))).toBe(false)
+    expect(hostCommand('/tmp/out/irv_layer_host', {})).toEqual(expect.arrayContaining(engine))
   })
 
   it('may not share a name with a file of the glue, whose objects share one folder', () => {

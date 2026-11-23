@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 
@@ -8,10 +8,12 @@ import {
   checkNamedSources,
   compileCommands,
   glueCommands,
+  parseSanitizer,
   pipelineScript,
-  platformCommands,
+  sanitizedPaths,
   treeSources,
   wasmPaths,
+  wasmRoots,
 } from './wasm-compile.ts'
 import type { CompileCommand, WasmPaths } from './wasm-compile.ts'
 import { loadWasmConfig } from './wasm-config.ts'
@@ -24,17 +26,11 @@ const paths: WasmPaths = {
   obj: '/repo/build/wasm/obj',
   shadow: '/repo/rom/gen3/wasm/include',
   overlay: '/repo/build/wasm/overlay',
-  platform: '/repo/build/wasm/platform',
+  asm: '/repo/build/wasm/asm',
   emcc: '/tools/emsdk/upstream/emscripten/emcc',
 }
 const config: WasmConfig = {
   emscripten: { version: '7.0.0' },
-  platform: {
-    repository: 'https://example.org/p.git',
-    commit: 'c'.repeat(40),
-    files: ['include/platform/dma.h', 'src/platform/dma.c'],
-    defines: ['RENDERER_EASY_DRAW'],
-  },
   exclude: ['src/agb_flash.c'],
   defines: { 'src/recorded_battle.c': ['IRV_WASM_NO_SAVE_SIZE_ASSERTS'] },
   flags: { 'src/ow_abilities.c': ['-Wno-error=incompatible-function-pointer-types'] },
@@ -180,50 +176,72 @@ describe('the compile commands', () => {
   })
 })
 
-describe('the platform commands', () => {
-  it('compile each C file of the platform from its patched copy, under the platform defines', () => {
-    const command = only(platformCommands(config, paths))
-    expect(command.source).toBe('platform/src/platform/dma.c')
-    expect(command.object).toBe('/repo/build/wasm/obj/platform/src/platform/dma.o')
-    expect(command.preprocess.at(-1)).toBe('/repo/build/wasm/platform/src/platform/dma.c')
-    expect(command.preprocess).toEqual(
-      expect.arrayContaining(['-DIRV_WASM', '-DRENDERER_EASY_DRAW', '-DMODERN=1']),
+describe('the sanitized build (#44)', () => {
+  it('compiles every file and the glue with the check, and the normal build without it', () => {
+    const options = { optimise: '-O2', sanitize: 'shift' } as const
+    expect(only(compileCommands(config, ['src/main.c'], paths, options)).compile).toContain(
+      '-fsanitize=shift',
     )
-    expect(command.compile).toContain('-O2')
+    expect(only(glueCommands(paths, ['/repo/rom/gen3/wasm/src/a.c'], options)).compile).toContain(
+      '-fsanitize=shift',
+    )
+    const normal = only(compileCommands(config, ['src/main.c'], paths)).compile
+    expect(normal.filter((arg) => arg.startsWith('-fsanitize'))).toEqual([])
   })
 
-  it('reach the platform headers after the tree include, so global.h stays the tree copy', () => {
-    const { preprocess } = only(platformCommands(config, paths))
-    expect(pairs(preprocess, '-iquote')).toEqual([
-      paths.shadow,
-      `${paths.overlay}/include`,
-      'include',
-      `${paths.platform}/include`,
-    ])
+  it('writes its objects, overlay copies and records under build/wasm/sanitize', () => {
+    expect(sanitizedPaths(paths)).toEqual({
+      ...paths,
+      out: '/repo/build/wasm/sanitize',
+      obj: '/repo/build/wasm/sanitize/obj',
+      overlay: '/repo/build/wasm/sanitize/overlay',
+    })
+  })
+
+  it('takes the shift check and refuses any other', () => {
+    expect(parseSanitizer('shift')).toBe('shift')
+    expect(() => parseSanitizer('address')).toThrow(/address.*shift/)
+    expect(() => parseSanitizer(undefined)).toThrow(/shift/)
+  })
+})
+
+describe('the WebAssembly roots', () => {
+  // The delete guard of rom-paths.ts takes them as it takes the ROM build's.
+  it('put the cache under .cache/wasm and the outputs under build/wasm, and nothing else', () => {
+    const repo = mkdtempSync(join(tmpdir(), 'irv-roots-'))
+    const real = realpathSync(repo)
+    expect(wasmRoots(repo)).toEqual({
+      cache: join(real, '.cache', 'wasm'),
+      out: join(real, 'build', 'wasm'),
+    })
+    rmSync(repo, { recursive: true })
   })
 })
 
 describe('the glue commands', () => {
   const glue = ['/repo/rom/gen3/wasm/src/irv_wasm_frame.c']
 
-  it('compile each C file of the glue into build/wasm/obj/glue, without the platform defines', () => {
+  it('compile each C file of the glue into build/wasm/obj/glue, with no define of its own', () => {
     const command = only(glueCommands(paths, glue))
     expect(command.source).toBe('glue/irv_wasm_frame.c')
     expect(command.object).toBe('/repo/build/wasm/obj/glue/irv_wasm_frame.o')
     expect(command.preprocess.at(-1)).toBe(glue[0])
     expect(command.preprocess).toContain('-DIRV_WASM')
-    expect(command.preprocess).not.toContain('-DIRV_WASM_PLATFORM')
+    expect(
+      command.preprocess.filter((arg) => arg.startsWith('-D') && arg !== '-DIRV_WASM'),
+    ).toEqual(['-DMODERN=1', '-DTESTING=0', '-DEMERALD'])
     expect(command.compile).toContain('-O2')
   })
 
-  it('reach the platform headers after the tree include, as the platform files do', () => {
+  // The borrowed platform headers left with their files (#43, B9): our layer's come last.
+  it("reach our platform layer's headers after the tree include, and no other folder", () => {
     const { preprocess } = only(glueCommands(paths, glue))
-    expect(pairs(preprocess, '-iquote').at(-1)).toBe(`${paths.platform}/include`)
-  })
-
-  it("reach our platform layer's headers before the borrowed ones", () => {
-    const quoted = pairs(only(glueCommands(paths, glue)).preprocess, '-iquote')
-    expect(quoted.indexOf(LAYER_DIR)).toBe(quoted.indexOf(`${paths.platform}/include`) - 1)
+    expect(pairs(preprocess, '-iquote')).toEqual([
+      paths.shadow,
+      `${paths.overlay}/include`,
+      'include',
+      LAYER_DIR,
+    ])
   })
 })
 

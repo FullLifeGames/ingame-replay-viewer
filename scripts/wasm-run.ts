@@ -5,7 +5,8 @@
 // `--play <dir>` writes the stream into the module's slot, calls AgbMain and answers as the shot
 // tool (rom/gen3/shot/replay_shot.c) does, with the frames of its shots as PPM in <dir> and one
 // JSON line per shot and the status on stdout. Frames and report.json go to build/wasm/run/.
-// `--baseline` and `--against-baseline` add the A/B of wasm-hashes.ts (#43).
+// `--baseline` and `--against-baseline` add the A/B of wasm-hashes.ts (#43). `--sanitize shift`
+// plays the module of `wasm:build -- --sanitize shift` (#44) and writes under build/wasm/sanitize.
 import { spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, join } from 'node:path'
@@ -32,7 +33,8 @@ import type { Scene } from './rom-shot-scenes.ts'
 import { finishRuns, parseShotArgs, planStreams, readFrames, reportRun } from './rom-shot.ts'
 import type { RunReport, StreamPlan } from './rom-shot.ts'
 import { describeSlot, GBA_ROM_BASE, loadSlotLayout, SLOT_SYMBOL } from './rom-slot.ts'
-import { wasmPaths } from './wasm-compile.ts'
+import { sanitizedDir, wasmPaths, wasmRoots } from './wasm-compile.ts'
+import type { Sanitizer } from './wasm-compile.ts'
 import {
   HashLog,
   parseRunArgs,
@@ -43,7 +45,7 @@ import {
 } from './wasm-hashes.ts'
 import type { RunArgs, RunHashes } from './wasm-hashes.ts'
 import { LINK_OUTPUTS } from './wasm-link.ts'
-import { wasmRoots } from './wasm-platform.ts'
+import { SoundLog } from './wasm-run-sound.ts'
 
 // The module's shape lives in src/web/wasm, which the page's worker shares.
 export type { GameModule, ModuleHooks } from '../src/web/wasm/game.ts'
@@ -152,6 +154,8 @@ export interface PlayResult {
   finishedAt: number | undefined
   /** The game's sound over the run: its samples, left and right counted apart, and their RMS. */
   audio: AudioMeter
+  /** Each frame's level and the BGM player's songs (O7). */
+  sound: SoundLog
   /** The line hashes of every frame of the run, for the A/B against the baseline. */
   hashes: RunHashes
 }
@@ -166,10 +170,13 @@ export async function playModule(
   const watch = new Watch(request.scenes.flatMap((scene) => scene.shots))
   let status: Status | undefined
   const audio = new AudioMeter()
+  const sound = new SoundLog()
   const hashes = new HashLog()
   const game: GameModule = await factory({
     irvAudio: (samples, count) => {
-      audio.add(new Float32Array(game.HEAPU8.buffer, game.HEAPU8.byteOffset + samples, count))
+      const frame = new Float32Array(game.HEAPU8.buffer, game.HEAPU8.byteOffset + samples, count)
+      audio.add(frame)
+      sound.add(frame)
     },
     irvFrame: (pixels) => {
       const memory = game.HEAPU8
@@ -177,6 +184,7 @@ export async function playModule(
       const progress = readProgress(memory, game._IrvWasm_Progress(), request.layout)
       const frame = () => readFrame(game.HEAPU16, pixels)
       const ended = watch.step(progress, frame)
+      sound.frame(watch.frame, memory)
       if (watch.frame % 3000 === 0) say(`frame ${String(watch.frame)}, op ${String(progress.done)}`)
       if (ended === undefined) return
       const { done, total, turn, error } = progress
@@ -198,12 +206,20 @@ export async function playModule(
     }
     const output = { shots: watch.lines, status }
     const { frames, finishedAt } = watch
-    return { output, frames, finishedAt, audio, hashes: hashes.done() }
+    return { output, frames, finishedAt, audio, sound, hashes: hashes.done() }
   }
   throw new Error(`AgbMain returned after ${String(watch.frame)} frames`)
 }
 
 const SCRIPT = fileURLToPath(import.meta.url)
+
+/** The module a run plays and where its streams' folders go: out is build/wasm. */
+export function runPlace(out: string, sanitize?: Sanitizer): { module: string; runDir: string } {
+  const dir = sanitize === undefined ? out : sanitizedDir(out)
+  return { module: join(dir, LINK_OUTPUTS.js), runDir: join(dir, 'run') }
+}
+
+// The scenes and the module of one stream, for its --play process.
 const RUN_FILE = 'play.json'
 const STREAM_FILE = 'stream.bin'
 
@@ -219,13 +235,14 @@ function ppm(frame: Frame): Buffer {
 
 // The --play side: the run in <dir>, its frames into <dir>, the shot tool's lines on stdout.
 async function playDir(dir: string): Promise<void> {
-  const { scenes } = JSON.parse(readFileSync(join(dir, RUN_FILE), 'utf8')) as { scenes: Scene[] }
+  const { scenes, module } = JSON.parse(readFileSync(join(dir, RUN_FILE), 'utf8')) as {
+    scenes: Scene[]
+    module: string
+  }
   const streamPath = join(dir, STREAM_FILE)
   const stream = existsSync(streamPath) ? new Uint8Array(readFileSync(streamPath)) : undefined
   const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
-  const modulePath = join(wasmPaths(REPO_DIR).out, LINK_OUTPUTS.js)
-  const factory = ((await import(pathToFileURL(modulePath).href)) as { default: ModuleFactory })
-    .default
+  const factory = ((await import(pathToFileURL(module).href)) as { default: ModuleFactory }).default
   const run = await playModule(factory, { stream, scenes, layout })
   for (const [name, frame] of run.frames) writeFileSync(join(dir, `${name}.ppm`), ppm(frame))
   writeHashes(join(dir, RUN_HASHES), run.hashes)
@@ -235,20 +252,33 @@ async function playDir(dir: string): Promise<void> {
   say(
     `${basename(dir)}: sound ${String(samples)} samples, ${perFrame.toFixed(1)} per frame, rms ${rms.toFixed(4)}`,
   )
+  sayMusic(basename(dir), run.sound, run.output.status.frame)
   const lines = [...run.output.shots, run.output.status]
   process.stdout.write(lines.map((line) => `${JSON.stringify(line)}\n`).join(''))
 }
 
+// O7: the BGM songs and the level by second from 5 s before the last song change to the end.
+function sayMusic(name: string, sound: SoundLog, end: number): void {
+  const songs = sound.songs.map(
+    (song) => `${String(song.tracks)} tracks from ${String(song.frame)}`,
+  )
+  say(`${name}: BGM songs ${songs.join(', ')}`)
+  const from = Math.max(1, (sound.songs.at(-1)?.frame ?? end) - 300)
+  const levels = sound.seconds(from, end).map((level) => level.toFixed(4))
+  say(`${name}: sound by second from frame ${String(from)}: ${levels.join(' ')}`)
+}
+
 interface StreamRun {
   runDir: string
+  module: string
   errors: readonly string[]
   baseline: { mode: RunArgs['mode']; out: string }
 }
 
-function runStream(plan: StreamPlan, { runDir, errors, baseline }: StreamRun): RunReport {
+function runStream(plan: StreamPlan, { runDir, module, errors, baseline }: StreamRun): RunReport {
   const dir = join(runDir, plan.name)
   mkdirSync(dir, { recursive: true })
-  writeFileSync(join(dir, RUN_FILE), JSON.stringify({ scenes: plan.scenes }))
+  writeFileSync(join(dir, RUN_FILE), JSON.stringify({ scenes: plan.scenes, module }))
   if (plan.stream !== undefined) writeFileSync(join(dir, STREAM_FILE), plan.stream)
   const [command, ...args] = playCommand(dir, RUN_SECONDS)
   const start = performance.now()
@@ -271,16 +301,16 @@ function runStream(plan: StreamPlan, { runDir, errors, baseline }: StreamRun): R
   return { ...report, problems: [...report.problems, ...settled.problems] }
 }
 
-async function runStreams({ mode, names }: RunArgs): Promise<void> {
+async function runStreams({ mode, names, sanitize }: RunArgs): Promise<void> {
   const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
   const errors = readErrorNames(readFileSync(INTERPRETER_HEADER_PATH, 'utf8'))
   const plans = await planStreams(parseShotArgs(names), layout)
   const { out } = wasmPaths(REPO_DIR)
   startBaseline(mode, out, plans)
-  const runDir = join(out, 'run')
+  const { module, runDir } = runPlace(out, sanitize)
   mkdirSync(runDir, { recursive: true })
   emptyInside(wasmRoots(REPO_DIR), runDir)
-  const run = { runDir, errors, baseline: { mode, out } }
+  const run = { runDir, module, errors, baseline: { mode, out } }
   const reports = plans.map((plan) => runStream(plan, run))
   finishRuns(reports, runDir, (line) => process.stdout.write(`wasm:run: ${line}\n`))
 }

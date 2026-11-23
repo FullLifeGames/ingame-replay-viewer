@@ -8,11 +8,9 @@
 
 #undef DmaSet
 void DmaSet(int dmaNum, const void *src, void *dest, u32 control);
-// The expansion passes plain addresses such as VRAM, which its macro cast to vu32. The borrowed
-// platform files see no macro; layer/irv_dma.h declares the name in parentheses.
-#ifndef IRV_WASM_PLATFORM
+// The expansion passes plain addresses such as VRAM, which its own macro cast to vu32, so this one
+// casts them to pointers. layer/irv_dma.h declares the name in parentheses, out of its reach.
 #define DmaSet(dmaNum, src, dest, control) DmaSet(dmaNum, (const void *)(src), (void *)(dest), control)
-#endif
 
 #undef CPU_FILL
 #define CPU_FILL(value, dest, size, bit) CPU_FILL_UNCHECKED(value, dest, size, bit)

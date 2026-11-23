@@ -2,22 +2,6 @@
   "emscripten": {
     "version": "7.0.0"
   },
-  "platform": {
-    "repository": "https://github.com/gradenGnostic/pokeemerald-multiplatform.git",
-    "commit": "db1cab3d2dc9f0e0a9f4a3d67983e5acf30a9a46",
-    "files": [
-      "include/cgb_audio.h",
-      "include/cgb_tables.h",
-      "include/mp2k_common.h",
-      "include/music_player.h",
-      "include/platform.h",
-      "include/sound_mixer.h",
-      "src/music_player.c",
-      "src/platform/cgb_audio.c",
-      "src/sound_mixer.c"
-    ],
-    "defines": ["IRV_WASM_PLATFORM", "RENDERER_EASY_DRAW", "PORTABLE"]
-  },
   "exclude": [
     "src/agb_flash.c",
     "src/agb_flash_1m.c",
