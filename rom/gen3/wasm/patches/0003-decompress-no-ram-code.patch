@@ -3,7 +3,7 @@ decoder of decompress_asm.s, the tANS loops and the tile number decoder, each co
 between two function addresses. WebAssembly runs no code from memory, and a function pointer
 is a table index, so the copy would read between two indices and the call would trap. Under
 IRV_WASM the buffer shrinks to one word, each wrapper gets the decoder itself, and LZ77 goes
-to the platform's LZ77UnCompWram.
+to the BIOS call LZ77UnCompWram of our platform layer (layer/irv_bios.c).
 
 diff --git a/src/decompress.c b/src/decompress.c
 index 8030c72..8d333ff 100644

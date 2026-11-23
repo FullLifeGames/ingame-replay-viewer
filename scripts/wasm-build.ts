@@ -10,9 +10,8 @@
 // build/wasm/irv-emerald.js and irv-emerald.wasm, then writes the patch from the dump to the module
 // (irv-emerald-wasm.bps); `--patch [report.md]` writes that patch alone. `--sanitize shift` beside
 // `--compile` or `--link` builds a module with clang's shift check (#44) under build/wasm/sanitize,
-// with no patch, and leaves the normal outputs alone. Everything it writes lies under build/wasm and
-// .cache/wasm, apart from a report path named on the command line. The tree comes from
-// `npm run rom:build`.
+// with no patch, and leaves the normal outputs alone. Everything it writes lies under build/wasm,
+// apart from a report path named on the command line. The tree comes from `npm run rom:build`.
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { isAbsolute, join } from 'node:path'

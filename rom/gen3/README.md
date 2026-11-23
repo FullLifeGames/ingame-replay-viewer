@@ -66,7 +66,7 @@ The tool takes a frame at each scene of `scripts/rom-shot-scenes.ts`, and `scrip
 The WebAssembly spike (#35) compiles the expansion with our C files to a WebAssembly module that runs in the browser without an emulator. `docs/wasm-spike.md` holds the results. The build lives in `wasm/` and reads the tree that `npm run rom:build` leaves; the ROM build never sees any of it.
 
 - `wasm/wasm.json`: the pinned Emscripten release, the tree files the module leaves out, and per-file defines and compiler flags.
-- `wasm/src/`: the glue, our C files for the module only. It blocks in `VBlankIntrWait`, has our platform layer run the frame, raises the interrupts, hands frames and sound to JavaScript, and stubs flash, the clock, the link cable and multiboot.
+- `wasm/src/`: the glue, our C files for the module only. It blocks in `VBlankIntrWait`, has our platform layer run the frame, raises the interrupts, hands frames and sound to JavaScript, and stubs flash, the clock, the link cable and multiboot. A run that must not go on stops in `irv_wasm_stop.c`, with a line that `wasm:run` and the page show.
 - `wasm/include/`: shadow headers. Each one shares a name with an upstream header, comes first on the include path, includes upstream's with `#include_next`, and then adds to it. Most add defines. `irv_wasm_sound.h` is our own.
 - `wasm/patches/series`: overlay patches. The build copies an upstream file into `build/wasm/overlay/`, applies its patch there, and compiles the copy. Each change sits under `#ifdef IRV_WASM`, and each patch carries its reason above `diff --git`, as the ROM's patches do.
 - `wasm/layer/`: our platform layer (#43), the C code that stands in for the GBA's hardware: BIOS calls, DMA, the interrupts, the frame driver, the renderer and the sound. It compiles with the glue, and `wasm/layer/host/` holds the native harness that runs the same files in the specs.
@@ -75,7 +75,7 @@ The platform layer is ours, under the repository's MIT licence. Until #43 the bu
 
 Each command is a heavy check on devbox, so run it alone and in the background:
 
-1. `npm run wasm:build -- --compile` compiles the kept tree files and the overlay copies at `-O2` into `build/wasm/obj/` (about 5 minutes).
+1. `npm run wasm:build -- --compile` compiles the kept tree files, the overlay copies, the glue and our platform layer at `-O2` into `build/wasm/obj/` (about 5 minutes).
 2. `npm run wasm:convert` turns the 544 ARM data objects of the ROM build (battle, animation and event scripts, songs) into WebAssembly objects in `build/wasm/asm/`. It is needed again only when the data changes.
 3. `npm run wasm:build -- --link` compiles the glue and our platform layer and links `build/wasm/irv-emerald.js` and `irv-emerald.wasm`, then writes the module patch `irv-emerald-wasm.bps` from your dump. `--patch` writes the patch alone.
 4. `npm run wasm:run -- hand-made 994052` plays streams in the module in Node and checks the scenes of `rom:shots`. It writes its frames and `report.json` to `build/wasm/run/`.
