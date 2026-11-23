@@ -111,6 +111,7 @@ export const SAMPLES: Readonly<Record<string, Sample>> = {
   'effects.freed': withValue('B_BUFF1', nb('Fire Spin'), FAR),
   'effects.disabled': withValue('B_BUFF1', nb('Body Slam'), FAR),
   'effects.transformed': withValue('B_BUFF1', 'Tyranitar', FAR),
+  'effects.tookAttack': withValue('B_BUFF1', nb('Future Sight'), FAR),
   'effects.squeezed': { args: [FAR, NEAR], fill: { B_SCR_NAME_WITH_PREFIX2: 'Dugtrio' } },
   'effects.wrapped': { args: [FAR, NEAR], fill: { B_SCR_NAME_WITH_PREFIX2: 'Dugtrio' } },
   'effects.clamped': { args: [FAR, NEAR], fill: { B_SCR_NAME_WITH_PREFIX: 'Dugtrio' } },

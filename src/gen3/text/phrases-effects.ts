@@ -14,6 +14,7 @@ import {
 } from './names'
 import { screenRaised } from './phrases-field'
 import { isTrapping } from './phrases-hp'
+import { STATUS_TEMPLATES } from './phrases-status'
 import { ownPhrase, type Phrase, tagged } from './template'
 
 type Line = (who: Mon) => string
@@ -82,6 +83,23 @@ export const EFFECT_TEMPLATES = {
   transformed: tagged('STRINGID_PKMNTRANSFORMEDINTO', (who: Mon, species: string) => {
     return `${nameAtStart(who)} transformed into ${species}!`
   }),
+  // Bide's second turn (`BattleScript_BideStoringEnergy`) and its third (`BattleScript_BideAttack`).
+  storingEnergy: tagged('STRINGID_PKMNSTORINGENERGY', start('is storing energy!')),
+  unleashedEnergy: tagged('STRINGID_PKMNUNLEASHEDENERGY', start('unleashed its energy!')),
+  // `BattleScript_RageIsBuilding` says it as a hit raises the user's Attack; the log starts Rage
+  // as the move is used, so the line comes then.
+  rageBuilding: tagged('STRINGID_PKMNRAGEBUILDING', (who: Mon) => {
+    return `${ownerAtStart(who)} rage is building!`
+  }),
+  // B_MSG_SET_MIST in `gMistUsedStringIds` (`BattleScript_EffectMist`); Gen 1 logs Mist as a
+  // start on its user.
+  mist: tagged('gText_PkmnShroudedInMist', start('surrounds itself with a protective mist!')),
+  // B_MSG_FUTURE_SIGHT in `gFutureMoveUsedStringIds`; the hit (`BattleScript_MonTookFutureAttack`)
+  // names the move as B_BUFF1.
+  foresaw: tagged('STRINGID_PKMNFORESAWATTACK', start('foresaw an attack!')),
+  tookAttack: tagged('STRINGID_PKMNTOOKATTACK', (who: Mon, move: string) => {
+    return `${nameAtStart(who)} took the ${move} attack!`
+  }),
 }
 
 const E = EFFECT_TEMPLATES
@@ -101,6 +119,9 @@ const STARTS: Readonly<Record<string, Line>> = {
   sandtomb: E.quicksand.render,
   // Mean Look's `-activate|<target>|trapped`, which the parser reads as a start.
   trapped: E.cantEscape.render,
+  rage: E.rageBuilding.render,
+  mist: E.mist.render,
+  futuresight: E.foresaw.render,
 }
 
 /**
@@ -152,6 +173,9 @@ const ACTS: Readonly<Record<string, Line>> = {
   substitute: E.substituteHit.render,
   confusion: E.isConfused.render,
   destinybond: E.tookFoe.render,
+  bide: E.storingEnergy.render,
+  // Heal Bell's shape from Gen 5 on; Gen 2 to 4 log `-cureteam`, which says the same line.
+  healbell: STATUS_TEMPLATES.bell.render,
 }
 
 /** An effect that acts; Splash's "nothing" names no Pokémon. */
@@ -171,12 +195,17 @@ const ENDS: Readonly<Record<string, Line>> = {
   leechseed: E.seedShed.render,
   encore: E.encoreEnded.render,
   disable: E.disableEnded.render,
+  bide: E.unleashedEnergy.render,
+}
+
+/** The end lines that name the effect's move, by the effect's id. */
+const ENDS_NAMING_MOVE: Readonly<Record<string, (who: Mon, move: string) => string>> = {
+  futuresight: E.tookAttack.render,
 }
 
 export function effectEnded(who: Mon, effect: Effect): Phrase {
-  const text = isTrapping(effect.name)
-    ? E.freed.render(who, moveName(effect.name))
-    : ENDS[toID(effect.name)]?.(who)
+  const namingMove = isTrapping(effect.name) ? E.freed.render : ENDS_NAMING_MOVE[toID(effect.name)]
+  const text = namingMove ? namingMove(who, moveName(effect.name)) : ENDS[toID(effect.name)]?.(who)
   if (text !== undefined) return { text }
   const own = `${ownerAtStart(who)} ${held(effect.name)} wore off!`
   return ownPhrase(own, `${effect.name} ending`)

@@ -27,6 +27,12 @@ import { bar, drain, isSubstituteCost } from './hp'
 
 const VOLATILES: Partial<Readonly<Record<string, Volatile>>> = { substitute: 'substitute' }
 
+/**
+ * Starts the expansion shows as the move alone: Bide's first turn plays its animation and says
+ * nothing (`BattleScript_SetUpBide`); its later turns say their lines.
+ */
+const SILENT_STARTS: ReadonlySet<string> = new Set(['bide'])
+
 const DESTINY_BOND = 'destinybond'
 const PERISH_ZERO = 'perish0'
 
@@ -50,7 +56,8 @@ export function effectStart(event: EventOf<'effectStart'>, ctx: Context): void {
   }
   const cost = ctx.near(1)
   if (cost?.kind === 'damage' && isSubstituteCost(event, cost)) bar(cost, ctx)
-  if (!event.silent) startLine(event, ctx)
+  const silent = event.silent ?? SILENT_STARTS.has(toID(effect.name))
+  if (!silent) startLine(event, ctx)
   else if (volatile === undefined) ctx.note(line, mechanicGap(effect.name, 'starting'))
 }
 
