@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { buildBattleScript } from './build'
-import { ScriptError } from './errors'
+import { GameTypeRefusal, ScriptError } from './errors'
 import type { ScriptEvent } from './events'
 import { NEXT, replayScript, scriptOf } from './testing'
 
@@ -188,6 +188,19 @@ describe('buildBattleScript: logs it refuses', () => {
   it('refuses doubles', () => {
     expect(() => buildBattleScript('|gametype|doubles\n')).toThrow(ScriptError)
     expect(() => buildBattleScript('|gametype|doubles\n')).toThrow(/^line 0: .*doubles/)
+  })
+
+  it('refuses doubles with a GameTypeRefusal that carries the game type (#59)', () => {
+    const build = () => buildBattleScript('|gametype|doubles\n')
+    expect(build).toThrow(GameTypeRefusal)
+    expect(build).toThrow(
+      expect.objectContaining({
+        name: 'GameTypeRefusal',
+        gameType: 'doubles',
+        line: 0,
+        message: 'line 0: the game type "doubles" is not singles',
+      }),
+    )
   })
 
   it('refuses a faint of a Pokémon that never appeared, with its line', () => {

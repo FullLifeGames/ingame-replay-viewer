@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { buildBattleScript } from '../script/build'
 import { scriptOf } from '../script/testing'
 import { buildGen3Stream } from './backend'
-import { Gen3Error } from './errors'
+import { Gen3Error, GenerationRefusal } from './errors'
 import { decodeStream } from './stream/decode'
 import { speciesOf } from './tables/lookup'
 import trainerPics from './tables/trainer-pics.json'
@@ -80,6 +80,18 @@ describe('buildGen3Stream', () => {
     const script = { ...scriptOf(), gen: 4 }
     expect(() => buildGen3Stream(script)).toThrow(Gen3Error)
     expect(() => buildGen3Stream(script)).toThrow(/Gen 4/)
+  })
+
+  it('refuses a Gen 9 log with a GenerationRefusal that carries the gen (#59)', () => {
+    const script = buildBattleScript('|gen|9\n')
+    expect(() => buildGen3Stream(script)).toThrow(GenerationRefusal)
+    expect(() => buildGen3Stream(script)).toThrow(
+      expect.objectContaining({
+        name: 'GenerationRefusal',
+        gen: 9,
+        message: 'the stream plays Gen 3 battles, this one is Gen 9',
+      }),
+    )
   })
 })
 
