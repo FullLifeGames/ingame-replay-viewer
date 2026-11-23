@@ -1,7 +1,7 @@
 // A saved replay: a replay the viewer reads from a file (#56). Four kinds: the file of Showdown's
 // "Download replay", a replay page saved from a browser, a battle log, and a replay's JSON file.
 // The reader runs on files from anywhere, so it builds no document and scans the text with string
-// search in one pass; no pattern here backtracks over more than one run of the text.
+// search, each search once; no pattern here backtracks over more than one run of the text.
 import { toID } from '@pkmn/dex'
 
 import { isNamedPlayer } from './drops'
