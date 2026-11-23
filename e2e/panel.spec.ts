@@ -11,6 +11,7 @@ import { REPO_DIR } from '../scripts/rom-paths.ts'
 import { WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'
 import { readReplay } from '../src/script/replay.ts'
 import { rawLog } from '../src/script/saved-replay-testing.ts'
+import { scrollWidth } from './page-text.ts'
 import { guardRequests } from './requests.ts'
 import { DUMP, missingForModule, report, waitFor } from './wasm-hook.ts'
 
@@ -30,15 +31,11 @@ const panel = (page: Page) => ({
 /** What the page's window offers to `page.evaluate`; the e2e compiles without the DOM types. */
 interface PageWindow {
   document: {
-    documentElement: { scrollWidth: number }
     getElementById(id: string): { textContent: string | null } | null
   }
   requestAnimationFrame(callback: () => void): number
   irvWasmSpike: { status(): { turn: number } | undefined }
 }
-
-const scrollWidth = (page: Page): Promise<number> =>
-  page.evaluate(() => (globalThis as unknown as PageWindow).document.documentElement.scrollWidth)
 
 /** The panel's turn and the hook's, read in one animation frame after the page's own draw. */
 const sampleTurn = (page: Page) =>

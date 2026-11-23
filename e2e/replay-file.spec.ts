@@ -1,7 +1,8 @@
 // A replay from a saved file in the viewer at / (#56): each kind the reader knows, built from the
 // test fixture as Showdown saves it, fills the list as the same replay loaded by link does. The
 // file stays in the tab, so the link's request to Showdown is the only one that leaves the page,
-// and a route answers it from the fixture.
+// and a route answers it from the fixture. On a phone-wide screen, the longest replay ID the
+// reader takes wraps in the status line, its detail and the summary.
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -9,8 +10,9 @@ import { expect, type Page, test } from '@playwright/test'
 
 import { REPO_DIR } from '../scripts/rom-paths.ts'
 import { readReplay } from '../src/script/replay.ts'
+import { LONGEST_REPLAY_ID } from '../src/script/replay-id.ts'
 import { downloadedFile, jsonFile, rawLog, replayPage } from '../src/script/saved-replay-testing.ts'
-import { notShownList } from './page-text.ts'
+import { notShownList, scrollWidth } from './page-text.ts'
 import { guardRequests } from './requests.ts'
 import { loadReplay, routeShowdown, showdownUrl } from './showdown.ts'
 
@@ -112,4 +114,33 @@ test('a file of no kind the viewer reads gets its line and leaves the list on th
   await expect(status).toHaveText(`Picked ${FIRST}. Press Start to play it.`)
   await expect(page.locator('#replay-file')).toHaveValue('')
   expect(notSameOriginGets).toEqual([])
+})
+
+test.describe('on a phone-wide screen', () => {
+  const WIDTH = 360
+  test.use({ viewport: { width: WIDTH, height: 740 } })
+
+  test('a file with the longest replay ID the reader takes wraps its lines', async ({
+    page,
+    baseURL,
+  }) => {
+    const notSameOriginGets = await guardRequests(page, baseURL)
+    const id = 'w'.repeat(LONGEST_REPLAY_ID)
+    await page.goto('/')
+    await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${FIRST}: `))
+
+    const text = downloadedFile({ ...REPLAY, id })
+    await pickFile(page, { name: 'long.html', mimeType: 'text/html', text })
+    await expect(page.getByRole('status')).toHaveText(`Picked ${id}. Press Start to play it.`)
+    await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${id}: `))
+    expect(await scrollWidth(page)).toBeLessThanOrEqual(WIDTH)
+
+    await page.locator('#details summary').click()
+    await pickFile(page, { name: `${id}.txt`, mimeType: 'text/plain', text: 'Bring snacks.\n' })
+    await expect(page.locator('#status-detail')).toHaveText(
+      new RegExp(`^Could not read the replay file ${id}\\.txt: `),
+    )
+    expect(await scrollWidth(page)).toBeLessThanOrEqual(WIDTH)
+    expect(notSameOriginGets).toEqual([])
+  })
 })

@@ -122,6 +122,13 @@ describe('the words for visitors', () => {
       )
     })
 
+    // A replay ID or a file name has no space to break at; the phone's screen must not scroll.
+    it(`wraps a long word in the status line, its detail and the summary on ${name}`, () => {
+      expect(page(name)).toMatch(
+        /#status,\s*#status-detail,\s*#replay-summary\s*\{\s*overflow-wrap: anywhere;\s*\}/,
+      )
+    })
+
     it(`gives the environment line its own "Details" and report link on ${name}`, () => {
       const block = /<div id="environment" hidden>([\s\S]*?)<\/div>/.exec(page(name))?.[1]
       expect(block).toContain('<p id="environment-line"></p>')

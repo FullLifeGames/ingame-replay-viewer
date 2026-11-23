@@ -16,3 +16,11 @@ export async function notShownList(page: Page) {
     rows: await page.locator('#not-shown-rows li').allInnerTexts(),
   }
 }
+
+/** How wide the page's content is, in CSS pixels: more than the viewport scrolls it sideways. */
+export const scrollWidth = (page: Page): Promise<number> =>
+  page.evaluate(
+    () =>
+      (globalThis as unknown as { document: { documentElement: { scrollWidth: number } } }).document
+        .documentElement.scrollWidth,
+  )
