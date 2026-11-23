@@ -78,6 +78,8 @@ describe('a replay choice', () => {
     await expect(choice.loadReplay('gen3ou-1')).rejects.toThrow(
       new SessionError(
         'Could not fetch the replay: https://replay.pokemonshowdown.com/gen3ou-1.json answered 404',
+        undefined,
+        { source: 'link', replay: 'gen3ou-1' },
       ),
     )
     expect((await choice.chosen())?.summary.id).toBe('smogtours-gen3ou-994086')
@@ -158,11 +160,13 @@ describe('a replay file', () => {
     expect(failure).toEqual(
       new SessionError(
         'Could not read the replay file big.log: big.log holds 5.1 MB, and the viewer reads replay files up to 5 MB',
+        undefined,
+        { source: 'file', replay: 'a file of no known kind' },
       ),
     )
     const cause = (failure as SessionError).cause
     expect(cause).toBeInstanceOf(FileSizeError)
-    expect((cause as FileSizeError).size).toBe(LARGEST_FILE + 1)
+    expect(cause).toMatchObject({ fileName: 'big.log', size: LARGEST_FILE + 1, megabytes: '5.1' })
     expect(read).not.toHaveBeenCalled()
     expect((await choice.chosen())?.summary.id).toBe('smogtours-gen3ou-994086')
   })

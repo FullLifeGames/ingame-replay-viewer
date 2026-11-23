@@ -2,6 +2,7 @@
 // message to a fresh worker; after it, frames and progress go through the shared buffers of
 // protocol.ts, since AgbMain never returns and the worker reads no further message.
 import type { SlotDescription } from '../../patch/slot'
+import type { FailedReport } from './failures'
 import type { SharedBuffers } from './protocol'
 
 /** The page's one message to a fresh worker. */
@@ -18,5 +19,4 @@ export interface StartMessage {
 }
 
 /** The worker's messages to the page. Frames and progress go through the shared buffers. */
-export type WorkerReport =
-  { readonly type: 'running' } | { readonly type: 'failed'; readonly line: string }
+export type WorkerReport = { readonly type: 'running' } | FailedReport

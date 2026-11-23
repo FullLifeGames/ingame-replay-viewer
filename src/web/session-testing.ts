@@ -52,7 +52,7 @@ export function world() {
   let crash: ((line: string) => void) | undefined
   const answer = (url: string): Promise<never> => {
     fetched.push(url)
-    const value = answers.get(url) ?? new FetchError(`${url} answered 404`)
+    const value = answers.get(url) ?? new FetchError(`${url} answered 404`, url, 404)
     return value instanceof Error ? Promise.reject(value) : Promise.resolve(value as never)
   }
   // Keeps the adapter's rules the session relies on: Restart refuses before a run.

@@ -214,5 +214,5 @@ if (problem === undefined) {
     },
   })
 } else {
-  view.showOnly(problem)
+  view.showOnly(problem.detail)
 }

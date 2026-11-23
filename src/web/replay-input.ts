@@ -7,7 +7,8 @@ export class ReplayInputError extends Error {
   override name = 'ReplayInputError'
 }
 
-const REPLAY_HOST = 'replay.pokemonshowdown.com'
+/** Showdown's replay host, which the page asks for a replay's JSON. */
+export const REPLAY_HOST = 'replay.pokemonshowdown.com'
 const ASK = `paste a replay ID or a link to ${REPLAY_HOST}`
 
 /** Showdown's replay IDs: lowercase words joined by single hyphens, as gen3ou-1234567890. */

@@ -3,7 +3,13 @@ import { describe, expect, it } from 'vitest'
 import build from '../../rom/gen3/build.json'
 import { createBps } from '../patch/bps-create'
 import type { SlotDescription } from '../patch/slot'
-import { checkBaseRom, patchBaseRom, readSlotDescription, RomError } from './rom'
+import {
+  BuildMismatchError,
+  checkBaseRom,
+  patchBaseRom,
+  readSlotDescription,
+  RomError,
+} from './rom'
 import { sha1Hex } from './sha1'
 
 // Synthetic bytes only: a small "base ROM" and a "built ROM" that differs in a few places.
@@ -63,6 +69,8 @@ describe('patchBaseRom', () => {
     const stale = { ...DESCRIPTION, romSha1: BASE_SHA1 }
     const refusal = patchBaseRom(BASE, PATCH, stale)
     await expect(refusal).rejects.toThrow(RomError)
+    await expect(refusal).rejects.toBeInstanceOf(BuildMismatchError)
+    await expect(refusal).rejects.toMatchObject({ name: 'BuildMismatchError' })
     await expect(refusal).rejects.toThrow(
       `The patched ROM's SHA1 is ${DESCRIPTION.romSha1}, replay-slot.json names ${BASE_SHA1}: ` +
         'the patch and replay-slot.json come from different builds. Run npm run rom:build again.',

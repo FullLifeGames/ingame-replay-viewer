@@ -11,6 +11,11 @@ export class RomError extends Error {
   override name = 'RomError'
 }
 
+/** The site's patch and replay-slot.json come from different builds. */
+export class BuildMismatchError extends RomError {
+  override name = 'BuildMismatchError'
+}
+
 const isCount = (value: unknown): boolean => Number.isSafeInteger(value) && Number(value) >= 0
 const isText = (value: unknown): boolean => typeof value === 'string'
 
@@ -85,7 +90,7 @@ export async function patchBaseRom(
   const rom = applyBps(patch, base)
   const built = await sha1Hex(rom)
   if (built !== description.romSha1) {
-    throw new RomError(
+    throw new BuildMismatchError(
       `The patched ROM's SHA1 is ${built}, replay-slot.json names ${description.romSha1}: ` +
         'the patch and replay-slot.json come from different builds. Run npm run rom:build again.',
     )

@@ -69,5 +69,5 @@ if (problem === undefined) {
   wireReplays(session, view)
   wireRun(session, view, audio)
 } else {
-  view.showOnly(problem)
+  view.showOnly(problem.detail)
 }
