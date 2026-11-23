@@ -44,7 +44,7 @@ Issue #49 asks the viewer to play a replay to its end on Android in Firefox and 
 - The audio worklet (`AudioWorkletNode`). Without it the game plays without sound, and the status line says why.
 - 256 MB of memory for the module, fixed at instantiation and never grown. A phone that refuses it gets the line "This browser did not give the game the 256 MB of memory it needs", with the browser's own words, after Start. Each Start tries again with the picked dump. The build before it, the patch applied to the dump and the compile, can run out of memory too; that gets the line "This browser ran out of memory while it built the game from your dump", and a reload with the dump picked again tries once more. `src/web/wasm/failures.ts` holds both lines and the number, and the web server's spec holds it equal to the link's (`scripts/wasm-link.ts`).
 
-On 22.11.2026 the user played the viewer, then the spike page `wasm.html`, on an Android phone in Firefox over `tailscale serve`, with sound. The runs at the end of wave 4's stage 4 fill this table: a replay at 1x and at 2x to its end on each phone, with the counts of the progress line.
+On 22.11.2026 the user played the viewer on an Android phone in Firefox over `tailscale serve`, with sound. The viewer was still `wasm.html` then. The runs at the end of wave 4's stage 4 fill this table: a replay at 1x and at 2x to its end on each phone, with the counts of the progress line.
 
 | Phone and browser | Replay | 1x to the end | 2x to the end | Samples skipped | Ran out of sound | What the browser lacks |
 | ----------------- | ------ | ------------- | ------------- | --------------- | ---------------- | ---------------------- |
