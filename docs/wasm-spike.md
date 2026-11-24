@@ -103,19 +103,19 @@ Bytes, with gzip at level 9 and brotli at quality 11 from Node's zlib (`scripts/
 
 | File                                  | Raw            | gzip           | brotli         |
 | ------------------------------------- | -------------- | -------------- | -------------- |
-| `irv-emerald-wasm.bps` (module patch) | 20,970,733     | 15,597,476     | 14,179,812     |
+| `irv-emerald-wasm.bps` (module patch) | 20,970,811     | 15,597,567     | 14,159,126     |
 | `irv-emerald.js` (Emscripten's glue)  | 8,635          | 3,135          | 2,837          |
-| **WebAssembly page**                  | **20,979,368** | **15,600,611** | **14,182,649** |
+| **WebAssembly page**                  | **20,979,446** | **15,600,702** | **14,161,963** |
 | `mgba.wasm`                           | 1,852,041      | 597,591        | 463,184        |
 | `mgba.js`                             | 248,854        | 57,127         | 48,706         |
-| `irv-emerald.bps` (ROM patch)         | 18,392,107     | 15,763,155     | 14,488,479     |
-| **Emulator page**                     | **20,493,002** | **16,417,873** | **15,000,369** |
+| `irv-emerald.bps` (ROM patch)         | 18,392,347     | 15,763,117     | 14,488,033     |
+| **Emulator page**                     | **20,493,242** | **16,417,835** | **14,999,923** |
 
-Raw, the WebAssembly page fetches 0.49 MB more. Compressed, it fetches 0.82 MB less with gzip and 0.82 MB less with brotli. The dev server sends both pages' files uncompressed; a real host picks the encoding (M2).
+Raw, the WebAssembly page fetches 0.49 MB more. Compressed, it fetches 0.82 MB less with gzip and 0.84 MB less with brotli. The dev server sends both pages' files uncompressed; a real host picks the encoding (M2).
 
 In wave 3 the module patch copied 5,815,589 of the module's 25,977,583 bytes (22.4 %) from the dump and carried 20,143,848 bytes as literals. For comparison, the ROM patch copied 8,069,773 of the ROM's 33,554,432 bytes (24.0 %) from the dump (the BPS actions SourceRead and SourceCopy, counted in both patches).
 
-The module itself, `irv-emerald.wasm` (25,973,953 bytes), never leaves the build machine: the server answers 404 for it, and the page rebuilds it from the dump.
+The module itself, `irv-emerald.wasm` (25,974,028 bytes), never leaves the build machine: the server answers 404 for it, and the page rebuilds it from the dump.
 
 ## What it means for the speed options and for #17
 
@@ -123,7 +123,7 @@ The module itself, `irv-emerald.wasm` (25,973,953 bytes), never leaves the build
 
 The speed options go into our own frame loop if milestone 2 ships the module. The page already grants the worker its frames by the tick rule (`src/web/wasm/protocol.ts`), so 1x, 2x and fast are one factor each, the sound follows at 1x and 2x, and fast gives way to 1x at END. If milestone 2 keeps mGBA, the options go to mGBA's fast-forward multiplier instead. In Chromium that tops out near 314 frames per second, where the module's fast averaged 330 to 348 in B6 and B7.
 
-The module does not solve #17. Its patch is 20.97 MB raw and 14.18 MB with brotli, against 18.39 MB and 14.49 MB for the ROM patch. Each copies under a quarter of its bytes from the dump and carries the rest itself. A visitor fetches 0.82 MB less on the WebAssembly page with gzip and with brotli, and the host's compression saves more than the switch: brotli takes 3.90 MB off the ROM patch. Per-asset extraction (below, "Nintendo's assets from the dump") is the one lever the spike found that shrinks the module patch itself, by the retail assets the expansion recompresses. The expansion's new assets stay in the patch on either route.
+The module does not solve #17. Its patch is 20.97 MB raw and 14.16 MB with brotli, against 18.39 MB and 14.49 MB for the ROM patch. Each copies under a quarter of its bytes from the dump and carries the rest itself. A visitor fetches 0.82 MB less on the WebAssembly page with gzip and 0.84 MB less with brotli, and the host's compression saves more than the switch: brotli takes 3.90 MB off the ROM patch. Per-asset extraction (below, "Nintendo's assets from the dump") is the one lever the spike found that shrinks the module patch itself, by the retail assets the expansion recompresses. The expansion's new assets stay in the patch on either route.
 
 ## Patches, shadow headers and flags
 
