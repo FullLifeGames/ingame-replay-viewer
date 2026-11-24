@@ -83,8 +83,9 @@ REPLAY_TEST("THEN sees the battle before END leaves it")
 
 // A recorded battle leaves on a held B while RecordedBattle_CanStopPlayback() says so
 // (BattleMainCB2). The replay counts as finished from the takeover on, so B held from the first
-// frame leaves the battle up to END, and the runner fails a test whose battle leaves before it.
-REPLAY_TEST("B held from the first frame leaves the battle up to END")
+// frame keeps the battle on screen to END, and the runner fails a test whose battle leaves
+// before it.
+REPLAY_TEST("B held from the first frame keeps the battle on screen to END")
 {
     STREAM
     {
