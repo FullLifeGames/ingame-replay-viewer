@@ -93,9 +93,6 @@ export const EFFECT_TEMPLATES = {
   rageBuilding: tagged('STRINGID_PKMNRAGEBUILDING', (who: Mon) => {
     return `${ownerAtStart(who)} rage is building!`
   }),
-  // B_MSG_SET_MIST in `gMistUsedStringIds` (`BattleScript_EffectMist`); Gen 1 logs Mist as a
-  // start on its user.
-  mist: tagged('gText_PkmnShroudedInMist', start('surrounds itself with a protective mist!')),
   // B_MSG_FUTURE_SIGHT and B_MSG_DOOM_DESIRE in `gFutureMoveUsedStringIds`; the hit
   // (`BattleScript_MonTookFutureAttack`) names the move as B_BUFF1.
   foresaw: tagged('STRINGID_PKMNFORESAWATTACK', start('foresaw an attack!')),
@@ -133,7 +130,8 @@ const STARTS: Readonly<Record<string, Line>> = {
   // Mean Look's `-activate|<target>|trapped`, which the parser reads as a start.
   trapped: E.cantEscape.render,
   rage: E.rageBuilding.render,
-  mist: E.mist.render,
+  // Gen 1 and 2 log Mist as a start on its user; Gen 3 as a side start (`sideStarted`).
+  mist: FIELD_TEMPLATES.mist.render,
   futuresight: E.foresaw.render,
   doomdesire: E.choseDestiny.render,
   // Gen 3 logs the sports as starts on their user; the game's line names the type they weaken.

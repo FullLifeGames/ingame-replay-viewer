@@ -55,6 +55,10 @@ export const FIELD_TEMPLATES = {
   safeguard: tagged('STRINGID_PKMNCOVEREDBYVEIL', (Team: string) => {
     return `${Team} side became cloaked in a mystical veil!`
   }),
+  // B_MSG_SET_MIST in `gMistUsedStringIds` (`BattleScript_EffectMist`), with the user as B_ATK.
+  mist: tagged('gText_PkmnShroudedInMist', (who: Mon) => {
+    return `${nameAtStart(who)} surrounds itself with a protective mist!`
+  }),
   spikesGone: tagged('STRINGID_PKMNBLEWAWAYSPIKES', (who: Mon) => {
     return `${nameAtStart(who)} blew away Spikes!`
   }),
@@ -126,9 +130,19 @@ export function screenRaised(side: Side, id: string): string | undefined {
   return id === 'reflect' || id === 'lightscreen' ? SIDE_STARTS[id]?.(side) : undefined
 }
 
-/** A condition set on one side, such as Spikes on the side they hurt. */
-export function sideStarted(side: Side, condition: Effect): Phrase {
-  const text = SIDE_STARTS[toID(condition.name)]?.(side)
+/** The side starts whose line names the Pokémon that set them, by the condition's id. */
+const SIDE_STARTS_BY_USER: Readonly<Record<string, (user: Mon) => string>> = {
+  mist: T.mist.render,
+}
+
+/**
+ * A condition set on one side, such as Spikes on the side they hurt; `user` is the Pokémon on
+ * that side whose move set it, if one did.
+ */
+export function sideStarted(side: Side, condition: Effect, user?: Mon): Phrase {
+  const id = toID(condition.name)
+  const byUser = SIDE_STARTS_BY_USER[id]
+  const text = user && byUser ? byUser(user) : SIDE_STARTS[id]?.(side)
   if (text !== undefined) return { text }
   const own = `${held(condition.name)} took effect on ${teamInside(side)} side!`
   return ownPhrase(own, `${condition.name} starting on a side`)
