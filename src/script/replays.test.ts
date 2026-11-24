@@ -23,9 +23,9 @@ function foldedLines(script: BattleScript): number[] {
  * A line of a kind the named list keeps as "no rule yet" (#60): it may stand in a test replay as
  * an `unsupported` drop, since the list gives its reason. Every other such drop fails.
  */
-function isNamedGap({ reason, detail }: DroppedLine): boolean {
-  const kind = /^no rule for (\|.+\|)$/.exec(detail ?? '')?.[1]
-  const named = Object.entries(NAMED_KINDS).find(([key]) => key === kind)?.[1]
+function isNamedGap({ reason, text }: DroppedLine): boolean {
+  const kind = readLines(text)[0]?.key
+  const named = kind === undefined ? undefined : NAMED_KINDS[kind]
   return reason === 'unsupported' && named?.group === 'no rule yet'
 }
 

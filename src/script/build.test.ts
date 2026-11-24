@@ -163,14 +163,15 @@ describe('buildBattleScript: lines it cannot show', () => {
     })
   })
 
-  it('lists a line without a rule as unsupported', () => {
-    // Only Gen 4 and later log it, so it stays without a rule.
-    const line = '|-swapboost|p1a: Dugtrio|p2a: Tyranitar|atk'
+  it('lists a line of a kind on the named list as unsupported, with the census reason', () => {
+    // Only Gen 4 and later log it, so it stays on the named list as a refused-format kind.
+    const line = '|-fieldstart|move: Trick Room|[of] p1a: Dugtrio'
     expect(scriptOf(line).dropped.at(-1)).toEqual({
       line: NEXT,
       text: line,
       reason: 'unsupported',
-      detail: 'no rule for |-swapboost|',
+      detail:
+        'a field condition starting: only Gen 4 and later log it, and the backend refuses those battles',
     })
   })
 
