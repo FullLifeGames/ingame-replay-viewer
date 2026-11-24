@@ -1,8 +1,11 @@
 // The division rewrite through Binaryen (#66): a small module with stand-in helpers goes through
-// wasm-dis, the rewrite and wasm-as, then runs in Node. The stand-ins return libgcc 14.2.1's values
-// of the ROM (.waves/04 plan-div fact 1, the issue's diagnosis); the 64-bit zero cases mirror the
-// 32-bit ones until 66-3 traces __divdi3 and __udivdi3. A helper's own op stays an op: rewritten,
-// it would call itself until the stack runs out. CI has no Emscripten, so this spec skips there.
+// wasm-dis, the rewrite and wasm-as, then runs in Node. The 32-bit stand-ins return libgcc
+// 14.2.1's values of the ROM (.waves/04 plan-div fact 1, the issue's diagnosis). The 64-bit ones
+// mirror the 32-bit ones on a zero divisor and do not return libgcc's 64-bit values, so their spec
+// proves only that the rewrite routes each 64-bit op to its helper;
+// scripts/wasm-layer-divide.test.ts holds libgcc's 64-bit values. A helper's own op stays an op:
+// rewritten, it would call itself until the stack runs out. CI has no Emscripten, so this spec
+// skips there.
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -121,7 +124,7 @@ describe.skipIf(!existsSync(wasmAs))(
       expect([run('i64.div_u', -2n, 2n), run('i64.rem_u', 7n, 3n)]).toEqual([2n ** 63n - 1n, 1n])
     })
 
-    it('calls the 64-bit helpers on a zero divisor', () => {
+    it('routes the 64-bit ops by a zero divisor to their helpers, with stand-in values', () => {
       expect([run('i64.div_s', 7n, 0n), run('i64.rem_s', -7n, 0n)]).toEqual([
         2n ** 63n - 1n,
         -(2n ** 63n),
