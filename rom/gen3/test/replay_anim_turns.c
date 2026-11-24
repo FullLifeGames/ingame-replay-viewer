@@ -61,6 +61,61 @@ SINGLE_BATTLE_TEST("Replay: engine: Solar Beam's charge plays turn 0")
     }
 }
 
+// In sun, Solar Beam charges and fires in one turn: the charge line, then the charge animation
+// (`BattleScript_TwoTurnMoveCharging`), then the beam on the turn `CanTwoTurnMoveFireThisTurn`
+// sets.
+SINGLE_BATTLE_TEST("Replay: engine: Solar Beam in sun says its line, charges, then fires on turn 1")
+{
+    GIVEN
+    {
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(opponent, MOVE_SUNNY_DAY); MOVE(player, MOVE_SOLAR_BEAM); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SUNNY_DAY, opponent);
+        MESSAGE("Wobbuffet used Solar Beam!");
+        MESSAGE("Wobbuffet absorbed light!");
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SOLAR_BEAM, player);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SOLAR_BEAM, player);
+        HP_BAR(opponent);
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, 1);
+    }
+}
+
+SINGLE_BATTLE_TEST("Replay: engine: Fly's hit plays turn 1")
+{
+    GIVEN
+    {
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_FLY); }
+        TURN { SKIP_TURN(player); }
+    }
+    SCENE
+    {
+        MESSAGE("Wobbuffet flew up high!");
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_FLY, player);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_FLY, player);
+        HP_BAR(opponent);
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, 1);
+    }
+}
+
 SINGLE_BATTLE_TEST("Replay: engine: Curse by a mon that is not a Ghost plays turn 1")
 {
     GIVEN
@@ -175,6 +230,34 @@ SINGLE_BATTLE_TEST("Replay: engine: Future Sight's hit plays turn 1")
         ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
         ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
         ANIMATION(ANIM_TYPE_MOVE, MOVE_FUTURE_SIGHT, player);
+        HP_BAR(opponent);
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, 1);
+    }
+}
+
+SINGLE_BATTLE_TEST("Replay: engine: Doom Desire's hit plays turn 1")
+{
+    GIVEN
+    {
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_DOOM_DESIRE); }
+        TURN { }
+        TURN { }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_DOOM_DESIRE, player);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
+        MESSAGE("The opposing Wobbuffet took the Doom Desire attack!");
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_DOOM_DESIRE, player);
         HP_BAR(opponent);
     }
     THEN
