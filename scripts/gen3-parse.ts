@@ -139,6 +139,23 @@ function nameIn(
 }
 
 /**
+ * The text of each `[PREFIX_X] = …` entry as code, up to the next entry: comments and
+ * preprocessor lines gone, so every branch of an `#if` inside an entry reads as one. An entry
+ * ends at the next key and not at its closing brace, since a branch may close a bracket that
+ * opened before the `#if` (Razor Wind's description).
+ */
+export function parseEntryValues(text: string, prefix: string): Map<string, string> {
+  const code = joinContinuations(stripComments(text)).replace(/^\s*#.*$/gm, '')
+  const keys = [...code.matchAll(new RegExp(String.raw`\[(${prefix}_\w+)\]\s*=(?!=)`, 'g'))]
+  const values = new Map<string, string>()
+  for (const [at, key] of keys.entries()) {
+    const start = key.index + key[0].length
+    values.set(key[1] ?? '', code.slice(start, keys[at + 1]?.index ?? code.length))
+  }
+  return values
+}
+
+/**
  * The display name of each `[PREFIX_X] = …` entry, read from `.field = _("…")` (or
  * `COMPOUND_STRING`, `ITEM_NAME`) inside the entry or inside the macros it uses. An entry without
  * a readable name stays out; the generator lists those.

@@ -1,0 +1,70 @@
+{
+  "MOVE_RAZOR_WIND": {
+    "stringId": "STRINGID_PKMNWHIPPEDWHIRLWIND",
+    "animationFirst": false
+  },
+  "MOVE_FLY": {
+    "stringId": "STRINGID_PKMNFLEWHIGH",
+    "animationFirst": false
+  },
+  "MOVE_SOLAR_BEAM": {
+    "stringId": "STRINGID_PKMNTOOKSUNLIGHT",
+    "animationFirst": false
+  },
+  "MOVE_DIG": {
+    "stringId": "STRINGID_PKMNDUGHOLE",
+    "animationFirst": false
+  },
+  "MOVE_SKULL_BASH": {
+    "stringId": "STRINGID_PKMNLOWEREDHEAD",
+    "animationFirst": true
+  },
+  "MOVE_SKY_ATTACK": {
+    "stringId": "STRINGID_CLOAKEDINAHARSHLIGHT",
+    "animationFirst": false
+  },
+  "MOVE_DIVE": {
+    "stringId": "STRINGID_PKMNHIDUNDERWATER",
+    "animationFirst": false
+  },
+  "MOVE_BOUNCE": {
+    "stringId": "STRINGID_PKMNSPRANGUP",
+    "animationFirst": false
+  },
+  "MOVE_SHADOW_FORCE": {
+    "stringId": "STRINGID_VANISHEDINSTANTLY",
+    "animationFirst": false
+  },
+  "MOVE_SKY_DROP": {
+    "stringId": "STRINGID_PKMNTOOKTARGETHIGH",
+    "animationFirst": false
+  },
+  "MOVE_FREEZE_SHOCK": {
+    "stringId": "STRINGID_CLOAKEDINAFREEZINGLIGHT",
+    "animationFirst": false
+  },
+  "MOVE_ICE_BURN": {
+    "stringId": "STRINGID_CLOAKEDINAFREEZINGLIGHT",
+    "animationFirst": false
+  },
+  "MOVE_PHANTOM_FORCE": {
+    "stringId": "STRINGID_VANISHEDINSTANTLY",
+    "animationFirst": false
+  },
+  "MOVE_GEOMANCY": {
+    "stringId": "STRINGID_PKNMABSORBINGPOWER",
+    "animationFirst": false
+  },
+  "MOVE_SOLAR_BLADE": {
+    "stringId": "STRINGID_PKMNTOOKSUNLIGHT",
+    "animationFirst": false
+  },
+  "MOVE_METEOR_BEAM": {
+    "stringId": "STRINGID_METEORBEAMCHARGING",
+    "animationFirst": true
+  },
+  "MOVE_ELECTRO_SHOT": {
+    "stringId": "STRINGID_ELECTROSHOTCHARGING",
+    "animationFirst": true
+  }
+}

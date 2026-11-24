@@ -122,6 +122,26 @@ interface MoveEvent {
   readonly notarget?: true
 }
 
+/** The charge turn of a two-turn move (`-prepare`), after its `[still]` move line. */
+interface PrepareEvent {
+  readonly kind: 'prepare'
+  readonly line: number
+  readonly user: PokemonRef
+  readonly move: string
+  readonly target?: PokemonRef
+}
+
+/** A move's animation without its move line (`-anim`): Solar Beam's hit in sun, on its charge turn. */
+interface AnimEvent {
+  readonly kind: 'anim'
+  readonly line: number
+  readonly user: PokemonRef
+  readonly move: string
+  readonly target?: PokemonRef
+  readonly miss?: true
+  readonly notarget?: true
+}
+
 interface CantEvent {
   readonly kind: 'cant'
   readonly line: number
@@ -284,6 +304,8 @@ export type ScriptEvent =
   | WinEvent
   | TieEvent
   | MoveEvent
+  | PrepareEvent
+  | AnimEvent
   | CantEvent
   | MissEvent
   | OhkoEvent

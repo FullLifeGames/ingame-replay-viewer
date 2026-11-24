@@ -26,8 +26,10 @@ import {
   transformed,
 } from '../text/phrases-effects'
 import { type Context, type EventOf, sameMon } from './context'
+import { HIT_TURN, isFutureMove } from './anim-turn'
 import { hit, hitLines } from './hits'
 import { bar, drain, isSubstituteCost } from './hp'
+import { playMove } from './moves'
 
 const VOLATILES: Partial<Readonly<Record<string, Volatile>>> = { substitute: 'substitute' }
 
@@ -81,11 +83,24 @@ export function effectEnd(event: EventOf<'effectEnd'>, ctx: Context): void {
     return
   }
   if (!event.silent) ctx.print(line, effectEnded(ctx.mon(who), effect))
+  if (!event.silent && isFutureMove(effect.name)) futureHit(event, ctx)
   if (volatile !== undefined) {
     ctx.emit(line, { op: 'volatile', side: ctx.activeSide(who), volatile, on: false })
   } else if (event.silent) {
     ctx.note(line, mechanicGap(effect.name, 'ending'))
   }
+}
+
+/**
+ * A future attack's hit after its line (`BattleScript_MonTookFutureAttack`): the animation of the
+ * Pokémon out on the other side, whose hit the damage after it plays. None while no Pokémon is out
+ * there.
+ */
+function futureHit(event: EventOf<'effectEnd'>, ctx: Context): void {
+  const { who, effect, line } = event
+  const user = ctx.activeOn(who.side === 'near' ? 'far' : 'near')
+  ctx.mover = user
+  if (user !== undefined) playMove({ line, user, move: effect.name }, who, HIT_TURN, ctx)
 }
 
 /** The hit that breaks a substitute: it takes the damage, fades, then the hit's lines follow. */

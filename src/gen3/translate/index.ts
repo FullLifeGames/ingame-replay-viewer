@@ -21,7 +21,18 @@ import { item, itemEnd } from './items'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
 import { hitCount } from './hits'
 import { damage, heal, setHp } from './hp'
-import { crit, effectiveness, failure, immunity, miss, move, noTarget, ohko } from './moves'
+import {
+  anim,
+  crit,
+  effectiveness,
+  failure,
+  immunity,
+  miss,
+  move,
+  noTarget,
+  ohko,
+  prepare,
+} from './moves'
 import { negativeStatReset, statChange, statLimit, statReset } from './stats'
 import { cant, cureStatus, cureTeam, status } from './status'
 import { faint, switchIn } from './switches'
@@ -40,6 +51,8 @@ const HANDLERS = {
   win,
   tie,
   move,
+  prepare,
+  anim,
   cant,
   miss,
   ohko,

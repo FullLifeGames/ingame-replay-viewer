@@ -24,7 +24,9 @@
 import type { ScriptEvent } from '../../script/events'
 import type { PokemonRef } from '../../script/types'
 import type { Instruction } from '../stream/instructions'
+import { chargeTurnOf } from '../tables/charge'
 import { moveOf } from '../tables/lookup'
+import { chargeLine } from '../text/phrases-charge'
 import {
   critical,
   effective,
@@ -36,6 +38,7 @@ import {
   usedMove,
 } from '../text/phrases'
 import { type Context, type EventOf, sameMon } from './context'
+import { animTurnOf, animTurnOfAnim, CHARGE_TURN } from './anim-turn'
 import { startMove } from './hits'
 
 /** The events right after a move that mean it did nothing: MISSED is the move's own `miss` flag. */
@@ -93,24 +96,39 @@ function didNothing(event: EventOf<'move'>, ctx: Context): boolean {
 /** Sleep Talk and a locked move (`calledBy`) change nothing: the game says "used" each time. */
 export function move(event: EventOf<'move'>, ctx: Context): void {
   const { user, target, line } = event
-  const found = moveOf(event.move)
-  ctx.note(line, found.fallback)
+  ctx.note(line, moveOf(event.move).fallback)
   ctx.print(line, usedMove(ctx.mon(user), event.move))
   ctx.mover = user
+  const events = eventsOfMove(ctx, event)
   let played: Instruction | undefined
   if (!(event.miss || event.still || event.notarget || didNothing(event, ctx))) {
-    const side = ctx.activeSide(user)
-    // Turn 0 for every move for now: the first of the animations a move can pick from.
-    played = {
-      op: 'move',
-      user: side,
-      target: target?.side ?? side,
-      move: found.number,
-      animTurn: 0,
-    }
-    ctx.emit(line, played)
+    played = playMove(event, target ?? user, animTurnOf(event, events, ctx), ctx)
   }
-  startMove(eventsOfMove(ctx, event), played, ctx)
+  startMove(events, played, ctx)
+}
+
+interface Played {
+  readonly line: number
+  readonly user: PokemonRef
+  readonly move: string
+}
+
+/** The MOVE of `move` by its user at `target`'s side on the animation turn `animTurn`. */
+export function playMove(
+  { line, user, move: name }: Played,
+  target: PokemonRef,
+  animTurn: number,
+  ctx: Context,
+): Instruction {
+  const played: Instruction = {
+    op: 'move',
+    user: ctx.activeSide(user),
+    target: target.side,
+    move: moveOf(name).number,
+    animTurn,
+  }
+  ctx.emit(line, played)
+  return played
 }
 
 /**
@@ -153,4 +171,31 @@ export function crit({ line }: EventOf<'crit'>, ctx: Context): void {
 
 export function effectiveness(event: EventOf<'effectiveness'>, ctx: Context): void {
   ctx.print(event.line, effective(event.effectiveness))
+}
+
+/**
+ * A two-turn move's charge turn, after its `[still]` move line (`BattleScript_TwoTurnMoveCharging`):
+ * the move's charge line and the charge animation, in the order its charge-turn table gives.
+ */
+export function prepare(event: EventOf<'prepare'>, ctx: Context): void {
+  const { user, line } = event
+  const charge = chargeTurnOf(event.move)
+  const play = () => playMove(event, event.target ?? user, CHARGE_TURN, ctx)
+  const say = () => {
+    ctx.print(line, chargeLine(ctx.mon(user), event.move, charge?.stringId))
+  }
+  if (charge?.animationFirst === true) {
+    play()
+    say()
+  } else {
+    say()
+    play()
+  }
+}
+
+/** Solar Beam's hit in sun on its charge turn; a beam that misses or fails plays nothing. */
+export function anim(event: EventOf<'anim'>, ctx: Context): void {
+  const next = ctx.near(1)
+  if (event.miss || event.notarget || (next !== undefined && NO_EFFECT.has(next.kind))) return
+  playMove(event, event.target ?? event.user, animTurnOfAnim(event), ctx)
 }

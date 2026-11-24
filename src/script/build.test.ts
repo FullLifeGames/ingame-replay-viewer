@@ -151,11 +151,13 @@ describe('buildBattleScript: lines it cannot show', () => {
   })
 
   it('lists a line without a rule as unsupported', () => {
-    expect(scriptOf('|-prepare|p1a: Dugtrio|Solar Beam').dropped.at(-1)).toEqual({
+    // Only Gen 4 and later log it, so it stays without a rule.
+    const line = '|-swapboost|p1a: Dugtrio|p2a: Tyranitar|atk'
+    expect(scriptOf(line).dropped.at(-1)).toEqual({
       line: NEXT,
-      text: '|-prepare|p1a: Dugtrio|Solar Beam',
+      text: line,
       reason: 'unsupported',
-      detail: 'no rule for |-prepare|',
+      detail: 'no rule for |-swapboost|',
     })
   })
 

@@ -209,3 +209,42 @@ describe('a one-hit KO and a move without a target', () => {
     ])
   })
 })
+
+// Showdown's charge turn (`onTryMove` of each move with `flags.charge`, data/moves.ts) logs the
+// move `[still]`, then `-prepare`; Solar Beam in sun then logs `-anim` for its hit, which a miss
+// marks (`attrLastMove('[miss]')` lands on the last move line, the `-anim`).
+describe('a charge turn and a move animation alone', () => {
+  it('reads the user, the move and the target of a charge turn, with or without one', () => {
+    const script = scriptOf(
+      '|move|p1a: Dugtrio|Solar Beam||[still]',
+      '|-prepare|p1a: Dugtrio|Solar Beam',
+      '|-prepare|p2a: Tyranitar|Fly|p1a: Dugtrio',
+    )
+
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+    expect(eventsFrom(script, NEXT + 1)).toEqual([
+      { kind: 'prepare', line: NEXT + 1, user: DUGTRIO, move: 'Solar Beam' },
+      { kind: 'prepare', line: NEXT + 2, user: TYRANITAR, move: 'Fly', target: DUGTRIO },
+    ])
+  })
+
+  it("reads the animation of Solar Beam's hit in sun, and its miss", () => {
+    const script = scriptOf(
+      '|-anim|p1a: Dugtrio|Solar Beam|p2a: Tyranitar',
+      '|-anim|p1a: Dugtrio|Solar Beam|p2a: Tyranitar|[miss]',
+    )
+
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+    expect(eventsFrom(script, NEXT)).toEqual([
+      { kind: 'anim', line: NEXT, user: DUGTRIO, move: 'Solar Beam', target: TYRANITAR },
+      {
+        kind: 'anim',
+        line: NEXT + 1,
+        user: DUGTRIO,
+        move: 'Solar Beam',
+        target: TYRANITAR,
+        miss: true,
+      },
+    ])
+  })
+})

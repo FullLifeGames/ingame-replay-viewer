@@ -4,6 +4,7 @@
 // needs no sample: it gets the far Pokémon, which every Pokémon placeholder names by default.
 import type { Mon } from '../src/gen3/text/names.ts'
 import type { AnyTemplate } from '../src/gen3/text/template.ts'
+import { CHARGE_TEMPLATES } from '../src/gen3/text/phrases-charge.ts'
 import { EFFECT_TEMPLATES } from '../src/gen3/text/phrases-effects.ts'
 import { FIELD_TEMPLATES } from '../src/gen3/text/phrases-field.ts'
 import { HP_TEMPLATES } from '../src/gen3/text/phrases-hp.ts'
@@ -49,6 +50,7 @@ export const TEMPLATE_GROUPS: Readonly<Record<string, Readonly<Record<string, An
   field: FIELD_TEMPLATES,
   effects: EFFECT_TEMPLATES,
   items: ITEM_TEMPLATES,
+  charge: CHARGE_TEMPLATES,
 }
 
 const withValue = (placeholder: string, value: string, ...before: unknown[]): Sample => ({

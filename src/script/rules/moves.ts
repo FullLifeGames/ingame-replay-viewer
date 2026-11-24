@@ -1,7 +1,8 @@
-// Rules for the lines around a move: the move itself, a Pokémon that cannot move, a miss, a
-// failure, a one-hit KO, a move without a target, an immunity, a block such as Protect's, the
-// critical hit and effectiveness lines that `hits.ts` folds into the hit after them, and the
-// `-hitcount` after a multi-hit move.
+// Rules for the lines around a move: the move itself, its charge turn (`-prepare`), its
+// animation alone (`-anim`, Solar Beam in sun), a Pokémon that cannot move, a miss, a failure, a
+// one-hit KO, a move without a target, an immunity, a block such as Protect's, the critical hit
+// and effectiveness lines that `hits.ts` folds into the hit after them, and the `-hitcount` after
+// a multi-hit move.
 
 import { causeOf, effectOf, flagsOf, numberOf, refIfAny, refOf } from '../refs'
 import type { Rules } from './index'
@@ -21,6 +22,39 @@ export const MOVE_RULES = {
           ...(ref ? { target: ref } : {}),
           ...(kwArgs.from ? { calledBy: effectOf(kwArgs.from) } : {}),
           ...flagsOf(kwArgs, ['miss', 'still', 'notarget']),
+        },
+      ]
+    },
+  },
+  '|-prepare|': {
+    arity: 3,
+    reads: [],
+    build: ({ line, args: [, user, move, target], battle }) => {
+      const ref = refIfAny(battle, target, line)
+      return [
+        {
+          kind: 'prepare',
+          line,
+          user: refOf(battle, user, line),
+          move,
+          ...(ref ? { target: ref } : {}),
+        },
+      ]
+    },
+  },
+  '|-anim|': {
+    arity: 3,
+    reads: ['miss', 'notarget'],
+    build: ({ line, args: [, user, move, target], kwArgs, battle }) => {
+      const ref = refIfAny(battle, target, line)
+      return [
+        {
+          kind: 'anim',
+          line,
+          user: refOf(battle, user, line),
+          move,
+          ...(ref ? { target: ref } : {}),
+          ...flagsOf(kwArgs, ['miss', 'notarget']),
         },
       ]
     },

@@ -172,6 +172,12 @@ export class Context {
     return ref.side
   }
 
+  /** The active Pokémon of `side`, or undefined while none is out. */
+  activeOn(side: Side): PokemonRef | undefined {
+    const index = this.active[side]
+    return index === undefined ? undefined : { side, index }
+  }
+
   /** The event `offset` places from the one in hand: -1 the one before, 1 the one after. */
   near(offset: number): ScriptEvent | undefined {
     return this.script.events[this.at + offset]
