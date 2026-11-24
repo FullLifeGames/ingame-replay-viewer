@@ -45,7 +45,7 @@ static const struct ReplayAnim sAnims[] =
     [REPLAY_ANIM_SIMPLE_HEAL]         = { REPLAY_ANIM_KIND_GENERAL, B_ANIM_SIMPLE_HEAL },
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sAnims) == REPLAY_ANIM_SIMPLE_HEAL + 1, ReplayAnimsCoverFormatV2);
+STATIC_ASSERT(ARRAY_COUNT(sAnims) == REPLAY_ANIM_SIMPLE_HEAL + 1, ReplayAnimsCoverTheFormat);
 
 // ANIM: the animation on the side's mon; the op ends when the controller has played it.
 bool32 Replay_OpAnim(const volatile u8 *operands, u32 step)
