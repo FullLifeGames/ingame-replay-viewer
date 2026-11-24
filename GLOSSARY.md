@@ -73,7 +73,7 @@ An effect that lasts on one side of the field, such as Spikes or Reflect.
 _Avoid_: hazard (only some are), field effect
 
 **Charge turn**:
-The first turn of a two-turn move such as Solar Beam or Fly. The user plays the set-up animation, the game prints the move's own line ("absorbed light!", "flew up high!"), and the hit comes on the next turn. In sun, Solar Beam charges and hits on the same turn.
+The first turn of a two-turn move such as Solar Beam or Fly. The user plays the set-up animation, the game prints the move's own line ("absorbed light!", "flew up high!"), and the hit comes on the next turn. In sun, Solar Beam charges and hits on the same turn. Fly, Dig, Dive and Bounce hide their user until the hit. A hit turn that misses, hits nothing or never starts shows the user again after the line that says so, with no animation.
 _Avoid_: prepare turn, wind-up
 
 **Animation turn**:
@@ -213,7 +213,7 @@ The check that walks every kind of battle log line the protocol library knows an
 _Avoid_: coverage list
 
 **Named list**:
-The kinds of battle log line the battle script has no rule for, in three groups, each with its reason: kinds a replay's log never holds, kinds of formats the viewer refuses, and kinds with no rule yet.
+The kinds of battle log line the battle script has no rule for, in three groups, each with its reason: kinds a replay's log never holds, kinds of formats the viewer refuses, and kinds with no rule yet. Since #65 the last group holds none.
 _Avoid_: named gap list, allow list
 
 **Content gap**:
