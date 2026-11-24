@@ -11,7 +11,7 @@
 // END's finish. The span from one op's start to the next holds the wait for the earlier ops'
 // controllers, text and KO animations and the op's own steps.
 //
-// The compare counts each start from op 0's start, so the engines' boot, which takes mGBA 13
+// The compare counts each start from op 0's start, so the engines' boot, which takes mGBA 16 to 22
 // frames longer, parts nothing.
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -29,10 +29,10 @@ export const OP_FRAMES_FILE = 'op-frames.txt'
 const FINISHED = 'finished'
 
 /**
- * Frames by which two starts may part before the compare names the op. A wait that ends on a
- * frame boundary in one engine can end a frame later in the other, and such a frame comes back
- * at the next boundary; three keeps that out and stays under the 14 frames by which a back
- * animation's speed variant moves 993907's END (66-4).
+ * Frames by which a start, counted from op 0, may part before the compare names the op. On
+ * hand-made and 993907 the gap steps by 1 frame at 20 ops and by 3 at two moves, and by 13 to 40
+ * frames at near send-outs, whose back animation follows the mon's nature (#71). Three keeps the
+ * small steps out and names the first large one.
  */
 export const DEFAULT_THRESHOLD = 3
 
