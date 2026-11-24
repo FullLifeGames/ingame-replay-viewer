@@ -72,6 +72,14 @@ _Avoid_: lead-in, opening
 An effect that lasts on one side of the field, such as Spikes or Reflect.
 _Avoid_: hazard (only some are), field effect
 
+**Charge turn**:
+The first turn of a two-turn move such as Solar Beam or Fly. The user plays the set-up animation, the game prints the move's own line ("absorbed light!", "flew up high!"), and the hit comes on the next turn. In sun, Solar Beam charges and hits on the same turn.
+_Avoid_: prepare turn, wind-up
+
+**Animation turn**:
+The number a move's animation reads to pick one of its two scripts: the set-up or the hit of a two-turn move, Curse by a Ghost type or by any other type, Brick Break with or without a screen to break. Swallow reads the Stockpile count from it. The game backend picks the number the game's battle engine would pass.
+_Avoid_: move turn; a plain "turn" names the battle's turn
+
 ## Pipeline
 
 **Battle script**:
@@ -197,7 +205,7 @@ A replay whose format's generation is no newer than the target game's, so every 
 _Avoid_: native replay
 
 **Dropped line**:
-A battle log line deliberately not shown in the game, such as chat or timer messages. Every line is either shown or a dropped line, never silently skipped. Each dropped line carries its reason; the reason `state` marks a line whose state a later line shows, such as the recharge turn that the next turn's "must recharge" line tells.
+A battle log line deliberately not shown in the game, such as chat or timer messages. Every line is either shown or a dropped line, never silently skipped. Each dropped line carries its reason; the reason `state` marks a line whose state a later line shows, such as the recharge turn that the next turn's "must recharge" line tells. The reason `preview` marks the Team Preview lines, since the intro's Poké Balls show each team, and `format` marks a line that a format writes for itself.
 _Avoid_: ignored line, skipped event
 
 **Kind census**:
