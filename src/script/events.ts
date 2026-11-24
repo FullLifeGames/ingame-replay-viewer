@@ -2,7 +2,7 @@
 // the index of the battle log line it came from. Fields a line does not carry stay absent.
 
 import type { WeatherName } from '@pkmn/client'
-import type { BoostID, StatusName } from '@pkmn/data'
+import type { StatusName } from '@pkmn/data'
 
 import type {
   AbilityEvent,
@@ -16,6 +16,12 @@ import type {
   SingleTurnEvent,
   TransformEvent,
 } from './effect-events'
+import type {
+  NegativeStatResetEvent,
+  StatChangeEvent,
+  StatLimitEvent,
+  StatResetEvent,
+} from './stat-events'
 import type { DroppedLine, Effect, HpFraction, PokemonRef, Side, TeamMember } from './types'
 
 /** What `[from]` and `[of]` name: the effect behind a line and the Pokémon it came from. */
@@ -193,6 +199,11 @@ interface HealEvent extends HpChange {
   readonly wisher?: PokemonRef
 }
 
+/** HP set outright, neither a hit nor a heal (Pain Split). */
+interface SetHpEvent extends HpChange {
+  readonly kind: 'setHp'
+}
+
 interface StatusEvent extends Caused {
   readonly kind: 'status'
   readonly line: number
@@ -216,32 +227,6 @@ interface CureTeamEvent {
   readonly line: number
   readonly who: PokemonRef
   readonly cause?: Effect
-}
-
-interface StatChangeEvent {
-  readonly kind: 'statChange'
-  readonly line: number
-  readonly who: PokemonRef
-  readonly stat: BoostID
-  /** Signed and never 0: a raise is positive, a drop negative. */
-  readonly stages: number
-  readonly cause?: Effect
-}
-
-/** A raise at +6 or a drop at -6: the log's change of 0 stages, with its direction kept. */
-interface StatLimitEvent {
-  readonly kind: 'statLimit'
-  readonly line: number
-  readonly who: PokemonRef
-  readonly stat: BoostID
-  readonly direction: 'up' | 'down'
-  readonly cause?: Effect
-}
-
-/** Every stat stage of every active Pokémon back to 0 (Haze). */
-interface StatResetEvent {
-  readonly kind: 'statReset'
-  readonly line: number
 }
 
 /** A critical hit that no hit absorbed. */
@@ -308,12 +293,14 @@ export type ScriptEvent =
   | BlockEvent
   | DamageEvent
   | HealEvent
+  | SetHpEvent
   | StatusEvent
   | CureStatusEvent
   | CureTeamEvent
   | StatChangeEvent
   | StatLimitEvent
   | StatResetEvent
+  | NegativeStatResetEvent
   | CritEvent
   | EffectivenessEvent
   | HitCountEvent

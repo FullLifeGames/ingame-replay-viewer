@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { healed, hurt, wishCameTrue } from './phrases-hp'
+import { healed, hpSet, hurt, wishCameTrue } from './phrases-hp'
 import { sceneOf } from './testing'
 
 const NBSP = '\u00a0'
@@ -69,5 +69,13 @@ describe('healing (P1)', () => {
     if (event.wisher === undefined) throw new Error('no wisher')
     expect(wishCameTrue(mon(event.wisher))).toBe("Dugtrio's wish came true!")
     expect(healed(mon(event.who), event.cause, undefined)).toBe("Dugtrio's HP was restored.")
+  })
+})
+
+describe('HP set outright', () => {
+  it('says the shared pain for Pain Split alone', () => {
+    expect(hpSet({ name: 'Pain Split', kind: 'move' })).toBe('The battlers shared their pain!')
+    expect(hpSet({ name: 'Endeavor', kind: 'move' })).toBeUndefined()
+    expect(hpSet(undefined)).toBeUndefined()
   })
 })

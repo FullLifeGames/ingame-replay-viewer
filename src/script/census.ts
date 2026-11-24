@@ -108,8 +108,6 @@ export const NAMED_KINDS: Readonly<Partial<Record<Protocol.ArgName, NamedKind>>>
 
   // No rule yet: Gen 1 to 3 singles battles can log these.
   '|-formechange|': noRule('a forme change that ends when the Pokémon leaves'),
-  '|-sethp|': noRule("a Pokémon's HP set outright, as when two Pokémon share their HP"),
-  '|-clearnegativeboost|': noRule("one Pokémon's lowered stat stages reset"),
   '|-prepare|': noRule('the charging turn of a two-turn move'),
   '|-anim|': noRule("a move's animation without the move's effects"),
 }

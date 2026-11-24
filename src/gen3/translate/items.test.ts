@@ -176,3 +176,47 @@ describe('item pop-ups (BattleScript_ItemPopUp_Scripting)', () => {
     expect(result.fallbacks.map(({ line, kind }) => [line, kind])).toEqual([[NEXT, 'item']])
   })
 })
+
+// `BattleScript_WhiteHerbRet`: the pop-up, the held item animation, STRINGID_PKMNSITEMRESTOREDSTATUS.
+describe('White Herb', () => {
+  const lowered = ['|-unboost|p1a: Dugtrio|atk|2', '|-boost|p1a: Dugtrio|spe|1']
+  const raised = (stat: string, stages: number) => ({
+    op: 'stat',
+    side: 'near',
+    stat,
+    stages,
+    arrows: 'none',
+  })
+
+  it('shows its pop-up and plays it once, resets the lowered stages and says it once', () => {
+    const result = streamOfLog(
+      ...lowered,
+      '|-enditem|p1a: Dugtrio|White Herb',
+      '|-clearnegativeboost|p1a: Dugtrio|[silent]',
+    )
+    const scene = result.instructions.filter(({ line }) => line >= NEXT + 2).slice(0, -1)
+    expect(scene.map(({ instruction }) => plain(instruction))).toEqual([
+      shown('near', 'White Herb'),
+      anim('near', 'heldItemEffect'),
+      held('near', 0),
+      raised('atk', 2),
+      'Dugtrio returned its stats to normal using its White Herb!',
+    ])
+    expect(result.fallbacks.filter(({ line }) => line >= NEXT + 2)).toEqual([])
+  })
+
+  it('resets the lowered stages with no line when no item ended before the silent reset', () => {
+    const scene = sceneOf(...lowered, '|-clearnegativeboost|p1a: Dugtrio|[silent]')
+    expect(scene.slice(-1)).toEqual([raised('atk', 2)])
+  })
+
+  it('says a reset with no item before it in a line of ours and lists it', () => {
+    const result = streamOfLog(...lowered, '|-clearnegativeboost|p1a: Dugtrio')
+    const scene = result.instructions.filter(({ line }) => line >= NEXT + 2).slice(0, -1)
+    expect(scene.map(({ instruction }) => plain(instruction))).toEqual([
+      raised('atk', 2),
+      'Dugtrio returned its lowered stats to normal!',
+    ])
+    expect(result.fallbacks.map(({ line, kind }) => [line, kind])).toEqual([[NEXT + 2, 'phrase']])
+  })
+})

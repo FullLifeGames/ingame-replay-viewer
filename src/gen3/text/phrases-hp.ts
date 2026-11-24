@@ -71,6 +71,7 @@ export const HP_TEMPLATES = {
     'STRINGID_PKMNWISHCAMETRUE',
     (wisher: Mon) => `${ownerAtStart(wisher)} wish came true!`,
   ),
+  sharedPain: tagged('STRINGID_SHAREDPAIN', () => 'The battlers shared their pain!'),
 }
 
 /** Causes whose line names the damaged Pokémon alone, by the effect's id. */
@@ -121,3 +122,9 @@ export function healed(who: Mon, cause: Effect | undefined, source: Mon | undefi
 }
 
 export const wishCameTrue = (wisher: Mon) => HP_TEMPLATES.wish.render(wisher)
+
+/** The line of HP set outright: Pain Split's, or none for HP set any other way. */
+export const hpSet = (cause: Effect | undefined) =>
+  cause !== undefined && toID(cause.name) === 'painsplit'
+    ? HP_TEMPLATES.sharedPain.render()
+    : undefined

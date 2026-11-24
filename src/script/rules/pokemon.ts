@@ -1,6 +1,7 @@
 // Rules for the lines about one Pokémon: switches, drags, faints, HP, status and stat stages.
 
 import type { Pokemon } from '@pkmn/client'
+import type { BoostID } from '@pkmn/data'
 
 import { ScriptError } from '../errors'
 import type { ScriptEvent } from '../events'
@@ -68,6 +69,23 @@ function heal(input: RuleInput<'|-heal|'>): ScriptEvent[] {
   return [{ kind: 'heal', ...hpChange(input), ...(wisher ? { wisher } : {}) }]
 }
 
+/**
+ * HP set outright (Pain Split). Showdown logs one line per Pokémon, the first `[silent]`, so one
+ * line says it. The older line names both Pokémon; its first one is silent the same way.
+ */
+function setHp({ line, args, kwArgs, battle }: RuleInput<'|-sethp|'>): ScriptEvent[] {
+  const cause = causeOf(kwArgs, battle, line)
+  const setOne = (ident: string, hpStatus: string, silent: boolean): ScriptEvent => {
+    const pokemon = pokemonOf(battle, ident, line)
+    const who = refOfPokemon(pokemon, line)
+    const health = healthOf(hpStatus, pokemon.maxhp, line)
+    return { kind: 'setHp', line, who, ...health, ...cause, ...(silent ? { silent } : {}) }
+  }
+  const silent = kwArgs.silent === true
+  if (args.length === 3) return [setOne(args[1], args[2], silent)]
+  return [setOne(args[1], args[2], true), setOne(args[3], args[4], silent)]
+}
+
 type StatKey = '|-boost|' | '|-unboost|'
 
 /** A change of 0 stages is a stat at its limit; it keeps the direction the line's kind gives. */
@@ -100,6 +118,17 @@ function statSet({ line, args, kwArgs, battle, before }: RuleInput<'|-setboost|'
   return [{ kind: 'statChange', line, who, stat, stages, ...cause }]
 }
 
+/** The lowered stages of one Pokémon back to 0 (White Herb), from the stages before the line. */
+function negativeStatReset(input: RuleInput<'|-clearnegativeboost|'>): ScriptEvent[] {
+  const { line, args, kwArgs, battle, before } = input
+  const who = refOf(battle, args[1], line)
+  const restored: Partial<Record<BoostID, number>> = {}
+  for (const [stat, stages] of Object.entries(before.boosts[who.side]) as [BoostID, number][]) {
+    if (stages < 0) restored[stat] = -stages
+  }
+  return [{ kind: 'negativeStatReset', line, who, restored, ...flagsOf(kwArgs, ['silent']) }]
+}
+
 export const POKEMON_RULES = {
   '|switch|': { arity: 3, reads: ['from'], build: switchIn },
   '|drag|': { arity: 3, reads: [], build: switchIn },
@@ -118,6 +147,7 @@ export const POKEMON_RULES = {
     build: (input) => [{ kind: 'damage', ...hpChange(input) }],
   },
   '|-heal|': { arity: 2, reads: ['from', 'of', 'silent', 'wisher'], build: heal },
+  '|-sethp|': { arity: 4, reads: ['from', 'silent'], build: setHp },
   '|-status|': {
     arity: 2,
     reads: ['from', 'of'],
@@ -160,6 +190,7 @@ export const POKEMON_RULES = {
   '|-boost|': { arity: 3, reads: ['from'], build: statChange },
   '|-unboost|': { arity: 3, reads: ['from'], build: statChange },
   '|-setboost|': { arity: 3, reads: ['from'], build: statSet },
+  '|-clearnegativeboost|': { arity: 1, reads: ['silent'], build: negativeStatReset },
   // Haze: the line names no Pokémon; the client resets the stages of every active one.
   '|-clearallboost|': { arity: 0, reads: [], build: ({ line }) => [{ kind: 'statReset', line }] },
 } satisfies Rules

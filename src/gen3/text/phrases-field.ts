@@ -38,6 +38,11 @@ export const FIELD_TEMPLATES = {
   sandEnd: tagged('STRINGID_SANDSTORMSUBSIDED', () => 'The sandstorm subsided.'),
   sunEnd: tagged('STRINGID_SUNLIGHTFADED', () => 'The sunlight faded.'),
   hailEnd: tagged('STRINGID_HAILSTOPPED', () => 'The hail stopped.'),
+  electricWeakened: tagged(
+    'STRINGID_ELECTRICITYWEAKENED',
+    () => "Electricity's power was weakened!",
+  ),
+  fireWeakened: tagged('STRINGID_FIREWEAKENED', () => "Fire's power was weakened!"),
   spikes: tagged('STRINGID_SPIKESSCATTERED', (team: string) => {
     return `Spikes were scattered on the ground all around ${team} side!`
   }),

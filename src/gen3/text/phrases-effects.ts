@@ -12,7 +12,7 @@ import {
   ownerAtStart,
   speciesName,
 } from './names'
-import { screenRaised } from './phrases-field'
+import { FIELD_TEMPLATES, screenRaised } from './phrases-field'
 import { isTrapping } from './phrases-hp'
 import { STATUS_TEMPLATES } from './phrases-status'
 import { ownPhrase, type Phrase, tagged } from './template'
@@ -132,6 +132,9 @@ const STARTS: Readonly<Record<string, Line>> = {
   rage: E.rageBuilding.render,
   mist: E.mist.render,
   futuresight: E.foresaw.render,
+  // Gen 3 logs the sports as starts on their user; the game's line names the type they weaken.
+  mudsport: FIELD_TEMPLATES.electricWeakened.render,
+  watersport: FIELD_TEMPLATES.fireWeakened.render,
 }
 
 /**

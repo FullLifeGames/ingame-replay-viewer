@@ -20,9 +20,9 @@ import { fieldActivate, sideEnd, sideStart, weather } from './field'
 import { item, itemEnd } from './items'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
 import { hitCount } from './hits'
-import { damage, heal } from './hp'
+import { damage, heal, setHp } from './hp'
 import { crit, effectiveness, failure, immunity, miss, move, noTarget, ohko } from './moves'
-import { statChange, statLimit, statReset } from './stats'
+import { negativeStatReset, statChange, statLimit, statReset } from './stats'
 import { cant, cureStatus, cureTeam, status } from './status'
 import { faint, switchIn } from './switches'
 import { tablesOf } from './tables'
@@ -49,12 +49,14 @@ const HANDLERS = {
   block,
   damage,
   heal,
+  setHp,
   status,
   cureStatus,
   cureTeam,
   statChange,
   statLimit,
   statReset,
+  negativeStatReset,
   crit,
   effectiveness,
   effectStart,
