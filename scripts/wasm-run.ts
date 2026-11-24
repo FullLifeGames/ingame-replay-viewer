@@ -1,6 +1,7 @@
 // npm run wasm:run [-- <name>...] (#35, plan B4): plays the streams of rom:shots in the
 // WebAssembly build (build/wasm/irv-emerald.js) in Node and checks the same scenes on its frames.
-// The names and the two refusal runs are those of rom:shots (planStreams). A hang inside the
+// The names, hand-made-b with B held from the first frame and the two refusal runs are those of
+// rom:shots (planStreams, withHeldB). A hang inside the
 // module cannot be interrupted from Node, so each stream runs in its own process under timeout:
 // `--play <dir>` writes the stream into the module's slot, calls AgbMain and answers as the shot
 // tool (rom/gen3/shot/replay_shot.c) does, with the frames of its shots as PPM in <dir> and one
@@ -30,8 +31,15 @@ import {
 } from './rom-shot-run.ts'
 import type { ProgressLayout, ToolOutput } from './rom-shot-run.ts'
 import type { Scene } from './rom-shot-scenes.ts'
-import { finishRuns, parseShotArgs, planStreams, readFrames, reportRun } from './rom-shot.ts'
-import type { RunReport, StreamPlan } from './rom-shot.ts'
+import {
+  finishRuns,
+  parseShotArgs,
+  planStreams,
+  readFrames,
+  reportRun,
+  withHeldB,
+} from './rom-shot.ts'
+import type { RunReport, ShotPlan } from './rom-shot.ts'
 import { describeSlot, GBA_ROM_BASE, loadSlotLayout, SLOT_SYMBOL } from './rom-slot.ts'
 import { sanitizedDir, wasmPaths, wasmRoots } from './wasm-compile.ts'
 import type { Sanitizer } from './wasm-compile.ts'
@@ -79,6 +87,18 @@ function writeStream(game: GameModule, stream: Uint8Array): void {
   const description = describeSlot(image, symbol, layout)
   const written = writeReplaySlot(image, description, stream)
   memory.set(written.subarray(description.offset, description.offset + layout.size), slot)
+}
+
+// KEYINPUT and two of its bits (include/gba/io_reg.h); a held key's bit is low. The module maps the
+// GBA's addresses one to one into its memory (irv_wasm_layout.c), so the game's ReadKeys reads
+// what the runner writes there before a frame.
+const KEYINPUT = 0x04000130
+const KEYS_MASK = 0x03ff
+const B_BUTTON = 0x0002
+
+/** Holds B for frame `next` and on when the run holds it from frame `from` (#68). */
+function holdB(game: GameModule, next: number, from: number | undefined): void {
+  if (from !== undefined && next >= from) game.HEAPU16[KEYINPUT >> 1] = KEYS_MASK & ~B_BUTTON
 }
 
 // Thrown from the frame import to end AgbMain. An object: Emscripten's invoke_* reads a thrown
@@ -144,6 +164,8 @@ export interface PlayRequest {
   stream: Uint8Array | undefined
   scenes: readonly Scene[]
   layout: ProgressLayout
+  /** Hold B from this frame on, the first frame being 1, as the shot tool's --hold-b-from. */
+  holdBFrom?: number | undefined
 }
 
 export interface PlayResult {
@@ -184,6 +206,7 @@ export async function playModule(
       const progress = readProgress(memory, game._IrvWasm_Progress(), request.layout)
       const frame = () => readFrame(game.HEAPU16, pixels)
       const ended = watch.step(progress, frame)
+      holdB(game, watch.frame + 1, request.holdBFrom)
       sound.frame(watch.frame, memory)
       if (watch.frame % 3000 === 0) say(`frame ${String(watch.frame)}, op ${String(progress.done)}`)
       if (ended === undefined) return
@@ -196,6 +219,7 @@ export async function playModule(
     printErr: (line) => process.stderr.write(`game: ${line}\n`),
   })
   if (request.stream !== undefined) writeStream(game, request.stream)
+  holdB(game, 1, request.holdBFrom)
   try {
     game._AgbMain()
   } catch (error) {
@@ -235,15 +259,16 @@ function ppm(frame: Frame): Buffer {
 
 // The --play side: the run in <dir>, its frames into <dir>, the shot tool's lines on stdout.
 async function playDir(dir: string): Promise<void> {
-  const { scenes, module } = JSON.parse(readFileSync(join(dir, RUN_FILE), 'utf8')) as {
+  const { scenes, module, holdBFrom } = JSON.parse(readFileSync(join(dir, RUN_FILE), 'utf8')) as {
     scenes: Scene[]
     module: string
+    holdBFrom?: number
   }
   const streamPath = join(dir, STREAM_FILE)
   const stream = existsSync(streamPath) ? new Uint8Array(readFileSync(streamPath)) : undefined
   const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
   const factory = ((await import(pathToFileURL(module).href)) as { default: ModuleFactory }).default
-  const run = await playModule(factory, { stream, scenes, layout })
+  const run = await playModule(factory, { stream, scenes, layout, holdBFrom })
   for (const [name, frame] of run.frames) writeFileSync(join(dir, `${name}.ppm`), ppm(frame))
   writeHashes(join(dir, RUN_HASHES), run.hashes)
   say(`${basename(dir)}: finished first at frame ${String(run.finishedAt ?? 'none')}`)
@@ -275,10 +300,11 @@ interface StreamRun {
   baseline: { mode: RunArgs['mode']; out: string }
 }
 
-function runStream(plan: StreamPlan, { runDir, module, errors, baseline }: StreamRun): RunReport {
+function runStream(plan: ShotPlan, { runDir, module, errors, baseline }: StreamRun): RunReport {
   const dir = join(runDir, plan.name)
   mkdirSync(dir, { recursive: true })
-  writeFileSync(join(dir, RUN_FILE), JSON.stringify({ scenes: plan.scenes, module }))
+  const { scenes, holdBFrom } = plan
+  writeFileSync(join(dir, RUN_FILE), JSON.stringify({ scenes, module, holdBFrom }))
   if (plan.stream !== undefined) writeFileSync(join(dir, STREAM_FILE), plan.stream)
   const [command, ...args] = playCommand(dir, RUN_SECONDS)
   const start = performance.now()
@@ -304,7 +330,7 @@ function runStream(plan: StreamPlan, { runDir, module, errors, baseline }: Strea
 async function runStreams({ mode, names, sanitize }: RunArgs): Promise<void> {
   const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
   const errors = readErrorNames(readFileSync(INTERPRETER_HEADER_PATH, 'utf8'))
-  const plans = await planStreams(parseShotArgs(names), layout)
+  const plans = withHeldB(await planStreams(parseShotArgs(names), layout))
   const { out } = wasmPaths(REPO_DIR)
   startBaseline(mode, out, plans)
   const { module, runDir } = runPlace(out, sanitize)

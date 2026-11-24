@@ -42,7 +42,13 @@ interface Fake {
   factory: (hooks: ModuleHooks) => Promise<GameModule>
   /** The slot's bytes as AgbMain found them. */
   slotAtStart: () => Uint8Array | undefined
+  /** KEYINPUT as each frame read it, from frame 1. */
+  keys: number[]
 }
+
+// KEYINPUT (include/gba/io_reg.h): all keys up, as the module's constructor sets it.
+const KEYINPUT = 0x04000130
+const KEYS_UP = 0x03ff
 
 // The slot as the C initializer leaves it in the module's data: magic, version, sizes, no stream.
 function emptySlot(memory: Uint8Array): void {
@@ -71,6 +77,8 @@ function fakeModule(script: Script, layout = LAYOUT, limit = 20000): Fake {
   emptySlot(memory)
   new Float32Array(memory.buffer, AUDIO, AUDIO_SAMPLES.length).set(AUDIO_SAMPLES)
   let slotAtStart: Uint8Array | undefined
+  const keys: number[] = []
+  words[KEYINPUT >> 1] = KEYS_UP
   const factory = (hooks: ModuleHooks) =>
     Promise.resolve<GameModule>({
       HEAPU8: memory,
@@ -80,6 +88,7 @@ function fakeModule(script: Script, layout = LAYOUT, limit = 20000): Fake {
       _AgbMain: () => {
         slotAtStart = memory.slice(SLOT, SLOT + SLOT_LAYOUT.size)
         for (let frame = 1; frame <= limit; frame++) {
+          keys.push(words[KEYINPUT >> 1] as number)
           const { progress, colour } = script(frame)
           writeProgress(memory, layout, progress)
           words.fill(colour, PIXELS >> 1, (PIXELS >> 1) + PIXEL_COUNT)
@@ -88,7 +97,7 @@ function fakeModule(script: Script, layout = LAYOUT, limit = 20000): Fake {
         }
       },
     })
-  return { factory, slotAtStart: () => slotAtStart }
+  return { factory, slotAtStart: () => slotAtStart, keys }
 }
 
 const playing = (done: number, total = 34): Progress => ({
@@ -210,6 +219,22 @@ describe('playing a stream in the module', () => {
     expect(frameLines(run.hashes, 9)).toEqual(frameLines(run.hashes, 1))
     expect(frameLines(run.hashes, 10)).not.toEqual(frameLines(run.hashes, 9))
     expect(frameLines(run.hashes, 30)).toEqual(frameLines(run.hashes, 10))
+  })
+
+  it('holds B from frame N on, by writing KEYINPUT before each frame, for a run that asks (#68)', async () => {
+    const end = { ...playing(34), finished: true }
+    const script = (frame: number) => ({ progress: frame < 6 ? playing(1) : end, colour: 0 })
+    const heldB = KEYS_UP & ~0x0002
+    const fromThree = fakeModule(script)
+    const request = { stream: undefined, scenes: [], layout: LAYOUT }
+    await playModule(fromThree.factory, { ...request, holdBFrom: 3 })
+    expect(fromThree.keys).toEqual([KEYS_UP, KEYS_UP, heldB, heldB, heldB, heldB])
+    const fromFirst = fakeModule(script)
+    await playModule(fromFirst.factory, { ...request, holdBFrom: 1 })
+    expect(fromFirst.keys).toEqual(Array.from({ length: 6 }, () => heldB))
+    const none = fakeModule(script)
+    await playModule(none.factory, request)
+    expect(none.keys).toEqual(Array.from({ length: 6 }, () => KEYS_UP))
   })
 
   it('fails when AgbMain returns, which the game never does', async () => {
