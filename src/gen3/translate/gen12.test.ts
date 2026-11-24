@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
+import { decodeStream } from '../stream/decode'
 import { plain, sceneOf, streamOfLog } from '../testing'
 
 const fallbacksOf = (...lines: string[]) =>
@@ -219,20 +220,17 @@ describe('Transform (Gen 1 to 3)', () => {
     expect(fallbacksOf(...lines)).toEqual([])
   })
 
-  it("names the shiny colours of a shiny target, which the game's copy lacks", () => {
+  it("takes no fallback for a shiny target: the ROM copies the colours of the target's party mon", () => {
     const shiny = [
       '|switch|p2a: Gleam|Tyranitar, shiny|100/100',
       '|move|p1a: Dugtrio|Transform|p2a: Gleam',
       '|-transform|p1a: Dugtrio|p2a: Gleam',
     ]
 
-    expect(fallbacksOf(...shiny)).toEqual([
-      {
-        line: NEXT + 2,
-        kind: 'mechanic',
-        detail: "no state in the stream for Transform copying the target's shiny colours",
-      },
-    ])
+    expect(fallbacksOf(...shiny)).toEqual([])
+    expect(decodeStream(streamOfLog(...shiny).bytes).parties.far).toContainEqual(
+      expect.objectContaining({ nickname: 'Gleam', shiny: true }),
+    )
   })
 })
 
