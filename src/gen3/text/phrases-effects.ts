@@ -88,8 +88,8 @@ export const EFFECT_TEMPLATES = {
   // Bide's second turn (`BattleScript_BideStoringEnergy`) and its third (`BattleScript_BideAttack`).
   storingEnergy: tagged('STRINGID_PKMNSTORINGENERGY', start('is storing energy!')),
   unleashedEnergy: tagged('STRINGID_PKMNUNLEASHEDENERGY', start('unleashed its energy!')),
-  // `BattleScript_RageIsBuilding` says it as a hit raises the user's Attack; the log starts Rage
-  // as the move is used, so the line comes then.
+  // `BattleScript_RageIsBuilding` says it after a hit raises the Attack of a Pokémon in a rage
+  // (`rage.ts`); a `-start|<mon>|Rage` line says it as Rage starts.
   rageBuilding: tagged('STRINGID_PKMNRAGEBUILDING', (who: Mon) => {
     return `${ownerAtStart(who)} rage is building!`
   }),
@@ -257,6 +257,9 @@ export function singleMove(who: Mon, effect: Effect): Phrase | undefined {
   const own = `${nameAtStart(who)} readied ${held(effect.name)}!`
   return ownPhrase(own, `${effect.name} until the next move`)
 }
+
+/** `who`'s rage builds as a hit raises its Attack. */
+export const rageBuilding = (who: Mon) => E.rageBuilding.render(who)
 
 /** `who` took the stat stages of `from` (Psych Up). */
 export const copiedStats = (who: Mon, from: Mon) => E.copiedStats.render(who, from)
