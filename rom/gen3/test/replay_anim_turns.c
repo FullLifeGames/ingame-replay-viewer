@@ -13,7 +13,7 @@
 // (gAnimMoveTurn, set from the controller's MOVE_ANIMATION command). The engine tests pin what the
 // pinned expansion passes for each case; the backend's turn rule follows them. Each arranges the
 // move in question as the battle's last move animation (the other battler is faster, so its
-// Celebrate plays first) and reads the turn in THEN, after the battle.
+// Celebrate plays first, or the move knocks it out) and reads the turn in THEN, after the battle.
 
 SINGLE_BATTLE_TEST("Replay: engine: Solar Beam's hit plays turn 1")
 {
@@ -238,6 +238,38 @@ SINGLE_BATTLE_TEST("Replay: engine: Future Sight's hit plays turn 1")
     }
 }
 
+// The user faints on the hit's turn, and its replacement comes after the end-of-turn effects: the
+// hit plays its animation from the user's empty position.
+SINGLE_BATTLE_TEST("Replay: engine: Future Sight's hit plays with its user's side fainted")
+{
+    GIVEN
+    {
+        PLAYER(SPECIES_WOBBUFFET) { HP(1); Speed(1); }
+        PLAYER(SPECIES_WYNAUT) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_FUTURE_SIGHT); }
+        TURN { }
+        TURN { MOVE(opponent, MOVE_SCRATCH); SEND_OUT(player, 1); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_FUTURE_SIGHT, player);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SCRATCH, opponent);
+        MESSAGE("Wobbuffet fainted!");
+        MESSAGE("The opposing Wobbuffet took the Future Sight attack!");
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_FUTURE_SIGHT, player);
+        HP_BAR(opponent);
+        MESSAGE("Go! Wynaut!");
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, 1);
+    }
+}
+
 SINGLE_BATTLE_TEST("Replay: engine: Doom Desire's hit plays turn 1")
 {
     GIVEN
@@ -373,7 +405,38 @@ SINGLE_BATTLE_TEST("Replay: engine: Triple Kick's third hit plays turn 0")
     }
 }
 
+// Bide moves first (priority 1 in the pinned data), so its unleash knocks out the opponent: no
+// move follows it, and the turn THEN reads is the unleash's.
 SINGLE_BATTLE_TEST("Replay: engine: Bide's unleash plays turn 0")
+{
+    GIVEN
+    {
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { HP(1); Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_BIDE); MOVE(opponent, MOVE_SCRATCH); }
+        TURN { SKIP_TURN(player); MOVE(opponent, MOVE_SCRATCH); }
+        TURN { SKIP_TURN(player); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_BIDE, player);
+        MESSAGE("Wobbuffet unleashed its energy!");
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_BIDE, player);
+        HP_BAR(opponent);
+        MESSAGE("The opposing Wobbuffet fainted!");
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, 0);
+    }
+}
+
+// Skull Bash's charge plays its animation before its line, then raises Defense
+// (MoveHasChargeTurnAdditionalEffect).
+SINGLE_BATTLE_TEST("Replay: engine: Skull Bash plays its charge before its line on turn 0")
 {
     GIVEN
     {
@@ -382,16 +445,16 @@ SINGLE_BATTLE_TEST("Replay: engine: Bide's unleash plays turn 0")
     }
     WHEN
     {
-        TURN { MOVE(player, MOVE_BIDE); MOVE(opponent, MOVE_SCRATCH); }
-        TURN { SKIP_TURN(player); MOVE(opponent, MOVE_SCRATCH); }
-        TURN { SKIP_TURN(player); MOVE(opponent, MOVE_SCRATCH); }
+        TURN { MOVE(player, MOVE_SKULL_BASH); }
     }
     SCENE
     {
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_BIDE, player);
-        MESSAGE("Wobbuffet unleashed its energy!");
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_BIDE, player);
-        HP_BAR(opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
+        MESSAGE("Wobbuffet used Skull Bash!");
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SKULL_BASH, player);
+        MESSAGE("Wobbuffet tucked in its head!");
+        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_STATS_CHANGE, player);
+        MESSAGE("Wobbuffet's Defense rose!");
     }
     THEN
     {

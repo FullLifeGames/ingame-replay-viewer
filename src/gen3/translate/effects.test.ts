@@ -248,3 +248,26 @@ describe('the effects that last until the next move', () => {
     ])
   })
 })
+
+describe('a future attack whose user has fainted (U4)', () => {
+  const start = [
+    '|move|p1a: Dugtrio|Future Sight|p2a: Tyranitar',
+    '|-start|p1a: Dugtrio|Future Sight',
+  ]
+  const hit = ['|-end|p2a: Tyranitar|move: Future Sight', '|-damage|p2a: Tyranitar|50/100']
+
+  it("lists the hit's animation, which the game plays from the empty side, as a mechanic", () => {
+    const ko = ['|move|p2a: Tyranitar|Rock Slide|p1a: Dugtrio', '|-damage|p1a: Dugtrio|0 fnt']
+    expect(fallbacksOf(...start, ...ko, '|faint|p1a: Dugtrio', ...hit)).toEqual([
+      {
+        line: NEXT + 5,
+        kind: 'mechanic',
+        detail: 'no state in the stream for Future Sight hitting from a side with no Pokémon out',
+      },
+    ])
+  })
+
+  it('lists nothing while its user is out', () => {
+    expect(fallbacksOf(...start, ...hit)).toEqual([])
+  })
+})

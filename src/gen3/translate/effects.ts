@@ -93,14 +93,19 @@ export function effectEnd(event: EventOf<'effectEnd'>, ctx: Context): void {
 
 /**
  * A future attack's hit after its line (`BattleScript_MonTookFutureAttack`): the animation of the
- * Pokémon out on the other side, whose hit the damage after it plays. None while no Pokémon is out
- * there.
+ * Pokémon out on the other side, whose hit the damage after it plays. While no Pokémon is out
+ * there, the game still plays the animation from the empty side, before the replacement comes in;
+ * the stream has no MOVE without a user, so the hit plays none and notes it.
  */
 function futureHit(event: EventOf<'effectEnd'>, ctx: Context): void {
   const { who, effect, line } = event
   const user = ctx.activeOn(who.side === 'near' ? 'far' : 'near')
   ctx.mover = user
-  if (user !== undefined) playMove({ line, user, move: effect.name }, who, HIT_TURN, ctx)
+  if (user === undefined) {
+    ctx.note(line, mechanicGap(effect.name, 'hitting from a side with no Pokémon out'))
+    return
+  }
+  playMove({ line, user, move: effect.name }, who, HIT_TURN, ctx)
 }
 
 /** The hit that breaks a substitute: it takes the damage, fades, then the hit's lines follow. */
