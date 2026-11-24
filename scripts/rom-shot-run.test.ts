@@ -95,18 +95,18 @@ describe('the shot tool', () => {
     expect(toolArgs(run)).toEqual(['r.gba', '0x10', 'f', ...clock, '--state-every', '60'])
   })
 
-  it('holds B from N frames after END only for a run that asks for it (#30)', () => {
+  it('holds B from frame N on only for a run that asks for it (#68)', () => {
     const run = { tool: 't', rom: 'r.gba', address: 16, frameDir: 'f', shots: ['a:1:2'] }
-    expect(toolArgs({ ...run, holdBFromEnd: 1 })).toEqual([
+    expect(toolArgs({ ...run, holdBFrom: 1 })).toEqual([
       'r.gba',
       '0x10',
       'f',
       ...clock,
-      '--hold-b-from-end',
+      '--hold-b-from',
       '1',
       'a:1:2',
     ])
-    expect(toolArgs(run)).not.toContain('--hold-b-from-end')
+    expect(toolArgs(run)).not.toContain('--hold-b-from')
   })
 
   it("fixes mGBA's cartridge clock at the module's time, so that two runs play alike", () => {

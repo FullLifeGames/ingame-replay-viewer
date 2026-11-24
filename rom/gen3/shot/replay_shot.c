@@ -4,7 +4,7 @@
 // it into the expansion's tree.
 //
 //     replay_shot <rom> <progress address> <frame dir> [--clock <seconds>] [--state-every <n>]
-//                 [--hold-b-from-end <n>] [<name>:<done>:<frames> ...]
+//                 [--hold-b-from <n>] [<name>:<done>:<frames> ...]
 //
 // It loads the ROM with no save file and no BIOS file, so mGBA keeps the save in memory and runs
 // its own BIOS, and runs frames as fast as it can. With --clock the cartridge's real-time clock
@@ -28,10 +28,9 @@
 // of 660 of 994052 equal their own frame, 21 and 334 the next one, and DMA0's internal source
 // stands 160 units past the SAD the game wrote).
 //
-// With --hold-b-from-end <n> (#30) B is down on every frame from the n-th after the first frame on
-// which the replay reports finished to the run's end, as a player who presses B after the end; no
-// other key is ever down. n is 1 or more: the tool reads the progress after a frame, so the frame
-// that reports finished has already run.
+// With --hold-b-from <n> (#30, #68) B is down on frame n and on every frame after it to the run's
+// end, as a player who holds B; no other key is ever down. Frames count from 1, so n 1 holds B
+// from the first frame the core runs.
 //
 // Output on stdout, one JSON object per line: {"shot":...} for each shot, then {"status":...}.
 // Exit code 0 when the run reached a status, 2 on a usage or emulator error.
@@ -94,8 +93,7 @@ struct Run
     struct Shot shots[MAX_SHOTS];
     int shotCount;
     unsigned long stateEvery;
-    unsigned long holdBFromEnd;
-    unsigned long finishedFrame;
+    unsigned long holdBFrom;
     bool fixedClock;
     time_t clock;
 };
@@ -275,15 +273,11 @@ static bool DumpState(struct Run *run, unsigned long frame)
     return WriteFrame(run, name);
 }
 
-// --hold-b-from-end <n>: notes the first frame F that reports finished. The keys set after a frame
-// hold for the next one, so they are set from frame F + n - 1 on, and B is down from frame F + n.
-static void HoldB(struct Run *run, struct Progress progress, unsigned long frame)
+// --hold-b-from <n>: the keys set before a frame hold for it, so B is set before frame n and stays
+// set.
+static void HoldB(struct Run *run, unsigned long frame)
 {
-    if (run->holdBFromEnd == 0)
-        return;
-    if (progress.finished && run->finishedFrame == 0)
-        run->finishedFrame = frame;
-    if (run->finishedFrame != 0 && frame + 1 - run->finishedFrame >= run->holdBFromEnd)
+    if (run->holdBFrom != 0 && frame >= run->holdBFrom)
         run->core->setKeys(run->core, 1 << GBA_KEY_B);
 }
 
@@ -294,6 +288,7 @@ static const char *Play(struct Run *run, unsigned long *frame, struct Progress *
 
     for (*frame = 1;; (*frame)++)
     {
+        HoldB(run, *frame);
         run->core->runFrame(run->core);
         DropAudio(run->core);
         if (!DumpState(run, *frame))
@@ -301,7 +296,6 @@ static const char *Play(struct Run *run, unsigned long *frame, struct Progress *
         *progress = ReadProgress(run);
         if (!TakeShots(run, *progress, *frame))
             return NULL;
-        HoldB(run, *progress, *frame);
         if (progress->error != 0 && errorFrame == 0)
             errorFrame = *frame;
         if (errorFrame != 0 && *frame - errorFrame >= ERROR_FRAMES)
@@ -318,7 +312,7 @@ static const char *Play(struct Run *run, unsigned long *frame, struct Progress *
     }
 }
 
-// --clock <seconds>, --state-every <n> and --hold-b-from-end <n>, each with its number.
+// --clock <seconds>, --state-every <n> and --hold-b-from <n>, each with its number.
 static bool ParseOption(struct Run *run, const char *name, const char *value)
 {
     char *end;
@@ -339,9 +333,9 @@ static bool ParseOption(struct Run *run, const char *name, const char *value)
         run->stateEvery = (unsigned long)number;
         return true;
     }
-    if (strcmp(name, "--hold-b-from-end") == 0 && number != 0)
+    if (strcmp(name, "--hold-b-from") == 0 && number != 0)
     {
-        run->holdBFromEnd = (unsigned long)number;
+        run->holdBFrom = (unsigned long)number;
         return true;
     }
     return false;
@@ -353,7 +347,7 @@ static int ParseArgs(struct Run *run, int argc, char **argv)
     int i;
 
     if (argc < 4)
-        return Fail("usage: replay_shot <rom> <progress address> <frame dir> [--clock <seconds>] [--state-every <n>] [--hold-b-from-end <n>] [<name>:<done>:<frames> ...]", NULL);
+        return Fail("usage: replay_shot <rom> <progress address> <frame dir> [--clock <seconds>] [--state-every <n>] [--hold-b-from <n>] [<name>:<done>:<frames> ...]", NULL);
     errno = 0;
     run->progressAddress = (uint32_t)strtoul(argv[2], &end, 0);
     if (errno != 0 || *end != '\0' || run->progressAddress == 0)

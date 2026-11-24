@@ -2,7 +2,7 @@
 // to END in headless mGBA and checks named scenes in its frames. A name is a test replay id (its
 // stream comes from the Gen 3 game backend; 994052 when no name is given, S2a D5) or hand-made (a
 // short battle written with the stream encoder). When hand-made is named, hand-made-b follows it:
-// the same stream with B held from the frame after END, which must keep the last scene (#30). Two
+// the same stream with B held from the first frame, which must show every scene (#30, #68). Two
 // refusal runs follow: the built ROM's empty slot (refused as EMPTY) and the hand-made stream with
 // an unknown version (refused as VERSION).
 // Frames, the ROMs and report.json go to build/rom/shots/. Needs a ROM from npm run rom:build and
@@ -85,18 +85,18 @@ export interface StreamPlan {
   expect: Expected
 }
 
-/** A stream plan as the shot tool plays it: mGBA can press B, the WebAssembly module cannot. */
+/** A stream plan as the shot tool and the module's runner play it. */
 export interface ShotPlan extends StreamPlan {
-  /** Hold B from this many frames after END to the run's end. */
-  holdBFromEnd?: number
+  /** Hold B from this frame on to the run's end; the first frame is 1. */
+  holdBFrom?: number
 }
 
 const HELD_B = `${HAND_MADE}-b`
 
-/** The plans with hand-made-b after hand-made: B held from the frame after END (#30). */
+/** The plans with hand-made-b after hand-made: B held from the first frame (#30, #68). */
 export function withHeldB(plans: readonly StreamPlan[]): ShotPlan[] {
   return plans.flatMap((plan) =>
-    plan.name === HAND_MADE ? [plan, { ...plan, name: HELD_B, holdBFromEnd: 1 }] : [plan],
+    plan.name === HAND_MADE ? [plan, { ...plan, name: HELD_B, holdBFrom: 1 }] : [plan],
   )
 }
 
@@ -227,7 +227,7 @@ function playRun(context: Context, plan: RunPlan): RunReport {
     address: context.address,
     frameDir,
     shots: shotArgs(plan.scenes),
-    ...(plan.holdBFromEnd === undefined ? {} : { holdBFromEnd: plan.holdBFromEnd }),
+    ...(plan.holdBFrom === undefined ? {} : { holdBFrom: plan.holdBFrom }),
   })
   const seconds = Math.round((performance.now() - start) / 100) / 10
   return reportRun({ plan, output, frames: readFrames(frameDir), errors: context.errors, seconds })
