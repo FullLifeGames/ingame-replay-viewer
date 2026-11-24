@@ -43,6 +43,18 @@ export interface TransformEvent {
   readonly into: PokemonRef
 }
 
+/**
+ * `who` takes the form `species` until it leaves the field (Castform's Forecast); `msg` marks a
+ * line the client shows with its message.
+ */
+export interface FormChangeEvent extends Caused {
+  readonly kind: 'formChange'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly species: string
+  readonly msg?: true
+}
+
 /** An effect that lasts the turn: Protect, Endure, Focus Punch's focus. */
 export interface SingleTurnEvent {
   readonly kind: 'singleTurn'

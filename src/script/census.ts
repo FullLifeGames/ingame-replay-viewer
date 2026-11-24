@@ -33,8 +33,6 @@ const notSingles = (what: string): NamedKind => ({
   reason: `${what}: only doubles and triples log it, and the build refuses those battles`,
 })
 
-const noRule = (what: string): NamedKind => ({ group: 'no rule yet', reason: what })
-
 /** The kinds on the named list. */
 export const NAMED_KINDS: Readonly<Partial<Record<Protocol.ArgName, NamedKind>>> = {
   // Not in a replay log.
@@ -105,7 +103,4 @@ export const NAMED_KINDS: Readonly<Partial<Record<Protocol.ArgName, NamedKind>>>
   '|-center|': notSingles('the last Pokémon of a triple battle moving to the centre'),
   '|-combine|': notSingles('two moves combined'),
   '|-waiting|': notSingles('a move waiting for an ally to combine with'),
-
-  // No rule yet: Gen 1 to 3 singles battles can log these.
-  '|-formechange|': noRule('a forme change that ends when the Pokémon leaves'),
 }

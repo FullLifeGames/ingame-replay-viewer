@@ -83,6 +83,8 @@ export const EFFECT_TEMPLATES = {
   transformed: tagged('STRINGID_PKMNTRANSFORMEDINTO', (who: Mon, species: string) => {
     return `${nameAtStart(who)} transformed into ${species}!`
   }),
+  // `BattleScript_BattlerFormChangeWithString`, after the form change (Castform's Forecast).
+  formChanged: tagged('STRINGID_PKMNTRANSFORMED', start('transformed!')),
   // Bide's second turn (`BattleScript_BideStoringEnergy`) and its third (`BattleScript_BideAttack`).
   storingEnergy: tagged('STRINGID_PKMNSTORINGENERGY', start('is storing energy!')),
   unleashedEnergy: tagged('STRINGID_PKMNUNLEASHEDENERGY', start('unleashed its energy!')),
@@ -262,6 +264,9 @@ export const copiedStats = (who: Mon, from: Mon) => E.copiedStats.render(who, fr
 /** `who` turned into the species `species`, by the expansion's name for it. */
 export const transformed = (who: Mon, species: string) =>
   E.transformed.render(who, speciesName(species))
+
+/** `who` took another form of its species. */
+export const formChanged = (who: Mon) => E.formChanged.render(who)
 
 /** A move `who` kept off, such as by Protect. */
 export function blocked(who: Mon, effect: Effect): Phrase {

@@ -9,6 +9,7 @@ import type {
   EffectActivateEvent,
   EffectEndEvent,
   EffectStartEvent,
+  FormChangeEvent,
   ItemEndEvent,
   ItemEvent,
   CopyBoostEvent,
@@ -330,6 +331,7 @@ export type ScriptEvent =
   | EffectEndEvent
   | EffectActivateEvent
   | TransformEvent
+  | FormChangeEvent
   | SingleTurnEvent
   | SingleMoveEvent
   | CopyBoostEvent

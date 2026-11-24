@@ -17,6 +17,7 @@ import {
 } from './effects'
 import { message, tie, win } from './end'
 import { fieldActivate, sideEnd, sideStart, weather } from './field'
+import { formChange } from './forms'
 import { item, itemEnd } from './items'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
 import { hitCount } from './hits'
@@ -76,6 +77,7 @@ const HANDLERS = {
   effectEnd,
   effectActivate,
   transform,
+  formChange,
   singleTurn,
   singleMove,
   copyBoost,

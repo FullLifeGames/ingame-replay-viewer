@@ -269,3 +269,52 @@ describe('the stat change rules', () => {
     ])
   })
 })
+
+describe('the form change rule', () => {
+  const CASTFORM = { side: 'far', index: 1 } as const
+  const FORECAST = { name: 'Forecast', kind: 'ability' }
+
+  // Showdown's Forecast: `formeChange(forme, this.effect, false, '0', '[msg]')`, which logs the
+  // species, `[msg]` and the ability as `[from]`.
+  it('turns Castform into its Sunny form by Forecast and back when the sun ends', () => {
+    const script = scriptOf(
+      '|switch|p2a: Castform|Castform|100/100',
+      '|-weather|SunnyDay',
+      '|-formechange|p2a: Castform|Castform-Sunny|[msg]|[from] ability: Forecast',
+      '|-weather|none',
+      '|-formechange|p2a: Castform|Castform|[msg]|[from] ability: Forecast',
+    )
+
+    expect(script.dropped.filter((drop) => drop.line >= NEXT)).toEqual([])
+    const changes = script.events.filter((event) => event.kind === 'formChange')
+    expect(changes).toEqual([
+      {
+        kind: 'formChange',
+        line: NEXT + 2,
+        who: CASTFORM,
+        species: 'Castform-Sunny',
+        cause: FORECAST,
+        msg: true,
+      },
+      {
+        kind: 'formChange',
+        line: NEXT + 4,
+        who: CASTFORM,
+        species: 'Castform',
+        cause: FORECAST,
+        msg: true,
+      },
+    ])
+  })
+
+  it('reads a form change with no cause and no message', () => {
+    const script = scriptOf(
+      '|switch|p2a: Castform|Castform|100/100',
+      '|-formechange|p2a: Castform|Castform-Rainy',
+    )
+
+    expect(eventsAt(script, NEXT + 1)).toEqual([
+      { kind: 'formChange', line: NEXT + 1, who: CASTFORM, species: 'Castform-Rainy' },
+    ])
+  })
+})

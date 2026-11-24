@@ -1,4 +1,5 @@
-// Rules for the lines about one Pokémon: switches, drags, faints, HP, status and stat stages.
+// Rules for the lines about one Pokémon: switches, drags, faints, HP, status, stat stages and
+// forms.
 
 import type { Pokemon } from '@pkmn/client'
 import type { BoostID } from '@pkmn/data'
@@ -129,6 +130,21 @@ function negativeStatReset(input: RuleInput<'|-clearnegativeboost|'>): ScriptEve
   return [{ kind: 'negativeStatReset', line, who, restored, ...flagsOf(kwArgs, ['silent']) }]
 }
 
+/** A form until the Pokémon leaves the field: Castform's Forecast in Gen 3. */
+function formChange({ line, args, kwArgs, battle }: RuleInput<'|-formechange|'>): ScriptEvent[] {
+  const [, ident, species] = args
+  return [
+    {
+      kind: 'formChange',
+      line,
+      who: refOf(battle, ident, line),
+      species,
+      ...causeOf(kwArgs, battle, line),
+      ...flagsOf(kwArgs, ['msg']),
+    },
+  ]
+}
+
 export const POKEMON_RULES = {
   '|switch|': { arity: 3, reads: ['from'], build: switchIn },
   '|drag|': { arity: 3, reads: [], build: switchIn },
@@ -191,6 +207,8 @@ export const POKEMON_RULES = {
   '|-unboost|': { arity: 3, reads: ['from'], build: statChange },
   '|-setboost|': { arity: 3, reads: ['from'], build: statSet },
   '|-clearnegativeboost|': { arity: 1, reads: ['silent'], build: negativeStatReset },
+  // The third argument, when present, is empty.
+  '|-formechange|': { arity: 2, reads: ['from', 'of', 'msg'], build: formChange },
   // Haze: the line names no Pokémon; the client resets the stages of every active one.
   '|-clearallboost|': { arity: 0, reads: [], build: ({ line }) => [{ kind: 'statReset', line }] },
 } satisfies Rules
