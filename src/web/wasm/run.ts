@@ -7,14 +7,7 @@ import { fetchBytes, fetchJson } from '../fetch'
 import { messageOf } from '../message'
 import { checkBaseRom, readSlotDescription } from '../rom'
 import { ROM_FILES } from '../rom-files'
-import { silenceText } from '../status'
-import {
-  AUDIO_PROCESSOR,
-  AUDIO_STOP,
-  AudioMeter,
-  type AudioProcessorOptions,
-  soundLine,
-} from './audio'
+import { AUDIO_PROCESSOR, AUDIO_STOP, AudioMeter, type AudioProcessorOptions } from './audio'
 import type { Sound } from './audio-opener'
 import workletUrl from './audio-worklet.ts?worker&url'
 import { TickClock } from './clock'
@@ -26,7 +19,6 @@ import {
   GBA_FRAMES_PER_SECOND,
   MIXER_RATE,
   readStatus,
-  type RunStatus,
   type Speed,
   speedAtEnd,
   writePace,
@@ -176,19 +168,6 @@ export function reachEnd(run: Run, now: number): Speed {
   run.writtenToEnd = run.ring.totalWritten
   return speedAtEnd(run.clock.speed)
 }
-
-/** The run's progress, with the sound's skips and dry spells while it has sound (#47). */
-export const progressLine = (status: RunStatus, run: Run): string => {
-  const finished =
-    run.finishedMs === undefined
-      ? ''
-      : ` Finished at frame ${String(status.finishedAt)} after ${(run.finishedMs / 1000).toFixed(1)} s.`
-  const sound = run.output === undefined ? '' : ` ${soundLine(run.ring)}`
-  return `Frame ${String(status.frame)}, instruction ${String(status.done)} of ${String(status.total)}, turn ${String(status.turn)}.${finished}${sound}`
-}
-
-export const runningLine = (picked: Picked, run: Run): string =>
-  `Running ${picked.id}: ${String(picked.stream.length)} bytes of instruction stream.${silenceText(run.silence, 'plays')}`
 
 /** The sound's numbers for the test hook: what went through the ring and how loud it was. */
 function audioStatus(run: Run) {

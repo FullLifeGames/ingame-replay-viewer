@@ -1,10 +1,12 @@
-// The page's own words: the status line after each step, the panel above the game, and the texts
-// of the "Not shown in the game" list. A failure's line comes from visitor.ts, and the words of
+// The page's own words: the status line after each step, the viewer's progress line under
+// "Details", the panel above the game, and the texts of the "Not shown in the game" list. A failure's line comes from visitor.ts, and the words of
 // the step that failed (replay-choice.ts, session.ts) become its detail.
 import { plainText } from './markup'
 import type { ReplaySummary } from './replay-choice'
 import type { DumpSummary, StartSummary } from './session'
 import type { NotShownCount, NotShownRow } from './stream'
+import { soundLine } from './wasm/audio'
+import type { RunStatus } from './wasm/protocol'
 
 export const READY_LINE = 'Pick your US Emerald dump, then press Start.'
 export const CHECKING_LINE = 'Checking your dump and patching it. This takes a few seconds.'
@@ -34,6 +36,34 @@ export const silenceText = (silence: string | undefined, verb: 'plays' | 'played
  */
 export const endedLine = (id: string, silence?: string): string =>
   `Played ${id} to the end of the battle.${silenceText(silence, 'played')}`
+
+/** The stream a run plays, by the id of its replay (run.ts's Picked). */
+interface PlayedStream {
+  readonly id: string
+  readonly stream: Uint8Array
+}
+
+/** What the viewer's lines read of a run (run.ts's Run): its time to END and its sound. */
+interface LineRun {
+  readonly finishedMs: number | undefined
+  /** The audio worklet's node; undefined for a run without sound. */
+  readonly output: unknown
+  readonly ring: { readonly skipped: number; readonly underruns: number }
+  readonly silence: string | undefined
+}
+
+/** The run's progress, with the sound's skips and dry spells while it has sound (#47). */
+export const progressLine = (status: RunStatus, run: LineRun): string => {
+  const finished =
+    run.finishedMs === undefined
+      ? ''
+      : ` Finished at frame ${String(status.finishedAt)} after ${(run.finishedMs / 1000).toFixed(1)} s.`
+  const sound = run.output === undefined ? '' : ` ${soundLine(run.ring)}`
+  return `Frame ${String(status.frame)}, instruction ${String(status.done)} of ${String(status.total)}, turn ${String(status.turn)}.${finished}${sound}`
+}
+
+export const runningLine = (picked: PlayedStream, run: LineRun): string =>
+  `Running ${picked.id}: ${String(picked.stream.length)} bytes of instruction stream.${silenceText(run.silence, 'plays')}`
 
 const PRESS_START = 'Press Start to play it.'
 

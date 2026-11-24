@@ -18,7 +18,15 @@ import {
   SessionError,
 } from '../replay-choice'
 import { wireReplayFile, wireReplays } from '../replay-view'
-import { BUILDING_LINE, BUILT_LINE, endedLine, panelText, READY_LINE } from '../status'
+import {
+  BUILDING_LINE,
+  BUILT_LINE,
+  endedLine,
+  panelText,
+  progressLine,
+  READY_LINE,
+  runningLine,
+} from '../status'
 import { environmentLine } from '../visitor'
 import { AudioOpener, type Sound } from './audio-opener'
 import { FRAME_HEIGHT, FRAME_WIDTH } from './frame'
@@ -30,11 +38,9 @@ import {
   buildModule,
   hookStatus,
   type Picked,
-  progressLine,
   reachEnd,
   type Run,
   openAudioContext,
-  runningLine,
   startRun,
   stopRun,
   watchRun,

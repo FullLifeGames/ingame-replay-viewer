@@ -10,10 +10,12 @@ import {
   notShownHeading,
   panelText,
   pickedLine,
+  progressLine,
   READY_LINE,
   replayLine,
   restartLine,
   rowText,
+  runningLine,
   silenceText,
   startLine,
 } from './status'
@@ -196,5 +198,38 @@ describe('the panel', () => {
       far: 'Far side: <b>x</b> &amp;',
       near: `Near side: ${long}`,
     })
+  })
+})
+
+describe("the viewer's run lines", () => {
+  const status = {
+    frame: 9120,
+    finishedAt: 9000,
+    done: 461,
+    total: 462,
+    turn: 30,
+    error: 0,
+    finished: true,
+    playing: false,
+  }
+  const ring = { skipped: 1, underruns: 2 }
+  const silent = { finishedMs: undefined, output: undefined, ring, silence: 'no audio worklet' }
+
+  it('names the replay and its stream in bytes once a run starts', () => {
+    const picked = { id: ID, stream: new Uint8Array(8346) }
+    expect(runningLine(picked, { ...silent, silence: undefined })).toBe(
+      `Running ${ID}: 8346 bytes of instruction stream.`,
+    )
+    expect(runningLine(picked, silent)).toBe(
+      `Running ${ID}: 8346 bytes of instruction stream. It plays without sound: no audio worklet.`,
+    )
+  })
+
+  it('counts the frames, the instructions and the turn, and the sound while it has sound', () => {
+    expect(progressLine(status, silent)).toBe('Frame 9120, instruction 461 of 462, turn 30.')
+    expect(progressLine(status, { ...silent, finishedMs: 150_040, output: {} })).toBe(
+      'Frame 9120, instruction 461 of 462, turn 30. Finished at frame 9000 after 150.0 s. ' +
+        'The page skipped 1 sound sample and ran out of sound 2 times.',
+    )
   })
 })
