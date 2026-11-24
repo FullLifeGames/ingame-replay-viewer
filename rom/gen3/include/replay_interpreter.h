@@ -103,8 +103,15 @@ void Replay_Unload(void);
 // For replay_setup.c: checks the stream and loads it into the interpreter.
 enum ReplayError Replay_Load(const volatile u8 *stream, u32 length, enum ReplayEnd end);
 
-// For the interpreter: Replay_Validate, which also counts the instructions (replay_stream_check.c).
-enum ReplayError Replay_ValidateStream(const volatile u8 *stream, u32 length, u16 *count);
+// What Replay_ValidateStream finds in a stream it lets through.
+struct ReplayStreamFacts
+{
+    u16 count;        // the instructions
+    u8 sidesOutAtEnd; // a bit for each REPLAY_SIDE_* whose battler is out at END, for the outro
+};
+
+// For the interpreter: Replay_Validate, which also gives the stream's facts (replay_stream_check.c).
+enum ReplayError Replay_ValidateStream(const volatile u8 *stream, u32 length, struct ReplayStreamFacts *facts);
 
 // Reads from a stream, which may lie in ROM (replay_stream.c). Numbers are little-endian.
 u32 Replay_ReadU16(const volatile u8 *bytes);
