@@ -11,6 +11,12 @@ const CHOICE_BAND = itemOf('Choice Band').number
 const shown = (side: Side, name: string) => ({ op: 'itemPopUp', side, item: itemOf(name).number })
 const anim = (side: Side, name: string) => ({ op: 'anim', side, anim: name })
 
+/** The instructions of the log lines from `first` on, without the closing END. */
+const sceneFrom = (result: ReturnType<typeof streamOfLog>, first: number) =>
+  result.instructions
+    .filter(({ line, instruction }) => line >= first && instruction.op !== 'end')
+    .map(({ instruction }) => instruction)
+
 describe('held items', () => {
   it('moves the item a Thief takes, plays the theft and says it', () => {
     const scene = sceneOf(
@@ -131,6 +137,24 @@ describe('item pop-ups (BattleScript_ItemPopUp_Scripting)', () => {
       anim('far', 'simpleHeal'),
       { op: 'hp', side: 'far', hp: 65 },
     ])
+  })
+
+  // `BattleScript_ItemHealHP_RemoveItem`: Berry Juice is no berry, so the held item animation
+  // plays, and the heal says nothing. Showdown logs it used up (`useItem`), then the heal.
+  it('shows Berry Juice used up for its heal once, plays it, then heals with no line', () => {
+    const result = streamOfLog(
+      '|-damage|p2a: Tyranitar|40/100',
+      '|-enditem|p2a: Tyranitar|Berry Juice',
+      '|-heal|p2a: Tyranitar|52/100|[from] item: Berry Juice',
+    )
+    expect(sceneFrom(result, NEXT + 1).map(plain)).toEqual([
+      shown('far', 'Berry Juice'),
+      anim('far', 'heldItemEffect'),
+      held('far', 0),
+      anim('far', 'simpleHeal'),
+      { op: 'hp', side: 'far', hp: 52 },
+    ])
+    expect(result.fallbacks).toEqual([])
   })
 
   it('shows the pop-up of a berry eaten for a stat', () => {

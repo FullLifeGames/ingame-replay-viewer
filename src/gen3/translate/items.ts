@@ -6,10 +6,12 @@
 // `BattleScript_ConsumableBerryStatRaise`); the cure or heal after it names the berry. An item
 // used for the stat change the next line makes, such as Berserk Gene, shows its pop-up and plays
 // the held item animation (`BattleScript_BerserkGene`); the change names the item. White Herb does
-// the same before the reset of the lowered stages (`BattleScript_WhiteHerbRet`). An item the
-// expansion lacks is text alone (plan §4) and shows no pop-up.
+// the same before the reset of the lowered stages (`BattleScript_WhiteHerbRet`), and Berry Juice
+// before its heal (`BattleScript_ItemHealHP_RemoveItem`). An item the expansion lacks is text
+// alone (plan §4) and shows no pop-up.
 import { Dex, toID } from '@pkmn/dex'
 
+import type { ScriptEvent } from '../../script/events'
 import type { PokemonRef } from '../../script/types'
 import { itemOf } from '../tables/lookup'
 import { isSteal, itemRemoved, itemShown } from '../text/phrases-items'
@@ -58,10 +60,13 @@ export function eatenBefore(who: PokemonRef, ctx: Context): string | undefined {
     : undefined
 }
 
-/** Whether the berry `name` that `who` ate on the line before showed its pop-up. */
+/**
+ * Whether the item `name` that `who` ate or used up on the line before showed its pop-up: a berry
+ * eaten for its heal (Sitrus Berry), or an item used up for it (Berry Juice).
+ */
 export function shownBefore(who: PokemonRef, name: string, ctx: Context): boolean {
-  const eaten = eatenBefore(who, ctx)
-  return eaten !== undefined && toID(eaten) === toID(name) && popUpOf(name) !== undefined
+  const before = eatenBefore(who, ctx) ?? usedUpBefore(who, ctx)
+  return before !== undefined && toID(before) === toID(name) && popUpOf(name) !== undefined
 }
 
 export function item(event: EventOf<'item'>, ctx: Context): void {
@@ -88,15 +93,23 @@ export function usedUpBefore(who: PokemonRef, ctx: Context): string | undefined 
     : undefined
 }
 
+/** Whether `next` is the heal of `who` by the item `name`. */
+const healsBy = (next: ScriptEvent | undefined, who: PokemonRef, name: string) =>
+  next?.kind === 'heal' &&
+  sameMon(next.who, who) &&
+  next.cause?.kind === 'item' &&
+  toID(next.cause.name) === toID(name)
+
 /**
- * An item used up for what the next line does: the stat changes @pkmn gives it (`boosts`), or
- * the reset of the lowered stages that names it (White Herb).
+ * An item used up for what the next line does: the stat changes @pkmn gives it (`boosts`), the
+ * reset of the lowered stages that names it (White Herb), or the heal that names it (Berry Juice,
+ * `BattleScript_ItemHealHP_RemoveItem`).
  */
 function usedForNext(event: EventOf<'itemEnd'>, ctx: Context): boolean {
   if (!usedUp(event)) return false
   const next = ctx.near(1)
   const resets = next?.kind === 'negativeStatReset' && sameMon(next.who, event.who)
-  return resets || Boolean(Dex.items.get(event.item).boosts)
+  return resets || healsBy(next, event.who, event.item) || Boolean(Dex.items.get(event.item).boosts)
 }
 
 export function itemEnd(event: EventOf<'itemEnd'>, ctx: Context): void {
