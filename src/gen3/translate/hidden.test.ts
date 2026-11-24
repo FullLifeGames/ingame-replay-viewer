@@ -186,7 +186,7 @@ describe('a hidden user stays hidden without a show', () => {
     expect(shows(scene)).toEqual([])
   })
 
-  it('when it faints, and its replacement is no hidden Pokémon', () => {
+  it('when it faints, and its replacement cannot move', () => {
     const scene = afterCharge(
       ...FLY,
       '|move|p1a: Dugtrio|Thunder|p2a: Tyranitar',
@@ -237,6 +237,26 @@ describe('a hidden user that plays another move', () => {
 /** The stream of `lines` as a replay of generation `gen` would give it. */
 const streamOfGen = (gen: number, ...lines: string[]) =>
   buildGen3Stream({ ...scriptOf(...lines), gen })
+
+// Gen 2's Whirlwind reaches a Fly user and drags it out; the switch ends its charge.
+describe('a hidden user that Whirlwind drags out in Gen 2', () => {
+  it('comes back with no show', () => {
+    const { instructions } = streamOfGen(
+      2,
+      '|-status|p2a: Tyranitar|par',
+      ...FLY,
+      '|move|p1a: Dugtrio|Whirlwind|p2a: Tyranitar',
+      '|drag|p2a: Skarmory|Skarmory, M|100/100',
+      '|turn|2',
+      '|switch|p2a: Tyranitar|Tyranitar, M|100/100 par',
+      '|move|p1a: Dugtrio|Earthquake|p2a: Tyranitar',
+      '|-damage|p2a: Tyranitar|60/100 par',
+      '|turn|3',
+      '|cant|p2a: Tyranitar|par',
+    )
+    expect(shows(instructions.map(({ instruction }) => instruction))).toEqual([])
+  })
+})
 
 describe('a hit turn that a full paralysis or Disable stops in Gen 1 and 2', () => {
   // Gen 1 keeps a fully paralysed Fly or Dig user out of reach; the Gen 3 game shows it.
