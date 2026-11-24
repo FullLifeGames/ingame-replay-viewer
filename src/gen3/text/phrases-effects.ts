@@ -100,6 +100,16 @@ export const EFFECT_TEMPLATES = {
   tookAttack: tagged('STRINGID_PKMNTOOKATTACK', (who: Mon, move: string) => {
     return `${nameAtStart(who)} took the ${move} attack!`
   }),
+  // `BattleScript_EffectDestinyBond` and `BattleScript_EffectGrudge`, with the user as B_ATK.
+  hopingToTakeFoe: tagged(
+    'STRINGID_PKMNTRYINGTOTAKEFOE',
+    start('is hoping to take its attacker down with it!'),
+  ),
+  grudge: tagged('STRINGID_PKMNWANTSGRUDGE', start('wants its target to bear a grudge!')),
+  // `BattleScript_EffectPsychUp`, with the user as B_SCR and the target as B_EFF.
+  copiedStats: tagged('STRINGID_PKMNCOPIEDSTATCHANGES', (who: Mon, from: Mon) => {
+    return `${nameAtStart(who)} copied ${nameInside(from)}'s stat changes!`
+  }),
 }
 
 const E = EFFECT_TEMPLATES
@@ -224,6 +234,27 @@ export function singleTurn(who: Mon, effect: Effect): Phrase {
   const own = `${nameAtStart(who)} is ready with ${held(effect.name)}!`
   return ownPhrase(own, `${effect.name} for one turn`)
 }
+
+const SINGLE_MOVE: Readonly<Record<string, Line>> = {
+  destinybond: E.hopingToTakeFoe.render,
+  grudge: E.grudge.render,
+}
+
+/** Effects the game starts without a line: Rage says its line as a hit raises Attack. */
+const SILENT_SINGLE_MOVE: ReadonlySet<string> = new Set(['rage'])
+
+/** An effect that lasts until `who` moves again, or undefined where the game says nothing. */
+export function singleMove(who: Mon, effect: Effect): Phrase | undefined {
+  const id = toID(effect.name)
+  if (SILENT_SINGLE_MOVE.has(id)) return undefined
+  const text = SINGLE_MOVE[id]?.(who)
+  if (text !== undefined) return { text }
+  const own = `${nameAtStart(who)} readied ${held(effect.name)}!`
+  return ownPhrase(own, `${effect.name} until the next move`)
+}
+
+/** `who` took the stat stages of `from` (Psych Up). */
+export const copiedStats = (who: Mon, from: Mon) => E.copiedStats.render(who, from)
 
 /** `who` turned into the species `species`, by the expansion's name for it. */
 export const transformed = (who: Mon, species: string) =>

@@ -39,4 +39,10 @@ describe('the end of the battle (X13)', () => {
       { line: NEXT, instruction: 'Bob forfeited.' },
     ])
   })
+
+  it("prints the server's own message, as `|-message|` does", () => {
+    expect(tail("|message|Time's up! Going to tiebreaker...").slice(0, 1)).toEqual([
+      { line: NEXT, instruction: "Time's up! Going to tiebreaker..." },
+    ])
+  })
 })

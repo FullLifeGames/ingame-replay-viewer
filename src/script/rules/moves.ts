@@ -1,6 +1,7 @@
 // Rules for the lines around a move: the move itself, a Pokémon that cannot move, a miss, a
-// failure, an immunity, a block such as Protect's, the critical hit and effectiveness lines that
-// `hits.ts` folds into the hit after them, and the `-hitcount` after a multi-hit move.
+// failure, a one-hit KO, a move without a target, an immunity, a block such as Protect's, the
+// critical hit and effectiveness lines that `hits.ts` folds into the hit after them, and the
+// `-hitcount` after a multi-hit move.
 
 import { causeOf, effectOf, flagsOf, numberOf, refIfAny, refOf } from '../refs'
 import type { Rules } from './index'
@@ -45,6 +46,16 @@ export const MOVE_RULES = {
       return [
         { kind: 'miss', line, user: refOf(battle, user, line), ...(ref ? { target: ref } : {}) },
       ]
+    },
+  },
+  '|-ohko|': { arity: 0, reads: [], build: ({ line }) => [{ kind: 'ohko', line }] },
+  // Gen 1 logs it without the user.
+  '|-notarget|': {
+    arity: 1,
+    reads: [],
+    build: ({ line, args: [, ident], battle }) => {
+      const who = refIfAny(battle, ident, line)
+      return [{ kind: 'noTarget', line, ...(who ? { who } : {}) }]
     },
   },
   '|-fail|': {

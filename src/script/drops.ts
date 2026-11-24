@@ -40,6 +40,12 @@ const REASONS: Partial<Record<Protocol.ArgName, DropReason>> = {
   '|warning|': 'room',
   '|-hint|': 'hint',
   '|debug|': 'debug',
+  // Team Preview, which a format can add as a rule: the intro's balls show each team.
+  '|clearpoke|': 'preview',
+  '|poke|': 'preview',
+  '|teampreview|': 'preview',
+  '|updatepoke|': 'preview',
+  '|custom|': 'format',
   // The client keeps the volatile; the next turn's `|cant|…|recharge` says it.
   '|-mustrecharge|': 'state',
 }

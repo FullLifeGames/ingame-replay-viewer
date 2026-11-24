@@ -17,9 +17,11 @@ import { mechanicGap } from '../fallbacks'
 import type { Anim, Volatile } from '../stream/instructions'
 import {
   blocked,
+  copiedStats,
   effectActivated,
   effectEnded,
   effectStarted,
+  singleMove as untilNextMove,
   singleTurn as lastsTheTurn,
   transformed,
 } from '../text/phrases-effects'
@@ -143,6 +145,17 @@ export function singleTurn({ who, effect, line }: EventOf<'singleTurn'>, ctx: Co
   const anim = SINGLE_TURN_ANIM[toID(effect.name)]
   if (anim !== undefined) ctx.emit(line, { op: 'anim', side: ctx.activeSide(who), anim })
   ctx.print(line, lastsTheTurn(ctx.mon(who), effect))
+}
+
+/** Rage starts without a line; the game says it as a hit raises Attack. */
+export function singleMove({ who, effect, line }: EventOf<'singleMove'>, ctx: Context): void {
+  const phrase = untilNextMove(ctx.mon(who), effect)
+  if (phrase !== undefined) ctx.print(line, phrase)
+}
+
+/** Psych Up's line, after its animation; the stream holds no stat stages to copy. */
+export function copyBoost({ who, from, line }: EventOf<'copyBoost'>, ctx: Context): void {
+  ctx.print(line, copiedStats(ctx.mon(who), ctx.mon(from)))
 }
 
 export function block({ who, effect, line }: EventOf<'block'>, ctx: Context): void {

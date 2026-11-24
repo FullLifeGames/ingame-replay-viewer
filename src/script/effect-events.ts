@@ -51,6 +51,22 @@ export interface SingleTurnEvent {
   readonly effect: Effect
 }
 
+/** An effect that lasts until its user's next move: Destiny Bond, Grudge, Rage. */
+export interface SingleMoveEvent {
+  readonly kind: 'singleMove'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly effect: Effect
+}
+
+/** `who` takes the stat stages of `from` (Psych Up). */
+export interface CopyBoostEvent extends Caused {
+  readonly kind: 'copyBoost'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly from: PokemonRef
+}
+
 export interface ItemEvent extends Caused {
   readonly kind: 'item'
   readonly line: number

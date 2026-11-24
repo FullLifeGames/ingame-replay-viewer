@@ -183,3 +183,29 @@ describe('the move rules', () => {
     expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
   })
 })
+
+// Showdown's Gen 1 to 3 rules log `-ohko` after the hit that knocks out with a one-hit KO move,
+// and `-notarget` after a move whose target is gone (data/mods/gen3/scripts.ts); Gen 1 names no
+// Pokémon in it (data/mods/gen1/scripts.ts).
+describe('a one-hit KO and a move without a target', () => {
+  it('reads the one-hit KO', () => {
+    const script = scriptOf('|-damage|p2a: Tyranitar|0 fnt', '|-ohko')
+
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+    expect(eventsAt(script, NEXT + 1)).toEqual([{ kind: 'ohko', line: NEXT + 1 }])
+  })
+
+  it('reads the user of a move without a target, and the Gen 1 line without one', () => {
+    const script = scriptOf(
+      '|move|p2a: Tyranitar|Earthquake||[notarget]',
+      '|-notarget|p2a: Tyranitar',
+      '|-notarget',
+    )
+
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+    expect(eventsFrom(script, NEXT + 1)).toEqual([
+      { kind: 'noTarget', line: NEXT + 1, who: TYRANITAR },
+      { kind: 'noTarget', line: NEXT + 2 },
+    ])
+  })
+})

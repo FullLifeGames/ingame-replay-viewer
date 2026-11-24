@@ -5,14 +5,23 @@ import type { Fallback } from '../fallbacks'
 import type { Stream } from '../stream/instructions'
 import { ability, closePopUp, inCausePopUp } from './abilities'
 import { Context, type EventOf, type Placed } from './context'
-import { block, effectActivate, effectEnd, effectStart, singleTurn, transform } from './effects'
+import {
+  block,
+  copyBoost,
+  effectActivate,
+  effectEnd,
+  effectStart,
+  singleMove,
+  singleTurn,
+  transform,
+} from './effects'
 import { message, tie, win } from './end'
 import { fieldActivate, sideEnd, sideStart, weather } from './field'
 import { item, itemEnd } from './items'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
 import { hitCount } from './hits'
 import { damage, heal } from './hp'
-import { crit, effectiveness, failure, immunity, miss, move } from './moves'
+import { crit, effectiveness, failure, immunity, miss, move, noTarget, ohko } from './moves'
 import { statChange, statLimit, statReset } from './stats'
 import { cant, cureStatus, cureTeam, status } from './status'
 import { faint, switchIn } from './switches'
@@ -33,6 +42,8 @@ const HANDLERS = {
   move,
   cant,
   miss,
+  ohko,
+  noTarget,
   immune: immunity,
   fail: failure,
   block,
@@ -51,6 +62,8 @@ const HANDLERS = {
   effectActivate,
   transform,
   singleTurn,
+  singleMove,
+  copyBoost,
   weather,
   sideStart,
   sideEnd,

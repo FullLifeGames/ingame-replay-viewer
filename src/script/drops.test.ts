@@ -51,6 +51,11 @@ const BEFORE_START = [
   ['a line of plain text', 'room'],
   ['|-hint|In Gen 3, Sleep Talk can be used while asleep.', 'hint'],
   ['|debug|BP: 70', 'debug'],
+  ['|clearpoke', 'preview'],
+  ['|poke|p1|Dugtrio, M|', 'preview'],
+  ['|teampreview', 'preview'],
+  ['|updatepoke|p1: Dugtrio|Dugtrio, M', 'preview'],
+  ['|custom|-endturn|p1a: Dugtrio|1', 'format'],
 ] as const
 
 describe('dropReasonOf', () => {

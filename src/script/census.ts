@@ -107,19 +107,9 @@ export const NAMED_KINDS: Readonly<Partial<Record<Protocol.ArgName, NamedKind>>>
   '|-waiting|': notSingles('a move waiting for an ally to combine with'),
 
   // No rule yet: Gen 1 to 3 singles battles can log these.
-  '|clearpoke|': noRule('the start of Team Preview, which a format can add as a rule'),
-  '|poke|': noRule('a Pokémon declared for Team Preview, which a format can add as a rule'),
-  '|teampreview|': noRule('the end of Team Preview, which a format can add as a rule'),
-  '|updatepoke|': noRule("a Pokémon's details revealed after Team Preview"),
-  '|message|': noRule('a message from the server in the battle (`|-message|` has a rule)'),
-  '|custom|': noRule("a format's own line for its client; no rule reads it"),
   '|-formechange|': noRule('a forme change that ends when the Pokémon leaves'),
-  '|-notarget|': noRule('a move that fails for want of a target'),
   '|-sethp|': noRule("a Pokémon's HP set outright, as when two Pokémon share their HP"),
-  '|-copyboost|': noRule("one Pokémon's stat stages copied to another"),
   '|-clearnegativeboost|': noRule("one Pokémon's lowered stat stages reset"),
   '|-prepare|': noRule('the charging turn of a two-turn move'),
-  '|-singlemove|': noRule("a move whose effect lasts until the user's next move"),
   '|-anim|': noRule("a move's animation without the move's effects"),
-  '|-ohko|': noRule('a one-hit knockout'),
 }

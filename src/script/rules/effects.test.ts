@@ -257,3 +257,35 @@ describe('the item rules', () => {
     ])
   })
 })
+
+describe('Psych Up and the effects that last until the next move', () => {
+  it("copies the target's stat stages to the user", () => {
+    const script = scriptOf('|-copyboost|p1a: Dugtrio|p2a: Tyranitar|[from] move: Psych Up')
+
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+    expect(eventsAt(script, NEXT)).toEqual([
+      {
+        kind: 'copyBoost',
+        line: NEXT,
+        who: DUGTRIO,
+        from: TYRANITAR,
+        cause: { name: 'Psych Up', kind: 'move' },
+      },
+    ])
+  })
+
+  it('reads Destiny Bond, Grudge and Rage as they start', () => {
+    const script = scriptOf(
+      '|-singlemove|p1a: Dugtrio|Destiny Bond',
+      '|-singlemove|p2a: Tyranitar|Grudge',
+      '|-singlemove|p2a: Tyranitar|Rage',
+    )
+
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+    expect(eventsFrom(script, NEXT)).toEqual([
+      { kind: 'singleMove', line: NEXT, who: DUGTRIO, effect: { name: 'Destiny Bond' } },
+      { kind: 'singleMove', line: NEXT + 1, who: TYRANITAR, effect: { name: 'Grudge' } },
+      { kind: 'singleMove', line: NEXT + 2, who: TYRANITAR, effect: { name: 'Rage' } },
+    ])
+  })
+})

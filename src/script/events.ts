@@ -11,6 +11,8 @@ import type {
   EffectStartEvent,
   ItemEndEvent,
   ItemEvent,
+  CopyBoostEvent,
+  SingleMoveEvent,
   SingleTurnEvent,
   TransformEvent,
 } from './effect-events'
@@ -127,6 +129,19 @@ interface MissEvent {
   readonly line: number
   readonly user: PokemonRef
   readonly target?: PokemonRef
+}
+
+/** A one-hit KO move's knockout, after its hit. */
+interface OhkoEvent {
+  readonly kind: 'ohko'
+  readonly line: number
+}
+
+/** A move that fails for want of a target; Gen 1's line names no Pokémon. */
+interface NoTargetEvent {
+  readonly kind: 'noTarget'
+  readonly line: number
+  readonly who?: PokemonRef
 }
 
 interface ImmuneEvent extends Caused {
@@ -286,6 +301,8 @@ export type ScriptEvent =
   | MoveEvent
   | CantEvent
   | MissEvent
+  | OhkoEvent
+  | NoTargetEvent
   | ImmuneEvent
   | FailEvent
   | BlockEvent
@@ -305,6 +322,8 @@ export type ScriptEvent =
   | EffectActivateEvent
   | TransformEvent
   | SingleTurnEvent
+  | SingleMoveEvent
+  | CopyBoostEvent
   | WeatherEvent
   | SideConditionEvent
   | FieldActivateEvent

@@ -1,5 +1,5 @@
 // Rules for the effects on one Pokémon: volatile effects such as Substitute, the effects of a
-// single turn, items and abilities.
+// single turn and until the next move, copied stat stages, items and abilities.
 
 import { causeOf, effectOf, flagsOf, refIfAny, refOf } from '../refs'
 import type { Rules } from './index'
@@ -66,6 +66,27 @@ export const EFFECT_RULES = {
     reads: [],
     build: ({ line, args: [, who, effect], battle }) => [
       { kind: 'singleTurn', line, who: refOf(battle, who, line), effect: effectOf(effect) },
+    ],
+  },
+  '|-singlemove|': {
+    arity: 2,
+    reads: [],
+    build: ({ line, args: [, who, effect], battle }) => [
+      { kind: 'singleMove', line, who: refOf(battle, who, line), effect: effectOf(effect) },
+    ],
+  },
+  // The client copies the stages; the script keeps who took them from whom.
+  '|-copyboost|': {
+    arity: 2,
+    reads: ['from'],
+    build: ({ line, args: [, who, from], kwArgs, battle }) => [
+      {
+        kind: 'copyBoost',
+        line,
+        who: refOf(battle, who, line),
+        from: refOf(battle, from, line),
+        ...causeOf(kwArgs, battle, line),
+      },
     ],
   },
   '|-item|': {

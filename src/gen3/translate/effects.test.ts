@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
+import { moveOf } from '../tables/lookup'
 import { plain, sceneOf, streamOfLog } from '../testing'
 
 const any = expect.any(Number) as number
@@ -202,5 +203,48 @@ describe('a Pokémon that faints by its effect drains its bar first (#39)', () =
     expect(sceneOf('|-start|p1a: Dugtrio|perish1')).not.toContainEqual(
       expect.objectContaining({ op: 'hp' }),
     )
+  })
+})
+
+describe('Psych Up', () => {
+  it("says the user copied the target's stat changes after the animation", () => {
+    const scene = sceneOf(
+      '|move|p1a: Dugtrio|Psych Up|p2a: Tyranitar',
+      '|-copyboost|p1a: Dugtrio|p2a: Tyranitar|[from] move: Psych Up',
+    )
+    expect(scene.map(plain).slice(1)).toEqual([
+      { op: 'move', user: 'near', target: 'far', move: moveOf('Psych Up').number },
+      "Dugtrio copied the opposing Tyranitar's stat changes!",
+    ])
+  })
+})
+
+describe('the effects that last until the next move', () => {
+  it('says Destiny Bond and Grudge as the game does', () => {
+    const scene = sceneOf(
+      '|-singlemove|p1a: Dugtrio|Destiny Bond',
+      '|-singlemove|p2a: Tyranitar|Grudge',
+    )
+    expect(scene.map(plain)).toEqual([
+      'Dugtrio is hoping to take its attacker down with it!',
+      'The opposing Tyranitar wants its target to bear a grudge!',
+    ])
+  })
+
+  it('says nothing for Rage as it starts, as the game says nothing then', () => {
+    const lines = ['|move|p2a: Tyranitar|Rage|p1a: Dugtrio', '|-singlemove|p2a: Tyranitar|Rage']
+    expect(
+      sceneOf(...lines)
+        .map(plain)
+        .slice(0, 1),
+    ).toEqual(['The opposing Tyranitar used Rage!'])
+    expect(sceneOf(...lines)).toHaveLength(2)
+    expect(fallbacksOf(...lines)).toEqual([])
+  })
+
+  it('lists an effect the game has no line for', () => {
+    expect(fallbacksOf('|-singlemove|p1a: Dugtrio|Glaive Rush')).toEqual([
+      expect.objectContaining({ kind: 'phrase' }),
+    ])
   })
 })

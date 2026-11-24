@@ -25,7 +25,16 @@ import type { ScriptEvent } from '../../script/events'
 import type { PokemonRef } from '../../script/types'
 import type { Instruction } from '../stream/instructions'
 import { moveOf } from '../tables/lookup'
-import { critical, effective, failed, immune, missed, usedMove } from '../text/phrases'
+import {
+  critical,
+  effective,
+  failed,
+  immune,
+  missed,
+  noTarget as noTargetLeft,
+  oneHitKo,
+  usedMove,
+} from '../text/phrases'
 import { type Context, type EventOf, sameMon } from './context'
 import { startMove } from './hits'
 
@@ -118,6 +127,16 @@ export function immunity({ who, effect, line }: EventOf<'immune'>, ctx: Context)
 
 export function failure({ who, effect, weak, line }: EventOf<'fail'>, ctx: Context): void {
   ctx.print(line, failed(ctx.mon(who), effect, weak))
+}
+
+/** After the hit that knocked its target out: the move's result line. */
+export function ohko({ line }: EventOf<'ohko'>, ctx: Context): void {
+  ctx.print(line, oneHitKo())
+}
+
+/** The move said its "used" line and played no animation (`[notarget]`); now it fails. */
+export function noTarget({ line }: EventOf<'noTarget'>, ctx: Context): void {
+  ctx.print(line, noTargetLeft())
 }
 
 /** A critical hit that no hit took in. */
