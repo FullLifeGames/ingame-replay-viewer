@@ -160,6 +160,37 @@ SINGLE_BATTLE_TEST("Replay: engine: Gust on a Fly user leaves it hidden")
     }
 }
 
+// The battle ends on the hit turn before the hit: the faster foe's Explosion misses the Fly user
+// and knocks out the foe's last mon. The user is still hidden, so the turn's start shows nothing.
+SINGLE_BATTLE_TEST("Replay: engine: a Fly user stays hidden into its hit turn")
+{
+    FORCE_MOVE_ANIM(TRUE);
+    GIVEN
+    {
+        ASSUME(IsExplosionMove(MOVE_EXPLOSION));
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_FLY); }
+        TURN { MOVE(opponent, MOVE_EXPLOSION); SKIP_TURN(player); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_FLY, player);
+        MESSAGE("The opposing Wobbuffet used Explosion!");
+        MESSAGE("Wobbuffet avoided the attack!");
+        MESSAGE("The opposing Wobbuffet fainted!");
+        NOT ANIMATION(ANIM_TYPE_MOVE, MOVE_FLY, player);
+    }
+    THEN
+    {
+        FORCE_MOVE_ANIM(FALSE);
+        EXPECT(IsSpriteHidden(PLAYER_BATTLER));
+    }
+}
+
 // The replay tests: MOVE plays the game's own animation, so a charge that hides its user in the
 // game hides it in the replay.
 static void PlayFlysCharge(void)
