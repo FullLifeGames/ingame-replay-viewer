@@ -25,7 +25,7 @@ import { wasmPaths } from './wasm-compile.ts'
 const VERSION = 1
 const MAGIC = 'op-frames'
 /** The log's file name in a run's folder of frames. */
-export const OP_FRAMES_FILE = 'op-frames.txt'
+const OP_FRAMES_FILE = 'op-frames.txt'
 const FINISHED = 'finished'
 
 /**
