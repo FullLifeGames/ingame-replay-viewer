@@ -138,6 +138,8 @@ export interface RunArgs {
   names: string[]
   /** Plays the sanitized module of build/wasm/sanitize (#44). */
   sanitize?: Sanitizer
+  /** Plays every test replay after the named streams (#66). */
+  all?: true
 }
 
 export function parseRunArgs(argv: string[]): RunArgs {
@@ -147,6 +149,7 @@ export function parseRunArgs(argv: string[]): RunArgs {
       baseline: { type: 'boolean' },
       'against-baseline': { type: 'boolean' },
       sanitize: { type: 'string' },
+      all: { type: 'boolean' },
     },
     allowPositionals: true,
   })
@@ -155,10 +158,11 @@ export function parseRunArgs(argv: string[]): RunArgs {
   }
   const mode =
     values.baseline === true ? 'baseline' : values['against-baseline'] ? 'against' : 'plain'
-  if (values.sanitize === undefined) return { mode, names: positionals }
+  const args: RunArgs = { mode, names: positionals, ...(values.all === true ? { all: true } : {}) }
+  if (values.sanitize === undefined) return args
   // The baseline holds the normal module; a sanitized one never takes its place.
   if (mode === 'baseline') throw new Error('a sanitized run never saves the baseline')
-  return { mode, names: positionals, sanitize: parseSanitizer(values.sanitize) }
+  return { ...args, sanitize: parseSanitizer(values.sanitize) }
 }
 
 const baselineDir = (out: string) => join(out, 'baseline')

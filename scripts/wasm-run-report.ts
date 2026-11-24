@@ -1,11 +1,12 @@
 // The streams of one wasm:run, one after the other, and their report (#66). A stream that fails (a
 // trap, a hang, a refusal that was not expected, a scene that misses) fails only itself: the run
 // plays every stream it was asked for, reports each one's END or its failure, and counts them.
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import type { RunReport, ShotPlan } from './rom-shot.ts'
 import { sayRun } from './rom-shot.ts'
+import type { SoundLog } from './wasm-run-sound.ts'
 
 /** A trap of the module, after `frame` frames of the run. */
 export class ModuleTrap extends Error {
@@ -16,6 +17,23 @@ export class ModuleTrap extends Error {
     super(`the module trapped after ${String(frame)} frames: ${String(cause)}`, { cause })
     this.frame = frame
   }
+}
+
+// How a stream's --play process ended, in its folder: END's frame, or the trap and the frames
+// before it.
+const OUTCOME_FILE = 'outcome.json'
+
+type Outcome = { end: number | undefined } | { trap: string; frame: number }
+
+export function writeOutcome(dir: string, outcome: Outcome): void {
+  writeFileSync(join(dir, OUTCOME_FILE), JSON.stringify(outcome))
+}
+
+/** The END of a stream's run, or its trap thrown, so that the run reports it and goes on. */
+export function readEnd(dir: string): number | undefined {
+  const outcome = JSON.parse(readFileSync(join(dir, OUTCOME_FILE), 'utf8')) as Outcome
+  if ('trap' in outcome) throw new ModuleTrap(outcome.frame, outcome.trap)
+  return outcome.end
 }
 
 /** Why a stream has no status: the trap and the frames before it, or the run's own error. */
@@ -33,6 +51,8 @@ export interface StreamReport extends Omit<RunReport, 'status'> {
   /** --against-baseline found no frames of this stream in the baseline, so it compared none. */
   noBaseline?: true
 }
+
+type Say = (line: string) => void
 
 /** Plays one stream and reports it; it throws when the stream ends without a status. */
 export type PlayStream = (plan: ShotPlan) => Promise<StreamReport>
@@ -67,8 +87,6 @@ export async function playStreams(
   return reports
 }
 
-type Say = (line: string) => void
-
 function sayStream(report: StreamReport, say: Say): void {
   const { status } = report
   if (status === undefined) {
@@ -99,4 +117,15 @@ export function finishStreams(reports: readonly StreamReport[], dir: string, say
   writeFileSync(join(dir, 'report.json'), `${JSON.stringify(reports, null, 2)}\n`)
   say(`${countLine(reports)}; frames and report.json in ${dir}`)
   return reports.filter((report) => report.problems.length > 0).length
+}
+
+// O7: the BGM songs and the level by second from 5 s before the last song change to the end.
+export function sayMusic(name: string, sound: SoundLog, end: number, say: Say): void {
+  const songs = sound.songs.map(
+    (song) => `${String(song.tracks)} tracks from ${String(song.frame)}`,
+  )
+  say(`${name}: BGM songs ${songs.join(', ')}`)
+  const from = Math.max(1, (sound.songs.at(-1)?.frame ?? end) - 300)
+  const levels = sound.seconds(from, end).map((level) => level.toFixed(4))
+  say(`${name}: sound by second from frame ${String(from)}: ${levels.join(' ')}`)
 }

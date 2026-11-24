@@ -145,6 +145,19 @@ describe('the arguments of wasm:run', () => {
     expect(() => parseRunArgs(['--baseline', '--against-baseline'])).toThrow(/one of/)
   })
 
+  it('plays every test replay after the named streams with --all (#66)', () => {
+    expect(parseRunArgs(['--all', 'hand-made'])).toEqual({
+      mode: 'plain',
+      names: ['hand-made'],
+      all: true,
+    })
+    expect(parseRunArgs(['--against-baseline', '--all'])).toEqual({
+      mode: 'against',
+      names: [],
+      all: true,
+    })
+  })
+
   it('plays the sanitized module with --sanitize, against the baseline but never saving one', () => {
     expect(parseRunArgs(['--sanitize', 'shift', 'hand-made'])).toEqual({
       mode: 'plain',

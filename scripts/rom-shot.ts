@@ -64,14 +64,27 @@ export function requiresEveryScene(name: string): boolean {
   return name === DEFAULT_REPLAY || name === HAND_MADE
 }
 
+/** The ids of the test replays among the files of test/fixtures/replays/, in their order. */
+function testReplayIds(files: readonly string[]): string[] {
+  return files.flatMap((name) => /-(\d+)\.json$/.exec(name)?.[1] ?? [])
+}
+
 /** The file in test/fixtures/replays/ of the test replay with this id. */
 export function replayFile(id: string, files: readonly string[]): string {
   const file = files.find((name) => name.endsWith(`-${id}.json`))
   if (file === undefined) {
-    const ids = files.flatMap((name) => /-(\d+)\.json$/.exec(name)?.[1] ?? [])
+    const ids = testReplayIds(files)
     throw new Error(`no test replay ${id} in test/fixtures/replays/; there are ${ids.join(', ')}`)
   }
   return file
+}
+
+/** The named streams, then every test replay not named among them (wasm:run --all, #66). */
+export function withEveryTestReplay(
+  names: readonly string[],
+  files: readonly string[] = readdirSync(REPLAY_DIR),
+): string[] {
+  return [...names, ...testReplayIds(files).filter((id) => !names.includes(id))]
 }
 
 /** A stream to play and what its run must show; the WebAssembly harness plays the same list. */

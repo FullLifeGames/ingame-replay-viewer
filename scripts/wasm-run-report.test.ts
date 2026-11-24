@@ -9,7 +9,7 @@ import { reportRun } from './rom-shot.ts'
 import { INTERPRETER_HEADER_PATH, readErrorNames } from './rom-shot-run.ts'
 import type { Fake, Script } from './wasm-run-fake.ts'
 import { fakeModule, KEYS_UP, LAYOUT, playing, SLOT_LAYOUT } from './wasm-run-fake.ts'
-import { finishStreams, playStreams } from './wasm-run-report.ts'
+import { finishStreams, ModuleTrap, playStreams, readEnd, writeOutcome } from './wasm-run-report.ts'
 import type { StreamReport } from './wasm-run-report.ts'
 import { playModule } from './wasm-run.ts'
 import type { GameModule, ModuleHooks } from './wasm-run.ts'
@@ -166,5 +166,28 @@ describe('the report of a run (#66)', () => {
       '  no baseline: frames not compared',
       `2 of 2 streams passed, 1 with no baseline (hand-made-b); frames and report.json in ${scratch}`,
     ])
+  })
+})
+
+describe('the end of a stream from its --play process (#66)', () => {
+  it('is END, none, or the trap thrown again with its frame', () => {
+    const dir = mkdtempSync(join(scratch, 'outcome-'))
+    writeOutcome(dir, { end: 2916 })
+    expect(readEnd(dir)).toBe(2916)
+    writeOutcome(dir, { end: undefined })
+    expect(readEnd(dir)).toBeUndefined()
+    writeOutcome(dir, { trap: 'RuntimeError: divide by zero', frame: 2635 })
+    const trap = (() => {
+      try {
+        return readEnd(dir)
+      } catch (error) {
+        return error
+      }
+    })()
+    expect(trap).toBeInstanceOf(ModuleTrap)
+    expect(trap).toMatchObject({
+      frame: 2635,
+      message: 'the module trapped after 2635 frames: RuntimeError: divide by zero',
+    })
   })
 })

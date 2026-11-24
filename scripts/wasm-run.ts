@@ -5,9 +5,12 @@
 // module cannot be interrupted from Node, so each stream runs in its own process under timeout:
 // `--play <dir>` writes the stream into the module's slot, calls AgbMain and answers as the shot
 // tool (rom/gen3/shot/replay_shot.c) does, with the frames of its shots as PPM in <dir> and one
-// JSON line per shot and the status on stdout. Frames and report.json go to build/wasm/run/.
+// JSON line per shot and the status on stdout, and END or the trap in <dir>/outcome.json. Frames
+// and report.json go to build/wasm/run/.
 // `--baseline` and `--against-baseline` add the A/B of wasm-hashes.ts (#43). `--sanitize shift`
 // plays the module of `wasm:build -- --sanitize shift` (#44) and writes under build/wasm/sanitize.
+// `--all` plays every test replay after the named streams. A stream that fails ends only itself;
+// wasm-run-report.ts reports each stream's END or failure (#66).
 import { spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, join } from 'node:path'
@@ -31,7 +34,14 @@ import {
 } from './rom-shot-run.ts'
 import type { ProgressLayout, ToolOutput } from './rom-shot-run.ts'
 import type { Scene } from './rom-shot-scenes.ts'
-import { parseShotArgs, planStreams, readFrames, reportRun, withHeldB } from './rom-shot.ts'
+import {
+  parseShotArgs,
+  planStreams,
+  readFrames,
+  reportRun,
+  withEveryTestReplay,
+  withHeldB,
+} from './rom-shot.ts'
 import type { ShotPlan } from './rom-shot.ts'
 import { describeSlot, GBA_ROM_BASE, loadSlotLayout, SLOT_SYMBOL } from './rom-slot.ts'
 import { sanitizedDir, wasmPaths, wasmRoots } from './wasm-compile.ts'
@@ -46,7 +56,15 @@ import {
 } from './wasm-hashes.ts'
 import type { RunArgs, RunHashes } from './wasm-hashes.ts'
 import { LINK_OUTPUTS } from './wasm-link.ts'
-import { finishStreams, ModuleTrap, playStreams, secondsSince } from './wasm-run-report.ts'
+import {
+  finishStreams,
+  ModuleTrap,
+  playStreams,
+  readEnd,
+  sayMusic,
+  secondsSince,
+  writeOutcome,
+} from './wasm-run-report.ts'
 import type { StreamReport } from './wasm-run-report.ts'
 import { SoundLog } from './wasm-run-sound.ts'
 
@@ -237,10 +255,6 @@ export function runPlace(out: string, sanitize?: Sanitizer): { module: string; r
 // The scenes and the module of one stream, for its --play process.
 const RUN_FILE = 'play.json'
 const STREAM_FILE = 'stream.bin'
-// How the --play process ended: END's frame, or the trap and the frames before it.
-const OUTCOME_FILE = 'outcome.json'
-
-type Outcome = { end: number | undefined } | { trap: string; frame: number }
 
 /** One stream's process: killed `seconds` after its start, and 10 s later if it ignores that. */
 export function playCommand(dir: string, seconds: number): string[] {
@@ -281,31 +295,9 @@ async function playDir(dir: string): Promise<void> {
   say(
     `${basename(dir)}: sound ${String(samples)} samples, ${perFrame.toFixed(1)} per frame, rms ${rms.toFixed(4)}`,
   )
-  sayMusic(basename(dir), run.sound, run.output.status.frame)
+  sayMusic(basename(dir), run.sound, run.output.status.frame, say)
   const lines = [...run.output.shots, run.output.status]
   process.stdout.write(lines.map((line) => `${JSON.stringify(line)}\n`).join(''))
-}
-
-function writeOutcome(dir: string, outcome: Outcome): void {
-  writeFileSync(join(dir, OUTCOME_FILE), JSON.stringify(outcome))
-}
-
-// The END of a played stream; a trap ends it here, so the run reports it and goes on (#66).
-function readEnd(dir: string): number | undefined {
-  const outcome = JSON.parse(readFileSync(join(dir, OUTCOME_FILE), 'utf8')) as Outcome
-  if ('trap' in outcome) throw new ModuleTrap(outcome.frame, outcome.trap)
-  return outcome.end
-}
-
-// O7: the BGM songs and the level by second from 5 s before the last song change to the end.
-function sayMusic(name: string, sound: SoundLog, end: number): void {
-  const songs = sound.songs.map(
-    (song) => `${String(song.tracks)} tracks from ${String(song.frame)}`,
-  )
-  say(`${name}: BGM songs ${songs.join(', ')}`)
-  const from = Math.max(1, (sound.songs.at(-1)?.frame ?? end) - 300)
-  const levels = sound.seconds(from, end).map((level) => level.toFixed(4))
-  say(`${name}: sound by second from frame ${String(from)}: ${levels.join(' ')}`)
 }
 
 interface StreamRun {
@@ -344,10 +336,11 @@ function runStream(plan: ShotPlan, { runDir, module, errors, baseline }: StreamR
   return { ...report, end, problems, ...(settled.noBaseline ? { noBaseline: true } : {}) }
 }
 
-async function runStreams({ mode, names, sanitize }: RunArgs): Promise<void> {
+async function runStreams({ mode, names, sanitize, all }: RunArgs): Promise<void> {
   const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
   const errors = readErrorNames(readFileSync(INTERPRETER_HEADER_PATH, 'utf8'))
-  const plans = withHeldB(await planStreams(parseShotArgs(names), layout))
+  const named = parseShotArgs(all === true ? withEveryTestReplay(names) : names)
+  const plans = withHeldB(await planStreams(named, layout))
   const { out } = wasmPaths(REPO_DIR)
   startBaseline(mode, out, plans)
   const { module, runDir } = runPlace(out, sanitize)

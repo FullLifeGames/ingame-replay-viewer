@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseShotArgs, replayFile, requiresEveryScene } from './rom-shot.ts'
+import { parseShotArgs, replayFile, requiresEveryScene, withEveryTestReplay } from './rom-shot.ts'
 
 describe('the arguments of rom:shots', () => {
   it('plays test replay 994052 when it gets no name', () => {
@@ -47,6 +47,25 @@ describe('the file of a test replay', () => {
     expect(() => replayFile('994000', files)).toThrow(
       'no test replay 994000 in test/fixtures/replays/; there are 994052, 994086',
     )
+  })
+})
+
+describe('every test replay (wasm:run --all, #66)', () => {
+  const files = ['gen2ou-2718267553.json', 'smogtours-gen3ou-994052.json', 'README.md']
+
+  it('follows the named streams, each test replay once, in the order of the files', () => {
+    expect(withEveryTestReplay(['hand-made', '994052'], files)).toEqual([
+      'hand-made',
+      '994052',
+      '2718267553',
+    ])
+  })
+
+  it('is every test replay in test/fixtures/replays/ when no stream is named', () => {
+    const ids = withEveryTestReplay([])
+    expect(ids).toContain('994052')
+    expect(ids).toContain('995161')
+    expect(ids.length).toBeGreaterThanOrEqual(10)
   })
 })
 
