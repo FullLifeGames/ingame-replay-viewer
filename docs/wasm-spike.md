@@ -53,24 +53,27 @@ A held B leaves the replay on screen in both builds. The replay plays as a recor
 
 ## Frames to END
 
-| Stream                        | WebAssembly, Node | WebAssembly, Chromium | mGBA, headless    |
-| ----------------------------- | ----------------- | --------------------- | ----------------- |
-| hand-made (34 ops)            | 2916              | 2916                  | 2923              |
-| 994052 (494 ops)              | 40981             | 40981                 | 40974             |
-| 995161 (431 ops)              | 32711             | not run               | 32784             |
-| 993907 (1554 ops)             | 133202            | not run               | 132991            |
-| 2717564545 (313 ops)          | 25643             | not run               | 25677             |
-| 994086 (1112 ops)             | 95326             | not run               | 95592             |
-| 994128 (1107 ops)             | 91992             | not run               | 91965             |
-| 994141 (1174 ops)             | 98969             | not run               | 99086             |
-| 994176 (1935 ops)             | 158491            | not run               | 158763            |
-| 2718507084 (499 ops)          | 41327             | not run               | 41434             |
-| 2718267553 (469 ops)          | 40217             | not run               | 40223             |
-| refusals (`EMPTY`, `VERSION`) | error at frame 31 | not run               | error at frame 44 |
+| Stream                          | WebAssembly, Node | WebAssembly, Chromium | mGBA, headless    |
+| ------------------------------- | ----------------- | --------------------- | ----------------- |
+| hand-made (34 ops)              | 2916              | 2916                  | 2923              |
+| 994052 (494 ops)                | 40981             | 40981                 | 40974             |
+| 995161 (431 ops)                | 32711             | not run               | 32784             |
+| 993907 (1555 ops)               | 133298            | not run               | 133200            |
+| 2717564545 (313 ops)            | 25643             | not run               | 25677             |
+| 994086 (1112 ops)               | 95326             | not run               | 95592             |
+| 994128 (1107 ops)               | 91992             | not run               | 91965             |
+| 994141 (1174 ops)               | 98969             | not run               | 99086             |
+| 994176 (1935 ops)               | 158491            | not run               | 158763            |
+| 2718507084 (499 ops)            | 41327             | not run               | 41434             |
+| 2718267553 (469 ops)            | 40217             | not run               | 40223             |
+| send-outs (17 battles, 422 ops) | 42771             | not run               | 42618             |
+| refusals (`EMPTY`, `VERSION`)   | error at frame 31 | not run               | error at frame 44 |
 
-The table holds the module and the ROM at stream version 3 (24.11.2026). On the test replays the two engines part by up to 272 frames: the module reaches END after mGBA on 993907 (211 frames), 994128 (27) and 994052 (7), and before mGBA on the other seven, by 6 frames on 2718267553 up to 272 on 994176. Nobody has traced the cause.
+The table holds the module and the ROM of wave 5's stage 2 at stream version 3 (24.11.2026); the send-out row sums its 17 battles. On the test replays the two engines part by up to 272 frames: the module reaches END after mGBA on 993907 (98 frames), 994128 (27) and 994052 (7), and before mGBA on the other seven, by 6 frames on 2718267553 up to 272 on 994176. One cause shows on 993907. Stage 2's ROM changes nothing that 993907's ops do, yet mGBA reaches its END 113 frames later on that ROM than on the ROM before it, while the module ends on the same frame. Each of Cloyster's eight near send-outs takes 14 frames more. The game picks one of three speeds of a back animation by the mon's nature, and the nature comes from a personality the ROM draws at random. So a change to the ROM can move mGBA's random draws and its frames. The other gaps are untraced.
 
 All ten test replays reach END in the module and in mGBA. 994052, 994086, 994128, 994141 and 994176 pass every scene. The other five pass 12 and lack `weather-start`, in both engines, since none of their streams holds a weather that an ability starts. 2718507084 and 2718267553 hold the moves whose animation turn is 1: Solar Beam in sun and three Curses by Pokémon that are not Ghost types. Stream version 3 moved no frame: hand-made, 994052 and both refusals equal wave 4's version 2 module frame for frame (`npm run wasm:run -- --against-baseline`), and the seven older test replays reach END at the frames of that module. Every test replay plays through the module at each lane end that changes the module or a stream rule, and at each stage end: `npm run wasm:run -- --all hand-made` plays hand-made and the ten test replays in one run. A stream that traps or fails a check fails alone, and the run plays the rest and lists each stream's END or failure.
+
+The send-out streams play each sprite animation that the species tables hold. `scripts/wasm-sendouts.ts` reads the 154 functions of `sMonAnimFunctions` and each species' front animation and back set from the pinned tree. It sends out the lowest-numbered species of each of the 98 front animations on the far side and of each of the 25 back sets on the near side. A team holds six mons, so the streams make 17 battles with 135 send-outs, and `npm run wasm:run -- send-outs` and `npm run rom:shots -- send-outs` play them. The game picks one of a back set's three functions by the mon's nature, which the stream does not set, so the near side plays the game's pick. No species holds the other 17 functions as its front animation or in its back set. All 17 battles reach END in both engines: 42,771 frames to END in the module and 42,618 in mGBA, each battle within 24 frames of the other engine, and every scene they hold passes.
 
 Stage 5 measured hand-made and 994052 again on the module with the refusal screen (#30) and the assert stop (#61), with the same counts. Wave 4 measured these on stage 3's merged tree: stream format 2, the first part of our platform layer, the outro, and mGBA on the fixed clock. In format 1, 994052's stream held 461 ops. Two `rom:shots` runs of hand-made wrote the same 20 frames byte for byte and reached END at the same frame, and mGBA reached END on 994052 at 40974 in both the oracle's run and `rom:shots`'. The e2e plays hand-made at 1x and 2x and 994052 at fast in Chromium, and the page reaches END at the Node harness's frames. On stage 4's merged tree it also plays 5 s of 994052 at 1x and 5 s at 2x before fast, both with sound, at 59.78 and 118.57 frames per second (1.001 and 1.985 times the GBA's pace). Our own sound engine (#43's second part) kept both counts: every frame of all four streams equals the frame of stage 3's module, which played the borrowed sound files.
 
@@ -180,6 +183,23 @@ It found 32 sites of the check's other half: a left shift that moves a bit into 
 Our layer reports no site. Four of its files carry the check (`irv_dma.c`, `irv_mp2k_main.c`, `irv_render.c`, `irv_render_blend.c`); the others hold no shift that needs one. The run found one more bug, which no shift caused: the shake animation's address (patch 0010, above).
 
 Division by zero is a second class. The GBA's division helpers from libgcc return a value for a zero divisor and go on. WebAssembly's integer division and remainder trap there, and its signed division traps on `INT_MIN / -1` too. Neither Emscripten 7.0.0 nor Binaryen 133 has a switch that changes this: Emscripten refuses `-sBINARYEN_TRAP_MODE=clamp`, and `wasm-opt` knows no `--trap-mode-clamp`. So `npm run wasm:build -- --link` rewrites the module after the link (`scripts/wasm-divide.ts`, #66). Each division and remainder becomes a call of its helper in our glue (`irv_wasm_divide.c`), and the helpers return what the ROM's libgcc 14.2.1 returns. By zero, a 32-bit quotient or remainder saturates by the numerator's sign. A 64-bit result by zero depends on the numerator's bit length, because libgcc's 64-bit division runs its shift loop without a zero test. The ROM links no 64-bit remainder helper and the module holds no 64-bit remainder, so those two helpers follow `__moddi3` and `__umoddi3` from the same libgcc archive. The specs run all eight helpers in the native harness against values that libgcc's own code returned. The sanitized link keeps WebAssembly's ops: that module is the tool that finds a fault, and a division that traps there is its finding. Clang's `-fsanitize=integer-divide-by-zero` logs a site and then lets the division trap, so a sanitized run names one site and stops. The game's objects hold about 490 divisions and remainders by a divisor they compute. Patch 0011 gives the GBA's result at the two sites the fixtures reached. A read of the other computed divisors in `pokemon_animation.c` found none that a battle can bring to 0.
+
+A build without patch 0011 plays 995161 to END at frame 32711 with every frame equal to the build with it, so the rewrite alone covers both of 0011's sites. The patch stays in the series.
+
+### Traps the GBA survives
+
+The GBA goes on through some faults that stop the module with a trap. A visitor then reads "The game stopped during this replay. Report it with the link below." (`gameStopped` in `src/web/visitor.ts`). Division has a guard; the other classes have none.
+
+| Class                                                                            | Guard in the module                                |
+| -------------------------------------------------------------------------------- | -------------------------------------------------- |
+| An integer division or remainder by 0, or `INT_MIN / -1`                         | the rewrite after the link and `irv_wasm_divide.c` |
+| A call through a null or mistyped function pointer; the GBA jumps                | none                                               |
+| Memory past the module's 256 MB (`scripts/wasm-link.ts`); the GBA reads open bus | none                                               |
+| The GBA's mirrored RAM, which the module maps one to one                         | none                                               |
+| `unreachable` outside the assert path                                            | none                                               |
+| A call stack past the module's 1 MB                                              | none                                               |
+
+The test replays and the send-out streams reach none of these.
 
 ## Licences
 
