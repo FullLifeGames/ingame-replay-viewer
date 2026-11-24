@@ -159,6 +159,13 @@ describe('sendOutStreams', () => {
     for (const { stream } of split) {
       expect(decodeStream(encodeStream(stream))).toEqual(stream)
       expect(stream.instructions.at(-1)).toEqual({ op: 'end', outcome: 'unknown' })
+      // The intro's lines come before the first send-out, so both ball displays are up (#21).
+      expect(stream.instructions.slice(0, 4).map((instruction) => instruction.op)).toEqual([
+        'intro',
+        'print',
+        'print',
+        'sendOut',
+      ])
     }
   })
 

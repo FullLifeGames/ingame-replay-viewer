@@ -8,7 +8,9 @@
 // A team holds six mons, and a battle sends out no species its team lacks, so the streams are
 // several battles: each sends out six far species, one after the other by WITHDRAW and SWITCH_IN,
 // and up to six near ones the same way; a battle past the near species sends out the first one.
-// No stream format changes. For each animation the species with the lowest number plays it.
+// Each send-out follows its line, as in the game, and the intro's line comes first, so both ball
+// displays are up before the first one. No stream format changes. For each animation the species
+// with the lowest number plays it.
 import type { Instruction, Party, Stream, StreamMon } from '../src/gen3/stream/instructions.ts'
 import type { Side } from '../src/script/types.ts'
 import { parseEntryFields } from './gen3-parse.ts'
@@ -139,8 +141,8 @@ function sideSendOuts(side: Side, party: readonly StreamMon[]): Instruction[][] 
   return party.map((mon, slot) => {
     const entering = { side, slot, hp: mon.maxHp, status: 'none' } as const
     const line: Instruction = { op: 'print', text: sentOutLine(side, mon) }
-    if (slot === 0) return [{ op: 'sendOut', ...entering }, line]
-    return [{ op: 'withdraw', side }, { op: 'switchIn', ...entering }, line]
+    if (slot === 0) return [line, { op: 'sendOut', ...entering }]
+    return [{ op: 'withdraw', side }, line, { op: 'switchIn', ...entering }]
   })
 }
 
@@ -162,7 +164,12 @@ function battle(teams: Readonly<Record<Side, StreamMon[]>>, pics: Record<Side, n
   return {
     trainers: { near: trainer('near'), far: trainer('far') },
     parties: { near: party('near'), far: party('far') },
-    instructions: [{ op: 'intro' }, ...turns.flat(), { op: 'end', outcome: 'unknown' }],
+    instructions: [
+      { op: 'intro' },
+      { op: 'print', text: `${TRAINER_NAMES.far} would like to battle!` },
+      ...turns.flat(),
+      { op: 'end', outcome: 'unknown' },
+    ],
   }
 }
 
