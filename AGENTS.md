@@ -63,7 +63,7 @@ Every change gets a class before work starts: the integrator proposes it, and th
 
 ## Issues and the board
 
-- Every task is an issue with acceptance criteria. Its labels give its status (`approved`; `parked` with its trigger in the text; `needs triage`), its class (`small fix`, `larger bug`, `feature`) and its area (`area: script`, `area: gen3`, `area: rom`, `area: web`, `area: tooling`, `area: docs`). Its milestone names the roadmap step.
+- Every task is an issue with acceptance criteria. Its labels give its status (`approved`; `parked` with its trigger in the text; `needs triage`), its class (`small fix`, `larger bug`, `feature`) and its area (`area: script`, `area: gen3`, `area: rom`, `area: web`, `area: gen5`, `area: tooling`, `area: docs`). Its milestone names the roadmap step.
 - The board gives each issue its Status (Approved, In wave, Gate, Done), its Wave and its Lane.
 - A new issue needs the user's approval at a gate. A report from elsewhere stays at `needs triage` until a gate rules on it.
 
