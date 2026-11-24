@@ -43,6 +43,10 @@ export const STATUS_TEMPLATES = {
   itemBurn: tagged('STRINGID_PKMNSITEMHEALEDBURN', withItem('cured its burn!')),
   itemFreeze: tagged('STRINGID_PKMNSITEMDEFROSTEDIT', withItem('defrosted it!')),
   itemSleep: tagged('STRINGID_PKMNSITEMWOKEIT', withItem('woke it up!')),
+  itemConfusion: tagged(
+    'STRINGID_PKMNSITEMSNAPPEDOUT',
+    withItem('snapped it out of its confusion!'),
+  ),
   aroma: tagged('STRINGID_SOOTHINGAROMA', () => 'A soothing aroma wafted through the area!'),
   bell: tagged('STRINGID_BELLCHIMED', () => 'A bell chimed!'),
 }
@@ -105,6 +109,11 @@ export const statusCured = (who: Mon, status: StatusName) => CURED[status](who)
 /** A held item, such as Lum Berry, that cured the status. */
 export function itemCured(who: Mon, item: string, status: StatusName): string {
   return ITEM_CURED[status](who, itemName(item))
+}
+
+/** Confusion that a held item, such as Persim Berry, ended. */
+export function itemEndedConfusion(who: Mon, item: string): string {
+  return STATUS_TEMPLATES.itemConfusion.render(who, itemName(item))
 }
 
 const TEAM_CURES: Readonly<Record<string, () => string>> = {

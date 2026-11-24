@@ -157,6 +157,25 @@ describe('item pop-ups (BattleScript_ItemPopUp_Scripting)', () => {
     expect(result.fallbacks).toEqual([])
   })
 
+  // `BattleScript_BerryCureConfusionRet`: the berry animation with no pop-up, then
+  // STRINGID_PKMNSITEMSNAPPEDOUT. Lum Berry takes the script when confusion is all it cures.
+  it.each(['Persim Berry', 'Lum Berry'])(
+    'plays a %s eaten for confusion alone with no pop-up and names it at the end',
+    (berry) => {
+      const result = streamOfLog(
+        '|-start|p1a: Dugtrio|confusion',
+        `|-enditem|p1a: Dugtrio|${berry}|[eat]`,
+        '|-end|p1a: Dugtrio|confusion',
+      )
+      expect(sceneFrom(result, NEXT + 1).map(plain)).toEqual([
+        anim('near', 'heldItemBerry'),
+        held('near', 0),
+        `Dugtrio's ${berry} snapped it out of its confusion!`,
+      ])
+      expect(result.fallbacks).toEqual([])
+    },
+  )
+
   it('shows the pop-up of a berry eaten for a stat', () => {
     const scene = sceneOf(
       '|-enditem|p1a: Dugtrio|Salac Berry|[eat]',

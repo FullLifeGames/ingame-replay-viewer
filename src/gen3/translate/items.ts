@@ -7,8 +7,9 @@
 // used for the stat change the next line makes, such as Berserk Gene, shows its pop-up and plays
 // the held item animation (`BattleScript_BerserkGene`); the change names the item. White Herb does
 // the same before the reset of the lowered stages (`BattleScript_WhiteHerbRet`), and Berry Juice
-// before its heal (`BattleScript_ItemHealHP_RemoveItem`). An item the expansion lacks is text
-// alone (plan §4) and shows no pop-up.
+// before its heal (`BattleScript_ItemHealHP_RemoveItem`). A berry eaten for confusion alone plays
+// its animation with no pop-up (`BattleScript_BerryCureConfusionRet`). An item the expansion
+// lacks is text alone (plan §4) and shows no pop-up.
 import { Dex, toID } from '@pkmn/dex'
 
 import type { ScriptEvent } from '../../script/events'
@@ -69,6 +70,10 @@ export function shownBefore(who: PokemonRef, name: string, ctx: Context): boolea
   return before !== undefined && toID(before) === toID(name) && popUpOf(name) !== undefined
 }
 
+/** Whether `event` ends the confusion of `who`. */
+export const endsConfusion = (event: ScriptEvent | undefined, who: PokemonRef) =>
+  event?.kind === 'effectEnd' && sameMon(event.who, who) && toID(event.effect.name) === 'confusion'
+
 export function item(event: EventOf<'item'>, ctx: Context): void {
   const { who, cause, source, line } = event
   const number = heldItem(ctx, line, event.item)
@@ -116,7 +121,8 @@ export function itemEnd(event: EventOf<'itemEnd'>, ctx: Context): void {
   const { who, cause, source, line } = event
   const number = heldItem(ctx, line, event.item)
   if (event.eaten || usedForNext(event, ctx)) {
-    showPopUp(who, event.item, line, ctx)
+    // A berry eaten for confusion alone shows none (`BattleScript_BerryCureConfusionRet`).
+    if (!(event.eaten && endsConfusion(ctx.near(1), who))) showPopUp(who, event.item, line, ctx)
     const anim = event.eaten ? 'heldItemBerry' : 'heldItemEffect'
     ctx.emit(line, { op: 'anim', side: ctx.activeSide(who), anim })
   } else if (!event.silent) {
