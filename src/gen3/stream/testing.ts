@@ -75,7 +75,7 @@ export const EACH_OP: readonly Instruction[] = [
   { op: 'print', text: 'Go! Dugtrio!' },
   { op: 'withdraw', side: 'near' },
   { op: 'switchIn', side: 'near', slot: 1, hp: 71, status: 'par' },
-  { op: 'move', user: 'far', target: 'near', move: 191 },
+  { op: 'move', user: 'far', target: 'near', move: 191, animTurn: 1 },
   { op: 'hit', side: 'near', effectiveness: 'super' },
   { op: 'hp', side: 'near', hp: 0 },
   { op: 'status', side: 'far', slot: 0, status: 'slp' },

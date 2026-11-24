@@ -21,6 +21,7 @@
 enum ReplayOperand
 {
     OPERAND_NONE, // the end of an op's operands
+    OPERAND_U8,
     OPERAND_U16,
     OPERAND_S8,
     OPERAND_FLAG,
@@ -57,7 +58,7 @@ struct ReplayOperandRange
     u8 width;
 };
 
-// Every op of format v2; replay_stream.h numbers them without gaps.
+// Every op of the format; replay_stream.h numbers them without gaps.
 static const struct ReplayOpFormat sOpFormats[] =
 {
     [REPLAY_OP_END]            = { REPLAY_OP_END_SIZE,            { OPERAND_OUTCOME } },
@@ -67,7 +68,7 @@ static const struct ReplayOpFormat sOpFormats[] =
     [REPLAY_OP_SEND_OUT]       = { REPLAY_OP_SEND_OUT_SIZE,       { OPERAND_SIDE, OPERAND_SLOT, OPERAND_U16, OPERAND_STATUS } },
     [REPLAY_OP_WITHDRAW]       = { REPLAY_OP_WITHDRAW_SIZE,       { OPERAND_SIDE } },
     [REPLAY_OP_SWITCH_IN]      = { REPLAY_OP_SWITCH_IN_SIZE,      { OPERAND_SIDE, OPERAND_SLOT, OPERAND_U16, OPERAND_STATUS } },
-    [REPLAY_OP_MOVE]           = { REPLAY_OP_MOVE_SIZE,           { OPERAND_SIDE, OPERAND_SIDE, OPERAND_MOVE } },
+    [REPLAY_OP_MOVE]           = { REPLAY_OP_MOVE_SIZE,           { OPERAND_SIDE, OPERAND_SIDE, OPERAND_MOVE, OPERAND_U8 } },
     [REPLAY_OP_HIT]            = { REPLAY_OP_HIT_SIZE,            { OPERAND_SIDE, OPERAND_EFFECTIVENESS } },
     [REPLAY_OP_HP]             = { REPLAY_OP_HP_SIZE,             { OPERAND_SIDE, OPERAND_U16 } },
     [REPLAY_OP_FAINT]          = { REPLAY_OP_FAINT_SIZE,          { OPERAND_SIDE } },
@@ -83,11 +84,12 @@ static const struct ReplayOpFormat sOpFormats[] =
     [REPLAY_OP_FLUSH_TEXT_BOX] = { REPLAY_OP_FLUSH_TEXT_BOX_SIZE },
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sOpFormats) == REPLAY_OP_FLUSH_TEXT_BOX + 1, ReplayOpFormatsCoverFormatV2);
+STATIC_ASSERT(ARRAY_COUNT(sOpFormats) == REPLAY_OP_FLUSH_TEXT_BOX + 1, ReplayOpFormatsCoverTheFormat);
 
 // The values each kind allows. The stream's own enums are numbered without gaps.
 static const struct ReplayOperandRange sOperandRanges[] =
 {
+    [OPERAND_U8]            = { 0, 0xFF, 1 },
     [OPERAND_U16]           = { 0, 0xFFFF, 2 },
     [OPERAND_S8]            = { 0, 0xFF, 1 },
     [OPERAND_FLAG]          = { FALSE, TRUE, 1 },

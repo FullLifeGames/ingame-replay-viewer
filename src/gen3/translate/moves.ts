@@ -100,7 +100,14 @@ export function move(event: EventOf<'move'>, ctx: Context): void {
   let played: Instruction | undefined
   if (!(event.miss || event.still || event.notarget || didNothing(event, ctx))) {
     const side = ctx.activeSide(user)
-    played = { op: 'move', user: side, target: target?.side ?? side, move: found.number }
+    // Turn 0 for every move for now: the first of the animations a move can pick from.
+    played = {
+      op: 'move',
+      user: side,
+      target: target?.side ?? side,
+      move: found.number,
+      animTurn: 0,
+    }
     ctx.emit(line, played)
   }
   startMove(eventsOfMove(ctx, event), played, ctx)

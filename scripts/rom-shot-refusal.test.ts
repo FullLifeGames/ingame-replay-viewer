@@ -75,7 +75,7 @@ describe('the run with B held after END', () => {
     missing: [],
     expect: outcome,
   })
-  const refusals = [play('empty-slot', 'EMPTY'), play('version-3', 'VERSION')]
+  const refusals = [play('empty-slot', 'EMPTY'), play('version-4', 'VERSION')]
 
   it("follows hand-made with B held from the frame after END and hand-made's scenes", () => {
     const plans = [play('hand-made'), play('994052'), ...refusals]
@@ -85,7 +85,7 @@ describe('the run with B held after END', () => {
       'hand-made-b',
       '994052',
       'empty-slot',
-      'version-3',
+      'version-4',
     ])
     const [handMadeRun, heldB] = runs
     expect(heldB).toEqual({ ...handMadeRun, name: 'hand-made-b', holdBFromEnd: 1 })

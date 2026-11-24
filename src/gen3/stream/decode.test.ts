@@ -9,6 +9,8 @@ import {
   MON,
   MON_OFFSET,
   monOffset,
+  OP,
+  SIDE,
   STREAM,
   STREAM_OFFSET,
   TRAINER_OFFSET,
@@ -47,9 +49,32 @@ describe('decodeStream', () => {
     expect(decodeStream(slot.subarray(8, 8 + bytes.length))).toEqual(streamOf([END]))
   })
 
-  it('refuses versions 1 and 3 (F7)', () => {
-    expect(patched([END], 0, [1])).toThrow('stream version 1 is unknown; this reads version 2')
-    expect(patched([END], 0, [3])).toThrow('stream version 3 is unknown; this reads version 2')
+  it('refuses versions 1, 2 and 4 (F7)', () => {
+    for (const version of [1, 2, 4]) {
+      expect(patched([END], 0, [version])).toThrow(
+        `stream version ${String(version)} is unknown; this reads version 3`,
+      )
+    }
+  })
+
+  it('refuses a MOVE of size 4, as version 2 wrote it, and reads its animation turn', () => {
+    const tables = encodeStream(streamWithLeads([END]))
+    const end = tables.length - encodeInstruction(END).length
+    const older = new Uint8Array([
+      ...tables.subarray(0, end),
+      ...[OP.move, 4, SIDE.near, SIDE.far, 1, 0],
+      ...tables.subarray(end),
+    ])
+    new DataView(older.buffer).setUint32(
+      STREAM_OFFSET.instructionsLength,
+      older.length - STREAM.tablesEnd,
+      true,
+    )
+    expect(() => decodeStream(older)).toThrow('move has size 4, not 5')
+    const move: Instruction = { op: 'move', user: 'near', target: 'far', move: 1, animTurn: 0xff }
+    expect(decodeStream(encodeStream(streamWithLeads([move, END])))).toEqual(
+      streamWithLeads([move, END]),
+    )
   })
 
   it('refuses an op with the wrong size (F7)', () => {
@@ -59,11 +84,11 @@ describe('decodeStream', () => {
     expect(patched([turn, END], at, [1])).toThrow(Gen3Error)
   })
 
-  it('refuses an unknown op, the one after the last op of version 2', () => {
+  it('refuses an unknown op, the one after the last op of version 3', () => {
     expect(patched([END], STREAM.tablesEnd, [0x15])).toThrow(/op 21/)
   })
 
-  it('refuses a header whose sizes or offsets are not those of version 2', () => {
+  it('refuses a header whose sizes or offsets are not those of version 3', () => {
     const cases: [number, number][] = [
       [STREAM_OFFSET.headerSize, 0x20],
       [STREAM_OFFSET.trainerSize, 25],
@@ -164,7 +189,7 @@ describe('decodeStream', () => {
   })
 
   it('refuses a MOVE before any SEND_OUT, as the ROM does (#18)', () => {
-    const move: Instruction = { op: 'move', user: 'near', target: 'far', move: 1 }
+    const move: Instruction = { op: 'move', user: 'near', target: 'far', move: 1, animTurn: 0 }
     expect(() => decodeStream(rawBytes([{ op: 'intro' }, move, END]))).toThrow(
       'move at 1 names the near side, which has no battler out',
     )
@@ -200,7 +225,7 @@ describe('decodeStream', () => {
 
   it('refuses a move, ability or item number at or above its count, as the ROM does', () => {
     const operands = AFTER_LEADS + 2
-    const move: Instruction = { op: 'move', user: 'far', target: 'near', move: 1 }
+    const move: Instruction = { op: 'move', user: 'far', target: 'near', move: 1, animTurn: 0 }
     const ability: Instruction = { op: 'ability', side: 'near', ability: 1, show: true }
     const item: Instruction = { op: 'item', side: 'far', slot: 0, item: 1 }
     const cases: [Instruction, number, number, RegExp][] = [

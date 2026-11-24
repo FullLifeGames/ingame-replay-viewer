@@ -135,7 +135,7 @@ describe('the scene points of a decoded instruction list (S6)', () => {
     const scene = named(
       [
         { op: 'print', text: 'Go!' },
-        { op: 'move', user: 'near', target: 'far', move: 89 },
+        { op: 'move', user: 'near', target: 'far', move: 89, animTurn: 0 },
         { op: 'end', outcome: 'tie' },
       ],
       'first-move',

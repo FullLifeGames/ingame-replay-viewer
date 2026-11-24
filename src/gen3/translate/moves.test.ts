@@ -17,7 +17,7 @@ describe('moves', () => {
     )
     expect(scene.map(plain)).toEqual([
       'Dugtrio used Earthquake!',
-      { op: 'move', user: 'near', target: 'far', move: EARTHQUAKE },
+      { op: 'move', user: 'near', target: 'far', move: EARTHQUAKE, animTurn: 0 },
       { op: 'hit', side: 'far', effectiveness: 'super' },
       { op: 'hp', side: 'far', hp: 10 },
       'A critical hit!',
@@ -130,7 +130,7 @@ describe('moves', () => {
     )
     expect(scene.map(plain).slice(0, 2)).toEqual([
       'Dugtrio used Earthquake!',
-      { op: 'move', user: 'near', target: 'far', move: EARTHQUAKE },
+      { op: 'move', user: 'near', target: 'far', move: EARTHQUAKE, animTurn: 0 },
     ])
   })
 
@@ -138,7 +138,7 @@ describe('moves', () => {
     const scene = sceneOf(earthquake, '|-heal|p2a: Tyranitar|60/100|[from] item: Leftovers')
     expect(scene.map(plain).slice(0, 2)).toEqual([
       'Dugtrio used Earthquake!',
-      { op: 'move', user: 'near', target: 'far', move: EARTHQUAKE },
+      { op: 'move', user: 'near', target: 'far', move: EARTHQUAKE, animTurn: 0 },
     ])
   })
 
@@ -187,7 +187,13 @@ describe('moves', () => {
         '|-start|p1a: Dugtrio|confusion',
       )
       const number = moveOf(move).number
-      expect(scene).toContainEqual({ op: 'move', user: 'far', target: 'near', move: number })
+      expect(scene).toContainEqual({
+        op: 'move',
+        user: 'far',
+        target: 'near',
+        move: number,
+        animTurn: 0,
+      })
     }
   })
 
@@ -214,7 +220,7 @@ describe('moves', () => {
     )
     expect(scene.map(plain).slice(0, 2)).toEqual([
       'Dugtrio used Memento!',
-      { op: 'move', user: 'near', target: 'far', move: moveOf('Memento').number },
+      { op: 'move', user: 'near', target: 'far', move: moveOf('Memento').number, animTurn: 0 },
     ])
   })
 
@@ -227,9 +233,9 @@ describe('moves', () => {
     )
     expect(scene.map(plain)).toEqual([
       'Dugtrio used Swords Dance!',
-      { op: 'move', user: 'near', target: 'near', move: swordsDance },
+      { op: 'move', user: 'near', target: 'near', move: swordsDance, animTurn: 0 },
       'The opposing Tyranitar used Rock Slide!',
-      { op: 'move', user: 'far', target: 'near', move: rockSlide },
+      { op: 'move', user: 'far', target: 'near', move: rockSlide, animTurn: 0 },
     ])
   })
 
@@ -240,6 +246,7 @@ describe('moves', () => {
       user: 'near',
       target: 'near',
       move: moveOf('Haze').number,
+      animTurn: 0,
     })
   })
 
@@ -251,6 +258,7 @@ describe('moves', () => {
       user: 'far',
       target: 'near',
       move: moveOf('Paleo Wave').number,
+      animTurn: 0,
     })
   })
 })

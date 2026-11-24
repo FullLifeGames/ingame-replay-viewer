@@ -30,7 +30,13 @@ const switchIn = (side: Side): Instruction => ({
   hp: 100,
   status: 'none',
 })
-const move = (user: Side, target: Side): Instruction => ({ op: 'move', user, target, move: 1 })
+const move = (user: Side, target: Side): Instruction => ({
+  op: 'move',
+  user,
+  target,
+  move: 1,
+  animTurn: 0,
+})
 const faint = (side: Side): Instruction => ({ op: 'faint', side })
 
 interface OrderCase {

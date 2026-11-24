@@ -19,7 +19,7 @@ describe('a one-hit KO', () => {
     )
     expect(scene.map(plain)).toEqual([
       'Dugtrio used Fissure!',
-      { op: 'move', user: 'near', target: 'far', move: moveOf('Fissure').number },
+      { op: 'move', user: 'near', target: 'far', move: moveOf('Fissure').number, animTurn: 0 },
       { op: 'hit', side: 'far', effectiveness: 'normal' },
       { op: 'hp', side: 'far', hp: 0 },
       "It's a one-hit KO!",

@@ -37,10 +37,10 @@ describe("Gen 1's Reflect and Light Screen, which last on their user", () => {
 
     expect(sceneOf(...lines).map(plain)).toEqual([
       'Dugtrio used Reflect!',
-      { op: 'move', user: 'near', target: 'near', move: expect.any(Number) as number },
+      { op: 'move', user: 'near', target: 'near', move: expect.any(Number) as number, animTurn: 0 },
       'Reflect made your side stronger against physical moves!',
       'The opposing Tyranitar used Light Screen!',
-      { op: 'move', user: 'far', target: 'far', move: expect.any(Number) as number },
+      { op: 'move', user: 'far', target: 'far', move: expect.any(Number) as number, animTurn: 0 },
       'Light Screen made the opposing side stronger against special moves!',
     ])
     expect(fallbacksOf(...lines)).toEqual([])
@@ -57,7 +57,7 @@ describe('Belly Drum (Gen 2 and 3)', () => {
 
     expect(sceneOf(...lines).map(plain)).toEqual([
       'Dugtrio used Belly Drum!',
-      { op: 'move', user: 'near', target: 'near', move: expect.any(Number) as number },
+      { op: 'move', user: 'near', target: 'near', move: expect.any(Number) as number, animTurn: 0 },
       { op: 'hp', side: 'near', hp: 50 },
       { op: 'stat', side: 'near', stat: 'atk', stages: 6, arrows: 'one' },
       'Dugtrio cut its own HP and maximized its Attack!',
@@ -75,7 +75,7 @@ describe("Mean Look's trap", () => {
 
     expect(sceneOf(...lines).map(plain)).toEqual([
       'Dugtrio used Mean Look!',
-      { op: 'move', user: 'near', target: 'far', move: expect.any(Number) as number },
+      { op: 'move', user: 'near', target: 'far', move: expect.any(Number) as number, animTurn: 0 },
       'The opposing Tyranitar can no longer escape!',
     ])
     expect(fallbacksOf(...lines)).toEqual([])
@@ -92,7 +92,7 @@ describe("Pursuit's activation on a Pokémon that switches out (Gen 2 and 3)", (
   it('prints nothing before the hit, which the withdraw follows', () => {
     expect(sceneOf(...lines).map(plain)).toEqual([
       'Dugtrio used Pursuit!',
-      { op: 'move', user: 'near', target: 'far', move: expect.any(Number) as number },
+      { op: 'move', user: 'near', target: 'far', move: expect.any(Number) as number, animTurn: 0 },
       { op: 'hit', side: 'far', effectiveness: 'normal' },
       { op: 'hp', side: 'far', hp: 80 },
     ])
@@ -111,7 +111,7 @@ describe('Haze (Gen 1 to 3)', () => {
 
     expect(sceneOf(...lines).map(plain)).toEqual([
       'The opposing Tyranitar used Haze!',
-      { op: 'move', user: 'far', target: 'far', move: expect.any(Number) as number },
+      { op: 'move', user: 'far', target: 'far', move: expect.any(Number) as number, animTurn: 0 },
       'All stat changes were eliminated!',
     ])
     expect(fallbacksOf(...lines)).toEqual([])
@@ -127,7 +127,7 @@ describe('Disable (Gen 1 to 3)', () => {
 
     expect(sceneOf(...lines).map(plain)).toEqual([
       'The opposing Tyranitar used Disable!',
-      { op: 'move', user: 'far', target: 'near', move: expect.any(Number) as number },
+      { op: 'move', user: 'far', target: 'near', move: expect.any(Number) as number, animTurn: 0 },
       "Dugtrio's Body Slam was disabled!",
     ])
     expect(fallbacksOf(...lines)).toEqual([])
@@ -156,7 +156,7 @@ describe('Transform (Gen 1 to 3)', () => {
   it('says the species it turned into, as the expansion does', () => {
     expect(sceneOf(...lines).map(plain)).toEqual([
       'Dugtrio used Transform!',
-      { op: 'move', user: 'near', target: 'far', move: expect.any(Number) as number },
+      { op: 'move', user: 'near', target: 'far', move: expect.any(Number) as number, animTurn: 0 },
       'Dugtrio transformed into Tyranitar!',
     ])
   })

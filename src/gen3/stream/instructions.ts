@@ -55,7 +55,16 @@ interface Operands {
   sendOut: Entering
   withdraw: OnSide
   switchIn: Entering
-  move: { readonly user: Side; readonly target: Side; readonly move: number }
+  /**
+   * `animTurn` is the turn the move's animation reads (the engine's `gAnimMoveTurn`): an odd one
+   * picks the second animation of a move that has two.
+   */
+  move: {
+    readonly user: Side
+    readonly target: Side
+    readonly move: number
+    readonly animTurn: number
+  }
   hit: OnSide & { readonly effectiveness: Effectiveness }
   hp: OnSide & { readonly hp: number }
   faint: OnSide
@@ -135,6 +144,7 @@ export const LAYOUT: { readonly [K in FixedOp]: Fields<Operands[K]> } = {
     ['user', side],
     ['target', side],
     ['move', below(counts.MOVES_COUNT_ALL)],
+    ['animTurn', 'u8'],
   ],
   hit: [
     ['side', side],

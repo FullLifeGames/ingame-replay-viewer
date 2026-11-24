@@ -125,7 +125,7 @@ describe('damage with no cause', () => {
     expect(scene.map(plain)).toEqual([
       hp('far', 50),
       'Dugtrio used Substitute!',
-      { op: 'move', user: 'near', target: 'near', move: expect.any(Number) as number },
+      { op: 'move', user: 'near', target: 'near', move: expect.any(Number) as number, animTurn: 0 },
       hp('near', 75),
     ])
   })

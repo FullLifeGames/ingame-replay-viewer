@@ -54,7 +54,7 @@ static void Replay_Exit(void);
 EWRAM_DATA struct ReplayProgress gReplayProgress = {0};
 static EWRAM_DATA struct ReplayState sReplay = {0};
 
-// The step function of each op of format v2. Replay_Validate refuses any other op.
+// The step function of each op of the format. Replay_Validate refuses any other op.
 static const ReplayOpFunc sOps[] =
 {
     [REPLAY_OP_END]            = Op_End,
@@ -80,7 +80,7 @@ static const ReplayOpFunc sOps[] =
     [REPLAY_OP_FLUSH_TEXT_BOX] = Op_FlushTextBox,
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sOps) == REPLAY_OP_FLUSH_TEXT_BOX + 1, ReplayOpsCoverFormatV2);
+STATIC_ASSERT(ARRAY_COUNT(sOps) == REPLAY_OP_FLUSH_TEXT_BOX + 1, ReplayOpsCoverTheFormat);
 
 // The battle outcome of each REPLAY_OUTCOME_*. A tie and an unknown end are draws.
 static const u8 sOutcomes[] =

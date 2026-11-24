@@ -16,7 +16,7 @@ describe('weather', () => {
     const scene = sceneOf('|move|p1a: Dugtrio|Rain Dance|p1a: Dugtrio', '|-weather|RainDance')
     expect(scene.map(plain)).toEqual([
       'Dugtrio used Rain Dance!',
-      { op: 'move', user: 'near', target: 'near', move: moveOf('Rain Dance').number },
+      { op: 'move', user: 'near', target: 'near', move: moveOf('Rain Dance').number, animTurn: 0 },
       { op: 'weather', weather: 'rain' },
       'It started to rain!',
     ])

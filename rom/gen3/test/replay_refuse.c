@@ -26,11 +26,13 @@ static void ExpectVersionRefused(u32 version)
     EXPECT(!Replay_IsLoaded());
 }
 
-// Version 1 is the format before ITEM_POP_UP and TRAP_TURN, as an older backend writes it.
-TEST("Replay: a stream of version 1 or 3 is refused before a battle starts")
+// Version 1 is the format before ITEM_POP_UP and TRAP_TURN, version 2 the one before MOVE's
+// animation turn, as an older backend writes them.
+TEST("Replay: a stream of version 1, 2 or 4 is refused before a battle starts")
 {
     ExpectVersionRefused(1);
-    ExpectVersionRefused(REPLAY_STREAM_VERSION + 1);
+    ExpectVersionRefused(2);
+    ExpectVersionRefused(4);
 }
 
 TEST("Replay: a stream of no bytes is refused as empty")

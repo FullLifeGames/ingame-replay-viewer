@@ -21,7 +21,7 @@ describe('Bide (Gen 1 to 3)', () => {
   it('says the energy it stores, then its release, and nothing as it starts', () => {
     expect(sceneOf(...lines).map(plain)).toEqual([
       'The opposing Tyranitar used Bide!',
-      { op: 'move', user: 'far', target: 'far', move: anyMove },
+      { op: 'move', user: 'far', target: 'far', move: anyMove, animTurn: 0 },
       'The opposing Tyranitar is storing energy!',
       'The opposing Tyranitar unleashed its energy!',
       { op: 'hit', side: 'near', effectiveness: 'normal' },
@@ -69,7 +69,7 @@ describe("Heal Bell's activation (Gen 5 and later shape)", () => {
 
     expect(sceneOf(...lines).map(plain)).toEqual([
       'Dugtrio used Heal Bell!',
-      { op: 'move', user: 'near', target: 'near', move: anyMove },
+      { op: 'move', user: 'near', target: 'near', move: anyMove, animTurn: 0 },
       'A bell chimed!',
     ])
     expect(fallbacksOf(...lines)).toEqual([])

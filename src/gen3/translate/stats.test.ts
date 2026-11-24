@@ -71,7 +71,7 @@ describe('stat changes', () => {
     )
     expect(scene.map(plain)).toEqual([
       'Dugtrio used Calm Mind!',
-      { op: 'move', user: 'near', target: 'near', move: moveOf('Calm Mind').number },
+      { op: 'move', user: 'near', target: 'near', move: moveOf('Calm Mind').number, animTurn: 0 },
       "Dugtrio's Sp. Atk won't go any higher!",
       stat('near', 'spd', 1, 'one'),
       "Dugtrio's Sp. Def rose!",

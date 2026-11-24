@@ -51,8 +51,8 @@ describe('the hand-made stream of the screenshot run', () => {
   it('gives a copy with the first unknown version, which the decoder refuses', () => {
     const bytes = handMadeBytes()
     const unknown = withVersion(bytes, UNKNOWN_VERSION)
-    expect([UNKNOWN_VERSION, unknown[0], bytes[0]]).toEqual([3, 3, 2])
-    expect(() => decodeStream(unknown)).toThrow('stream version 3 is unknown')
+    expect([UNKNOWN_VERSION, unknown[0], bytes[0]]).toEqual([4, 4, 3])
+    expect(() => decodeStream(unknown)).toThrow('stream version 4 is unknown')
   })
 })
 

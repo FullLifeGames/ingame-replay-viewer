@@ -1,4 +1,4 @@
-{"length":6655,"crc32":"f90d2fdf","trainers":{"near":{"name":"A Welcome Guest","trainerPic":1,"teamSize":6,"revealed":5},"far":{"name":"xXEricXx","trainerPic":3,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":51,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Dugtrio"},{"species":145,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zapdos"},{"species":245,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Suicune"},{"species":344,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Claydol"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},null],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"},{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":142,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Aerodactyl"}]}}
+{"length":6692,"crc32":"1024cf38","trainers":{"near":{"name":"A Welcome Guest","trainerPic":1,"teamSize":6,"revealed":5},"far":{"name":"xXEricXx","trainerPic":3,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":51,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Dugtrio"},{"species":145,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zapdos"},{"species":245,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Suicune"},{"species":344,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Claydol"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},null],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"},{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":142,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Aerodactyl"}]}}
 {"line":23,"op":"intro"}
 {"line":23,"op":"print","text":"You are challenged by xXEricXx!"}
 {"line":25,"op":"print","text":"xXEricXx sent out Tyranitar!"}
@@ -12,7 +12,7 @@
 {"line":26,"op":"ability","side":"far","ability":45,"show":false}
 {"line":27,"op":"turn","number":1}
 {"line":32,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":32,"op":"move","user":"near","target":"far","move":89}
+{"line":32,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":34,"op":"hit","side":"far","effectiveness":"super"}
 {"line":34,"op":"hp","side":"far","hp":0}
 {"line":34,"op":"print","text":"It's super effective!"}
@@ -28,7 +28,7 @@
 {"line":45,"op":"print","text":"Go! Zapdos!"}
 {"line":45,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
 {"line":46,"op":"print","text":"The opposing Skarmory used Spikes!"}
-{"line":46,"op":"move","user":"far","target":"near","move":191}
+{"line":46,"op":"move","user":"far","target":"near","move":191,"animTurn":0}
 {"line":47,"op":"print","text":"Spikes were scattered on the ground all around your side!"}
 {"line":49,"op":"print","text":"The sandstorm is raging."}
 {"line":49,"op":"anim","side":"near","anim":"sandstormContinues"}
@@ -45,7 +45,7 @@
 {"line":56,"op":"print","text":"xXEricXx sent out Celebi!"}
 {"line":56,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
 {"line":57,"op":"print","text":"Zapdos used Substitute!"}
-{"line":57,"op":"move","user":"near","target":"near","move":164}
+{"line":57,"op":"move","user":"near","target":"near","move":164,"animTurn":0}
 {"line":58,"op":"volatile","side":"near","volatile":"substitute","on":true}
 {"line":59,"op":"hp","side":"near","hp":76}
 {"line":58,"op":"print","text":"Zapdos put in a substitute!"}
@@ -67,11 +67,11 @@
 {"line":65,"op":"hp","side":"near","hp":76}
 {"line":67,"op":"turn","number":4}
 {"line":70,"op":"print","text":"The opposing Celebi used Psychic!"}
-{"line":70,"op":"move","user":"far","target":"near","move":94}
+{"line":70,"op":"move","user":"far","target":"near","move":94,"animTurn":0}
 {"line":71,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":71,"op":"print","text":"The substitute took damage for Zapdos!"}
 {"line":72,"op":"print","text":"Zapdos used Baton Pass!"}
-{"line":72,"op":"move","user":"near","target":"near","move":226}
+{"line":72,"op":"move","user":"near","target":"near","move":226,"animTurn":0}
 {"line":75,"op":"withdraw","side":"near"}
 {"line":75,"op":"print","text":"Go! Dugtrio!"}
 {"line":75,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
@@ -88,12 +88,12 @@
 {"line":80,"op":"hp","side":"far","hp":100}
 {"line":82,"op":"turn","number":5}
 {"line":85,"op":"print","text":"Dugtrio used Hidden Power!"}
-{"line":85,"op":"move","user":"near","target":"far","move":237}
+{"line":85,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
 {"line":87,"op":"hit","side":"far","effectiveness":"super"}
 {"line":87,"op":"hp","side":"far","hp":8}
 {"line":87,"op":"print","text":"It's super effective!"}
 {"line":88,"op":"print","text":"The opposing Celebi used Psychic!"}
-{"line":88,"op":"move","user":"far","target":"near","move":94}
+{"line":88,"op":"move","user":"far","target":"near","move":94,"animTurn":0}
 {"line":89,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":89,"op":"print","text":"The substitute took damage for Dugtrio!"}
 {"line":89,"op":"anim","side":"near","anim":"substituteFade"}
@@ -110,7 +110,7 @@
 {"line":93,"op":"hp","side":"far","hp":8}
 {"line":95,"op":"turn","number":6}
 {"line":98,"op":"print","text":"Dugtrio used Hidden Power!"}
-{"line":98,"op":"move","user":"near","target":"far","move":237}
+{"line":98,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
 {"line":100,"op":"hit","side":"far","effectiveness":"super"}
 {"line":100,"op":"hp","side":"far","hp":0}
 {"line":100,"op":"print","text":"It's super effective!"}
@@ -126,7 +126,7 @@
 {"line":111,"op":"print","text":"Go! Zapdos!"}
 {"line":111,"op":"switchIn","side":"near","slot":1,"hp":76,"status":"none"}
 {"line":112,"op":"print","text":"The opposing Metagross used Meteor Mash!"}
-{"line":112,"op":"move","user":"far","target":"near","move":309}
+{"line":112,"op":"move","user":"far","target":"near","move":309,"animTurn":0}
 {"line":114,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":114,"op":"hp","side":"near","hp":46}
 {"line":114,"op":"print","text":"It's not very effective…"}
@@ -141,12 +141,12 @@
 {"line":118,"op":"hp","side":"near","hp":46}
 {"line":120,"op":"turn","number":8}
 {"line":123,"op":"print","text":"Zapdos used Thunderbolt!"}
-{"line":123,"op":"move","user":"near","target":"far","move":85}
+{"line":123,"op":"move","user":"near","target":"far","move":85,"animTurn":0}
 {"line":125,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":125,"op":"hp","side":"far","hp":20}
 {"line":125,"op":"print","text":"A critical hit!"}
 {"line":126,"op":"print","text":"The opposing Metagross used Agility!"}
-{"line":126,"op":"move","user":"far","target":"far","move":97}
+{"line":126,"op":"move","user":"far","target":"far","move":97,"animTurn":0}
 {"line":127,"op":"stat","side":"far","stat":"spe","stages":2,"arrows":"one"}
 {"line":127,"op":"print","text":"The opposing Metagross's Speed rose sharply!"}
 {"line":129,"op":"print","text":"The sandstorm is raging."}
@@ -164,7 +164,7 @@
 {"line":132,"op":"hp","side":"near","hp":46}
 {"line":134,"op":"turn","number":9}
 {"line":138,"op":"print","text":"The opposing Metagross used Rock Slide!"}
-{"line":138,"op":"move","user":"far","target":"near","move":157}
+{"line":138,"op":"move","user":"far","target":"near","move":157,"animTurn":0}
 {"line":140,"op":"hit","side":"near","effectiveness":"super"}
 {"line":140,"op":"hp","side":"near","hp":0}
 {"line":140,"op":"print","text":"It's super effective!"}
@@ -189,7 +189,7 @@
 {"line":150,"op":"hp","side":"near","hp":88}
 {"line":152,"op":"turn","number":10}
 {"line":156,"op":"print","text":"The opposing Metagross used Rock Slide!"}
-{"line":156,"op":"move","user":"far","target":"near","move":157}
+{"line":156,"op":"move","user":"far","target":"near","move":157,"animTurn":0}
 {"line":157,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":157,"op":"hp","side":"near","hp":73}
 {"line":158,"op":"print","text":"Suicune flinched and couldn't move!"}
@@ -208,11 +208,11 @@
 {"line":163,"op":"hp","side":"near","hp":73}
 {"line":165,"op":"turn","number":11}
 {"line":169,"op":"print","text":"The opposing Metagross used Rock Slide!"}
-{"line":169,"op":"move","user":"far","target":"near","move":157}
+{"line":169,"op":"move","user":"far","target":"near","move":157,"animTurn":0}
 {"line":170,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":170,"op":"hp","side":"near","hp":55}
 {"line":171,"op":"print","text":"Suicune used Surf!"}
-{"line":171,"op":"move","user":"near","target":"far","move":57}
+{"line":171,"op":"move","user":"near","target":"far","move":57,"animTurn":0}
 {"line":172,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":172,"op":"hp","side":"far","hp":5}
 {"line":174,"op":"print","text":"The sandstorm is raging."}
@@ -234,7 +234,7 @@
 {"line":183,"op":"print","text":"xXEricXx sent out Skarmory!"}
 {"line":183,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
 {"line":184,"op":"print","text":"Suicune used Surf!"}
-{"line":184,"op":"move","user":"near","target":"far","move":57}
+{"line":184,"op":"move","user":"near","target":"far","move":57,"animTurn":0}
 {"line":185,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":185,"op":"hp","side":"far","hp":71}
 {"line":187,"op":"print","text":"The sandstorm is raging."}
@@ -252,11 +252,11 @@
 {"line":190,"op":"hp","side":"far","hp":77}
 {"line":192,"op":"turn","number":13}
 {"line":196,"op":"print","text":"Suicune used Surf!"}
-{"line":196,"op":"move","user":"near","target":"far","move":57}
+{"line":196,"op":"move","user":"near","target":"far","move":57,"animTurn":0}
 {"line":197,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":197,"op":"hp","side":"far","hp":49}
 {"line":198,"op":"print","text":"The opposing Skarmory used Spikes!"}
-{"line":198,"op":"move","user":"far","target":"near","move":191}
+{"line":198,"op":"move","user":"far","target":"near","move":191,"animTurn":0}
 {"line":199,"op":"print","text":"Spikes were scattered on the ground all around your side!"}
 {"line":201,"op":"print","text":"The sandstorm is raging."}
 {"line":201,"op":"anim","side":"near","anim":"sandstormContinues"}
@@ -273,12 +273,12 @@
 {"line":204,"op":"hp","side":"far","hp":55}
 {"line":206,"op":"turn","number":14}
 {"line":209,"op":"print","text":"Suicune used Rest!"}
-{"line":209,"op":"move","user":"near","target":"near","move":156}
+{"line":209,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
 {"line":210,"op":"print","text":"Suicune slept and restored its HP!"}
 {"line":210,"op":"status","side":"near","slot":2,"status":"slp"}
 {"line":211,"op":"hp","side":"near","hp":100}
 {"line":212,"op":"print","text":"The opposing Skarmory used Roar!"}
-{"line":212,"op":"move","user":"far","target":"near","move":46}
+{"line":212,"op":"move","user":"far","target":"near","move":46,"animTurn":0}
 {"line":213,"op":"withdraw","side":"near"}
 {"line":213,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
 {"line":213,"op":"print","text":"Claydol was dragged out!"}
@@ -292,7 +292,7 @@
 {"line":221,"op":"print","text":"The opposing Skarmory used Toxic!"}
 {"line":222,"op":"print","text":"Claydol avoided the attack!"}
 {"line":223,"op":"print","text":"Claydol used Rain Dance!"}
-{"line":223,"op":"move","user":"near","target":"near","move":240}
+{"line":223,"op":"move","user":"near","target":"near","move":240,"animTurn":0}
 {"line":224,"op":"weather","weather":"rain"}
 {"line":224,"op":"print","text":"It started to rain!"}
 {"line":226,"op":"print","text":"Rain continues to fall."}
@@ -303,12 +303,12 @@
 {"line":227,"op":"hp","side":"far","hp":67}
 {"line":229,"op":"turn","number":16}
 {"line":232,"op":"print","text":"The opposing Skarmory used Toxic!"}
-{"line":232,"op":"move","user":"far","target":"near","move":92}
+{"line":232,"op":"move","user":"far","target":"near","move":92,"animTurn":0}
 {"line":233,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":233,"op":"print","text":"Claydol was badly poisoned!"}
 {"line":233,"op":"status","side":"near","slot":3,"status":"tox"}
 {"line":234,"op":"print","text":"Claydol used Rapid Spin!"}
-{"line":234,"op":"move","user":"near","target":"far","move":229}
+{"line":234,"op":"move","user":"near","target":"far","move":229,"animTurn":0}
 {"line":236,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":236,"op":"hp","side":"far","hp":66}
 {"line":236,"op":"print","text":"It's not very effective…"}
@@ -328,7 +328,7 @@
 {"line":246,"op":"print","text":"Go! Blissey!"}
 {"line":246,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
 {"line":247,"op":"print","text":"The opposing Skarmory used Spikes!"}
-{"line":247,"op":"move","user":"far","target":"near","move":191}
+{"line":247,"op":"move","user":"far","target":"near","move":191,"animTurn":0}
 {"line":248,"op":"print","text":"Spikes were scattered on the ground all around your side!"}
 {"line":250,"op":"print","text":"Rain continues to fall."}
 {"line":250,"op":"anim","side":"near","anim":"rainContinues"}
@@ -340,7 +340,7 @@
 {"line":256,"op":"print","text":"The opposing Skarmory used Toxic!"}
 {"line":257,"op":"print","text":"Blissey avoided the attack!"}
 {"line":258,"op":"print","text":"Blissey used Thunder Wave!"}
-{"line":258,"op":"move","user":"near","target":"far","move":86}
+{"line":258,"op":"move","user":"near","target":"far","move":86,"animTurn":0}
 {"line":259,"op":"anim","side":"far","anim":"statusPrz"}
 {"line":259,"op":"print","text":"The opposing Skarmory is paralyzed, so it may be unable to move!"}
 {"line":259,"op":"status","side":"far","slot":1,"status":"par"}
@@ -352,7 +352,7 @@
 {"line":262,"op":"hp","side":"far","hp":84}
 {"line":264,"op":"turn","number":19}
 {"line":268,"op":"print","text":"Blissey used Seismic Toss!"}
-{"line":268,"op":"move","user":"near","target":"far","move":69}
+{"line":268,"op":"move","user":"near","target":"far","move":69,"animTurn":0}
 {"line":269,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":269,"op":"hp","side":"far","hp":54}
 {"line":270,"op":"print","text":"The opposing Skarmory couldn't move because it's paralyzed!"}
@@ -365,7 +365,7 @@
 {"line":273,"op":"hp","side":"far","hp":60}
 {"line":275,"op":"turn","number":20}
 {"line":279,"op":"print","text":"Blissey used Seismic Toss!"}
-{"line":279,"op":"move","user":"near","target":"far","move":69}
+{"line":279,"op":"move","user":"near","target":"far","move":69,"animTurn":0}
 {"line":280,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":280,"op":"hp","side":"far","hp":30}
 {"line":281,"op":"print","text":"The opposing Skarmory couldn't move because it's paralyzed!"}
@@ -380,13 +380,13 @@
 {"line":288,"op":"print","text":"xXEricXx sent out Starmie!"}
 {"line":288,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
 {"line":289,"op":"print","text":"Blissey used Aromatherapy!"}
-{"line":289,"op":"move","user":"near","target":"near","move":312}
+{"line":289,"op":"move","user":"near","target":"near","move":312,"animTurn":0}
 {"line":290,"op":"print","text":"A soothing aroma wafted through the area!"}
 {"line":290,"op":"status","side":"near","slot":2,"status":"none"}
 {"line":290,"op":"status","side":"near","slot":3,"status":"none"}
 {"line":293,"op":"turn","number":22}
 {"line":296,"op":"print","text":"The opposing Starmie used Thunder Wave!"}
-{"line":296,"op":"move","user":"far","target":"near","move":86}
+{"line":296,"op":"move","user":"far","target":"near","move":86,"animTurn":0}
 {"line":297,"op":"anim","side":"near","anim":"statusPrz"}
 {"line":297,"op":"print","text":"Blissey is paralyzed, so it may be unable to move!"}
 {"line":297,"op":"status","side":"near","slot":4,"status":"par"}
@@ -394,11 +394,11 @@
 {"line":298,"op":"anim","side":"near","anim":"statusPrz"}
 {"line":301,"op":"turn","number":23}
 {"line":304,"op":"print","text":"The opposing Starmie used Surf!"}
-{"line":304,"op":"move","user":"far","target":"near","move":57}
+{"line":304,"op":"move","user":"far","target":"near","move":57,"animTurn":0}
 {"line":305,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":305,"op":"hp","side":"near","hp":88}
 {"line":306,"op":"print","text":"Blissey used Seismic Toss!"}
-{"line":306,"op":"move","user":"near","target":"far","move":69}
+{"line":306,"op":"move","user":"near","target":"far","move":69,"animTurn":0}
 {"line":307,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":307,"op":"hp","side":"far","hp":70}
 {"line":309,"op":"itemPopUp","side":"far","item":472}
@@ -413,7 +413,7 @@
 {"line":315,"op":"print","text":"The opposing Starmie used Thunder Wave!"}
 {"line":316,"op":"print","text":"Blissey is already paralyzed!"}
 {"line":317,"op":"print","text":"Blissey used Thunder Wave!"}
-{"line":317,"op":"move","user":"near","target":"far","move":86}
+{"line":317,"op":"move","user":"near","target":"far","move":86,"animTurn":0}
 {"line":318,"op":"anim","side":"far","anim":"statusPrz"}
 {"line":318,"op":"print","text":"The opposing Starmie is paralyzed, so it may be unable to move!"}
 {"line":318,"op":"status","side":"far","slot":4,"status":"par"}
@@ -445,13 +445,13 @@
 {"line":332,"op":"hp","side":"far","hp":88}
 {"line":334,"op":"turn","number":26}
 {"line":337,"op":"print","text":"Suicune used Calm Mind!"}
-{"line":337,"op":"move","user":"near","target":"near","move":347}
+{"line":337,"op":"move","user":"near","target":"near","move":347,"animTurn":0}
 {"line":338,"op":"stat","side":"near","stat":"spa","stages":1,"arrows":"several"}
 {"line":338,"op":"print","text":"Suicune's Sp. Atk rose!"}
 {"line":339,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
 {"line":339,"op":"print","text":"Suicune's Sp. Def rose!"}
 {"line":340,"op":"print","text":"The opposing Starmie used Thunder Wave!"}
-{"line":340,"op":"move","user":"far","target":"near","move":86}
+{"line":340,"op":"move","user":"far","target":"near","move":86,"animTurn":0}
 {"line":341,"op":"anim","side":"near","anim":"statusPrz"}
 {"line":341,"op":"print","text":"Suicune is paralyzed, so it may be unable to move!"}
 {"line":341,"op":"status","side":"near","slot":2,"status":"par"}
@@ -470,7 +470,7 @@
 {"line":350,"op":"print","text":"xXEricXx sent out Metagross!"}
 {"line":350,"op":"switchIn","side":"far","slot":3,"hp":11,"status":"none"}
 {"line":351,"op":"print","text":"Suicune used Surf!"}
-{"line":351,"op":"move","user":"near","target":"far","move":57}
+{"line":351,"op":"move","user":"near","target":"far","move":57,"animTurn":0}
 {"line":353,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":353,"op":"hp","side":"far","hp":0}
 {"line":353,"op":"print","text":"A critical hit!"}
@@ -480,11 +480,11 @@
 {"line":357,"op":"switchIn","side":"far","slot":5,"hp":100,"status":"none"}
 {"line":360,"op":"turn","number":28}
 {"line":363,"op":"print","text":"The opposing Aerodactyl used Double-Edge!"}
-{"line":363,"op":"move","user":"far","target":"near","move":38}
+{"line":363,"op":"move","user":"far","target":"near","move":38,"animTurn":0}
 {"line":364,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":364,"op":"hp","side":"near","hp":71}
 {"line":365,"op":"print","text":"Suicune used Surf!"}
-{"line":365,"op":"move","user":"near","target":"far","move":57}
+{"line":365,"op":"move","user":"near","target":"far","move":57,"animTurn":0}
 {"line":367,"op":"hit","side":"far","effectiveness":"super"}
 {"line":367,"op":"hp","side":"far","hp":0}
 {"line":367,"op":"print","text":"It's super effective!"}

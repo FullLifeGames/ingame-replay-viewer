@@ -24,16 +24,16 @@ describe('Substitute (X12)', () => {
     )
     expect(scene.map(plain)).toEqual([
       'Dugtrio used Substitute!',
-      { op: 'move', user: 'near', target: 'near', move: any },
+      { op: 'move', user: 'near', target: 'near', move: any, animTurn: 0 },
       substitute(true),
       { op: 'hp', side: 'near', hp: 75 },
       'Dugtrio put in a substitute!',
       'The opposing Tyranitar used Rock Slide!',
-      { op: 'move', user: 'far', target: 'near', move: any },
+      { op: 'move', user: 'far', target: 'near', move: any, animTurn: 0 },
       { op: 'hit', side: 'near', effectiveness: 'normal' },
       'The substitute took damage for Dugtrio!',
       'The opposing Tyranitar used Earthquake!',
-      { op: 'move', user: 'far', target: 'near', move: any },
+      { op: 'move', user: 'far', target: 'near', move: any, animTurn: 0 },
       { op: 'hit', side: 'near', effectiveness: 'super' },
       'The substitute took damage for Dugtrio!',
       { op: 'anim', side: 'near', anim: 'substituteFade' },
@@ -158,7 +158,7 @@ describe('a Pokémon that faints by its effect drains its bar first (#39)', () =
   it('says Destiny Bond took the attacker down after the holder faints, then drains it', () => {
     expect(sceneOf(...destinyBond).map(plain)).toEqual([
       'Dugtrio used Earthquake!',
-      { op: 'move', user: 'near', target: 'far', move: any },
+      { op: 'move', user: 'near', target: 'far', move: any, animTurn: 0 },
       { op: 'hit', side: 'far', effectiveness: 'normal' },
       { op: 'hp', side: 'far', hp: 0 },
       { op: 'faint', side: 'far' },
@@ -213,7 +213,7 @@ describe('Psych Up', () => {
       '|-copyboost|p1a: Dugtrio|p2a: Tyranitar|[from] move: Psych Up',
     )
     expect(scene.map(plain).slice(1)).toEqual([
-      { op: 'move', user: 'near', target: 'far', move: moveOf('Psych Up').number },
+      { op: 'move', user: 'near', target: 'far', move: moveOf('Psych Up').number, animTurn: 0 },
       "Dugtrio copied the opposing Tyranitar's stat changes!",
     ])
   })

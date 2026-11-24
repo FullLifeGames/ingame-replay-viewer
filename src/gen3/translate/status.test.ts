@@ -3,7 +3,13 @@ import { describe, expect, it } from 'vitest'
 import { NEXT } from '../../script/testing'
 import { plain, sceneOf, streamOfLog } from '../testing'
 
-const anyMove = { op: 'move', user: 'far', target: 'near', move: expect.any(Number) as number }
+const anyMove = {
+  op: 'move',
+  user: 'far',
+  target: 'near',
+  move: expect.any(Number) as number,
+  animTurn: 0,
+}
 const status = (side: 'near' | 'far', value: string, slot = 0) => ({
   op: 'status',
   side,

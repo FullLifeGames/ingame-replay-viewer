@@ -1,4 +1,4 @@
-{"length":13931,"crc32":"e81ec6d3","trainers":{"near":{"name":"Bugsileus","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Christos","trainerPic":5,"teamSize":6,"revealed":5}},"parties":{"near":[{"species":234,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Stantler"},{"species":230,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Kingdra"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":130,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gyarados"},{"species":379,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Registeel"},{"species":51,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Dugtrio"}],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"},{"species":94,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gengar"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":260,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Swampert"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"},null]}}
+{"length":14025,"crc32":"e073c9f1","trainers":{"near":{"name":"Bugsileus","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Christos","trainerPic":5,"teamSize":6,"revealed":5}},"parties":{"near":[{"species":234,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Stantler"},{"species":230,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Kingdra"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":130,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gyarados"},{"species":379,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Registeel"},{"species":51,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Dugtrio"}],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"},{"species":94,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gengar"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":260,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Swampert"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"},null]}}
 {"line":23,"op":"intro"}
 {"line":23,"op":"print","text":"You are challenged by Christos!"}
 {"line":25,"op":"print","text":"Christos sent out Tyranitar!"}
@@ -16,12 +16,12 @@
 {"line":27,"op":"ability","side":"near","ability":22,"show":false}
 {"line":29,"op":"turn","number":1}
 {"line":37,"op":"print","text":"Stantler used Hidden Power!"}
-{"line":37,"op":"move","user":"near","target":"far","move":237}
+{"line":37,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
 {"line":39,"op":"hit","side":"far","effectiveness":"super"}
 {"line":39,"op":"hp","side":"far","hp":42}
 {"line":39,"op":"print","text":"It's super effective!"}
 {"line":40,"op":"print","text":"The opposing Tyranitar used Rock Slide!"}
-{"line":40,"op":"move","user":"far","target":"near","move":157}
+{"line":40,"op":"move","user":"far","target":"near","move":157,"animTurn":0}
 {"line":41,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":41,"op":"hp","side":"near","hp":68}
 {"line":43,"op":"print","text":"The sandstorm is raging."}
@@ -39,7 +39,7 @@
 {"line":50,"op":"print","text":"Christos sent out Gengar!"}
 {"line":50,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
 {"line":51,"op":"print","text":"Stantler used Thunder Wave!"}
-{"line":51,"op":"move","user":"near","target":"far","move":86}
+{"line":51,"op":"move","user":"near","target":"far","move":86,"animTurn":0}
 {"line":52,"op":"anim","side":"far","anim":"statusPrz"}
 {"line":52,"op":"print","text":"The opposing Gengar is paralyzed, so it may be unable to move!"}
 {"line":52,"op":"status","side":"far","slot":1,"status":"par"}
@@ -65,7 +65,7 @@
 {"line":63,"op":"print","text":"Go! Kingdra!"}
 {"line":63,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
 {"line":64,"op":"print","text":"The opposing Gengar used Will-O-Wisp!"}
-{"line":64,"op":"move","user":"far","target":"near","move":261}
+{"line":64,"op":"move","user":"far","target":"near","move":261,"animTurn":0}
 {"line":65,"op":"anim","side":"near","anim":"statusBrn"}
 {"line":65,"op":"print","text":"Kingdra was burned!"}
 {"line":65,"op":"status","side":"near","slot":1,"status":"brn"}
@@ -92,7 +92,7 @@
 {"line":78,"op":"print","text":"Christos sent out Blissey!"}
 {"line":78,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
 {"line":79,"op":"print","text":"Kingdra used Rain Dance!"}
-{"line":79,"op":"move","user":"near","target":"near","move":240}
+{"line":79,"op":"move","user":"near","target":"near","move":240,"animTurn":0}
 {"line":80,"op":"weather","weather":"rain"}
 {"line":80,"op":"print","text":"It started to rain!"}
 {"line":82,"op":"print","text":"Rain continues to fall."}
@@ -118,7 +118,7 @@
 {"line":93,"op":"hp","side":"near","hp":74}
 {"line":95,"op":"turn","number":6}
 {"line":98,"op":"print","text":"The opposing Swampert used Protect!"}
-{"line":98,"op":"move","user":"far","target":"far","move":182}
+{"line":98,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
 {"line":99,"op":"print","text":"The opposing Swampert protected itself!"}
 {"line":100,"op":"print","text":"Stantler used Hypnosis!"}
 {"line":101,"op":"print","text":"The opposing Swampert protected itself!"}
@@ -156,7 +156,7 @@
 {"line":127,"op":"print","text":"Christos sent out Metagross!"}
 {"line":127,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
 {"line":128,"op":"print","text":"Blissey used Substitute!"}
-{"line":128,"op":"move","user":"near","target":"near","move":164}
+{"line":128,"op":"move","user":"near","target":"near","move":164,"animTurn":0}
 {"line":129,"op":"volatile","side":"near","volatile":"substitute","on":true}
 {"line":130,"op":"hp","side":"near","hp":76}
 {"line":129,"op":"print","text":"Blissey put in a substitute!"}
@@ -166,7 +166,7 @@
 {"line":132,"op":"hp","side":"near","hp":82}
 {"line":134,"op":"turn","number":10}
 {"line":138,"op":"print","text":"The opposing Metagross used Earthquake!"}
-{"line":138,"op":"move","user":"far","target":"near","move":89}
+{"line":138,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":140,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":140,"op":"print","text":"The substitute took damage for Blissey!"}
 {"line":140,"op":"anim","side":"near","anim":"substituteFade"}
@@ -197,20 +197,20 @@
 {"line":161,"op":"print","text":"Christos sent out Swampert!"}
 {"line":161,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
 {"line":162,"op":"print","text":"Gyarados used Dragon Dance!"}
-{"line":162,"op":"move","user":"near","target":"near","move":349}
+{"line":162,"op":"move","user":"near","target":"near","move":349,"animTurn":0}
 {"line":163,"op":"stat","side":"near","stat":"atk","stages":1,"arrows":"several"}
 {"line":163,"op":"print","text":"Gyarados's Attack rose!"}
 {"line":164,"op":"stat","side":"near","stat":"spe","stages":1,"arrows":"none"}
 {"line":164,"op":"print","text":"Gyarados's Speed rose!"}
 {"line":167,"op":"turn","number":13}
 {"line":170,"op":"print","text":"Gyarados used Double-Edge!"}
-{"line":170,"op":"move","user":"near","target":"far","move":38}
+{"line":170,"op":"move","user":"near","target":"far","move":38,"animTurn":0}
 {"line":171,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":171,"op":"hp","side":"far","hp":54}
 {"line":172,"op":"hp","side":"near","hp":83}
 {"line":172,"op":"print","text":"Gyarados was damaged by the recoil!"}
 {"line":173,"op":"print","text":"The opposing Swampert used Toxic!"}
-{"line":173,"op":"move","user":"far","target":"near","move":92}
+{"line":173,"op":"move","user":"far","target":"near","move":92,"animTurn":0}
 {"line":174,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":174,"op":"print","text":"Gyarados was badly poisoned!"}
 {"line":174,"op":"status","side":"near","slot":3,"status":"tox"}
@@ -227,10 +227,10 @@
 {"line":178,"op":"hp","side":"far","hp":60}
 {"line":180,"op":"turn","number":14}
 {"line":183,"op":"print","text":"The opposing Swampert used Protect!"}
-{"line":183,"op":"move","user":"far","target":"far","move":182}
+{"line":183,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
 {"line":184,"op":"print","text":"The opposing Swampert protected itself!"}
 {"line":185,"op":"print","text":"Gyarados used Dragon Dance!"}
-{"line":185,"op":"move","user":"near","target":"near","move":349}
+{"line":185,"op":"move","user":"near","target":"near","move":349,"animTurn":0}
 {"line":186,"op":"stat","side":"near","stat":"atk","stages":1,"arrows":"several"}
 {"line":186,"op":"print","text":"Gyarados's Attack rose!"}
 {"line":187,"op":"stat","side":"near","stat":"spe","stages":1,"arrows":"none"}
@@ -271,7 +271,7 @@
 {"line":207,"op":"anim","side":"near","anim":"sandstormContinues"}
 {"line":207,"op":"ability","side":"far","ability":45,"show":false}
 {"line":208,"op":"print","text":"Gyarados used Hidden Power!"}
-{"line":208,"op":"move","user":"near","target":"far","move":237}
+{"line":208,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
 {"line":209,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":209,"op":"hp","side":"far","hp":3}
 {"line":211,"op":"print","text":"The sandstorm is raging."}
@@ -288,7 +288,7 @@
 {"line":214,"op":"hp","side":"near","hp":40}
 {"line":216,"op":"turn","number":17}
 {"line":219,"op":"print","text":"Gyarados used Earthquake!"}
-{"line":219,"op":"move","user":"near","target":"far","move":89}
+{"line":219,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":221,"op":"hit","side":"far","effectiveness":"super"}
 {"line":221,"op":"hp","side":"far","hp":0}
 {"line":221,"op":"print","text":"It's super effective!"}
@@ -334,7 +334,7 @@
 {"line":247,"op":"print","text":"Christos sent out Blissey!"}
 {"line":247,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
 {"line":248,"op":"print","text":"Kingdra used Rain Dance!"}
-{"line":248,"op":"move","user":"near","target":"near","move":240}
+{"line":248,"op":"move","user":"near","target":"near","move":240,"animTurn":0}
 {"line":249,"op":"weather","weather":"rain"}
 {"line":249,"op":"print","text":"It started to rain!"}
 {"line":251,"op":"print","text":"Rain continues to fall."}
@@ -345,7 +345,7 @@
 {"line":256,"op":"print","text":"Go! Registeel!"}
 {"line":256,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
 {"line":257,"op":"print","text":"The opposing Blissey used Seismic Toss!"}
-{"line":257,"op":"move","user":"far","target":"near","move":69}
+{"line":257,"op":"move","user":"far","target":"near","move":69,"animTurn":0}
 {"line":258,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":258,"op":"hp","side":"near","hp":73}
 {"line":260,"op":"print","text":"Rain continues to fall."}
@@ -371,7 +371,7 @@
 {"line":274,"op":"print","text":"Christos sent out Blissey!"}
 {"line":274,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
 {"line":275,"op":"print","text":"Kingdra used Surf!"}
-{"line":275,"op":"move","user":"near","target":"far","move":57}
+{"line":275,"op":"move","user":"near","target":"far","move":57,"animTurn":0}
 {"line":276,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":276,"op":"hp","side":"far","hp":75}
 {"line":278,"op":"print","text":"Rain continues to fall."}
@@ -390,7 +390,7 @@
 {"line":286,"op":"print","text":"The opposing Blissey's Attack fell!"}
 {"line":285,"op":"ability","side":"near","ability":22,"show":false}
 {"line":287,"op":"print","text":"The opposing Blissey used Seismic Toss!"}
-{"line":287,"op":"move","user":"far","target":"near","move":69}
+{"line":287,"op":"move","user":"far","target":"near","move":69,"animTurn":0}
 {"line":288,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":288,"op":"hp","side":"near","hp":0}
 {"line":289,"op":"faint","side":"near"}
@@ -413,7 +413,7 @@
 {"line":301,"op":"print","text":"Christos sent out Metagross!"}
 {"line":301,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
 {"line":302,"op":"print","text":"Blissey used Substitute!"}
-{"line":302,"op":"move","user":"near","target":"near","move":164}
+{"line":302,"op":"move","user":"near","target":"near","move":164,"animTurn":0}
 {"line":303,"op":"volatile","side":"near","volatile":"substitute","on":true}
 {"line":304,"op":"hp","side":"near","hp":69}
 {"line":303,"op":"print","text":"Blissey put in a substitute!"}
@@ -423,14 +423,14 @@
 {"line":306,"op":"hp","side":"near","hp":75}
 {"line":308,"op":"turn","number":25}
 {"line":311,"op":"print","text":"The opposing Metagross used Earthquake!"}
-{"line":311,"op":"move","user":"far","target":"near","move":89}
+{"line":311,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":312,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":312,"op":"print","text":"The substitute took damage for Blissey!"}
 {"line":312,"op":"anim","side":"near","anim":"substituteFade"}
 {"line":312,"op":"print","text":"Blissey's substitute faded!"}
 {"line":312,"op":"volatile","side":"near","volatile":"substitute","on":false}
 {"line":313,"op":"print","text":"Blissey used Thunder!"}
-{"line":313,"op":"move","user":"near","target":"far","move":87}
+{"line":313,"op":"move","user":"near","target":"far","move":87,"animTurn":0}
 {"line":315,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":315,"op":"hp","side":"far","hp":47}
 {"line":315,"op":"print","text":"A critical hit!"}
@@ -449,7 +449,7 @@
 {"line":324,"op":"ability","side":"far","ability":29,"show":false}
 {"line":323,"op":"ability","side":"near","ability":22,"show":false}
 {"line":325,"op":"print","text":"The opposing Metagross used Earthquake!"}
-{"line":325,"op":"move","user":"far","target":"near","move":89}
+{"line":325,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":326,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":326,"op":"hp","side":"near","hp":0}
 {"line":327,"op":"faint","side":"near"}
@@ -458,7 +458,7 @@
 {"line":330,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
 {"line":333,"op":"turn","number":27}
 {"line":336,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":336,"op":"move","user":"near","target":"far","move":89}
+{"line":336,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":338,"op":"hit","side":"far","effectiveness":"super"}
 {"line":338,"op":"hp","side":"far","hp":0}
 {"line":338,"op":"print","text":"It's super effective!"}
@@ -476,7 +476,7 @@
 {"line":349,"op":"print","text":"Go! Registeel!"}
 {"line":349,"op":"switchIn","side":"near","slot":4,"hp":79,"status":"none"}
 {"line":350,"op":"print","text":"The opposing Swampert used Earthquake!"}
-{"line":350,"op":"move","user":"far","target":"near","move":89}
+{"line":350,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":352,"op":"hit","side":"near","effectiveness":"super"}
 {"line":352,"op":"hp","side":"near","hp":28}
 {"line":352,"op":"print","text":"It's super effective!"}
@@ -490,7 +490,7 @@
 {"line":355,"op":"hp","side":"far","hp":91}
 {"line":357,"op":"turn","number":29}
 {"line":360,"op":"print","text":"The opposing Swampert used Protect!"}
-{"line":360,"op":"move","user":"far","target":"far","move":182}
+{"line":360,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
 {"line":361,"op":"print","text":"The opposing Swampert protected itself!"}
 {"line":362,"op":"print","text":"Registeel used Seismic Toss!"}
 {"line":363,"op":"print","text":"The opposing Swampert protected itself!"}
@@ -517,7 +517,7 @@
 {"line":378,"op":"print","text":"Go! Blissey!"}
 {"line":378,"op":"switchIn","side":"near","slot":2,"hp":81,"status":"none"}
 {"line":379,"op":"print","text":"The opposing Gengar used Thunderbolt!"}
-{"line":379,"op":"move","user":"far","target":"near","move":85}
+{"line":379,"op":"move","user":"far","target":"near","move":85,"animTurn":0}
 {"line":380,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":380,"op":"hp","side":"near","hp":69}
 {"line":382,"op":"itemPopUp","side":"near","item":472}
@@ -530,7 +530,7 @@
 {"line":387,"op":"print","text":"Christos sent out Swampert!"}
 {"line":387,"op":"switchIn","side":"far","slot":3,"hp":97,"status":"none"}
 {"line":388,"op":"print","text":"Blissey used Substitute!"}
-{"line":388,"op":"move","user":"near","target":"near","move":164}
+{"line":388,"op":"move","user":"near","target":"near","move":164,"animTurn":0}
 {"line":389,"op":"volatile","side":"near","volatile":"substitute","on":true}
 {"line":390,"op":"hp","side":"near","hp":50}
 {"line":389,"op":"print","text":"Blissey put in a substitute!"}
@@ -544,11 +544,11 @@
 {"line":393,"op":"hp","side":"far","hp":100}
 {"line":395,"op":"turn","number":33}
 {"line":398,"op":"print","text":"Blissey used Ice Beam!"}
-{"line":398,"op":"move","user":"near","target":"far","move":58}
+{"line":398,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
 {"line":399,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":399,"op":"hp","side":"far","hp":80}
 {"line":400,"op":"print","text":"The opposing Swampert used Earthquake!"}
-{"line":400,"op":"move","user":"far","target":"near","move":89}
+{"line":400,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":401,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":401,"op":"print","text":"The substitute took damage for Blissey!"}
 {"line":401,"op":"anim","side":"near","anim":"substituteFade"}
@@ -568,7 +568,7 @@
 {"line":409,"op":"print","text":"Go! Registeel!"}
 {"line":409,"op":"switchIn","side":"near","slot":4,"hp":40,"status":"none"}
 {"line":410,"op":"print","text":"The opposing Swampert used Earthquake!"}
-{"line":410,"op":"move","user":"far","target":"near","move":89}
+{"line":410,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":412,"op":"hit","side":"near","effectiveness":"super"}
 {"line":412,"op":"hp","side":"near","hp":0}
 {"line":412,"op":"print","text":"It's super effective!"}
@@ -586,7 +586,7 @@
 {"line":423,"op":"print","text":"Christos sent out Blissey!"}
 {"line":423,"op":"switchIn","side":"far","slot":2,"hp":87,"status":"none"}
 {"line":424,"op":"print","text":"Kingdra used Rain Dance!"}
-{"line":424,"op":"move","user":"near","target":"near","move":240}
+{"line":424,"op":"move","user":"near","target":"near","move":240,"animTurn":0}
 {"line":425,"op":"weather","weather":"rain"}
 {"line":425,"op":"print","text":"It started to rain!"}
 {"line":427,"op":"print","text":"Rain continues to fall."}
@@ -597,11 +597,11 @@
 {"line":428,"op":"hp","side":"far","hp":94}
 {"line":430,"op":"turn","number":36}
 {"line":433,"op":"print","text":"Kingdra used Surf!"}
-{"line":433,"op":"move","user":"near","target":"far","move":57}
+{"line":433,"op":"move","user":"near","target":"far","move":57,"animTurn":0}
 {"line":434,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":434,"op":"hp","side":"far","hp":69}
 {"line":435,"op":"print","text":"The opposing Blissey used Seismic Toss!"}
-{"line":435,"op":"move","user":"far","target":"near","move":69}
+{"line":435,"op":"move","user":"far","target":"near","move":69,"animTurn":0}
 {"line":436,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":436,"op":"hp","side":"near","hp":57}
 {"line":438,"op":"print","text":"Rain continues to fall."}
@@ -616,7 +616,7 @@
 {"line":444,"op":"print","text":"Go! Dugtrio!"}
 {"line":444,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
 {"line":445,"op":"print","text":"The opposing Blissey used Seismic Toss!"}
-{"line":445,"op":"move","user":"far","target":"near","move":69}
+{"line":445,"op":"move","user":"far","target":"near","move":69,"animTurn":0}
 {"line":446,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":446,"op":"hp","side":"near","hp":53}
 {"line":448,"op":"print","text":"Rain continues to fall."}
@@ -627,11 +627,11 @@
 {"line":449,"op":"hp","side":"far","hp":81}
 {"line":451,"op":"turn","number":38}
 {"line":454,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":454,"op":"move","user":"near","target":"far","move":89}
+{"line":454,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":455,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":455,"op":"hp","side":"far","hp":36}
 {"line":456,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":456,"op":"move","user":"far","target":"far","move":135}
+{"line":456,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":457,"op":"hp","side":"far","hp":86}
 {"line":457,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":459,"op":"print","text":"Rain continues to fall."}
@@ -642,11 +642,11 @@
 {"line":460,"op":"hp","side":"far","hp":92}
 {"line":462,"op":"turn","number":39}
 {"line":465,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":465,"op":"move","user":"near","target":"far","move":89}
+{"line":465,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":466,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":466,"op":"hp","side":"far","hp":47}
 {"line":467,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":467,"op":"move","user":"far","target":"far","move":135}
+{"line":467,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":468,"op":"hp","side":"far","hp":97}
 {"line":468,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":470,"op":"weather","weather":"none"}
@@ -657,11 +657,11 @@
 {"line":471,"op":"hp","side":"far","hp":100}
 {"line":473,"op":"turn","number":40}
 {"line":476,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":476,"op":"move","user":"near","target":"far","move":89}
+{"line":476,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":477,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":477,"op":"hp","side":"far","hp":49}
 {"line":478,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":478,"op":"move","user":"far","target":"far","move":135}
+{"line":478,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":479,"op":"hp","side":"far","hp":99}
 {"line":479,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":481,"op":"itemPopUp","side":"far","item":472}
@@ -670,11 +670,11 @@
 {"line":481,"op":"hp","side":"far","hp":100}
 {"line":483,"op":"turn","number":41}
 {"line":486,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":486,"op":"move","user":"near","target":"far","move":89}
+{"line":486,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":487,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":487,"op":"hp","side":"far","hp":49}
 {"line":488,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":488,"op":"move","user":"far","target":"far","move":135}
+{"line":488,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":489,"op":"hp","side":"far","hp":99}
 {"line":489,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":491,"op":"itemPopUp","side":"far","item":472}
@@ -683,11 +683,11 @@
 {"line":491,"op":"hp","side":"far","hp":100}
 {"line":493,"op":"turn","number":42}
 {"line":496,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":496,"op":"move","user":"near","target":"far","move":89}
+{"line":496,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":497,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":497,"op":"hp","side":"far","hp":48}
 {"line":498,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":498,"op":"move","user":"far","target":"far","move":135}
+{"line":498,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":499,"op":"hp","side":"far","hp":98}
 {"line":499,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":501,"op":"itemPopUp","side":"far","item":472}
@@ -696,38 +696,38 @@
 {"line":501,"op":"hp","side":"far","hp":100}
 {"line":503,"op":"turn","number":43}
 {"line":506,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":506,"op":"move","user":"near","target":"far","move":89}
+{"line":506,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":507,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":507,"op":"hp","side":"far","hp":51}
 {"line":508,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":508,"op":"move","user":"far","target":"far","move":135}
+{"line":508,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":509,"op":"hp","side":"far","hp":100}
 {"line":509,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":512,"op":"turn","number":44}
 {"line":515,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":515,"op":"move","user":"near","target":"far","move":89}
+{"line":515,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":516,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":516,"op":"hp","side":"far","hp":53}
 {"line":517,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":517,"op":"move","user":"far","target":"far","move":135}
+{"line":517,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":518,"op":"hp","side":"far","hp":100}
 {"line":518,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":521,"op":"turn","number":45}
 {"line":524,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":524,"op":"move","user":"near","target":"far","move":89}
+{"line":524,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":525,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":525,"op":"hp","side":"far","hp":56}
 {"line":526,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":526,"op":"move","user":"far","target":"far","move":135}
+{"line":526,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":527,"op":"hp","side":"far","hp":100}
 {"line":527,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":530,"op":"turn","number":46}
 {"line":533,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":533,"op":"move","user":"near","target":"far","move":89}
+{"line":533,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":534,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":534,"op":"hp","side":"far","hp":48}
 {"line":535,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":535,"op":"move","user":"far","target":"far","move":135}
+{"line":535,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":536,"op":"hp","side":"far","hp":98}
 {"line":536,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":538,"op":"itemPopUp","side":"far","item":472}
@@ -736,11 +736,11 @@
 {"line":538,"op":"hp","side":"far","hp":100}
 {"line":540,"op":"turn","number":47}
 {"line":543,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":543,"op":"move","user":"near","target":"far","move":89}
+{"line":543,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":544,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":544,"op":"hp","side":"far","hp":48}
 {"line":545,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":545,"op":"move","user":"far","target":"far","move":135}
+{"line":545,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":546,"op":"hp","side":"far","hp":98}
 {"line":546,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":548,"op":"itemPopUp","side":"far","item":472}
@@ -749,52 +749,52 @@
 {"line":548,"op":"hp","side":"far","hp":100}
 {"line":550,"op":"turn","number":48}
 {"line":553,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":553,"op":"move","user":"near","target":"far","move":89}
+{"line":553,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":554,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":554,"op":"hp","side":"far","hp":56}
 {"line":555,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":555,"op":"move","user":"far","target":"far","move":135}
+{"line":555,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":556,"op":"hp","side":"far","hp":100}
 {"line":556,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":559,"op":"turn","number":49}
 {"line":562,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":562,"op":"move","user":"near","target":"far","move":89}
+{"line":562,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":563,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":563,"op":"hp","side":"far","hp":51}
 {"line":564,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":564,"op":"move","user":"far","target":"far","move":135}
+{"line":564,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":565,"op":"hp","side":"far","hp":100}
 {"line":565,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":568,"op":"turn","number":50}
 {"line":571,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":571,"op":"move","user":"near","target":"far","move":89}
+{"line":571,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":572,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":572,"op":"hp","side":"far","hp":53}
 {"line":573,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":573,"op":"move","user":"far","target":"far","move":135}
+{"line":573,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":574,"op":"hp","side":"far","hp":100}
 {"line":574,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":577,"op":"turn","number":51}
 {"line":580,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":580,"op":"move","user":"near","target":"far","move":89}
+{"line":580,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":581,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":581,"op":"hp","side":"far","hp":51}
 {"line":582,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":582,"op":"move","user":"far","target":"far","move":135}
+{"line":582,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":583,"op":"hp","side":"far","hp":100}
 {"line":583,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":586,"op":"turn","number":52}
 {"line":589,"op":"print","text":"Dugtrio used Earthquake!"}
-{"line":589,"op":"move","user":"near","target":"far","move":89}
+{"line":589,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
 {"line":590,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":590,"op":"hp","side":"far","hp":55}
 {"line":591,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":591,"op":"move","user":"far","target":"far","move":135}
+{"line":591,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":592,"op":"hp","side":"far","hp":100}
 {"line":592,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":595,"op":"turn","number":53}
 {"line":598,"op":"print","text":"Dugtrio used Struggle!"}
-{"line":598,"op":"move","user":"near","target":"far","move":165}
+{"line":598,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
 {"line":599,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":599,"op":"hp","side":"far","hp":84}
 {"line":600,"op":"hp","side":"near","hp":39}
@@ -807,14 +807,14 @@
 {"line":604,"op":"hp","side":"far","hp":90}
 {"line":606,"op":"turn","number":54}
 {"line":609,"op":"print","text":"Dugtrio used Struggle!"}
-{"line":609,"op":"move","user":"near","target":"far","move":165}
+{"line":609,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
 {"line":611,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":611,"op":"hp","side":"far","hp":59}
 {"line":611,"op":"print","text":"A critical hit!"}
 {"line":612,"op":"hp","side":"near","hp":13}
 {"line":612,"op":"print","text":"Dugtrio was damaged by the recoil!"}
 {"line":613,"op":"print","text":"The opposing Blissey used Seismic Toss!"}
-{"line":613,"op":"move","user":"far","target":"near","move":69}
+{"line":613,"op":"move","user":"far","target":"near","move":69,"animTurn":0}
 {"line":614,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":614,"op":"hp","side":"near","hp":0}
 {"line":615,"op":"faint","side":"near"}
@@ -831,11 +831,11 @@
 {"line":621,"op":"hp","side":"far","hp":65}
 {"line":623,"op":"turn","number":55}
 {"line":626,"op":"print","text":"Blissey used Ice Beam!"}
-{"line":626,"op":"move","user":"near","target":"far","move":58}
+{"line":626,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
 {"line":627,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":627,"op":"hp","side":"far","hp":58}
 {"line":628,"op":"print","text":"The opposing Blissey used Soft-Boiled!"}
-{"line":628,"op":"move","user":"far","target":"far","move":135}
+{"line":628,"op":"move","user":"far","target":"far","move":135,"animTurn":0}
 {"line":629,"op":"hp","side":"far","hp":100}
 {"line":629,"op":"print","text":"The opposing Blissey's HP was restored."}
 {"line":631,"op":"itemPopUp","side":"near","item":472}
@@ -844,7 +844,7 @@
 {"line":631,"op":"hp","side":"near","hp":75}
 {"line":633,"op":"turn","number":56}
 {"line":636,"op":"print","text":"Blissey used Substitute!"}
-{"line":636,"op":"move","user":"near","target":"near","move":164}
+{"line":636,"op":"move","user":"near","target":"near","move":164,"animTurn":0}
 {"line":637,"op":"volatile","side":"near","volatile":"substitute","on":true}
 {"line":638,"op":"hp","side":"near","hp":50}
 {"line":637,"op":"print","text":"Blissey put in a substitute!"}
@@ -856,13 +856,13 @@
 {"line":642,"op":"hp","side":"near","hp":56}
 {"line":644,"op":"turn","number":57}
 {"line":647,"op":"print","text":"Blissey used Calm Mind!"}
-{"line":647,"op":"move","user":"near","target":"near","move":347}
+{"line":647,"op":"move","user":"near","target":"near","move":347,"animTurn":0}
 {"line":648,"op":"stat","side":"near","stat":"spa","stages":1,"arrows":"several"}
 {"line":648,"op":"print","text":"Blissey's Sp. Atk rose!"}
 {"line":649,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
 {"line":649,"op":"print","text":"Blissey's Sp. Def rose!"}
 {"line":650,"op":"print","text":"The opposing Blissey used Seismic Toss!"}
-{"line":650,"op":"move","user":"far","target":"near","move":69}
+{"line":650,"op":"move","user":"far","target":"near","move":69,"animTurn":0}
 {"line":651,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":651,"op":"print","text":"The substitute took damage for Blissey!"}
 {"line":653,"op":"itemPopUp","side":"near","item":472}
@@ -871,13 +871,13 @@
 {"line":653,"op":"hp","side":"near","hp":62}
 {"line":655,"op":"turn","number":58}
 {"line":658,"op":"print","text":"Blissey used Calm Mind!"}
-{"line":658,"op":"move","user":"near","target":"near","move":347}
+{"line":658,"op":"move","user":"near","target":"near","move":347,"animTurn":0}
 {"line":659,"op":"stat","side":"near","stat":"spa","stages":1,"arrows":"several"}
 {"line":659,"op":"print","text":"Blissey's Sp. Atk rose!"}
 {"line":660,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
 {"line":660,"op":"print","text":"Blissey's Sp. Def rose!"}
 {"line":661,"op":"print","text":"The opposing Blissey used Seismic Toss!"}
-{"line":661,"op":"move","user":"far","target":"near","move":69}
+{"line":661,"op":"move","user":"far","target":"near","move":69,"animTurn":0}
 {"line":662,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":662,"op":"print","text":"The substitute took damage for Blissey!"}
 {"line":662,"op":"anim","side":"near","anim":"substituteFade"}
@@ -893,7 +893,7 @@
 {"line":669,"op":"print","text":"Christos sent out Swampert!"}
 {"line":669,"op":"switchIn","side":"far","slot":3,"hp":92,"status":"none"}
 {"line":670,"op":"print","text":"Blissey used Substitute!"}
-{"line":670,"op":"move","user":"near","target":"near","move":164}
+{"line":670,"op":"move","user":"near","target":"near","move":164,"animTurn":0}
 {"line":671,"op":"volatile","side":"near","volatile":"substitute","on":true}
 {"line":672,"op":"hp","side":"near","hp":44}
 {"line":671,"op":"print","text":"Blissey put in a substitute!"}
@@ -907,11 +907,11 @@
 {"line":675,"op":"hp","side":"far","hp":98}
 {"line":677,"op":"turn","number":60}
 {"line":680,"op":"print","text":"Blissey used Ice Beam!"}
-{"line":680,"op":"move","user":"near","target":"far","move":58}
+{"line":680,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
 {"line":681,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":681,"op":"hp","side":"far","hp":61}
 {"line":682,"op":"print","text":"The opposing Swampert used Earthquake!"}
-{"line":682,"op":"move","user":"far","target":"near","move":89}
+{"line":682,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":683,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":683,"op":"print","text":"The substitute took damage for Blissey!"}
 {"line":683,"op":"anim","side":"near","anim":"substituteFade"}
@@ -931,7 +931,7 @@
 {"line":691,"op":"print","text":"Go! Kingdra!"}
 {"line":691,"op":"switchIn","side":"near","slot":1,"hp":57,"status":"none"}
 {"line":692,"op":"print","text":"The opposing Swampert used Earthquake!"}
-{"line":692,"op":"move","user":"far","target":"near","move":89}
+{"line":692,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":693,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":693,"op":"hp","side":"near","hp":17}
 {"line":695,"op":"itemPopUp","side":"far","item":472}
@@ -940,10 +940,10 @@
 {"line":695,"op":"hp","side":"far","hp":74}
 {"line":697,"op":"turn","number":62}
 {"line":700,"op":"print","text":"The opposing Swampert used Protect!"}
-{"line":700,"op":"move","user":"far","target":"far","move":182}
+{"line":700,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
 {"line":701,"op":"print","text":"The opposing Swampert protected itself!"}
 {"line":702,"op":"print","text":"Kingdra used Rain Dance!"}
-{"line":702,"op":"move","user":"near","target":"near","move":240}
+{"line":702,"op":"move","user":"near","target":"near","move":240,"animTurn":0}
 {"line":703,"op":"weather","weather":"rain"}
 {"line":703,"op":"print","text":"It started to rain!"}
 {"line":705,"op":"print","text":"Rain continues to fall."}
@@ -958,7 +958,7 @@
 {"line":711,"op":"print","text":"Christos sent out Blissey!"}
 {"line":711,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
 {"line":712,"op":"print","text":"Kingdra used Hidden Power!"}
-{"line":712,"op":"move","user":"near","target":"far","move":237}
+{"line":712,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
 {"line":713,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":713,"op":"hp","side":"far","hp":93}
 {"line":715,"op":"print","text":"Rain continues to fall."}
@@ -969,11 +969,11 @@
 {"line":716,"op":"hp","side":"far","hp":99}
 {"line":718,"op":"turn","number":64}
 {"line":721,"op":"print","text":"Kingdra used Surf!"}
-{"line":721,"op":"move","user":"near","target":"far","move":57}
+{"line":721,"op":"move","user":"near","target":"far","move":57,"animTurn":0}
 {"line":722,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":722,"op":"hp","side":"far","hp":76}
 {"line":723,"op":"print","text":"The opposing Blissey used Thunder Wave!"}
-{"line":723,"op":"move","user":"far","target":"near","move":86}
+{"line":723,"op":"move","user":"far","target":"near","move":86,"animTurn":0}
 {"line":724,"op":"anim","side":"near","anim":"statusPrz"}
 {"line":724,"op":"print","text":"Kingdra is paralyzed, so it may be unable to move!"}
 {"line":724,"op":"status","side":"near","slot":1,"status":"par"}
@@ -985,9 +985,9 @@
 {"line":727,"op":"hp","side":"far","hp":82}
 {"line":729,"op":"turn","number":65}
 {"line":732,"op":"print","text":"The opposing Blissey used Wish!"}
-{"line":732,"op":"move","user":"far","target":"far","move":273}
+{"line":732,"op":"move","user":"far","target":"far","move":273,"animTurn":0}
 {"line":733,"op":"print","text":"Kingdra used Surf!"}
-{"line":733,"op":"move","user":"near","target":"far","move":57}
+{"line":733,"op":"move","user":"near","target":"far","move":57,"animTurn":0}
 {"line":734,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":734,"op":"hp","side":"far","hp":57}
 {"line":736,"op":"print","text":"Rain continues to fall."}
@@ -1018,7 +1018,7 @@
 {"line":753,"op":"hp","side":"far","hp":69}
 {"line":755,"op":"turn","number":68}
 {"line":758,"op":"print","text":"The opposing Blissey used Seismic Toss!"}
-{"line":758,"op":"move","user":"far","target":"near","move":69}
+{"line":758,"op":"move","user":"far","target":"near","move":69,"animTurn":0}
 {"line":759,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":759,"op":"hp","side":"near","hp":0}
 {"line":760,"op":"faint","side":"near"}
@@ -1039,7 +1039,7 @@
 {"line":771,"op":"print","text":"Christos sent out Swampert!"}
 {"line":771,"op":"switchIn","side":"far","slot":3,"hp":80,"status":"none"}
 {"line":772,"op":"print","text":"Blissey used Substitute!"}
-{"line":772,"op":"move","user":"near","target":"near","move":164}
+{"line":772,"op":"move","user":"near","target":"near","move":164,"animTurn":0}
 {"line":773,"op":"volatile","side":"near","volatile":"substitute","on":true}
 {"line":774,"op":"hp","side":"near","hp":37}
 {"line":773,"op":"print","text":"Blissey put in a substitute!"}
@@ -1053,11 +1053,11 @@
 {"line":777,"op":"hp","side":"far","hp":86}
 {"line":779,"op":"turn","number":70}
 {"line":782,"op":"print","text":"Blissey used Ice Beam!"}
-{"line":782,"op":"move","user":"near","target":"far","move":58}
+{"line":782,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
 {"line":783,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":783,"op":"hp","side":"far","hp":66}
 {"line":784,"op":"print","text":"The opposing Swampert used Earthquake!"}
-{"line":784,"op":"move","user":"far","target":"near","move":89}
+{"line":784,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":785,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":785,"op":"print","text":"The substitute took damage for Blissey!"}
 {"line":785,"op":"anim","side":"near","anim":"substituteFade"}
@@ -1073,7 +1073,7 @@
 {"line":788,"op":"hp","side":"far","hp":72}
 {"line":790,"op":"turn","number":71}
 {"line":793,"op":"print","text":"Blissey used Ice Beam!"}
-{"line":793,"op":"move","user":"near","target":"far","move":58}
+{"line":793,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
 {"line":794,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":794,"op":"hp","side":"far","hp":54}
 {"line":795,"op":"anim","side":"far","anim":"statusFrz"}
@@ -1082,7 +1082,7 @@
 {"line":796,"op":"print","text":"The opposing Swampert thawed out!"}
 {"line":796,"op":"status","side":"far","slot":3,"status":"none"}
 {"line":797,"op":"print","text":"The opposing Swampert used Earthquake!"}
-{"line":797,"op":"move","user":"far","target":"near","move":89}
+{"line":797,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":798,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":798,"op":"hp","side":"near","hp":12}
 {"line":800,"op":"itemPopUp","side":"near","item":472}
@@ -1095,11 +1095,11 @@
 {"line":801,"op":"hp","side":"far","hp":60}
 {"line":803,"op":"turn","number":72}
 {"line":807,"op":"print","text":"Blissey used Ice Beam!"}
-{"line":807,"op":"move","user":"near","target":"far","move":58}
+{"line":807,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
 {"line":808,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":808,"op":"hp","side":"far","hp":40}
 {"line":809,"op":"print","text":"The opposing Swampert used Earthquake!"}
-{"line":809,"op":"move","user":"far","target":"near","move":89}
+{"line":809,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":810,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":810,"op":"hp","side":"near","hp":0}
 {"line":811,"op":"faint","side":"near"}
