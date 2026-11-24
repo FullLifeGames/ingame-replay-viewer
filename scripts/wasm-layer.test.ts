@@ -78,6 +78,13 @@ describe('the host harness', () => {
     expect(argv.slice(-2)).toEqual(['-o', '/tmp/out/irv_layer_host'])
   })
 
+  it("compiles the glue's division helpers too, which include no game header (#66)", () => {
+    const argv = hostCommand('/tmp/out/irv_layer_host', {})
+    const helpers = argv.find((arg) => arg.endsWith('/src/irv_wasm_divide.c'))
+    expect(helpers).toBeDefined()
+    expect(argv).toEqual(expect.arrayContaining(['-iquote', join(helpers ?? '', '..')]))
+  })
+
   it('takes the compiler from CC', () => {
     expect(hostCommand('/tmp/h', { CC: 'clang' })[0]).toBe('clang')
   })

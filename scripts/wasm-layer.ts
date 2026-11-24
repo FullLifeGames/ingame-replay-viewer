@@ -6,12 +6,14 @@
 // destination after the call.
 import { spawnSync } from 'node:child_process'
 import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 
 import { WASM_DIR } from './wasm-config.ts'
 
 export const LAYER_DIR = join(WASM_DIR, 'layer')
 const HOST_DIR = join(LAYER_DIR, 'host')
+// The glue's division helpers (#66) include no game header, so the harness runs them too.
+const DIVIDE_SOURCE = join(WASM_DIR, 'src', 'irv_wasm_divide.c')
 const INSTALL = 'install one with sudo apt install gcc, or name it in CC'
 
 /** The C files of one folder of the build, sorted, without those of its subfolders. */
@@ -28,8 +30,9 @@ export const layerSources = (dir: string = LAYER_DIR) => folderSources(dir)
 export function hostCommand(output: string, env: NodeJS.ProcessEnv = process.env): string[] {
   const cc = env.CC ?? 'cc'
   const flags = ['-std=gnu17', '-O1', '-Wall', '-Wextra', '-Werror', '-DIRV_HOST']
-  const sources = [...layerSources(), ...folderSources(HOST_DIR)]
-  return [cc, ...flags, '-I', LAYER_DIR, ...sources, '-lm', '-o', output]
+  const sources = [...layerSources(), ...folderSources(HOST_DIR), DIVIDE_SOURCE]
+  const includes = ['-I', LAYER_DIR, '-iquote', dirname(DIVIDE_SOURCE)]
+  return [cc, ...flags, ...includes, ...sources, '-lm', '-o', output]
 }
 
 /** Compiles the harness into `dir` and returns its path. */
