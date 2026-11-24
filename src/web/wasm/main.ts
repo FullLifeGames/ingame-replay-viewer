@@ -46,6 +46,7 @@ import {
   watchRun,
 } from './run'
 import { Runs } from './runs'
+import { pressStart } from './start-press'
 import { findWasmView, type WasmView } from './view'
 
 /**
@@ -202,17 +203,21 @@ function wirePause(viewer: Viewer, view: WasmView): void {
 }
 
 /**
- * Runs a press on Start or Restart. Once its run begins and the button still holds the focus, the
- * focus moves to Pause, so Space pauses the run instead of starting it over (S5-17).
+ * Runs a press on Start or Restart. Once its run begins and the focus still sits on the button, or
+ * on no element since Start was disabled during the wait, the focus moves to Pause, so Space
+ * pauses the run instead of starting it over (S5-17).
  */
 function playFrom(
   view: WasmView,
   button: HTMLButtonElement,
   play: () => Promise<string | undefined>,
 ): void {
+  const held = document.activeElement === button
   act(view, async () => {
     const line = await play()
-    if (line !== undefined && document.activeElement === button) view.focusPause()
+    const now = document.activeElement
+    const kept = now === button || now === null || now === document.body
+    if (line !== undefined && held && kept) view.focusPause()
     return line
   })
 }
@@ -224,8 +229,9 @@ function wire(viewer: Viewer, view: WasmView): void {
     view.status(BUILDING_LINE)
     act(view, () => viewer.pickDump(file))
   })
+  // Start stays disabled from its click until the run begins or fails (#69).
   view.start.addEventListener('click', () => {
-    playFrom(view, view.start, () => viewer.play())
+    playFrom(view, view.start, () => pressStart(view.start, viewer.play))
   })
   view.restart.addEventListener('click', () => {
     playFrom(view, view.restart, () => viewer.restart())

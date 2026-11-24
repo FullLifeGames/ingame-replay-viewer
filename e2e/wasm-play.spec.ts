@@ -4,8 +4,8 @@
 // at 2x (#43), and plays 994052 at fast. It reads the run's status through the page's test hook
 // (wasm-hook.ts) and checks the tick rule's pace at 1x and 2x on both streams. The game's sound
 // plays at 1x and 2x and stays silent at fast; the test counts the samples
-// that pass the audio ring and measures their loudness. Two Start presses during the build start
-// one run, and at END the page leaves fast for 1x. A second test measures mGBA on the emulator page
+// that pass the audio ring and measures their loudness. A second Start press during the build
+// finds Start disabled, so one run starts, and at END the page leaves fast for 1x. A second test measures mGBA on the emulator page
 // at fast-forward, for the write-up's speed comparison (B7).
 // The frames and the sound come from the dump, so only numbers leave the tests.
 import { existsSync, readFileSync } from 'node:fs'
@@ -143,14 +143,22 @@ test('the viewer plays hand-made and 994052 at 1x and 2x, switches the speed whi
   expect(await page.evaluate('[isSecureContext, crossOriginIsolated]')).toEqual([true, true])
   await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles(DUMP)
 
-  await test.step('two Start presses during the build start one run', async () => {
+  await test.step('a second Start press during the build finds Start disabled, and one run starts', async () => {
     const start = page.getByRole('button', { name: 'Start', exact: true })
     await start.click()
-    await start.click()
+    // In one call, so the run cannot begin between the look and the press. A click on a disabled
+    // button does nothing, as a visitor's does.
+    const disabledAtPress = await start.evaluate((button: { disabled: boolean; click(): void }) => {
+      const disabled = button.disabled
+      button.click()
+      return disabled
+    })
+    expect(disabledAtPress).toBe(true)
     // The status line may end on the build's line, which comes at the same moment.
     await expect
       .poll(async () => (await status(page))?.runs, { timeout: 180_000, intervals: [1000] })
       .toEqual({ started: 1, live: 1 })
+    await expect(start).toBeEnabled()
   })
 
   await test.step('the hand-made battle runs at 1x, with its sound', async () => {
