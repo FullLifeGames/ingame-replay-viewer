@@ -150,6 +150,9 @@ const CANT_MOVE: Readonly<Record<string, (who: Mon, move: string) => string>> = 
  */
 const PARTIALLY_TRAPPED = 'partiallytrapped'
 
+/** The scene of `cant|…|partiallytrapped`, which the test replays' spec names. */
+export const PARTIAL_TRAP_SCENE = 'a Pokémon a partial trap keeps from moving'
+
 /** A Pokémon that cannot move, for the reason the log gives and the move it could not use. */
 export function cant(who: Mon, reason: Effect, move: string | undefined): Phrase {
   const id = toID(reason.name)
@@ -157,6 +160,6 @@ export function cant(who: Mon, reason: Effect, move: string | undefined): Phrase
   const text = bound && move !== undefined ? bound(who, moveName(move)) : CANT[id]?.(who)
   if (text !== undefined) return { text }
   const own = `${nameAtStart(who)} couldn't move!`
-  if (id === PARTIALLY_TRAPPED) return ownPhrase(own, 'a Pokémon a partial trap keeps from moving')
+  if (id === PARTIALLY_TRAPPED) return ownPhrase(own, PARTIAL_TRAP_SCENE)
   return ownPhrase(own, `a Pokémon held back by ${reason.name}`)
 }
