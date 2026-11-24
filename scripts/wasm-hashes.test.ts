@@ -211,13 +211,28 @@ describe('the baseline around the runs', () => {
     expect(readHashes(join(out, 'baseline', 'hand-made.crc')).frames).toBe(1)
   })
 
-  it('refuses --against-baseline before any run when a stream has no baseline', () => {
+  it('refuses --against-baseline before any run when the baseline holds none of the streams', () => {
     const out = outWithModule()
     mkdirSync(join(out, 'baseline'))
-    writeFileSync(join(out, 'baseline', 'hand-made.crc'), new Uint8Array(0))
     expect(() => {
       startBaseline('against', out, [{ name: 'hand-made' }, { name: '994052' }])
-    }).toThrow(/no baseline for 994052.*--baseline/)
+    }).toThrow(/no baseline for hand-made, 994052.*--baseline/)
+  })
+
+  it('compares the streams the baseline holds and reports the others as without one (W5-38)', () => {
+    const out = outWithModule()
+    mkdirSync(join(out, 'baseline'))
+    writeHashes(join(out, 'baseline', 'hand-made.crc'), log(frame(1)).done())
+    const streams = [{ name: 'hand-made' }, { name: 'hand-made-b' }]
+    expect(() => {
+      startBaseline('against', out, streams)
+    }).not.toThrow()
+    const against = { mode: 'against', out } as const
+    expect(settleBaseline(against, 'hand-made-b', runFile(out, frame(2)))).toEqual({
+      problems: [],
+      noBaseline: true,
+    })
+    expect(settleBaseline(against, 'hand-made', runFile(out, frame(2))).problems).toHaveLength(1)
   })
 
   it('holds a run against its baseline and names what differs', () => {

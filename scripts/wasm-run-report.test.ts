@@ -154,4 +154,17 @@ describe('the report of a run (#66)', () => {
     expect(finishStreams([played], scratch, (line) => lines.push(line))).toBe(0)
     expect(lines.at(-1)).toBe(`1 of 1 streams passed; frames and report.json in ${scratch}`)
   })
+
+  it('says which streams the baseline lacks and counts them apart; they fail only on their own', () => {
+    const lines: string[] = []
+    const unbased = { ...played, name: 'hand-made-b', noBaseline: true } as const
+    expect(finishStreams([played, unbased], scratch, (line) => lines.push(line))).toBe(0)
+    expect(lines.slice(3)).toEqual([
+      'hand-made-b: passed, finished after 3066 frames, 34 of 34 done, 95.2 s',
+      '  pass first-hp: moved',
+      '  END at frame 2916',
+      '  no baseline: frames not compared',
+      `2 of 2 streams passed, 1 with no baseline (hand-made-b); frames and report.json in ${scratch}`,
+    ])
+  })
 })

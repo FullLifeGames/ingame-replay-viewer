@@ -30,6 +30,8 @@ export interface StreamReport extends Omit<RunReport, 'status'> {
   /** END: the first frame on which the interpreter reported `finished`. */
   end?: number | undefined
   failure?: StreamFailure
+  /** --against-baseline found no frames of this stream in the baseline, so it compared none. */
+  noBaseline?: true
 }
 
 /** Plays one stream and reports it; it throws when the stream ends without a status. */
@@ -75,14 +77,19 @@ function sayStream(report: StreamReport, say: Say): void {
   }
   sayRun({ ...report, status }, say)
   if (report.end !== undefined) say(`  END at frame ${String(report.end)}`)
+  if (report.noBaseline) say('  no baseline: frames not compared')
 }
 
-/** The last line: streams passed and failed, by name. */
+/** The last line: streams passed, failed and without a baseline, by name. */
 export function countLine(reports: readonly StreamReport[]): string {
   const failed = reports.filter((report) => report.problems.length > 0).map(({ name }) => name)
+  const unbased = reports.filter((report) => report.noBaseline).map(({ name }) => name)
   const passed = reports.length - failed.length
   const parts = [`${String(passed)} of ${String(reports.length)} streams passed`]
   if (failed.length > 0) parts.push(`${String(failed.length)} failed (${failed.join(', ')})`)
+  if (unbased.length > 0) {
+    parts.push(`${String(unbased.length)} with no baseline (${unbased.join(', ')})`)
+  }
   return parts.join(', ')
 }
 

@@ -340,7 +340,8 @@ function runStream(plan: ShotPlan, { runDir, module, errors, baseline }: StreamR
   const report = reportRun({ plan, output, frames: readFrames(dir), errors, seconds })
   const settled = settleBaseline(baseline, plan.name, join(dir, RUN_HASHES))
   if (settled.equal !== undefined) say(settled.equal)
-  return { ...report, end, problems: [...report.problems, ...settled.problems] }
+  const problems = [...report.problems, ...settled.problems]
+  return { ...report, end, problems, ...(settled.noBaseline ? { noBaseline: true } : {}) }
 }
 
 async function runStreams({ mode, names, sanitize }: RunArgs): Promise<void> {
