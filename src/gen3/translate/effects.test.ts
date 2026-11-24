@@ -271,3 +271,27 @@ describe('a future attack whose user has fainted (U4)', () => {
     expect(fallbacksOf(...start, ...hit)).toEqual([])
   })
 })
+
+// Showdown's Gen 3 Doom Desire (`data/mods/gen3/moves.ts`) logs `-start|<user>|Doom Desire` as it
+// is used and `-end|<target>|move: Doom Desire` as it hits (`futuremove`, `data/conditions.ts`).
+// The game says B_MSG_DOOM_DESIRE of `gFutureMoveUsedStringIds`, then STRINGID_PKMNTOOKATTACK
+// with the move's name (`BattleScript_MonTookFutureAttack`).
+describe('Doom Desire', () => {
+  it('says its user chose it as its destiny, then that its target took the attack', () => {
+    const lines = [
+      '|move|p1a: Dugtrio|Doom Desire|p2a: Tyranitar',
+      '|-start|p1a: Dugtrio|Doom Desire',
+      '|-end|p2a: Tyranitar|move: Doom Desire',
+      '|-damage|p2a: Tyranitar|50/100',
+    ]
+    const texts = sceneOf(...lines)
+      .map(plain)
+      .filter((step) => typeof step === 'string')
+    expect(texts).toEqual([
+      'Dugtrio used Doom Desire!',
+      'Dugtrio chose Doom Desire as its destiny!',
+      'The opposing Tyranitar took the Doom Desire attack!',
+    ])
+    expect(fallbacksOf(...lines)).toEqual([])
+  })
+})

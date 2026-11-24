@@ -96,9 +96,10 @@ export const EFFECT_TEMPLATES = {
   // B_MSG_SET_MIST in `gMistUsedStringIds` (`BattleScript_EffectMist`); Gen 1 logs Mist as a
   // start on its user.
   mist: tagged('gText_PkmnShroudedInMist', start('surrounds itself with a protective mist!')),
-  // B_MSG_FUTURE_SIGHT in `gFutureMoveUsedStringIds`; the hit (`BattleScript_MonTookFutureAttack`)
-  // names the move as B_BUFF1.
+  // B_MSG_FUTURE_SIGHT and B_MSG_DOOM_DESIRE in `gFutureMoveUsedStringIds`; the hit
+  // (`BattleScript_MonTookFutureAttack`) names the move as B_BUFF1.
   foresaw: tagged('STRINGID_PKMNFORESAWATTACK', start('foresaw an attack!')),
+  choseDestiny: tagged('STRINGID_PKMNCHOSEXASDESTINY', start('chose Doom Desire as its destiny!')),
   tookAttack: tagged('STRINGID_PKMNTOOKATTACK', (who: Mon, move: string) => {
     return `${nameAtStart(who)} took the ${move} attack!`
   }),
@@ -134,6 +135,7 @@ const STARTS: Readonly<Record<string, Line>> = {
   rage: E.rageBuilding.render,
   mist: E.mist.render,
   futuresight: E.foresaw.render,
+  doomdesire: E.choseDestiny.render,
   // Gen 3 logs the sports as starts on their user; the game's line names the type they weaken.
   mudsport: FIELD_TEMPLATES.electricWeakened.render,
   watersport: FIELD_TEMPLATES.fireWeakened.render,
@@ -216,6 +218,7 @@ const ENDS: Readonly<Record<string, Line>> = {
 /** The end lines that name the effect's move, by the effect's id. */
 const ENDS_NAMING_MOVE: Readonly<Record<string, (who: Mon, move: string) => string>> = {
   futuresight: E.tookAttack.render,
+  doomdesire: E.tookAttack.render,
 }
 
 export function effectEnded(who: Mon, effect: Effect): Phrase {
