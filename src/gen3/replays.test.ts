@@ -34,13 +34,11 @@ const charsetRead = (text: string) => decodeText(encodeText(text))
 
 /**
  * The mechanic fallbacks the test replays may take, each a line the game shows nothing for:
- * Perish Song's first count, whose later counts print; Pursuit's activation, whose withdraw
- * line the switch after the hit prints (none after a knockout); Bide's first turn, which the
- * expansion shows as the move alone. A new one fails until it is named here.
+ * Perish Song's first count, whose later counts print; Bide's first turn, which the expansion
+ * shows as the move alone. A new one fails until it is named here.
  */
 const NAMED_MECHANICS: ReadonlySet<string> = new Set([
   mechanicGap('perish3', 'starting').detail,
-  mechanicGap('Pursuit', 'acting').detail,
   mechanicGap('Bide', 'starting').detail,
 ])
 

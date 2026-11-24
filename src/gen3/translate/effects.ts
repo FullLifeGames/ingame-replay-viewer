@@ -6,7 +6,7 @@
 // Destiny Bond's line before both faints; the game says it after the holder's faint, then drains
 // the attacker's bar (`BattleScript_DestinyBondTakesLife`), so the line waits for that faint. A
 // perish count at 0 drains the bar after its line (`BattleScript_PerishSongTakesLife`). Pursuit's
-// activation shows nothing (`PURSUIT`). Transform says the species its user turned into
+// activation calls its target back (`PURSUIT`). Transform says the species its user turned into
 // (`BattleScript_EffectTransform`). The MOVE op's animation turns the sprite into the target's
 // species, read from its party mon; nothing sets the transform volatiles, so a shiny target's copy
 // takes the plain colours, a mechanic fallback.
@@ -25,6 +25,7 @@ import {
   singleTurn as lastsTheTurn,
   transformed,
 } from '../text/phrases-effects'
+import { withdrawn } from '../text/phrases-field'
 import { itemEndedConfusion } from '../text/phrases-status'
 import { type Context, type EventOf, type PrintText, sameMon } from './context'
 import { HIT_TURN, isFutureMove } from './anim-turn'
@@ -46,9 +47,10 @@ const PERISH_ZERO = 'perish0'
 
 /**
  * Pursuit on a Pokémon that switches out: the game says "X, come back!" (`STRINGID_RETURNMON`,
- * `BattleScript_ActionSwitch`) before the hit. Our withdraw says it at the switch after the hit,
- * and not at all when the hit knocks the Pokémon out (the log then sends the next one in after
- * the faint). The activation shows nothing and names the mechanic.
+ * `BattleScript_ActionSwitch`) before `jumpifnopursuitswitchdmg` hands the turn to the Pursuit;
+ * a target that lives switches by `BattleScript_DoSwitchOut` (`MoveEndPursuitNextAction`), which
+ * returns it to its ball with no line. The log puts the activation before the Pursuit's move
+ * line, so the activation says the line and the switch after it none (`pursuedBefore`).
  */
 const PURSUIT = 'pursuit'
 
@@ -136,8 +138,8 @@ function substituteBreaks(event: EventOf<'effectEnd'>, ctx: Context): void {
 /** A substitute that takes a hit (`[damage]`) plays the hit first; any other effect is a line. */
 export function effectActivate(event: EventOf<'effectActivate'>, ctx: Context): void {
   const { who, effect, line } = event
-  if (toID(effect.name) === PURSUIT) {
-    ctx.note(line, mechanicGap(effect.name, 'acting'))
+  if (toID(effect.name) === PURSUIT && who !== undefined) {
+    ctx.print(line, withdrawn(ctx.mon(who), ctx.player(who.side).text))
     return
   }
   if (who !== undefined && takesDown(event, who, ctx)) {
@@ -147,6 +149,17 @@ export function effectActivate(event: EventOf<'effectActivate'>, ctx: Context): 
   if (event.damage && who !== undefined) hit(line, ctx.activeSide(who), event.effectiveness, ctx)
   ctx.print(line, effectActivated(who && ctx.mon(who), effect))
   hitLines(event, ctx)
+}
+
+/** Whether a Pursuit's activation in this turn called `who` back before its switch. */
+export function pursuedBefore(who: PokemonRef, ctx: Context): boolean {
+  for (const event of ctx.script.events.slice(0, ctx.at).toReversed()) {
+    if (event.kind === 'turn') return false
+    if (event.kind === 'effectActivate' && toID(event.effect.name) === PURSUIT) {
+      return sameMon(event.who, who)
+    }
+  }
+  return false
 }
 
 /** Destiny Bond waits when a faint of another Pokémon, its attacker, follows in the turn. */

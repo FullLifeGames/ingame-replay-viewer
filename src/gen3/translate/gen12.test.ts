@@ -83,24 +83,64 @@ describe("Mean Look's trap", () => {
 })
 
 describe("Pursuit's activation on a Pokémon that switches out (Gen 2 and 3)", () => {
-  const lines = [
-    '|-activate|p2a: Tyranitar|move: Pursuit',
-    '|move|p1a: Dugtrio|Pursuit|p2a: Tyranitar|[from] Pursuit',
-    '|-damage|p2a: Tyranitar|80/100',
+  const pursuit = (target: string, user: string, hp: string) => [
+    `|-activate|${target}|move: Pursuit`,
+    `|move|${user}|Pursuit|${target}|[from] Pursuit`,
+    `|-damage|${target}|${hp}`,
   ]
+  const anyMove = expect.any(Number) as number
 
-  it('prints nothing before the hit, which the withdraw follows', () => {
+  it('calls the target back before the hit, and the switch after it says no more', () => {
+    const lines = [
+      ...pursuit('p2a: Tyranitar', 'p1a: Dugtrio', '80/100'),
+      '|switch|p2a: Skarmory|Skarmory, F|100/100',
+    ]
+
     expect(sceneOf(...lines).map(plain)).toEqual([
+      'Bob withdrew Tyranitar!',
       'Dugtrio used Pursuit!',
-      { op: 'move', user: 'near', target: 'far', move: expect.any(Number) as number, animTurn: 0 },
+      { op: 'move', user: 'near', target: 'far', move: anyMove, animTurn: 0 },
       { op: 'hit', side: 'far', effectiveness: 'normal' },
       { op: 'hp', side: 'far', hp: 80 },
+      { op: 'withdraw', side: 'far' },
+      'Bob sent out Skarmory!',
+      { op: 'switchIn', side: 'far', slot: 1, hp: 100, status: 'none' },
     ])
+    expect(fallbacksOf(...lines)).toEqual([])
   })
 
-  it('names the mechanic the stream holds no state for', () => {
-    expect(fallbacksOf(...lines)).toEqual([
-      { line: NEXT, kind: 'mechanic', detail: 'no state in the stream for Pursuit acting' },
+  it('calls the near Pokémon back by its own line', () => {
+    const lines = pursuit('p1a: Dugtrio', 'p2a: Tyranitar', '0 fnt')
+
+    expect(
+      sceneOf(...lines)
+        .map(plain)
+        .slice(0, 2),
+    ).toEqual(['Dugtrio, come back!', 'The opposing Tyranitar used Pursuit!'])
+  })
+
+  it("leaves a later switch of the trainer's own choice its line", () => {
+    const lines = [
+      ...pursuit('p2a: Tyranitar', 'p1a: Dugtrio', '80/100'),
+      '|switch|p2a: Skarmory|Skarmory, F|100/100',
+      '|turn|2',
+      '|switch|p2a: Tyranitar|Tyranitar, M|80/100',
+      '|turn|3',
+      '|switch|p2a: Skarmory|Skarmory, F|100/100',
+    ]
+
+    expect(
+      sceneOf(...lines)
+        .map(plain)
+        .filter((step) => typeof step === 'string'),
+    ).toEqual([
+      'Bob withdrew Tyranitar!',
+      'Dugtrio used Pursuit!',
+      'Bob sent out Skarmory!',
+      'Bob withdrew Skarmory!',
+      'Bob sent out Tyranitar!',
+      'Bob withdrew Tyranitar!',
+      'Bob sent out Skarmory!',
     ])
   })
 })

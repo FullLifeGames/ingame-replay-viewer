@@ -6,7 +6,7 @@
 import { fainted } from '../text/phrases'
 import { draggedOut, sentOut, withdrawn } from '../text/phrases-field'
 import type { Context, EventOf } from './context'
-import { takeDown } from './effects'
+import { pursuedBefore, takeDown } from './effects'
 import { afterFaint } from './hits'
 import { endIntro, sendOutLead } from './intro'
 import { scaleHp } from './scale'
@@ -34,11 +34,14 @@ export function switchIn(event: SwitchInEvent, ctx: Context): void {
   ctx.enter(who)
 }
 
-/** The Pokémon a switch replaces goes back; only a switch of the trainer's own choice says so. */
+/**
+ * The Pokémon a switch replaces goes back; only a switch of the trainer's own choice says so,
+ * and not again after a Pursuit's activation said it.
+ */
 function withdraw({ replaces, dragged, cause, line }: SwitchInEvent, ctx: Context): void {
   if (replaces === undefined) return
   const side = ctx.activeSide(replaces)
-  if (!dragged && cause === undefined) {
+  if (!dragged && cause === undefined && !pursuedBefore(replaces, ctx)) {
     ctx.print(line, withdrawn(ctx.mon(replaces), ctx.player(side).text))
   }
   ctx.emit(line, { op: 'withdraw', side })
