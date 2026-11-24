@@ -13,7 +13,8 @@
 // (gAnimMoveTurn, set from the controller's MOVE_ANIMATION command). The engine tests pin what the
 // pinned expansion passes for each case; the backend's turn rule follows them. Each arranges the
 // move in question as the battle's last move animation (the other battler is faster, so its
-// Celebrate plays first, or the move knocks it out) and reads the turn in THEN, after the battle.
+// Celebrate plays first; the move knocks it out; or, for Pursuit, the other side switches and
+// makes no move) and reads the turn in THEN, after the battle.
 
 SINGLE_BATTLE_TEST("Replay: engine: Solar Beam's hit plays turn 1")
 {
