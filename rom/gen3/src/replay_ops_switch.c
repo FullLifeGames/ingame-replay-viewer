@@ -15,15 +15,20 @@
 // switch scripts). After a faint the stream has no WITHDRAW: the faint animation has taken the mon
 // off the field.
 
+void Replay_ReturnMonToBall(u32 side)
+{
+    u32 battler = Replay_GetBattler(side);
+
+    BtlController_EmitReturnMonToBall(battler, B_COMM_TO_CONTROLLER, FALSE);
+    MarkBattlerForControllerExec(battler);
+}
+
 // WITHDRAW: the mon goes back into its ball.
 bool32 Replay_OpWithdraw(const volatile u8 *operands, u32 step)
 {
-    u32 battler = Replay_GetBattler(operands[0]);
-
     if (step != 0)
         return TRUE;
-    BtlController_EmitReturnMonToBall(battler, B_COMM_TO_CONTROLLER, FALSE);
-    MarkBattlerForControllerExec(battler);
+    Replay_ReturnMonToBall(operands[0]);
     return FALSE;
 }
 

@@ -116,15 +116,11 @@ static void Replay_Outro(void)
         sOutro.step++;
 }
 
-// As WITHDRAW returns a mon (replay_ops_switch.c).
+// As WITHDRAW returns a mon.
 static void ReturnToBall(u32 side)
 {
-    u32 battler = Replay_GetBattler(side);
-
-    if (!(sOutro.sidesOut & (1u << side)))
-        return;
-    BtlController_EmitReturnMonToBall(battler, B_COMM_TO_CONTROLLER, FALSE);
-    MarkBattlerForControllerExec(battler);
+    if (sOutro.sidesOut & (1u << side))
+        Replay_ReturnMonToBall(side);
 }
 
 static bool32 Outro_ReturnLoser(void)
