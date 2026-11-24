@@ -40,17 +40,18 @@ const formatOf = (id: string) => /^(?:smogtours-)?(gen[123]ou)-\d+$/.exec(id)?.[
 
 describe('the test replays', () => {
   // Five Gen 3 replays from Smogon tournaments (#2), a Gen 3 ladder replay with a multi-hit move
-  // (#15), and one Gen 1 and one Gen 2 replay from Smogon tournaments (#60).
-  it('are seven tournament replays and one from the ladder', () => {
+  // (#15), one Gen 1 and one Gen 2 replay from Smogon tournaments (#60), and a Gen 3 and a Gen 2
+  // ladder replay with Curse and, the Gen 3 one, Solar Beam in sun (#65).
+  it('are seven tournament replays and three from the ladder', () => {
     expect(replays.filter(({ file }) => file.startsWith('smogtours-'))).toHaveLength(7)
-    expect(replays).toHaveLength(8)
+    expect(replays).toHaveLength(10)
   })
 
-  it('hold six Gen 3 replays, one Gen 1 and one Gen 2', () => {
+  it('hold seven Gen 3 replays, one Gen 1 and two Gen 2', () => {
     const formats = replays.map(({ file }) => formatOf(file))
-    expect(formats.filter((format) => format === 'gen3ou')).toHaveLength(6)
+    expect(formats.filter((format) => format === 'gen3ou')).toHaveLength(7)
     expect(formats.filter((format) => format === 'gen1ou')).toHaveLength(1)
-    expect(formats.filter((format) => format === 'gen2ou')).toHaveLength(1)
+    expect(formats.filter((format) => format === 'gen2ou')).toHaveLength(2)
   })
 
   it.each(replays)('$file is a saved Gen 1, 2 or 3 OU singles replay', ({ file, replay }) => {
