@@ -68,13 +68,15 @@ npm run build && npx vite preview --port 5177 --strictPort
 
 The preview uses the same plugin, so it sends the same headers and serves the same two files from `build/rom/`. `dist/` holds both pages, the viewer's worker and audio worklet, mGBA's script, worker and wasm, and the test replays. It holds no ROM, patch or save. The workers, the worklet and mGBA's wasm load from `dist/assets/`, and the plugin serves the viewer's two `/wasm/` files from `build/wasm/`, so a replay runs as it does on the dev server. The WebAssembly e2e passed against the preview in wave 3 (B7), when the viewer was still `wasm.html`. The production build for a real host is M2's work.
 
-## HTTPS or localhost
+## HTTPS
 
-mGBA runs its threads on `SharedArrayBuffer`. A browser grants it only on a secure context (HTTPS or `localhost`) that is cross-origin isolated (the two headers above). The dump's SHA1 needs `crypto.subtle`, which also needs a secure context.
+mGBA runs its threads on `SharedArrayBuffer`. A browser grants it only on a secure context (HTTPS or `localhost`) that is cross-origin isolated (the two headers above). The dump's SHA1 needs `crypto.subtle`, which also needs a secure context. Over plain HTTP, each page shows "This page needs HTTPS." with its own `https:` address, and "Details" says that the page is not a secure context.
 
-`http://<tailscale ip>:5177` is plain HTTP, so neither page can run the game there, and each shows one line that names what is missing. Open `http://localhost:5177` on devbox, or reach the page over the tailnet with HTTPS.
+## For developers on devbox
 
-## Reaching the page over the tailnet
+The project's dev server and preview run on devbox, the development machine. `http://<tailscale ip>:5177` is plain HTTP, so neither page can run the game there, and each shows one line that names what is missing. Open `http://localhost:5177` on devbox, or reach the page over the tailnet with HTTPS.
+
+### Reaching the page over the tailnet
 
 `tailscale serve` puts the dev server behind a tailnet-only HTTPS address with a real certificate:
 
