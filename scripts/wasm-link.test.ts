@@ -119,7 +119,10 @@ describe('the link command', () => {
     '-sSTACK_SIZE=1048576',
     '-sSUPPORT_LONGJMP=emscripten',
     '-sERROR_ON_UNDEFINED_SYMBOLS=1',
-    '-sEXPORTED_FUNCTIONS=_AgbMain,_IrvWasm_Slot,_IrvWasm_Progress',
+    // The division helpers have no caller before wasm:divide; the export keeps them by name.
+    '-sEXPORTED_FUNCTIONS=_AgbMain,_IrvWasm_Slot,_IrvWasm_Progress,' +
+      '_IrvWasm_I32DivS,_IrvWasm_I32DivU,_IrvWasm_I32RemS,_IrvWasm_I32RemU,' +
+      '_IrvWasm_I64DivS,_IrvWasm_I64DivU,_IrvWasm_I64RemS,_IrvWasm_I64RemU',
     '-sEXPORTED_RUNTIME_METHODS=HEAPU8,HEAPU16',
     '--profiling-funcs',
   ])('sets %s', (flag) => {

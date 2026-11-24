@@ -1,17 +1,24 @@
 // The streams of the screenshot run: a test replay's stream from the Gen 3 game backend, a
 // hand-made battle written with the stream encoder, the same stream with an unknown version, and
-// the decoder that turns the bytes back into instructions for the scene points. src/gen3/ imports
+// the decoder that turns the bytes back into instructions for the scene points, and the send-out
+// streams of scripts/wasm-sendouts.ts from the pinned tree. src/gen3/ imports
 // without file extensions and imports JSON, as the page's bundler resolves them, so
 // scripts/rom-shot.ts loads this module through Vite's module runner, not with plain Node.
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { buildGen3Stream } from '../src/gen3/backend.ts'
 import { decodeStream } from '../src/gen3/stream/decode.ts'
 import { encodeStream } from '../src/gen3/stream/encode.ts'
 import { STREAM, STREAM_OFFSET } from '../src/gen3/stream/format.ts'
 import type { Instruction, Stream, StreamMon } from '../src/gen3/stream/instructions.ts'
 import { moveOf, speciesOf } from '../src/gen3/tables/lookup.ts'
+import speciesTable from '../src/gen3/tables/species.json'
 import trainerPics from '../src/gen3/tables/trainer-pics.json'
 import { buildBattleScript } from '../src/script/build.ts'
 import { readReplay } from '../src/script/replay.ts'
+import { buildPaths } from './rom-paths.ts'
+import { readSendOutAnimations, sendOutStreams } from './wasm-sendouts.ts'
 
 export { decodeStream }
 
@@ -100,4 +107,15 @@ export function withVersion(bytes: Uint8Array, version: number): Uint8Array {
   const copy = bytes.slice()
   new DataView(copy.buffer).setUint16(STREAM_OFFSET.version, version, true)
   return copy
+}
+
+/** The send-out streams (#66) of the tree the ROM builds from, each by the name of its run. */
+export function sendOutBytes(): [string, Uint8Array][] {
+  const { tree } = buildPaths()
+  const anims = readSendOutAnimations((path) => readFileSync(join(tree, path), 'utf8'))
+  const pics = { near: trainerPics.TRAINER_PIC_BRENDAN, far: trainerPics.TRAINER_PIC_MAY }
+  return sendOutStreams(anims, speciesTable, pics).map(({ name, stream }) => [
+    name,
+    encodeStream(stream),
+  ])
 }

@@ -364,37 +364,42 @@ static enum ReplayError ValidateOrderOf(u8 *presence, const volatile u8 *instruc
 }
 
 // The second pass, over instructions the first pass let through: each one keeps the order rules
-// of replay_stream.h.
-static enum ReplayError ValidateOrder(const volatile u8 *stream)
+// of replay_stream.h. END comes last, so the presence after the pass gives the sides out at END.
+static enum ReplayError ValidateOrder(const volatile u8 *stream, u8 *sidesOut)
 {
     const volatile u8 *instructions = stream + Replay_ReadU32(stream + REPLAY_STREAM_OFFSET_INSTRUCTIONS_OFFSET);
     u32 length = Replay_ReadU32(stream + REPLAY_STREAM_OFFSET_INSTRUCTIONS_LENGTH);
     u8 presence[REPLAY_STREAM_SIDE_COUNT] = { PRESENCE_NONE, PRESENCE_NONE };
     bool32 introduced = (instructions[0] == REPLAY_OP_INTRO);
     enum ReplayError error = REPLAY_ERROR_NONE;
-    u32 at;
+    u32 at, side;
 
     for (at = 0; at < length && error == REPLAY_ERROR_NONE; at += REPLAY_INSTRUCTION_HEADER_SIZE + instructions[at + 1])
         error = ValidateOrderOf(presence, instructions + at, at, introduced);
+    for (side = 0; side < REPLAY_STREAM_SIDE_COUNT; side++)
+    {
+        if (presence[side] == PRESENCE_OUT)
+            *sidesOut |= 1u << side;
+    }
     return error;
 }
 
-enum ReplayError Replay_ValidateStream(const volatile u8 *stream, u32 length, u16 *count)
+enum ReplayError Replay_ValidateStream(const volatile u8 *stream, u32 length, struct ReplayStreamFacts *facts)
 {
     enum ReplayError error = ValidateHeader(stream, length);
 
-    *count = 0;
+    memset(facts, 0, sizeof(*facts));
     if (error == REPLAY_ERROR_NONE)
         error = ValidateTeams(stream);
     if (error == REPLAY_ERROR_NONE)
-        error = ValidateInstructions(stream, count);
+        error = ValidateInstructions(stream, &facts->count);
     if (error == REPLAY_ERROR_NONE)
-        error = ValidateOrder(stream);
+        error = ValidateOrder(stream, &facts->sidesOutAtEnd);
     return error;
 }
 
 enum ReplayError Replay_Validate(const volatile u8 *stream, u32 length)
 {
-    u16 count;
-    return Replay_ValidateStream(stream, length, &count);
+    struct ReplayStreamFacts facts;
+    return Replay_ValidateStream(stream, length, &facts);
 }

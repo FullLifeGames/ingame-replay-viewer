@@ -16,8 +16,9 @@
 // as gBattleMainFunc: every mon still out goes back into its ball, the loser's first, the winner's
 // trainer slides in, the scene holds for two seconds, and the screen and the music fade to black.
 // A tie or an unknown end has no winner: no trainer slides in, and the battle music plays on until
-// the fade. END has counted as done and finished before the outro starts, so every reader of
-// gReplayProgress sees the end on the same frame as before.
+// the fade. END stops the low-HP beep for every outcome. END has counted as done and finished
+// before the outro starts, so every reader of gReplayProgress sees the end on the same frame as
+// before.
 
 // Two seconds at 60 frames a second.
 #define OUTRO_HOLD_FRAMES 120
@@ -84,20 +85,22 @@ void Replay_StartVictoryMusic(u32 outcome)
     PlayBGM(MUS_VICTORY_TRAINER);
 }
 
+// The game stops the low-HP beep at a win before the victory music (HandleEndTurn_BattleWon), and
+// at any end once it leaves the battle (FreeRestoreBattleData). The outro never leaves the battle,
+// so END stops the beep for every outcome, as a win's line did already.
 void Replay_StartOutro(u32 outcome, u32 sidesOut)
 {
+    BattleStopLowHpSound();
     memset(&sOutro, 0, sizeof(sOutro));
     sOutro.outcome = outcome;
     sOutro.sidesOut = sidesOut;
     gBattleMainFunc = Replay_Outro;
 }
 
+// The step never leaves sOutroSteps: Outro_End hands gBattleMainFunc on, and if it did not, the
+// last step would run again.
 static void Replay_Outro(void)
 {
-#if TESTING
-    if (sOutro.step == 0)
-        ReplayTest_AtOutroStart();
-#endif
     if (gBattleControllerExecFlags)
         return;
     if (sOutro.wait != 0)
@@ -105,19 +108,19 @@ static void Replay_Outro(void)
         sOutro.wait--;
         return;
     }
-    if (sOutroSteps[sOutro.step]())
+#if TESTING
+    if (sOutro.step == 0)
+        ReplayTest_AtOutroStart();
+#endif
+    if (sOutroSteps[sOutro.step]() && sOutro.step < ARRAY_COUNT(sOutroSteps) - 1)
         sOutro.step++;
 }
 
-// As WITHDRAW returns a mon (replay_ops_switch.c).
+// As WITHDRAW returns a mon.
 static void ReturnToBall(u32 side)
 {
-    u32 battler = Replay_GetBattler(side);
-
-    if (!(sOutro.sidesOut & (1u << side)))
-        return;
-    BtlController_EmitReturnMonToBall(battler, B_COMM_TO_CONTROLLER, FALSE);
-    MarkBattlerForControllerExec(battler);
+    if (sOutro.sidesOut & (1u << side))
+        Replay_ReturnMonToBall(side);
 }
 
 static bool32 Outro_ReturnLoser(void)

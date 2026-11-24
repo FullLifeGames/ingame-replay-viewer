@@ -88,17 +88,15 @@ export const EFFECT_TEMPLATES = {
   // Bide's second turn (`BattleScript_BideStoringEnergy`) and its third (`BattleScript_BideAttack`).
   storingEnergy: tagged('STRINGID_PKMNSTORINGENERGY', start('is storing energy!')),
   unleashedEnergy: tagged('STRINGID_PKMNUNLEASHEDENERGY', start('unleashed its energy!')),
-  // `BattleScript_RageIsBuilding` says it as a hit raises the user's Attack; the log starts Rage
-  // as the move is used, so the line comes then.
+  // `BattleScript_RageIsBuilding` says it after a hit raises the Attack of a Pokémon in a rage
+  // (`rage.ts`); a `-start|<mon>|Rage` line says it as Rage starts.
   rageBuilding: tagged('STRINGID_PKMNRAGEBUILDING', (who: Mon) => {
     return `${ownerAtStart(who)} rage is building!`
   }),
-  // B_MSG_SET_MIST in `gMistUsedStringIds` (`BattleScript_EffectMist`); Gen 1 logs Mist as a
-  // start on its user.
-  mist: tagged('gText_PkmnShroudedInMist', start('surrounds itself with a protective mist!')),
-  // B_MSG_FUTURE_SIGHT in `gFutureMoveUsedStringIds`; the hit (`BattleScript_MonTookFutureAttack`)
-  // names the move as B_BUFF1.
+  // B_MSG_FUTURE_SIGHT and B_MSG_DOOM_DESIRE in `gFutureMoveUsedStringIds`; the hit
+  // (`BattleScript_MonTookFutureAttack`) names the move as B_BUFF1.
   foresaw: tagged('STRINGID_PKMNFORESAWATTACK', start('foresaw an attack!')),
+  choseDestiny: tagged('STRINGID_PKMNCHOSEXASDESTINY', start('chose Doom Desire as its destiny!')),
   tookAttack: tagged('STRINGID_PKMNTOOKATTACK', (who: Mon, move: string) => {
     return `${nameAtStart(who)} took the ${move} attack!`
   }),
@@ -132,8 +130,10 @@ const STARTS: Readonly<Record<string, Line>> = {
   // Mean Look's `-activate|<target>|trapped`, which the parser reads as a start.
   trapped: E.cantEscape.render,
   rage: E.rageBuilding.render,
-  mist: E.mist.render,
+  // Gen 1 and 2 log Mist as a start on its user; Gen 3 as a side start (`sideStarted`).
+  mist: FIELD_TEMPLATES.mist.render,
   futuresight: E.foresaw.render,
+  doomdesire: E.choseDestiny.render,
   // Gen 3 logs the sports as starts on their user; the game's line names the type they weaken.
   mudsport: FIELD_TEMPLATES.electricWeakened.render,
   watersport: FIELD_TEMPLATES.fireWeakened.render,
@@ -216,6 +216,7 @@ const ENDS: Readonly<Record<string, Line>> = {
 /** The end lines that name the effect's move, by the effect's id. */
 const ENDS_NAMING_MOVE: Readonly<Record<string, (who: Mon, move: string) => string>> = {
   futuresight: E.tookAttack.render,
+  doomdesire: E.tookAttack.render,
 }
 
 export function effectEnded(who: Mon, effect: Effect): Phrase {
@@ -257,6 +258,9 @@ export function singleMove(who: Mon, effect: Effect): Phrase | undefined {
   const own = `${nameAtStart(who)} readied ${held(effect.name)}!`
   return ownPhrase(own, `${effect.name} until the next move`)
 }
+
+/** `who`'s rage builds as a hit raises its Attack. */
+export const rageBuilding = (who: Mon) => E.rageBuilding.render(who)
 
 /** `who` took the stat stages of `from` (Psych Up). */
 export const copiedStats = (who: Mon, from: Mon) => E.copiedStats.render(who, from)

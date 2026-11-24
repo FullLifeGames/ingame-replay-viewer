@@ -38,7 +38,7 @@ struct ReplayState
     u8 step;
     u8 lastOp; // the op that ended last, REPLAY_OP_END (0) before the first
     u8 end; // enum ReplayEnd
-    u8 sidesOut; // a bit for each REPLAY_SIDE_* whose battler is out
+    u8 sidesOutAtEnd; // a bit for each REPLAY_SIDE_* whose battler is out at END
     bool8 loaded;
 };
 
@@ -116,15 +116,16 @@ static const u32 sStatus1[] =
 
 enum ReplayError Replay_Load(const volatile u8 *stream, u32 length, enum ReplayEnd end)
 {
-    u16 count;
-    enum ReplayError error = Replay_ValidateStream(stream, length, &count);
+    struct ReplayStreamFacts facts;
+    enum ReplayError error = Replay_ValidateStream(stream, length, &facts);
 
     memset(&gReplayProgress, 0, sizeof(gReplayProgress));
     memset(&sReplay, 0, sizeof(sReplay));
     gReplayProgress.error = error;
     if (error != REPLAY_ERROR_NONE)
         return error;
-    gReplayProgress.total = count;
+    gReplayProgress.total = facts.count;
+    sReplay.sidesOutAtEnd = facts.sidesOutAtEnd;
     sReplay.stream = stream;
     sReplay.instructions = stream + Replay_ReadU32(stream + REPLAY_STREAM_OFFSET_INSTRUCTIONS_OFFSET);
     sReplay.length = Replay_ReadU32(stream + REPLAY_STREAM_OFFSET_INSTRUCTIONS_LENGTH);
@@ -151,6 +152,9 @@ void Replay_Unload(void)
 }
 
 // gBattleMainFunc is DoBattleIntro here; the INTRO op runs it through sReplay.upstreamIntro.
+// BattleMainCB2 quits a recorded battle on a held B until its playback counts as finished, so the
+// playback counts as finished from here on and B does nothing during the replay or after END
+// (#68). Only InitBattleControllers resets it (RecordedBattle_Init), and that ran before.
 void Replay_TakeOverBattleMain(void)
 {
     if (!sReplay.loaded)
@@ -159,6 +163,10 @@ void Replay_TakeOverBattleMain(void)
     gBattleMainFunc = Replay_RunBattle;
     gCurrentMove = MOVE_NONE;
     gReplayProgress.playing = TRUE;
+    RecordedBattle_SetPlaybackFinished();
+#if TESTING
+    ReplayTest_AtFrame();
+#endif
 }
 
 // The KO animation (#24). When a mon faints, the faint handler starts the animation of the mon
@@ -187,28 +195,13 @@ static bool32 Replay_WaitsForKOAnimation(u32 op, u32 step)
     return op != REPLAY_OP_PRINT || sReplay.lastOp != REPLAY_OP_FAINT;
 }
 
-// Which sides have their battler out, for the outro. The order rules (include/replay_stream.h),
-// which Replay_Load checked, let SEND_OUT and SWITCH_IN put a side's battler out and WITHDRAW and
-// FAINT take it off; the side is the first operand of all four.
-static void KeepSidesOut(const volatile u8 *instruction)
-{
-    switch (instruction[0])
-    {
-    case REPLAY_OP_SEND_OUT:
-    case REPLAY_OP_SWITCH_IN:
-        sReplay.sidesOut |= 1u << instruction[REPLAY_INSTRUCTION_HEADER_SIZE];
-        break;
-    case REPLAY_OP_WITHDRAW:
-    case REPLAY_OP_FAINT:
-        sReplay.sidesOut &= ~(1u << instruction[REPLAY_INSTRUCTION_HEADER_SIZE]);
-        break;
-    }
-}
-
 static void Replay_RunBattle(void)
 {
     const volatile u8 *instruction;
 
+#if TESTING
+    ReplayTest_AtFrame();
+#endif
     if (gBattleControllerExecFlags || IsTextPrinterActiveOnWindow(B_WIN_MSG))
         return;
     if (sReplay.wait != 0)
@@ -229,7 +222,6 @@ static void Replay_RunBattle(void)
         return;
     }
     gReplayProgress.done++;
-    KeepSidesOut(instruction);
     sReplay.lastOp = instruction[0];
     sReplay.step = 0;
     sReplay.at += REPLAY_INSTRUCTION_HEADER_SIZE + instruction[1];
@@ -246,6 +238,7 @@ static void Replay_Hold(void)
 static void Replay_Exit(void)
 {
 #if TESTING
+    ReplayTest_AtFrame();
     ReplayTest_AtEnd();
 #endif
     gBattleMainFunc = Replay_Hold;
@@ -255,17 +248,16 @@ static void Replay_Exit(void)
 }
 
 // END: gBattleOutcome, then, from the next frame, once END counts as done, the outro
-// (replay_outro.c) or, in most tests, the way out of the battle. The playback counts as finished,
-// as at the end of a real battle, so a held B no longer leaves the replay (BattleMainCB2, #30).
+// (replay_outro.c) or, in most tests, the way out of the battle. The recorded battle's playback
+// has counted as finished since the takeover, so a held B does not leave the outro (#30).
 static bool32 Op_End(const volatile u8 *operands, u32 step)
 {
     gBattleOutcome = sOutcomes[operands[0]];
     gReplayProgress.finished = TRUE;
-    RecordedBattle_SetPlaybackFinished();
     if (sReplay.end == REPLAY_EXIT_AT_END)
         gBattleMainFunc = Replay_Exit;
     else
-        Replay_StartOutro(operands[0], sReplay.sidesOut);
+        Replay_StartOutro(operands[0], sReplay.sidesOutAtEnd);
     return TRUE;
 }
 

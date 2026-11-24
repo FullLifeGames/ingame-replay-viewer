@@ -4,6 +4,7 @@
 import type { Battle, Pokemon } from '@pkmn/client'
 import type { Protocol } from '@pkmn/protocol'
 
+import { noRuleReason } from './census'
 import { newBattle } from './client'
 import { dropReasonOf } from './drops'
 import { GameTypeRefusal, ScriptError } from './errors'
@@ -72,7 +73,7 @@ function readLine(build: Build, line: LogLine): void {
   build.started ||= line.key === '|start|'
   const rule = ruleFor(line.key)
   if (reason !== undefined || rule === undefined) {
-    drop(build, line, reason ?? 'unsupported', reason ? undefined : `no rule for ${line.key}`)
+    drop(build, line, reason ?? 'unsupported', reason ? undefined : noRuleReason(line.key))
     return
   }
   const unread = unreadPart(rule, line)

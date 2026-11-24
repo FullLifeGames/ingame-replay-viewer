@@ -51,8 +51,10 @@ export function weather(event: EventOf<'weather'>, ctx: Context): void {
 const playsAfterText = ({ phase, cause }: EventOf<'weather'>) =>
   phase === 'upkeep' || (phase === 'start' && cause?.kind === 'ability')
 
+/** A side start by a move names its user, the Pokémon whose move the log shows last there. */
 export function sideStart({ side, condition, line }: EventOf<'sideStart'>, ctx: Context): void {
-  ctx.print(line, sideStarted(side, condition))
+  const user = ctx.mover?.side === side ? ctx.mon(ctx.mover) : undefined
+  ctx.print(line, sideStarted(side, condition, user))
 }
 
 export function sideEnd(event: EventOf<'sideEnd'>, ctx: Context): void {

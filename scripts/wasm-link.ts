@@ -8,6 +8,7 @@ import { basename, join, relative, sep } from 'node:path'
 import { objectPath, sanitizeFlags } from './wasm-compile.ts'
 import type { CompileOptions, Sanitizer, WasmPaths } from './wasm-compile.ts'
 import { WASM_DIR } from './wasm-config.ts'
+import { DIVIDE_OPS, helperName } from './wasm-divide.ts'
 import { folderSources, LAYER_DIR } from './wasm-layer.ts'
 
 // Our C files of the build: the frame, the stubs, the replacements and the memory check, then
@@ -18,8 +19,15 @@ export const LINK_OUTPUTS = { js: 'irv-emerald.js', wasm: 'irv-emerald.wasm' } a
 export const WASM_BUILD_STEPS =
   'npm run rom:build, npm run wasm:build -- --compile, npm run wasm:convert and ' +
   'npm run wasm:build -- --link'
-// What the host calls: the game's entry, and where the slot and the replay progress lie.
-const LINK_EXPORTS = ['AgbMain', 'IrvWasm_Slot', 'IrvWasm_Progress'] as const
+// What the host calls: the game's entry, and where the slot and the replay progress lie. Then the
+// division helpers (rom/gen3/wasm/src/irv_wasm_divide.c): no code calls them before wasm:divide
+// rewrites the module, and the export keeps each under its own name, which the rewrite looks for.
+const LINK_EXPORTS = [
+  'AgbMain',
+  'IrvWasm_Slot',
+  'IrvWasm_Progress',
+  ...DIVIDE_OPS.map((op) => helperName(op)),
+] as const
 
 export interface LinkSettings {
   globalBase: number

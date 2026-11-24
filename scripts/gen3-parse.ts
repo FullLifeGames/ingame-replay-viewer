@@ -156,6 +156,30 @@ export function parseEntryValues(text: string, prefix: string): Map<string, stri
 }
 
 /**
+ * The first group of `field` matched in each `[PREFIX_X] = …` entry or inside the macros it uses.
+ * An entry without a match stays out; one key with two values fails.
+ */
+export function parseEntryFields(text: string, prefix: string, field: RegExp): Map<string, string> {
+  const source = joinContinuations(stripComments(text))
+  const macros = readMacros(source)
+  const code = source.replace(/^\s*#.*$/gm, '')
+  const key = new RegExp(String.raw`\[(${prefix}_\w+)\]\s*=(?!=)`, 'g')
+  const values = new Map<string, string>()
+  for (let match = key.exec(code); match !== null; match = key.exec(code)) {
+    const end = valueEnd(code, key.lastIndex)
+    const value = nameIn(code.slice(key.lastIndex, end), field, macros)
+    const constant = match[1] ?? ''
+    const known = values.get(constant)
+    if (value !== undefined && known !== undefined && known !== value) {
+      throw new Error(`${constant} is "${known}" and "${value}"`)
+    }
+    if (value !== undefined) values.set(constant, value)
+    key.lastIndex = end
+  }
+  return values
+}
+
+/**
  * The display name of each `[PREFIX_X] = …` entry, read from `.field = _("…")` (or
  * `COMPOUND_STRING`, `ITEM_NAME`) inside the entry or inside the macros it uses. An entry without
  * a readable name stays out; the generator lists those.
@@ -165,24 +189,8 @@ export function parseDisplayNames(
   prefix: string,
   field: string,
 ): Map<string, string> {
-  const source = joinContinuations(stripComments(text))
-  const macros = readMacros(source)
-  const code = source.replace(/^\s*#.*$/gm, '')
-  const fieldPattern = new RegExp(String.raw`\.${field}\s*=\s*\w*\(\s*"((?:[^"\\]|\\.)*)"`)
-  const key = new RegExp(String.raw`\[(${prefix}_\w+)\]\s*=(?!=)`, 'g')
-  const names = new Map<string, string>()
-  for (let match = key.exec(code); match !== null; match = key.exec(code)) {
-    const end = valueEnd(code, key.lastIndex)
-    const name = nameIn(code.slice(key.lastIndex, end), fieldPattern, macros)
-    const constant = match[1] ?? ''
-    const known = names.get(constant)
-    if (name !== undefined && known !== undefined && known !== name) {
-      throw new Error(`${constant} is "${known}" and "${name}"`)
-    }
-    if (name !== undefined) names.set(constant, name)
-    key.lastIndex = end
-  }
-  return names
+  const pattern = new RegExp(String.raw`\.${field}\s*=\s*\w*\(\s*"((?:[^"\\]|\\.)*)"`)
+  return parseEntryFields(text, prefix, pattern)
 }
 
 export interface Charmap {

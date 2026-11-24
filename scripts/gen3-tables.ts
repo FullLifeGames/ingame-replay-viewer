@@ -39,7 +39,7 @@ interface ContentTable {
 const SPECIES_INFO = 'src/data/pokemon/species_info.h'
 
 // species_info.h includes one file per generation; the list comes from its #include lines.
-function speciesFiles(read: ReadTree): string[] {
+export function speciesFiles(read: ReadTree): string[] {
   const included = parseIncludes(read(SPECIES_INFO), 'species_info/')
   return [SPECIES_INFO, ...included.map((path) => `src/data/pokemon/${path}`)]
 }

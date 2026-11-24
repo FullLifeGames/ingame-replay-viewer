@@ -29,4 +29,7 @@ void RunScript(struct HostCall *call);
 // irv_layer_host_mp2k.c: the script's sound operation; true when it gives a result word.
 bool HostSoundCall(uint32_t call, uint32_t a, uint32_t b, uint32_t *result);
 
+// irv_layer_host_divide.c: the glue's division helpers on records of the source.
+void RunDivide(struct HostCall *call);
+
 #endif // GUARD_IRV_LAYER_HOST_H

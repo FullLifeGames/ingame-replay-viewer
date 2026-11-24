@@ -89,8 +89,12 @@ bool32 Replay_HidesHpNumbers(void);
 void ReplayTest_AtEnd(void);
 // Called when op number op (counted from 0) starts, after every wait before it.
 void ReplayTest_AtOpStart(u32 op);
-// Called on the outro's first frame, the frame after END.
+// Called once, when the outro runs its first step: on the frame after END, as END leaves no
+// controller busy and no wait.
 void ReplayTest_AtOutroStart(void);
+// Called on each frame the interpreter runs the battle, from the takeover to END, before
+// BattleMainCB2 reads the held keys on that frame.
+void ReplayTest_AtFrame(void);
 #endif
 
 // Forgets the loaded replay; gReplayProgress stays readable.
@@ -99,8 +103,15 @@ void Replay_Unload(void);
 // For replay_setup.c: checks the stream and loads it into the interpreter.
 enum ReplayError Replay_Load(const volatile u8 *stream, u32 length, enum ReplayEnd end);
 
-// For the interpreter: Replay_Validate, which also counts the instructions (replay_stream_check.c).
-enum ReplayError Replay_ValidateStream(const volatile u8 *stream, u32 length, u16 *count);
+// What Replay_ValidateStream finds in a stream it lets through.
+struct ReplayStreamFacts
+{
+    u16 count;        // the instructions
+    u8 sidesOutAtEnd; // a bit for each REPLAY_SIDE_* whose battler is out at END, for the outro
+};
+
+// For the interpreter: Replay_Validate, which also gives the stream's facts (replay_stream_check.c).
+enum ReplayError Replay_ValidateStream(const volatile u8 *stream, u32 length, struct ReplayStreamFacts *facts);
 
 // Reads from a stream, which may lie in ROM (replay_stream.c). Numbers are little-endian.
 u32 Replay_ReadU16(const volatile u8 *bytes);

@@ -95,6 +95,7 @@ export const SAMPLES: Readonly<Record<string, Sample>> = {
   'status.itemBurn': lumBerry,
   'status.itemFreeze': lumBerry,
   'status.itemSleep': lumBerry,
+  'status.itemConfusion': withValue('B_LAST_ITEM', nb('Persim Berry'), FAR),
   'cant.taunt': rockSlide,
   'cant.disabled': rockSlide,
   'field.challenged': withValue('B_LINK_OPPONENT1_NAME', ERIC),
