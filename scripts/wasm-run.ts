@@ -31,15 +31,8 @@ import {
 } from './rom-shot-run.ts'
 import type { ProgressLayout, ToolOutput } from './rom-shot-run.ts'
 import type { Scene } from './rom-shot-scenes.ts'
-import {
-  finishRuns,
-  parseShotArgs,
-  planStreams,
-  readFrames,
-  reportRun,
-  withHeldB,
-} from './rom-shot.ts'
-import type { RunReport, ShotPlan } from './rom-shot.ts'
+import { parseShotArgs, planStreams, readFrames, reportRun, withHeldB } from './rom-shot.ts'
+import type { ShotPlan } from './rom-shot.ts'
 import { describeSlot, GBA_ROM_BASE, loadSlotLayout, SLOT_SYMBOL } from './rom-slot.ts'
 import { sanitizedDir, wasmPaths, wasmRoots } from './wasm-compile.ts'
 import type { Sanitizer } from './wasm-compile.ts'
@@ -53,7 +46,8 @@ import {
 } from './wasm-hashes.ts'
 import type { RunArgs, RunHashes } from './wasm-hashes.ts'
 import { LINK_OUTPUTS } from './wasm-link.ts'
-import { playStreams } from './wasm-run-report.ts'
+import { finishStreams, ModuleTrap, playStreams, secondsSince } from './wasm-run-report.ts'
+import type { StreamReport } from './wasm-run-report.ts'
 import { SoundLog } from './wasm-run-sound.ts'
 
 // The module's shape lives in src/web/wasm, which the page's worker shares.
@@ -224,11 +218,7 @@ export async function playModule(
   try {
     game._AgbMain()
   } catch (error) {
-    if (!(error instanceof Stop) || status === undefined) {
-      throw new Error(`the module trapped after ${String(watch.frame)} frames: ${String(error)}`, {
-        cause: error,
-      })
-    }
+    if (!(error instanceof Stop) || status === undefined) throw new ModuleTrap(watch.frame, error)
     const output = { shots: watch.lines, status }
     const { frames, finishedAt } = watch
     return { output, frames, finishedAt, audio, sound, hashes: hashes.done() }
@@ -247,6 +237,10 @@ export function runPlace(out: string, sanitize?: Sanitizer): { module: string; r
 // The scenes and the module of one stream, for its --play process.
 const RUN_FILE = 'play.json'
 const STREAM_FILE = 'stream.bin'
+// How the --play process ended: END's frame, or the trap and the frames before it.
+const OUTCOME_FILE = 'outcome.json'
+
+type Outcome = { end: number | undefined } | { trap: string; frame: number }
 
 /** One stream's process: killed `seconds` after its start, and 10 s later if it ignores that. */
 export function playCommand(dir: string, seconds: number): string[] {
@@ -269,7 +263,16 @@ async function playDir(dir: string): Promise<void> {
   const stream = existsSync(streamPath) ? new Uint8Array(readFileSync(streamPath)) : undefined
   const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
   const factory = ((await import(pathToFileURL(module).href)) as { default: ModuleFactory }).default
-  const run = await playModule(factory, { stream, scenes, layout, holdBFrom })
+  let run: PlayResult
+  try {
+    run = await playModule(factory, { stream, scenes, layout, holdBFrom })
+  } catch (error) {
+    if (!(error instanceof ModuleTrap)) throw error
+    say(`${basename(dir)}: ${error.message}`)
+    writeOutcome(dir, { trap: String(error.cause), frame: error.frame })
+    return
+  }
+  writeOutcome(dir, { end: run.finishedAt })
   for (const [name, frame] of run.frames) writeFileSync(join(dir, `${name}.ppm`), ppm(frame))
   writeHashes(join(dir, RUN_HASHES), run.hashes)
   say(`${basename(dir)}: finished first at frame ${String(run.finishedAt ?? 'none')}`)
@@ -281,6 +284,17 @@ async function playDir(dir: string): Promise<void> {
   sayMusic(basename(dir), run.sound, run.output.status.frame)
   const lines = [...run.output.shots, run.output.status]
   process.stdout.write(lines.map((line) => `${JSON.stringify(line)}\n`).join(''))
+}
+
+function writeOutcome(dir: string, outcome: Outcome): void {
+  writeFileSync(join(dir, OUTCOME_FILE), JSON.stringify(outcome))
+}
+
+// The END of a played stream; a trap ends it here, so the run reports it and goes on (#66).
+function readEnd(dir: string): number | undefined {
+  const outcome = JSON.parse(readFileSync(join(dir, OUTCOME_FILE), 'utf8')) as Outcome
+  if ('trap' in outcome) throw new ModuleTrap(outcome.frame, outcome.trap)
+  return outcome.end
 }
 
 // O7: the BGM songs and the level by second from 5 s before the last song change to the end.
@@ -301,7 +315,7 @@ interface StreamRun {
   baseline: { mode: RunArgs['mode']; out: string }
 }
 
-function runStream(plan: ShotPlan, { runDir, module, errors, baseline }: StreamRun): RunReport {
+function runStream(plan: ShotPlan, { runDir, module, errors, baseline }: StreamRun): StreamReport {
   const dir = join(runDir, plan.name)
   mkdirSync(dir, { recursive: true })
   const { scenes, holdBFrom } = plan
@@ -314,18 +328,19 @@ function runStream(plan: ShotPlan, { runDir, module, errors, baseline }: StreamR
     stdio: ['ignore', 'pipe', 'inherit'],
     maxBuffer: 16 * 1024 * 1024,
   })
-  const seconds = Math.round((performance.now() - start) / 100) / 10
+  const seconds = secondsSince(start)
   if (result.error !== undefined) throw result.error
   if (result.status === 124 || result.status === 137) {
     throw new Error(`${plan.name}: no end after ${String(RUN_SECONDS)} s, a hang inside the module`)
   }
   if (result.status !== 0)
     throw new Error(`${plan.name}: the run failed (exit ${String(result.status)})`)
+  const end = readEnd(dir)
   const output = readToolOutput(result.stdout)
   const report = reportRun({ plan, output, frames: readFrames(dir), errors, seconds })
   const settled = settleBaseline(baseline, plan.name, join(dir, RUN_HASHES))
   if (settled.equal !== undefined) say(settled.equal)
-  return { ...report, problems: [...report.problems, ...settled.problems] }
+  return { ...report, end, problems: [...report.problems, ...settled.problems] }
 }
 
 async function runStreams({ mode, names, sanitize }: RunArgs): Promise<void> {
@@ -339,7 +354,10 @@ async function runStreams({ mode, names, sanitize }: RunArgs): Promise<void> {
   emptyInside(wasmRoots(REPO_DIR), runDir)
   const run = { runDir, module, errors, baseline: { mode, out } }
   const reports = await playStreams(plans, (plan) => Promise.resolve(runStream(plan, run)))
-  finishRuns(reports, runDir, (line) => process.stdout.write(`wasm:run: ${line}\n`))
+  const failed = finishStreams(reports, runDir, (line) =>
+    process.stdout.write(`wasm:run: ${line}\n`),
+  )
+  if (failed > 0) process.exitCode = 1
 }
 
 async function main(): Promise<void> {

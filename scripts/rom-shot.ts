@@ -260,7 +260,8 @@ export function reportRun(run: PlayedRun): RunReport {
   return { name, expect, seconds: run.seconds, status: output.status, scenes, missing, problems }
 }
 
-function sayRun(report: RunReport, say: Say): void {
+/** A run's lines: its verdict and status, its scenes, the scenes it lacks and its problems. */
+export function sayRun(report: RunReport, say: Say): void {
   const { status } = report
   const verdict = report.problems.length === 0 ? 'passed' : 'FAILED'
   say(
