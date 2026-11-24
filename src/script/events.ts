@@ -2,18 +2,27 @@
 // the index of the battle log line it came from. Fields a line does not carry stay absent.
 
 import type { WeatherName } from '@pkmn/client'
-import type { BoostID, StatusName } from '@pkmn/data'
+import type { StatusName } from '@pkmn/data'
 
 import type {
   AbilityEvent,
   EffectActivateEvent,
   EffectEndEvent,
   EffectStartEvent,
+  FormChangeEvent,
   ItemEndEvent,
   ItemEvent,
+  CopyBoostEvent,
+  SingleMoveEvent,
   SingleTurnEvent,
   TransformEvent,
 } from './effect-events'
+import type {
+  NegativeStatResetEvent,
+  StatChangeEvent,
+  StatLimitEvent,
+  StatResetEvent,
+} from './stat-events'
 import type { DroppedLine, Effect, HpFraction, PokemonRef, Side, TeamMember } from './types'
 
 /** What `[from]` and `[of]` name: the effect behind a line and the Pokémon it came from. */
@@ -114,6 +123,26 @@ interface MoveEvent {
   readonly notarget?: true
 }
 
+/** The charge turn of a two-turn move (`-prepare`), after its `[still]` move line. */
+interface PrepareEvent {
+  readonly kind: 'prepare'
+  readonly line: number
+  readonly user: PokemonRef
+  readonly move: string
+  readonly target?: PokemonRef
+}
+
+/** A move's animation without its move line (`-anim`): Solar Beam's hit in sun, on its charge turn. */
+interface AnimEvent {
+  readonly kind: 'anim'
+  readonly line: number
+  readonly user: PokemonRef
+  readonly move: string
+  readonly target?: PokemonRef
+  readonly miss?: true
+  readonly notarget?: true
+}
+
 interface CantEvent {
   readonly kind: 'cant'
   readonly line: number
@@ -127,6 +156,19 @@ interface MissEvent {
   readonly line: number
   readonly user: PokemonRef
   readonly target?: PokemonRef
+}
+
+/** A one-hit KO move's knockout, after its hit. */
+interface OhkoEvent {
+  readonly kind: 'ohko'
+  readonly line: number
+}
+
+/** A move that fails for want of a target; Gen 1's line names no Pokémon. */
+interface NoTargetEvent {
+  readonly kind: 'noTarget'
+  readonly line: number
+  readonly who?: PokemonRef
 }
 
 interface ImmuneEvent extends Caused {
@@ -178,6 +220,11 @@ interface HealEvent extends HpChange {
   readonly wisher?: PokemonRef
 }
 
+/** HP set outright, neither a hit nor a heal (Pain Split). */
+interface SetHpEvent extends HpChange {
+  readonly kind: 'setHp'
+}
+
 interface StatusEvent extends Caused {
   readonly kind: 'status'
   readonly line: number
@@ -201,32 +248,6 @@ interface CureTeamEvent {
   readonly line: number
   readonly who: PokemonRef
   readonly cause?: Effect
-}
-
-interface StatChangeEvent {
-  readonly kind: 'statChange'
-  readonly line: number
-  readonly who: PokemonRef
-  readonly stat: BoostID
-  /** Signed and never 0: a raise is positive, a drop negative. */
-  readonly stages: number
-  readonly cause?: Effect
-}
-
-/** A raise at +6 or a drop at -6: the log's change of 0 stages, with its direction kept. */
-interface StatLimitEvent {
-  readonly kind: 'statLimit'
-  readonly line: number
-  readonly who: PokemonRef
-  readonly stat: BoostID
-  readonly direction: 'up' | 'down'
-  readonly cause?: Effect
-}
-
-/** Every stat stage of every active Pokémon back to 0 (Haze). */
-interface StatResetEvent {
-  readonly kind: 'statReset'
-  readonly line: number
 }
 
 /** A critical hit that no hit absorbed. */
@@ -284,19 +305,25 @@ export type ScriptEvent =
   | WinEvent
   | TieEvent
   | MoveEvent
+  | PrepareEvent
+  | AnimEvent
   | CantEvent
   | MissEvent
+  | OhkoEvent
+  | NoTargetEvent
   | ImmuneEvent
   | FailEvent
   | BlockEvent
   | DamageEvent
   | HealEvent
+  | SetHpEvent
   | StatusEvent
   | CureStatusEvent
   | CureTeamEvent
   | StatChangeEvent
   | StatLimitEvent
   | StatResetEvent
+  | NegativeStatResetEvent
   | CritEvent
   | EffectivenessEvent
   | HitCountEvent
@@ -304,7 +331,10 @@ export type ScriptEvent =
   | EffectEndEvent
   | EffectActivateEvent
   | TransformEvent
+  | FormChangeEvent
   | SingleTurnEvent
+  | SingleMoveEvent
+  | CopyBoostEvent
   | WeatherEvent
   | SideConditionEvent
   | FieldActivateEvent

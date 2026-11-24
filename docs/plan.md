@@ -40,7 +40,7 @@ Decisions from the design session on 2026-11-20 that are not ADRs, plus the road
 
 ## Roadmap
 
-Order after milestone 2 (user, 22.11.2026): milestone 3 starts first, and Gen 5 (milestone 6) follows beside it, since the two touch different games and can run as separate lanes.
+Order after milestone 2 (user, 22.11.2026): milestone 3 starts first, and Gen 5 (milestone 6) follows beside it, since the two touch different games and can run as separate lanes. Wave 5 (user, 24.11.2026): the cleanup that finishes milestone 2's code (#65 to #71) runs in one lane, with a time-boxed Gen 5 spike (#72) beside it. Milestone 3 starts once the cleanup ends.
 
 1. **First replay.** One real ADV OU singles replay plays start to finish in the expansion ROM, watched on a bare page served from devbox over Tailscale:
    - intro and send-outs
@@ -57,14 +57,15 @@ Order after milestone 2 (user, 22.11.2026): milestone 3 starts first, and Gen 5 
 
 2. **Gen 3 web tool v1.** Public on fulllifegames.com/Tools/, with replay URL and upload, the v1 controls and presentation, and Gen 1–3 singles formats.
    - Ships the WebAssembly build as the viewer at `/`. #43 is done, and the emulator page stays at `/emulator.html` as the fallback, on devbox and on the site (user, 23.11.2026). Milestone 2 closes every open Gen 3 issue before the work moves on (user, 22.11.2026); five parked issues whose triggers have not fired (#26, #27, #28, #29, #40) moved to milestone 3 (user, 23.11.2026).
-   - Download size (#17, user 22.11.2026): the host serves the module patch as it is, compressed with brotli. `scripts/patch-sizes.ts` measured it on 23.11.2026 on the module of wave 4's stage 5 (stream version 2, our whole platform layer, the refusal screen, overlay patch 0011), with Node's zlib (gzip at level 9, brotli at quality 11): the module patch is 20,970,945 bytes raw, 15,597,563 with gzip and 14,202,743 with brotli. With Emscripten's glue (2,837 bytes with brotli), a visitor to the viewer fetches 14,205,580 bytes of game files. Brotli at quality 11 moves by about 0.3 % when bytes shift: a 7-byte change to the raw patch once added 46,860 bytes with brotli and 16 with gzip. The brotli figures hold for files the host compresses ahead of time; a host that compresses on the fly at a lower quality sends more. The ROM patch measures 18,391,834, 15,762,743 and 14,485,705. By ELF symbol size the ROM holds 26.82 MB, and the cries (1.62 MB) and Pokémon graphics (1.15 MB) of species up to 386 hold 2.77 MB of it. The census gave only these two classes a retail share: it did not count songs, trainer graphics, battle animation graphics or tilesets, and it counts symbol bytes, not the patch's literal bytes, so the patch may copy some of them from the dump. The 2.77 MB is the species assets' share, not a bound on what per-asset extraction could save. Extracting the species assets would save less than their 2.77 MB: the build draws Gen 1–3 Pokémon in the Gen 4/5 style, which retail Emerald lacks, and nobody has checked whether the expansion's cries match retail's. The user parked extraction until visitors report slow loading after the deploy.
+   - Download size (#17, user 22.11.2026): the host serves the module patch as it is, compressed with brotli. `scripts/patch-sizes.ts` measured it on 24.11.2026 on the module of wave 5's stage 1 (stream version 3, our whole platform layer, the refusal screen, overlay patch 0011), with Node's zlib (gzip at level 9, brotli at quality 11): the module patch is 20,970,811 bytes raw, 15,597,567 with gzip and 14,159,126 with brotli. With Emscripten's glue (2,837 bytes with brotli), a visitor to the viewer fetches 14,161,963 bytes of game files. Brotli at quality 11 moves by about 0.3 % when bytes shift: a 7-byte change to the raw patch once added 46,860 bytes with brotli and 16 with gzip. The brotli figures hold for files the host compresses ahead of time; a host that compresses on the fly at a lower quality sends more. The ROM patch measures 18,392,347, 15,763,117 and 14,488,033. By ELF symbol size the ROM holds 26.82 MB, and the cries (1.62 MB) and Pokémon graphics (1.15 MB) of species up to 386 hold 2.77 MB of it. The census gave only these two classes a retail share: it did not count songs, trainer graphics, battle animation graphics or tilesets, and it counts symbol bytes, not the patch's literal bytes, so the patch may copy some of them from the dump. The 2.77 MB is the species assets' share, not a bound on what per-asset extraction could save. Extracting the species assets would save less than their 2.77 MB: the build draws Gen 1–3 Pokémon in the Gen 4/5 style, which retail Emerald lacks, and nobody has checked whether the expansion's cries match retail's. The user parked extraction until visitors report slow loading after the deploy.
    - Open: how it is deployed to vserver, including the COOP/COEP headers the page needs for `SharedArrayBuffer`.
 3. **Newer formats on Gen 3.** Gen 4–9 singles, including Tera, Mega Evolution, Z-Moves and Dynamax.
-   - Open: which formats besides Gen 9 OU come first.
+   - Order (user, 24.11.2026): Gen 4 OU and Gen 5 OU first, with Team Preview as their only new mechanic; then Gen 9 OU with Tera; then Gen 6 to 8 with Mega Evolution, Z-Moves and Dynamax.
 4. **Doubles on Gen 3.** VGC, including Champions formats with open team sheets.
    - Open: which Champions mechanics the expansion covers.
 5. **Viewer v2.** Jump to a turn, flip sides, exact HP for random formats (re-running the battle from the published seed and inputs), backgrounds per format, music, rating display.
 6. **Gen 5.** Black 2/White 2 driven from outside: first Gen 1–5 formats, then newer ones.
+   - Starts with a time-boxed spike in wave 5 (#72; user, 24.11.2026), on Black 2 (USA) from the user's dump.
    - Open: the emulator (EmulatorJS's melonDS, desmume-wasm, DS Anywhere) and speed on phones.
    - Open: building the savestate in the user's browser from a save file.
    - Open: borrowed slots for newer content, and permission from Smogon for its Gen 5-style sprites.
@@ -80,7 +81,7 @@ Order after milestone 2 (user, 22.11.2026): milestone 3 starts first, and Gen 5 
     - The port: imyourhuckleberryponcho/Pokemon-XD-PC-Port, version 0.7.0, a public beta under MIT. It compiles the Pokémon XD decompilation (CC0) for 64-bit Windows, with test builds for Linux and macOS, and draws with Direct3D 12, Vulkan or Direct3D 11. Its README (read on 23.11.2026) calls it playable from New Game into the story, with known bugs.
     - It reads everything from the user's own disc image (USA, `GXXE01`) while it runs, and its repository holds no game data. That fits ADR 0002.
     - Battles: singles and doubles, the port's own battle replays with pause, speed control and a free camera (0.7.0), and mods that script battle effects in Luau.
-    - Open: everything. A spike comes first, on three questions:
+    - Open: everything. A spike comes first, on two questions:
       - how a battle script reaches the game while the game stays a renderer (ADR 0001) and we keep no fork (ADR 0007);
-      - whether the port can run in a browser, or whether this target ships as a desktop viewer;
-      - where it sits in the order. XD fights doubles in its story, so it meets milestone 4.
+      - whether the port can run in a browser, or whether this target ships as a desktop viewer.
+    - Order: it stays last (user, 24.11.2026). XD fights doubles in its story, so it builds on milestone 4.

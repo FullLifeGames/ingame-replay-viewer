@@ -11,7 +11,7 @@ import type { ScriptEvent } from '../../script/events'
 import type { PokemonRef } from '../../script/types'
 import type { Anim } from '../stream/instructions'
 import { moveOf } from '../tables/lookup'
-import { healed, hurt, isTrapping, wishCameTrue } from '../text/phrases-hp'
+import { healed, hpSet, hurt, isTrapping, wishCameTrue } from '../text/phrases-hp'
 import { type Context, type EventOf, type PrintText, sameMon } from './context'
 import { hit, hitLines } from './hits'
 import { itemPopUp, shownBefore } from './items'
@@ -42,7 +42,8 @@ const CAUSED: Readonly<Record<string, readonly Step[]>> = {
 
 type DamageEvent = EventOf<'damage'>
 type HealEvent = EventOf<'heal'>
-type HpEvent = DamageEvent | HealEvent
+type SetHpEvent = EventOf<'setHp'>
+type HpEvent = DamageEvent | HealEvent | SetHpEvent
 
 /**
  * The HP a Substitute costs: the damage with no cause right after its start's line, on the same
@@ -107,6 +108,40 @@ function itemHeal(event: HealEvent, item: string, ctx: Context): readonly Step[]
   if (shownBefore(event.who, item, ctx)) return ['simpleHeal', 'bar']
   if (itemPopUp(event.who, item, event.line, ctx)) return ['heldItemEffect', 'simpleHeal', 'bar']
   return ['heldItemEffect', 'bar', 'say']
+}
+
+/**
+ * The pair of lines one Pain Split logs: the first `[silent]`, the second naming the other
+ * Pokémon with the same cause.
+ */
+const pairs = (
+  first: ScriptEvent | undefined,
+  second: ScriptEvent | undefined,
+): second is SetHpEvent =>
+  first?.kind === 'setHp' &&
+  second?.kind === 'setHp' &&
+  first.silent === true &&
+  second.silent !== true &&
+  !sameMon(first.who, second.who) &&
+  first.cause?.name === second.cause?.name
+
+/**
+ * HP set outright. Pain Split moves the user's bar, then the target's, then says it
+ * (`BattleScript_EffectPainSplit`); the log sets the target's HP first, so the first line of the
+ * pair moves both bars, user first, and the second says the line.
+ */
+export function setHp(event: SetHpEvent, ctx: Context): void {
+  const next = ctx.near(1)
+  if (pairs(event, next)) {
+    const both = [event, next].toSorted(
+      (a, b) => Number(sameMon(ctx.mover, b.who)) - Number(sameMon(ctx.mover, a.who)),
+    )
+    for (const one of both) bar({ ...one, line: event.line }, ctx)
+  } else if (!pairs(ctx.near(-1), event)) {
+    bar(event, ctx)
+  }
+  const text = event.silent === true ? undefined : hpSet(event.cause)
+  if (text !== undefined) ctx.print(event.line, text)
 }
 
 /** The steps of one HP change; `say` prints `text`. */

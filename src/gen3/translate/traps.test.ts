@@ -14,6 +14,7 @@ const move = (name: string, user: Side, target: Side) => ({
   user,
   target,
   move: moveOf(name).number,
+  animTurn: 0,
 })
 const hit = (side: Side) => ({ op: 'hit', side, effectiveness: 'normal' })
 const hp = (side: Side, value: number) => ({ op: 'hp', side, hp: value })

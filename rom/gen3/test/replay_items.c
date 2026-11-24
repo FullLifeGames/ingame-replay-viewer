@@ -9,7 +9,7 @@
 #include "constants/moves.h"
 #include "constants/species.h"
 
-// Held items and traps (format v2, #16, #19): ITEM_POP_UP empties the text box and shows a held
+// Held items and traps (#16, #19): ITEM_POP_UP empties the text box and shows a held
 // item's pop-up as BattleScript_ItemPopUp_Scripting does, ANIM SIMPLE_HEAL plays the heal of a
 // Leftovers turn, TRAP_TURN plays the end-of-turn animation of the move that traps a mon.
 

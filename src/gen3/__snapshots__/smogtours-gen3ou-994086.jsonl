@@ -1,4 +1,4 @@
-{"length":15508,"crc32":"90ae1a39","trainers":{"near":{"name":"dataexpunged","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Halbert Simpson","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"},{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":344,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Claydol"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"}],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Fantasy Mead"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Machine Pass"},{"species":260,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Checker Knig"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Beanstalk Pa"},{"species":146,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Magma Flows"},{"species":142,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Sky Sands"}]}}
+{"length":15570,"crc32":"e80d8f44","trainers":{"near":{"name":"dataexpunged","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Halbert Simpson","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"},{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":242,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Blissey"},{"species":344,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Claydol"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"}],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Fantasy Mead"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Machine Pass"},{"species":260,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Checker Knig"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Beanstalk Pa"},{"species":146,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Magma Flows"},{"species":142,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Sky Sands"}]}}
 {"line":23,"op":"intro"}
 {"line":23,"op":"print","text":"You are challenged by Halbert Simpson!"}
 {"line":25,"op":"print","text":"Halbert Simpson sent out Fantasy Meadow!"}
@@ -18,7 +18,7 @@
 {"line":36,"op":"print","text":"Halbert Simpson sent out Machine Passage!"}
 {"line":36,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
 {"line":37,"op":"print","text":"Tyranitar used Focus Punch!"}
-{"line":37,"op":"move","user":"near","target":"far","move":264}
+{"line":37,"op":"move","user":"near","target":"far","move":264,"animTurn":0}
 {"line":38,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":38,"op":"hp","side":"far","hp":56}
 {"line":40,"op":"print","text":"The sandstorm is raging."}
@@ -31,10 +31,10 @@
 {"line":46,"op":"anim","side":"near","anim":"focusPunchSetup"}
 {"line":46,"op":"print","text":"Tyranitar is tightening its focus!"}
 {"line":47,"op":"print","text":"The opposing Machine Passage used Spikes!"}
-{"line":47,"op":"move","user":"far","target":"near","move":191}
+{"line":47,"op":"move","user":"far","target":"near","move":191,"animTurn":0}
 {"line":48,"op":"print","text":"Spikes were scattered on the ground all around your side!"}
 {"line":49,"op":"print","text":"Tyranitar used Focus Punch!"}
-{"line":49,"op":"move","user":"near","target":"far","move":264}
+{"line":49,"op":"move","user":"near","target":"far","move":264,"animTurn":0}
 {"line":50,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":50,"op":"hp","side":"far","hp":19}
 {"line":52,"op":"print","text":"The sandstorm is raging."}
@@ -45,7 +45,7 @@
 {"line":53,"op":"hp","side":"far","hp":25}
 {"line":55,"op":"turn","number":3}
 {"line":59,"op":"print","text":"The opposing Machine Passage used Protect!"}
-{"line":59,"op":"move","user":"far","target":"far","move":182}
+{"line":59,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
 {"line":60,"op":"print","text":"The opposing Machine Passage protected itself!"}
 {"line":61,"op":"print","text":"Tyranitar used Rock Slide!"}
 {"line":62,"op":"print","text":"The opposing Machine Passage protected itself!"}
@@ -59,12 +59,12 @@
 {"line":70,"op":"anim","side":"near","anim":"focusPunchSetup"}
 {"line":70,"op":"print","text":"Tyranitar is tightening its focus!"}
 {"line":71,"op":"print","text":"The opposing Machine Passage used Toxic!"}
-{"line":71,"op":"move","user":"far","target":"near","move":92}
+{"line":71,"op":"move","user":"far","target":"near","move":92,"animTurn":0}
 {"line":72,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":72,"op":"print","text":"Tyranitar was badly poisoned!"}
 {"line":72,"op":"status","side":"near","slot":0,"status":"tox"}
 {"line":73,"op":"print","text":"Tyranitar used Focus Punch!"}
-{"line":73,"op":"move","user":"near","target":"far","move":264}
+{"line":73,"op":"move","user":"near","target":"far","move":264,"animTurn":0}
 {"line":74,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":74,"op":"hp","side":"far","hp":0}
 {"line":75,"op":"faint","side":"far"}
@@ -84,7 +84,7 @@
 {"line":87,"op":"hp","side":"near","hp":88}
 {"line":87,"op":"print","text":"Starmie was hurt by the spikes!"}
 {"line":88,"op":"print","text":"The opposing Checker Knights used Ice Beam!"}
-{"line":88,"op":"move","user":"far","target":"near","move":58}
+{"line":88,"op":"move","user":"far","target":"near","move":58,"animTurn":0}
 {"line":90,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":90,"op":"hp","side":"near","hp":74}
 {"line":90,"op":"print","text":"It's not very effective…"}
@@ -103,7 +103,7 @@
 {"line":99,"op":"print","text":"Halbert Simpson sent out Beanstalk Park!"}
 {"line":99,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
 {"line":100,"op":"print","text":"Starmie used Surf!"}
-{"line":100,"op":"move","user":"near","target":"far","move":57}
+{"line":100,"op":"move","user":"near","target":"far","move":57,"animTurn":0}
 {"line":102,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":102,"op":"hp","side":"far","hp":85}
 {"line":102,"op":"print","text":"It's not very effective…"}
@@ -129,7 +129,7 @@
 {"line":113,"op":"print","text":"Go! Skarmory!"}
 {"line":113,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
 {"line":114,"op":"print","text":"The opposing Beanstalk Park used Hidden Power!"}
-{"line":114,"op":"move","user":"far","target":"near","move":237}
+{"line":114,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
 {"line":116,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":116,"op":"hp","side":"near","hp":95}
 {"line":116,"op":"print","text":"It's not very effective…"}
@@ -148,7 +148,7 @@
 {"line":125,"op":"print","text":"Halbert Simpson sent out Magma Flows!"}
 {"line":125,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
 {"line":126,"op":"print","text":"Skarmory used Spikes!"}
-{"line":126,"op":"move","user":"near","target":"far","move":191}
+{"line":126,"op":"move","user":"near","target":"far","move":191,"animTurn":0}
 {"line":127,"op":"print","text":"Spikes were scattered on the ground all around the opposing side!"}
 {"line":129,"op":"print","text":"The sandstorm is raging."}
 {"line":129,"op":"anim","side":"near","anim":"sandstormContinues"}
@@ -167,7 +167,7 @@
 {"line":137,"op":"hp","side":"near","hp":88}
 {"line":137,"op":"print","text":"Blissey was hurt by the spikes!"}
 {"line":138,"op":"print","text":"The opposing Magma Flows used Flamethrower!"}
-{"line":138,"op":"move","user":"far","target":"near","move":53}
+{"line":138,"op":"move","user":"far","target":"near","move":53,"animTurn":0}
 {"line":139,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":139,"op":"hp","side":"near","hp":68}
 {"line":141,"op":"print","text":"The sandstorm is raging."}
@@ -194,7 +194,7 @@
 {"line":151,"op":"hp","side":"far","hp":88}
 {"line":151,"op":"print","text":"The opposing Fantasy Meadow was hurt by the spikes!"}
 {"line":152,"op":"print","text":"Blissey used Sing!"}
-{"line":152,"op":"move","user":"near","target":"far","move":47}
+{"line":152,"op":"move","user":"near","target":"far","move":47,"animTurn":0}
 {"line":153,"op":"anim","side":"far","anim":"statusSlp"}
 {"line":153,"op":"print","text":"The opposing Fantasy Meadow fell asleep!"}
 {"line":153,"op":"status","side":"far","slot":0,"status":"slp"}
@@ -228,7 +228,7 @@
 {"line":173,"op":"print","text":"Go! Claydol!"}
 {"line":173,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
 {"line":174,"op":"print","text":"The opposing Sky Sands used Rock Slide!"}
-{"line":174,"op":"move","user":"far","target":"near","move":157}
+{"line":174,"op":"move","user":"far","target":"near","move":157,"animTurn":0}
 {"line":176,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":176,"op":"hp","side":"near","hp":74}
 {"line":176,"op":"print","text":"It's not very effective…"}
@@ -246,7 +246,7 @@
 {"line":185,"op":"hp","side":"far","hp":88}
 {"line":185,"op":"print","text":"The opposing Checker Knights was hurt by the spikes!"}
 {"line":186,"op":"print","text":"Claydol used Rapid Spin!"}
-{"line":186,"op":"move","user":"near","target":"far","move":229}
+{"line":186,"op":"move","user":"near","target":"far","move":229,"animTurn":0}
 {"line":187,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":187,"op":"hp","side":"far","hp":85}
 {"line":188,"op":"print","text":"Claydol blew away Spikes!"}
@@ -284,7 +284,7 @@
 {"line":207,"op":"print","text":"Go! Skarmory!"}
 {"line":207,"op":"switchIn","side":"near","slot":2,"hp":95,"status":"none"}
 {"line":208,"op":"print","text":"The opposing Sky Sands used Double-Edge!"}
-{"line":208,"op":"move","user":"far","target":"near","move":38}
+{"line":208,"op":"move","user":"far","target":"near","move":38,"animTurn":0}
 {"line":210,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":210,"op":"hp","side":"near","hp":75}
 {"line":210,"op":"print","text":"It's not very effective…"}
@@ -296,7 +296,7 @@
 {"line":217,"op":"print","text":"Halbert Simpson sent out Magma Flows!"}
 {"line":217,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
 {"line":218,"op":"print","text":"Skarmory used Spikes!"}
-{"line":218,"op":"move","user":"near","target":"far","move":191}
+{"line":218,"op":"move","user":"near","target":"far","move":191,"animTurn":0}
 {"line":219,"op":"print","text":"Spikes were scattered on the ground all around the opposing side!"}
 {"line":221,"op":"print","text":"The sandstorm is raging."}
 {"line":221,"op":"anim","side":"near","anim":"sandstormContinues"}
@@ -313,7 +313,7 @@
 {"line":228,"op":"print","text":"Go! Blissey!"}
 {"line":228,"op":"switchIn","side":"near","slot":3,"hp":68,"status":"none"}
 {"line":229,"op":"print","text":"The opposing Magma Flows used Toxic!"}
-{"line":229,"op":"move","user":"far","target":"near","move":92}
+{"line":229,"op":"move","user":"far","target":"near","move":92,"animTurn":0}
 {"line":230,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":230,"op":"print","text":"Blissey was badly poisoned!"}
 {"line":230,"op":"status","side":"near","slot":3,"status":"tox"}
@@ -338,11 +338,11 @@
 {"line":237,"op":"hp","side":"near","hp":61}
 {"line":239,"op":"turn","number":18}
 {"line":242,"op":"print","text":"The opposing Magma Flows used Flamethrower!"}
-{"line":242,"op":"move","user":"far","target":"near","move":53}
+{"line":242,"op":"move","user":"far","target":"near","move":53,"animTurn":0}
 {"line":243,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":243,"op":"hp","side":"near","hp":42}
 {"line":244,"op":"print","text":"Blissey used Soft-Boiled!"}
-{"line":244,"op":"move","user":"near","target":"near","move":135}
+{"line":244,"op":"move","user":"near","target":"near","move":135,"animTurn":0}
 {"line":245,"op":"hp","side":"near","hp":92}
 {"line":245,"op":"print","text":"Blissey's HP was restored."}
 {"line":247,"op":"print","text":"The sandstorm is raging."}
@@ -371,7 +371,7 @@
 {"line":258,"op":"print","text":"Go! Starmie!"}
 {"line":258,"op":"switchIn","side":"near","slot":1,"hp":74,"status":"none"}
 {"line":259,"op":"print","text":"The opposing Magma Flows used Toxic!"}
-{"line":259,"op":"move","user":"far","target":"near","move":92}
+{"line":259,"op":"move","user":"far","target":"near","move":92,"animTurn":0}
 {"line":260,"op":"anim","side":"near","anim":"statusPsn"}
 {"line":260,"op":"print","text":"Starmie was badly poisoned!"}
 {"line":260,"op":"status","side":"near","slot":1,"status":"tox"}
@@ -396,11 +396,11 @@
 {"line":267,"op":"hp","side":"far","hp":100}
 {"line":269,"op":"turn","number":20}
 {"line":272,"op":"print","text":"Starmie used Ice Beam!"}
-{"line":272,"op":"move","user":"near","target":"far","move":58}
+{"line":272,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
 {"line":273,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":273,"op":"hp","side":"far","hp":69}
 {"line":274,"op":"print","text":"The opposing Magma Flows used Flamethrower!"}
-{"line":274,"op":"move","user":"far","target":"near","move":53}
+{"line":274,"op":"move","user":"far","target":"near","move":53,"animTurn":0}
 {"line":276,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":276,"op":"hp","side":"near","hp":28}
 {"line":276,"op":"print","text":"It's not very effective…"}
@@ -430,7 +430,7 @@
 {"line":289,"op":"print","text":"Go! Blissey!"}
 {"line":289,"op":"switchIn","side":"near","slot":3,"hp":79,"status":"none"}
 {"line":290,"op":"print","text":"The opposing Magma Flows used Flamethrower!"}
-{"line":290,"op":"move","user":"far","target":"near","move":53}
+{"line":290,"op":"move","user":"far","target":"near","move":53,"animTurn":0}
 {"line":291,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":291,"op":"hp","side":"near","hp":60}
 {"line":293,"op":"print","text":"The sandstorm is raging."}
@@ -457,7 +457,7 @@
 {"line":303,"op":"hp","side":"far","hp":69}
 {"line":303,"op":"print","text":"The opposing Beanstalk Park was hurt by the spikes!"}
 {"line":304,"op":"print","text":"Blissey used Soft-Boiled!"}
-{"line":304,"op":"move","user":"near","target":"near","move":135}
+{"line":304,"op":"move","user":"near","target":"near","move":135,"animTurn":0}
 {"line":305,"op":"hp","side":"near","hp":100}
 {"line":305,"op":"print","text":"Blissey's HP was restored."}
 {"line":307,"op":"print","text":"The sandstorm is raging."}
@@ -478,10 +478,10 @@
 {"line":311,"op":"hp","side":"near","hp":100}
 {"line":313,"op":"turn","number":23}
 {"line":316,"op":"print","text":"The opposing Beanstalk Park used Leech Seed!"}
-{"line":316,"op":"move","user":"far","target":"near","move":73}
+{"line":316,"op":"move","user":"far","target":"near","move":73,"animTurn":0}
 {"line":317,"op":"print","text":"Blissey was seeded!"}
 {"line":318,"op":"print","text":"Blissey used Ice Beam!"}
-{"line":318,"op":"move","user":"near","target":"far","move":58}
+{"line":318,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
 {"line":320,"op":"hit","side":"far","effectiveness":"super"}
 {"line":320,"op":"hp","side":"far","hp":28}
 {"line":320,"op":"print","text":"It's super effective!"}
@@ -511,7 +511,7 @@
 {"line":333,"op":"print","text":"Go! Skarmory!"}
 {"line":333,"op":"switchIn","side":"near","slot":2,"hp":75,"status":"none"}
 {"line":334,"op":"print","text":"The opposing Beanstalk Park used Recover!"}
-{"line":334,"op":"move","user":"far","target":"far","move":105}
+{"line":334,"op":"move","user":"far","target":"far","move":105,"animTurn":0}
 {"line":335,"op":"hp","side":"far","hp":98}
 {"line":335,"op":"print","text":"The opposing Beanstalk Park's HP was restored."}
 {"line":337,"op":"print","text":"The sandstorm is raging."}
@@ -529,7 +529,7 @@
 {"line":344,"op":"print","text":"Halbert Simpson sent out Sky Sands!"}
 {"line":344,"op":"switchIn","side":"far","slot":5,"hp":100,"status":"none"}
 {"line":345,"op":"print","text":"Skarmory used Thief!"}
-{"line":345,"op":"move","user":"near","target":"far","move":168}
+{"line":345,"op":"move","user":"near","target":"far","move":168,"animTurn":0}
 {"line":346,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":346,"op":"hp","side":"far","hp":95}
 {"line":347,"op":"item","side":"far","slot":5,"item":0}
@@ -544,7 +544,7 @@
 {"line":356,"op":"print","text":"Go! Claydol!"}
 {"line":356,"op":"switchIn","side":"near","slot":4,"hp":87,"status":"none"}
 {"line":357,"op":"print","text":"The opposing Sky Sands used Rock Slide!"}
-{"line":357,"op":"move","user":"far","target":"near","move":157}
+{"line":357,"op":"move","user":"far","target":"near","move":157,"animTurn":0}
 {"line":359,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":359,"op":"hp","side":"near","hp":67}
 {"line":359,"op":"print","text":"It's not very effective…"}
@@ -582,7 +582,7 @@
 {"line":379,"op":"hp","side":"far","hp":78}
 {"line":379,"op":"print","text":"The opposing Fantasy Meadow was hurt by the spikes!"}
 {"line":380,"op":"print","text":"Skarmory used Spikes!"}
-{"line":380,"op":"move","user":"near","target":"far","move":191}
+{"line":380,"op":"move","user":"near","target":"far","move":191,"animTurn":0}
 {"line":381,"op":"print","text":"Spikes were scattered on the ground all around the opposing side!"}
 {"line":383,"op":"print","text":"The sandstorm is raging."}
 {"line":383,"op":"anim","side":"near","anim":"sandstormContinues"}
@@ -609,7 +609,7 @@
 {"line":398,"op":"print","text":"Halbert Simpson sent out Magma Flows!"}
 {"line":398,"op":"switchIn","side":"far","slot":4,"hp":69,"status":"none"}
 {"line":399,"op":"print","text":"Metagross used Meteor Mash!"}
-{"line":399,"op":"move","user":"near","target":"far","move":309}
+{"line":399,"op":"move","user":"near","target":"far","move":309,"animTurn":0}
 {"line":401,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":401,"op":"hp","side":"far","hp":37}
 {"line":401,"op":"print","text":"It's not very effective…"}
@@ -628,7 +628,7 @@
 {"line":410,"op":"print","text":"Go! Blissey!"}
 {"line":410,"op":"switchIn","side":"near","slot":3,"hp":88,"status":"none"}
 {"line":411,"op":"print","text":"The opposing Magma Flows used Flamethrower!"}
-{"line":411,"op":"move","user":"far","target":"near","move":53}
+{"line":411,"op":"move","user":"far","target":"near","move":53,"animTurn":0}
 {"line":412,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":412,"op":"hp","side":"near","hp":67}
 {"line":414,"op":"print","text":"The sandstorm is raging."}
@@ -655,7 +655,7 @@
 {"line":424,"op":"hp","side":"far","hp":65}
 {"line":424,"op":"print","text":"The opposing Fantasy Meadow was hurt by the spikes!"}
 {"line":425,"op":"print","text":"Blissey used Seismic Toss!"}
-{"line":425,"op":"move","user":"near","target":"far","move":69}
+{"line":425,"op":"move","user":"near","target":"far","move":69,"animTurn":0}
 {"line":426,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":426,"op":"hp","side":"far","hp":40}
 {"line":428,"op":"print","text":"The sandstorm is raging."}
@@ -679,7 +679,7 @@
 {"line":437,"op":"print","text":"The opposing Fantasy Meadow woke up!"}
 {"line":437,"op":"status","side":"far","slot":0,"status":"none"}
 {"line":438,"op":"print","text":"The opposing Fantasy Meadow used Rock Slide!"}
-{"line":438,"op":"move","user":"far","target":"near","move":157}
+{"line":438,"op":"move","user":"far","target":"near","move":157,"animTurn":0}
 {"line":440,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":440,"op":"hp","side":"near","hp":85}
 {"line":440,"op":"print","text":"It's not very effective…"}
@@ -701,7 +701,7 @@
 {"line":450,"op":"hp","side":"far","hp":66}
 {"line":450,"op":"print","text":"The opposing Checker Knights was hurt by the spikes!"}
 {"line":451,"op":"print","text":"Metagross used Meteor Mash!"}
-{"line":451,"op":"move","user":"near","target":"far","move":309}
+{"line":451,"op":"move","user":"near","target":"far","move":309,"animTurn":0}
 {"line":453,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":453,"op":"hp","side":"far","hp":47}
 {"line":453,"op":"print","text":"It's not very effective…"}
@@ -721,7 +721,7 @@
 {"line":462,"op":"print","text":"Go! Skarmory!"}
 {"line":462,"op":"switchIn","side":"near","slot":2,"hp":75,"status":"none"}
 {"line":463,"op":"print","text":"The opposing Checker Knights used Hydro Pump!"}
-{"line":463,"op":"move","user":"far","target":"near","move":56}
+{"line":463,"op":"move","user":"far","target":"near","move":56,"animTurn":0}
 {"line":464,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":464,"op":"hp","side":"near","hp":40}
 {"line":466,"op":"print","text":"The sandstorm is raging."}
@@ -732,7 +732,7 @@
 {"line":467,"op":"hp","side":"far","hp":60}
 {"line":469,"op":"turn","number":36}
 {"line":472,"op":"print","text":"The opposing Checker Knights used Protect!"}
-{"line":472,"op":"move","user":"far","target":"far","move":182}
+{"line":472,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
 {"line":473,"op":"print","text":"The opposing Checker Knights protected itself!"}
 {"line":474,"op":"print","text":"Skarmory used Drill Peck!"}
 {"line":475,"op":"print","text":"The opposing Checker Knights protected itself!"}
@@ -744,11 +744,11 @@
 {"line":478,"op":"hp","side":"far","hp":66}
 {"line":480,"op":"turn","number":37}
 {"line":483,"op":"print","text":"Skarmory used Drill Peck!"}
-{"line":483,"op":"move","user":"near","target":"far","move":65}
+{"line":483,"op":"move","user":"near","target":"far","move":65,"animTurn":0}
 {"line":484,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":484,"op":"hp","side":"far","hp":42}
 {"line":485,"op":"print","text":"The opposing Checker Knights used Hydro Pump!"}
-{"line":485,"op":"move","user":"far","target":"near","move":56}
+{"line":485,"op":"move","user":"far","target":"near","move":56,"animTurn":0}
 {"line":486,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":486,"op":"hp","side":"near","hp":5}
 {"line":488,"op":"print","text":"The sandstorm is raging."}
@@ -759,7 +759,7 @@
 {"line":489,"op":"hp","side":"far","hp":48}
 {"line":491,"op":"turn","number":38}
 {"line":494,"op":"print","text":"The opposing Checker Knights used Protect!"}
-{"line":494,"op":"move","user":"far","target":"far","move":182}
+{"line":494,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
 {"line":495,"op":"print","text":"The opposing Checker Knights protected itself!"}
 {"line":496,"op":"print","text":"Skarmory used Drill Peck!"}
 {"line":497,"op":"print","text":"The opposing Checker Knights protected itself!"}
@@ -771,11 +771,11 @@
 {"line":500,"op":"hp","side":"far","hp":54}
 {"line":502,"op":"turn","number":39}
 {"line":505,"op":"print","text":"Skarmory used Drill Peck!"}
-{"line":505,"op":"move","user":"near","target":"far","move":65}
+{"line":505,"op":"move","user":"near","target":"far","move":65,"animTurn":0}
 {"line":506,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":506,"op":"hp","side":"far","hp":30}
 {"line":507,"op":"print","text":"The opposing Checker Knights used Ice Beam!"}
-{"line":507,"op":"move","user":"far","target":"near","move":58}
+{"line":507,"op":"move","user":"far","target":"near","move":58,"animTurn":0}
 {"line":508,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":508,"op":"hp","side":"near","hp":0}
 {"line":509,"op":"faint","side":"near"}
@@ -797,11 +797,11 @@
 {"line":517,"op":"hp","side":"far","hp":36}
 {"line":519,"op":"turn","number":40}
 {"line":522,"op":"print","text":"Starmie used Recover!"}
-{"line":522,"op":"move","user":"near","target":"near","move":105}
+{"line":522,"op":"move","user":"near","target":"near","move":105,"animTurn":0}
 {"line":523,"op":"hp","side":"near","hp":66}
 {"line":523,"op":"print","text":"Starmie's HP was restored."}
 {"line":524,"op":"print","text":"The opposing Checker Knights used Earthquake!"}
-{"line":524,"op":"move","user":"far","target":"near","move":89}
+{"line":524,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":525,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":525,"op":"hp","side":"near","hp":11}
 {"line":527,"op":"print","text":"The sandstorm is raging."}
@@ -819,11 +819,11 @@
 {"line":530,"op":"hp","side":"far","hp":42}
 {"line":532,"op":"turn","number":41}
 {"line":535,"op":"print","text":"Starmie used Surf!"}
-{"line":535,"op":"move","user":"near","target":"far","move":57}
+{"line":535,"op":"move","user":"near","target":"far","move":57,"animTurn":0}
 {"line":536,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":536,"op":"hp","side":"far","hp":3}
 {"line":537,"op":"print","text":"The opposing Checker Knights used Earthquake!"}
-{"line":537,"op":"move","user":"far","target":"near","move":89}
+{"line":537,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":538,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":538,"op":"hp","side":"near","hp":0}
 {"line":539,"op":"faint","side":"near"}
@@ -842,7 +842,7 @@
 {"line":546,"op":"hp","side":"near","hp":100}
 {"line":548,"op":"turn","number":42}
 {"line":551,"op":"print","text":"The opposing Checker Knights used Protect!"}
-{"line":551,"op":"move","user":"far","target":"far","move":182}
+{"line":551,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
 {"line":552,"op":"print","text":"The opposing Checker Knights protected itself!"}
 {"line":553,"op":"print","text":"Metagross used Earthquake!"}
 {"line":554,"op":"print","text":"The opposing Checker Knights protected itself!"}
@@ -854,12 +854,12 @@
 {"line":557,"op":"hp","side":"far","hp":15}
 {"line":559,"op":"turn","number":43}
 {"line":562,"op":"print","text":"The opposing Checker Knights used Earthquake!"}
-{"line":562,"op":"move","user":"far","target":"near","move":89}
+{"line":562,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":564,"op":"hit","side":"near","effectiveness":"super"}
 {"line":564,"op":"hp","side":"near","hp":43}
 {"line":564,"op":"print","text":"It's super effective!"}
 {"line":565,"op":"print","text":"Metagross used Meteor Mash!"}
-{"line":565,"op":"move","user":"near","target":"far","move":309}
+{"line":565,"op":"move","user":"near","target":"far","move":309,"animTurn":0}
 {"line":567,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":567,"op":"hp","side":"far","hp":0}
 {"line":567,"op":"print","text":"It's not very effective…"}
@@ -886,7 +886,7 @@
 {"line":582,"op":"print","text":"Go! Tyranitar!"}
 {"line":582,"op":"switchIn","side":"near","slot":0,"hp":94,"status":"tox"}
 {"line":583,"op":"print","text":"The opposing Magma Flows used Flamethrower!"}
-{"line":583,"op":"move","user":"far","target":"near","move":53}
+{"line":583,"op":"move","user":"far","target":"near","move":53,"animTurn":0}
 {"line":585,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":585,"op":"hp","side":"near","hp":74}
 {"line":585,"op":"print","text":"It's not very effective…"}
@@ -908,7 +908,7 @@
 {"line":591,"op":"hp","side":"near","hp":74}
 {"line":593,"op":"turn","number":45}
 {"line":596,"op":"print","text":"The opposing Magma Flows used Protect!"}
-{"line":596,"op":"move","user":"far","target":"far","move":182}
+{"line":596,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
 {"line":597,"op":"print","text":"The opposing Magma Flows protected itself!"}
 {"line":598,"op":"print","text":"Tyranitar used Rock Slide!"}
 {"line":599,"op":"print","text":"The opposing Magma Flows protected itself!"}
@@ -936,7 +936,7 @@
 {"line":613,"op":"hp","side":"far","hp":56}
 {"line":613,"op":"print","text":"The opposing Beanstalk Park was hurt by the spikes!"}
 {"line":614,"op":"print","text":"Tyranitar used Rock Slide!"}
-{"line":614,"op":"move","user":"near","target":"far","move":157}
+{"line":614,"op":"move","user":"near","target":"far","move":157,"animTurn":0}
 {"line":615,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":615,"op":"hp","side":"far","hp":24}
 {"line":617,"op":"print","text":"The sandstorm is raging."}
@@ -957,11 +957,11 @@
 {"line":621,"op":"hp","side":"near","hp":56}
 {"line":623,"op":"turn","number":47}
 {"line":626,"op":"print","text":"The opposing Beanstalk Park used Recover!"}
-{"line":626,"op":"move","user":"far","target":"far","move":105}
+{"line":626,"op":"move","user":"far","target":"far","move":105,"animTurn":0}
 {"line":627,"op":"hp","side":"far","hp":74}
 {"line":627,"op":"print","text":"The opposing Beanstalk Park's HP was restored."}
 {"line":628,"op":"print","text":"Tyranitar used Hidden Power!"}
-{"line":628,"op":"move","user":"near","target":"far","move":237}
+{"line":628,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
 {"line":630,"op":"hit","side":"far","effectiveness":"super"}
 {"line":630,"op":"hp","side":"far","hp":5}
 {"line":630,"op":"print","text":"It's super effective!"}
@@ -983,7 +983,7 @@
 {"line":640,"op":"switchIn","side":"far","slot":5,"hp":95,"status":"none"}
 {"line":641,"op":"turn","number":48}
 {"line":644,"op":"print","text":"The opposing Sky Sands used Earthquake!"}
-{"line":644,"op":"move","user":"far","target":"near","move":89}
+{"line":644,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":646,"op":"hit","side":"near","effectiveness":"super"}
 {"line":646,"op":"hp","side":"near","hp":0}
 {"line":646,"op":"print","text":"It's super effective!"}
@@ -999,11 +999,11 @@
 {"line":653,"op":"hp","side":"near","hp":79}
 {"line":655,"op":"turn","number":49}
 {"line":658,"op":"print","text":"The opposing Sky Sands used Double-Edge!"}
-{"line":658,"op":"move","user":"far","target":"near","move":38}
+{"line":658,"op":"move","user":"far","target":"near","move":38,"animTurn":0}
 {"line":659,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":659,"op":"hp","side":"near","hp":42}
 {"line":660,"op":"print","text":"Claydol used Psychic!"}
-{"line":660,"op":"move","user":"near","target":"far","move":94}
+{"line":660,"op":"move","user":"near","target":"far","move":94,"animTurn":0}
 {"line":661,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":661,"op":"hp","side":"far","hp":63}
 {"line":663,"op":"print","text":"The sandstorm is raging."}
@@ -1014,11 +1014,11 @@
 {"line":664,"op":"hp","side":"near","hp":48}
 {"line":666,"op":"turn","number":50}
 {"line":669,"op":"print","text":"The opposing Sky Sands used Double-Edge!"}
-{"line":669,"op":"move","user":"far","target":"near","move":38}
+{"line":669,"op":"move","user":"far","target":"near","move":38,"animTurn":0}
 {"line":670,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":670,"op":"hp","side":"near","hp":10}
 {"line":671,"op":"print","text":"Claydol used Explosion!"}
-{"line":671,"op":"move","user":"near","target":"far","move":153}
+{"line":671,"op":"move","user":"near","target":"far","move":153,"animTurn":0}
 {"line":673,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":673,"op":"hp","side":"far","hp":0}
 {"line":673,"op":"print","text":"It's not very effective…"}
@@ -1044,7 +1044,7 @@
 {"line":684,"op":"hp","side":"near","hp":55}
 {"line":686,"op":"turn","number":51}
 {"line":689,"op":"print","text":"The opposing Fantasy Meadow used Earthquake!"}
-{"line":689,"op":"move","user":"far","target":"near","move":89}
+{"line":689,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":691,"op":"hit","side":"near","effectiveness":"super"}
 {"line":691,"op":"hp","side":"near","hp":0}
 {"line":691,"op":"print","text":"It's super effective!"}
@@ -1085,7 +1085,7 @@
 {"line":713,"op":"hp","side":"near","hp":67}
 {"line":715,"op":"turn","number":53}
 {"line":718,"op":"print","text":"The opposing Fantasy Meadow used Rock Slide!"}
-{"line":718,"op":"move","user":"far","target":"near","move":157}
+{"line":718,"op":"move","user":"far","target":"near","move":157,"animTurn":0}
 {"line":719,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":719,"op":"hp","side":"near","hp":19}
 {"line":720,"op":"print","text":"Blissey flinched and couldn't move!"}
@@ -1104,7 +1104,7 @@
 {"line":725,"op":"hp","side":"near","hp":19}
 {"line":727,"op":"turn","number":54}
 {"line":730,"op":"print","text":"The opposing Fantasy Meadow used Earthquake!"}
-{"line":730,"op":"move","user":"far","target":"near","move":89}
+{"line":730,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
 {"line":731,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":731,"op":"hp","side":"near","hp":0}
 {"line":732,"op":"faint","side":"near"}

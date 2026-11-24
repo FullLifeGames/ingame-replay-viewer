@@ -1,0 +1,87 @@
+{
+  "MOVE_RAZOR_WIND": {
+    "stringId": "STRINGID_PKMNWHIPPEDWHIRLWIND",
+    "animationFirst": false,
+    "semiInvulnerable": false
+  },
+  "MOVE_FLY": {
+    "stringId": "STRINGID_PKMNFLEWHIGH",
+    "animationFirst": false,
+    "semiInvulnerable": true
+  },
+  "MOVE_SOLAR_BEAM": {
+    "stringId": "STRINGID_PKMNTOOKSUNLIGHT",
+    "animationFirst": false,
+    "semiInvulnerable": false
+  },
+  "MOVE_DIG": {
+    "stringId": "STRINGID_PKMNDUGHOLE",
+    "animationFirst": false,
+    "semiInvulnerable": true
+  },
+  "MOVE_SKULL_BASH": {
+    "stringId": "STRINGID_PKMNLOWEREDHEAD",
+    "animationFirst": true,
+    "semiInvulnerable": false
+  },
+  "MOVE_SKY_ATTACK": {
+    "stringId": "STRINGID_CLOAKEDINAHARSHLIGHT",
+    "animationFirst": false,
+    "semiInvulnerable": false
+  },
+  "MOVE_DIVE": {
+    "stringId": "STRINGID_PKMNHIDUNDERWATER",
+    "animationFirst": false,
+    "semiInvulnerable": true
+  },
+  "MOVE_BOUNCE": {
+    "stringId": "STRINGID_PKMNSPRANGUP",
+    "animationFirst": false,
+    "semiInvulnerable": true
+  },
+  "MOVE_SHADOW_FORCE": {
+    "stringId": "STRINGID_VANISHEDINSTANTLY",
+    "animationFirst": false,
+    "semiInvulnerable": true
+  },
+  "MOVE_SKY_DROP": {
+    "stringId": "STRINGID_PKMNTOOKTARGETHIGH",
+    "animationFirst": false,
+    "semiInvulnerable": true
+  },
+  "MOVE_FREEZE_SHOCK": {
+    "stringId": "STRINGID_CLOAKEDINAFREEZINGLIGHT",
+    "animationFirst": false,
+    "semiInvulnerable": false
+  },
+  "MOVE_ICE_BURN": {
+    "stringId": "STRINGID_CLOAKEDINAFREEZINGLIGHT",
+    "animationFirst": false,
+    "semiInvulnerable": false
+  },
+  "MOVE_PHANTOM_FORCE": {
+    "stringId": "STRINGID_VANISHEDINSTANTLY",
+    "animationFirst": false,
+    "semiInvulnerable": true
+  },
+  "MOVE_GEOMANCY": {
+    "stringId": "STRINGID_PKNMABSORBINGPOWER",
+    "animationFirst": false,
+    "semiInvulnerable": false
+  },
+  "MOVE_SOLAR_BLADE": {
+    "stringId": "STRINGID_PKMNTOOKSUNLIGHT",
+    "animationFirst": false,
+    "semiInvulnerable": false
+  },
+  "MOVE_METEOR_BEAM": {
+    "stringId": "STRINGID_METEORBEAMCHARGING",
+    "animationFirst": true,
+    "semiInvulnerable": false
+  },
+  "MOVE_ELECTRO_SHOT": {
+    "stringId": "STRINGID_ELECTROSHOTCHARGING",
+    "animationFirst": true,
+    "semiInvulnerable": false
+  }
+}

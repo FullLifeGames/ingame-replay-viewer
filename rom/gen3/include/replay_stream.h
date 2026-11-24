@@ -1,7 +1,7 @@
 #ifndef GUARD_REPLAY_STREAM_H
 #define GUARD_REPLAY_STREAM_H
 
-// The instruction stream, version 2: the Gen 3 game backend writes it into the replay slot's
+// The instruction stream, version 3: the Gen 3 game backend writes it into the replay slot's
 // stream (replay_slot.h) and the ROM interpreter plays it. src/gen3/stream/format.ts holds the same
 // numbers; its spec checks that both files define the same REPLAY_* names with the same values.
 // Keep each value a plain number.
@@ -21,7 +21,7 @@
 // 5. Every other op is free: PRINT, TURN, WEATHER, END, FLUSH_TEXT_BOX, and STATUS and ITEM,
 //    which name a party slot (Heal Bell reaches the whole party).
 
-#define REPLAY_STREAM_VERSION        2
+#define REPLAY_STREAM_VERSION        3
 #define REPLAY_STREAM_HEADER_SIZE    0x10
 #define REPLAY_STREAM_SIDE_COUNT     2
 #define REPLAY_STREAM_PARTY_SIZE     6
@@ -75,7 +75,7 @@
 #define REPLAY_OP_SEND_OUT       0x04 // side u8, slot u8, hp u16, status u8 (REPLAY_STATUS_*)
 #define REPLAY_OP_WITHDRAW       0x05 // side u8
 #define REPLAY_OP_SWITCH_IN      0x06 // side u8, slot u8, hp u16, status u8 (REPLAY_STATUS_*)
-#define REPLAY_OP_MOVE           0x07 // user side u8, target side u8, move u16 (MOVE_*)
+#define REPLAY_OP_MOVE           0x07 // user side u8, target side u8, move u16 (MOVE_*), animTurn u8: the turn the move animation reads (gAnimMoveTurn)
 #define REPLAY_OP_HIT            0x08 // side u8, effectiveness u8 (REPLAY_EFFECTIVENESS_*)
 #define REPLAY_OP_HP             0x09 // side u8, hp u16
 #define REPLAY_OP_FAINT          0x0A // side u8
@@ -89,6 +89,8 @@
 #define REPLAY_OP_ITEM_POP_UP    0x12 // side u8, item u16 (ITEM_*): the pop-up of a held item that takes effect
 #define REPLAY_OP_TRAP_TURN      0x13 // side u8, move u16 (MOVE_*): the trapping move
 #define REPLAY_OP_FLUSH_TEXT_BOX 0x14 // no operands: empties the text box, as flushtextbox does
+#define REPLAY_OP_FORM_CHANGE    0x15 // side u8, species u16 (SPECIES_*, not SPECIES_NONE): the mon's form until it leaves the field
+#define REPLAY_OP_SHOW_MON       0x16 // side u8: shows the mon's sprite again, with no animation
 
 // The size byte of each op but PRINT.
 #define REPLAY_OP_END_SIZE            1
@@ -97,7 +99,7 @@
 #define REPLAY_OP_SEND_OUT_SIZE       5
 #define REPLAY_OP_WITHDRAW_SIZE       1
 #define REPLAY_OP_SWITCH_IN_SIZE      5
-#define REPLAY_OP_MOVE_SIZE           4
+#define REPLAY_OP_MOVE_SIZE           5
 #define REPLAY_OP_HIT_SIZE            2
 #define REPLAY_OP_HP_SIZE             3
 #define REPLAY_OP_FAINT_SIZE          1
@@ -111,6 +113,8 @@
 #define REPLAY_OP_ITEM_POP_UP_SIZE    3
 #define REPLAY_OP_TRAP_TURN_SIZE      3
 #define REPLAY_OP_FLUSH_TEXT_BOX_SIZE 0
+#define REPLAY_OP_FORM_CHANGE_SIZE    3
+#define REPLAY_OP_SHOW_MON_SIZE       1
 
 // PRINT's size byte: one glyph and EOS at least.
 #define REPLAY_PRINT_MIN_SIZE 2
@@ -185,10 +189,10 @@
 #define REPLAY_ANIM_SIMPLE_HEAL         17
 
 // The masks of the order rules, a bit per REPLAY_OP_* and REPLAY_ANIM_* number:
-// WITHDRAW, MOVE, HIT, HP, FAINT, STAT, ANIM, VOLATILE, ABILITY, ITEM_POP_UP and TRAP_TURN, whose
-// side operands name a side with a battler out, and the four weather animations, which need none.
-// replay_stream_check.c asserts each against the names.
-#define REPLAY_ORDER_ON_FIELD_OPS 0xDB7A0
+// WITHDRAW, MOVE, HIT, HP, FAINT, STAT, ANIM, VOLATILE, ABILITY, ITEM_POP_UP, TRAP_TURN,
+// FORM_CHANGE and SHOW_MON, whose side operands name a side with a battler out, and the four
+// weather animations, which need none. replay_stream_check.c asserts each against the names.
+#define REPLAY_ORDER_ON_FIELD_OPS 0x6DB7A0
 #define REPLAY_ORDER_FREE_ANIMS   0xF0
 
 struct ReplayStreamHeader

@@ -4,6 +4,7 @@
 // needs no sample: it gets the far Pokémon, which every Pokémon placeholder names by default.
 import type { Mon } from '../src/gen3/text/names.ts'
 import type { AnyTemplate } from '../src/gen3/text/template.ts'
+import { CHARGE_TEMPLATES } from '../src/gen3/text/phrases-charge.ts'
 import { EFFECT_TEMPLATES } from '../src/gen3/text/phrases-effects.ts'
 import { FIELD_TEMPLATES } from '../src/gen3/text/phrases-field.ts'
 import { HP_TEMPLATES } from '../src/gen3/text/phrases-hp.ts'
@@ -49,6 +50,7 @@ export const TEMPLATE_GROUPS: Readonly<Record<string, Readonly<Record<string, An
   field: FIELD_TEMPLATES,
   effects: EFFECT_TEMPLATES,
   items: ITEM_TEMPLATES,
+  charge: CHARGE_TEMPLATES,
 }
 
 const withValue = (placeholder: string, value: string, ...before: unknown[]): Sample => ({
@@ -120,6 +122,7 @@ export const SAMPLES: Readonly<Record<string, Sample>> = {
   'effects.disabled': withValue('B_BUFF1', nb('Body Slam'), FAR),
   'effects.transformed': withValue('B_BUFF1', 'Tyranitar', FAR),
   'effects.tookAttack': withValue('B_BUFF1', nb('Future Sight'), FAR),
+  'effects.copiedStats': { args: [FAR, NEAR], fill: { B_EFF_NAME_WITH_PREFIX2: 'Dugtrio' } },
   'effects.squeezed': { args: [FAR, NEAR], fill: { B_SCR_NAME_WITH_PREFIX2: 'Dugtrio' } },
   'effects.wrapped': { args: [FAR, NEAR], fill: { B_SCR_NAME_WITH_PREFIX2: 'Dugtrio' } },
   'effects.clamped': { args: [FAR, NEAR], fill: { B_SCR_NAME_WITH_PREFIX: 'Dugtrio' } },
@@ -132,4 +135,5 @@ export const SAMPLES: Readonly<Record<string, Sample>> = {
     args: [NEAR, FAR, nb('Choice Band')],
     fill: { B_ATK_NAME_WITH_PREFIX: 'Dugtrio', B_LAST_ITEM: nb('Choice Band') },
   },
+  'items.whiteHerb': withValue('B_LAST_ITEM', nb('White Herb'), FAR),
 }

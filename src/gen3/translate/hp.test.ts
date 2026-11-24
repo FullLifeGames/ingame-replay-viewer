@@ -125,7 +125,7 @@ describe('damage with no cause', () => {
     expect(scene.map(plain)).toEqual([
       hp('far', 50),
       'Dugtrio used Substitute!',
-      { op: 'move', user: 'near', target: 'near', move: expect.any(Number) as number },
+      { op: 'move', user: 'near', target: 'near', move: expect.any(Number) as number, animTurn: 0 },
       hp('near', 75),
     ])
   })
@@ -175,5 +175,38 @@ describe('heals', () => {
       hp('far', 60),
       'Dugtrio had its energy drained!',
     ])
+  })
+})
+
+/** The ops from the line `from` on, without the closing END. */
+const opsFrom = (from: number, ...lines: string[]) =>
+  streamOfLog(...lines)
+    .instructions.filter(({ line, instruction }) => line >= from && instruction.op !== 'end')
+    .map(({ instruction }) => plain(instruction))
+
+// `BattleScript_EffectPainSplit`: the user's bar, the target's bar, then STRINGID_SHAREDPAIN.
+describe('Pain Split', () => {
+  it("moves the user's bar, then the target's, then says the battlers shared their pain", () => {
+    const ops = opsFrom(
+      NEXT + 1,
+      '|move|p1a: Dugtrio|Pain Split|p2a: Tyranitar',
+      '|-sethp|p2a: Tyranitar|60/100|[from] move: Pain Split|[silent]',
+      '|-sethp|p1a: Dugtrio|60/100|[from] move: Pain Split',
+    )
+    expect(ops).toEqual([hp('near', 60), hp('far', 60), 'The battlers shared their pain!'])
+  })
+
+  it('reads the older line that names both Pokémon in either order, the user first', () => {
+    const move = '|move|p2a: Tyranitar|Pain Split|p1a: Dugtrio'
+    const shared = 'The battlers shared their pain!'
+    const userLast = '|-sethp|p1a: Dugtrio|60|p2a: Tyranitar|60|[from] move: Pain Split'
+    const userFirst = '|-sethp|p2a: Tyranitar|60|p1a: Dugtrio|60|[from] move: Pain Split'
+    expect(opsFrom(NEXT + 1, move, userLast)).toEqual([hp('far', 60), hp('near', 60), shared])
+    expect(opsFrom(NEXT + 1, move, userFirst)).toEqual([hp('far', 60), hp('near', 60), shared])
+  })
+
+  it('moves the bar alone for HP set outright with no Pain Split, and the next hit from there', () => {
+    const ops = opsFrom(NEXT, '|-sethp|p1a: Dugtrio|50/100', '|-damage|p1a: Dugtrio|40/100')
+    expect(ops).toEqual([hp('near', 50), hit('near'), hp('near', 40)])
   })
 })

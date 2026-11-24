@@ -16,6 +16,7 @@ const move = (name: string, user: Side = 'near', target: Side = 'far') => ({
   user,
   target,
   move: moveOf(name).number,
+  animTurn: 0,
 })
 const hit = (side: Side, effectiveness: Effectiveness = 'normal') => ({
   op: 'hit',

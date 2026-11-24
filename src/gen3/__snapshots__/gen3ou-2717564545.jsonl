@@ -1,4 +1,4 @@
-{"length":4438,"crc32":"8d75ef92","trainers":{"near":{"name":"chronosxsonorhc","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"oldsmellybastard","trainerPic":2,"teamSize":6,"revealed":3}},"parties":{"near":[{"species":38,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ninetales"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":233,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Porygon2"},{"species":254,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Sceptile"},{"species":260,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Swampert"},{"species":237,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Hitmontop"}],"far":[{"species":348,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Jumbo Shrimp"},{"species":260,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Fent Cart"},{"species":214,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Come on and "},null,null,null]}}
+{"length":4466,"crc32":"13dacf7a","trainers":{"near":{"name":"chronosxsonorhc","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"oldsmellybastard","trainerPic":2,"teamSize":6,"revealed":3}},"parties":{"near":[{"species":38,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ninetales"},{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Celebi"},{"species":233,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Porygon2"},{"species":254,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Sceptile"},{"species":260,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Swampert"},{"species":237,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Hitmontop"}],"far":[{"species":348,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Jumbo Shrimp"},{"species":260,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Fent Cart"},{"species":214,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Come on and "},null,null,null]}}
 {"line":25,"op":"intro"}
 {"line":25,"op":"print","text":"You are challenged by oldsmellybastard!"}
 {"line":27,"op":"print","text":"oldsmellybastard sent out Jumbo Shrimp!"}
@@ -9,11 +9,11 @@
 {"line":32,"op":"print","text":"Ninetales used Will-O-Wisp!"}
 {"line":33,"op":"print","text":"The opposing Jumbo Shrimp avoided the attack!"}
 {"line":34,"op":"print","text":"The opposing Jumbo Shrimp used Rock Blast!"}
-{"line":34,"op":"move","user":"far","target":"near","move":350}
+{"line":34,"op":"move","user":"far","target":"near","move":350,"animTurn":0}
 {"line":36,"op":"hit","side":"near","effectiveness":"super"}
 {"line":36,"op":"hp","side":"near","hp":76}
 {"line":38,"op":"flushTextBox"}
-{"line":38,"op":"move","user":"far","target":"near","move":350}
+{"line":38,"op":"move","user":"far","target":"near","move":350,"animTurn":0}
 {"line":38,"op":"hit","side":"near","effectiveness":"super"}
 {"line":38,"op":"hp","side":"near","hp":48}
 {"line":39,"op":"print","text":"It's super effective!"}
@@ -24,7 +24,7 @@
 {"line":41,"op":"hp","side":"near","hp":54}
 {"line":43,"op":"turn","number":2}
 {"line":46,"op":"print","text":"Ninetales used Charm!"}
-{"line":46,"op":"move","user":"near","target":"far","move":204}
+{"line":46,"op":"move","user":"near","target":"far","move":204,"animTurn":0}
 {"line":47,"op":"stat","side":"far","stat":"atk","stages":-2,"arrows":"one"}
 {"line":47,"op":"print","text":"The opposing Jumbo Shrimp's Attack harshly fell!"}
 {"line":48,"op":"print","text":"The opposing Jumbo Shrimp used Rock Blast!"}
@@ -39,7 +39,7 @@
 {"line":56,"op":"print","text":"oldsmellybastard sent out Fent Cart!"}
 {"line":56,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
 {"line":57,"op":"print","text":"Ninetales used Will-O-Wisp!"}
-{"line":57,"op":"move","user":"near","target":"far","move":261}
+{"line":57,"op":"move","user":"near","target":"far","move":261,"animTurn":0}
 {"line":58,"op":"anim","side":"far","anim":"statusBrn"}
 {"line":58,"op":"print","text":"The opposing Fent Cart was burned!"}
 {"line":58,"op":"status","side":"far","slot":1,"status":"brn"}
@@ -56,7 +56,7 @@
 {"line":66,"op":"print","text":"Go! Celebi!"}
 {"line":66,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
 {"line":67,"op":"print","text":"The opposing Fent Cart used Surf!"}
-{"line":67,"op":"move","user":"far","target":"near","move":57}
+{"line":67,"op":"move","user":"far","target":"near","move":57,"animTurn":0}
 {"line":69,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":69,"op":"hp","side":"near","hp":86}
 {"line":69,"op":"print","text":"It's not very effective…"}
@@ -79,7 +79,7 @@
 {"line":79,"op":"ability","side":"near","ability":67,"show":true}
 {"line":79,"op":"ability","side":"near","ability":67,"show":false}
 {"line":80,"op":"print","text":"The opposing Fent Cart used Ice Beam!"}
-{"line":80,"op":"move","user":"far","target":"near","move":58}
+{"line":80,"op":"move","user":"far","target":"near","move":58,"animTurn":0}
 {"line":81,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":81,"op":"hp","side":"near","hp":80}
 {"line":83,"op":"itemPopUp","side":"near","item":472}
@@ -99,7 +99,7 @@
 {"line":90,"op":"print","text":"oldsmellybastard sent out Jumbo Shrimp!"}
 {"line":90,"op":"switchIn","side":"far","slot":0,"hp":100,"status":"none"}
 {"line":91,"op":"print","text":"Porygon2 used Ice Beam!"}
-{"line":91,"op":"move","user":"near","target":"far","move":58}
+{"line":91,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
 {"line":92,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":92,"op":"hp","side":"far","hp":72}
 {"line":94,"op":"itemPopUp","side":"near","item":472}
@@ -108,7 +108,7 @@
 {"line":94,"op":"hp","side":"near","hp":93}
 {"line":96,"op":"turn","number":7}
 {"line":99,"op":"print","text":"Porygon2 used Toxic!"}
-{"line":99,"op":"move","user":"near","target":"far","move":92}
+{"line":99,"op":"move","user":"near","target":"far","move":92,"animTurn":0}
 {"line":100,"op":"anim","side":"far","anim":"statusPsn"}
 {"line":100,"op":"print","text":"The opposing Jumbo Shrimp was badly poisoned!"}
 {"line":100,"op":"status","side":"far","slot":0,"status":"tox"}
@@ -118,7 +118,7 @@
 {"line":102,"op":"print","text":"The opposing Jumbo Shrimp's Lum Berry cured its poison!"}
 {"line":102,"op":"status","side":"far","slot":0,"status":"none"}
 {"line":103,"op":"print","text":"The opposing Jumbo Shrimp used Hidden Power!"}
-{"line":103,"op":"move","user":"far","target":"near","move":237}
+{"line":103,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
 {"line":104,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":104,"op":"hp","side":"near","hp":57}
 {"line":106,"op":"itemPopUp","side":"near","item":472}
@@ -127,11 +127,11 @@
 {"line":106,"op":"hp","side":"near","hp":63}
 {"line":108,"op":"turn","number":8}
 {"line":111,"op":"print","text":"Porygon2 used Ice Beam!"}
-{"line":111,"op":"move","user":"near","target":"far","move":58}
+{"line":111,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
 {"line":112,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":112,"op":"hp","side":"far","hp":40}
 {"line":113,"op":"print","text":"The opposing Jumbo Shrimp used Hidden Power!"}
-{"line":113,"op":"move","user":"far","target":"near","move":237}
+{"line":113,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
 {"line":114,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":114,"op":"hp","side":"near","hp":25}
 {"line":116,"op":"itemPopUp","side":"near","item":472}
@@ -140,11 +140,11 @@
 {"line":116,"op":"hp","side":"near","hp":31}
 {"line":118,"op":"turn","number":9}
 {"line":121,"op":"print","text":"Porygon2 used Recover!"}
-{"line":121,"op":"move","user":"near","target":"near","move":105}
+{"line":121,"op":"move","user":"near","target":"near","move":105,"animTurn":0}
 {"line":122,"op":"hp","side":"near","hp":81}
 {"line":122,"op":"print","text":"Porygon2's HP was restored."}
 {"line":123,"op":"print","text":"The opposing Jumbo Shrimp used Hidden Power!"}
-{"line":123,"op":"move","user":"far","target":"near","move":237}
+{"line":123,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
 {"line":124,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":124,"op":"hp","side":"near","hp":45}
 {"line":126,"op":"itemPopUp","side":"near","item":472}
@@ -153,11 +153,11 @@
 {"line":126,"op":"hp","side":"near","hp":52}
 {"line":128,"op":"turn","number":10}
 {"line":131,"op":"print","text":"Porygon2 used Ice Beam!"}
-{"line":131,"op":"move","user":"near","target":"far","move":58}
+{"line":131,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
 {"line":132,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":132,"op":"hp","side":"far","hp":12}
 {"line":133,"op":"print","text":"The opposing Jumbo Shrimp used Hidden Power!"}
-{"line":133,"op":"move","user":"far","target":"near","move":237}
+{"line":133,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
 {"line":134,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":134,"op":"hp","side":"near","hp":19}
 {"line":136,"op":"itemPopUp","side":"near","item":472}
@@ -166,11 +166,11 @@
 {"line":136,"op":"hp","side":"near","hp":25}
 {"line":138,"op":"turn","number":11}
 {"line":141,"op":"print","text":"Porygon2 used Recover!"}
-{"line":141,"op":"move","user":"near","target":"near","move":105}
+{"line":141,"op":"move","user":"near","target":"near","move":105,"animTurn":0}
 {"line":142,"op":"hp","side":"near","hp":75}
 {"line":142,"op":"print","text":"Porygon2's HP was restored."}
 {"line":143,"op":"print","text":"The opposing Jumbo Shrimp used Hidden Power!"}
-{"line":143,"op":"move","user":"far","target":"near","move":237}
+{"line":143,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
 {"line":144,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":144,"op":"hp","side":"near","hp":41}
 {"line":146,"op":"itemPopUp","side":"near","item":472}
@@ -179,7 +179,7 @@
 {"line":146,"op":"hp","side":"near","hp":48}
 {"line":148,"op":"turn","number":12}
 {"line":151,"op":"print","text":"Porygon2 used Ice Beam!"}
-{"line":151,"op":"move","user":"near","target":"far","move":58}
+{"line":151,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
 {"line":152,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":152,"op":"hp","side":"far","hp":0}
 {"line":153,"op":"faint","side":"far"}
@@ -199,11 +199,11 @@
 {"line":160,"op":"hp","side":"far","hp":70}
 {"line":162,"op":"turn","number":13}
 {"line":165,"op":"print","text":"Porygon2 used Recover!"}
-{"line":165,"op":"move","user":"near","target":"near","move":105}
+{"line":165,"op":"move","user":"near","target":"near","move":105,"animTurn":0}
 {"line":166,"op":"hp","side":"near","hp":100}
 {"line":166,"op":"print","text":"Porygon2's HP was restored."}
 {"line":167,"op":"print","text":"The opposing Fent Cart used Rain Dance!"}
-{"line":167,"op":"move","user":"far","target":"far","move":240}
+{"line":167,"op":"move","user":"far","target":"far","move":240,"animTurn":0}
 {"line":168,"op":"weather","weather":"rain"}
 {"line":168,"op":"print","text":"It started to rain!"}
 {"line":170,"op":"print","text":"Rain continues to fall."}
@@ -221,7 +221,7 @@
 {"line":177,"op":"print","text":"Go! Sceptile!"}
 {"line":177,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
 {"line":178,"op":"print","text":"The opposing Fent Cart used Surf!"}
-{"line":178,"op":"move","user":"far","target":"near","move":57}
+{"line":178,"op":"move","user":"far","target":"near","move":57,"animTurn":0}
 {"line":180,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":180,"op":"hp","side":"near","hp":65}
 {"line":180,"op":"print","text":"It's not very effective…"}
@@ -251,11 +251,11 @@
 {"line":193,"op":"anim","side":"near","anim":"rainContinues"}
 {"line":195,"op":"turn","number":16}
 {"line":198,"op":"print","text":"The opposing Come on and Slam used Swords Dance!"}
-{"line":198,"op":"move","user":"far","target":"far","move":14}
+{"line":198,"op":"move","user":"far","target":"far","move":14,"animTurn":0}
 {"line":199,"op":"stat","side":"far","stat":"atk","stages":2,"arrows":"one"}
 {"line":199,"op":"print","text":"The opposing Come on and Slam's Attack rose sharply!"}
 {"line":200,"op":"print","text":"Swampert used Ice Beam!"}
-{"line":200,"op":"move","user":"near","target":"far","move":58}
+{"line":200,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
 {"line":201,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":201,"op":"hp","side":"far","hp":79}
 {"line":203,"op":"print","text":"Rain continues to fall."}
@@ -270,14 +270,14 @@
 {"line":210,"op":"print","text":"The opposing Come on and Slam's Attack fell!"}
 {"line":209,"op":"ability","side":"near","ability":22,"show":false}
 {"line":211,"op":"print","text":"The opposing Come on and Slam used Swords Dance!"}
-{"line":211,"op":"move","user":"far","target":"far","move":14}
+{"line":211,"op":"move","user":"far","target":"far","move":14,"animTurn":0}
 {"line":212,"op":"stat","side":"far","stat":"atk","stages":2,"arrows":"one"}
 {"line":212,"op":"print","text":"The opposing Come on and Slam's Attack rose sharply!"}
 {"line":214,"op":"weather","weather":"none"}
 {"line":214,"op":"print","text":"The rain stopped."}
 {"line":216,"op":"turn","number":18}
 {"line":219,"op":"print","text":"The opposing Come on and Slam used Megahorn!"}
-{"line":219,"op":"move","user":"far","target":"near","move":224}
+{"line":219,"op":"move","user":"far","target":"near","move":224,"animTurn":0}
 {"line":221,"op":"hit","side":"near","effectiveness":"resisted"}
 {"line":221,"op":"hp","side":"near","hp":0}
 {"line":221,"op":"print","text":"It's not very effective…"}
@@ -289,13 +289,13 @@
 {"line":226,"op":"ability","side":"near","ability":62,"show":false}
 {"line":229,"op":"turn","number":19}
 {"line":232,"op":"print","text":"Porygon2 used Protect!"}
-{"line":232,"op":"move","user":"near","target":"near","move":182}
+{"line":232,"op":"move","user":"near","target":"near","move":182,"animTurn":0}
 {"line":233,"op":"print","text":"Porygon2 protected itself!"}
 {"line":234,"op":"print","text":"The opposing Come on and Slam used Megahorn!"}
 {"line":235,"op":"print","text":"Porygon2 avoided the attack!"}
 {"line":238,"op":"turn","number":20}
 {"line":241,"op":"print","text":"The opposing Come on and Slam used Megahorn!"}
-{"line":241,"op":"move","user":"far","target":"near","move":224}
+{"line":241,"op":"move","user":"far","target":"near","move":224,"animTurn":0}
 {"line":242,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":242,"op":"hp","side":"near","hp":0}
 {"line":243,"op":"faint","side":"near"}
@@ -304,7 +304,7 @@
 {"line":246,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
 {"line":249,"op":"turn","number":21}
 {"line":252,"op":"print","text":"The opposing Come on and Slam used Megahorn!"}
-{"line":252,"op":"move","user":"far","target":"near","move":224}
+{"line":252,"op":"move","user":"far","target":"near","move":224,"animTurn":0}
 {"line":253,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":253,"op":"hp","side":"near","hp":0}
 {"line":254,"op":"faint","side":"near"}

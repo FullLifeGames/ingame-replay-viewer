@@ -16,7 +16,7 @@ describe('weather', () => {
     const scene = sceneOf('|move|p1a: Dugtrio|Rain Dance|p1a: Dugtrio', '|-weather|RainDance')
     expect(scene.map(plain)).toEqual([
       'Dugtrio used Rain Dance!',
-      { op: 'move', user: 'near', target: 'near', move: moveOf('Rain Dance').number },
+      { op: 'move', user: 'near', target: 'near', move: moveOf('Rain Dance').number, animTurn: 0 },
       { op: 'weather', weather: 'rain' },
       'It started to rain!',
     ])
@@ -115,5 +115,24 @@ describe('sides and the field', () => {
     expect(sceneOf('|-fieldactivate|move: Perish Song').map(plain)).toEqual([
       'All Pokémon that heard the song will faint in three turns!',
     ])
+  })
+})
+
+// Showdown's Gen 3 rules log the sports as `-start` lines (`@pkmn/sim` `data/mods/gen5/moves.js`);
+// the game says `gSportsUsedStringIds` after the animation (`BattleScript_EffectMudSport`).
+describe('Mud Sport and Water Sport', () => {
+  it('says that electricity or fire was weakened, with no line of ours', () => {
+    const mud = streamOfLog('|-start|p1a: Dugtrio|Mud Sport')
+    const water = streamOfLog('|-start|p2a: Tyranitar|move: Water Sport')
+    const textOf = (result: typeof mud) =>
+      result.instructions
+        .filter(({ line }) => line >= NEXT)
+        .map(({ instruction }) => plain(instruction))
+    expect(textOf(mud)).toEqual([
+      "Electricity's power was weakened!",
+      { op: 'end', outcome: 'unknown' },
+    ])
+    expect(textOf(water)).toEqual(["Fire's power was weakened!", { op: 'end', outcome: 'unknown' }])
+    expect([...mud.fallbacks, ...water.fallbacks].filter(({ line }) => line >= NEXT)).toEqual([])
   })
 })

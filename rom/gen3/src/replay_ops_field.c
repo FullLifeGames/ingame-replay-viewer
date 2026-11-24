@@ -22,7 +22,7 @@ static const u16 sWeathers[] =
     [REPLAY_WEATHER_HAIL] = B_WEATHER_HAIL,
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sWeathers) == REPLAY_WEATHER_HAIL + 1, ReplayWeathersCoverFormatV2);
+STATIC_ASSERT(ARRAY_COUNT(sWeathers) == REPLAY_WEATHER_HAIL + 1, ReplayWeathersCoverTheFormat);
 
 // WEATHER: the battle's weather.
 bool32 Replay_OpWeather(const volatile u8 *operands, u32 step)
@@ -31,7 +31,7 @@ bool32 Replay_OpWeather(const volatile u8 *operands, u32 step)
     return TRUE;
 }
 
-// VOLATILE: Substitute, the only volatile of format v2. The controller puts the mon's sprite
+// VOLATILE: Substitute, the only volatile of the format. The controller puts the mon's sprite
 // behind its substitute after the Substitute move's animation (TrySetBehindSubstituteSpriteBit);
 // when the substitute goes, the sprite bit goes with it, as the fade animation clears it on screen.
 bool32 Replay_OpVolatile(const volatile u8 *operands, u32 step)

@@ -32,6 +32,8 @@ export const MOVE_TEMPLATES = {
     return `${nameAtStart(who)} cannot be confused!`
   }),
   failed: tagged('STRINGID_BUTITFAILED', () => 'But it failed!'),
+  // `resultmessage` for MOVE_RESULT_ONE_HIT_KO (src/battle_script_commands.c).
+  oneHitKo: tagged('STRINGID_ONEHITKO', () => "It's a one-hit KO!"),
   // B_MSG_SUBSTITUTE_FAILED in `gSubstituteUsedStringIds`; `BattleScript_EffectSubstitute`
   // prints it and skips the animation (data/battle_scripts_1.s).
   substituteWeak: tagged('STRINGID_TOOWEAKFORSUBSTITUTE', () => {
@@ -154,6 +156,11 @@ export function failed(who: Mon, effect: Effect | undefined, weak?: true): strin
   const own = effect && ALREADY[toID(effect.name) as keyof typeof ALREADY]
   return own ? own(who) : MOVE_TEMPLATES.failed.render()
 }
+
+export const oneHitKo = () => MOVE_TEMPLATES.oneHitKo.render()
+
+/** A move whose target is gone: `CancelerNoTarget` runs `BattleScript_ButItFailed`. */
+export const noTarget = () => MOVE_TEMPLATES.failed.render()
 
 export const fainted = (who: Mon) => MOVE_TEMPLATES.fainted.render(who)
 

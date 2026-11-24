@@ -17,15 +17,19 @@ import { mechanicGap } from '../fallbacks'
 import type { Anim, Volatile } from '../stream/instructions'
 import {
   blocked,
+  copiedStats,
   effectActivated,
   effectEnded,
   effectStarted,
+  singleMove as untilNextMove,
   singleTurn as lastsTheTurn,
   transformed,
 } from '../text/phrases-effects'
 import { type Context, type EventOf, sameMon } from './context'
+import { HIT_TURN, isFutureMove } from './anim-turn'
 import { hit, hitLines } from './hits'
 import { bar, drain, isSubstituteCost } from './hp'
+import { playMove } from './moves'
 
 const VOLATILES: Partial<Readonly<Record<string, Volatile>>> = { substitute: 'substitute' }
 
@@ -79,11 +83,29 @@ export function effectEnd(event: EventOf<'effectEnd'>, ctx: Context): void {
     return
   }
   if (!event.silent) ctx.print(line, effectEnded(ctx.mon(who), effect))
+  if (!event.silent && isFutureMove(effect.name)) futureHit(event, ctx)
   if (volatile !== undefined) {
     ctx.emit(line, { op: 'volatile', side: ctx.activeSide(who), volatile, on: false })
   } else if (event.silent) {
     ctx.note(line, mechanicGap(effect.name, 'ending'))
   }
+}
+
+/**
+ * A future attack's hit after its line (`BattleScript_MonTookFutureAttack`): the animation of the
+ * Pokémon out on the other side, whose hit the damage after it plays. While no Pokémon is out
+ * there, the game still plays the animation from the empty side, before the replacement comes in;
+ * the stream has no MOVE without a user, so the hit plays none and notes it.
+ */
+function futureHit(event: EventOf<'effectEnd'>, ctx: Context): void {
+  const { who, effect, line } = event
+  const user = ctx.activeOn(who.side === 'near' ? 'far' : 'near')
+  ctx.mover = user
+  if (user === undefined) {
+    ctx.note(line, mechanicGap(effect.name, 'hitting from a side with no Pokémon out'))
+    return
+  }
+  playMove({ line, user, move: effect.name }, who, HIT_TURN, ctx)
 }
 
 /** The hit that breaks a substitute: it takes the damage, fades, then the hit's lines follow. */
@@ -143,6 +165,17 @@ export function singleTurn({ who, effect, line }: EventOf<'singleTurn'>, ctx: Co
   const anim = SINGLE_TURN_ANIM[toID(effect.name)]
   if (anim !== undefined) ctx.emit(line, { op: 'anim', side: ctx.activeSide(who), anim })
   ctx.print(line, lastsTheTurn(ctx.mon(who), effect))
+}
+
+/** Rage starts without a line; the game says it as a hit raises Attack. */
+export function singleMove({ who, effect, line }: EventOf<'singleMove'>, ctx: Context): void {
+  const phrase = untilNextMove(ctx.mon(who), effect)
+  if (phrase !== undefined) ctx.print(line, phrase)
+}
+
+/** Psych Up's line, after its animation; the stream holds no stat stages to copy. */
+export function copyBoost({ who, from, line }: EventOf<'copyBoost'>, ctx: Context): void {
+  ctx.print(line, copiedStats(ctx.mon(who), ctx.mon(from)))
 }
 
 export function block({ who, effect, line }: EventOf<'block'>, ctx: Context): void {

@@ -7,10 +7,16 @@
 // any higher!" and `DecreaseStat` `STRINGID_STATSWONTDECREASE` "… won't go any lower!"
 // (`battle_stat_change.c`, `battle_message.c`). Belly Drum plays its arrows like any change, then
 // says the maxed Attack, its own message (`B_MSG_STAT_CHANGED_BELLY_DRUM`). Haze resets every
-// stage with no stat animation and says so once (`BattleScript_EffectHaze`).
+// stage with no stat animation and says so once (`BattleScript_EffectHaze`). White Herb's reset
+// raises each lowered stage back to 0 with no arrows, then says it with the item its `-enditem`
+// showed (`BattleScript_WhiteHerbRet`).
+import type { BoostID } from '@pkmn/data'
+
 import type { ScriptEvent } from '../../script/events'
 import { statChanged, statChangesGone, statWontChange } from '../text/phrases'
+import { loweredStatsReset } from '../text/phrases-items'
 import { type Context, type EventOf, sameMon } from './context'
+import { usedUpBefore } from './items'
 
 type StatChangeEvent = EventOf<'statChange'>
 
@@ -36,4 +42,16 @@ export function statLimit(
 
 export function statReset({ line }: EventOf<'statReset'>, ctx: Context): void {
   ctx.print(line, statChangesGone())
+}
+
+export function negativeStatReset(event: EventOf<'negativeStatReset'>, ctx: Context): void {
+  const { who, line } = event
+  const side = ctx.activeSide(who)
+  for (const [stat, stages] of Object.entries(event.restored) as [BoostID, number][]) {
+    ctx.emit(line, { op: 'stat', side, stat, stages, arrows: 'none' })
+  }
+  const item = usedUpBefore(who, ctx)
+  if (item !== undefined || event.silent !== true) {
+    ctx.print(line, loweredStatsReset(ctx.mon(who), item))
+  }
 }

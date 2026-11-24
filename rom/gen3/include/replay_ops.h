@@ -14,8 +14,9 @@ u32 Replay_GetBattler(u32 side);
 // Waits this many frames before the op's next step.
 void Replay_Wait(u32 frames);
 
-// A party mon takes the field: its party slot gets the HP, at most its max HP, and the status
-// (REPLAY_STATUS_*), and the battler's battle mon is made from it.
+// A party mon takes the field: its party slot gets the species of the stream's team table, the
+// HP, at most its max HP, and the status (REPLAY_STATUS_*), and the battler's battle mon is made
+// from it.
 void Replay_PutMonOnField(u32 battler, u32 slot, u32 hp, u32 status);
 
 // The status1 of a REPLAY_STATUS_*.
@@ -35,6 +36,7 @@ bool32 Replay_OpMove(const volatile u8 *operands, u32 step);
 bool32 Replay_OpHit(const volatile u8 *operands, u32 step);
 bool32 Replay_OpHp(const volatile u8 *operands, u32 step);
 bool32 Replay_OpFaint(const volatile u8 *operands, u32 step);
+bool32 Replay_OpShowMon(const volatile u8 *operands, u32 step);
 
 // replay_ops_switch.c
 bool32 Replay_OpWithdraw(const volatile u8 *operands, u32 step);
@@ -45,6 +47,7 @@ bool32 Replay_OpStatus(const volatile u8 *operands, u32 step);
 bool32 Replay_OpStat(const volatile u8 *operands, u32 step);
 bool32 Replay_OpItem(const volatile u8 *operands, u32 step);
 bool32 Replay_OpItemPopUp(const volatile u8 *operands, u32 step);
+bool32 Replay_OpFormChange(const volatile u8 *operands, u32 step);
 
 // replay_anims.c
 bool32 Replay_OpAnim(const volatile u8 *operands, u32 step);

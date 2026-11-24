@@ -10,6 +10,8 @@ const REPLAY_994128 = replayScript('smogtours-gen3ou-994128')
 const REPLAY_994141 = replayScript('smogtours-gen3ou-994141')
 
 const DUGTRIO = { side: 'near', index: 0 } as const
+const TYRANITAR = { side: 'far', index: 0 } as const
+const PAIN_SPLIT = { name: 'Pain Split', kind: 'move' }
 
 describe('the HP rules', () => {
   it('gives Leech Seed damage its cause and source, then a silent heal', () => {
@@ -73,6 +75,47 @@ describe('the HP rules', () => {
       },
     ])
     expect(script.dropped.filter((drop) => drop.line >= NEXT)).toEqual([])
+  })
+
+  // Showdown's Pain Split (`@pkmn/sim` `data/moves.js`, `painsplit.onHit`) sets the target's HP on a
+  // silent line, then the user's on the line that says it.
+  it("sets each Pokémon's HP outright for Pain Split, the target's line silent", () => {
+    const script = scriptOf(
+      '|move|p1a: Dugtrio|Pain Split|p2a: Tyranitar',
+      '|-sethp|p2a: Tyranitar|60/100|[from] move: Pain Split|[silent]',
+      '|-sethp|p1a: Dugtrio|60/100|[from] move: Pain Split',
+    )
+
+    expect(script.dropped.filter((drop) => drop.line >= NEXT)).toEqual([])
+    expect(eventsFrom(script, NEXT + 1)).toEqual([
+      {
+        kind: 'setHp',
+        line: NEXT + 1,
+        who: TYRANITAR,
+        hp: { hp: 60, max: 100 },
+        cause: PAIN_SPLIT,
+        silent: true,
+      },
+      { kind: 'setHp', line: NEXT + 2, who: DUGTRIO, hp: { hp: 60, max: 100 }, cause: PAIN_SPLIT },
+    ])
+  })
+
+  // `@pkmn/protocol` also types the older line that names both Pokémon with their HP.
+  it('reads the older Pain Split line that names both Pokémon as two HP changes', () => {
+    const script = scriptOf('|-sethp|p2a: Tyranitar|60|p1a: Dugtrio|60|[from] move: Pain Split')
+
+    expect(script.dropped.filter((drop) => drop.line >= NEXT)).toEqual([])
+    expect(eventsAt(script, NEXT)).toEqual([
+      {
+        kind: 'setHp',
+        line: NEXT,
+        who: TYRANITAR,
+        hp: { hp: 60, max: 100 },
+        cause: PAIN_SPLIT,
+        silent: true,
+      },
+      { kind: 'setHp', line: NEXT, who: DUGTRIO, hp: { hp: 60, max: 100 }, cause: PAIN_SPLIT },
+    ])
   })
 })
 
@@ -200,6 +243,78 @@ describe('the stat change rules', () => {
         stages: 1,
         cause: { name: 'Liechi Berry', kind: 'item' },
       },
+    ])
+  })
+
+  // Showdown's White Herb (`@pkmn/sim` `data/items.js`, `whiteherb.onUse`) ends the item, then
+  // resets the lowered stages on a silent line.
+  it('raises each lowered stat back to 0 for White Herb and leaves a raised one', () => {
+    const script = scriptOf(
+      '|-unboost|p1a: Dugtrio|atk|2',
+      '|-boost|p1a: Dugtrio|spe|1',
+      '|-unboost|p1a: Dugtrio|def|1',
+      '|-enditem|p1a: Dugtrio|White Herb',
+      '|-clearnegativeboost|p1a: Dugtrio|[silent]',
+    )
+
+    expect(script.dropped.filter((drop) => drop.line >= NEXT)).toEqual([])
+    expect(eventsAt(script, NEXT + 4)).toEqual([
+      {
+        kind: 'negativeStatReset',
+        line: NEXT + 4,
+        who: DUGTRIO,
+        restored: { atk: 2, def: 1 },
+        silent: true,
+      },
+    ])
+  })
+})
+
+describe('the form change rule', () => {
+  const CASTFORM = { side: 'far', index: 1 } as const
+  const FORECAST = { name: 'Forecast', kind: 'ability' }
+
+  // Showdown's Forecast: `formeChange(forme, this.effect, false, '0', '[msg]')`, which logs the
+  // species, `[msg]` and the ability as `[from]`.
+  it('turns Castform into its Sunny form by Forecast and back when the sun ends', () => {
+    const script = scriptOf(
+      '|switch|p2a: Castform|Castform|100/100',
+      '|-weather|SunnyDay',
+      '|-formechange|p2a: Castform|Castform-Sunny|[msg]|[from] ability: Forecast',
+      '|-weather|none',
+      '|-formechange|p2a: Castform|Castform|[msg]|[from] ability: Forecast',
+    )
+
+    expect(script.dropped.filter((drop) => drop.line >= NEXT)).toEqual([])
+    const changes = script.events.filter((event) => event.kind === 'formChange')
+    expect(changes).toEqual([
+      {
+        kind: 'formChange',
+        line: NEXT + 2,
+        who: CASTFORM,
+        species: 'Castform-Sunny',
+        cause: FORECAST,
+        msg: true,
+      },
+      {
+        kind: 'formChange',
+        line: NEXT + 4,
+        who: CASTFORM,
+        species: 'Castform',
+        cause: FORECAST,
+        msg: true,
+      },
+    ])
+  })
+
+  it('reads a form change with no cause and no message', () => {
+    const script = scriptOf(
+      '|switch|p2a: Castform|Castform|100/100',
+      '|-formechange|p2a: Castform|Castform-Rainy',
+    )
+
+    expect(eventsAt(script, NEXT + 1)).toEqual([
+      { kind: 'formChange', line: NEXT + 1, who: CASTFORM, species: 'Castform-Rainy' },
     ])
   })
 })

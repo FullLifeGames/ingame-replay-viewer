@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
+import { chargeTurns, MOVES_INFO } from './gen3-charge.ts'
 import {
   parseCharmap,
   parseDefine,
@@ -59,7 +60,7 @@ const CONTENT: readonly ContentTable[] = [
     enumName: 'Move',
     prefix: 'MOVE',
     field: 'name',
-    data: () => ['src/data/moves_info.h'],
+    data: () => [MOVES_INFO],
     count: 'MOVES_COUNT_ALL',
   },
   {
@@ -101,6 +102,7 @@ export const TABLE_FILES = [
   'trainer-front-pics.json',
   'counts.json',
   'charmap.json',
+  'charge-turns.json',
   'meta.json',
 ] as const
 
@@ -232,6 +234,7 @@ export function generateTables(read: ReadTree, pin: UpstreamPin): GeneratedTable
   files['trainer-front-pics.json'] = jsonText(trainerPicsWith(recorded, 'frontPic'))
   files['counts.json'] = jsonText(counts(recorded))
   files['charmap.json'] = jsonText(parseCharmap(recorded('charmap.txt')))
+  files['charge-turns.json'] = jsonText(chargeTurns(recorded(MOVES_INFO)))
   const sorted = [...hashes].sort(([a], [b]) => (a < b ? -1 : 1))
   files['meta.json'] = jsonText({
     tag: pin.tag,

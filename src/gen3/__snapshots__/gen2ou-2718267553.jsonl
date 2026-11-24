@@ -1,0 +1,472 @@
+{"length":6244,"crc32":"98077ebd","trainers":{"near":{"name":"GSCKING","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"denyro","trainerPic":2,"teamSize":6,"revealed":5}},"parties":{"near":[{"species":94,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gengar"},{"species":135,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Jolteon"},{"species":68,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Machamp"},{"species":200,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Misdreavus"},{"species":143,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Snorlax"},{"species":6,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Charizard"}],"far":[{"species":243,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Raikou"},{"species":143,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Snorlax"},{"species":94,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gengar"},{"species":227,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Skarmory"},{"species":91,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Cloyster"},null]}}
+{"line":22,"op":"intro"}
+{"line":22,"op":"print","text":"You are challenged by denyro!"}
+{"line":24,"op":"print","text":"denyro sent out Raikou!"}
+{"line":24,"op":"sendOut","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":23,"op":"print","text":"Go! Gengar!"}
+{"line":23,"op":"sendOut","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":25,"op":"turn","number":1}
+{"line":29,"op":"print","text":"Gengar, come back!"}
+{"line":29,"op":"withdraw","side":"near"}
+{"line":29,"op":"print","text":"Go! Jolteon!"}
+{"line":29,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":30,"op":"print","text":"The opposing Raikou used Thunder!"}
+{"line":30,"op":"move","user":"far","target":"near","move":87,"animTurn":0}
+{"line":32,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":32,"op":"hp","side":"near","hp":78}
+{"line":32,"op":"print","text":"It's not very effective…"}
+{"line":34,"op":"itemPopUp","side":"near","item":472}
+{"line":34,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":34,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":34,"op":"hp","side":"near","hp":84}
+{"line":36,"op":"turn","number":2}
+{"line":39,"op":"print","text":"denyro withdrew Raikou!"}
+{"line":39,"op":"withdraw","side":"far"}
+{"line":39,"op":"print","text":"denyro sent out Snorlax!"}
+{"line":39,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":40,"op":"print","text":"Jolteon used Thunder!"}
+{"line":40,"op":"move","user":"near","target":"far","move":87,"animTurn":0}
+{"line":41,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":41,"op":"hp","side":"far","hp":75}
+{"line":43,"op":"itemPopUp","side":"near","item":472}
+{"line":43,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":43,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":43,"op":"hp","side":"near","hp":90}
+{"line":44,"op":"itemPopUp","side":"far","item":472}
+{"line":44,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":44,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":44,"op":"hp","side":"far","hp":81}
+{"line":46,"op":"turn","number":3}
+{"line":49,"op":"print","text":"Jolteon used Reflect!"}
+{"line":49,"op":"move","user":"near","target":"near","move":115,"animTurn":0}
+{"line":50,"op":"print","text":"Reflect made your side stronger against physical moves!"}
+{"line":51,"op":"print","text":"The opposing Snorlax used Body Slam!"}
+{"line":51,"op":"move","user":"far","target":"near","move":34,"animTurn":0}
+{"line":52,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":52,"op":"hp","side":"near","hp":69}
+{"line":54,"op":"itemPopUp","side":"near","item":472}
+{"line":54,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":54,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":54,"op":"hp","side":"near","hp":75}
+{"line":55,"op":"itemPopUp","side":"far","item":472}
+{"line":55,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":55,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":55,"op":"hp","side":"far","hp":87}
+{"line":57,"op":"turn","number":4}
+{"line":60,"op":"print","text":"Jolteon used Agility!"}
+{"line":60,"op":"move","user":"near","target":"near","move":97,"animTurn":0}
+{"line":61,"op":"stat","side":"near","stat":"spe","stages":2,"arrows":"one"}
+{"line":61,"op":"print","text":"Jolteon's Speed rose sharply!"}
+{"line":62,"op":"print","text":"The opposing Snorlax used Body Slam!"}
+{"line":62,"op":"move","user":"far","target":"near","move":34,"animTurn":0}
+{"line":63,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":63,"op":"hp","side":"near","hp":54}
+{"line":65,"op":"itemPopUp","side":"near","item":472}
+{"line":65,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":65,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":65,"op":"hp","side":"near","hp":60}
+{"line":66,"op":"itemPopUp","side":"far","item":472}
+{"line":66,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":66,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":66,"op":"hp","side":"far","hp":94}
+{"line":68,"op":"turn","number":5}
+{"line":71,"op":"print","text":"Jolteon used Baton Pass!"}
+{"line":71,"op":"move","user":"near","target":"near","move":226,"animTurn":0}
+{"line":74,"op":"withdraw","side":"near"}
+{"line":74,"op":"print","text":"Go! Machamp!"}
+{"line":74,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":75,"op":"print","text":"The opposing Snorlax used Body Slam!"}
+{"line":75,"op":"move","user":"far","target":"near","move":34,"animTurn":0}
+{"line":76,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":76,"op":"hp","side":"near","hp":84}
+{"line":77,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":77,"op":"print","text":"Machamp is paralyzed, so it may be unable to move!"}
+{"line":77,"op":"status","side":"near","slot":2,"status":"par"}
+{"line":79,"op":"itemPopUp","side":"far","item":472}
+{"line":79,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":79,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":79,"op":"hp","side":"far","hp":99}
+{"line":80,"op":"itemPopUp","side":"near","item":472}
+{"line":80,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":80,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":80,"op":"hp","side":"near","hp":90}
+{"line":82,"op":"turn","number":6}
+{"line":85,"op":"print","text":"denyro withdrew Snorlax!"}
+{"line":85,"op":"withdraw","side":"far"}
+{"line":85,"op":"print","text":"denyro sent out Gengar!"}
+{"line":85,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":86,"op":"print","text":"Machamp couldn't move because it's paralyzed!"}
+{"line":86,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":88,"op":"itemPopUp","side":"near","item":472}
+{"line":88,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":88,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":88,"op":"hp","side":"near","hp":96}
+{"line":90,"op":"turn","number":7}
+{"line":93,"op":"print","text":"denyro withdrew Gengar!"}
+{"line":93,"op":"withdraw","side":"far"}
+{"line":93,"op":"print","text":"denyro sent out Skarmory!"}
+{"line":93,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":94,"op":"print","text":"Machamp used Meditate!"}
+{"line":94,"op":"move","user":"near","target":"near","move":96,"animTurn":0}
+{"line":95,"op":"stat","side":"near","stat":"atk","stages":1,"arrows":"one"}
+{"line":95,"op":"print","text":"Machamp's Attack rose!"}
+{"line":97,"op":"itemPopUp","side":"near","item":472}
+{"line":97,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":97,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":97,"op":"hp","side":"near","hp":100}
+{"line":98,"op":"print","text":"Your side's Reflect wore off!"}
+{"line":100,"op":"turn","number":8}
+{"line":103,"op":"print","text":"The opposing Skarmory used Drill Peck!"}
+{"line":103,"op":"move","user":"far","target":"near","move":65,"animTurn":0}
+{"line":105,"op":"hit","side":"near","effectiveness":"super"}
+{"line":105,"op":"hp","side":"near","hp":51}
+{"line":105,"op":"print","text":"It's super effective!"}
+{"line":106,"op":"print","text":"Machamp couldn't move because it's paralyzed!"}
+{"line":106,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":108,"op":"itemPopUp","side":"near","item":472}
+{"line":108,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":108,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":108,"op":"hp","side":"near","hp":57}
+{"line":110,"op":"turn","number":9}
+{"line":113,"op":"print","text":"denyro withdrew Skarmory!"}
+{"line":113,"op":"withdraw","side":"far"}
+{"line":113,"op":"print","text":"denyro sent out Gengar!"}
+{"line":113,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":114,"op":"print","text":"Machamp used Cross Chop!"}
+{"line":115,"op":"print","text":"It doesn't affect the opposing Gengar…"}
+{"line":117,"op":"itemPopUp","side":"near","item":472}
+{"line":117,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":117,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":117,"op":"hp","side":"near","hp":63}
+{"line":119,"op":"turn","number":10}
+{"line":122,"op":"print","text":"The opposing Gengar used Destiny Bond!"}
+{"line":122,"op":"move","user":"far","target":"far","move":194,"animTurn":0}
+{"line":123,"op":"print","text":"The opposing Gengar is hoping to take its attacker down with it!"}
+{"line":124,"op":"print","text":"Machamp couldn't move because it's paralyzed!"}
+{"line":124,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":126,"op":"itemPopUp","side":"near","item":472}
+{"line":126,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":126,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":126,"op":"hp","side":"near","hp":69}
+{"line":128,"op":"turn","number":11}
+{"line":131,"op":"print","text":"The opposing Gengar used Explosion!"}
+{"line":131,"op":"move","user":"far","target":"near","move":153,"animTurn":0}
+{"line":132,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":132,"op":"hp","side":"near","hp":0}
+{"line":133,"op":"faint","side":"far"}
+{"line":133,"op":"print","text":"The opposing Gengar fainted!"}
+{"line":134,"op":"faint","side":"near"}
+{"line":134,"op":"print","text":"Machamp fainted!"}
+{"line":137,"op":"print","text":"denyro sent out Snorlax!"}
+{"line":137,"op":"switchIn","side":"far","slot":1,"hp":99,"status":"none"}
+{"line":138,"op":"print","text":"Go! Misdreavus!"}
+{"line":138,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":140,"op":"itemPopUp","side":"far","item":472}
+{"line":140,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":140,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":140,"op":"hp","side":"far","hp":100}
+{"line":142,"op":"turn","number":12}
+{"line":145,"op":"print","text":"denyro withdrew Snorlax!"}
+{"line":145,"op":"withdraw","side":"far"}
+{"line":145,"op":"print","text":"denyro sent out Skarmory!"}
+{"line":145,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":146,"op":"print","text":"Misdreavus used Mean Look!"}
+{"line":146,"op":"move","user":"near","target":"far","move":212,"animTurn":0}
+{"line":147,"op":"print","text":"The opposing Skarmory can no longer escape!"}
+{"line":150,"op":"turn","number":13}
+{"line":153,"op":"print","text":"Misdreavus used Confuse Ray!"}
+{"line":153,"op":"move","user":"near","target":"far","move":109,"animTurn":0}
+{"line":154,"op":"print","text":"The opposing Skarmory became confused!"}
+{"line":155,"op":"print","text":"The opposing Skarmory is confused!"}
+{"line":156,"op":"print","text":"It hurt itself in its confusion!"}
+{"line":156,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":156,"op":"hp","side":"far","hp":93}
+{"line":159,"op":"turn","number":14}
+{"line":162,"op":"print","text":"Misdreavus used Perish Song!"}
+{"line":162,"op":"move","user":"near","target":"near","move":195,"animTurn":0}
+{"line":165,"op":"print","text":"All Pokémon that heard the song will faint in three turns!"}
+{"line":166,"op":"print","text":"The opposing Skarmory is confused!"}
+{"line":167,"op":"print","text":"The opposing Skarmory used Whirlwind!"}
+{"line":167,"op":"move","user":"far","target":"near","move":18,"animTurn":0}
+{"line":168,"op":"withdraw","side":"near"}
+{"line":168,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":168,"op":"print","text":"Snorlax was dragged out!"}
+{"line":170,"op":"print","text":"The opposing Skarmory's perish count fell to 3!"}
+{"line":172,"op":"turn","number":15}
+{"line":175,"op":"print","text":"The opposing Skarmory is confused!"}
+{"line":176,"op":"print","text":"The opposing Skarmory used Thief!"}
+{"line":176,"op":"move","user":"far","target":"near","move":168,"animTurn":0}
+{"line":177,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":177,"op":"hp","side":"near","hp":97}
+{"line":178,"op":"item","side":"far","slot":3,"item":472}
+{"line":178,"op":"anim","side":"far","anim":"itemSteal"}
+{"line":178,"op":"print","text":"The opposing Skarmory stole Snorlax's Leftovers!"}
+{"line":179,"op":"print","text":"Snorlax used Curse!"}
+{"line":179,"op":"move","user":"near","target":"near","move":174,"animTurn":1}
+{"line":180,"op":"stat","side":"near","stat":"spe","stages":-1,"arrows":"one"}
+{"line":180,"op":"print","text":"Snorlax's Speed fell!"}
+{"line":181,"op":"stat","side":"near","stat":"atk","stages":1,"arrows":"several"}
+{"line":181,"op":"print","text":"Snorlax's Attack rose!"}
+{"line":182,"op":"stat","side":"near","stat":"def","stages":1,"arrows":"none"}
+{"line":182,"op":"print","text":"Snorlax's Defense rose!"}
+{"line":184,"op":"print","text":"The opposing Skarmory's perish count fell to 2!"}
+{"line":185,"op":"itemPopUp","side":"far","item":472}
+{"line":185,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":185,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":185,"op":"hp","side":"far","hp":99}
+{"line":187,"op":"turn","number":16}
+{"line":190,"op":"print","text":"denyro withdrew Skarmory!"}
+{"line":190,"op":"withdraw","side":"far"}
+{"line":190,"op":"print","text":"denyro sent out Cloyster!"}
+{"line":190,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":191,"op":"print","text":"Snorlax used Body Slam!"}
+{"line":191,"op":"move","user":"near","target":"far","move":34,"animTurn":0}
+{"line":192,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":192,"op":"hp","side":"far","hp":64}
+{"line":194,"op":"itemPopUp","side":"far","item":472}
+{"line":194,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":194,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":194,"op":"hp","side":"far","hp":70}
+{"line":196,"op":"turn","number":17}
+{"line":199,"op":"print","text":"The opposing Cloyster used Spikes!"}
+{"line":199,"op":"move","user":"far","target":"near","move":191,"animTurn":0}
+{"line":200,"op":"print","text":"Spikes were scattered on the ground all around your side!"}
+{"line":201,"op":"print","text":"Snorlax used Curse!"}
+{"line":201,"op":"move","user":"near","target":"near","move":174,"animTurn":1}
+{"line":202,"op":"stat","side":"near","stat":"spe","stages":-1,"arrows":"one"}
+{"line":202,"op":"print","text":"Snorlax's Speed fell!"}
+{"line":203,"op":"stat","side":"near","stat":"atk","stages":1,"arrows":"several"}
+{"line":203,"op":"print","text":"Snorlax's Attack rose!"}
+{"line":204,"op":"stat","side":"near","stat":"def","stages":1,"arrows":"none"}
+{"line":204,"op":"print","text":"Snorlax's Defense rose!"}
+{"line":206,"op":"itemPopUp","side":"far","item":472}
+{"line":206,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":206,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":206,"op":"hp","side":"far","hp":76}
+{"line":208,"op":"turn","number":18}
+{"line":211,"op":"print","text":"denyro withdrew Cloyster!"}
+{"line":211,"op":"withdraw","side":"far"}
+{"line":211,"op":"print","text":"denyro sent out Skarmory!"}
+{"line":211,"op":"switchIn","side":"far","slot":3,"hp":99,"status":"none"}
+{"line":212,"op":"print","text":"Snorlax used Body Slam!"}
+{"line":212,"op":"move","user":"near","target":"far","move":34,"animTurn":0}
+{"line":214,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":214,"op":"hp","side":"far","hp":75}
+{"line":214,"op":"print","text":"It's not very effective…"}
+{"line":215,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":215,"op":"print","text":"The opposing Skarmory is paralyzed, so it may be unable to move!"}
+{"line":215,"op":"status","side":"far","slot":3,"status":"par"}
+{"line":217,"op":"itemPopUp","side":"far","item":472}
+{"line":217,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":217,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":217,"op":"hp","side":"far","hp":81}
+{"line":219,"op":"turn","number":19}
+{"line":222,"op":"print","text":"Snorlax used Body Slam!"}
+{"line":222,"op":"move","user":"near","target":"far","move":34,"animTurn":0}
+{"line":224,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":224,"op":"hp","side":"far","hp":57}
+{"line":224,"op":"print","text":"It's not very effective…"}
+{"line":225,"op":"print","text":"The opposing Skarmory couldn't move because it's paralyzed!"}
+{"line":225,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":227,"op":"itemPopUp","side":"far","item":472}
+{"line":227,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":227,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":227,"op":"hp","side":"far","hp":63}
+{"line":229,"op":"turn","number":20}
+{"line":232,"op":"print","text":"Snorlax used Body Slam!"}
+{"line":232,"op":"move","user":"near","target":"far","move":34,"animTurn":0}
+{"line":234,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":234,"op":"hp","side":"far","hp":37}
+{"line":234,"op":"print","text":"It's not very effective…"}
+{"line":235,"op":"print","text":"The opposing Skarmory used Whirlwind!"}
+{"line":235,"op":"move","user":"far","target":"near","move":18,"animTurn":0}
+{"line":236,"op":"withdraw","side":"near"}
+{"line":236,"op":"switchIn","side":"near","slot":1,"hp":60,"status":"none"}
+{"line":236,"op":"print","text":"Jolteon was dragged out!"}
+{"line":237,"op":"hp","side":"near","hp":48}
+{"line":237,"op":"print","text":"Jolteon was hurt by the spikes!"}
+{"line":239,"op":"itemPopUp","side":"near","item":472}
+{"line":239,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":239,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":239,"op":"hp","side":"near","hp":54}
+{"line":240,"op":"itemPopUp","side":"far","item":472}
+{"line":240,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":240,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":240,"op":"hp","side":"far","hp":43}
+{"line":242,"op":"turn","number":21}
+{"line":245,"op":"print","text":"denyro withdrew Skarmory!"}
+{"line":245,"op":"withdraw","side":"far"}
+{"line":245,"op":"print","text":"denyro sent out Snorlax!"}
+{"line":245,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":246,"op":"print","text":"Jolteon used Agility!"}
+{"line":246,"op":"move","user":"near","target":"near","move":97,"animTurn":0}
+{"line":247,"op":"stat","side":"near","stat":"spe","stages":2,"arrows":"one"}
+{"line":247,"op":"print","text":"Jolteon's Speed rose sharply!"}
+{"line":249,"op":"itemPopUp","side":"near","item":472}
+{"line":249,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":249,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":249,"op":"hp","side":"near","hp":60}
+{"line":251,"op":"turn","number":22}
+{"line":254,"op":"print","text":"Jolteon used Reflect!"}
+{"line":254,"op":"move","user":"near","target":"near","move":115,"animTurn":0}
+{"line":255,"op":"print","text":"Reflect made your side stronger against physical moves!"}
+{"line":256,"op":"print","text":"The opposing Snorlax used Earthquake!"}
+{"line":256,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
+{"line":258,"op":"hit","side":"near","effectiveness":"super"}
+{"line":258,"op":"hp","side":"near","hp":27}
+{"line":258,"op":"print","text":"It's super effective!"}
+{"line":260,"op":"itemPopUp","side":"near","item":472}
+{"line":260,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":260,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":260,"op":"hp","side":"near","hp":33}
+{"line":262,"op":"turn","number":23}
+{"line":265,"op":"print","text":"Jolteon used Baton Pass!"}
+{"line":265,"op":"move","user":"near","target":"near","move":226,"animTurn":0}
+{"line":268,"op":"withdraw","side":"near"}
+{"line":268,"op":"print","text":"Go! Charizard!"}
+{"line":268,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
+{"line":269,"op":"print","text":"The opposing Snorlax used Earthquake!"}
+{"line":270,"op":"print","text":"It doesn't affect Charizard…"}
+{"line":273,"op":"turn","number":24}
+{"line":276,"op":"print","text":"Charizard used Belly Drum!"}
+{"line":276,"op":"move","user":"near","target":"near","move":187,"animTurn":0}
+{"line":277,"op":"hp","side":"near","hp":51}
+{"line":278,"op":"stat","side":"near","stat":"atk","stages":6,"arrows":"one"}
+{"line":278,"op":"print","text":"Charizard cut its own HP and maximized its Attack!"}
+{"line":279,"op":"print","text":"The opposing Snorlax used Body Slam!"}
+{"line":279,"op":"move","user":"far","target":"near","move":34,"animTurn":0}
+{"line":280,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":280,"op":"hp","side":"near","hp":34}
+{"line":282,"op":"itemPopUp","side":"near","item":472}
+{"line":282,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":282,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":282,"op":"hp","side":"near","hp":40}
+{"line":284,"op":"turn","number":25}
+{"line":287,"op":"print","text":"Charizard used Rock Slide!"}
+{"line":287,"op":"move","user":"near","target":"far","move":157,"animTurn":0}
+{"line":288,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":288,"op":"hp","side":"far","hp":54}
+{"line":289,"op":"print","text":"The opposing Snorlax flinched and couldn't move!"}
+{"line":291,"op":"itemPopUp","side":"near","item":472}
+{"line":291,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":291,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":291,"op":"hp","side":"near","hp":46}
+{"line":292,"op":"itemPopUp","side":"far","item":472}
+{"line":292,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":292,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":292,"op":"hp","side":"far","hp":60}
+{"line":294,"op":"turn","number":26}
+{"line":297,"op":"print","text":"denyro withdrew Snorlax!"}
+{"line":297,"op":"withdraw","side":"far"}
+{"line":297,"op":"print","text":"denyro sent out Skarmory!"}
+{"line":297,"op":"switchIn","side":"far","slot":3,"hp":43,"status":"par"}
+{"line":298,"op":"print","text":"Charizard used Earthquake!"}
+{"line":299,"op":"print","text":"It doesn't affect the opposing Skarmory…"}
+{"line":301,"op":"itemPopUp","side":"near","item":472}
+{"line":301,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":301,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":301,"op":"hp","side":"near","hp":53}
+{"line":302,"op":"itemPopUp","side":"far","item":472}
+{"line":302,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":302,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":302,"op":"hp","side":"far","hp":49}
+{"line":303,"op":"print","text":"Your side's Reflect wore off!"}
+{"line":305,"op":"turn","number":27}
+{"line":308,"op":"print","text":"Charizard used Fire Blast!"}
+{"line":308,"op":"move","user":"near","target":"far","move":126,"animTurn":0}
+{"line":311,"op":"hit","side":"far","effectiveness":"super"}
+{"line":311,"op":"hp","side":"far","hp":0}
+{"line":311,"op":"print","text":"A critical hit!"}
+{"line":311,"op":"print","text":"It's super effective!"}
+{"line":312,"op":"faint","side":"far"}
+{"line":312,"op":"print","text":"The opposing Skarmory fainted!"}
+{"line":315,"op":"print","text":"denyro sent out Cloyster!"}
+{"line":315,"op":"switchIn","side":"far","slot":4,"hp":76,"status":"none"}
+{"line":317,"op":"itemPopUp","side":"near","item":472}
+{"line":317,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":317,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":317,"op":"hp","side":"near","hp":59}
+{"line":318,"op":"itemPopUp","side":"far","item":472}
+{"line":318,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":318,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":318,"op":"hp","side":"far","hp":82}
+{"line":320,"op":"turn","number":28}
+{"line":323,"op":"print","text":"denyro withdrew Cloyster!"}
+{"line":323,"op":"withdraw","side":"far"}
+{"line":323,"op":"print","text":"denyro sent out Raikou!"}
+{"line":323,"op":"switchIn","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":324,"op":"print","text":"Charizard used Rock Slide!"}
+{"line":324,"op":"move","user":"near","target":"far","move":157,"animTurn":0}
+{"line":325,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":325,"op":"hp","side":"far","hp":36}
+{"line":327,"op":"itemPopUp","side":"near","item":472}
+{"line":327,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":327,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":327,"op":"hp","side":"near","hp":65}
+{"line":328,"op":"itemPopUp","side":"far","item":472}
+{"line":328,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":328,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":328,"op":"hp","side":"far","hp":42}
+{"line":330,"op":"turn","number":29}
+{"line":333,"op":"print","text":"Charizard used Earthquake!"}
+{"line":333,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
+{"line":335,"op":"hit","side":"far","effectiveness":"super"}
+{"line":335,"op":"hp","side":"far","hp":0}
+{"line":335,"op":"print","text":"It's super effective!"}
+{"line":336,"op":"faint","side":"far"}
+{"line":336,"op":"print","text":"The opposing Raikou fainted!"}
+{"line":339,"op":"print","text":"denyro sent out Cloyster!"}
+{"line":339,"op":"switchIn","side":"far","slot":4,"hp":82,"status":"none"}
+{"line":341,"op":"itemPopUp","side":"near","item":472}
+{"line":341,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":341,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":341,"op":"hp","side":"near","hp":71}
+{"line":342,"op":"itemPopUp","side":"far","item":472}
+{"line":342,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":342,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":342,"op":"hp","side":"far","hp":88}
+{"line":344,"op":"turn","number":30}
+{"line":347,"op":"print","text":"Charizard used Rock Slide!"}
+{"line":347,"op":"move","user":"near","target":"far","move":157,"animTurn":0}
+{"line":349,"op":"hit","side":"far","effectiveness":"super"}
+{"line":349,"op":"hp","side":"far","hp":2}
+{"line":349,"op":"print","text":"It's super effective!"}
+{"line":350,"op":"print","text":"The opposing Cloyster flinched and couldn't move!"}
+{"line":352,"op":"itemPopUp","side":"near","item":472}
+{"line":352,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":352,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":352,"op":"hp","side":"near","hp":77}
+{"line":353,"op":"itemPopUp","side":"far","item":472}
+{"line":353,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":353,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":353,"op":"hp","side":"far","hp":7}
+{"line":355,"op":"turn","number":31}
+{"line":365,"op":"print","text":"Charizard used Earthquake!"}
+{"line":365,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
+{"line":367,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":367,"op":"hp","side":"far","hp":0}
+{"line":367,"op":"print","text":"A critical hit!"}
+{"line":368,"op":"faint","side":"far"}
+{"line":368,"op":"print","text":"The opposing Cloyster fainted!"}
+{"line":372,"op":"print","text":"denyro sent out Snorlax!"}
+{"line":372,"op":"switchIn","side":"far","slot":1,"hp":60,"status":"none"}
+{"line":374,"op":"itemPopUp","side":"near","item":472}
+{"line":374,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":374,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":374,"op":"hp","side":"near","hp":83}
+{"line":375,"op":"itemPopUp","side":"far","item":472}
+{"line":375,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":375,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":375,"op":"hp","side":"far","hp":66}
+{"line":377,"op":"turn","number":32}
+{"line":381,"op":"print","text":"Charizard used Earthquake!"}
+{"line":381,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
+{"line":382,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":382,"op":"hp","side":"far","hp":0}
+{"line":383,"op":"faint","side":"far"}
+{"line":383,"op":"print","text":"The opposing Snorlax fainted!"}
+{"line":390,"op":"print","text":"denyro lost due to inactivity."}
+{"line":392,"op":"print","text":"GSCKING won the battle!"}
+{"line":392,"op":"end","outcome":"nearWon"}
+{"line":163,"fallback":"mechanic","detail":"no state in the stream for perish3 starting"}
+{"line":164,"fallback":"mechanic","detail":"no state in the stream for perish3 starting"}

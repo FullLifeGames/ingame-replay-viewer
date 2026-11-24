@@ -1,0 +1,500 @@
+{"length":7131,"crc32":"4e919aef","trainers":{"near":{"name":"second children","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"nya420","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":251,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"atom eve"},{"species":6,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"battle beast"},{"species":330,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"invincible"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":true,"nickname":"conquest"},{"species":135,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"red rush"},{"species":82,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"machinehead"}],"far":[{"species":286,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"cube"},{"species":275,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"remedy"},{"species":6,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"warning"},{"species":377,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"basalt"},{"species":71,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"hofmann"},{"species":245,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"yoyo"}]}}
+{"line":25,"op":"intro"}
+{"line":25,"op":"print","text":"You are challenged by nya420!"}
+{"line":27,"op":"print","text":"nya420 sent out cube!"}
+{"line":27,"op":"sendOut","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":26,"op":"print","text":"Go! atom eve!"}
+{"line":26,"op":"sendOut","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":28,"op":"turn","number":1}
+{"line":32,"op":"print","text":"nya420 withdrew cube!"}
+{"line":32,"op":"withdraw","side":"far"}
+{"line":32,"op":"print","text":"nya420 sent out remedy!"}
+{"line":32,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":33,"op":"print","text":"atom eve used Hidden Power!"}
+{"line":33,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
+{"line":35,"op":"hit","side":"far","effectiveness":"super"}
+{"line":35,"op":"hp","side":"far","hp":57}
+{"line":35,"op":"print","text":"It's super effective!"}
+{"line":38,"op":"turn","number":2}
+{"line":41,"op":"print","text":"nya420 withdrew remedy!"}
+{"line":41,"op":"withdraw","side":"far"}
+{"line":41,"op":"print","text":"nya420 sent out warning!"}
+{"line":41,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":42,"op":"print","text":"atom eve used Hidden Power!"}
+{"line":42,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
+{"line":44,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":44,"op":"hp","side":"far","hp":88}
+{"line":44,"op":"print","text":"It's not very effective…"}
+{"line":47,"op":"turn","number":3}
+{"line":50,"op":"print","text":"atom eve, come back!"}
+{"line":50,"op":"withdraw","side":"near"}
+{"line":50,"op":"print","text":"Go! battle beast!"}
+{"line":50,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":51,"op":"print","text":"The opposing warning used Substitute!"}
+{"line":51,"op":"move","user":"far","target":"far","move":164,"animTurn":0}
+{"line":52,"op":"volatile","side":"far","volatile":"substitute","on":true}
+{"line":53,"op":"hp","side":"far","hp":63}
+{"line":52,"op":"print","text":"The opposing warning put in a substitute!"}
+{"line":56,"op":"turn","number":4}
+{"line":60,"op":"print","text":"battle beast used Rock Slide!"}
+{"line":60,"op":"move","user":"near","target":"far","move":157,"animTurn":0}
+{"line":62,"op":"hit","side":"far","effectiveness":"super"}
+{"line":62,"op":"print","text":"The substitute took damage for the opposing warning!"}
+{"line":62,"op":"anim","side":"far","anim":"substituteFade"}
+{"line":62,"op":"print","text":"The opposing warning's substitute faded!"}
+{"line":62,"op":"volatile","side":"far","volatile":"substitute","on":false}
+{"line":62,"op":"print","text":"It's super effective!"}
+{"line":63,"op":"print","text":"The opposing warning used Fire Blast!"}
+{"line":63,"op":"move","user":"far","target":"near","move":126,"animTurn":0}
+{"line":65,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":65,"op":"hp","side":"near","hp":63}
+{"line":65,"op":"print","text":"It's not very effective…"}
+{"line":68,"op":"turn","number":5}
+{"line":72,"op":"print","text":"nya420 withdrew warning!"}
+{"line":72,"op":"withdraw","side":"far"}
+{"line":72,"op":"print","text":"nya420 sent out basalt!"}
+{"line":72,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":73,"op":"print","text":"battle beast used Rock Slide!"}
+{"line":73,"op":"move","user":"near","target":"far","move":157,"animTurn":0}
+{"line":74,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":74,"op":"hp","side":"far","hp":90}
+{"line":76,"op":"itemPopUp","side":"far","item":472}
+{"line":76,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":76,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":76,"op":"hp","side":"far","hp":96}
+{"line":78,"op":"turn","number":6}
+{"line":81,"op":"print","text":"battle beast, come back!"}
+{"line":81,"op":"withdraw","side":"near"}
+{"line":81,"op":"print","text":"Go! atom eve!"}
+{"line":81,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":82,"op":"print","text":"nya420 withdrew basalt!"}
+{"line":82,"op":"withdraw","side":"far"}
+{"line":82,"op":"print","text":"nya420 sent out cube!"}
+{"line":82,"op":"switchIn","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":85,"op":"turn","number":7}
+{"line":88,"op":"print","text":"The opposing cube used Sunny Day!"}
+{"line":88,"op":"move","user":"far","target":"far","move":241,"animTurn":0}
+{"line":89,"op":"weather","weather":"sun"}
+{"line":89,"op":"print","text":"The sunlight turned harsh!"}
+{"line":90,"op":"print","text":"atom eve used Baton Pass!"}
+{"line":90,"op":"move","user":"near","target":"near","move":226,"animTurn":0}
+{"line":93,"op":"withdraw","side":"near"}
+{"line":93,"op":"print","text":"Go! battle beast!"}
+{"line":93,"op":"switchIn","side":"near","slot":1,"hp":63,"status":"none"}
+{"line":95,"op":"print","text":"The sunlight is strong."}
+{"line":95,"op":"anim","side":"near","anim":"sunContinues"}
+{"line":97,"op":"turn","number":8}
+{"line":100,"op":"print","text":"nya420 withdrew cube!"}
+{"line":100,"op":"withdraw","side":"far"}
+{"line":100,"op":"print","text":"nya420 sent out basalt!"}
+{"line":100,"op":"switchIn","side":"far","slot":3,"hp":96,"status":"none"}
+{"line":101,"op":"print","text":"battle beast used Hidden Power!"}
+{"line":101,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
+{"line":103,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":103,"op":"hp","side":"far","hp":89}
+{"line":103,"op":"print","text":"It's not very effective…"}
+{"line":105,"op":"print","text":"The sunlight is strong."}
+{"line":105,"op":"anim","side":"near","anim":"sunContinues"}
+{"line":106,"op":"itemPopUp","side":"far","item":472}
+{"line":106,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":106,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":106,"op":"hp","side":"far","hp":95}
+{"line":108,"op":"turn","number":9}
+{"line":111,"op":"print","text":"battle beast, come back!"}
+{"line":111,"op":"withdraw","side":"near"}
+{"line":111,"op":"print","text":"Go! invincible!"}
+{"line":111,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":112,"op":"print","text":"nya420 withdrew basalt!"}
+{"line":112,"op":"withdraw","side":"far"}
+{"line":112,"op":"print","text":"nya420 sent out remedy!"}
+{"line":112,"op":"switchIn","side":"far","slot":1,"hp":57,"status":"none"}
+{"line":114,"op":"print","text":"The sunlight is strong."}
+{"line":114,"op":"anim","side":"near","anim":"sunContinues"}
+{"line":116,"op":"turn","number":10}
+{"line":119,"op":"print","text":"The opposing remedy used Solar Beam!"}
+{"line":120,"op":"print","text":"The opposing remedy absorbed light!"}
+{"line":120,"op":"move","user":"far","target":"far","move":76,"animTurn":0}
+{"line":121,"op":"move","user":"far","target":"near","move":76,"animTurn":1}
+{"line":122,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":122,"op":"hp","side":"near","hp":29}
+{"line":123,"op":"print","text":"invincible used Hidden Power!"}
+{"line":123,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
+{"line":125,"op":"hit","side":"far","effectiveness":"super"}
+{"line":125,"op":"hp","side":"far","hp":0}
+{"line":125,"op":"print","text":"It's super effective!"}
+{"line":126,"op":"faint","side":"far"}
+{"line":126,"op":"print","text":"The opposing remedy fainted!"}
+{"line":129,"op":"print","text":"nya420 sent out hofmann!"}
+{"line":129,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":131,"op":"print","text":"The sunlight is strong."}
+{"line":131,"op":"anim","side":"near","anim":"sunContinues"}
+{"line":133,"op":"turn","number":11}
+{"line":136,"op":"print","text":"invincible, come back!"}
+{"line":136,"op":"withdraw","side":"near"}
+{"line":136,"op":"print","text":"Go! atom eve!"}
+{"line":136,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":137,"op":"print","text":"The opposing hofmann used Hidden Power!"}
+{"line":137,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":139,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":139,"op":"hp","side":"near","hp":92}
+{"line":139,"op":"print","text":"It's not very effective…"}
+{"line":141,"op":"weather","weather":"none"}
+{"line":141,"op":"print","text":"The sunlight faded."}
+{"line":142,"op":"itemPopUp","side":"near","item":472}
+{"line":142,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":142,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":142,"op":"hp","side":"near","hp":98}
+{"line":144,"op":"turn","number":12}
+{"line":147,"op":"print","text":"The opposing hofmann used Sludge Bomb!"}
+{"line":147,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":149,"op":"hit","side":"near","effectiveness":"super"}
+{"line":149,"op":"hp","side":"near","hp":29}
+{"line":149,"op":"print","text":"It's super effective!"}
+{"line":150,"op":"print","text":"atom eve used Swords Dance!"}
+{"line":150,"op":"move","user":"near","target":"near","move":14,"animTurn":0}
+{"line":151,"op":"stat","side":"near","stat":"atk","stages":2,"arrows":"one"}
+{"line":151,"op":"print","text":"atom eve's Attack rose sharply!"}
+{"line":153,"op":"itemPopUp","side":"near","item":472}
+{"line":153,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":153,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":153,"op":"hp","side":"near","hp":35}
+{"line":155,"op":"turn","number":13}
+{"line":158,"op":"print","text":"atom eve, come back!"}
+{"line":158,"op":"withdraw","side":"near"}
+{"line":158,"op":"print","text":"Go! conquest!"}
+{"line":158,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":159,"op":"print","text":"The opposing hofmann used Sludge Bomb!"}
+{"line":160,"op":"print","text":"It doesn't affect conquest…"}
+{"line":163,"op":"turn","number":14}
+{"line":166,"op":"print","text":"nya420 withdrew hofmann!"}
+{"line":166,"op":"withdraw","side":"far"}
+{"line":166,"op":"print","text":"nya420 sent out warning!"}
+{"line":166,"op":"switchIn","side":"far","slot":2,"hp":63,"status":"none"}
+{"line":167,"op":"print","text":"conquest used Agility!"}
+{"line":167,"op":"move","user":"near","target":"near","move":97,"animTurn":0}
+{"line":168,"op":"stat","side":"near","stat":"spe","stages":2,"arrows":"one"}
+{"line":168,"op":"print","text":"conquest's Speed rose sharply!"}
+{"line":171,"op":"turn","number":15}
+{"line":174,"op":"print","text":"conquest used Rock Slide!"}
+{"line":174,"op":"move","user":"near","target":"far","move":157,"animTurn":0}
+{"line":176,"op":"hit","side":"far","effectiveness":"super"}
+{"line":176,"op":"hp","side":"far","hp":0}
+{"line":176,"op":"print","text":"It's super effective!"}
+{"line":177,"op":"faint","side":"far"}
+{"line":177,"op":"print","text":"The opposing warning fainted!"}
+{"line":180,"op":"print","text":"nya420 sent out basalt!"}
+{"line":180,"op":"switchIn","side":"far","slot":3,"hp":95,"status":"none"}
+{"line":182,"op":"itemPopUp","side":"far","item":472}
+{"line":182,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":182,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":182,"op":"hp","side":"far","hp":100}
+{"line":184,"op":"turn","number":16}
+{"line":187,"op":"print","text":"conquest used Meteor Mash!"}
+{"line":187,"op":"move","user":"near","target":"far","move":309,"animTurn":0}
+{"line":189,"op":"hit","side":"far","effectiveness":"super"}
+{"line":189,"op":"hp","side":"far","hp":37}
+{"line":189,"op":"print","text":"It's super effective!"}
+{"line":190,"op":"stat","side":"near","stat":"atk","stages":1,"arrows":"one"}
+{"line":190,"op":"print","text":"conquest's Attack rose!"}
+{"line":191,"op":"print","text":"The opposing basalt used Curse!"}
+{"line":191,"op":"move","user":"far","target":"far","move":174,"animTurn":1}
+{"line":192,"op":"stat","side":"far","stat":"spe","stages":-1,"arrows":"one"}
+{"line":192,"op":"print","text":"The opposing basalt's Speed fell!"}
+{"line":193,"op":"stat","side":"far","stat":"atk","stages":1,"arrows":"several"}
+{"line":193,"op":"print","text":"The opposing basalt's Attack rose!"}
+{"line":194,"op":"stat","side":"far","stat":"def","stages":1,"arrows":"none"}
+{"line":194,"op":"print","text":"The opposing basalt's Defense rose!"}
+{"line":196,"op":"itemPopUp","side":"far","item":472}
+{"line":196,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":196,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":196,"op":"hp","side":"far","hp":43}
+{"line":198,"op":"turn","number":17}
+{"line":201,"op":"print","text":"conquest used Meteor Mash!"}
+{"line":201,"op":"move","user":"near","target":"far","move":309,"animTurn":0}
+{"line":203,"op":"hit","side":"far","effectiveness":"super"}
+{"line":203,"op":"hp","side":"far","hp":0}
+{"line":203,"op":"print","text":"It's super effective!"}
+{"line":204,"op":"faint","side":"far"}
+{"line":204,"op":"print","text":"The opposing basalt fainted!"}
+{"line":207,"op":"print","text":"nya420 sent out yoyo!"}
+{"line":207,"op":"switchIn","side":"far","slot":5,"hp":100,"status":"none"}
+{"line":210,"op":"turn","number":18}
+{"line":213,"op":"print","text":"conquest used Earthquake!"}
+{"line":213,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
+{"line":214,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":214,"op":"hp","side":"far","hp":65}
+{"line":215,"op":"print","text":"The opposing yoyo used Surf!"}
+{"line":215,"op":"move","user":"far","target":"near","move":57,"animTurn":0}
+{"line":216,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":216,"op":"hp","side":"near","hp":66}
+{"line":218,"op":"itemPopUp","side":"far","item":472}
+{"line":218,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":218,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":218,"op":"hp","side":"far","hp":71}
+{"line":220,"op":"turn","number":19}
+{"line":223,"op":"print","text":"conquest used Rock Slide!"}
+{"line":223,"op":"move","user":"near","target":"far","move":157,"animTurn":0}
+{"line":224,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":224,"op":"hp","side":"far","hp":45}
+{"line":225,"op":"print","text":"The opposing yoyo flinched and couldn't move!"}
+{"line":227,"op":"itemPopUp","side":"far","item":472}
+{"line":227,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":227,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":227,"op":"hp","side":"far","hp":51}
+{"line":229,"op":"turn","number":20}
+{"line":232,"op":"print","text":"conquest used Rock Slide!"}
+{"line":232,"op":"move","user":"near","target":"far","move":157,"animTurn":0}
+{"line":233,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":233,"op":"hp","side":"far","hp":27}
+{"line":234,"op":"print","text":"The opposing yoyo used Rest!"}
+{"line":234,"op":"move","user":"far","target":"far","move":156,"animTurn":0}
+{"line":235,"op":"print","text":"The opposing yoyo slept and restored its HP!"}
+{"line":235,"op":"status","side":"far","slot":5,"status":"slp"}
+{"line":236,"op":"hp","side":"far","hp":100}
+{"line":239,"op":"turn","number":21}
+{"line":242,"op":"print","text":"conquest used Meteor Mash!"}
+{"line":242,"op":"move","user":"near","target":"far","move":309,"animTurn":0}
+{"line":244,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":244,"op":"hp","side":"far","hp":75}
+{"line":244,"op":"print","text":"It's not very effective…"}
+{"line":245,"op":"print","text":"The opposing yoyo is fast asleep."}
+{"line":245,"op":"anim","side":"far","anim":"statusSlp"}
+{"line":246,"op":"print","text":"The opposing yoyo used Sleep Talk!"}
+{"line":246,"op":"move","user":"far","target":"far","move":214,"animTurn":0}
+{"line":247,"op":"print","text":"The opposing yoyo used Calm Mind!"}
+{"line":247,"op":"move","user":"far","target":"far","move":347,"animTurn":0}
+{"line":248,"op":"stat","side":"far","stat":"spa","stages":1,"arrows":"several"}
+{"line":248,"op":"print","text":"The opposing yoyo's Sp. Atk rose!"}
+{"line":249,"op":"stat","side":"far","stat":"spd","stages":1,"arrows":"none"}
+{"line":249,"op":"print","text":"The opposing yoyo's Sp. Def rose!"}
+{"line":251,"op":"itemPopUp","side":"far","item":472}
+{"line":251,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":251,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":251,"op":"hp","side":"far","hp":81}
+{"line":253,"op":"turn","number":22}
+{"line":256,"op":"print","text":"conquest used Meteor Mash!"}
+{"line":256,"op":"move","user":"near","target":"far","move":309,"animTurn":0}
+{"line":258,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":258,"op":"hp","side":"far","hp":56}
+{"line":258,"op":"print","text":"It's not very effective…"}
+{"line":259,"op":"print","text":"The opposing yoyo is fast asleep."}
+{"line":259,"op":"anim","side":"far","anim":"statusSlp"}
+{"line":260,"op":"print","text":"The opposing yoyo used Sleep Talk!"}
+{"line":260,"op":"move","user":"far","target":"far","move":214,"animTurn":0}
+{"line":261,"op":"print","text":"The opposing yoyo used Calm Mind!"}
+{"line":261,"op":"move","user":"far","target":"far","move":347,"animTurn":0}
+{"line":262,"op":"stat","side":"far","stat":"spa","stages":1,"arrows":"several"}
+{"line":262,"op":"print","text":"The opposing yoyo's Sp. Atk rose!"}
+{"line":263,"op":"stat","side":"far","stat":"spd","stages":1,"arrows":"none"}
+{"line":263,"op":"print","text":"The opposing yoyo's Sp. Def rose!"}
+{"line":265,"op":"itemPopUp","side":"far","item":472}
+{"line":265,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":265,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":265,"op":"hp","side":"far","hp":62}
+{"line":267,"op":"turn","number":23}
+{"line":270,"op":"print","text":"conquest used Rock Slide!"}
+{"line":270,"op":"move","user":"near","target":"far","move":157,"animTurn":0}
+{"line":271,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":271,"op":"hp","side":"far","hp":37}
+{"line":272,"op":"print","text":"The opposing yoyo woke up!"}
+{"line":272,"op":"status","side":"far","slot":5,"status":"none"}
+{"line":273,"op":"print","text":"The opposing yoyo flinched and couldn't move!"}
+{"line":275,"op":"itemPopUp","side":"far","item":472}
+{"line":275,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":275,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":275,"op":"hp","side":"far","hp":44}
+{"line":277,"op":"turn","number":24}
+{"line":280,"op":"print","text":"conquest used Rock Slide!"}
+{"line":280,"op":"move","user":"near","target":"far","move":157,"animTurn":0}
+{"line":281,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":281,"op":"hp","side":"far","hp":20}
+{"line":282,"op":"print","text":"The opposing yoyo used Rest!"}
+{"line":282,"op":"move","user":"far","target":"far","move":156,"animTurn":0}
+{"line":283,"op":"print","text":"The opposing yoyo slept and restored its HP!"}
+{"line":283,"op":"status","side":"far","slot":5,"status":"slp"}
+{"line":284,"op":"hp","side":"far","hp":100}
+{"line":287,"op":"turn","number":25}
+{"line":290,"op":"print","text":"conquest used Meteor Mash!"}
+{"line":291,"op":"print","text":"The opposing yoyo avoided the attack!"}
+{"line":292,"op":"print","text":"The opposing yoyo is fast asleep."}
+{"line":292,"op":"anim","side":"far","anim":"statusSlp"}
+{"line":293,"op":"print","text":"The opposing yoyo used Sleep Talk!"}
+{"line":293,"op":"move","user":"far","target":"far","move":214,"animTurn":0}
+{"line":294,"op":"print","text":"The opposing yoyo used Surf!"}
+{"line":294,"op":"move","user":"far","target":"near","move":57,"animTurn":0}
+{"line":295,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":295,"op":"hp","side":"near","hp":0}
+{"line":296,"op":"faint","side":"near"}
+{"line":296,"op":"print","text":"conquest fainted!"}
+{"line":299,"op":"print","text":"Go! battle beast!"}
+{"line":299,"op":"switchIn","side":"near","slot":1,"hp":63,"status":"none"}
+{"line":302,"op":"turn","number":26}
+{"line":305,"op":"print","text":"battle beast used Belly Drum!"}
+{"line":305,"op":"move","user":"near","target":"near","move":187,"animTurn":0}
+{"line":306,"op":"hp","side":"near","hp":13}
+{"line":307,"op":"stat","side":"near","stat":"atk","stages":6,"arrows":"one"}
+{"line":307,"op":"print","text":"battle beast cut its own HP and maximized its Attack!"}
+{"line":308,"op":"print","text":"The opposing yoyo is fast asleep."}
+{"line":308,"op":"anim","side":"far","anim":"statusSlp"}
+{"line":309,"op":"print","text":"The opposing yoyo used Sleep Talk!"}
+{"line":309,"op":"move","user":"far","target":"far","move":214,"animTurn":0}
+{"line":310,"op":"print","text":"The opposing yoyo used Rest!"}
+{"line":310,"op":"move","user":"far","target":"far","move":156,"animTurn":0}
+{"line":312,"op":"itemPopUp","side":"near","item":569}
+{"line":312,"op":"anim","side":"near","anim":"heldItemBerry"}
+{"line":312,"op":"item","side":"near","slot":1,"item":0}
+{"line":313,"op":"stat","side":"near","stat":"spe","stages":1,"arrows":"one"}
+{"line":313,"op":"print","text":"The Salac Berry boosted battle beast's Speed!"}
+{"line":315,"op":"turn","number":27}
+{"line":318,"op":"print","text":"battle beast used Hidden Power!"}
+{"line":318,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
+{"line":319,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":319,"op":"hp","side":"far","hp":40}
+{"line":320,"op":"print","text":"The opposing yoyo woke up!"}
+{"line":320,"op":"status","side":"far","slot":5,"status":"none"}
+{"line":321,"op":"print","text":"The opposing yoyo used Surf!"}
+{"line":321,"op":"move","user":"far","target":"near","move":57,"animTurn":0}
+{"line":323,"op":"hit","side":"near","effectiveness":"super"}
+{"line":323,"op":"hp","side":"near","hp":0}
+{"line":323,"op":"print","text":"It's super effective!"}
+{"line":324,"op":"faint","side":"near"}
+{"line":324,"op":"print","text":"battle beast fainted!"}
+{"line":327,"op":"print","text":"Go! red rush!"}
+{"line":327,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":329,"op":"itemPopUp","side":"far","item":472}
+{"line":329,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":329,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":329,"op":"hp","side":"far","hp":46}
+{"line":331,"op":"turn","number":28}
+{"line":334,"op":"print","text":"red rush used Thunderbolt!"}
+{"line":334,"op":"move","user":"near","target":"far","move":85,"animTurn":0}
+{"line":337,"op":"hit","side":"far","effectiveness":"super"}
+{"line":337,"op":"hp","side":"far","hp":0}
+{"line":337,"op":"print","text":"A critical hit!"}
+{"line":337,"op":"print","text":"It's super effective!"}
+{"line":338,"op":"faint","side":"far"}
+{"line":338,"op":"print","text":"The opposing yoyo fainted!"}
+{"line":341,"op":"print","text":"nya420 sent out cube!"}
+{"line":341,"op":"switchIn","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":344,"op":"turn","number":29}
+{"line":347,"op":"print","text":"red rush used Substitute!"}
+{"line":347,"op":"move","user":"near","target":"near","move":164,"animTurn":0}
+{"line":348,"op":"volatile","side":"near","volatile":"substitute","on":true}
+{"line":349,"op":"hp","side":"near","hp":76}
+{"line":348,"op":"print","text":"red rush put in a substitute!"}
+{"line":350,"op":"print","text":"The opposing cube used Spore!"}
+{"line":351,"op":"print","text":"But it failed!"}
+{"line":353,"op":"itemPopUp","side":"near","item":472}
+{"line":353,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":353,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":353,"op":"hp","side":"near","hp":82}
+{"line":355,"op":"turn","number":30}
+{"line":358,"op":"print","text":"red rush used Hidden Power!"}
+{"line":358,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
+{"line":360,"op":"hit","side":"far","effectiveness":"super"}
+{"line":360,"op":"hp","side":"far","hp":13}
+{"line":360,"op":"print","text":"It's super effective!"}
+{"line":361,"op":"print","text":"The opposing cube used Sunny Day!"}
+{"line":361,"op":"move","user":"far","target":"far","move":241,"animTurn":0}
+{"line":362,"op":"weather","weather":"sun"}
+{"line":362,"op":"print","text":"The sunlight turned harsh!"}
+{"line":364,"op":"print","text":"The sunlight is strong."}
+{"line":364,"op":"anim","side":"near","anim":"sunContinues"}
+{"line":365,"op":"itemPopUp","side":"near","item":472}
+{"line":365,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":365,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":365,"op":"hp","side":"near","hp":88}
+{"line":366,"op":"itemPopUp","side":"far","item":472}
+{"line":366,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":366,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":366,"op":"hp","side":"far","hp":19}
+{"line":368,"op":"turn","number":31}
+{"line":371,"op":"print","text":"The opposing cube used Mach Punch!"}
+{"line":371,"op":"move","user":"far","target":"near","move":183,"animTurn":0}
+{"line":372,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":372,"op":"print","text":"The substitute took damage for red rush!"}
+{"line":372,"op":"anim","side":"near","anim":"substituteFade"}
+{"line":372,"op":"print","text":"red rush's substitute faded!"}
+{"line":372,"op":"volatile","side":"near","volatile":"substitute","on":false}
+{"line":373,"op":"print","text":"red rush used Hidden Power!"}
+{"line":373,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
+{"line":375,"op":"hit","side":"far","effectiveness":"super"}
+{"line":375,"op":"hp","side":"far","hp":0}
+{"line":375,"op":"print","text":"It's super effective!"}
+{"line":376,"op":"faint","side":"far"}
+{"line":376,"op":"print","text":"The opposing cube fainted!"}
+{"line":379,"op":"print","text":"nya420 sent out hofmann!"}
+{"line":379,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":381,"op":"print","text":"The sunlight is strong."}
+{"line":381,"op":"anim","side":"near","anim":"sunContinues"}
+{"line":382,"op":"itemPopUp","side":"near","item":472}
+{"line":382,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":382,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":382,"op":"hp","side":"near","hp":93}
+{"line":384,"op":"turn","number":32}
+{"line":387,"op":"print","text":"red rush, come back!"}
+{"line":387,"op":"withdraw","side":"near"}
+{"line":387,"op":"print","text":"Go! invincible!"}
+{"line":387,"op":"switchIn","side":"near","slot":2,"hp":29,"status":"none"}
+{"line":388,"op":"print","text":"The opposing hofmann used Swords Dance!"}
+{"line":388,"op":"move","user":"far","target":"far","move":14,"animTurn":0}
+{"line":389,"op":"stat","side":"far","stat":"atk","stages":2,"arrows":"one"}
+{"line":389,"op":"print","text":"The opposing hofmann's Attack rose sharply!"}
+{"line":391,"op":"print","text":"The sunlight is strong."}
+{"line":391,"op":"anim","side":"near","anim":"sunContinues"}
+{"line":393,"op":"turn","number":33}
+{"line":396,"op":"print","text":"The opposing hofmann used Hidden Power!"}
+{"line":396,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":398,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":398,"op":"hp","side":"near","hp":0}
+{"line":398,"op":"print","text":"A critical hit!"}
+{"line":399,"op":"faint","side":"near"}
+{"line":399,"op":"print","text":"invincible fainted!"}
+{"line":402,"op":"print","text":"Go! machinehead!"}
+{"line":402,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
+{"line":404,"op":"print","text":"The sunlight is strong."}
+{"line":404,"op":"anim","side":"near","anim":"sunContinues"}
+{"line":406,"op":"turn","number":34}
+{"line":409,"op":"print","text":"The opposing hofmann used Hidden Power!"}
+{"line":409,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":411,"op":"hit","side":"near","effectiveness":"super"}
+{"line":411,"op":"hp","side":"near","hp":0}
+{"line":411,"op":"print","text":"It's super effective!"}
+{"line":412,"op":"faint","side":"near"}
+{"line":412,"op":"print","text":"machinehead fainted!"}
+{"line":415,"op":"print","text":"Go! atom eve!"}
+{"line":415,"op":"switchIn","side":"near","slot":0,"hp":35,"status":"none"}
+{"line":417,"op":"weather","weather":"none"}
+{"line":417,"op":"print","text":"The sunlight faded."}
+{"line":418,"op":"itemPopUp","side":"near","item":472}
+{"line":418,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":418,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":418,"op":"hp","side":"near","hp":41}
+{"line":420,"op":"turn","number":35}
+{"line":423,"op":"print","text":"The opposing hofmann used Sludge Bomb!"}
+{"line":423,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":425,"op":"hit","side":"near","effectiveness":"super"}
+{"line":425,"op":"hp","side":"near","hp":0}
+{"line":425,"op":"print","text":"It's super effective!"}
+{"line":426,"op":"faint","side":"near"}
+{"line":426,"op":"print","text":"atom eve fainted!"}
+{"line":429,"op":"print","text":"Go! red rush!"}
+{"line":429,"op":"switchIn","side":"near","slot":4,"hp":93,"status":"none"}
+{"line":431,"op":"itemPopUp","side":"near","item":472}
+{"line":431,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":431,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":431,"op":"hp","side":"near","hp":99}
+{"line":433,"op":"turn","number":36}
+{"line":436,"op":"print","text":"red rush used Hidden Power!"}
+{"line":436,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
+{"line":438,"op":"hit","side":"far","effectiveness":"super"}
+{"line":438,"op":"hp","side":"far","hp":23}
+{"line":438,"op":"print","text":"It's super effective!"}
+{"line":439,"op":"print","text":"The opposing hofmann used Sludge Bomb!"}
+{"line":439,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":440,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":440,"op":"hp","side":"near","hp":0}
+{"line":441,"op":"faint","side":"near"}
+{"line":441,"op":"print","text":"red rush fainted!"}
+{"line":443,"op":"print","text":"nya420 won the battle!"}
+{"line":443,"op":"end","outcome":"farWon"}

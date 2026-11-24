@@ -12,7 +12,7 @@ import {
   ownerAtStart,
   speciesName,
 } from './names'
-import { screenRaised } from './phrases-field'
+import { FIELD_TEMPLATES, screenRaised } from './phrases-field'
 import { isTrapping } from './phrases-hp'
 import { STATUS_TEMPLATES } from './phrases-status'
 import { ownPhrase, type Phrase, tagged } from './template'
@@ -83,6 +83,8 @@ export const EFFECT_TEMPLATES = {
   transformed: tagged('STRINGID_PKMNTRANSFORMEDINTO', (who: Mon, species: string) => {
     return `${nameAtStart(who)} transformed into ${species}!`
   }),
+  // `BattleScript_BattlerFormChangeWithString`, after the form change (Castform's Forecast).
+  formChanged: tagged('STRINGID_PKMNTRANSFORMED', start('transformed!')),
   // Bide's second turn (`BattleScript_BideStoringEnergy`) and its third (`BattleScript_BideAttack`).
   storingEnergy: tagged('STRINGID_PKMNSTORINGENERGY', start('is storing energy!')),
   unleashedEnergy: tagged('STRINGID_PKMNUNLEASHEDENERGY', start('unleashed its energy!')),
@@ -99,6 +101,16 @@ export const EFFECT_TEMPLATES = {
   foresaw: tagged('STRINGID_PKMNFORESAWATTACK', start('foresaw an attack!')),
   tookAttack: tagged('STRINGID_PKMNTOOKATTACK', (who: Mon, move: string) => {
     return `${nameAtStart(who)} took the ${move} attack!`
+  }),
+  // `BattleScript_EffectDestinyBond` and `BattleScript_EffectGrudge`, with the user as B_ATK.
+  hopingToTakeFoe: tagged(
+    'STRINGID_PKMNTRYINGTOTAKEFOE',
+    start('is hoping to take its attacker down with it!'),
+  ),
+  grudge: tagged('STRINGID_PKMNWANTSGRUDGE', start('wants its target to bear a grudge!')),
+  // `BattleScript_EffectPsychUp`, with the user as B_SCR and the target as B_EFF.
+  copiedStats: tagged('STRINGID_PKMNCOPIEDSTATCHANGES', (who: Mon, from: Mon) => {
+    return `${nameAtStart(who)} copied ${nameInside(from)}'s stat changes!`
   }),
 }
 
@@ -122,6 +134,9 @@ const STARTS: Readonly<Record<string, Line>> = {
   rage: E.rageBuilding.render,
   mist: E.mist.render,
   futuresight: E.foresaw.render,
+  // Gen 3 logs the sports as starts on their user; the game's line names the type they weaken.
+  mudsport: FIELD_TEMPLATES.electricWeakened.render,
+  watersport: FIELD_TEMPLATES.fireWeakened.render,
 }
 
 /**
@@ -225,9 +240,33 @@ export function singleTurn(who: Mon, effect: Effect): Phrase {
   return ownPhrase(own, `${effect.name} for one turn`)
 }
 
+const SINGLE_MOVE: Readonly<Record<string, Line>> = {
+  destinybond: E.hopingToTakeFoe.render,
+  grudge: E.grudge.render,
+}
+
+/** Effects the game starts without a line: Rage says its line as a hit raises Attack. */
+const SILENT_SINGLE_MOVE: ReadonlySet<string> = new Set(['rage'])
+
+/** An effect that lasts until `who` moves again, or undefined where the game says nothing. */
+export function singleMove(who: Mon, effect: Effect): Phrase | undefined {
+  const id = toID(effect.name)
+  if (SILENT_SINGLE_MOVE.has(id)) return undefined
+  const text = SINGLE_MOVE[id]?.(who)
+  if (text !== undefined) return { text }
+  const own = `${nameAtStart(who)} readied ${held(effect.name)}!`
+  return ownPhrase(own, `${effect.name} until the next move`)
+}
+
+/** `who` took the stat stages of `from` (Psych Up). */
+export const copiedStats = (who: Mon, from: Mon) => E.copiedStats.render(who, from)
+
 /** `who` turned into the species `species`, by the expansion's name for it. */
 export const transformed = (who: Mon, species: string) =>
   E.transformed.render(who, speciesName(species))
+
+/** `who` took another form of its species. */
+export const formChanged = (who: Mon) => E.formChanged.render(who)
 
 /** A move `who` kept off, such as by Protect. */
 export function blocked(who: Mon, effect: Effect): Phrase {

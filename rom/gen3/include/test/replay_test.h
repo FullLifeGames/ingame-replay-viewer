@@ -58,6 +58,11 @@ struct ReplayTestTrainerSprite
 };
 const struct ReplayTestTrainerSprite *ReplayTest_TrainerSpriteAtOpStart(u32 op, u32 side);
 
+// The animation turn of the last move animation (gAnimMoveTurn) when the interpreter started op
+// number op, recorded as the KO animation counter is. At the start of the op after a MOVE it is
+// the turn that MOVE's animation read.
+u32 ReplayTest_AnimMoveTurnAtOpStart(u32 op);
+
 // Called in STREAM: the interpreter plays the outro after END (REPLAY_OUTRO_THEN_EXIT), and THEN
 // runs once the outro has faded the screen to black.
 void ReplayTest_PlayOutro(void);
@@ -79,7 +84,10 @@ void ReplayStream_Turn(u32 number);
 void ReplayStream_Print(const u8 *text);
 void ReplayStream_Intro(void);
 void ReplayStream_SendOut(u32 side, u32 slot, u32 hp, u32 status);
+// The MOVE has animation turn 0: the first script of a move animation that has two.
 void ReplayStream_Move(u32 userSide, u32 targetSide, u32 move);
+// The MOVE has the animation turn animTurn, which the game's move animation reads (gAnimMoveTurn).
+void ReplayStream_MoveOnAnimTurn(u32 userSide, u32 targetSide, u32 move, u32 animTurn);
 void ReplayStream_Hit(u32 side, u32 effectiveness);
 void ReplayStream_Hp(u32 side, u32 hp);
 void ReplayStream_Faint(u32 side);
@@ -94,6 +102,10 @@ void ReplayStream_ItemPopUp(u32 side, u32 item);
 // move is the move that traps the side's mon.
 void ReplayStream_TrapTurn(u32 side, u32 move);
 void ReplayStream_FlushTextBox(void);
+// species is the form the side's mon takes, such as SPECIES_CASTFORM_SUNNY.
+void ReplayStream_FormChange(u32 side, u32 species);
+// Shows the side's mon again, as the game shows a hidden Fly user whose hit turn plays no move.
+void ReplayStream_ShowMon(u32 side);
 void ReplayStream_Weather(u32 weather);
 void ReplayStream_Volatile(u32 side, u32 volatileId, bool32 on);
 // show: TRUE shows the ability pop-up, FALSE hides it.

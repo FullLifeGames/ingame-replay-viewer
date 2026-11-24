@@ -48,6 +48,12 @@ export const BATTLE_RULES = {
     reads: [],
     build: ({ line, args: [, text] }) => [{ kind: 'message', line, text }],
   },
+  // The server's own line in the battle, such as the turn limit's, reads as `|-message|`.
+  '|message|': {
+    arity: 1,
+    reads: [],
+    build: ({ line, args: [, text] }) => [{ kind: 'message', line, text }],
+  },
   '|win|': {
     arity: 1,
     reads: [],

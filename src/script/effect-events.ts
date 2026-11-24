@@ -43,12 +43,40 @@ export interface TransformEvent {
   readonly into: PokemonRef
 }
 
+/**
+ * `who` takes the form `species` until it leaves the field (Castform's Forecast); `msg` marks a
+ * line the client shows with its message.
+ */
+export interface FormChangeEvent extends Caused {
+  readonly kind: 'formChange'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly species: string
+  readonly msg?: true
+}
+
 /** An effect that lasts the turn: Protect, Endure, Focus Punch's focus. */
 export interface SingleTurnEvent {
   readonly kind: 'singleTurn'
   readonly line: number
   readonly who: PokemonRef
   readonly effect: Effect
+}
+
+/** An effect that lasts until its user's next move: Destiny Bond, Grudge, Rage. */
+export interface SingleMoveEvent {
+  readonly kind: 'singleMove'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly effect: Effect
+}
+
+/** `who` takes the stat stages of `from` (Psych Up). */
+export interface CopyBoostEvent extends Caused {
+  readonly kind: 'copyBoost'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly from: PokemonRef
 }
 
 export interface ItemEvent extends Caused {

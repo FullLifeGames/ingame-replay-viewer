@@ -5,7 +5,8 @@
 // `BattleScript_BerryCureStatusRet`, `BattleScript_ItemHealHP_RemoveBerry` and
 // `BattleScript_ConsumableBerryStatRaise`); the cure or heal after it names the berry. An item
 // used for the stat change the next line makes, such as Berserk Gene, shows its pop-up and plays
-// the held item animation (`BattleScript_BerserkGene`); the change names the item. An item the
+// the held item animation (`BattleScript_BerserkGene`); the change names the item. White Herb does
+// the same before the reset of the lowered stages (`BattleScript_WhiteHerbRet`). An item the
 // expansion lacks is text alone (plan §4) and shows no pop-up.
 import { Dex, toID } from '@pkmn/dex'
 
@@ -75,14 +76,33 @@ export function item(event: EventOf<'item'>, ctx: Context): void {
   ctx.print(line, itemShown(ctx.mon(who), event.item, cause, source && ctx.mon(source)))
 }
 
-/** An item used up, neither eaten nor taken, that @pkmn gives stat changes (`boosts`). */
-const usedForBoosts = ({ item, cause, eaten, silent }: EventOf<'itemEnd'>) =>
-  !eaten && !silent && cause === undefined && Boolean(Dex.items.get(item).boosts)
+/** An item used up by its holder: neither eaten, nor taken, nor gone without a word. */
+const usedUp = ({ eaten, silent, cause }: EventOf<'itemEnd'>) =>
+  !eaten && !silent && cause === undefined
+
+/** The item `who` used up on the line before the event in hand, if it used one there. */
+export function usedUpBefore(who: PokemonRef, ctx: Context): string | undefined {
+  const before = ctx.near(-1)
+  return before?.kind === 'itemEnd' && usedUp(before) && sameMon(before.who, who)
+    ? before.item
+    : undefined
+}
+
+/**
+ * An item used up for what the next line does: the stat changes @pkmn gives it (`boosts`), or
+ * the reset of the lowered stages that names it (White Herb).
+ */
+function usedForNext(event: EventOf<'itemEnd'>, ctx: Context): boolean {
+  if (!usedUp(event)) return false
+  const next = ctx.near(1)
+  const resets = next?.kind === 'negativeStatReset' && sameMon(next.who, event.who)
+  return resets || Boolean(Dex.items.get(event.item).boosts)
+}
 
 export function itemEnd(event: EventOf<'itemEnd'>, ctx: Context): void {
   const { who, cause, source, line } = event
   const number = heldItem(ctx, line, event.item)
-  if (event.eaten || usedForBoosts(event)) {
+  if (event.eaten || usedForNext(event, ctx)) {
     showPopUp(who, event.item, line, ctx)
     const anim = event.eaten ? 'heldItemBerry' : 'heldItemEffect'
     ctx.emit(line, { op: 'anim', side: ctx.activeSide(who), anim })

@@ -16,6 +16,9 @@ export const ITEM_TEMPLATES = {
   knockedOff: tagged('STRINGID_PKMNKNOCKEDOFF', (user: Mon, target: Mon, item: string) => {
     return `${nameAtStart(user)} knocked off ${nameInside(target)}'s ${item}!`
   }),
+  whiteHerb: tagged('STRINGID_PKMNSITEMRESTOREDSTATUS', (who: Mon, item: string) => {
+    return `${nameAtStart(who)} returned its stats to normal using its ${item}!`
+  }),
   pressure: tagged('STRINGID_PRESSUREENTERS', (who: Mon) => {
     return `${nameAtStart(who)} is exerting its pressure!`
   }),
@@ -56,6 +59,18 @@ export function itemRemoved(
     return { text: ITEM_TEMPLATES.knockedOff.render(source, who, name) }
   }
   return ownPhrase(`${ownerAtStart(who)} ${name} was used up!`, `${item} used up`)
+}
+
+/**
+ * Lowered stages back to 0: by the item `who` used up just before (White Herb), or else in a line
+ * of ours.
+ */
+export function loweredStatsReset(who: Mon, item: string | undefined): Phrase {
+  if (item !== undefined) return { text: ITEM_TEMPLATES.whiteHerb.render(who, itemName(item)) }
+  return ownPhrase(
+    `${nameAtStart(who)} returned its lowered stats to normal!`,
+    'lowered stats reset',
+  )
 }
 
 /** The line an ability adds to its pop-up, if it has one. */

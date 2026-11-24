@@ -4,6 +4,7 @@ import {
   parseCharmap,
   parseDefine,
   parseDisplayNames,
+  parseEntryValues,
   parseEnum,
   parseIncludes,
 } from './gen3-parse.ts'
@@ -199,5 +200,29 @@ describe('parseDefine (T3b)', () => {
   it('refuses a define it cannot read as one number, and a missing one', () => {
     expect(() => parseDefine(text, 'TWICE')).toThrow(/TWICE is "\(MAX_LEVEL \* 2\)", not a number/)
     expect(() => parseDefine(text, 'MAX')).toThrow(/no #define MAX/)
+  })
+})
+
+describe('parseEntryValues', () => {
+  // Razor Wind's description closes its bracket in each branch of an `#if`.
+  it('reads each entry up to the next, every branch of an #if, comments gone', () => {
+    const text = [
+      '[MOVE_RAZOR_WIND] =',
+      '{',
+      '    .description = COMPOUND_STRING(',
+      '    #if B_UPDATED_MOVE_DATA == GEN_3',
+      '        "old"),',
+      '    #else',
+      '        "new"),',
+      '    #endif',
+      '    .power = 80, // a comment',
+      '},',
+      '[MOVE_FLY] = { .power = 90 },',
+    ].join('\n')
+    const values = parseEntryValues(text, 'MOVE')
+    expect([...values.keys()]).toEqual(['MOVE_RAZOR_WIND', 'MOVE_FLY'])
+    const razorWind = (values.get('MOVE_RAZOR_WIND') ?? '').replace(/\s+/g, ' ')
+    expect(razorWind).toBe(' { .description = COMPOUND_STRING( "old"), "new"), .power = 80, }, ')
+    expect(values.get('MOVE_FLY')).toBe(' { .power = 90 },')
   })
 })

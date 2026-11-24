@@ -1,4 +1,4 @@
-// The instruction stream, version 2 (plan §2): the numbers both sides of the seam share. The C
+// The instruction stream, version 3 (plan §2): the numbers both sides of the seam share. The C
 // side is rom/gen3/include/replay_stream.h; format.test.ts holds the two equal, name by name
 // (`OP.sendOut` is REPLAY_OP_SEND_OUT). The stream is little-endian; it starts with its version.
 //
@@ -18,7 +18,7 @@ import type { Side } from '../../script/types'
 
 /** The stream header's values and where the team tables and the instructions start. */
 export const STREAM = {
-  version: 2,
+  version: 3,
   headerSize: 0x10,
   sideCount: 2,
   partySize: 6,
@@ -96,6 +96,8 @@ export const OP = {
   itemPopUp: 0x12,
   trapTurn: 0x13,
   flushTextBox: 0x14,
+  formChange: 0x15,
+  showMon: 0x16,
 } as const
 
 export type Op = keyof typeof OP
@@ -108,7 +110,7 @@ export const OP_SIZE = {
   sendOut: 5,
   withdraw: 1,
   switchIn: 5,
-  move: 4,
+  move: 5,
   hit: 2,
   hp: 3,
   faint: 1,
@@ -122,6 +124,8 @@ export const OP_SIZE = {
   itemPopUp: 3,
   trapTurn: 3,
   flushTextBox: 0,
+  formChange: 3,
+  showMon: 1,
 } as const satisfies Record<Exclude<Op, 'print'>, number>
 
 /** PRINT's operand: its text in the game's charset and EOS, one glyph at least. */
@@ -187,7 +191,7 @@ export const ANIM = {
 /**
  * The masks of the order rules, as bits by OP and ANIM number: the ops whose side operands name a
  * side with a battler out (WITHDRAW, MOVE, HIT, HP, FAINT, STAT, ANIM, VOLATILE, ABILITY,
- * ITEM_POP_UP, TRAP_TURN), and the four weather anims that need none. order.test.ts holds each
- * mask equal to the OR of those names.
+ * ITEM_POP_UP, TRAP_TURN, FORM_CHANGE, SHOW_MON), and the four weather anims that need none.
+ * order.test.ts holds each mask equal to the OR of those names.
  */
-export const ORDER = { onFieldOps: 0xdb7a0, freeAnims: 0xf0 } as const
+export const ORDER = { onFieldOps: 0x6db7a0, freeAnims: 0xf0 } as const

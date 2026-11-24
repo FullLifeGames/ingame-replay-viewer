@@ -21,9 +21,9 @@ const u16 = (bytes: Uint8Array, at: number) => (bytes[at] ?? 0) | ((bytes[at + 1
 const u32 = (bytes: Uint8Array, at: number) => u16(bytes, at) + u16(bytes, at + 2) * 0x10000
 
 describe('encodeStream', () => {
-  it('starts a stream of END alone with version 2 and header size 16 (F1)', () => {
+  it('starts a stream of END alone with version 3 and header size 16 (F1)', () => {
     const bytes = encodeStream(streamOf([END]))
-    expect([...bytes.subarray(0, 4)]).toEqual([0x02, 0x00, 0x10, 0x00])
+    expect([...bytes.subarray(0, 4)]).toEqual([0x03, 0x00, 0x10, 0x00])
     expect([bytes[4], bytes[5], u16(bytes, 6)]).toEqual([24, 24, 0])
     expect([u32(bytes, 8), u32(bytes, 12)]).toEqual([STREAM.tablesEnd, 3])
     expect([...bytes.subarray(STREAM.tablesEnd)]).toEqual([0x00, 0x01, 0x00])
@@ -59,7 +59,7 @@ describe('encodeStream', () => {
   })
 
   it('refuses a MOVE before any SEND_OUT, as the ROM does (#18)', () => {
-    const move: Instruction = { op: 'move', user: 'near', target: 'far', move: 1 }
+    const move: Instruction = { op: 'move', user: 'near', target: 'far', move: 1, animTurn: 0 }
     expect(() => encodeStream(streamOf([{ op: 'intro' }, move, END]))).toThrow(
       'move at 1 names the near side, which has no battler out',
     )
@@ -174,11 +174,11 @@ describe('encodeInstruction', () => {
     expect(() => encodeInstruction({ op: 'print', text: 'a\nb' })).toThrow(Gen3Error)
   })
 
-  it('writes signed stages and a two-byte move', () => {
+  it('writes signed stages, and a two-byte move with its animation turn', () => {
     const stat: Instruction = { op: 'stat', side: 'far', stat: 'atk', stages: -1, arrows: 'one' }
     expect(encodeInstruction(stat)).toEqual([0x0c, 4, 1, 1, 0xff, 1])
-    const move: Instruction = { op: 'move', user: 'near', target: 'far', move: 0x0312 }
-    expect(encodeInstruction(move)).toEqual([0x07, 4, 0, 1, 0x12, 0x03])
+    const move: Instruction = { op: 'move', user: 'near', target: 'far', move: 0x0312, animTurn: 2 }
+    expect(encodeInstruction(move)).toEqual([0x07, 5, 0, 1, 0x12, 0x03, 2])
   })
 
   it('encodes the ops of version 2: ITEM_POPUP, TRAP_TURN, FLUSH_TEXT_BOX, ANIM SIMPLE_HEAL', () => {
@@ -189,6 +189,23 @@ describe('encodeInstruction', () => {
     expect(encodeInstruction({ op: 'flushTextBox' })).toEqual([0x14, 0])
     const heal: Instruction = { op: 'anim', side: 'far', anim: 'simpleHeal' }
     expect(encodeInstruction(heal)).toEqual([0x0d, 2, 1, 17])
+  })
+
+  it('encodes FORM_CHANGE as the side and a two-byte species, as ITEM_POP_UP orders them', () => {
+    const change: Instruction = { op: 'formChange', side: 'far', species: 0x041b }
+    expect(encodeInstruction(change)).toEqual([0x15, 3, 1, 0x1b, 0x04])
+  })
+
+  it('encodes SHOW_MON as the side alone', () => {
+    expect(encodeInstruction({ op: 'showMon', side: 'far' })).toEqual([0x16, 1, 1])
+  })
+
+  it('takes FORM_CHANGE species 1 to NUM_SPECIES - 1 and refuses 0 and NUM_SPECIES', () => {
+    const change = (species: number): Instruction => ({ op: 'formChange', side: 'near', species })
+    expect(encodeInstruction(change(1))).toHaveLength(5)
+    expect(encodeInstruction(change(counts.NUM_SPECIES - 1))).toHaveLength(5)
+    expect(() => encodeInstruction(change(0))).toThrow(Gen3Error)
+    expect(() => encodeInstruction(change(counts.NUM_SPECIES))).toThrow(Gen3Error)
   })
 
   it('takes the last item and move of the expansion and refuses the next', () => {
@@ -209,7 +226,9 @@ describe('encodeInstruction', () => {
       { op: 'stat', side: 'near', stat: 'def', stages: 128, arrows: 'none' },
       { op: 'weather', weather: 'fog' as 'rain' },
       { op: 'volatile', side: 'near', volatile: 'substitute', on: 1 as unknown as boolean },
-      { op: 'move', user: 'near', target: 'far', move: 0x1234 },
+      { op: 'move', user: 'near', target: 'far', move: 0x1234, animTurn: 0 },
+      { op: 'move', user: 'near', target: 'far', move: 1, animTurn: 0x100 },
+      { op: 'move', user: 'near', target: 'far', move: 1, animTurn: -1 },
       { op: 'item', side: 'far', slot: 0, item: 'Leftovers' as unknown as number },
       { op: 'itemPopUp', side: 'far', item: 1.5 },
       { op: 'trapTurn', side: 'top' as 'near', move: 83 },

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
+import { moveOf } from '../tables/lookup'
 import { plain, sceneOf, streamOfLog } from '../testing'
 
 const any = expect.any(Number) as number
@@ -23,16 +24,16 @@ describe('Substitute (X12)', () => {
     )
     expect(scene.map(plain)).toEqual([
       'Dugtrio used Substitute!',
-      { op: 'move', user: 'near', target: 'near', move: any },
+      { op: 'move', user: 'near', target: 'near', move: any, animTurn: 0 },
       substitute(true),
       { op: 'hp', side: 'near', hp: 75 },
       'Dugtrio put in a substitute!',
       'The opposing Tyranitar used Rock Slide!',
-      { op: 'move', user: 'far', target: 'near', move: any },
+      { op: 'move', user: 'far', target: 'near', move: any, animTurn: 0 },
       { op: 'hit', side: 'near', effectiveness: 'normal' },
       'The substitute took damage for Dugtrio!',
       'The opposing Tyranitar used Earthquake!',
-      { op: 'move', user: 'far', target: 'near', move: any },
+      { op: 'move', user: 'far', target: 'near', move: any, animTurn: 0 },
       { op: 'hit', side: 'near', effectiveness: 'super' },
       'The substitute took damage for Dugtrio!',
       { op: 'anim', side: 'near', anim: 'substituteFade' },
@@ -157,7 +158,7 @@ describe('a Pokémon that faints by its effect drains its bar first (#39)', () =
   it('says Destiny Bond took the attacker down after the holder faints, then drains it', () => {
     expect(sceneOf(...destinyBond).map(plain)).toEqual([
       'Dugtrio used Earthquake!',
-      { op: 'move', user: 'near', target: 'far', move: any },
+      { op: 'move', user: 'near', target: 'far', move: any, animTurn: 0 },
       { op: 'hit', side: 'far', effectiveness: 'normal' },
       { op: 'hp', side: 'far', hp: 0 },
       { op: 'faint', side: 'far' },
@@ -202,5 +203,71 @@ describe('a Pokémon that faints by its effect drains its bar first (#39)', () =
     expect(sceneOf('|-start|p1a: Dugtrio|perish1')).not.toContainEqual(
       expect.objectContaining({ op: 'hp' }),
     )
+  })
+})
+
+describe('Psych Up', () => {
+  it("says the user copied the target's stat changes after the animation", () => {
+    const scene = sceneOf(
+      '|move|p1a: Dugtrio|Psych Up|p2a: Tyranitar',
+      '|-copyboost|p1a: Dugtrio|p2a: Tyranitar|[from] move: Psych Up',
+    )
+    expect(scene.map(plain).slice(1)).toEqual([
+      { op: 'move', user: 'near', target: 'far', move: moveOf('Psych Up').number, animTurn: 0 },
+      "Dugtrio copied the opposing Tyranitar's stat changes!",
+    ])
+  })
+})
+
+describe('the effects that last until the next move', () => {
+  it('says Destiny Bond and Grudge as the game does', () => {
+    const scene = sceneOf(
+      '|-singlemove|p1a: Dugtrio|Destiny Bond',
+      '|-singlemove|p2a: Tyranitar|Grudge',
+    )
+    expect(scene.map(plain)).toEqual([
+      'Dugtrio is hoping to take its attacker down with it!',
+      'The opposing Tyranitar wants its target to bear a grudge!',
+    ])
+  })
+
+  it('says nothing for Rage as it starts, as the game says nothing then', () => {
+    const lines = ['|move|p2a: Tyranitar|Rage|p1a: Dugtrio', '|-singlemove|p2a: Tyranitar|Rage']
+    expect(
+      sceneOf(...lines)
+        .map(plain)
+        .slice(0, 1),
+    ).toEqual(['The opposing Tyranitar used Rage!'])
+    expect(sceneOf(...lines)).toHaveLength(2)
+    expect(fallbacksOf(...lines)).toEqual([])
+  })
+
+  it('lists an effect the game has no line for', () => {
+    expect(fallbacksOf('|-singlemove|p1a: Dugtrio|Glaive Rush')).toEqual([
+      expect.objectContaining({ kind: 'phrase' }),
+    ])
+  })
+})
+
+describe('a future attack whose user has fainted (U4)', () => {
+  const start = [
+    '|move|p1a: Dugtrio|Future Sight|p2a: Tyranitar',
+    '|-start|p1a: Dugtrio|Future Sight',
+  ]
+  const hit = ['|-end|p2a: Tyranitar|move: Future Sight', '|-damage|p2a: Tyranitar|50/100']
+
+  it("lists the hit's animation, which the game plays from the empty side, as a mechanic", () => {
+    const ko = ['|move|p2a: Tyranitar|Rock Slide|p1a: Dugtrio', '|-damage|p1a: Dugtrio|0 fnt']
+    expect(fallbacksOf(...start, ...ko, '|faint|p1a: Dugtrio', ...hit)).toEqual([
+      {
+        line: NEXT + 5,
+        kind: 'mechanic',
+        detail: 'no state in the stream for Future Sight hitting from a side with no Pokémon out',
+      },
+    ])
+  })
+
+  it('lists nothing while its user is out', () => {
+    expect(fallbacksOf(...start, ...hit)).toEqual([])
   })
 })

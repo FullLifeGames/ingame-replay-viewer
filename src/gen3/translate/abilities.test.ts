@@ -118,7 +118,7 @@ describe('ability pop-ups', () => {
     )
     expect(scene.map(plain)).toEqual([
       'Dugtrio used Swagger!',
-      { op: 'move', user: 'near', target: 'far', move: moveOf('Swagger').number },
+      { op: 'move', user: 'near', target: 'far', move: moveOf('Swagger').number, animTurn: 0 },
       { op: 'stat', side: 'far', stat: 'atk', stages: 2, arrows: 'one' },
       "The opposing Tyranitar's Attack rose sharply!",
       popUp('far', 'Own Tempo', true),

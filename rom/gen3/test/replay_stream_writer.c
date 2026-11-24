@@ -145,7 +145,12 @@ void ReplayStream_SendOut(u32 side, u32 slot, u32 hp, u32 status)
 
 void ReplayStream_Move(u32 userSide, u32 targetSide, u32 move)
 {
-    const u8 operands[REPLAY_OP_MOVE_SIZE] = { userSide, targetSide, move, move >> 8 };
+    ReplayStream_MoveOnAnimTurn(userSide, targetSide, move, 0);
+}
+
+void ReplayStream_MoveOnAnimTurn(u32 userSide, u32 targetSide, u32 move, u32 animTurn)
+{
+    const u8 operands[REPLAY_OP_MOVE_SIZE] = { userSide, targetSide, move, move >> 8, animTurn };
     ReplayStream_Op(REPLAY_OP_MOVE, REPLAY_OP_MOVE_SIZE, operands);
 }
 
@@ -236,6 +241,18 @@ void ReplayStream_TrapTurn(u32 side, u32 move)
 void ReplayStream_FlushTextBox(void)
 {
     ReplayStream_Op(REPLAY_OP_FLUSH_TEXT_BOX, REPLAY_OP_FLUSH_TEXT_BOX_SIZE, NULL);
+}
+
+void ReplayStream_FormChange(u32 side, u32 species)
+{
+    const u8 operands[REPLAY_OP_FORM_CHANGE_SIZE] = { side, species, species >> 8 };
+    ReplayStream_Op(REPLAY_OP_FORM_CHANGE, REPLAY_OP_FORM_CHANGE_SIZE, operands);
+}
+
+void ReplayStream_ShowMon(u32 side)
+{
+    const u8 operands[REPLAY_OP_SHOW_MON_SIZE] = { side };
+    ReplayStream_Op(REPLAY_OP_SHOW_MON, REPLAY_OP_SHOW_MON_SIZE, operands);
 }
 
 const u8 *ReplayStream_Data(void)

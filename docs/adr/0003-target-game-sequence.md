@@ -26,4 +26,4 @@ Black 2/White 2 (Gen 5, NDS), the generation whose sprites Showdown's own client
 
 ## Amendment, 23.11.2026: Pokémon XD
 
-Pokémon XD: Gale of Darkness joins the roadmap as a second 3D target game (user, 23.11.2026). It would run through its native PC port, which compiles the game's decompilation and reads the user's own disc image. Its place in the order is open, and `docs/plan.md` holds what is known about the port.
+Pokémon XD: Gale of Darkness joins the roadmap as a second 3D target game (user, 23.11.2026). It would run through its native PC port, which compiles the game's decompilation and reads the user's own disc image. It stays last in the order (user, 24.11.2026), and `docs/plan.md` holds what is known about the port.

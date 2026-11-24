@@ -59,11 +59,18 @@ A held B would end the replay before END in both builds: the replay plays as a r
 | 994052 (494 ops)              | 40981             | 40981                 | 40974             |
 | 995161 (431 ops)              | 32711             | not run               | 32784             |
 | 993907 (1554 ops)             | 133202            | not run               | 132991            |
+| 2717564545 (313 ops)          | 25643             | not run               | 25677             |
+| 994086 (1112 ops)             | 95326             | not run               | 95592             |
+| 994128 (1107 ops)             | 91992             | not run               | 91965             |
+| 994141 (1174 ops)             | 98969             | not run               | 99086             |
+| 994176 (1935 ops)             | 158491            | not run               | 158763            |
+| 2718507084 (499 ops)          | 41327             | not run               | 41434             |
+| 2718267553 (469 ops)          | 40217             | not run               | 40223             |
 | refusals (`EMPTY`, `VERSION`) | error at frame 31 | not run               | error at frame 44 |
 
-In the module, 993907 reaches END 211 frames after mGBA and 995161 reaches it 73 frames before mGBA; nobody has traced the cause.
+The table holds the module and the ROM at stream version 3 (24.11.2026). On the test replays the two engines part by up to 272 frames: the module reaches END after mGBA on 993907 (211 frames), 994128 (27) and 994052 (7), and before mGBA on the other seven, by 6 frames on 2718267553 up to 272 on 994176. Nobody has traced the cause.
 
-995161 (Gen 1) and 993907 (Gen 2) joined in stage 5. The module reached END on them once patch 0011 was in, with 12 scenes passing on each and `weather-start` missing, as in mGBA, since neither stream has weather. On 23.11.2026 the five other replay fixtures, all Gen 3 (2717564545, 994086, 994128, 994141, 994176), also reached END in the module, and every scene of each passed; 2717564545 has no weather either. From stage 5 on, every test replay plays through the module at each lane end that changes the module or a stream rule, and at the stage end: `npm run wasm:run -- <id>` once per fixture, since a run stops at its first failed stream.
+All ten test replays reach END in the module and in mGBA. 994052, 994086, 994128, 994141 and 994176 pass every scene. The other five pass 12 and lack `weather-start`, in both engines, since none of their streams holds a weather that an ability starts. 2718507084 and 2718267553 hold the moves whose animation turn is 1: Solar Beam in sun and three Curses by Pokémon that are not Ghost types. Stream version 3 moved no frame: hand-made, 994052 and both refusals equal wave 4's version 2 module frame for frame (`npm run wasm:run -- --against-baseline`), and the seven older test replays reach END at the frames of that module. Every test replay plays through the module at each lane end that changes the module or a stream rule, and at each stage end: `npm run wasm:run -- <id>` once per test replay, since a run stops at its first failed stream.
 
 Stage 5 measured hand-made and 994052 again on the module with the refusal screen (#30) and the assert stop (#61), with the same counts. Wave 4 measured these on stage 3's merged tree: stream format 2, the first part of our platform layer, the outro, and mGBA on the fixed clock. In format 1, 994052's stream held 461 ops. Two `rom:shots` runs of hand-made wrote the same 20 frames byte for byte and reached END at the same frame, and mGBA reached END on 994052 at 40974 in both the oracle's run and `rom:shots`'. The e2e plays hand-made at 1x and 2x and 994052 at fast in Chromium, and the page reaches END at the Node harness's frames. On stage 4's merged tree it also plays 5 s of 994052 at 1x and 5 s at 2x before fast, both with sound, at 59.78 and 118.57 frames per second (1.001 and 1.985 times the GBA's pace). Our own sound engine (#43's second part) kept both counts: every frame of all four streams equals the frame of stage 3's module, which played the borrowed sound files.
 
@@ -92,23 +99,23 @@ The mGBA probe (`e2e/wasm-spike.spec.ts`, its second test) plays 994052 on the e
 
 ## Download size
 
-Bytes, with gzip at level 9 and brotli at quality 11 from Node's zlib (`scripts/patch-sizes.ts`). The module's rows measure stage 5's build of wave 4: stream format 2, our whole platform layer, the stub list, the one stop with the assert in it, patches 0010 and 0011, and the refusal screen. The ROM patch's row measures the ROM of the same stage, with the refusal screen. mGBA's rows are stage 3's, whose files later stages left unchanged. Take the brotli numbers as about ±0.3 %: at quality 11 with Node's default window, a change that shifts the bytes after it moves them by tens of KB. In stage 4 a build 7 bytes larger raw gave a module patch 46,860 bytes larger with brotli and 16 bytes larger with gzip.
+Bytes, with gzip at level 9 and brotli at quality 11 from Node's zlib (`scripts/patch-sizes.ts`). The module's rows measure stage 1's build of wave 5: stream version 3, our whole platform layer, the stub list, the one stop with the assert in it, patches 0010 and 0011, and the refusal screen. The ROM patch's row measures the ROM of the same stage. mGBA's rows are stage 3's, whose files later stages left unchanged. Take the brotli numbers as about ±0.3 %: at quality 11 with Node's default window, a change that shifts the bytes after it moves them by tens of KB. In stage 4 a build 7 bytes larger raw gave a module patch 46,860 bytes larger with brotli and 16 bytes larger with gzip.
 
 | File                                  | Raw            | gzip           | brotli         |
 | ------------------------------------- | -------------- | -------------- | -------------- |
-| `irv-emerald-wasm.bps` (module patch) | 20,970,945     | 15,597,563     | 14,202,743     |
+| `irv-emerald-wasm.bps` (module patch) | 20,970,811     | 15,597,567     | 14,159,126     |
 | `irv-emerald.js` (Emscripten's glue)  | 8,635          | 3,135          | 2,837          |
-| **WebAssembly page**                  | **20,979,580** | **15,600,698** | **14,205,580** |
+| **WebAssembly page**                  | **20,979,446** | **15,600,702** | **14,161,963** |
 | `mgba.wasm`                           | 1,852,041      | 597,591        | 463,184        |
 | `mgba.js`                             | 248,854        | 57,127         | 48,706         |
-| `irv-emerald.bps` (ROM patch)         | 18,391,834     | 15,762,743     | 14,485,705     |
-| **Emulator page**                     | **20,492,729** | **16,417,461** | **14,997,595** |
+| `irv-emerald.bps` (ROM patch)         | 18,392,347     | 15,763,117     | 14,488,033     |
+| **Emulator page**                     | **20,493,242** | **16,417,835** | **14,999,923** |
 
-Raw, the WebAssembly page fetches 0.49 MB more. Compressed, it fetches 0.82 MB less with gzip and 0.79 MB less with brotli. The dev server sends both pages' files uncompressed; a real host picks the encoding (M2).
+Raw, the WebAssembly page fetches 0.49 MB more. Compressed, it fetches 0.82 MB less with gzip and 0.84 MB less with brotli. The dev server sends both pages' files uncompressed; a real host picks the encoding (M2).
 
 In wave 3 the module patch copied 5,815,589 of the module's 25,977,583 bytes (22.4 %) from the dump and carried 20,143,848 bytes as literals. For comparison, the ROM patch copied 8,069,773 of the ROM's 33,554,432 bytes (24.0 %) from the dump (the BPS actions SourceRead and SourceCopy, counted in both patches).
 
-The module itself, `irv-emerald.wasm` (25,973,610 bytes), never leaves the build machine: the server answers 404 for it, and the page rebuilds it from the dump.
+The module itself, `irv-emerald.wasm` (25,974,028 bytes), never leaves the build machine: the server answers 404 for it, and the page rebuilds it from the dump.
 
 ## What it means for the speed options and for #17
 
@@ -116,7 +123,7 @@ The module itself, `irv-emerald.wasm` (25,973,610 bytes), never leaves the build
 
 The speed options go into our own frame loop if milestone 2 ships the module. The page already grants the worker its frames by the tick rule (`src/web/wasm/protocol.ts`), so 1x, 2x and fast are one factor each, the sound follows at 1x and 2x, and fast gives way to 1x at END. If milestone 2 keeps mGBA, the options go to mGBA's fast-forward multiplier instead. In Chromium that tops out near 314 frames per second, where the module's fast averaged 330 to 348 in B6 and B7.
 
-The module does not solve #17. Its patch is 20.97 MB raw and 14.20 MB with brotli, against 18.39 MB and 14.49 MB for the ROM patch. Each copies under a quarter of its bytes from the dump and carries the rest itself. A visitor fetches 0.82 MB less on the WebAssembly page with gzip and 0.79 MB less with brotli, and the host's compression saves more than the switch: brotli takes 3.91 MB off the ROM patch. Per-asset extraction (below, "Nintendo's assets from the dump") is the one lever the spike found that shrinks the module patch itself, by the retail assets the expansion recompresses. The expansion's new assets stay in the patch on either route.
+The module does not solve #17. Its patch is 20.97 MB raw and 14.16 MB with brotli, against 18.39 MB and 14.49 MB for the ROM patch. Each copies under a quarter of its bytes from the dump and carries the rest itself. A visitor fetches 0.82 MB less on the WebAssembly page with gzip and 0.84 MB less with brotli, and the host's compression saves more than the switch: brotli takes 3.90 MB off the ROM patch. Per-asset extraction (below, "Nintendo's assets from the dump") is the one lever the spike found that shrinks the module patch itself, by the retail assets the expansion recompresses. The expansion's new assets stay in the patch on either route.
 
 ## Patches, shadow headers and flags
 

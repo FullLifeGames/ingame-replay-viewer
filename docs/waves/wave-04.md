@@ -233,6 +233,18 @@ Waiting for the user:
 - Where milestone 10 (Pokémon XD) sits in the order.
 - The gate's review page, with eight questions: the two merges, the seven proposals below, P1's cut, what wave 5 holds, milestone 3's first formats, the Gen 5 spike and Pokémon XD's place. Wave 5's first commit records the answers here.
 
+The gate's answers on the review page (24.11.2026), "1a 2a 3a 4a 5b 6a 7a 8b":
+
+- 1a and 2a: #63 merged at 781cdea as 2d81d45, then #64 at 38ca053 as db7c612. CI is green on `master`.
+- 3a: all seven proposals approved for milestone 2. They are #65 (P1), #66 (P2), #67 (P3), #68 (P4), #69 (P5), #70 (P6) and #71 (P7).
+- 4a: P1 is one issue, with the animation's turn, the fifteen kinds and stream version 3.
+- 5b: wave 5 runs the cleanup in one lane, with the Gen 5 spike beside it from the start. Milestone 3 waits for the cleanup.
+- 6a: milestone 3 starts with Gen 4 OU and Gen 5 OU, then Gen 9 OU with Tera, then Gen 6 to 8.
+- 7a: a time-boxed Gen 5 spike in wave 5 (#72), with the note "There is a black 2 dump in the roms folder where also emerald lives".
+- 8b: Pokémon XD stays last in the roadmap.
+
+Still waiting for the user after the gate: the phone runs for #47 and #49, the device checks of #56 to #59, the two saved files for #56, and #59's report link against the issue form.
+
 ## Rests
 
 Became an issue:
@@ -296,7 +308,7 @@ Proposals for the gate, in the order of the notes, the largest first:
 - R43: a double click on Start during a run starts two runs in a row.
 - R44, found by reading while a reviewer checked the proposals, with no run behind it yet: the move instruction plays every animation as turn 0 (`rom/gen3/src/replay_ops_damage.c:40`), and 33 of the game's animation scripts pick their second animation on an odd turn (`Cmd_choosetwoturnanim`). So the hit turn of a two-turn move would show its charge, and a Curse by a non-Ghost would show the Ghost's animation. Bide's release, Brick Break through a screen, Pursuit on a switch and the hit of Future Sight and Doom Desire use the same choice. No fixture's scene holds one; 993907's Pursuit on a switching Exeggutor may be the first case.
 
-A planner cut these rests into seven issue proposals for milestone 2, and a reviewer checked their claims against the code: about 120 held, 11 were wrong and 8 unclear, and the planner reworked the text. The gate's page puts them to the user:
+A planner cut these rests into seven issue proposals for milestone 2, and a reviewer checked their claims against the code: about 120 held, 11 were wrong and 8 unclear, and the planner reworked the text. The gate's page put them to the user, who approved all seven (#65 to #71, in the order P1 to P7):
 
 - P1 (feature): moves play their own animation (R44), and charge turns, Pain Split and the other kinds with no rule yet appear as in the game (R1, R9's White Herb, Castform's form change). The stream goes to version 3.
 - P2 (larger bug): a division or trap the GBA survives no longer stops the viewer (R34 to R37, the rewrite after the link, a stream that sends out one Pokémon per animation).

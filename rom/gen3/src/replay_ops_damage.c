@@ -10,11 +10,12 @@
 #include "constants/battle.h"
 #include "constants/songs.h"
 
-// The ops of a move and its damage (#6): MOVE, HIT, HP and FAINT. Each emits its controller
-// commands as the battle engine does for a move that hits (CancelerMoveAnimation,
+// The ops of a move and its damage (#6, #65): MOVE, HIT, HP, FAINT and SHOW_MON. Each emits its
+// controller commands as the battle engine does for a move that hits (CancelerMoveAnimation,
 // CancelerEffectivenessSound, CancelerHitAnimation, CancelerHealthBarUpdate in
-// battle_move_resolution.c) and for a mon that faints (BattleScript_FaintBattler). An op with two
-// commands for one battler emits one per step, because a battler has one bufferA.
+// battle_move_resolution.c), for a mon that faints (BattleScript_FaintBattler) and for a user that
+// a move left hidden (MoveEndAttackerVisible). An op with two commands for one battler emits one
+// per step, because a battler has one bufferA.
 
 // The sound of each REPLAY_EFFECTIVENESS_*, as CancelerEffectivenessSound picks it.
 static const u16 sEffectivenessSounds[] =
@@ -25,19 +26,21 @@ static const u16 sEffectivenessSounds[] =
 };
 
 // MOVE: the user's move animation against the target. The animation reads gBattlerAttacker and
-// gBattlerTarget (DoMoveAnim), so they and gCurrentMove are set first. The stream gives no damage
-// and no multi-hit count, so both are 0, as for a move that deals none.
+// gBattlerTarget (DoMoveAnim), so they and gCurrentMove are set first. The animation turn goes to
+// the controller as the stream gives it, as the engine passes gBattleScripting.animTurn. The stream
+// gives no damage and no multi-hit count, so both are 0, as for a move that deals none.
 bool32 Replay_OpMove(const volatile u8 *operands, u32 step)
 {
     u32 user = Replay_GetBattler(operands[0]);
     enum Move move = Replay_ReadU16(operands + 2);
+    u32 animTurn = operands[4];
 
     if (step != 0)
         return TRUE;
     gBattlerAttacker = user;
     gBattlerTarget = Replay_GetBattler(operands[1]);
     gCurrentMove = move;
-    BtlController_EmitMoveAnimation(user, B_COMM_TO_CONTROLLER, move, 0, GetMovePower(move), 0, gBattleMons[user].friendship, 0);
+    BtlController_EmitMoveAnimation(user, B_COMM_TO_CONTROLLER, move, animTurn, GetMovePower(move), 0, gBattleMons[user].friendship, 0);
     MarkBattlerForControllerExec(user);
     return FALSE;
 }
@@ -120,6 +123,22 @@ bool32 Replay_OpFaint(const volatile u8 *operands, u32 step)
     default:
         return TRUE;
     }
+    MarkBattlerForControllerExec(battler);
+    return FALSE;
+}
+
+// SHOW_MON: the side's mon shown again with no animation. A move animation can leave its user
+// hidden: Fly, Dig, Dive and Bounce hide it on their charge turn, and only their hit shows it. On a
+// hit turn that plays no animation (a miss, Protect, a full paralysis), the engine shows the user
+// with the controller's sprite invisibility command (MoveEndAttackerVisible in
+// battle_move_resolution.c), and so does this op. The controller leaves a visible mon as it is.
+bool32 Replay_OpShowMon(const volatile u8 *operands, u32 step)
+{
+    u32 battler = Replay_GetBattler(operands[0]);
+
+    if (step != 0)
+        return TRUE;
+    BtlController_EmitSpriteInvisibility(battler, B_COMM_TO_CONTROLLER, FALSE);
     MarkBattlerForControllerExec(battler);
     return FALSE;
 }
