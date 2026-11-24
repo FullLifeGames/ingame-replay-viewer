@@ -22,7 +22,7 @@ afterAll(() => {
   rmSync(scratch, { recursive: true, force: true })
 })
 
-/** A numerator, a divisor, then the results of div_s, div_u, rem_s and rem_u (DIVIDE_OPS' order). */
+/** A numerator, a divisor, then the results of div_s, div_u, rem_s and rem_u, as in DIVIDE_OPS. */
 type Row = readonly [bigint, bigint, bigint, bigint, bigint, bigint]
 
 const MIN32 = -(1n << 31n)

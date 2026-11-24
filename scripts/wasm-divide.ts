@@ -1,6 +1,6 @@
 // npm run wasm:divide (#66): WebAssembly traps on a zero divisor and on INT_MIN / -1, where the
 // ROM's libgcc helpers return a value. After the link, each 32-bit and 64-bit division and
-// remainder outside the helpers becomes a call of its helper, which the glue exports (66-3).
+// remainder outside the helpers becomes a call of its helper, which wasm-link.ts exports.
 // Binaryen's wasm-dis prints the module as folded text: an op opens a line of its own and its two
 // operands follow on the lines below, so the op line becomes `(call $<helper>` and the operands
 // keep their order. The text (95 MB for the game) passes one line at a time and never sits in one
@@ -74,7 +74,8 @@ const FUNC_HEADER = /^ \(func \$([^\s()]+)(.*)$/
 const zeroCounts = () =>
   Object.fromEntries(DIVIDE_OPS.map((op) => [op, 0])) as Record<DivideOp, number>
 
-const countLine = (counts: Record<DivideOp, number>): string =>
+/** The counts per op, in DIVIDE_OPS' order: `i32.div_s 613, i32.div_u 585, …`. */
+export const countLine = (counts: Record<DivideOp, number>): string =>
   DIVIDE_OPS.map((op) => `${op} ${String(counts[op])}`).join(', ')
 
 // A function header's types: `(param $0 i32) (param $1 i32) (result i32)` is (i32, i32) -> i32.
