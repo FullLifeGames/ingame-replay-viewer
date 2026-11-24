@@ -1,9 +1,11 @@
-// The send-out streams (#66): one send-out for each animation of a Pokémon's sprite that the
-// pinned expansion's species tables hold, so both engines play every one. A far send-out plays the
-// species' front animation (`.frontAnimId`, DoMonFrontSpriteAnimation in src/pokemon.c); a near
-// one plays a function of the species' back set (`.backAnimId`), and the mon's nature picks which
-// of the set's three (LaunchAnimationTaskForBackSprite in src/pokemon_animation.c). The stream sets
-// no nature, so a back set counts as reached and the function inside it is the game's pick.
+// The send-out streams (#66): one send-out for each front animation and each back set that the
+// pinned expansion's species tables hold, so both engines play every front animation and one
+// function of each back set. A far send-out plays the species' front animation (`.frontAnimId`,
+// DoMonFrontSpriteAnimation in src/pokemon.c); a near one plays a function of the species' back set
+// (`.backAnimId`), and the mon's nature picks which of the set's three
+// (LaunchAnimationTaskForBackSprite in src/pokemon_animation.c). The stream sets no nature, so a
+// back set counts as reached, the function inside it is the one the drawn nature picks, and the
+// streams do not play every back function.
 //
 // A team holds six mons, and a battle sends out no species its team lacks, so the streams are
 // several battles: each sends out six far species, one after the other by WITHDRAW and SWITCH_IN,
