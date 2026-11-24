@@ -91,6 +91,9 @@ void ReplayTest_AtEnd(void);
 void ReplayTest_AtOpStart(u32 op);
 // Called on the outro's first frame, the frame after END.
 void ReplayTest_AtOutroStart(void);
+// Called on each frame the interpreter runs the battle, from the takeover to END, before
+// BattleMainCB2 reads the held keys on that frame.
+void ReplayTest_AtFrame(void);
 #endif
 
 // Forgets the loaded replay; gReplayProgress stays readable.

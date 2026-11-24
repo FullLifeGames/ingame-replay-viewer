@@ -3,6 +3,7 @@
 #include "battle_anim.h"
 #include "battle_controllers.h"
 #include "battle_gfx_sfx_util.h"
+#include "battle_main.h"
 #include "battle_util2.h"
 #include "main.h"
 #include "pokemon.h"
@@ -28,6 +29,7 @@ static EWRAM_DATA u8 sKOAnimsAtOpStart[REPLAY_TEST_RECORDED_OPS] = {0};
 static EWRAM_DATA u8 sAnimMoveTurnsAtOpStart[REPLAY_TEST_RECORDED_OPS] = {0};
 static EWRAM_DATA struct ReplayTestTrainerSprite sTrainerSpritesAtOpStart[REPLAY_TEST_RECORDED_OPS][REPLAY_STREAM_SIDE_COUNT] = {0};
 static EWRAM_DATA bool8 sPlayOutro = FALSE;
+static EWRAM_DATA bool8 sHoldB = FALSE;
 static EWRAM_DATA struct ReplayProgress sProgressAtOutroStart = {0};
 
 static void CB2_ReplayTest_Done(void);
@@ -47,6 +49,7 @@ static void ReplayTest_SetUp(void *data)
     memset(sAnimMoveTurnsAtOpStart, 0, sizeof(sAnimMoveTurnsAtOpStart));
     memset(sTrainerSpritesAtOpStart, 0, sizeof(sTrainerSpritesAtOpStart));
     sPlayOutro = FALSE;
+    sHoldB = FALSE;
     memset(&sProgressAtOutroStart, 0, sizeof(sProgressAtOutroStart));
     Replay_Unload();
 }
@@ -120,6 +123,23 @@ void ReplayTest_AtOpStart(u32 op)
 void ReplayTest_PlayOutro(void)
 {
     sPlayOutro = TRUE;
+}
+
+void ReplayTest_HoldB(void)
+{
+    sHoldB = TRUE;
+}
+
+// ReadKeys sets gMain.heldKeys from KEYINPUT at the start of each frame, before callback1 runs
+// the battle's main function, so a key added here is held when BattleMainCB2 reads it. A battle
+// left before END (BattleMainCB2 on a held B) has CB2_QuitRecordedBattle as its callback2 while
+// its fade runs, and THEN would never run.
+void ReplayTest_AtFrame(void)
+{
+    if (gMain.callback2 == CB2_QuitRecordedBattle)
+        Test_ExitWithResult(TEST_RESULT_FAIL, SourceLine(0), "%s:%d: the battle left before END, at op %d of %d", gTestRunnerState.test->filename, SourceLine(0), gReplayProgress.done, gReplayProgress.total);
+    if (sHoldB)
+        gMain.heldKeys |= B_BUTTON;
 }
 
 void ReplayTest_AtOutroStart(void)

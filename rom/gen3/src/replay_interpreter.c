@@ -151,6 +151,9 @@ void Replay_Unload(void)
 }
 
 // gBattleMainFunc is DoBattleIntro here; the INTRO op runs it through sReplay.upstreamIntro.
+// BattleMainCB2 quits a recorded battle on a held B until its playback counts as finished, so the
+// playback counts as finished from here on and B does nothing during the replay or after END
+// (#68). Only InitBattleControllers resets it (RecordedBattle_Init), and that ran before.
 void Replay_TakeOverBattleMain(void)
 {
     if (!sReplay.loaded)
@@ -159,6 +162,10 @@ void Replay_TakeOverBattleMain(void)
     gBattleMainFunc = Replay_RunBattle;
     gCurrentMove = MOVE_NONE;
     gReplayProgress.playing = TRUE;
+    RecordedBattle_SetPlaybackFinished();
+#if TESTING
+    ReplayTest_AtFrame();
+#endif
 }
 
 // The KO animation (#24). When a mon faints, the faint handler starts the animation of the mon
@@ -209,6 +216,9 @@ static void Replay_RunBattle(void)
 {
     const volatile u8 *instruction;
 
+#if TESTING
+    ReplayTest_AtFrame();
+#endif
     if (gBattleControllerExecFlags || IsTextPrinterActiveOnWindow(B_WIN_MSG))
         return;
     if (sReplay.wait != 0)
@@ -246,6 +256,7 @@ static void Replay_Hold(void)
 static void Replay_Exit(void)
 {
 #if TESTING
+    ReplayTest_AtFrame();
     ReplayTest_AtEnd();
 #endif
     gBattleMainFunc = Replay_Hold;
@@ -255,13 +266,12 @@ static void Replay_Exit(void)
 }
 
 // END: gBattleOutcome, then, from the next frame, once END counts as done, the outro
-// (replay_outro.c) or, in most tests, the way out of the battle. The playback counts as finished,
-// as at the end of a real battle, so a held B no longer leaves the replay (BattleMainCB2, #30).
+// (replay_outro.c) or, in most tests, the way out of the battle. The recorded battle's playback
+// has counted as finished since the takeover, so a held B does not leave the outro (#30).
 static bool32 Op_End(const volatile u8 *operands, u32 step)
 {
     gBattleOutcome = sOutcomes[operands[0]];
     gReplayProgress.finished = TRUE;
-    RecordedBattle_SetPlaybackFinished();
     if (sReplay.end == REPLAY_EXIT_AT_END)
         gBattleMainFunc = Replay_Exit;
     else

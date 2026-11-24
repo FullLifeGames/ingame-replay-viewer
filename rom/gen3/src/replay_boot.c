@@ -84,8 +84,9 @@ static void CB2_ReplayRefused(void)
     SetMainCallback2(CB2_ReplayStopped);
 }
 
-// After a B press has left the playback before END (BattleMainCB2): the screen stays black from
-// the fade.
+// Replay_Start's way out of the battle, which the ROM's replay does not take: after the outro it
+// holds the black screen, and a held B does nothing (Replay_TakeOverBattleMain). The screen would
+// stay black from the fade.
 static void CB2_ReplayLeft(void)
 {
     SetVBlankCallback(NULL);
