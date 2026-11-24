@@ -70,6 +70,11 @@ void ReplayTest_PlayOutro(void);
 // The progress on the outro's first frame, the frame after END. All zero if no outro started.
 const struct ReplayProgress *ReplayTest_ProgressAtOutroStart(void);
 
+// Whether the low-HP beep (SE_LOW_HEALTH) plays now, and whether it played on the outro's first
+// frame. The second is FALSE if no outro started.
+bool32 ReplayTest_PlaysLowHpBeep(void);
+bool32 ReplayTest_LowHpBeepAtOutroStart(void);
+
 // Called in STREAM: B is held on every frame the interpreter runs the battle, from the frame it
 // takes over the battle to END, as a player who holds B through the whole replay.
 void ReplayTest_HoldB(void);

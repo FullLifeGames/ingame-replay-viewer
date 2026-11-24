@@ -5,12 +5,15 @@
 #include "battle_gfx_sfx_util.h"
 #include "battle_main.h"
 #include "battle_util2.h"
+#include "m4a.h"
 #include "main.h"
 #include "pokemon.h"
 #include "replay_ops.h"
+#include "sound.h"
 #include "sprite.h"
 #include "window.h"
 #include "test/replay_test.h"
+#include "constants/songs.h"
 
 // The runner of REPLAY_TEST (#7). It borrows upstream's event queue and matchers: SCENE queues
 // into gBattleTestRunnerState, and the recorders in test_runner_battle.c match each message, HP
@@ -31,6 +34,7 @@ static EWRAM_DATA struct ReplayTestTrainerSprite sTrainerSpritesAtOpStart[REPLAY
 static EWRAM_DATA bool8 sPlayOutro = FALSE;
 static EWRAM_DATA bool8 sHoldB = FALSE;
 static EWRAM_DATA struct ReplayProgress sProgressAtOutroStart = {0};
+static EWRAM_DATA bool8 sLowHpBeepAtOutroStart = FALSE;
 
 static void CB2_ReplayTest_Done(void);
 
@@ -51,6 +55,7 @@ static void ReplayTest_SetUp(void *data)
     sPlayOutro = FALSE;
     sHoldB = FALSE;
     memset(&sProgressAtOutroStart, 0, sizeof(sProgressAtOutroStart));
+    sLowHpBeepAtOutroStart = FALSE;
     Replay_Unload();
 }
 
@@ -145,11 +150,24 @@ void ReplayTest_AtFrame(void)
 void ReplayTest_AtOutroStart(void)
 {
     sProgressAtOutroStart = gReplayProgress;
+    sLowHpBeepAtOutroStart = ReplayTest_PlaysLowHpBeep();
 }
 
 const struct ReplayProgress *ReplayTest_ProgressAtOutroStart(void)
 {
     return &sProgressAtOutroStart;
+}
+
+// The beep plays on the music player SE3 (sound/song_table.inc) until m4aSongNumStop stops it or
+// its song ends.
+bool32 ReplayTest_PlaysLowHpBeep(void)
+{
+    return gMPlayInfo_SE3.songHeader == gSongTable[SE_LOW_HEALTH].header && IsSpecialSEPlaying();
+}
+
+bool32 ReplayTest_LowHpBeepAtOutroStart(void)
+{
+    return sLowHpBeepAtOutroStart;
 }
 
 static void CheckRecordedOp(u32 op)
