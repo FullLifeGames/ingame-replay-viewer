@@ -97,12 +97,10 @@ void Replay_StartOutro(u32 outcome, u32 sidesOut)
     gBattleMainFunc = Replay_Outro;
 }
 
+// The step never leaves sOutroSteps: Outro_End hands gBattleMainFunc on, and if it did not, the
+// last step would run again.
 static void Replay_Outro(void)
 {
-#if TESTING
-    if (sOutro.step == 0)
-        ReplayTest_AtOutroStart();
-#endif
     if (gBattleControllerExecFlags)
         return;
     if (sOutro.wait != 0)
@@ -110,7 +108,11 @@ static void Replay_Outro(void)
         sOutro.wait--;
         return;
     }
-    if (sOutroSteps[sOutro.step]())
+#if TESTING
+    if (sOutro.step == 0)
+        ReplayTest_AtOutroStart();
+#endif
+    if (sOutroSteps[sOutro.step]() && sOutro.step < ARRAY_COUNT(sOutroSteps) - 1)
         sOutro.step++;
 }
 

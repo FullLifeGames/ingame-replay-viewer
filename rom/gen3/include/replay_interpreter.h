@@ -89,7 +89,8 @@ bool32 Replay_HidesHpNumbers(void);
 void ReplayTest_AtEnd(void);
 // Called when op number op (counted from 0) starts, after every wait before it.
 void ReplayTest_AtOpStart(u32 op);
-// Called on the outro's first frame, the frame after END.
+// Called once, when the outro runs its first step: on the frame after END, as END leaves no
+// controller busy and no wait.
 void ReplayTest_AtOutroStart(void);
 // Called on each frame the interpreter runs the battle, from the takeover to END, before
 // BattleMainCB2 reads the held keys on that frame.
