@@ -59,6 +59,15 @@ export interface HeldLines {
   readonly texts: readonly string[]
 }
 
+/** A Pokémon that its charge turn hid (`hidden.ts`). */
+export interface Hidden {
+  readonly who: PokemonRef
+  /** The move whose charge hid it. */
+  readonly move: string
+  /** The index in `script.events` of the event after which it shows again, once known. */
+  pendingAt?: number
+}
+
 /** A player as the header and the text show them. */
 export interface Player {
   /** For the trainer table: fitted to the charset, plain spaces. */
@@ -85,6 +94,8 @@ export class Context {
   multiHit: MultiHit | undefined
   /** A multi-hit move's last lines, which its knocked out target's faint says. */
   afterFaint: HeldLines | undefined
+  /** The Pokémon that a charge turn hid, by side; only `hidden.ts` writes it. */
+  readonly hidden: Record<Side, Hidden | undefined> = { near: undefined, far: undefined }
   /** The index in `script.events` of the event in hand; the walk sets it. */
   at = 0
   /** The Pokémon whose move the log shows last; its own HP loss is no hit. */

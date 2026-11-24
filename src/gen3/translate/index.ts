@@ -18,6 +18,7 @@ import {
 import { message, tie, win } from './end'
 import { fieldActivate, sideEnd, sideStart, weather } from './field'
 import { formChange } from './forms'
+import { showHidden } from './hidden'
 import { item, itemEnd } from './items'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
 import { hitCount } from './hits'
@@ -107,6 +108,7 @@ export function translate(script: BattleScript): Translation {
     inCausePopUp(event, ctx, () => {
       handle(event, ctx)
     })
+    showHidden(event, ctx)
   }
   endIntro(ctx)
   closePopUp(undefined, ctx)
