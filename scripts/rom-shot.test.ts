@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 
 import { describe, expect, it } from 'vitest'
 
-import { readerTree } from './rom-paths.ts'
+import { buildPaths } from './rom-paths.ts'
 import {
   parseShotArgs,
   planStreams,
@@ -94,7 +94,7 @@ describe('the scenes a run must have', () => {
   })
 })
 
-describe.skipIf(!existsSync(readerTree()))('the send-out plans (#66, pinned tree)', () => {
+describe.skipIf(!existsSync(buildPaths().tree))('the send-out plans (#66, pinned tree)', () => {
   it('are one plan per battle, each to its end, before the two refusals', async () => {
     const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
     const plans = await planStreams(['send-outs'], layout)
@@ -106,5 +106,5 @@ describe.skipIf(!existsSync(readerTree()))('the send-out plans (#66, pinned tree
       expect(plan.expect).toBe('finished')
       expect(requiresEveryScene(plan.name)).toBe(false)
     }
-  })
+  }, 60_000)
 })

@@ -17,7 +17,7 @@ import speciesTable from '../src/gen3/tables/species.json'
 import trainerPics from '../src/gen3/tables/trainer-pics.json'
 import { buildBattleScript } from '../src/script/build.ts'
 import { readReplay } from '../src/script/replay.ts'
-import { readerTree } from './rom-paths.ts'
+import { buildPaths } from './rom-paths.ts'
 import { readSendOutAnimations, sendOutStreams } from './wasm-sendouts.ts'
 
 export { decodeStream }
@@ -109,9 +109,9 @@ export function withVersion(bytes: Uint8Array, version: number): Uint8Array {
   return copy
 }
 
-/** The send-out streams (#66) of the pinned tree, each by the name of its run. */
+/** The send-out streams (#66) of the tree the ROM builds from, each by the name of its run. */
 export function sendOutBytes(): [string, Uint8Array][] {
-  const tree = readerTree()
+  const { tree } = buildPaths()
   const anims = readSendOutAnimations((path) => readFileSync(join(tree, path), 'utf8'))
   const pics = { near: trainerPics.TRAINER_PIC_BRENDAN, far: trainerPics.TRAINER_PIC_MAY }
   return sendOutStreams(anims, speciesTable, pics).map(({ name, stream }) => [
