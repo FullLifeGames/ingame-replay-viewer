@@ -81,6 +81,8 @@ interface Operands {
   trapTurn: OnSide & { readonly move: number }
   /** The text box emptied, as a battle script's `flushtextbox`; no operands. */
   flushTextBox: unknown
+  /** The side's mon takes the form of `species` (Castform's Forecast) until it leaves the field. */
+  formChange: OnSide & { readonly species: number }
 }
 
 export type Instruction = { [K in Op]: { readonly op: K } & Operands[K] }[Op]
@@ -121,6 +123,9 @@ const status = { enum: STATUS } as const
 
 /** A number of the expansion below its count; the ROM's validator refuses any other. */
 const below = (count: number, min = 0) => ({ bytes: 2, min, max: count - 1 }) as const
+
+/** A species of the expansion; 0 is SPECIES_NONE, no mon. */
+const species = below(counts.NUM_SPECIES, 1)
 
 /** The operands of each op but PRINT, in byte order. */
 export const LAYOUT: { readonly [K in FixedOp]: Fields<Operands[K]> } = {
@@ -195,6 +200,10 @@ export const LAYOUT: { readonly [K in FixedOp]: Fields<Operands[K]> } = {
     ['move', below(counts.MOVES_COUNT_ALL)],
   ],
   flushTextBox: [],
+  formChange: [
+    ['side', side],
+    ['species', species],
+  ],
 }
 
 /** A trainer's fields; their offsets are TRAINER_OFFSET's under the same names. */
@@ -207,7 +216,7 @@ export const TRAINER_FIELDS: Fields<StreamTrainer> = [
 
 /** A mon's fields; their offsets are MON_OFFSET's under the same names. Species 0 is no mon. */
 export const MON_FIELDS: Fields<StreamMon> = [
-  ['species', below(counts.NUM_SPECIES, 1)],
+  ['species', species],
   ['maxHp', below(MON.maxHpLimit, 1)],
   ['level', { bytes: 1, min: 1, max: counts.MAX_LEVEL }],
   ['gender', { enum: GENDER }],

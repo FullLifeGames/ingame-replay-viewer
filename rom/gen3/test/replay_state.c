@@ -3,6 +3,7 @@
 #include "battle_anim.h"
 #include "pokemon.h"
 #include "test/replay_test.h"
+#include "constants/abilities.h"
 #include "constants/battle.h"
 #include "constants/battle_anim.h"
 #include "constants/items.h"
@@ -192,5 +193,94 @@ REPLAY_TEST("ITEM sets the held item of the party mon and of the mon on the fiel
         EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_HELD_ITEM), ITEM_LEFTOVERS);
         EXPECT_EQ(GetMonData(&gParties[B_TRAINER_OPPONENT_A][1], MON_DATA_HELD_ITEM), ITEM_CHOICE_BAND);
         EXPECT_EQ(farMon->item, ITEM_NONE);
+    }
+}
+
+// Gyarados near and Castform far on the field, Blissey behind Castform.
+static void StartGyaradosVsCastform(void)
+{
+    ReplayStream_Mon(REPLAY_SIDE_NEAR, 0, SPECIES_GYARADOS, 100);
+    ReplayStream_Mon(REPLAY_SIDE_FAR, 0, SPECIES_CASTFORM, 100);
+    ReplayStream_Mon(REPLAY_SIDE_FAR, 1, SPECIES_BLISSEY, 100);
+    ReplayStream_Intro();
+    ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+    ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+}
+
+static u32 GetFarTransformSpecies(void)
+{
+    return gBattleSpritesDataPtr->battlerData[GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT)].transformSpecies;
+}
+
+// Forecast in sun, as BattleScript_BattlerFormChangeWithString plays it: the pop-up, flushtextbox,
+// the change with B_ANIM_FORM_CHANGE, then STRINGID_PKMNTRANSFORMED.
+REPLAY_TEST("FORM_CHANGE turns Castform into its Sunny form with the form change animation")
+{
+    STREAM
+    {
+        StartGyaradosVsCastform();
+        ReplayStream_Ability(REPLAY_SIDE_FAR, ABILITY_FORECAST, TRUE);
+        ReplayStream_FlushTextBox();
+        ReplayStream_FormChange(REPLAY_SIDE_FAR, SPECIES_CASTFORM_SUNNY);
+        ReplayStream_Print(COMPOUND_STRING("The opposing Castform transformed!"));
+        ReplayStream_Ability(REPLAY_SIDE_FAR, ABILITY_FORECAST, FALSE);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        ABILITY_POPUP(farMon, ABILITY_FORECAST);
+        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_FORM_CHANGE, farMon);
+        MESSAGE("The opposing Castform transformed!");
+    }
+    THEN
+    {
+        EXPECT_EQ(farMon->species, SPECIES_CASTFORM_SUNNY);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_SPECIES), SPECIES_CASTFORM_SUNNY);
+        EXPECT_EQ(GetFarTransformSpecies(), SPECIES_CASTFORM_SUNNY);
+    }
+}
+
+// The weather ends: Forecast turns Castform back with the same op.
+REPLAY_TEST("FORM_CHANGE turns Castform back into its base form")
+{
+    STREAM
+    {
+        StartGyaradosVsCastform();
+        ReplayStream_FormChange(REPLAY_SIDE_FAR, SPECIES_CASTFORM_SUNNY);
+        ReplayStream_FormChange(REPLAY_SIDE_FAR, SPECIES_CASTFORM);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_FORM_CHANGE, farMon);
+        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_FORM_CHANGE, farMon);
+    }
+    THEN
+    {
+        EXPECT_EQ(farMon->species, SPECIES_CASTFORM);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_SPECIES), SPECIES_CASTFORM);
+        EXPECT_EQ(GetFarTransformSpecies(), SPECIES_CASTFORM);
+    }
+}
+
+// Showdown logs no change back when Castform leaves the field; the game's Castform enters in the
+// form of its party mon, which SWITCH_IN takes from the stream's team table.
+REPLAY_TEST("SWITCH_IN brings a mon back in the species of its team table after a FORM_CHANGE")
+{
+    STREAM
+    {
+        StartGyaradosVsCastform();
+        ReplayStream_FormChange(REPLAY_SIDE_FAR, SPECIES_CASTFORM_SUNNY);
+        ReplayStream_Withdraw(REPLAY_SIDE_FAR);
+        ReplayStream_SwitchIn(REPLAY_SIDE_FAR, 1, 100, REPLAY_STATUS_NONE);
+        ReplayStream_Withdraw(REPLAY_SIDE_FAR);
+        ReplayStream_SwitchIn(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    THEN
+    {
+        EXPECT_EQ(farMon->species, SPECIES_CASTFORM);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_SPECIES), SPECIES_CASTFORM);
+        EXPECT_EQ(GetFarTransformSpecies(), SPECIES_NONE);
     }
 }

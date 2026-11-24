@@ -85,7 +85,7 @@ describe('decodeStream', () => {
   })
 
   it('refuses an unknown op, the one after the last op of version 3', () => {
-    expect(patched([END], STREAM.tablesEnd, [0x15])).toThrow(/op 21/)
+    expect(patched([END], STREAM.tablesEnd, [0x16])).toThrow(/op 22/)
   })
 
   it('refuses a header whose sizes or offsets are not those of version 3', () => {
@@ -223,15 +223,17 @@ describe('decodeStream', () => {
     expect(far().instructions[0]).toEqual({ op: 'status', side: 'far', slot: 5, status: 'brn' })
   })
 
-  it('refuses a move, ability or item number at or above its count, as the ROM does', () => {
+  it('refuses a move, ability, item or species number outside its range, as the ROM does', () => {
     const operands = AFTER_LEADS + 2
     const move: Instruction = { op: 'move', user: 'far', target: 'near', move: 1, animTurn: 0 }
     const ability: Instruction = { op: 'ability', side: 'near', ability: 1, show: true }
     const item: Instruction = { op: 'item', side: 'far', slot: 0, item: 1 }
+    const change: Instruction = { op: 'formChange', side: 'near', species: 1 }
     const cases: [Instruction, number, number, RegExp][] = [
       [move, 2, counts.MOVES_COUNT_ALL, /move move 935/],
       [ability, 1, counts.ABILITIES_COUNT, /ability ability 320/],
       [item, 2, counts.ITEMS_COUNT, /item item 874/],
+      [change, 1, counts.NUM_SPECIES, /formChange species 1573/],
     ]
     for (const [instruction, at, count, message] of cases) {
       expect(patched([...LEADS, instruction, END], operands + at, u16(count))).toThrow(message)
@@ -240,6 +242,7 @@ describe('decodeStream', () => {
         op: instruction.op,
       })
     }
+    expect(patched([...LEADS, change, END], operands + 1, u16(0))).toThrow(/species 0 /)
   })
 
   it('refuses a name without EOS and a byte outside the charset', () => {

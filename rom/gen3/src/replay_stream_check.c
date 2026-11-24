@@ -38,6 +38,7 @@ enum ReplayOperand
     OPERAND_MOVE,
     OPERAND_ABILITY,
     OPERAND_ITEM,
+    OPERAND_SPECIES,
 };
 
 #define MAX_OPERANDS 4
@@ -82,9 +83,10 @@ static const struct ReplayOpFormat sOpFormats[] =
     [REPLAY_OP_ITEM_POP_UP]    = { REPLAY_OP_ITEM_POP_UP_SIZE,    { OPERAND_SIDE, OPERAND_ITEM } },
     [REPLAY_OP_TRAP_TURN]      = { REPLAY_OP_TRAP_TURN_SIZE,      { OPERAND_SIDE, OPERAND_MOVE } },
     [REPLAY_OP_FLUSH_TEXT_BOX] = { REPLAY_OP_FLUSH_TEXT_BOX_SIZE },
+    [REPLAY_OP_FORM_CHANGE]    = { REPLAY_OP_FORM_CHANGE_SIZE,    { OPERAND_SIDE, OPERAND_SPECIES } },
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sOpFormats) == REPLAY_OP_FLUSH_TEXT_BOX + 1, ReplayOpFormatsCoverTheFormat);
+STATIC_ASSERT(ARRAY_COUNT(sOpFormats) == REPLAY_OP_FORM_CHANGE + 1, ReplayOpFormatsCoverTheFormat);
 
 // The values each kind allows. The stream's own enums are numbered without gaps.
 static const struct ReplayOperandRange sOperandRanges[] =
@@ -106,6 +108,7 @@ static const struct ReplayOperandRange sOperandRanges[] =
     [OPERAND_MOVE]          = { MOVE_NONE, MOVES_COUNT_ALL - 1, 2 },
     [OPERAND_ABILITY]       = { ABILITY_NONE, ABILITIES_COUNT - 1, 2 },
     [OPERAND_ITEM]          = { ITEM_NONE, ITEMS_COUNT - 1, 2 },
+    [OPERAND_SPECIES]       = { SPECIES_NONE + 1, NUM_SPECIES - 1, 2 },
 };
 
 // A glyph the text printer draws. The bytes from CHAR_DYNAMIC up are control codes, which could
@@ -297,7 +300,7 @@ enum ReplayPresence
 // The masks hold a bit per op and per animation, and each names its ops as format.ts does.
 STATIC_ASSERT(ARRAY_COUNT(sOpFormats) <= 32, ReplayOrderOpsFitTheMask);
 STATIC_ASSERT(REPLAY_ANIM_SIMPLE_HEAL < 32, ReplayOrderAnimsFitTheMask);
-STATIC_ASSERT(REPLAY_ORDER_ON_FIELD_OPS == ((1 << REPLAY_OP_WITHDRAW) | (1 << REPLAY_OP_MOVE) | (1 << REPLAY_OP_HIT) | (1 << REPLAY_OP_HP) | (1 << REPLAY_OP_FAINT) | (1 << REPLAY_OP_STAT) | (1 << REPLAY_OP_ANIM) | (1 << REPLAY_OP_VOLATILE) | (1 << REPLAY_OP_ABILITY) | (1 << REPLAY_OP_ITEM_POP_UP) | (1 << REPLAY_OP_TRAP_TURN)), ReplayOrderOnFieldOps);
+STATIC_ASSERT(REPLAY_ORDER_ON_FIELD_OPS == ((1 << REPLAY_OP_WITHDRAW) | (1 << REPLAY_OP_MOVE) | (1 << REPLAY_OP_HIT) | (1 << REPLAY_OP_HP) | (1 << REPLAY_OP_FAINT) | (1 << REPLAY_OP_STAT) | (1 << REPLAY_OP_ANIM) | (1 << REPLAY_OP_VOLATILE) | (1 << REPLAY_OP_ABILITY) | (1 << REPLAY_OP_ITEM_POP_UP) | (1 << REPLAY_OP_TRAP_TURN) | (1 << REPLAY_OP_FORM_CHANGE)), ReplayOrderOnFieldOps);
 STATIC_ASSERT(REPLAY_ORDER_FREE_ANIMS == ((1 << REPLAY_ANIM_RAIN_CONTINUES) | (1 << REPLAY_ANIM_SUN_CONTINUES) | (1 << REPLAY_ANIM_SANDSTORM_CONTINUES) | (1 << REPLAY_ANIM_HAIL_CONTINUES)), ReplayOrderFreeAnims);
 
 static bool32 IsInMask(u32 mask, u32 bit)

@@ -38,6 +38,7 @@ const move = (user: Side, target: Side): Instruction => ({
   animTurn: 0,
 })
 const faint = (side: Side): Instruction => ({ op: 'faint', side })
+const formChange = (side: Side): Instruction => ({ op: 'formChange', side, species: 1051 })
 
 interface OrderCase {
   /** The name of its TEST in replay_refuse_order.c, after "Replay: order: ". */
@@ -106,6 +107,11 @@ const CASES: readonly OrderCase[] = [
     refused: /^anim at 4 names the near side, which has no battler out$/,
   },
   {
+    name: 'a FORM_CHANGE after a WITHDRAW is refused',
+    instructions: [...LEADS, { op: 'withdraw', side: 'far' }, formChange('far')],
+    refused: /^formChange at 4 names the far side, which has no battler out$/,
+  },
+  {
     name: 'a double KO in sand, the sand upkeep and both switch-ins pass',
     instructions: [
       ...LEADS,
@@ -126,6 +132,10 @@ const CASES: readonly OrderCase[] = [
       switchIn('near'),
       move('near', 'far'),
     ],
+  },
+  {
+    name: 'a FORM_CHANGE of a battler on the field passes',
+    instructions: [...LEADS, formChange('near'), formChange('far')],
   },
   {
     name: 'a STATUS and an ITEM of a benched slot pass',
@@ -223,6 +233,7 @@ describe('ORDER', () => {
       'ability',
       'itemPopUp',
       'trapTurn',
+      'formChange',
     ]
     expect(ORDER.onFieldOps).toBe(bits(ops.map((op) => OP[op])))
   })

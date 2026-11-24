@@ -5,6 +5,7 @@
 #include "constants/characters.h"
 #include "constants/items.h"
 #include "constants/moves.h"
+#include "constants/species.h"
 
 // The interpreter refuses an operand outside the range the format gives it before a battle starts
 // (#6), and lets the operands at the ends of each range through.
@@ -130,6 +131,21 @@ TEST("Replay: a move, ability or item past the expansion's own is refused")
     EXPECT_EQ(CHECK_OP(REPLAY_OP_ITEM, REPLAY_SIDE_NEAR, 0, U16(ITEMS_COUNT - 1)), REPLAY_ERROR_NONE);
     EXPECT_EQ(CHECK_OP(REPLAY_OP_ITEM_POP_UP, REPLAY_SIDE_FAR, U16(ITEMS_COUNT - 1)), REPLAY_ERROR_NONE);
     EXPECT_EQ(CHECK_OP(REPLAY_OP_TRAP_TURN, REPLAY_SIDE_NEAR, U16(MOVES_COUNT_ALL - 1)), REPLAY_ERROR_NONE);
+}
+
+// FORM_CHANGE's species is a mon: SPECIES_NONE and the numbers from NUM_SPECIES up are none.
+TEST("Replay: a FORM_CHANGE to no species or past the expansion's own is refused")
+{
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_FORM_CHANGE, REPLAY_SIDE_FAR, U16(SPECIES_NONE)), REPLAY_ERROR_OPERAND);
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_FORM_CHANGE, REPLAY_SIDE_FAR, U16(NUM_SPECIES)), REPLAY_ERROR_OPERAND);
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_FORM_CHANGE, 2, U16(SPECIES_CASTFORM_SUNNY)), REPLAY_ERROR_OPERAND);
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_FORM_CHANGE, REPLAY_SIDE_FAR, U16(SPECIES_NONE + 1)), REPLAY_ERROR_NONE);
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_FORM_CHANGE, REPLAY_SIDE_NEAR, U16(NUM_SPECIES - 1)), REPLAY_ERROR_NONE);
+}
+
+TEST("Replay: a FORM_CHANGE of another size is refused")
+{
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_FORM_CHANGE, REPLAY_SIDE_FAR, SPECIES_CASTFORM_SUNNY & 0xFF), REPLAY_ERROR_SIZE);
 }
 
 // MOVE's last operand is the turn the move animation reads (gAnimMoveTurn): any u8 passes.

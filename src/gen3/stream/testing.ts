@@ -87,6 +87,7 @@ export const EACH_OP: readonly Instruction[] = [
   { op: 'item', side: 'far', slot: 3, item: 234 },
   { op: 'itemPopUp', side: 'near', item: 234 },
   { op: 'trapTurn', side: 'far', move: 83 },
+  { op: 'formChange', side: 'far', species: 1051 },
   { op: 'faint', side: 'near' },
   { op: 'flushTextBox' },
   { op: 'end', outcome: 'farWon' },

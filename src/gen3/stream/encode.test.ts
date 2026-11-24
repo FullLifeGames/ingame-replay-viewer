@@ -191,6 +191,19 @@ describe('encodeInstruction', () => {
     expect(encodeInstruction(heal)).toEqual([0x0d, 2, 1, 17])
   })
 
+  it('encodes FORM_CHANGE as the side and a two-byte species, as ITEM_POP_UP orders them', () => {
+    const change: Instruction = { op: 'formChange', side: 'far', species: 0x041b }
+    expect(encodeInstruction(change)).toEqual([0x15, 3, 1, 0x1b, 0x04])
+  })
+
+  it('takes FORM_CHANGE species 1 to NUM_SPECIES - 1 and refuses 0 and NUM_SPECIES', () => {
+    const change = (species: number): Instruction => ({ op: 'formChange', side: 'near', species })
+    expect(encodeInstruction(change(1))).toHaveLength(5)
+    expect(encodeInstruction(change(counts.NUM_SPECIES - 1))).toHaveLength(5)
+    expect(() => encodeInstruction(change(0))).toThrow(Gen3Error)
+    expect(() => encodeInstruction(change(counts.NUM_SPECIES))).toThrow(Gen3Error)
+  })
+
   it('takes the last item and move of the expansion and refuses the next', () => {
     const item = (number: number): Instruction => ({ op: 'itemPopUp', side: 'near', item: number })
     const move = (number: number): Instruction => ({ op: 'trapTurn', side: 'far', move: number })

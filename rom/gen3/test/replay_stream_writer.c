@@ -243,6 +243,12 @@ void ReplayStream_FlushTextBox(void)
     ReplayStream_Op(REPLAY_OP_FLUSH_TEXT_BOX, REPLAY_OP_FLUSH_TEXT_BOX_SIZE, NULL);
 }
 
+void ReplayStream_FormChange(u32 side, u32 species)
+{
+    const u8 operands[REPLAY_OP_FORM_CHANGE_SIZE] = { side, species, species >> 8 };
+    ReplayStream_Op(REPLAY_OP_FORM_CHANGE, REPLAY_OP_FORM_CHANGE_SIZE, operands);
+}
+
 const u8 *ReplayStream_Data(void)
 {
     return sStream;

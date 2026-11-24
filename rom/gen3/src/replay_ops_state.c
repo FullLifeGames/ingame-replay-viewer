@@ -2,6 +2,7 @@
 #include "battle.h"
 #include "battle_anim.h"
 #include "battle_controllers.h"
+#include "battle_gfx_sfx_util.h"
 #include "battle_interface.h"
 #include "pokemon.h"
 #include "replay_interpreter.h"
@@ -11,9 +12,9 @@
 #include "constants/battle_anim.h"
 #include "constants/pokemon.h"
 
-// The ops of a mon's state (#6, #19): STATUS, STAT, ITEM and ITEM_POP_UP. Both parties are local
-// in a recorded battle, so each writes the party mon itself; the battle mon changes only while that
-// party mon is on the field.
+// The ops of a mon's state (#6, #19, #65): STATUS, STAT, ITEM, ITEM_POP_UP and FORM_CHANGE. Both
+// parties are local in a recorded battle, so each writes the party mon itself; the battle mon
+// changes only while that party mon is on the field.
 
 static bool32 IsOnField(u32 battler, u32 slot)
 {
@@ -126,4 +127,33 @@ bool32 Replay_OpItemPopUp(const volatile u8 *operands, u32 step)
             FreeAbilityPopUpGfx();
         return TRUE;
     }
+}
+
+// FORM_CHANGE: the side's mon takes another form, as BattleScript_BattlerFormChangeWithString
+// changes it between the ability pop-up and STRINGID_PKMNTRANSFORMED, which come as ABILITY and
+// PRINT. The party mon and the battle mon take the species first, as in the engine
+// (TryBattleFormChange, then BS_HandleFormChange's REQUEST_SPECIES_BATTLE), because
+// B_ANIM_FORM_CHANGE draws the party mon's species (AnimTask_TransformMon,
+// HandleSpeciesGfxDataChange). After the animation the healthbox and the far mon's shadow follow
+// the species, as BS_HandleFormChange's second case does. transformSpecies is set as
+// HandleSpeciesGfxDataChange leaves it, also where a headless test skips the animation. A switch
+// brings the form of the team table back (Replay_PutMonOnField).
+bool32 Replay_OpFormChange(const volatile u8 *operands, u32 step)
+{
+    u32 battler = Replay_GetBattler(operands[0]);
+    u32 species = Replay_ReadU16(operands + 1);
+
+    if (step == 0)
+    {
+        SetMonData(GetBattlerMon(battler), MON_DATA_SPECIES, &species);
+        gBattleMons[battler].species = species;
+        BtlController_EmitBattleAnimation(battler, B_COMM_TO_CONTROLLER, B_ANIM_FORM_CHANGE, 0);
+        MarkBattlerForControllerExec(battler);
+        return FALSE;
+    }
+    gBattleSpritesDataPtr->battlerData[battler].transformSpecies = species;
+    UpdateHealthboxAttribute(gHealthboxSpriteIds[battler], GetBattlerMon(battler), HEALTHBOX_ALL);
+    if (!IsOnPlayerSide(battler))
+        SetBattlerShadowSpriteCallback(battler, species);
+    return TRUE;
 }
