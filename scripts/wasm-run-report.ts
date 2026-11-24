@@ -37,7 +37,7 @@ export function readEnd(dir: string): number | undefined {
 }
 
 /** Why a stream has no status: the trap and the frames before it, or the run's own error. */
-export interface StreamFailure {
+interface StreamFailure {
   message: string
   frame?: number
 }
@@ -99,7 +99,7 @@ function sayStream(report: StreamReport, say: Say): void {
 }
 
 /** The last line: streams passed, failed and without a baseline, by name. */
-export function countLine(reports: readonly StreamReport[]): string {
+function countLine(reports: readonly StreamReport[]): string {
   const failed = reports.filter((report) => report.problems.length > 0).map(({ name }) => name)
   const unbased = reports.filter((report) => report.noBaseline).map(({ name }) => name)
   const passed = reports.length - failed.length
