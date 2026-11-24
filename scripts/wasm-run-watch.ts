@@ -1,6 +1,7 @@
 // The shot tool's loop (Play and TakeShots in rom/gen3/shot/replay_shot.c) for wasm:run: it
 // watches the module's progress one frame at a time, takes the shots and says when the run ends.
 import type { Progress } from '../src/web/wasm/progress.ts'
+import { OpClock } from './op-frames.ts'
 import type { Frame } from './rom-shot-probes.ts'
 import type { ToolOutput } from './rom-shot-run.ts'
 import type { Scene } from './rom-shot-scenes.ts'
@@ -18,6 +19,7 @@ export class Watch {
   frame = 0
   finishedAt: number | undefined
   readonly lines: ToolOutput['shots'] = []
+  readonly ops = new OpClock()
   readonly frames = new Map<string, Frame>()
   private readonly due = new Map<string, number>()
   private lastDone = 0
@@ -33,6 +35,7 @@ export class Watch {
   /** Takes the shots due on this frame; returns the status when the run ends on it. */
   step(progress: Progress, frame: () => Frame): Status['status'] | undefined {
     this.frame++
+    this.ops.note(progress, this.frame)
     this.takeShots(progress, frame)
     this.noteFirsts(progress)
     if (this.errorFrame !== 0 && this.frame - this.errorFrame >= ERROR_FRAMES) return 'error'

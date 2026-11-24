@@ -5,8 +5,9 @@
 // module cannot be interrupted from Node, so each stream runs in its own process under timeout:
 // `--play <dir>` writes the stream into the module's slot, calls AgbMain and answers as the shot
 // tool (rom/gen3/shot/replay_shot.c) does, with the frames of its shots as PPM in <dir> and one
-// JSON line per shot and the status on stdout, and END or the trap in <dir>/outcome.json. Frames
-// and report.json go to build/wasm/run/.
+// JSON line per shot, per op start and for the status on stdout, and END or the trap in
+// <dir>/outcome.json. Frames, each stream's op frame log (op-frames.ts) and report.json go to
+// build/wasm/run/.
 // `--baseline` and `--against-baseline` add the A/B of wasm-hashes.ts (#43). `--sanitize shift`
 // plays the module of `wasm:build -- --sanitize shift` (#44) and writes under build/wasm/sanitize.
 // `--all` plays every test replay after the named streams. A stream that fails ends only itself;
@@ -21,6 +22,7 @@ import { AudioMeter } from '../src/web/wasm/audio.ts'
 import { FRAME_HEIGHT, FRAME_WIDTH, widenFrame } from '../src/web/wasm/frame.ts'
 import type { GameModule, ModuleHooks } from '../src/web/wasm/game.ts'
 import { readProgress } from '../src/web/wasm/progress.ts'
+import { opFrameLog, writeOpFrames } from './op-frames.ts'
 import { runCliAsync } from './rom-cli.ts'
 import { emptyInside, REPO_DIR } from './rom-paths.ts'
 import type { Frame } from './rom-shot-probes.ts'
@@ -181,7 +183,7 @@ export async function playModule(
     game._AgbMain()
   } catch (error) {
     if (!(error instanceof Stop) || status === undefined) throw new ModuleTrap(watch.frame, error)
-    const output = { shots: watch.lines, status }
+    const output = { shots: watch.lines, ops: watch.ops.starts, status }
     const { frames, finishedAt } = watch
     return { output, frames, finishedAt, audio, sound, hashes: hashes.done() }
   }
@@ -240,7 +242,7 @@ async function playDir(dir: string): Promise<void> {
     `${basename(dir)}: sound ${String(samples)} samples, ${perFrame.toFixed(1)} per frame, rms ${rms.toFixed(4)}`,
   )
   sayMusic(basename(dir), run.sound, run.output.status.frame, say)
-  const lines = [...run.output.shots, run.output.status]
+  const lines = [...run.output.shots, ...run.output.ops, run.output.status]
   process.stdout.write(lines.map((line) => `${JSON.stringify(line)}\n`).join(''))
 }
 
@@ -273,6 +275,7 @@ function runStream(plan: ShotPlan, { runDir, module, errors, baseline }: StreamR
     throw new Error(`${plan.name}: the run failed (exit ${String(result.status)})`)
   const end = readEnd(dir)
   const output = readToolOutput(result.stdout)
+  writeOpFrames(dir, opFrameLog({ engine: 'module', stream: plan.name }, output.ops, plan.ops))
   const report = reportRun({ plan, output, frames: readFrames(dir), errors, seconds })
   const settled = settleBaseline(baseline, plan.name, join(dir, RUN_HASHES))
   if (settled.equal !== undefined) say(settled.equal)

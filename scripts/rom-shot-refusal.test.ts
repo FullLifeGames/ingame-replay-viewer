@@ -74,6 +74,7 @@ describe('the run with B held', () => {
     scenes: name === 'hand-made' ? scenesOf(handMade) : [],
     missing: [],
     expect: outcome,
+    ops: [],
   })
   const refusals = [play('empty-slot', 'EMPTY'), play('version-4', 'VERSION')]
 

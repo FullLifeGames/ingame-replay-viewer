@@ -85,6 +85,26 @@ describe('playing a stream in the module', () => {
     expect(run.frames.get('twenty')?.rgb.subarray(0, 3)).toEqual(Uint8Array.from([0xce, 0, 0]))
   })
 
+  it('logs the frame each op starts, from the first frame the game plays, as the shot tool (#71)', async () => {
+    const end = { ...playing(3, 3), finished: true }
+    const fake = fakeModule((frame) => ({
+      progress:
+        frame < 10
+          ? { ...playing(0, 3), playing: false }
+          : frame < 14
+            ? playing(frame < 12 ? 0 : 2, 3)
+            : end,
+      colour: 0,
+    }))
+    const run = await playModule(fake.factory, { stream: undefined, scenes: [], layout: LAYOUT })
+    expect(run.output.ops).toEqual([
+      { op: 0, frame: 10 },
+      { op: 1, frame: 12 },
+      { op: 2, frame: 12 },
+      { op: 3, frame: 14 },
+    ])
+  })
+
   it('keeps playing past END while a shot is due and ends 600 frames later as finished', async () => {
     const end = { ...playing(34), finished: true }
     const fake = fakeModule((frame) => ({ progress: frame < 30 ? playing(1) : end, colour: 0 }))
