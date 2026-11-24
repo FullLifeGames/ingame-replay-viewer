@@ -1,10 +1,11 @@
 // The charge turns of the two-turn moves (#65), from the pinned `gMovesInfo`
 // (src/data/moves_info.h): the line each says, `.argument.twoTurnAttack.stringId`, whether it
 // plays its animation before that line, and whether it hides its user until the hit, which a
-// semi-invulnerable `.state` (`enum SemiInvulnerableState`, include/constants/battle.h) marks. `Cmd_twoturnmoveschargestringandanimation`
-// (src/battle_script_commands.c) takes the animation first for a move with an effect on its
-// charge turn only (`MoveHasChargeTurnAdditionalEffect`, `.onChargeTurnOnly`); the macro of the
-// same name (asm/macros/battle_script.inc) plays the line first otherwise.
+// semi-invulnerable `.state` (`enum SemiInvulnerableState`, include/constants/battle.h) marks.
+// `Cmd_twoturnmoveschargestringandanimation` (src/battle_script_commands.c) takes the animation
+// first for a move with an effect on its charge turn only (`MoveHasChargeTurnAdditionalEffect`,
+// `.onChargeTurnOnly`); the macro of the same name (asm/macros/battle_script.inc) plays the line
+// first otherwise.
 //
 // The reader takes every branch of an `#if` inside an entry. Skull Bash sets `.onChargeTurnOnly`
 // under `B_UPDATED_MOVE_DATA >= GEN_2`, which holds for the pinned config's `GEN_LATEST`.
