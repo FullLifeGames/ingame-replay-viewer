@@ -136,6 +136,19 @@ describe('buildBattleScript: intro and end', () => {
     })
   })
 
+  // The client's species of a Pokémon is its form while a form change or Transform lasts; the
+  // team takes the species of its switch line, which the game's party table holds.
+  it('names a team member by its own species when the log ends in another form', () => {
+    const changed = scriptOf(
+      '|switch|p2a: Castform|Castform|100/100',
+      '|-formechange|p2a: Castform|Castform-Rainy|[msg]|[from] ability: Forecast',
+      '|move|p1a: Dugtrio|Transform|p2a: Castform',
+      '|-transform|p1a: Dugtrio|p2a: Castform',
+    )
+    expect(changed.teams.far[1]).toMatchObject({ species: 'Castform' })
+    expect(changed.teams.near[0]).toMatchObject({ species: 'Dugtrio' })
+  })
+
   it('keeps a nickname apart from the species', () => {
     expect(nicknamed.teams.far[0]).toMatchObject({ species: 'Tyranitar', name: 'Fantasy Meadow' })
   })

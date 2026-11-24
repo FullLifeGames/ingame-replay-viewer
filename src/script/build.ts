@@ -85,8 +85,12 @@ function readLine(build: Build, line: LogLine): void {
   build.events.push(...build.hits.pass(events))
 }
 
+/**
+ * A team member as its switch line shows it. `baseSpeciesForme` is that species; the client's
+ * `speciesForme` is the form of a form change or Transform while it lasts.
+ */
 function memberOf(pokemon: Pokemon): TeamMember {
-  const { speciesForme: species, name, gender, level, shiny } = pokemon
+  const { baseSpeciesForme: species, name, gender, level, shiny } = pokemon
   return { species, name, ...(gender === 'M' || gender === 'F' ? { gender } : {}), level, shiny }
 }
 
