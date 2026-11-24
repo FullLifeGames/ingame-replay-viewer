@@ -17,8 +17,18 @@ describe('the charge turns', () => {
     expect(chargeTurnOf('Solar Beam')).toEqual({
       stringId: 'STRINGID_PKMNTOOKSUNLIGHT',
       animationFirst: false,
+      semiInvulnerable: false,
     })
     expect(chargeTurnOf('Skull Bash')?.animationFirst).toBe(true)
     expect(chargeTurnOf('Earthquake')).toBeUndefined()
+  })
+
+  // @pkmn gives the moves that hide their user a condition of their own (Showdown's
+  // `onInvulnerability`), and no other charging move of Gen 1 to 3 has one.
+  it('hide the user of exactly the charging moves that @pkmn gives a condition', () => {
+    const hiding = CHARGING.filter((move) => chargeTurnOf(move.name)?.semiInvulnerable === true)
+    const withCondition = CHARGING.filter((move) => move.condition !== undefined)
+    expect(hiding.map(({ name }) => name)).toEqual(withCondition.map(({ name }) => name))
+    expect(hiding).toHaveLength(4)
   })
 })

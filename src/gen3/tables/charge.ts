@@ -8,6 +8,8 @@ interface ChargeTurn {
   readonly stringId: string
   /** Whether the charge plays its animation before its line. */
   readonly animationFirst: boolean
+  /** Whether the charge hides its user until the hit (Fly, Dig, Dive, Bounce). */
+  readonly semiInvulnerable: boolean
 }
 
 const TURNS: Readonly<Partial<Record<string, ChargeTurn>>> = turns

@@ -27,10 +27,18 @@ const MOVES_INFO = `const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
 `
 
 describe('chargeTurns', () => {
-  it("reads each two-turn move's charge line and whether its animation comes first", () => {
+  it("reads each two-turn move's charge line, its animation's place and whether it hides", () => {
     expect(chargeTurns(MOVES_INFO)).toEqual({
-      MOVE_FLY: { stringId: 'STRINGID_PKMNFLEWHIGH', animationFirst: false },
-      MOVE_SKULL_BASH: { stringId: 'STRINGID_PKMNLOWEREDHEAD', animationFirst: true },
+      MOVE_FLY: {
+        stringId: 'STRINGID_PKMNFLEWHIGH',
+        animationFirst: false,
+        semiInvulnerable: true,
+      },
+      MOVE_SKULL_BASH: {
+        stringId: 'STRINGID_PKMNLOWEREDHEAD',
+        animationFirst: true,
+        semiInvulnerable: false,
+      },
     })
   })
 
