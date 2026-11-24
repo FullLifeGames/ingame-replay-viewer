@@ -145,7 +145,12 @@ void ReplayStream_SendOut(u32 side, u32 slot, u32 hp, u32 status)
 
 void ReplayStream_Move(u32 userSide, u32 targetSide, u32 move)
 {
-    const u8 operands[REPLAY_OP_MOVE_SIZE] = { userSide, targetSide, move, move >> 8, 0 };
+    ReplayStream_MoveOnAnimTurn(userSide, targetSide, move, 0);
+}
+
+void ReplayStream_MoveOnAnimTurn(u32 userSide, u32 targetSide, u32 move, u32 animTurn)
+{
+    const u8 operands[REPLAY_OP_MOVE_SIZE] = { userSide, targetSide, move, move >> 8, animTurn };
     ReplayStream_Op(REPLAY_OP_MOVE, REPLAY_OP_MOVE_SIZE, operands);
 }
 

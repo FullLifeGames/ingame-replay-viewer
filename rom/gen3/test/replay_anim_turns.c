@@ -1,0 +1,411 @@
+#include "global.h"
+#include "battle.h"
+#include "battle_anim.h"
+#include "test/battle.h"
+#include "test/replay_test.h"
+#include "constants/abilities.h"
+#include "constants/battle.h"
+#include "constants/battle_anim.h"
+#include "constants/moves.h"
+#include "constants/species.h"
+
+// The animation turn (#65): the value a move animation reads to choose between its scripts
+// (gAnimMoveTurn, set from the controller's MOVE_ANIMATION command). The engine tests pin what the
+// pinned expansion passes for each case; the backend's turn rule follows them. Each arranges the
+// move in question as the battle's last move animation (the other battler is faster, so its
+// Celebrate plays first) and reads the turn in THEN, after the battle.
+
+SINGLE_BATTLE_TEST("Replay: engine: Solar Beam's hit plays turn 1")
+{
+    GIVEN
+    {
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_SOLAR_BEAM); }
+        TURN { SKIP_TURN(player); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SOLAR_BEAM, player);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SOLAR_BEAM, player);
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, 1);
+    }
+}
+
+SINGLE_BATTLE_TEST("Replay: engine: Solar Beam's charge plays turn 0")
+{
+    GIVEN
+    {
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_SOLAR_BEAM); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SOLAR_BEAM, player);
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, 0);
+    }
+}
+
+SINGLE_BATTLE_TEST("Replay: engine: Curse by a mon that is not a Ghost plays turn 1")
+{
+    GIVEN
+    {
+        ASSUME(!IsSpeciesOfType(SPECIES_SNORLAX, TYPE_GHOST));
+        PLAYER(SPECIES_SNORLAX) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_CURSE); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CURSE, player);
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, 1);
+    }
+}
+
+SINGLE_BATTLE_TEST("Replay: engine: Curse by a Ghost plays turn 0")
+{
+    GIVEN
+    {
+        ASSUME(IsSpeciesOfType(SPECIES_GENGAR, TYPE_GHOST));
+        PLAYER(SPECIES_GENGAR) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_CURSE, target: opponent); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CURSE, player);
+    }
+    THEN
+    {
+        EXPECT(opponent->volatiles.cursed);
+        EXPECT_EQ(gAnimMoveTurn, 0);
+    }
+}
+
+SINGLE_BATTLE_TEST("Replay: engine: Brick Break into Reflect plays turn 1")
+{
+    GIVEN
+    {
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(opponent, MOVE_REFLECT); }
+        TURN { MOVE(player, MOVE_BRICK_BREAK); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_REFLECT, opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_BRICK_BREAK, player);
+    }
+    THEN
+    {
+        EXPECT_EQ(gSideTimers[B_SIDE_OPPONENT].reflectTimer, 0);
+        EXPECT_EQ(gAnimMoveTurn, 1);
+    }
+}
+
+SINGLE_BATTLE_TEST("Replay: engine: Brick Break with no screen plays turn 0")
+{
+    GIVEN
+    {
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_BRICK_BREAK); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_BRICK_BREAK, player);
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, 0);
+    }
+}
+
+// Future Sight hits at the end of the second turn after it was used, after both moves.
+SINGLE_BATTLE_TEST("Replay: engine: Future Sight's hit plays turn 1")
+{
+    GIVEN
+    {
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_FUTURE_SIGHT); }
+        TURN { }
+        TURN { }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_FUTURE_SIGHT, player);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_FUTURE_SIGHT, player);
+        HP_BAR(opponent);
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, 1);
+    }
+}
+
+SINGLE_BATTLE_TEST("Replay: engine: Swallow plays its Stockpile count as the turn")
+{
+    u32 stockpiles;
+
+    PARAMETRIZE { stockpiles = 1; }
+    PARAMETRIZE { stockpiles = 2; }
+    PARAMETRIZE { stockpiles = 3; }
+    GIVEN
+    {
+        PLAYER(SPECIES_WOBBUFFET) { HP(10); MaxHP(400); Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_STOCKPILE); }
+        TURN { MOVE(player, stockpiles >= 2 ? MOVE_STOCKPILE : MOVE_CELEBRATE); }
+        TURN { MOVE(player, stockpiles >= 3 ? MOVE_STOCKPILE : MOVE_CELEBRATE); }
+        TURN { MOVE(player, MOVE_SWALLOW); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SWALLOW, player);
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, stockpiles);
+    }
+}
+
+// Two hits: the second is the battle's last move animation.
+SINGLE_BATTLE_TEST("Replay: engine: Double Slap's second hit plays turn 0")
+{
+    GIVEN
+    {
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_DOUBLE_SLAP, WITH_RNG(RNG_HITS, 2)); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_DOUBLE_SLAP, player);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_DOUBLE_SLAP, player);
+        MESSAGE("The Pokémon was hit 2 times!");
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, 0);
+    }
+}
+
+// Sturdy holds the first kick at 1 HP, so the second faints the target and is the last.
+SINGLE_BATTLE_TEST("Replay: engine: Triple Kick's second hit plays turn 0")
+{
+    GIVEN
+    {
+        WITH_CONFIG(B_STURDY, GEN_5);
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        OPPONENT(SPECIES_GEODUDE) { Ability(ABILITY_STURDY); Level(1); Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_TRIPLE_KICK); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_TRIPLE_KICK, player);
+        ABILITY_POPUP(opponent, ABILITY_STURDY);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_TRIPLE_KICK, player);
+        MESSAGE("The opposing Geodude fainted!");
+        NOT ANIMATION(ANIM_TYPE_MOVE, MOVE_TRIPLE_KICK, player);
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, 0);
+    }
+}
+
+SINGLE_BATTLE_TEST("Replay: engine: Triple Kick's third hit plays turn 0")
+{
+    GIVEN
+    {
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_TRIPLE_KICK); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_TRIPLE_KICK, player);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_TRIPLE_KICK, player);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_TRIPLE_KICK, player);
+        MESSAGE("The Pokémon was hit 3 times!");
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, 0);
+    }
+}
+
+SINGLE_BATTLE_TEST("Replay: engine: Bide's unleash plays turn 0")
+{
+    GIVEN
+    {
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); }
+    }
+    WHEN
+    {
+        TURN { MOVE(player, MOVE_BIDE); MOVE(opponent, MOVE_SCRATCH); }
+        TURN { SKIP_TURN(player); MOVE(opponent, MOVE_SCRATCH); }
+        TURN { SKIP_TURN(player); MOVE(opponent, MOVE_SCRATCH); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_BIDE, player);
+        MESSAGE("Wobbuffet unleashed its energy!");
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_BIDE, player);
+        HP_BAR(opponent);
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, 0);
+    }
+}
+
+SINGLE_BATTLE_TEST("Replay: engine: Pursuit on a switching target plays turn 0")
+{
+    GIVEN
+    {
+        PLAYER(SPECIES_WOBBUFFET);
+        OPPONENT(SPECIES_WYNAUT);
+        OPPONENT(SPECIES_WOBBUFFET);
+    }
+    WHEN
+    {
+        TURN { SWITCH(opponent, 1); MOVE(player, MOVE_PURSUIT); }
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_PURSUIT, player);
+        HP_BAR(opponent);
+        MESSAGE("2 sent out Wobbuffet!");
+    }
+    THEN
+    {
+        EXPECT_EQ(gAnimMoveTurn, 0);
+    }
+}
+
+// The replay tests: MOVE hands its animTurn to the move animation. Op 3 is the MOVE, so the turn
+// its animation read is recorded at the start of op 4.
+#define MOVE_OP 3
+
+static void PlayMoveOnAnimTurn(u32 species, u32 move, u32 animTurn)
+{
+    ReplayStream_Mon(REPLAY_SIDE_NEAR, 0, species, 100);
+    ReplayStream_Intro();
+    ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+    ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+    ReplayStream_MoveOnAnimTurn(REPLAY_SIDE_NEAR, REPLAY_SIDE_FAR, move, animTurn);
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+}
+
+REPLAY_TEST("MOVE plays Curse by a mon that is not a Ghost on turn 1")
+{
+    STREAM { PlayMoveOnAnimTurn(SPECIES_SNORLAX, MOVE_CURSE, 1); }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_CURSE, nearMon); }
+    THEN { EXPECT_EQ(ReplayTest_AnimMoveTurnAtOpStart(MOVE_OP + 1), 1); }
+}
+
+REPLAY_TEST("MOVE plays Solar Beam's charge on turn 0")
+{
+    STREAM { PlayMoveOnAnimTurn(SPECIES_WOBBUFFET, MOVE_SOLAR_BEAM, 0); }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_SOLAR_BEAM, nearMon); }
+    THEN { EXPECT_EQ(ReplayTest_AnimMoveTurnAtOpStart(MOVE_OP + 1), 0); }
+}
+
+REPLAY_TEST("MOVE plays Solar Beam's hit on turn 1")
+{
+    STREAM { PlayMoveOnAnimTurn(SPECIES_WOBBUFFET, MOVE_SOLAR_BEAM, 1); }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_SOLAR_BEAM, nearMon); }
+    THEN { EXPECT_EQ(ReplayTest_AnimMoveTurnAtOpStart(MOVE_OP + 1), 1); }
+}
+
+REPLAY_TEST("MOVE plays Brick Break through a screen on turn 1")
+{
+    STREAM { PlayMoveOnAnimTurn(SPECIES_WOBBUFFET, MOVE_BRICK_BREAK, 1); }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_BRICK_BREAK, nearMon); }
+    THEN { EXPECT_EQ(ReplayTest_AnimMoveTurnAtOpStart(MOVE_OP + 1), 1); }
+}
+
+REPLAY_TEST("MOVE plays Future Sight's hit on turn 1")
+{
+    STREAM { PlayMoveOnAnimTurn(SPECIES_WOBBUFFET, MOVE_FUTURE_SIGHT, 1); }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_FUTURE_SIGHT, nearMon); }
+    THEN { EXPECT_EQ(ReplayTest_AnimMoveTurnAtOpStart(MOVE_OP + 1), 1); }
+}
+
+REPLAY_TEST("MOVE plays Swallow after one Stockpile on turn 1")
+{
+    STREAM { PlayMoveOnAnimTurn(SPECIES_WOBBUFFET, MOVE_SWALLOW, 1); }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_SWALLOW, nearMon); }
+    THEN { EXPECT_EQ(ReplayTest_AnimMoveTurnAtOpStart(MOVE_OP + 1), 1); }
+}
+
+REPLAY_TEST("MOVE plays Swallow after two Stockpiles on turn 2")
+{
+    STREAM { PlayMoveOnAnimTurn(SPECIES_WOBBUFFET, MOVE_SWALLOW, 2); }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_SWALLOW, nearMon); }
+    THEN { EXPECT_EQ(ReplayTest_AnimMoveTurnAtOpStart(MOVE_OP + 1), 2); }
+}
+
+REPLAY_TEST("MOVE plays Swallow after three Stockpiles on turn 3")
+{
+    STREAM { PlayMoveOnAnimTurn(SPECIES_WOBBUFFET, MOVE_SWALLOW, 3); }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_SWALLOW, nearMon); }
+    THEN { EXPECT_EQ(ReplayTest_AnimMoveTurnAtOpStart(MOVE_OP + 1), 3); }
+}

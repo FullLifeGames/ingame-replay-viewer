@@ -25,19 +25,21 @@ static const u16 sEffectivenessSounds[] =
 };
 
 // MOVE: the user's move animation against the target. The animation reads gBattlerAttacker and
-// gBattlerTarget (DoMoveAnim), so they and gCurrentMove are set first. The stream gives no damage
-// and no multi-hit count, so both are 0, as for a move that deals none.
+// gBattlerTarget (DoMoveAnim), so they and gCurrentMove are set first. The animation turn goes to
+// the controller as the stream gives it, as the engine passes gBattleScripting.animTurn. The stream
+// gives no damage and no multi-hit count, so both are 0, as for a move that deals none.
 bool32 Replay_OpMove(const volatile u8 *operands, u32 step)
 {
     u32 user = Replay_GetBattler(operands[0]);
     enum Move move = Replay_ReadU16(operands + 2);
+    u32 animTurn = operands[4];
 
     if (step != 0)
         return TRUE;
     gBattlerAttacker = user;
     gBattlerTarget = Replay_GetBattler(operands[1]);
     gCurrentMove = move;
-    BtlController_EmitMoveAnimation(user, B_COMM_TO_CONTROLLER, move, 0, GetMovePower(move), 0, gBattleMons[user].friendship, 0);
+    BtlController_EmitMoveAnimation(user, B_COMM_TO_CONTROLLER, move, animTurn, GetMovePower(move), 0, gBattleMons[user].friendship, 0);
     MarkBattlerForControllerExec(user);
     return FALSE;
 }
