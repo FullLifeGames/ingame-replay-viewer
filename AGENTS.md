@@ -16,6 +16,7 @@ The viewer plays Pokémon Showdown replays back inside real Pokémon games. A ga
 - `rom/gen3/`: our C files and the list of changes against the pinned pokeemerald-expansion. The build scripts are `scripts/rom-*`. The upstream checkout (`.cache/rom/`) and the build outputs (`build/rom/`) stay out of the tracked tree.
 - `rom/gen3/wasm/`: the WebAssembly build (#35, #43, `docs/wasm-spike.md`): its config, glue C files, shadow headers, our platform layer in `layer/` with its native test harness in `layer/host/`, and the patches against copies of upstream files. The build scripts are `scripts/wasm-*`. The outputs (`build/wasm/`) stay out of the tracked tree.
 - `src/patch/`: the BPS codec that the build and the page share, plain TypeScript.
+- `src/gen5/`, `src/web/gen5/`, `scripts/gen5-*`: the Gen 5 spike (#72, `docs/gen5-spike.md`), not a game backend. `src/gen5/` is plain TypeScript with no DOM; the page in `src/web/gen5/` runs Black 2 in EmulatorJS's melonDS. The spike's checkouts and outputs (`.cache/gen5/`, `build/gen5/`) stay out of the tracked tree.
 - `test/fixtures/replays/`: the test replays as Showdown's replay JSON. Unit specs sit next to their source as `*.test.ts`.
 - `docs/waves/`: one booking per wave.
 

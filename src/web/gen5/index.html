@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gen 5 spike: Black 2 in melonDS</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 1rem;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem 1rem;
+      }
+      #figures {
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, monospace;
+        font-size: 0.85rem;
+      }
+      #game {
+        width: min(512px, 100%);
+        aspect-ratio: 2 / 3;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Gen 5 spike</h1>
+    <p>
+      <label for="dump">Pick your Black 2 (USA) dump. It stays in this browser.</label>
+      <input id="dump" type="file" />
+    </p>
+    <p id="phone-note">
+      On a phone, the tab may reload or go blank after you pick the dump. That means the browser ran
+      out of memory, and it counts as a result: note it down.
+    </p>
+    <p id="status" role="status">Waiting for a dump.</p>
+    <div class="controls">
+      <label><input id="uncapped" type="checkbox" disabled /> Run without the speed cap</label>
+      <button id="copy" type="button">Copy figures</button>
+    </div>
+    <p class="controls">
+      <span id="core-line">You run the plain core.</span>
+      <a id="core-switch" href="?threads=1">Switch to the thread core</a>
+    </p>
+    <p class="controls">
+      <span id="vsync-line">Vsync is off: each frame starts as soon as the last one ends.</span>
+      <a id="vsync-switch" href="?vsync=1">Turn vsync on</a>
+    </p>
+    <p>A switch reloads the page, so you pick the dump again.</p>
+    <p id="device">Measuring this device for two seconds.</p>
+    <p id="speed"></p>
+    <p><output id="figures"></output></p>
+    <div id="game"></div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
