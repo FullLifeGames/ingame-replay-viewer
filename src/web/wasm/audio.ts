@@ -1,4 +1,4 @@
-// The game's sound on its way out of the WebAssembly spike page (#35): the worker's hook takes
+// The game's sound on its way out of the viewer (#35): the worker's hook takes
 // each frame's samples from the module's memory into the audio ring (ring.ts), and the
 // audio worklet resamples them from the mixer's rate to the audio context's. DOM-free, so the
 // worker, the worklet and the Node harness share it.

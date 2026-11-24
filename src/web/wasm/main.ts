@@ -40,7 +40,7 @@ import {
   watchRun,
 } from './run'
 import { Runs } from './runs'
-import { findSpikeView, type SpikeView } from './view'
+import { findWasmView, type WasmView } from './view'
 
 /**
  * A pick with the summary the list shows for it and the place it came from, which a failed run
@@ -52,11 +52,7 @@ type ListedPick = Picked & { readonly summary?: ReplaySummary; readonly place?: 
 type NamedRun = Run & { readonly id: string; readonly summary: ReplaySummary | undefined }
 
 /** The animation-frame loop: grants the run its frames, draws the newest and shows the progress. */
-function drawLoop(
-  view: SpikeView,
-  runs: Runs<NamedRun>,
-  changeSpeed: (speed: Speed) => void,
-): void {
+function drawLoop(view: WasmView, runs: Runs<NamedRun>, changeSpeed: (speed: Speed) => void): void {
   const context = view.canvas.getContext('2d')
   const image = new ImageData(FRAME_WIDTH, FRAME_HEIGHT)
   const draw = (now: number) => {
@@ -104,7 +100,7 @@ async function pickedStream(choice: ReplayChoice): Promise<ListedPick | undefine
 }
 
 /** The page's state and its actions; the view's events call them. */
-function createSpike(view: SpikeView) {
+function createViewer(view: WasmView) {
   let built: Promise<Built> | undefined
   let last: ListedPick | undefined
   const choice = createReplayChoice(fetchJson)
@@ -161,16 +157,16 @@ function createSpike(view: SpikeView) {
     /** Pauses or plays the current run; the sound's call runs inside the caller's event. */
     togglePause: () => togglePause(runs.current, audio, performance.now()),
     spaceToggles: (press: KeyPress) => spaceToggles(press, runs.current),
-    /** The test hook of e2e/wasm-spike.spec.ts: the run's status, its sound and the run counts. */
+    /** The test hook of e2e/wasm-play.spec.ts: the run's status, its sound and the run counts. */
     status: () =>
       runs.current === undefined ? undefined : { ...hookStatus(runs.current), runs: runs.counts },
   }
 }
 
-type Spike = ReturnType<typeof createSpike>
+type Viewer = ReturnType<typeof createViewer>
 
 /** Runs a handler's work; its line or its failure's visitor line becomes the status line. */
-function act(view: SpikeView, work: () => Promise<string | undefined>): void {
+function act(view: WasmView, work: () => Promise<string | undefined>): void {
   work().then(
     (line) => {
       if (line !== undefined) view.status(line)
@@ -186,13 +182,13 @@ function act(view: SpikeView, work: () => Promise<string | undefined>): void {
  * `act`, so the sound resumes inside it. A refused suspend or resume shows no line: the clock
  * holds or plays the game, and the next press asks the audio again (S5-16).
  */
-function wirePause(spike: Spike, view: SpikeView): void {
+function wirePause(viewer: Viewer, view: WasmView): void {
   const toggle = () => {
-    spike.togglePause().catch(() => undefined)
+    viewer.togglePause().catch(() => undefined)
   }
   view.pause.addEventListener('click', toggle)
   document.addEventListener('keydown', (event) => {
-    if (!spike.spaceToggles(event)) return
+    if (!viewer.spaceToggles(event)) return
     toggle()
     // The page does not scroll on the Space that toggled.
     event.preventDefault()
@@ -204,7 +200,7 @@ function wirePause(spike: Spike, view: SpikeView): void {
  * focus moves to Pause, so Space pauses the run instead of starting it over (S5-17).
  */
 function playFrom(
-  view: SpikeView,
+  view: WasmView,
   button: HTMLButtonElement,
   play: () => Promise<string | undefined>,
 ): void {
@@ -215,28 +211,28 @@ function playFrom(
   })
 }
 
-function wire(spike: Spike, view: SpikeView): void {
+function wire(viewer: Viewer, view: WasmView): void {
   view.dump.addEventListener('change', () => {
     const file = view.dump.files?.[0]
     if (file === undefined) return
     view.status(BUILDING_LINE)
-    act(view, () => spike.pickDump(file))
+    act(view, () => viewer.pickDump(file))
   })
   view.start.addEventListener('click', () => {
-    playFrom(view, view.start, () => spike.play())
+    playFrom(view, view.start, () => viewer.play())
   })
   view.restart.addEventListener('click', () => {
-    playFrom(view, view.restart, () => spike.restart())
+    playFrom(view, view.restart, () => viewer.restart())
   })
-  wirePause(spike, view)
+  wirePause(viewer, view)
   view.onSpeed((speed) => {
-    spike.changeSpeed(speed)
+    viewer.changeSpeed(speed)
   })
-  wireReplays(spike, view)
-  wireReplayFile(spike, view)
+  wireReplays(viewer, view)
+  wireReplayFile(viewer, view)
 }
 
-const view = findSpikeView()
+const view = findWasmView()
 // The probe's URL loads nothing: the browser reads the options first (web.dev's check).
 const moduleWorkers = startsModuleWorkers(
   typeof Worker === 'undefined' ? undefined : (options) => new Worker('blob://', options),
@@ -246,14 +242,14 @@ const problem = environmentProblem(
   'the game',
 )
 if (problem === undefined) {
-  const spike = createSpike(view)
-  wire(spike, view)
+  const viewer = createViewer(view)
+  wire(viewer, view)
   view.status(READY_LINE)
   // The e2e plays a stream of its own (the hand-made battle) and reads the run's status.
   Object.assign(window, {
-    irvWasmSpike: {
-      play: (id: string, bytes: number[]) => spike.play({ id, stream: Uint8Array.from(bytes) }),
-      status: spike.status,
+    irvWasmViewer: {
+      play: (id: string, bytes: number[]) => viewer.play({ id, stream: Uint8Array.from(bytes) }),
+      status: viewer.status,
     },
   })
 } else {

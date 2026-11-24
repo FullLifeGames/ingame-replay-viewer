@@ -1,4 +1,4 @@
-// The worker of the WebAssembly spike page (#35): one run of the game. It takes the page's start
+// The worker of the viewer (#35): one run of the game. It takes the page's start
 // message, instantiates the module the page compiled (a refused memory gets its own line,
 // failures.ts), writes the stream into the slot (refused if the slot's own header and
 // replay-slot.json come from different builds) and calls AgbMain, which never returns. Each

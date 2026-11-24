@@ -74,7 +74,7 @@ function findShownReplayView() {
 }
 
 /** The page's controls, and the calls that show the run's state. */
-export function findSpikeView() {
+export function findWasmView() {
   const progress = element('progress', HTMLParagraphElement)
   const speeds = element('speed', HTMLFieldSetElement)
   const checkedSpeed = (): Speed => {
@@ -121,4 +121,4 @@ export function findSpikeView() {
   }
 }
 
-export type SpikeView = ReturnType<typeof findSpikeView>
+export type WasmView = ReturnType<typeof findWasmView>

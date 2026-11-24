@@ -1,4 +1,4 @@
-// One run of the game on the WebAssembly spike page (#35): the module built from the dump, the
+// One run of the game on the viewer (#35): the module built from the dump, the
 // worker, the shared buffers, the tick clock and the sound. main.ts holds the page's state and
 // starts and stops runs through this file. The e2e covers it, as it covers the page's wiring.
 import { applyBps } from '../../patch/bps-apply'
@@ -211,7 +211,7 @@ function audioStatus(run: Run) {
   }
 }
 
-/** The test hook's view of a run (e2e/wasm-spike.spec.ts). */
+/** The test hook's view of a run (e2e/wasm-play.spec.ts). */
 export function hookStatus(run: Run) {
   return {
     ...readStatus(run.control),
