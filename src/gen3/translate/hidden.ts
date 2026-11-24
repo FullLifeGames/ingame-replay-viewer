@@ -7,13 +7,14 @@
 // - The hit turn hits nothing, or the user cannot take it: `MoveEndAttackerVisible`
 //   (src/battle_move_resolution.c) shows the user in move end, after the result line (a miss,
 //   Protect, an immunity, an absorbing ability, no target), after a `cant` line and its status
-//   animation, or after the HP of a confusion self-hit. The stream plays SHOW_MON there.
+//   animation, or after the HP of a confusion self-hit that leaves it standing. The stream plays
+//   SHOW_MON there.
 // - A move that hits the hidden Pokémon (Thunder or Gust on Fly, Earthquake on Dig) plays no hit
 //   animation on an invisible sprite and leaves it hidden.
 //
-// A hidden Pokémon that faints, or whose side sends in another, needs no show; neither does one
-// at the end of the battle. A future attack's hit by a hidden Pokémon (`futureHit` in effects.ts)
-// plays from the hidden sprite and changes nothing here.
+// A hidden Pokémon that faints (from a confusion self-hit too), or whose side sends in another,
+// needs no show; neither does one at the end of the battle. A future attack's hit by a hidden
+// Pokémon (`futureHit` in effects.ts) plays from the hidden sprite and changes nothing here.
 //
 // Two cases differ from the game:
 // - Yawn's sleep on a hidden Pokémon: the game shows it at "fell asleep!" (`makevisible` in
@@ -90,13 +91,17 @@ const endsHidden = (event: ScriptEvent, { who }: Hidden) =>
   (event.kind === 'faint' && sameMon(event.who, who)) ||
   (event.kind === 'switchIn' && event.who.side === who.side)
 
-/** Whether `event` is the last of a hit turn that hit nothing. */
+/**
+ * Whether `event` is the last of a hit turn that hit nothing. A confusion self-hit that knocks the
+ * user out is not: the game's faint slide plays on the hidden sprite.
+ */
 function endsHitTurn(event: ScriptEvent, hidden: Hidden, ctx: Context): boolean {
   if (hidden.pendingAt === ctx.at) return true
   if (event.kind === 'cant') return sameMon(event.who, hidden.who)
   return (
     event.kind === 'damage' &&
     sameMon(event.who, hidden.who) &&
+    event.hp.hp > 0 &&
     event.cause !== undefined &&
     toID(event.cause.name) === 'confusion'
   )

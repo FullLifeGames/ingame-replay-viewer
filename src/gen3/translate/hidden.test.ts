@@ -175,6 +175,17 @@ describe('a hidden user stays hidden without a show', () => {
     expect(shows(scene)).toEqual([])
   })
 
+  it('when a confusion self-hit knocks it out: the faint slides the hidden sprite down', () => {
+    const scene = afterCharge(
+      ...FLY,
+      '|-activate|p2a: Tyranitar|confusion',
+      '|-damage|p2a: Tyranitar|0 fnt|[from] confusion',
+      '|faint|p2a: Tyranitar',
+    )
+    expect(scene).toContainEqual({ op: 'hp', side: 'far', hp: 0 })
+    expect(shows(scene)).toEqual([])
+  })
+
   it('when it faints, and its replacement is no hidden Pokémon', () => {
     const scene = afterCharge(
       ...FLY,
