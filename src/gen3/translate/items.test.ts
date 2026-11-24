@@ -176,6 +176,27 @@ describe('item pop-ups (BattleScript_ItemPopUp_Scripting)', () => {
     },
   )
 
+  // `BattleScript_BerryCureStatusAndConfusionRet`: pop-up, berry animation, the cure line, then
+  // STRINGID_PKMNSITEMSNAPPEDOUT. Showdown logs the status cure between the berry and the end.
+  it('names a Lum Berry that cures a status and confusion in both lines', () => {
+    const result = streamOfLog(
+      '|-status|p1a: Dugtrio|par',
+      '|-start|p1a: Dugtrio|confusion',
+      '|-enditem|p1a: Dugtrio|Lum Berry|[eat]',
+      '|-curestatus|p1a: Dugtrio|par|[msg]',
+      '|-end|p1a: Dugtrio|confusion',
+    )
+    expect(sceneFrom(result, NEXT + 2).map(plain)).toEqual([
+      shown('near', 'Lum Berry'),
+      anim('near', 'heldItemBerry'),
+      held('near', 0),
+      "Dugtrio's Lum Berry cured its paralysis!",
+      { op: 'status', side: 'near', slot: 0, status: 'none' },
+      "Dugtrio's Lum Berry snapped it out of its confusion!",
+    ])
+    expect(result.fallbacks).toEqual([])
+  })
+
   it('shows the pop-up of a berry eaten for a stat', () => {
     const scene = sceneOf(
       '|-enditem|p1a: Dugtrio|Salac Berry|[eat]',

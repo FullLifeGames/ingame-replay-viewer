@@ -8,8 +8,9 @@
 // the held item animation (`BattleScript_BerserkGene`); the change names the item. White Herb does
 // the same before the reset of the lowered stages (`BattleScript_WhiteHerbRet`), and Berry Juice
 // before its heal (`BattleScript_ItemHealHP_RemoveItem`). A berry eaten for confusion alone plays
-// its animation with no pop-up (`BattleScript_BerryCureConfusionRet`). An item the expansion
-// lacks is text alone (plan §4) and shows no pop-up.
+// its animation with no pop-up (`BattleScript_BerryCureConfusionRet`); one that cures a status
+// too names itself again as the confusion ends (`BattleScript_BerryCureStatusAndConfusionRet`).
+// An item the expansion lacks is text alone (plan §4) and shows no pop-up.
 import { Dex, toID } from '@pkmn/dex'
 
 import type { ScriptEvent } from '../../script/events'
@@ -53,12 +54,25 @@ function showPopUp(who: PokemonRef, name: string, line: number, ctx: Context): b
   return item !== undefined
 }
 
-/** The berry `who` ate on the line before the event in hand, if it ate one there. */
-export function eatenBefore(who: PokemonRef, ctx: Context): string | undefined {
-  const before = ctx.near(-1)
-  return before?.kind === 'itemEnd' && before.eaten && sameMon(before.who, who)
-    ? before.item
+/** The berry `who` ate `offset` events from the one in hand, if it ate one there. */
+function eatenAt(offset: number, who: PokemonRef, ctx: Context): string | undefined {
+  const event = ctx.near(offset)
+  return event?.kind === 'itemEnd' && event.eaten && sameMon(event.who, who)
+    ? event.item
     : undefined
+}
+
+/** The berry `who` ate on the line before the event in hand, if it ate one there. */
+export const eatenBefore = (who: PokemonRef, ctx: Context) => eatenAt(-1, who, ctx)
+
+/**
+ * The berry `who` ate for the confusion the event in hand ends: on the line before, or on the
+ * line before its status cure (Lum Berry, `BattleScript_BerryCureStatusAndConfusionRet`).
+ */
+export function eatenForConfusion(who: PokemonRef, ctx: Context): string | undefined {
+  const before = ctx.near(-1)
+  const cured = before?.kind === 'cureStatus' && sameMon(before.who, who)
+  return eatenAt(cured ? -2 : -1, who, ctx)
 }
 
 /**

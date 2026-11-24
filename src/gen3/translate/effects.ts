@@ -31,7 +31,7 @@ import { type Context, type EventOf, type PrintText, sameMon } from './context'
 import { HIT_TURN, isFutureMove } from './anim-turn'
 import { hit, hitLines } from './hits'
 import { bar, drain, isSubstituteCost } from './hp'
-import { eatenBefore, endsConfusion } from './items'
+import { eatenForConfusion, endsConfusion } from './items'
 import { playMove } from './moves'
 
 const VOLATILES: Partial<Readonly<Record<string, Volatile>>> = { substitute: 'substitute' }
@@ -96,11 +96,12 @@ export function effectEnd(event: EventOf<'effectEnd'>, ctx: Context): void {
 }
 
 /**
- * The line of an effect that ends. A berry eaten on the line before for confusion names itself
- * (STRINGID_PKMNSITEMSNAPPEDOUT, `BattleScript_BerryCureConfusionRet`).
+ * The line of an effect that ends. A berry eaten for confusion names itself
+ * (STRINGID_PKMNSITEMSNAPPEDOUT, `BattleScript_BerryCureConfusionRet` and
+ * `BattleScript_BerryCureStatusAndConfusionRet`).
  */
 function endLine(event: EventOf<'effectEnd'>, ctx: Context): PrintText {
-  const berry = eatenBefore(event.who, ctx)
+  const berry = eatenForConfusion(event.who, ctx)
   const mon = ctx.mon(event.who)
   if (berry !== undefined && endsConfusion(event, event.who)) return itemEndedConfusion(mon, berry)
   return effectEnded(mon, event.effect)
