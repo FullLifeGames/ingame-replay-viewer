@@ -10,11 +10,12 @@
 #include "constants/battle.h"
 #include "constants/songs.h"
 
-// The ops of a move and its damage (#6): MOVE, HIT, HP and FAINT. Each emits its controller
-// commands as the battle engine does for a move that hits (CancelerMoveAnimation,
+// The ops of a move and its damage (#6, #65): MOVE, HIT, HP, FAINT and SHOW_MON. Each emits its
+// controller commands as the battle engine does for a move that hits (CancelerMoveAnimation,
 // CancelerEffectivenessSound, CancelerHitAnimation, CancelerHealthBarUpdate in
-// battle_move_resolution.c) and for a mon that faints (BattleScript_FaintBattler). An op with two
-// commands for one battler emits one per step, because a battler has one bufferA.
+// battle_move_resolution.c), for a mon that faints (BattleScript_FaintBattler) and for a user that
+// a move left hidden (MoveEndAttackerVisible). An op with two commands for one battler emits one
+// per step, because a battler has one bufferA.
 
 // The sound of each REPLAY_EFFECTIVENESS_*, as CancelerEffectivenessSound picks it.
 static const u16 sEffectivenessSounds[] =
@@ -122,6 +123,22 @@ bool32 Replay_OpFaint(const volatile u8 *operands, u32 step)
     default:
         return TRUE;
     }
+    MarkBattlerForControllerExec(battler);
+    return FALSE;
+}
+
+// SHOW_MON: the side's mon shown again with no animation. A move animation can leave its user
+// hidden: Fly, Dig, Dive and Bounce hide it on their charge turn, and only their hit shows it. On a
+// hit turn that plays no animation (a miss, Protect, a full paralysis), the engine shows the user
+// with the controller's sprite invisibility command (MoveEndAttackerVisible in
+// battle_move_resolution.c), and so does this op. The controller leaves a visible mon as it is.
+bool32 Replay_OpShowMon(const volatile u8 *operands, u32 step)
+{
+    u32 battler = Replay_GetBattler(operands[0]);
+
+    if (step != 0)
+        return TRUE;
+    BtlController_EmitSpriteInvisibility(battler, B_COMM_TO_CONTROLLER, FALSE);
     MarkBattlerForControllerExec(battler);
     return FALSE;
 }

@@ -36,6 +36,7 @@ bool32 Replay_OpMove(const volatile u8 *operands, u32 step);
 bool32 Replay_OpHit(const volatile u8 *operands, u32 step);
 bool32 Replay_OpHp(const volatile u8 *operands, u32 step);
 bool32 Replay_OpFaint(const volatile u8 *operands, u32 step);
+bool32 Replay_OpShowMon(const volatile u8 *operands, u32 step);
 
 // replay_ops_switch.c
 bool32 Replay_OpWithdraw(const volatile u8 *operands, u32 step);

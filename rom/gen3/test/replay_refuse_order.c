@@ -144,6 +144,18 @@ TEST("Replay: order: a FORM_CHANGE after a WITHDRAW is refused")
     EXPECT_EQ(Validate(), REPLAY_ERROR_ORDER);
 }
 
+TEST("Replay: order: a SHOW_MON after a WITHDRAW is refused")
+{
+    ReplayStream_Begin();
+    ReplayStream_Intro();
+    ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+    ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+    ReplayStream_Withdraw(REPLAY_SIDE_NEAR);
+    ReplayStream_ShowMon(REPLAY_SIDE_NEAR);
+    ReplayStream_End(REPLAY_OUTCOME_TIE);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_ORDER);
+}
+
 // Explosion in sand: both battlers faint, the game still plays the sandstorm at the end of the
 // turn, then both sides send in their next mon.
 TEST("Replay: order: a double KO in sand, the sand upkeep and both switch-ins pass")
@@ -187,6 +199,18 @@ TEST("Replay: order: a FORM_CHANGE of a battler on the field passes")
     ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
     ReplayStream_FormChange(REPLAY_SIDE_NEAR, SPECIES_CASTFORM_SUNNY);
     ReplayStream_FormChange(REPLAY_SIDE_FAR, SPECIES_CASTFORM_SUNNY);
+    ReplayStream_End(REPLAY_OUTCOME_TIE);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_NONE);
+}
+
+TEST("Replay: order: a SHOW_MON of a battler on the field passes")
+{
+    ReplayStream_Begin();
+    ReplayStream_Intro();
+    ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+    ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+    ReplayStream_ShowMon(REPLAY_SIDE_NEAR);
+    ReplayStream_ShowMon(REPLAY_SIDE_FAR);
     ReplayStream_End(REPLAY_OUTCOME_TIE);
     EXPECT_EQ(Validate(), REPLAY_ERROR_NONE);
 }

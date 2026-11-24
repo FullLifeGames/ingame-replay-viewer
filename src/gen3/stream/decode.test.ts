@@ -85,7 +85,7 @@ describe('decodeStream', () => {
   })
 
   it('refuses an unknown op, the one after the last op of version 3', () => {
-    expect(patched([END], STREAM.tablesEnd, [0x16])).toThrow(/op 22/)
+    expect(patched([END], STREAM.tablesEnd, [0x17])).toThrow(/op 23/)
   })
 
   it('refuses a header whose sizes or offsets are not those of version 3', () => {

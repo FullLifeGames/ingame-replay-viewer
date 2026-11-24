@@ -80,9 +80,10 @@ static const ReplayOpFunc sOps[] =
     [REPLAY_OP_TRAP_TURN]      = Replay_OpTrapTurn,
     [REPLAY_OP_FLUSH_TEXT_BOX] = Op_FlushTextBox,
     [REPLAY_OP_FORM_CHANGE]    = Replay_OpFormChange,
+    [REPLAY_OP_SHOW_MON]       = Replay_OpShowMon,
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sOps) == REPLAY_OP_FORM_CHANGE + 1, ReplayOpsCoverTheFormat);
+STATIC_ASSERT(ARRAY_COUNT(sOps) == REPLAY_OP_SHOW_MON + 1, ReplayOpsCoverTheFormat);
 
 // The battle outcome of each REPLAY_OUTCOME_*. A tie and an unknown end are draws.
 static const u8 sOutcomes[] =

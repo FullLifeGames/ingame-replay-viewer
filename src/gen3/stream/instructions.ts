@@ -83,6 +83,11 @@ interface Operands {
   flushTextBox: unknown
   /** The side's mon takes the form of `species` (Castform's Forecast) until it leaves the field. */
   formChange: OnSide & { readonly species: number }
+  /**
+   * The side's mon shown again with no animation, as the game shows a Fly, Dig, Dive or Bounce
+   * user whose hit turn plays no move animation (the controller's sprite invisibility command).
+   */
+  showMon: OnSide
 }
 
 export type Instruction = { [K in Op]: { readonly op: K } & Operands[K] }[Op]
@@ -204,6 +209,7 @@ export const LAYOUT: { readonly [K in FixedOp]: Fields<Operands[K]> } = {
     ['side', side],
     ['species', species],
   ],
+  showMon: [['side', side]],
 }
 
 /** A trainer's fields; their offsets are TRAINER_OFFSET's under the same names. */

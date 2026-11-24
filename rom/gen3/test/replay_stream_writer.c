@@ -249,6 +249,12 @@ void ReplayStream_FormChange(u32 side, u32 species)
     ReplayStream_Op(REPLAY_OP_FORM_CHANGE, REPLAY_OP_FORM_CHANGE_SIZE, operands);
 }
 
+void ReplayStream_ShowMon(u32 side)
+{
+    const u8 operands[REPLAY_OP_SHOW_MON_SIZE] = { side };
+    ReplayStream_Op(REPLAY_OP_SHOW_MON, REPLAY_OP_SHOW_MON_SIZE, operands);
+}
+
 const u8 *ReplayStream_Data(void)
 {
     return sStream;

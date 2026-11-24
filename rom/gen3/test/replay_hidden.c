@@ -185,3 +185,38 @@ REPLAY_TEST("MOVE plays Fly's charge, which hides its user")
         EXPECT(IsSpriteHidden(Replay_GetBattler(REPLAY_SIDE_NEAR)));
     }
 }
+
+REPLAY_TEST("SHOW_MON shows a mon that Fly's charge hid")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        PlayFlysCharge();
+        ReplayStream_ShowMon(REPLAY_SIDE_NEAR);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_FLY, nearMon); }
+    THEN
+    {
+        FORCE_MOVE_ANIM(FALSE);
+        EXPECT(!IsSpriteHidden(Replay_GetBattler(REPLAY_SIDE_NEAR)));
+    }
+}
+
+REPLAY_TEST("SHOW_MON leaves a visible mon visible")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        ReplayStream_Intro();
+        ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_ShowMon(REPLAY_SIDE_FAR);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    THEN
+    {
+        FORCE_MOVE_ANIM(FALSE);
+        EXPECT(!IsSpriteHidden(Replay_GetBattler(REPLAY_SIDE_FAR)));
+    }
+}

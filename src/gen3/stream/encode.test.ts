@@ -196,6 +196,10 @@ describe('encodeInstruction', () => {
     expect(encodeInstruction(change)).toEqual([0x15, 3, 1, 0x1b, 0x04])
   })
 
+  it('encodes SHOW_MON as the side alone', () => {
+    expect(encodeInstruction({ op: 'showMon', side: 'far' })).toEqual([0x16, 1, 1])
+  })
+
   it('takes FORM_CHANGE species 1 to NUM_SPECIES - 1 and refuses 0 and NUM_SPECIES', () => {
     const change = (species: number): Instruction => ({ op: 'formChange', side: 'near', species })
     expect(encodeInstruction(change(1))).toHaveLength(5)
