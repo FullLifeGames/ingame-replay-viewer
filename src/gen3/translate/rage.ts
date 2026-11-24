@@ -14,18 +14,19 @@ const RAGE = 'rage'
 const isHitOn = (event: ScriptEvent, who: PokemonRef) =>
   event.kind === 'damage' && sameMon(event.who, who) && event.cause === undefined
 
+/** Whether `event` is a single-move effect, a move or a switch-in of `who`. */
+const isOwn = (event: ScriptEvent, who: PokemonRef) =>
+  (event.kind === 'singleMove' && sameMon(event.who, who)) ||
+  (event.kind === 'move' && sameMon(event.user, who)) ||
+  (event.kind === 'switchIn' && sameMon(event.who, who))
+
 /**
  * Whether Rage is on `who` in `before`, the events from the latest back: its start comes before
  * any move or switch-in of its own.
  */
 function inRage(who: PokemonRef, before: readonly ScriptEvent[]): boolean {
-  for (const event of before) {
-    if (event.kind === 'singleMove' && sameMon(event.who, who))
-      return toID(event.effect.name) === RAGE
-    if (event.kind === 'move' && sameMon(event.user, who)) return false
-    if (event.kind === 'switchIn' && sameMon(event.who, who)) return false
-  }
-  return false
+  const latest = before.find((event) => isOwn(event, who))
+  return latest?.kind === 'singleMove' && toID(latest.effect.name) === RAGE
 }
 
 /** Whether a stat change is a hit's raise of the Attack of a Pokémon in a rage. */
