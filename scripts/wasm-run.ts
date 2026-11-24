@@ -53,6 +53,7 @@ import {
 } from './wasm-hashes.ts'
 import type { RunArgs, RunHashes } from './wasm-hashes.ts'
 import { LINK_OUTPUTS } from './wasm-link.ts'
+import { playStreams } from './wasm-run-report.ts'
 import { SoundLog } from './wasm-run-sound.ts'
 
 // The module's shape lives in src/web/wasm, which the page's worker shares.
@@ -337,7 +338,7 @@ async function runStreams({ mode, names, sanitize }: RunArgs): Promise<void> {
   mkdirSync(runDir, { recursive: true })
   emptyInside(wasmRoots(REPO_DIR), runDir)
   const run = { runDir, module, errors, baseline: { mode, out } }
-  const reports = plans.map((plan) => runStream(plan, run))
+  const reports = await playStreams(plans, (plan) => Promise.resolve(runStream(plan, run)))
   finishRuns(reports, runDir, (line) => process.stdout.write(`wasm:run: ${line}\n`))
 }
 
