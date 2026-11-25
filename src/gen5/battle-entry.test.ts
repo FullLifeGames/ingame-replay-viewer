@@ -42,4 +42,21 @@ describe('battleEntry', () => {
       { kind: 'mark', name: 'battle' },
     ])
   })
+
+  it('marks the wait for the adapter and presses A on a quicker beat, if asked to', () => {
+    const [start] = battleEntry(
+      [MODE, POINTER],
+      { start: 900, battle: 300 },
+      {
+        markEvery: 30,
+        every: 4,
+      },
+    )
+    expect(start).toMatchObject({
+      name: 'battle-start',
+      markEvery: 30,
+      mash: { buttons: ['A'], every: 4, hold: 2 },
+    })
+    expect(steps[0]).not.toHaveProperty('markEvery')
+  })
 })

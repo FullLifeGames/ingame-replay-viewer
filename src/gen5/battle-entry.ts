@@ -23,9 +23,26 @@ export interface EntryLimits {
   battle: number
 }
 
-/** A every TEXT_EVERY frames until the adapter pointer leads into main RAM (mark `battle-start`),
- * then no input until all `checks` hold for STANDING_FRAMES frames in a row (mark `battle`). */
-export function battleEntry(checks: readonly RamCheck[], limits: EntryLimits): MacroStep[] {
+/** How a route presses A while the battle comes: marks on the way, and a quicker beat. */
+export interface EntryPace {
+  /** Marks `battle-start-NNN` every this many frames while the route waits for the adapter. */
+  markEvery?: number
+  /** A every this many frames, held for half of them, instead of every TEXT_EVERY frames. */
+  every?: number
+}
+
+/** A until the adapter pointer leads into main RAM (mark `battle-start`), then no input until all
+ * `checks` hold for STANDING_FRAMES frames in a row (mark `battle`). */
+export function battleEntry(
+  checks: readonly RamCheck[],
+  limits: EntryLimits,
+  pace: EntryPace = {},
+): MacroStep[] {
+  const { markEvery, every } = pace
+  const mash =
+    every === undefined
+      ? { buttons: ['A'] as const, every: TEXT_EVERY, hold: PRESS_FRAMES }
+      : { buttons: ['A'] as const, every, hold: Math.max(1, Math.floor(every / 2)) }
   return [
     {
       kind: 'until',
@@ -33,7 +50,8 @@ export function battleEntry(checks: readonly RamCheck[], limits: EntryLimits): M
       checks: checks.filter((check) => check.mainRamPointer === true),
       holdFor: 1,
       limit: limits.start,
-      mash: { buttons: ['A'], every: TEXT_EVERY, hold: PRESS_FRAMES },
+      mash,
+      ...(markEvery === undefined ? {} : { markEvery }),
     },
     mark('battle-start'),
     { kind: 'until', name: 'battle', checks, holdFor: STANDING_FRAMES, limit: limits.battle },

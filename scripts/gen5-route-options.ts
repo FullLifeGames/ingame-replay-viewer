@@ -1,6 +1,6 @@
 // The command line of scripts/gen5-route.ts (#72, #78): which route a run plays, the state it
 // starts from, the save it queues or takes, and the page's address. Usage: --route
-// new-game|save-here|continue|continue-probe|trainer, --from <mark> and --to <mark> (the new
+// new-game|save-here|continue|trainer, --from <mark> and --to <mark> (the new
 // game's marks; --from starts from the state s5-<mark>), --state <file base> (any state under
 // build/gen5/states/), --save <file> (queued through the hook before the pick), --take-save
 // <name> (written to build/gen5/saves/<name>.sav once it stands still), --query <text>,
@@ -9,7 +9,7 @@ import { parseArgs } from 'node:util'
 
 import { isSaveName } from '../src/gen5/save-file.ts'
 
-const ROUTES = ['new-game', 'save-here', 'continue', 'continue-probe', 'trainer'] as const
+const ROUTES = ['new-game', 'save-here', 'continue', 'trainer'] as const
 
 export type RouteName = (typeof ROUTES)[number]
 
@@ -79,7 +79,7 @@ export function readRouteOptions(args: string[], now: number): RouteOptions {
   })
   if (!isRoute(values.route))
     throw new Error(
-      `--route takes new-game, save-here, continue, continue-probe or trainer, not "${values.route}".`,
+      `--route takes new-game, save-here, continue or trainer, not "${values.route}".`,
     )
   const minutes = Number(values.minutes)
   const query = values.query.replace(/^\?/, '')

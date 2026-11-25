@@ -1,8 +1,9 @@
 // The route runs of the Gen 5 spike (#72, #78): plays a route on the spike page in headless
 // Chromium, from boot or from a state under build/gen5/states/: the new game of src/gen5/route.ts
 // up to a mark or its end, the save from the field menu (src/gen5/save-menu.ts), the continue
-// from a save (src/gen5/continue-route.ts), with or without a probe east after it, or the story
-// on from the rival battle (src/gen5/trainer-route.ts). At each mark the page saves a state and
+// from the save into the trainer's battle (src/gen5/continue-route.ts), whose log counts the frames
+// from the title to the action menu, or the story on from the rival battle
+// (src/gen5/trainer-route.ts). At each mark the page saves a state and
 // the core's frame; scripts/gen5-route-run.ts writes them to build/gen5/states/ and
 // build/gen5/frames/ (gitignored, ADR 0002; never served or committed) and logs the emulated
 // frame, the wall time and a hash of main RAM. Requests stay on the machine and carry no body (scripts/gen5-requests.ts).
@@ -15,9 +16,9 @@ import { chromium, type Page } from '@playwright/test'
 
 import { battleRefs } from '../src/gen5/battle-check.ts'
 import type { Bw2Numbers, RoutePlaces } from '../src/gen5/bw2-numbers.ts'
-import { continueRoute, probeEast } from '../src/gen5/continue-route.ts'
-import type { Gen5Global, RunPlan } from '../src/gen5/hook.ts'
-import { routeSlice } from '../src/gen5/macro.ts'
+import { continueRoute, MENU_LIMIT } from '../src/gen5/continue-route.ts'
+import type { Gen5Global, RunPlan, RunReport } from '../src/gen5/hook.ts'
+import { type MacroStep, routeSlice } from '../src/gen5/macro.ts'
 import { newGameRoute, PLAYER_X, PLAYER_Z } from '../src/gen5/route.ts'
 import { SAVE_SLOT_BEFORE_POKEMON, saveGame } from '../src/gen5/save-menu.ts'
 import { FIELD_X, FIELD_Z, trainerRoute } from '../src/gen5/trainer-route.ts'
@@ -32,10 +33,6 @@ type BattleRefs = ReturnType<typeof battleRefs>
 
 type Route = Pick<RunPlan, 'steps' | 'stateMarks'>
 
-/** The probe's beats after Continue: 40 of 30 frames, room for a few tiles' walk, the trainer's
- * walk-up and line, and the battle's opening. */
-const PROBE_BEATS = 40
-
 /** The steps of the chosen route; the save route keeps one state, at its mark `saved`, and the
  * trainer route plays on after `from`, the mark of the state it starts from. */
 function routeOf(
@@ -46,9 +43,7 @@ function routeOf(
 ): Route {
   if (options.route === 'save-here')
     return { steps: saveGame(SAVE_SLOT_BEFORE_POKEMON), stateMarks: ['saved'] }
-  if (options.route === 'continue') return { steps: continueRoute() }
-  if (options.route === 'continue-probe')
-    return { steps: [...continueRoute(), ...probeEast(PROBE_BEATS)] }
+  if (options.route === 'continue') return { steps: continueRoute(refs.checks) }
   if (options.route === 'trainer') return trainerRoute(places, from)
   return { steps: routeSlice(newGameRoute(places, refs.checks), options.from, options.to) }
 }
@@ -82,6 +77,25 @@ async function queue(page: Page, plan: RunPlan, save: string | undefined): Promi
   log(`queued the save ${save}: ${String(bytes.length)} bytes`)
 }
 
+/** The continue route's count from the mark `title` (#78): to the first frame the battle checks
+ * held, which is the mark `battle` less the frames they went on holding, and to the mark itself,
+ * each against MENU_LIMIT. */
+function logMenuCount(report: RunReport, steps: readonly MacroStep[]): void {
+  const frameOf = (name: string) => report.marks.find((record) => record.name === name)?.frame
+  const [title, battle] = [frameOf('title'), frameOf('battle')]
+  const standing = steps.find((step) => step.kind === 'until' && step.name === 'battle')
+  if (title === undefined || battle === undefined || standing?.kind !== 'until') {
+    log('menu count: the run has no marks title and battle')
+    return
+  }
+  const against = (frames: number) =>
+    `${String(frames)} (${frames <= MENU_LIMIT ? 'within' : 'OVER'} the limit of ${String(MENU_LIMIT)})`
+  const held = battle - (standing.holdFor - 1) - title
+  log(
+    `menu count from title: to the first frame the battle checks hold ${against(held)}, to the mark battle ${against(battle - title)}`,
+  )
+}
+
 /** Plays the route in the opened page; true when the save, if asked for, was taken. */
 async function play(page: Page, dump: string, plan: RunPlan, options: RouteOptions) {
   await queue(page, plan, options.save)
@@ -95,6 +109,7 @@ async function play(page: Page, dump: string, plan: RunPlan, options: RouteOptio
   }
   const report = await follow(page, options)
   await logEnd(page, options, plan.watch)
+  if (options.route === 'continue') logMenuCount(report, plan.steps)
   log(`${sampleLine()}; status: ${report.status}`)
   let taken = true
   if (options.takeSave !== undefined) {
