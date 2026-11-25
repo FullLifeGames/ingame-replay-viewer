@@ -61,6 +61,17 @@ describe('quietLines', () => {
       bianca: { x: 2, z: 29 },
     },
     saveTrainer: { x: 3, z: 41 },
+    entry: {
+      functions: {
+        Spin_Main: { call: 0x02004001, thumb: true },
+        Spin_Arm: { call: 0x02004100, thumb: false },
+      },
+      data: { sTable: symbol('sTable', 0x02100000) },
+      constants: { HEAPID_SPIN: 43 },
+      layouts: { Kite: LAYOUT, Lamp: LAYOUT },
+      battleOverlay: { start: 0x02190000, end: 0x02190600 },
+      bootOverlays: { ovA: { start: 0x02180000, end: 0x02190000 } },
+    },
   }
 
   it('gives the pin, the count of symbols and the checks, and no address, offset or value', () => {
@@ -69,7 +80,25 @@ describe('quietLines', () => {
       'symbols 2',
       'outside main RAM: itcm',
       'adapter layout checked: members present, offsets rising, inside the struct, bit-fields shared',
+      'entry functions in ARM: Spin_Arm',
+      'entry symbols all in main RAM',
+      'battle overlay in main RAM, apart from the boot overlays',
+      'entry layouts Kite, Lamp',
     ])
+  })
+
+  // Scene: the direct entry's numbers (#97) reach the public log as names and checks alone.
+  it("names the entry's ARM functions and its symbols outside main RAM, and no number", () => {
+    const entry = {
+      ...numbers.entry,
+      functions: { Spin_Main: { call: 0x02004001, thumb: true } },
+      data: { itcm: symbol('itcm', 0x01ff8123) },
+      battleOverlay: { start: 0x023ffc00, end: 0x02400400 },
+    }
+    const lines = quietLines({ ...numbers, entry })
+    expect(lines).toContain('entry functions all Thumb')
+    expect(lines).toContain('entry symbols outside main RAM: itcm')
+    expect(lines).toContain('battle overlay outside main RAM, apart from the boot overlays')
   })
 
   // Scene: each of pokebw2's lists runs from 0, so its size would give away its last entry's

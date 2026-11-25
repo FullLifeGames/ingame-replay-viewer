@@ -127,6 +127,37 @@ export interface RoutePlaces {
   bianca: ActorPlace
 }
 
+/** The addresses from `start` up to and without `end`. */
+export interface Span {
+  start: number
+  end: number
+}
+
+/** A function the direct entry's routine calls through a register. */
+export interface EntryFunction {
+  /** The address to call: the symbol's, with bit 0 set for a Thumb function. */
+  call: number
+  thumb: boolean
+}
+
+/** What the direct battle start (#97) needs, all by pokebw2's own names (scripts/gen5-bw2-entry.ts). */
+export interface EntryNumbers {
+  /** The functions the routine calls, in the order of ENTRY_FUNCTIONS. */
+  functions: Record<string, EntryFunction>
+  /** The data the page compares and hands over: the proc manager, the boot proc's tables and
+   * param, the battle proc's table. */
+  data: Record<string, Bw2Symbol>
+  /** The heap, the overlays, the music's channels, the trainer class and the fast text speed. */
+  constants: Record<string, number>
+  /** The structs the page and the routine write through, by struct name. */
+  layouts: Record<string, StructLayout>
+  /** The battle overlay's span in RAM, where the routine lives until the battle loads there. */
+  battleOverlay: Span
+  /** The spans of the overlays GameInit loads at boot, by overlay name; the battle overlay's
+   * span meets none of them. */
+  bootOverlays: Record<string, Span>
+}
+
 /** The whole of build/gen5/bw2.json. */
 export interface Bw2Numbers extends ServerCmdTable {
   pokebw2: { repository: string; commit: string }
@@ -141,4 +172,5 @@ export interface Bw2Numbers extends ServerCmdTable {
    * his NPC entry, found by his trainer constant (scripts/gen5-bw2-trainer.ts). He looks up along
    * his column `x`. */
   saveTrainer: ActorPlace
+  entry: EntryNumbers
 }

@@ -1,8 +1,9 @@
 // Generates build/gen5/bw2.json, the Gen 5 spike's numbers of Black 2 (USA) (#72, D4), from
 // pokebw2 at its pin (gen5-bw2-source.ts): the addresses S6 needs, the adapter and server command
 // enums, each argument format's puts, the message rules, the adapter's layout, the route's places
-// in the map's events and the tile of the shipped save's trainer. The checkout lives in
-// .cache/gen5/pokebw2/ and the output in build/gen5/; nothing of pokebw2 is committed.
+// in the map's events, the tile of the shipped save's trainer, and the direct entry's numbers
+// (#97). The checkout lives in .cache/gen5/pokebw2/ and the output in build/gen5/; nothing of
+// pokebw2 is committed.
 // Usage: node scripts/gen5-bw2.ts [--checkout <dir>] [--quiet] (fetches on the first run). With
 // --quiet the report gives the pin, counts and checks and no number of pokebw2, as CI's public log
 // needs.
@@ -19,6 +20,7 @@ import {
   pickSymbols,
 } from './gen5-bw2-c.ts'
 import { battleNumbers } from './gen5-bw2-battle.ts'
+import { BATTLE_OVERLAY, BOOT_LINKS, ENTRY_SOURCES, entryNumbers } from './gen5-bw2-entry.ts'
 import { ROUTE_MAP, routePlaces } from './gen5-bw2-field.ts'
 import { parseArgFormats, parseMessageRules } from './gen5-bw2-put.ts'
 import { fullLines, quietLines, report } from './gen5-bw2-report.ts'
@@ -136,7 +138,7 @@ export function checkCommandFormats(
 
 /** The files the generator parses, by the role each plays. */
 const SOURCES = {
-  symbols: 'config/b2_us/arm9/overlays/ov167/symbols.txt',
+  symbols: `config/b2_us/arm9/overlays/${BATTLE_OVERLAY}/symbols.txt`,
   adapterC: 'src/battle/btl_adapter.c',
   queueC: 'src/battle/btl_server_cmd.c',
   serverC: 'src/battle/btl_server.c',
@@ -151,14 +153,18 @@ const SOURCES = {
   trainerEvents: SAVE_TRAINER.events,
   trainerList: SAVE_TRAINER.trainers,
   trainerScript: SAVE_TRAINER.script,
+  ...ENTRY_SOURCES,
 }
 
-type Sources = Record<keyof typeof SOURCES, string>
+type Sources = Record<keyof typeof SOURCES, string> & { bootLinks: Record<string, string> }
 
-/** Every file the generator parses, read through `read` before any parsing. */
+const readAll = (read: Pokebw2Read, paths: Readonly<Record<string, string>>) =>
+  Object.fromEntries(Object.entries(paths).map(([role, path]) => [role, read(path)]))
+
+/** Every file the generator parses, read through `read` before any parsing: the link files of
+ * the boot overlays by overlay name. */
 export function readSources(read: Pokebw2Read): Sources {
-  const entries = Object.entries(SOURCES).map(([role, path]) => [role, read(path)])
-  return Object.fromEntries(entries) as Sources
+  return { ...readAll(read, SOURCES), bootLinks: readAll(read, BOOT_LINKS) } as Sources
 }
 
 function parse(sources: Sources): Bw2Numbers {
@@ -188,6 +194,11 @@ function parse(sources: Sources): Bw2Numbers {
       events: sources.trainerEvents,
       trainers: sources.trainerList,
       script: sources.trainerScript,
+    }),
+    entry: entryNumbers({
+      ...sources,
+      battleSymbols: sources.symbols,
+      battleOverlay: BATTLE_OVERLAY,
     }),
   }
 }

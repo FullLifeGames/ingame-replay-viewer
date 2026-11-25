@@ -1,6 +1,6 @@
 // The report of the pokebw2 generator (gen5-bw2.ts): the full one with every number it read, for a
 // run on the build machine, and the quiet one for CI's public log, with no number of pokebw2.
-import type { Bw2Numbers, Bw2Symbol } from '../src/gen5/bw2-numbers.ts'
+import type { Bw2Numbers, Bw2Symbol, EntryNumbers } from '../src/gen5/bw2-numbers.ts'
 import { inMainRam } from '../src/gen5/main-ram.ts'
 import { packCommands, type ServerCommand } from '../src/gen5/server-cmd.ts'
 
@@ -54,6 +54,27 @@ const count = (table: object) => String(Object.keys(table).length)
 const LAYOUT_CHECKED =
   'adapter layout checked: members present, offsets rising, inside the struct, bit-fields shared'
 
+/** The direct entry's checks by name: its ARM functions, its symbols outside main RAM, and the
+ * battle overlay's span, which the generator has already checked against the boot overlays. */
+function entryChecks(entry: EntryNumbers): string[] {
+  const functions = Object.entries(entry.functions)
+  const arm = functions.filter(([, fn]) => !fn.thumb).map(([name]) => name)
+  const outside = [
+    ...functions.filter(([, fn]) => !inMainRam(fn.call - (fn.thumb ? 1 : 0))).map(([name]) => name),
+    ...namesOutsideMainRam(entry.data),
+  ]
+  const { start, end } = entry.battleOverlay
+  const span = inMainRam(start, end - start) ? 'in main RAM' : 'outside main RAM'
+  return [
+    arm.length === 0 ? 'entry functions all Thumb' : `entry functions in ARM: ${arm.join(', ')}`,
+    outside.length === 0
+      ? 'entry symbols all in main RAM'
+      : `entry symbols outside main RAM: ${outside.join(', ')}`,
+    `battle overlay ${span}, apart from the boot overlays`,
+    `entry layouts ${Object.keys(entry.layouts).join(', ')}`,
+  ]
+}
+
 /** The report for a public log: the pin, the count of the symbols it looked up by our own names,
  * and the two checks, and no number of pokebw2: no address, offset, value or size. Each of
  * pokebw2's lists runs from 0, so a list's size would give away its last entry's number. */
@@ -64,6 +85,27 @@ export function quietLines(numbers: Bw2Numbers): string[] {
     `symbols ${count(numbers.symbols)}`,
     outside.length === 0 ? 'all symbols in main RAM' : `outside main RAM: ${outside.join(', ')}`,
     LAYOUT_CHECKED,
+    ...entryChecks(numbers.entry),
+  ]
+}
+
+/** Every number of the direct entry, for a run on the build machine. */
+function entryLines(entry: EntryNumbers): string[] {
+  const span = ({ start, end }: { start: number; end: number }) => `${hex(start)} to ${hex(end)}`
+  return [
+    ...Object.entries(entry.functions).map(
+      ([name, fn]) => `entry function ${name} ${fn.thumb ? 'thumb' : 'arm'} ${hex(fn.call)}`,
+    ),
+    ...Object.values(entry.data).map(
+      (symbol) => `entry data ${symbol.name} ${symbol.module} ${hex(symbol.address)}`,
+    ),
+    `entry constants ${JSON.stringify(entry.constants)}`,
+    ...Object.entries(entry.layouts).map(
+      ([name, layout]) =>
+        `entry layout ${name} size ${hex(layout.size)}, align ${String(layout.align)}`,
+    ),
+    `battle overlay ${span(entry.battleOverlay)}`,
+    ...Object.entries(entry.bootOverlays).map(([name, at]) => `boot overlay ${name} ${span(at)}`),
   ]
 }
 
@@ -88,6 +130,8 @@ export function fullLines(numbers: Bw2Numbers): string[] {
     LAYOUT_CHECKED,
     `battle ${JSON.stringify(numbers.battle)}`,
     ...momentSamples(numbers),
+    ...entryLines(numbers.entry),
+    ...entryChecks(numbers.entry),
   ]
 }
 
