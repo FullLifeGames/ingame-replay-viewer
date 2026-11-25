@@ -28,7 +28,8 @@ const root = execFileSync('git', ['rev-parse', '--show-toplevel'], {
 const git = (...args: string[]) => execFileSync('git', args, { cwd: root, encoding: 'utf8' })
 const tracked = git('ls-files', '-z').split('\0').filter(Boolean)
 
-const FORBIDDEN_NAME = /\.(?:gba|agb|bps|ips|ups|sav|srm|elf|nds|ss\w*|state|ppm|wasm)$/i
+const FORBIDDEN_NAME =
+  /\.(?:gba|agb|bps|ips|ups|sav|srm|elf|nds|ss\w*|state|ppm|wasm|data|7z|tgz|tar|gz)$/i
 
 // The saves folder from the root, as git lists it: a save directly in it is ours.
 const SAVES = relative(GEN5_PATHS.repo, GEN5_PATHS.saves)
@@ -49,6 +50,14 @@ function hasGbaHeader(bytes: Uint8Array): boolean {
 }
 
 const WASM_MAGIC = [0x00, 0x61, 0x73, 0x6d]
+const ARCHIVE_MAGICS = [
+  [0x1f, 0x8b], // gzip: a .tgz, a .tar.gz
+  [0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c], // 7z: an EmulatorJS core (.data)
+]
+
+function hasArchiveMagic(bytes: Uint8Array): boolean {
+  return ARCHIVE_MAGICS.some((magic) => magic.every((byte, index) => bytes[index] === byte))
+}
 
 function hasWasmMagic(bytes: Uint8Array): boolean {
   return WASM_MAGIC.every((byte, index) => bytes[index] === byte)
@@ -100,9 +109,14 @@ function stagedHeads(repo: string): Staged[] {
 const offending = (repo: string) =>
   stagedHeads(repo)
     .filter(({ head }) =>
-      [hasGbaHeader, hasPatchMagic, hasFrameMagic, hasWasmMagic, isConvertedData].some((check) =>
-        check(head),
-      ),
+      [
+        hasGbaHeader,
+        hasPatchMagic,
+        hasFrameMagic,
+        hasWasmMagic,
+        hasArchiveMagic,
+        isConvertedData,
+      ].some((check) => check(head)),
     )
     .map(({ path }) => path)
 
@@ -148,6 +162,8 @@ describe('the check of a repo index', () => {
   writeFileSync(join(repo, 'module.dat'), '\u0000asm\u0001\u0000\u0000\u0000')
   writeFileSync(join(repo, 'songs.txt'), `# sound/x.o, ${CONVERTED_BY}\n\t.byte\t1\n`)
   writeFileSync(join(repo, 'about.md'), `# Notes on the files ${CONVERTED_BY} writes\n`)
+  writeFileSync(join(repo, 'source.txt'), new Uint8Array([0x1f, 0x8b, 0x08, 0x00]))
+  writeFileSync(join(repo, 'core.txt'), new Uint8Array([0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c, 0x00]))
   execFileSync('git', ['add', '-A'], { cwd: repo })
   unlinkSync(join(repo, 'renamed.txt'))
 
@@ -156,10 +172,12 @@ describe('the check of a repo index', () => {
       'a.dat',
       'b.dat',
       'c.dat',
+      'core.txt',
       'frame.dat',
       'module.dat',
       'renamed.txt',
       'songs.txt',
+      'source.txt',
     ])
   })
 })
@@ -176,7 +194,27 @@ describe('the name rule', () => {
     expect(isForbiddenName(path)).toBe(true)
   })
 
-  it.each(['notes.md', 'ppm.ts', 'rom-shot-probes.ts', 'wasm-run.ts'])('takes %s', (path) => {
+  // Scene: an archive or a core in the tree (#79, D12): the cores EmulatorJS packs as 7z, the
+  // fetched packages and the source archives of scripts/gen5-sources.ts.
+  it.each([
+    '.cache/gen5/emulatorjs/site/data/cores/melonds-wasm.data',
+    'melonds.7z',
+    'core-melonds-4.2.3.tgz',
+    'retroarch.tar',
+    'melonds-18a057d372783b42d7e297b8731f3c3d673cdcab.tar.gz',
+    'notes.md.gz',
+  ])('refuses the archive or core %s', (path) => {
+    expect(isForbiddenName(path)).toBe(true)
+  })
+
+  it.each([
+    'notes.md',
+    'ppm.ts',
+    'rom-shot-probes.ts',
+    'wasm-run.ts',
+    'scripts/gen5-sources.ts',
+    'data.json',
+  ])('takes %s', (path) => {
     expect(isForbiddenName(path)).toBe(false)
   })
 
@@ -197,11 +235,11 @@ describe('the name rule', () => {
 })
 
 describe('the tracked tree', () => {
-  it('holds no ROM, savestate, ELF, patch or frame by name', () => {
+  it('holds no ROM, savestate, ELF, patch, frame, archive or core by name', () => {
     expect(tracked.filter((path) => isForbiddenName(path))).toEqual([])
   })
 
-  it('holds no file that starts with a GBA header, a patch, frame or wasm magic, or data assembly', () => {
+  it('holds no file that starts with a GBA header, a patch, frame, wasm, gzip or 7z magic, or data assembly', () => {
     expect(stagedHeads(root).length).toBeGreaterThan(0)
     expect(offending(root)).toEqual([])
   })
@@ -223,6 +261,9 @@ describe('the tracked tree', () => {
     'build/wasm/asm/data/battle_scripts_1.s',
     'build/wasm/asm/data/battle_scripts_1.o',
     '.cache/wasm/platform/src/platform/bios.c',
+    '.cache/gen5/sources/melonds-18a057d372783b42d7e297b8731f3c3d673cdcab.tar.gz',
+    '.cache/gen5/sources/git/melonds.git/HEAD',
+    '.cache/gen5/emulatorjs/site/data/cores/melonds-wasm.data',
   ])('ignores %s', (path) => {
     expect(git('check-ignore', path).trim()).toBe(path)
   })
