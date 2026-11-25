@@ -1,6 +1,8 @@
+import { toID } from '@pkmn/dex'
 import type { Protocol } from '@pkmn/protocol'
 
 import type { LogLine } from './lines'
+import { effectOf } from './refs'
 import type { DropReason } from './types'
 
 type NamedPlayerArgs = Extract<Protocol.Args['|player|'], { length: 5 }>
@@ -50,6 +52,20 @@ const REASONS: Partial<Record<Protocol.ArgName, DropReason>> = {
   '|-mustrecharge|': 'state',
 }
 
+/**
+ * The one-turn effects whose `|-singleturn|` line the game never shows, by the effect's id. Roost
+ * alone: its heal line says the move, the client keeps the volatile, and the game prints nothing
+ * for the turn without its Flying type. A set of names, since @pkmn's data tells no effect the
+ * game says from one it keeps silent.
+ */
+const STATE_SINGLE_TURNS: ReadonlySet<string> = new Set(['roost'])
+
+/** Whether `line` is a one-turn effect the game keeps silent, such as Roost's. */
+function isStateSingleTurn({ key, args: [, , effect] }: LogLine): boolean {
+  if (key !== '|-singleturn|' || typeof effect !== 'string') return false
+  return STATE_SINGLE_TURNS.has(toID(effectOf(effect).name))
+}
+
 /** A `|player|` line that names its player, as the intro shows it. */
 export function isNamedPlayer(args: Protocol.ArgType): args is NamedPlayerArgs {
   return args[0] === 'player' && typeof args[2] === 'string' && args[2] !== ''
@@ -65,6 +81,9 @@ export function dropReasonOf(line: LogLine, started: boolean): DropReason | unde
   }
   if (line.key === '|player|') {
     return started || !isNamedPlayer(line.args) ? 'room' : undefined
+  }
+  if (isStateSingleTurn(line)) {
+    return 'state'
   }
   return line.key && dropReasonOfKind(line.key)
 }

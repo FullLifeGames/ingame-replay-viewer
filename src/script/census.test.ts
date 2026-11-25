@@ -11,8 +11,8 @@ type Named = typeof NAMED_KINDS
 
 const KINDS = Object.keys(Protocol.ARGS) as Protocol.ArgName[]
 
-// `dropReasonOf` decides `||` by its text. `|player|` has a rule and drops by its line too; the
-// rule is its place.
+// `dropReasonOf` decides `||` by its text. `|player|` and `|-singleturn|` (Roost's) have a rule
+// and drop by their line too; the rule is their place.
 const BY_LINE: readonly Protocol.ArgName[] = ['||']
 
 function placesOf(kind: Protocol.ArgName, named: Named = NAMED_KINDS): string[] {
