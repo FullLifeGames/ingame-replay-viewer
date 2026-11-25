@@ -2,6 +2,7 @@
 // macro that src/web/gen5/frame-hook.ts plays one emulated frame at a time. Each mark is a
 // milestone where a run saves a state and a frame, so the next attempt starts there
 // (scripts/gen5-route.ts). Frame counts were read off frames of earlier runs, never off a clock.
+import type { RoutePlaces } from './bw2-numbers.ts'
 import type { Button, MacroStep } from './macro.ts'
 import type { RamCheck, RamRef } from './ram-check.ts'
 
@@ -92,9 +93,9 @@ const probe = (moves: readonly Button[], frames: number, first: number): MacroSt
 
 /** The player's grid position, as the field keeps it while the route stays in Aspertia City: a
  * heap block whose address repeats as long as the route from boot does. Found by comparing the
- * states of three marks a known walk apart (outside, walk-42, walk-43: x 47, 45, 43 on row 761,
- * the row of Hugh's greeting trigger in pokebw2's res/field/events/aspertia_city.json); the
- * triple after it is the tile the player is walking to. */
+ * states of three marks a known walk apart (outside, walk-42, walk-43: two tiles apart each time,
+ * on the row of Hugh's greeting trigger in the map's events); the triple after it is the tile the
+ * player is walking to. The rows (`z`) and columns (`x`) are those of the map's events. */
 export const PLAYER_X: RamRef = { name: 'player x', address: 0x0223e4da, width: 2 }
 export const PLAYER_Z: RamRef = { name: 'player z', address: 0x0223e4de, width: 2 }
 
@@ -160,13 +161,15 @@ const HUGH: MacroStep[] = markedMash('hugh', 3, 300, 20)
  * west and north stopped there), so the route goes one tile down, east and north to the
  * Pokémon Center (walk-73). There Hugh stops IRV (walk-81: he was just in the Pokémon Center)
  * and turns him back (east-04); then east and north past the Pokémon Center to (54, 729).
- * From there the route walks by the player's position: pokebw2's events for Aspertia City put
- * the lookout's triggers at x 36 to 38 on rows 714 to 720, one level up, and Bianca at (36, 709).
- * North to row 721 (a lamp post blocks the way west there), back to row 724, west to the foot of
- * the stairs at x 46 (walk-100 shows them), one row down onto them, west on the landing to x 38,
- * north up the stairs to row 719 (Hugh's "the outlook" talk), north to row 712, west to x 36,
- * north below Bianca, and A to talk to her. */
-const NORTH: MacroStep[] = [
+ * From there the route walks by the player's position. The lookout's triggers lie one level up
+ * in one strip of columns, and Bianca stands above them. North to row 721 (a lamp post blocks the
+ * way west there), back to row 724, west to the foot of the stairs at x 46 (walk-100 shows them):
+ * these three were read from RAM on the spike's runs, and no event of the lookout lies there.
+ * Then one row down onto the stairs, west on the landing to the triggers' last column (from
+ * `places.hughTrigger`), north up the stairs to the row of Hugh's "the outlook" talk
+ * (`places.outlookTrigger`), north to row 712 (read from RAM, like the first three), west to
+ * Bianca's column and north to the row below her (`places.bianca`), and A to talk to her. */
+const north = ({ hughTrigger, outlookTrigger, bianca }: RoutePlaces): MacroStep[] => [
   ...probe(['Up', 'Up', 'Up', 'Up'], 32, 49),
   ...probe(['Left', 'Left', 'Up', 'Up', 'Up', 'Up'], 32, 53),
   ...probe(['Up', 'Up', 'Up', 'Up', 'Up', 'Up'], 32, 59),
@@ -184,15 +187,15 @@ const NORTH: MacroStep[] = [
   walkUntil('stairs-foot', 'Left', { ...PLAYER_X, oneOf: [46] }),
   mark('stairs-foot'),
   ...probe(['Down'], TILE_FRAMES, 91),
-  walkUntil('landing', 'Left', { ...PLAYER_X, atMost: 38 }),
+  walkUntil('landing', 'Left', { ...PLAYER_X, atMost: hughTrigger.x + hughTrigger.width - 1 }),
   mark('landing'),
-  walkUntil('lookout-stairs', 'Up', { ...PLAYER_Z, atMost: 719 }),
+  walkUntil('lookout-stairs', 'Up', { ...PLAYER_Z, atMost: outlookTrigger.z }),
   mark('lookout-stairs'),
   ...markedMash('lookout', 4, 150, 20),
   walkUntil('lookout-top', 'Up', { ...PLAYER_Z, atMost: 712 }),
   mark('lookout-top'),
-  walkUntil('below-bianca', 'Left', { ...PLAYER_X, atMost: 36 }),
-  walkUntil('below-bianca', 'Up', { ...PLAYER_Z, atMost: 710 }),
+  walkUntil('below-bianca', 'Left', { ...PLAYER_X, atMost: bianca.x }),
+  walkUntil('below-bianca', 'Up', { ...PLAYER_Z, atMost: bianca.z + 1 }),
   press('Up', 8),
   mark('below-bianca'),
   ...markedMash('bianca', 12, 150, 20),
@@ -215,17 +218,17 @@ const STARTER: MacroStep[] = [
 /** By to-battle-16 Bianca's part is over and more A only repeats her last words, a message that
  * B does not close (a run that mashed B stood there for 600 frames). So the route holds Down
  * with A every 20 frames: A closes her words, and once they close Down turns IRV away from her
- * and walks him south to row 714, where pokebw2's trigger brings Hugh, who asks for a battle.
- * Their talk needs A too (B mashed for 9000 frames left it standing). After it Bianca only
- * repeats her call for a battle; the battle starts from the trigger on row 716, so the route
- * holds Down with A again until IRV stands there. Then A until the battle
- * has its adapter, then no input until the action menu stands (src/gen5/battle-check.ts) for
- * 60 frames: an A there would pick Fight. */
-const battle = (checks: readonly RamCheck[]): MacroStep[] => [
+ * and walks him south to the row of the trigger that brings Hugh (`places.hughTrigger`), who
+ * asks for a battle. Their talk needs A too (B mashed for 9000 frames left it standing). After
+ * it Bianca only repeats her call for a battle; the battle starts from its own trigger
+ * (`places.battleTrigger`), so the route holds Down with A again until IRV stands on its row.
+ * Then A until the battle has its adapter, then no input until the action menu stands
+ * (src/gen5/battle-check.ts) for 60 frames: an A there would pick Fight. */
+const battle = (places: RoutePlaces, checks: readonly RamCheck[]): MacroStep[] => [
   {
     kind: 'until',
     name: 'hugh-trigger',
-    checks: [{ ...PLAYER_Z, oneOf: [714] }],
+    checks: [{ ...PLAYER_Z, oneOf: [places.hughTrigger.z] }],
     holdFor: 1,
     limit: 900,
     mash: { buttons: ['A'], every: 20, hold: PRESS_FRAMES, held: ['Down'] },
@@ -234,7 +237,7 @@ const battle = (checks: readonly RamCheck[]): MacroStep[] => [
   {
     kind: 'until',
     name: 'battle-trigger',
-    checks: [{ ...PLAYER_Z, oneOf: [716] }],
+    checks: [{ ...PLAYER_Z, oneOf: [places.battleTrigger.z] }],
     holdFor: 1,
     limit: 3000,
     mash: { buttons: ['A'], every: 20, hold: PRESS_FRAMES, held: ['Down'] },
@@ -253,8 +256,9 @@ const battle = (checks: readonly RamCheck[]): MacroStep[] => [
   mark('battle'),
 ]
 
-/** The route from boot; `battleChecks` is the end condition (src/gen5/battle-check.ts). */
-export function newGameRoute(battleChecks: readonly RamCheck[]): MacroStep[] {
+/** The route from boot to the places of the map's events (scripts/gen5-bw2-field.ts);
+ * `battleChecks` is the end condition (src/gen5/battle-check.ts). */
+export function newGameRoute(places: RoutePlaces, battleChecks: readonly RamCheck[]): MacroStep[] {
   return [
     ...TO_TITLE,
     ...TO_GENDER,
@@ -267,8 +271,8 @@ export function newGameRoute(battleChecks: readonly RamCheck[]): MacroStep[] {
     ...TO_DOOR,
     ...TOWN,
     ...HUGH,
-    ...NORTH,
+    ...north(places),
     ...STARTER,
-    ...battle(battleChecks),
+    ...battle(places, battleChecks),
   ]
 }

@@ -11,6 +11,19 @@ struct BtlServer { u8 open; u16 round; Turn turn; void *pokeCon; Mystery tail[CO
   mainH: `struct BattleParty { u8 count; void *mons[3]; };
 struct BtlPokeCon { BOOL forServer; BattleParty parties[2]; void *mainModule; };
 struct BtlMainModule { u16 id; void *server; Mystery rest[COUNT]; };`,
+  // The setup puts the clients in swapped order, so a reader that assumed client = position fails.
+  // The multi battle's setup before it, with an invented count, is a decoy for the reader.
+  mainC: `static BOOL BtlMain_SetupMulti(u32 *state, BtlMainModule *m) { m->clientCount = 5; }
+BOOL BtlMain_SetupAloneSingle(u32 *state, BtlMainModule *mainModule) {
+    switch (*state) {
+    case 0:
+        mainModule->clientCount = 2; // two clients
+        mainModule->posClientIds[0] = 1;
+        mainModule->posClientIds[1] = 0;
+        break;
+    }
+    return FALSE;
+}`,
   pokeparamH: `typedef struct { u16 hp; u32 seen; u16 species; u8 monId; Mystery more[COUNT]; } BattleMonCore;
 struct BattleMon { BattleMonCore core; s8 boost; };`,
 }
@@ -28,6 +41,28 @@ describe('battleNumbers', () => {
     expect(battle.party.size).toBe(0x10)
     expect(battle.monCore.fields.monId).toEqual({ offset: 10, size: 1 })
     expect(battle.waitSelectSeq).toBe(5)
+  })
+
+  // Scene: a single battle's positions come from its setup, not from the client IDs.
+  it("reads the single battle's clients and the client at each position as its setup writes them", () => {
+    expect(battleNumbers(SOURCES).single).toEqual({ clientCount: 2, posClientIds: [1, 0] })
+  })
+
+  it('refuses a setup without the function, without the count or without a position for a client', () => {
+    const mainC = (from: string, to: string) => ({
+      ...SOURCES,
+      mainC: SOURCES.mainC.replace(from, to),
+    })
+    expect(() => battleNumbers(mainC('AloneSingle', 'AloneDouble'))).toThrow(
+      /BtlMain_SetupAloneSingle/,
+    )
+    expect(() => battleNumbers(mainC('mainModule->clientCount = 2;', ''))).toThrow(/clientCount/)
+    expect(() => battleNumbers(mainC('clientCount = 2', 'clientCount = 3'))).toThrow(/client 2/)
+    expect(() => battleNumbers(mainC('posClientIds[1] = 0', 'posClientIds[1] = 1'))).toThrow(
+      /client 0/,
+    )
+    expect(() => battleNumbers(mainC('posClientIds[1]', 'posClientIds[2]'))).toThrow(/skips/)
+    expect(() => battleNumbers(mainC('clientCount = 2', 'clientCount = TWO'))).toThrow(/TWO/)
   })
 
   it('refuses a BattleMon whose first member is not its core, whose offsets it borrows', () => {

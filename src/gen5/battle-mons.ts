@@ -3,7 +3,7 @@
 // step function, and from it a chain of pointers leads to the clients' poke container
 // (pokebw2: src/battle/btl_server.c, src/battle/btl_main.c, include/battle/btl_main.h). Each link
 // is checked before it is followed. The layouts come from build/gen5/bw2.json.
-import type { BattleNumbers, StructLayout } from './bw2-numbers.ts'
+import type { BattleNumbers, SingleBattle, StructLayout } from './bw2-numbers.ts'
 import { inMainRam } from './main-ram.ts'
 import type { ReadRam } from './ram-check.ts'
 
@@ -96,14 +96,11 @@ export function frontMon(
   }
 }
 
-/** The clients a single battle has; its setup puts client 0 at position 0 and client 1 at 1
- * (pokebw2 src/battle/btl_main.c, the single battle's posClientIds). */
-const SINGLE_CLIENTS = 2
-
-/** A single battle's position of a client's Pokémon. */
-export function singleBattlePos(clientId: number): number {
-  if (!Number.isInteger(clientId) || clientId < 0 || clientId >= SINGLE_CLIENTS) {
+/** A single battle's position of a client's Pokémon, from the battle's setup. */
+export function singleBattlePos(single: SingleBattle, clientId: number): number {
+  const pos = single.posClientIds.indexOf(clientId)
+  if (!Number.isInteger(clientId) || clientId < 0 || clientId >= single.clientCount || pos < 0) {
     throw new RangeError(`A single battle has no client ${String(clientId)}.`)
   }
-  return clientId
+  return pos
 }

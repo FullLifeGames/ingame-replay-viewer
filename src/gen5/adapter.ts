@@ -13,8 +13,6 @@ export interface AdapterNumbers {
   layout: StructLayout
   /** The adapter command that plays server commands (BTL_ACMD_SERVER_CMD). */
   serverCmd: number
-  /** The adapter command that asks the player for an action (BTL_ACMD_SELECT_ACTION). */
-  selectAction: number
   /** The state the writes leave (BTL_ADAPTER_STATE_IDLE), which holds the server. */
   heldState: number
   /** The client's command queue (BTL_SERVER_CMD_QUE_SIZE), into which it copies the block. */
@@ -32,7 +30,6 @@ export function adapterNumbers(numbers: Bw2Numbers): AdapterNumbers {
   return {
     layout: numbers.adapter,
     serverCmd: named(numbers.adapterCommands, 'BTL_ACMD_SERVER_CMD'),
-    selectAction: named(numbers.adapterCommands, 'BTL_ACMD_SELECT_ACTION'),
     heldState: named(numbers.adapterStates, 'BTL_ADAPTER_STATE_IDLE'),
     queueSize: numbers.queueSize,
   }
