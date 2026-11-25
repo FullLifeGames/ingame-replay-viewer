@@ -1,5 +1,5 @@
-// The shot tools' side of #30: the refusal screen names its reason in text on the refusal colour,
-// and B held after END must leave the replay's last scene as it is.
+// The shot tools' side of #30 and #68: the refusal screen names its reason in text on the refusal
+// colour, and B held from the first frame must leave every scene of the replay as it is.
 import { describe, expect, it } from 'vitest'
 
 import { checkShots, SCREEN } from './rom-shot-probes.ts'
@@ -66,7 +66,7 @@ describe('the scene of a refused stream', () => {
   })
 })
 
-describe('the run with B held after END', () => {
+describe('the run with B held', () => {
   const handMade = handMadeStream()
   const play = (name: string, outcome = 'finished'): StreamPlan => ({
     name,
@@ -74,10 +74,11 @@ describe('the run with B held after END', () => {
     scenes: name === 'hand-made' ? scenesOf(handMade) : [],
     missing: [],
     expect: outcome,
+    ops: [],
   })
   const refusals = [play('empty-slot', 'EMPTY'), play('version-4', 'VERSION')]
 
-  it("follows hand-made with B held from the frame after END and hand-made's scenes", () => {
+  it("follows hand-made with B held from the first frame and hand-made's scenes", () => {
     const plans = [play('hand-made'), play('994052'), ...refusals]
     const runs = withHeldB(plans)
     expect(runs.map((run) => run.name)).toEqual([
@@ -88,9 +89,9 @@ describe('the run with B held after END', () => {
       'version-4',
     ])
     const [handMadeRun, heldB] = runs
-    expect(heldB).toEqual({ ...handMadeRun, name: 'hand-made-b', holdBFromEnd: 1 })
+    expect(heldB).toEqual({ ...handMadeRun, name: 'hand-made-b', holdBFrom: 1 })
     expect(heldB?.scenes.map((scene) => scene.name)).toContain('outro')
-    expect(runs.filter((run) => run.holdBFromEnd !== undefined)).toHaveLength(1)
+    expect(runs.filter((run) => run.holdBFrom !== undefined)).toHaveLength(1)
   })
 
   it('adds no run when hand-made is not named', () => {

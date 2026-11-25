@@ -204,36 +204,49 @@ function winScene(input: Input): Scene | undefined {
 }
 
 // After END the outro (rom/gen3/src/replay_outro.c) returns the mons still out, slides the
-// winner's trainer in and holds the scene for 120 frames before it fades to black; 150 frames
-// after END lie in that hold. BtlController_HandleTrainerSlide ends the trainer's 64x64 sprite
-// centred on (80, 80) near and on (176 + 32, 40) far (U/src/battle_controllers.c:2516-2546).
+// winner's trainer in and holds the scene for 120 frames before it fades to black. END counts as
+// done before the outro starts, so each engine takes the shot 150 frames into its own outro: after
+// the returns and the slide's 48 frames, inside the hold. BtlController_HandleTrainerSlide ends the
+// trainer's 64x64 sprite centred on (80, 80) near and on (176 + 32, 40) far, and starts it 96
+// pixels off that place, 2 pixels a frame (U/src/battle_controllers.c:2516-2548,
+// SpriteCB_TrainerSlideIn at U/src/battle_gfx_sfx_util.c:432-445).
 // Near, that is where PlayerHandleDrawTrainerPic draws the trainer in the intro
 // (U/src/battle_controller_player.c:1893-1947), over the same field: the region must match the
 // intro frame pixel for pixel, which a frame with no trainer, a fading frame or a black one fails.
 // Measured on the 994052 and hand-made frames of step 7: 0 pixels differ. Far, the intro draws the
-// trainer at x 176 (U/src/battle_controller_opponent.c:374-413), 32 pixels left of the slide's
-// end, and no frame of a run shows the field there without a trainer or a mon: the trainer's
-// pixels match the intro's 32 pixels to the left on 2717564545, but the field behind it differs on
-// 524 pixels. So far, the region differs from the win frame only because the winner's mon went
-// back or its trainer came in, and the win line stays in the text box until the fade, so a frame
-// with the box changed is fading or black. A tie or an unknown end has no winner: the outro holds
-// the last line in the text box as the win frame shows it.
+// trainer centred on (176, 40) (OpponentHandleDrawTrainerPic,
+// U/src/battle_controller_opponent.c:374-413), 32 pixels left of the slide's end, and the field
+// behind the trainer's clear pixels differs between the two places (524 pixels on six of the seven
+// test replays that the far side wins, 514 on 994128, in both engines). So the placed probe (rom-shot-placed.ts) looks for the intro's trainer in the region:
+// the best match must lie at the slide's end and nowhere within 16 pixels of it, which a trainer
+// a frame short of its end (2 pixels right) fails, as do an empty field, a fading frame and a
+// black one. Without an intro either side checks only that the winner's mon went back or its
+// trainer came in: the region differs from the win frame, and the win line stays in the text box
+// until the fade, so a frame with the box changed is fading or black. A tie or an unknown end has
+// no winner: the outro holds the last line in the text box as the win frame shows it.
 const OUTRO_FRAMES = 150
 const TRAINER_REGIONS: Readonly<Record<Side, Region>> = {
   near: { x: 48, y: 48, width: 64, height: 64 },
   far: { x: 176, y: 8, width: 64, height: 64 },
 }
+const FAR_SLIDE_END = 32
+const FAR_REACH = 16
 type Outcome = Extract<Instruction, { op: 'end' }>['outcome']
 const WINNERS: Readonly<Partial<Record<Outcome, Side>>> = { nearWon: 'near', farWon: 'far' }
+
+function trainerCheck(winner: Side): Check {
+  const to = TRAINER_REGIONS[winner]
+  if (winner === 'near') return { probe: 'same', before: 'intro', after: 'outro', region: to }
+  const from = { ...to, x: to.x - FAR_SLIDE_END }
+  return { probe: 'placed', before: 'intro', after: 'outro', from, to, reach: FAR_REACH }
+}
 
 function outroCheck(input: Input, outcome: Outcome): Check {
   const winner = WINNERS[outcome]
   const after = 'outro'
   if (winner === undefined) return { probe: 'same', before: 'win', after, region: SCREEN.message }
+  if (introScene(input) !== undefined) return trainerCheck(winner)
   const region = TRAINER_REGIONS[winner]
-  if (winner === 'near' && introScene(input) !== undefined) {
-    return { probe: 'same', before: 'intro', after, region }
-  }
   return { probe: 'differs', before: 'win', after, region, kept: SCREEN.message }
 }
 

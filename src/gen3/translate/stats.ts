@@ -9,14 +9,17 @@
 // says the maxed Attack, its own message (`B_MSG_STAT_CHANGED_BELLY_DRUM`). Haze resets every
 // stage with no stat animation and says so once (`BattleScript_EffectHaze`). White Herb's reset
 // raises each lowered stage back to 0 with no arrows, then says it with the item its `-enditem`
-// showed (`BattleScript_WhiteHerbRet`).
+// showed (`BattleScript_WhiteHerbRet`). A hit's raise of a Pokémon in a rage then says the rage
+// builds (`rage.ts`).
 import type { BoostID } from '@pkmn/data'
 
 import type { ScriptEvent } from '../../script/events'
 import { statChanged, statChangesGone, statWontChange } from '../text/phrases'
+import { rageBuilding } from '../text/phrases-effects'
 import { loweredStatsReset } from '../text/phrases-items'
 import { type Context, type EventOf, sameMon } from './context'
 import { usedUpBefore } from './items'
+import { buildsRage } from './rage'
 
 type StatChangeEvent = EventOf<'statChange'>
 
@@ -31,6 +34,7 @@ export function statChange(event: StatChangeEvent, ctx: Context): void {
   const arrows = first ? (continues(ctx.near(1), event) ? 'several' : 'one') : 'none'
   ctx.emit(line, { op: 'stat', side: ctx.activeSide(who), stat, stages, arrows })
   ctx.print(line, statChanged(ctx.mon(who), stat, stages, event.cause))
+  if (buildsRage(event, ctx)) ctx.print(line, rageBuilding(ctx.mon(who)))
 }
 
 export function statLimit(

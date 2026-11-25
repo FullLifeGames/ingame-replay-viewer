@@ -86,7 +86,7 @@ test('a test replay picked in the viewer shows its list and asks for Start, and 
 })
 
 // #50 with the module: the replay loaded by link starts at fast, as Start plays what the list
-// describes, and the game works through its instructions. The spike test covers END at fast.
+// describes, and the game works through its instructions. e2e/wasm-play.spec.ts covers END at fast.
 test('a replay loaded by link starts at fast in the viewer and plays its instructions', async ({
   page,
   baseURL,

@@ -27,6 +27,7 @@ The viewer plays Pokémon Showdown replays back inside real Pokémon games. A ga
 - Code, comments, docs, commit messages, issues and pull requests are in English.
 - Gates: numbered questions, a short scene per question, options a/b/c in one or two sentences each, the recommendation marked, answer format "1a 2a 3a".
 - Gate questions reach the user as a review page (user, 21.11.2026, as in ps-dashboard-2): a private Artifact with only the open questions, one card per question with its scene, the options, the recommendation marked and a note field. The page stores each answer with the `db` capability, one document per question under `answers/<id>` with `choice`, `note` and `at`, and shows the answer line with a copy button as a fallback. One free-text field after the last question stores `answers/_free` with `note` and `at`, for feedback that fits no question. The chat carries the link and one line on what is open. Once the user says the page is filled, the integrator reads the answers from its store and records them in the booking.
+- Every gate and every decision put to the user comes as a review page with things to show (user, 24.11.2026): links the user opens on their own devices over Tailscale, such as a gallery of frames, a preview of the page or a running spike. Each question whose subject shows on screen carries pictures of it on the page, for the user to approve what they see, and names what else to look at. The pictures go on the private page alone, never into the repository (ADR 0002). The links stay in the chat and out of tracked files.
 - Detail questions do not stop a wave. The integrator decides them by the recommendation and records each in the booking's section "Decided without the user": the scene, the options, the choice and what a reversal costs. A blocker that no recommendation settles goes to the user.
 - Tracked documents and every user-facing string go through the `stop-slop` skill. Exceptions: technical invariants with "never" or "always", and quotes of program output.
 - Commits: English, imperative, no attribution lines (no Co-Authored-By, no "Generated with"). The same holds for issues, pull requests and comments. Write messages with quotes to a file and use `git commit -F <file>`.
@@ -65,7 +66,7 @@ Every change gets a class before work starts: the integrator proposes it, and th
 
 ## Issues and the board
 
-- Every task is an issue with acceptance criteria. Its labels give its status (`approved`; `parked` with its trigger in the text; `needs triage`), its class (`small fix`, `larger bug`, `feature`) and its area (`area: script`, `area: gen3`, `area: rom`, `area: web`, `area: tooling`, `area: docs`). Its milestone names the roadmap step.
+- Every task is an issue with acceptance criteria. Its labels give its status (`approved`; `parked` with its trigger in the text; `needs triage`), its class (`small fix`, `larger bug`, `feature`) and its area (`area: script`, `area: gen3`, `area: rom`, `area: web`, `area: gen5`, `area: tooling`, `area: docs`). Its milestone names the roadmap step.
 - The board gives each issue its Status (Approved, In wave, Gate, Done), its Wave and its Lane.
 - A new issue needs the user's approval at a gate. A report from elsewhere stays at `needs triage` until a gate rules on it.
 

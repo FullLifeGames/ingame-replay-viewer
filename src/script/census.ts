@@ -1,6 +1,7 @@
 // The named list: the line kinds of @pkmn/protocol that the battle script neither shows nor drops
-// by kind, each with its group and its reason. Only specs read it: the kind census
-// (`census.test.ts`) finds every kind a rule, a drop reason or a place here.
+// by kind, each with its group and its reason. The build gives a line of such a kind its reason
+// (`noRuleReason`); the kind census (`census.test.ts`) finds every kind a rule, a drop reason or
+// a place here.
 
 import type { Protocol } from '@pkmn/protocol'
 
@@ -104,3 +105,10 @@ export const NAMED_KINDS: Readonly<Partial<Record<Protocol.ArgName, NamedKind>>>
   '|-combine|': notSingles('two moves combined'),
   '|-waiting|': notSingles('a move waiting for an ally to combine with'),
 }
+
+/**
+ * Why the build drops a line of `kind`, which has no rule: the named list's reason, or "no rule
+ * for" the kind when the list lacks it, as for a kind newer than the census.
+ */
+export const noRuleReason = (kind: Protocol.ArgName): string =>
+  NAMED_KINDS[kind]?.reason ?? `no rule for ${kind}`

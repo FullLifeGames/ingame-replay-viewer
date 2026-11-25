@@ -37,6 +37,16 @@ static void StartBattle(void)
     ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
 }
 
+// As StartBattle, with the near mon sent out in the red: the send-out starts the low-HP beep
+// (HandleLowHpMusicChange at the end of the recorded player's intro).
+static void StartBattleNearInRed(void)
+{
+    PlayBGM(MUS_VS_TRAINER);
+    ReplayStream_Intro();
+    ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+    ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 10, REPLAY_STATUS_NONE);
+}
+
 static bool32 PlaysSong(u32 song)
 {
     return gMPlayInfo_BGM.songHeader == gSongTable[song].header;
@@ -45,6 +55,19 @@ static bool32 PlaysSong(u32 song)
 static const struct Sprite *GetTrainerSlideSprite(u32 side)
 {
     return &gSprites[gBattleStruct->trainerSlideSpriteIds[GetBattlerAtPosition(side == REPLAY_SIDE_NEAR ? B_POSITION_PLAYER_LEFT : B_POSITION_OPPONENT_LEFT)]];
+}
+
+// Whether the side's trainer stands where the slide ends, as the near back pic or the far front
+// pic of trainerPic.
+static bool32 HasTrainerSlidIn(u32 side, u32 trainerPic)
+{
+    const struct Sprite *trainer = GetTrainerSlideSprite(side);
+
+    if (!trainer->inUse)
+        return FALSE;
+    if (side == REPLAY_SIDE_NEAR)
+        return trainer->images == GetTrainerBackPicImage(trainerPic) && trainer->x + trainer->x2 == NEAR_TRAINER_END_X;
+    return trainer->oam.affineParam == trainerPic && trainer->x + trainer->x2 == FAR_TRAINER_END_X;
 }
 
 REPLAY_TEST("The win line before END of a near win starts the victory music")
@@ -224,6 +247,101 @@ REPLAY_TEST("The outro of a tie fades out with no trainer and keeps the battle m
         EXPECT(PlaysSong(MUS_VS_TRAINER));
         EXPECT(IsBGMPausedOrStopped());
     }
+}
+
+// A tie that leaves both mons out, as a tie by the endless battle clause does: both go back, the
+// far one first, and no trainer slides in.
+REPLAY_TEST("The outro of a tie with both mons out returns both, the far one first, with no trainer")
+{
+    STREAM
+    {
+        ReplayTest_PlayOutro();
+        SetTrainerPics(TRAINER_PIC_STEVEN, TRAINER_PIC_RED);
+        StartBattle();
+        ReplayStream_Print(COMPOUND_STRING("The battle ended in a tie!"));
+        ReplayStream_End(REPLAY_OUTCOME_TIE);
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_SPECIAL, B_ANIM_SWITCH_OUT_OPPONENT_MON, farMon);
+        ANIMATION(ANIM_TYPE_SPECIAL, B_ANIM_SWITCH_OUT_PLAYER_MON, nearMon);
+    }
+    THEN
+    {
+        EXPECT(!HasTrainerSlidIn(REPLAY_SIDE_NEAR, TRAINER_PIC_STEVEN));
+        EXPECT(!HasTrainerSlidIn(REPLAY_SIDE_FAR, TRAINER_PIC_RED));
+        EXPECT_EQ((u32)gPaletteFade.y, 16);
+        EXPECT(PlaysSong(MUS_VS_TRAINER));
+        EXPECT(IsBGMPausedOrStopped());
+    }
+}
+
+// The probe of the beep tests below: a near mon sent out in the red starts the beep, and nothing
+// stops it up to END.
+REPLAY_TEST("A near mon sent out in the red starts the low-HP beep")
+{
+    STREAM
+    {
+        StartBattleNearInRed();
+        ReplayStream_End(REPLAY_OUTCOME_TIE);
+    }
+    THEN { EXPECT(ReplayTest_PlaysLowHpBeep()); }
+}
+
+// The game stops the beep at a win before the victory music (HandleEndTurn_BattleWon), and when it
+// leaves a battle (FreeRestoreBattleData). The outro never leaves the battle, so END stops the beep
+// itself, for any outcome. The beep is a burst of eight notes that ends by itself (se_low_health),
+// so the tests read it on the outro's first frame, the frame after END.
+REPLAY_TEST("The outro of a tie stops the low-HP beep")
+{
+    STREAM
+    {
+        ReplayTest_PlayOutro();
+        StartBattleNearInRed();
+        ReplayStream_Print(COMPOUND_STRING("The battle ended in a tie!"));
+        ReplayStream_End(REPLAY_OUTCOME_TIE);
+    }
+    THEN { EXPECT(!ReplayTest_LowHpBeepAtOutroStart()); }
+}
+
+// A log cut short has no win and no tie line: the backend ends the stream with an END of unknown
+// outcome after its last line. The battle counts as a draw, no victory music starts, and the
+// outro runs as at a tie.
+REPLAY_TEST("The outro of an unknown end returns both mons, the far one first, with no trainer")
+{
+    STREAM
+    {
+        ReplayTest_PlayOutro();
+        SetTrainerPics(TRAINER_PIC_STEVEN, TRAINER_PIC_RED);
+        StartBattle();
+        ReplayStream_Turn(2);
+        ReplayStream_End(REPLAY_OUTCOME_UNKNOWN);
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_SPECIAL, B_ANIM_SWITCH_OUT_OPPONENT_MON, farMon);
+        ANIMATION(ANIM_TYPE_SPECIAL, B_ANIM_SWITCH_OUT_PLAYER_MON, nearMon);
+    }
+    THEN
+    {
+        EXPECT_EQ(gBattleOutcome, B_OUTCOME_DREW);
+        EXPECT(!HasTrainerSlidIn(REPLAY_SIDE_NEAR, TRAINER_PIC_STEVEN));
+        EXPECT(!HasTrainerSlidIn(REPLAY_SIDE_FAR, TRAINER_PIC_RED));
+        EXPECT_EQ((u32)gPaletteFade.y, 16);
+        EXPECT(PlaysSong(MUS_VS_TRAINER));
+        EXPECT(IsBGMPausedOrStopped());
+    }
+}
+
+REPLAY_TEST("The outro of an unknown end stops the low-HP beep")
+{
+    STREAM
+    {
+        ReplayTest_PlayOutro();
+        StartBattleNearInRed();
+        ReplayStream_End(REPLAY_OUTCOME_UNKNOWN);
+    }
+    THEN { EXPECT(!ReplayTest_LowHpBeepAtOutroStart()); }
 }
 
 // The outro runs after END: the progress says done and finished on the frame after END, as the

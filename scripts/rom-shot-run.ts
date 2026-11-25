@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 
+import type { OpStart } from './op-frames.ts'
 import { ROM_DIR } from './rom-config.ts'
 import { findSymbol } from './rom-slot.ts'
 
@@ -40,6 +41,8 @@ interface StatusLine {
 
 export interface ToolOutput {
   shots: ShotLine[]
+  /** The frame each op started on, for the op frame log (#71). */
+  ops: OpStart[]
   status: StatusLine
 }
 
@@ -109,15 +112,17 @@ export function buildTool(output: string): void {
 
 export function readToolOutput(text: string): ToolOutput {
   const shots: ShotLine[] = []
+  const ops: OpStart[] = []
   let status: StatusLine | undefined
   for (const line of text.split('\n')) {
     if (line.trim() === '') continue
-    const value = JSON.parse(line) as Partial<ShotLine & StatusLine>
+    const value = JSON.parse(line) as Partial<ShotLine & StatusLine & OpStart>
     if (value.status !== undefined) status = value as StatusLine
+    else if (value.op !== undefined) ops.push(value as OpStart)
     else shots.push(value as ShotLine)
   }
   if (status === undefined) throw new Error('the shot tool ended without a status')
-  return { shots, status }
+  return { shots, ops, status }
 }
 
 /**
@@ -135,8 +140,8 @@ export interface ToolRun {
   shots: string[]
   /** Dump the video state and the frame every N frames, for the mGBA oracle (#43). */
   stateEvery?: number
-  /** Hold B from N frames after the replay reports finished to the run's end (#30). */
-  holdBFromEnd?: number
+  /** Hold B from frame N on to the run's end, the first frame being 1 (#68). */
+  holdBFrom?: number
 }
 
 const option = (name: string, value: number | undefined) =>
@@ -146,7 +151,7 @@ export function toolArgs(run: ToolRun): string[] {
   const options = [
     ...option('--clock', TOOL_CLOCK),
     ...option('--state-every', run.stateEvery),
-    ...option('--hold-b-from-end', run.holdBFromEnd),
+    ...option('--hold-b-from', run.holdBFrom),
   ]
   return [run.rom, `0x${run.address.toString(16)}`, run.frameDir, ...options, ...run.shots]
 }

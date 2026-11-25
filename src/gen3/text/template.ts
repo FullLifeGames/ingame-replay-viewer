@@ -33,7 +33,12 @@ export interface Phrase {
   readonly fallback?: PhraseFallback
 }
 
+/** The fallback of `scene`, which the game has no message for. */
+export function phraseGap(scene: string): PhraseFallback {
+  return { kind: 'phrase', detail: `no game message for ${scene}` }
+}
+
 /** Our wording for `scene`, listed as a fallback. */
 export function ownPhrase(text: string, scene: string): Phrase {
-  return { text, fallback: { kind: 'phrase', detail: `no game message for ${scene}` } }
+  return { text, fallback: phraseGap(scene) }
 }

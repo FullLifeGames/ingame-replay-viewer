@@ -1,4 +1,4 @@
-// The audio worklet of the WebAssembly spike page (#35): one processor that plays the run's audio
+// The audio worklet of the viewer (#35): one processor that plays the run's audio
 // ring, resampled from the mixer's rate to the audio context's and held at the latency cap
 // (RingReader in audio.ts). It runs on the audio thread and reads the ring the worker fills.
 // The e2e covers it, as it covers the page's wiring.

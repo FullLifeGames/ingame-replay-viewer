@@ -1,4 +1,4 @@
-// What the WebAssembly build hands to the spike page (#35, plan D5 (c)): a BPS patch from the
+// What the WebAssembly build hands to the viewer (#35, plan D5 (c)): a BPS patch from the
 // user's dump to the module, so the page rebuilds build/wasm/irv-emerald.wasm from the dump as it
 // rebuilds the ROM (scripts/rom-outputs.ts). The patch counts only once it gives the module back.
 // The module and the patch hold Nintendo's data and stay in build/wasm (ADR 0002).

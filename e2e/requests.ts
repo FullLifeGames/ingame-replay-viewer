@@ -1,6 +1,6 @@
-// Keeps a test's requests on devbox: a request to another origin is aborted unless the test
-// fulfils it with its own route (registered later, so it runs first), and every request that is
-// not a same-origin GET is listed for the test to check.
+// Keeps a test's requests on the test's own server: a request to another origin is aborted
+// unless the test fulfils it with its own route (registered later, so it runs first), and every
+// request that is not a same-origin GET is listed for the test to check.
 import type { Page } from '@playwright/test'
 
 export async function guardRequests(page: Page, baseURL: string | undefined): Promise<string[]> {

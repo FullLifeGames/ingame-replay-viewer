@@ -111,6 +111,36 @@ describe('sides and the field', () => {
     ])
   })
 
+  // Showdown's Gen 3 Mist is a side condition (`data/moves.ts` `mist`); the game says
+  // gText_PkmnShroudedInMist with the user as B_ATK (`BattleScript_EffectMist`).
+  it("says Mist's start on a side by its user, as the game does", () => {
+    const lines = ['|move|p2a: Tyranitar|Mist|p2a: Tyranitar', '|-sidestart|p2: Bob|Mist']
+    expect(sceneOf(...lines).map(plain)[2]).toBe(
+      'The opposing Tyranitar surrounds itself with a protective mist!',
+    )
+    expect(streamOfLog(...lines).fallbacks.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
+
+  // The game breaks the screens in `BattleScript_BreakScreens`: the move's animation, then
+  // STRINGID_REFLECTWOREOFF or STRINGID_LIGHTSCREENWOREOFF, then the hit; "The wall shattered!"
+  // (STRINGID_THEWALLSHATTERED) is in no script. Showdown logs the `-sideend` between the move
+  // and the damage (`brickbreak` `onTryHit`).
+  it("says the screen Brick Break breaks after the move's animation and before the hit", () => {
+    const scene = sceneOf(
+      '|-sidestart|p2: Bob|Reflect',
+      '|move|p1a: Dugtrio|Brick Break|p2a: Tyranitar',
+      '|-sideend|p2: Bob|Reflect',
+      '|-damage|p2a: Tyranitar|60/100',
+    )
+    expect(scene.map(plain).slice(1)).toEqual([
+      'Dugtrio used Brick Break!',
+      { op: 'move', user: 'near', target: 'far', move: moveOf('Brick Break').number, animTurn: 1 },
+      "The opposing side's Reflect wore off!",
+      { op: 'hit', side: 'far', effectiveness: 'normal' },
+      { op: 'hp', side: 'far', hp: 60 },
+    ])
+  })
+
   it('says Perish Song for the whole field', () => {
     expect(sceneOf('|-fieldactivate|move: Perish Song').map(plain)).toEqual([
       'All Pokémon that heard the song will faint in three turns!',

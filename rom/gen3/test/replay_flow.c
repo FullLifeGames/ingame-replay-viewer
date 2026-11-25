@@ -1,5 +1,6 @@
 #include "global.h"
 #include "battle.h"
+#include "battle_main.h"
 #include "pokemon.h"
 #include "test/replay_test.h"
 #include "constants/battle.h"
@@ -77,5 +78,28 @@ REPLAY_TEST("THEN sees the battle before END leaves it")
         EXPECT_EQ(GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_HP), 71);
         EXPECT(gBattleStruct != NULL);
         EXPECT_EQ(gReplayProgress.done, 4);
+    }
+}
+
+// A recorded battle leaves on a held B while RecordedBattle_CanStopPlayback() says so
+// (BattleMainCB2). The replay counts as finished from the takeover on, so B held from the first
+// frame keeps the battle on screen to END, and the runner fails a test whose battle leaves
+// before it.
+REPLAY_TEST("B held from the first frame keeps the battle on screen to END")
+{
+    STREAM
+    {
+        ReplayTest_HoldB();
+        ReplayStream_Intro();
+        ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    THEN
+    {
+        EXPECT(JOY_HELD(B_BUTTON));
+        EXPECT(gMain.callback2 == BattleMainCB2);
+        EXPECT_EQ(gReplayProgress.done, 4);
+        EXPECT(gReplayProgress.finished);
     }
 }

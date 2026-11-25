@@ -152,6 +152,7 @@ static const struct Command sCommands[] = {
     {"bgaffine", 1, RunBgAffine},
     {"objaffine", 2, RunObjAffine},
     {"script", 0, RunScript},
+    {"divide", 0, RunDivide},
 };
 
 static void WriteOutput(const char *path, const struct HostCall *call)

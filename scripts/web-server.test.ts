@@ -198,7 +198,7 @@ describe('the dev server plugin', () => {
   })
 })
 
-describe('the WebAssembly spike files', () => {
+describe("the WebAssembly build's files", () => {
   it('names the routes after the build outputs', () => {
     expect(WASM_FILES).toEqual({
       glue: `wasm/${LINK_OUTPUTS.js}`,
@@ -240,7 +240,7 @@ describe('the WebAssembly spike files', () => {
   })
 
   // In dev, Vite serves the page's own modules of src/web/wasm/ under the same /wasm/ prefix.
-  it("passes the spike page's own modules on to Vite", async () => {
+  it("passes the viewer's own modules on to Vite", async () => {
     for (const name of ['main.ts', 'worker.ts?worker_file&type=module', 'protocol.ts']) {
       const response = await fetch(`${fullBase}/wasm/${name}`)
       expect(await response.text(), name).toBe('next')

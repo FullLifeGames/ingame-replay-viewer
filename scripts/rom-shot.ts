@@ -1,12 +1,13 @@
 // npm run rom:shots [-- <name>...] (#7, plan section 7): plays streams in the built ROM from boot
 // to END in headless mGBA and checks named scenes in its frames. A name is a test replay id (its
-// stream comes from the Gen 3 game backend; 994052 when no name is given, S2a D5) or hand-made (a
-// short battle written with the stream encoder). When hand-made is named, hand-made-b follows it:
-// the same stream with B held from the frame after END, which must keep the last scene (#30). Two
+// stream comes from the Gen 3 game backend; 994052 when no name is given, S2a D5), hand-made (a
+// short battle written with the stream encoder) or send-outs (the battles of
+// scripts/wasm-sendouts.ts, one stream each, #66). When hand-made is named, hand-made-b follows it:
+// the same stream with B held from the first frame, which must show every scene (#30, #68). Two
 // refusal runs follow: the built ROM's empty slot (refused as EMPTY) and the hand-made stream with
 // an unknown version (refused as VERSION).
-// Frames, the ROMs and report.json go to build/rom/shots/. Needs a ROM from npm run rom:build and
-// libmgba-dev.
+// Frames, each stream's op frame log (op-frames.ts), the ROMs and report.json go to
+// build/rom/shots/. Needs a ROM from npm run rom:build and libmgba-dev.
 import { createHash } from 'node:crypto'
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -14,8 +15,10 @@ import { parseArgs } from 'node:util'
 
 import { runnerImport } from 'vite'
 
+import type { Stream } from '../src/gen3/stream/instructions.ts'
 import type { SlotDescription } from '../src/patch/slot.ts'
 import { writeReplaySlot } from '../src/patch/slot.ts'
+import { opFrameLog, writeOpFrames } from './op-frames.ts'
 import { nmOutput } from './rom-build.ts'
 import { runCliAsync } from './rom-cli.ts'
 import { OUTPUT_NAMES } from './rom-outputs.ts'
@@ -38,6 +41,7 @@ import type { Expected, SceneVerdict, ToolOutput } from './rom-shot-run.ts'
 import { missingScenes, refusalScenes, scenesOf, shotArgs } from './rom-shot-scenes.ts'
 import type { Scene } from './rom-shot-scenes.ts'
 import type * as ShotStream from './rom-shot-stream.ts'
+import { SEND_OUTS } from './wasm-sendouts.ts'
 
 const HAND_MADE = 'hand-made'
 const DEFAULT_REPLAY = '994052'
@@ -47,9 +51,9 @@ const REPLAY_DIR = join(REPO_DIR, 'test', 'fixtures', 'replays')
 export function parseShotArgs(argv: string[]): string[] {
   const { positionals } = parseArgs({ args: argv, options: {}, allowPositionals: true })
   positionals.forEach((name, i) => {
-    if (name !== HAND_MADE && !/^\d+$/.test(name)) {
+    if (name !== HAND_MADE && name !== SEND_OUTS && !/^\d+$/.test(name)) {
       throw new Error(
-        `"${name}" is neither a test replay id (its digits, such as ${DEFAULT_REPLAY}) nor ${HAND_MADE}`,
+        `"${name}" is neither a test replay id (its digits, such as ${DEFAULT_REPLAY}), ${HAND_MADE} nor ${SEND_OUTS}`,
       )
     }
     if (positionals.indexOf(name) !== i) {
@@ -64,14 +68,27 @@ export function requiresEveryScene(name: string): boolean {
   return name === DEFAULT_REPLAY || name === HAND_MADE
 }
 
+/** The ids of the test replays among the files of test/fixtures/replays/, in their order. */
+function testReplayIds(files: readonly string[]): string[] {
+  return files.flatMap((name) => /-(\d+)\.json$/.exec(name)?.[1] ?? [])
+}
+
 /** The file in test/fixtures/replays/ of the test replay with this id. */
 export function replayFile(id: string, files: readonly string[]): string {
   const file = files.find((name) => name.endsWith(`-${id}.json`))
   if (file === undefined) {
-    const ids = files.flatMap((name) => /-(\d+)\.json$/.exec(name)?.[1] ?? [])
+    const ids = testReplayIds(files)
     throw new Error(`no test replay ${id} in test/fixtures/replays/; there are ${ids.join(', ')}`)
   }
   return file
+}
+
+/** The named streams, then every test replay not named among them (wasm:run --all, #66). */
+export function withEveryTestReplay(
+  names: readonly string[],
+  files: readonly string[] = readdirSync(REPLAY_DIR),
+): string[] {
+  return [...names, ...testReplayIds(files).filter((id) => !names.includes(id))]
 }
 
 /** A stream to play and what its run must show; the WebAssembly harness plays the same list. */
@@ -83,20 +100,22 @@ export interface StreamPlan {
   /** The scenes the stream lacks. */
   missing: string[]
   expect: Expected
+  /** The stream's ops by name, in order, for the op frame log (#71). */
+  ops: string[]
 }
 
-/** A stream plan as the shot tool plays it: mGBA can press B, the WebAssembly module cannot. */
+/** A stream plan as the shot tool and the module's runner play it. */
 export interface ShotPlan extends StreamPlan {
-  /** Hold B from this many frames after END to the run's end. */
-  holdBFromEnd?: number
+  /** Hold B from this frame on to the run's end; the first frame is 1. */
+  holdBFrom?: number
 }
 
 const HELD_B = `${HAND_MADE}-b`
 
-/** The plans with hand-made-b after hand-made: B held from the frame after END (#30). */
+/** The plans with hand-made-b after hand-made: B held from the first frame (#30, #68). */
 export function withHeldB(plans: readonly StreamPlan[]): ShotPlan[] {
   return plans.flatMap((plan) =>
-    plan.name === HAND_MADE ? [plan, { ...plan, name: HELD_B, holdBFromEnd: 1 }] : [plan],
+    plan.name === HAND_MADE ? [plan, { ...plan, name: HELD_B, holdBFrom: 1 }] : [plan],
   )
 }
 
@@ -143,10 +162,12 @@ function readBuiltRom(paths: BuildPaths): { rom: Uint8Array; description: SlotDe
   return { rom, description }
 }
 
-function streamBytes(shot: typeof ShotStream, name: string): Uint8Array {
-  if (name === HAND_MADE) return shot.handMadeBytes()
+// A named stream's bytes by the name of its run; send-outs names one stream per battle.
+function namedStreams(shot: typeof ShotStream, name: string): [string, Uint8Array][] {
+  if (name === SEND_OUTS) return shot.sendOutBytes()
+  if (name === HAND_MADE) return [[name, shot.handMadeBytes()]]
   const file = join(REPLAY_DIR, replayFile(name, readdirSync(REPLAY_DIR)))
-  return shot.replayBytes(JSON.parse(readFileSync(file, 'utf8')))
+  return [[name, shot.replayBytes(JSON.parse(readFileSync(file, 'utf8')))]]
 }
 
 /**
@@ -158,8 +179,9 @@ export async function planStreams(
   layout: ProgressLayout,
 ): Promise<StreamPlan[]> {
   const shot = await loadShotStream()
-  const plays = names.map((name): StreamPlan => {
-    const bytes = streamBytes(shot, name)
+  const plays = names.flatMap((named) => namedStreams(shot, named))
+  const opsOf = (stream: Stream) => stream.instructions.map(({ op }) => op)
+  const played = plays.map(([name, bytes]): StreamPlan => {
     const stream = shot.decodeStream(bytes)
     return {
       name,
@@ -167,18 +189,20 @@ export async function planStreams(
       scenes: scenesOf(stream),
       missing: missingScenes(stream),
       expect: 'finished',
+      ops: opsOf(stream),
     }
   })
-  const refused = refusalScenes(layout.refusedColour)
+  const refused = { scenes: refusalScenes(layout.refusedColour), missing: [] }
+  const handMade = shot.handMadeBytes()
   return [
-    ...plays,
-    { name: 'empty-slot', stream: undefined, scenes: refused, missing: [], expect: 'EMPTY' },
+    ...played,
+    { name: 'empty-slot', stream: undefined, ...refused, expect: 'EMPTY', ops: [] },
     {
       name: `version-${String(shot.UNKNOWN_VERSION)}`,
-      stream: shot.withVersion(shot.handMadeBytes(), shot.UNKNOWN_VERSION),
-      scenes: refused,
-      missing: [],
+      stream: shot.withVersion(handMade, shot.UNKNOWN_VERSION),
+      ...refused,
       expect: 'VERSION',
+      ops: opsOf(shot.decodeStream(handMade)),
     },
   ]
 }
@@ -227,9 +251,10 @@ function playRun(context: Context, plan: RunPlan): RunReport {
     address: context.address,
     frameDir,
     shots: shotArgs(plan.scenes),
-    ...(plan.holdBFromEnd === undefined ? {} : { holdBFromEnd: plan.holdBFromEnd }),
+    ...(plan.holdBFrom === undefined ? {} : { holdBFrom: plan.holdBFrom }),
   })
   const seconds = Math.round((performance.now() - start) / 100) / 10
+  writeOpFrames(frameDir, opFrameLog({ engine: 'mgba', stream: plan.name }, output.ops, plan.ops))
   return reportRun({ plan, output, frames: readFrames(frameDir), errors: context.errors, seconds })
 }
 
@@ -260,7 +285,8 @@ export function reportRun(run: PlayedRun): RunReport {
   return { name, expect, seconds: run.seconds, status: output.status, scenes, missing, problems }
 }
 
-function sayRun(report: RunReport, say: Say): void {
+/** A run's lines: its verdict and status, its scenes, the scenes it lacks and its problems. */
+export function sayRun(report: RunReport, say: Say): void {
   const { status } = report
   const verdict = report.problems.length === 0 ? 'passed' : 'FAILED'
   say(

@@ -21,6 +21,10 @@ const ERRORS = readErrorNames(readFileSync(INTERPRETER_HEADER_PATH, 'utf8'))
 
 const finished: ToolOutput = {
   shots: [{ shot: 'intro', frame: 300, done: 1 }],
+  ops: [
+    { op: 0, frame: 290 },
+    { op: 1, frame: 295 },
+  ],
   status: { status: 'finished', frame: 4000, done: 31, total: 31, turn: 2, error: 0 },
 }
 
@@ -95,18 +99,18 @@ describe('the shot tool', () => {
     expect(toolArgs(run)).toEqual(['r.gba', '0x10', 'f', ...clock, '--state-every', '60'])
   })
 
-  it('holds B from N frames after END only for a run that asks for it (#30)', () => {
+  it('holds B from frame N on only for a run that asks for it (#68)', () => {
     const run = { tool: 't', rom: 'r.gba', address: 16, frameDir: 'f', shots: ['a:1:2'] }
-    expect(toolArgs({ ...run, holdBFromEnd: 1 })).toEqual([
+    expect(toolArgs({ ...run, holdBFrom: 1 })).toEqual([
       'r.gba',
       '0x10',
       'f',
       ...clock,
-      '--hold-b-from-end',
+      '--hold-b-from',
       '1',
       'a:1:2',
     ])
-    expect(toolArgs(run)).not.toContain('--hold-b-from-end')
+    expect(toolArgs(run)).not.toContain('--hold-b-from')
   })
 
   it("fixes mGBA's cartridge clock at the module's time, so that two runs play alike", () => {
@@ -123,8 +127,10 @@ describe('the shot tool', () => {
     expect(TOOL_CLOCK).toBe(module)
   })
 
-  it('reports shots and a final status, one JSON object per line', () => {
+  it('reports shots, op starts and a final status, one JSON object per line', () => {
     const text = [
+      '{"op":0,"frame":290}',
+      '{"op":1,"frame":295}',
       '{"shot":"intro","frame":300,"done":1}',
       '{"status":"finished","frame":4000,"done":31,"total":31,"turn":2,"error":0}',
       '',
@@ -166,6 +172,7 @@ describe('judging a run', () => {
   it('names a stall, a failed scene and an unfinished count', () => {
     const output: ToolOutput = {
       shots: [],
+      ops: [],
       status: { status: 'stall', frame: 9000, done: 7, total: 31, turn: 1, error: 0 },
     }
     const scenes = [{ name: 'win', pass: false, detail: 'no frame "win"' }]
@@ -179,6 +186,7 @@ describe('judging a run', () => {
   it('passes a refusal with the expected error and fails another one', () => {
     const output: ToolOutput = {
       shots: [],
+      ops: [],
       status: { status: 'error', frame: 2, done: 0, total: 0, turn: 0, error: 1 },
     }
     expect(judgeRun({ expect: 'EMPTY', output, scenes: [], errors: ERRORS })).toEqual([])
@@ -190,6 +198,7 @@ describe('judging a run', () => {
   it('fails a refusal whose last frame is not the refusal screen', () => {
     const output: ToolOutput = {
       shots: [],
+      ops: [],
       status: { status: 'error', frame: 44, done: 0, total: 0, turn: 0, error: 2 },
     }
     const scenes = [{ name: 'refused', pass: false, detail: '0 text pixels on 0x630000' }]

@@ -40,6 +40,8 @@ bool32 Replay_OpShowMon(const volatile u8 *operands, u32 step);
 
 // replay_ops_switch.c
 bool32 Replay_OpWithdraw(const volatile u8 *operands, u32 step);
+// The side's mon goes back into its ball, for WITHDRAW and the outro.
+void Replay_ReturnMonToBall(u32 side);
 bool32 Replay_OpSwitchIn(const volatile u8 *operands, u32 step);
 
 // replay_ops_state.c

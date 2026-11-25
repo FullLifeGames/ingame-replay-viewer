@@ -1,4 +1,4 @@
-// What the WebAssembly spike page (#35) and its worker share: the SharedArrayBuffer layout and
+// What the viewer (#35) and its worker share: the SharedArrayBuffer layout and
 // the speeds. The worker runs AgbMain, which never returns, so after the start message
 // everything goes through shared memory: the worker writes each frame, the frame count and
 // the replay progress there, and before it plays on it waits until the page allows the frame. The

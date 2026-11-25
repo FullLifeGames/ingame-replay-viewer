@@ -1,4 +1,4 @@
-// The audio ring of the WebAssembly spike page (#35): the game's sound on its way from the worker
+// The audio ring of the viewer (#35): the game's sound on its way from the worker
 // to the audio thread, in a SharedArrayBuffer that both see. A header of counters comes first,
 // then the float samples. DOM-free, so the worker, the worklet and the Node harness share it.
 

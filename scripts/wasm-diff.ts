@@ -1,7 +1,8 @@
 // The scene diff of the WebAssembly build (#43, plan section 2.3): `npm run wasm:diff --
 // [<stream> ...]`. For each scene frame that `npm run wasm:run` wrote to build/wasm/run/<stream>/,
 // it counts the pixels that differ from mGBA's frame of the same scene in
-// build/rom/shots/<stream>/ (from `npm run rom:shots`) and boxes them. A scene in mid-animation
+// build/rom/shots/<stream>/ (from `npm run rom:shots`) and boxes them. A refused run writes no
+// scene frame, so its final frame, the refusal screen, stands in for one. A scene in mid-animation
 // stands a few frames apart between the two engines, so this reports and does not gate; the mGBA
 // oracle (`npm run wasm:oracle`) checks the renderer without that gap.
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
@@ -61,12 +62,17 @@ export function sceneDiffLine(stream: string, scene: string, { pixels, box }: Pi
   return `${stream}/${scene}: ${String(pixels)} pixels differ${where}`
 }
 
-/** Each scene frame of our folder against mGBA's, by name; the final frame is no scene. */
+// The frames to compare: each scene frame, or the final frame of a run that wrote none. The final
+// frame of a run that plays belongs to no scene and stays out.
+function framesToCompare(oursDir: string): string[] {
+  const names = readdirSync(oursDir).filter((name) => name.endsWith('.ppm'))
+  const scenes = names.filter((name) => name !== FINAL).sort()
+  return scenes.length > 0 || !names.includes(FINAL) ? scenes : [FINAL]
+}
+
+/** Each scene frame of our folder against mGBA's, by name; a refused run's final frame. */
 export function diffScenes(oursDir: string, theirsDir: string): SceneDiff[] {
-  const names = readdirSync(oursDir)
-    .filter((name) => name.endsWith('.ppm') && name !== FINAL)
-    .sort()
-  return names.map((name) => {
+  return framesToCompare(oursDir).map((name) => {
     const theirs = join(theirsDir, name)
     if (!existsSync(theirs)) throw new Error(`no mGBA frame ${theirs}; run npm run rom:shots first`)
     const diff = framePixelDiff(
