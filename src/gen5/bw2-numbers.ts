@@ -151,6 +151,9 @@ export interface EntryNumbers {
   constants: Record<string, number>
   /** The structs the page and the routine write through, by struct name. */
   layouts: Record<string, StructLayout>
+  /** The size of the string buffer each named function creates (GFL_StrBufCreate's first
+   * argument), in characters with the terminator: the room the page may write a name into. */
+  bufferSizes: Record<string, number>
   /** The battle overlay's span in RAM, where the routine lives until the battle loads there. */
   battleOverlay: Span
   /** The spans of the overlays GameInit loads at boot, by overlay name; the battle overlay's

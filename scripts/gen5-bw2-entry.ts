@@ -51,6 +51,8 @@ export const ENTRY_SOURCES = {
   configH: 'include/save/config.h',
   battleProcH: 'include/battle/battle_proc.h',
   trainerClasses: 'generated/trainer_classes.txt',
+  printsysC: 'src/system/printsys.c',
+  setupC: 'src/system/btl_setup.c',
 }
 
 /** The link files of the overlays GameInit loads, by overlay name; the generator checks
@@ -116,7 +118,11 @@ const LAYOUTS: Readonly<
   PlayerInfo: { from: ['playerInfoH'], members: ['name', 'gender'] },
   Config: { from: ['configH'], members: ['textSpeed'] },
   BtlFieldStatus: { from: ['fieldEventH'], members: [] },
+  PartyPkm: { from: ['partyH', 'mailH', 'pmsH'], members: [] },
 }
+
+/** The functions whose string buffer the page writes a name into, each creating one. */
+const BUFFER_MAKERS = ['TrainerBattleSetup_Create']
 
 /** The trainer class of the opponent (D12): the class of the shipped save's trainer. */
 const TRAINER_CLASS = 'TRAINER_CLASS_YOUNGSTER'
@@ -188,7 +194,17 @@ function entryConstants(input: EntryInput): Record<string, number> {
       enumAround(input.configH, 'CONFIG_TEXT_SPEED_FAST'),
       'CONFIG_TEXT_SPEED_FAST',
     ),
+    CHAR_EOM: defineValue(input.printsysC, 'CHAR_EOM'),
   }
+}
+
+/** The size the function `name` gives the string buffer it creates: the first argument of the
+ * first `GFL_StrBufCreate(<n>, …)` in its body. */
+function bufferSize(source: string, name: string): number {
+  const body = new RegExp(`\\b${name}\\([^)]*\\)\\s*\\{([^}]*)\\}`).exec(source)?.[1] ?? ''
+  const size = /\bGFL_StrBufCreate\(\s*(\d+)\s*,/.exec(body)?.[1]
+  if (size === undefined) throw new Error(`${name} creates no string buffer of a literal size`)
+  return Number(size)
 }
 
 function entryLayouts(input: EntryInput): Record<string, StructLayout> {
@@ -217,6 +233,9 @@ export function entryNumbers(input: EntryInput): EntryNumbers {
     data: entryData(input, arm9),
     constants: entryConstants(input),
     layouts: entryLayouts(input),
+    bufferSizes: Object.fromEntries(
+      BUFFER_MAKERS.map((name) => [name, bufferSize(input.setupC, name)]),
+    ),
     battleOverlay,
     bootOverlays,
   }

@@ -69,6 +69,7 @@ describe('quietLines', () => {
       data: { sTable: symbol('sTable', 0x02100000) },
       constants: { HEAPID_SPIN: 43 },
       layouts: { Kite: LAYOUT, Lamp: LAYOUT },
+      bufferSizes: { Kite_Create: 9 },
       battleOverlay: { start: 0x02190000, end: 0x02190600 },
       bootOverlays: { ovA: { start: 0x02180000, end: 0x02190000 } },
     },

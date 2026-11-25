@@ -75,6 +75,14 @@ struct PokeParty { s32 capacity; s32 count; PartyPkm pkms[PARTY_SIZE]; u8 slotEx
 struct Config { u16 textSpeed : 4; u16 : 12; };`,
   battleProcH: '#define OVERLAY_BATTLE_MAIN OVERLAY_ID(101)',
   trainerClasses: 'TRAINER_CLASS_HIKER = 0\nTRAINER_CLASS_YOUNGSTER\n',
+  printsysC: '#define CHAR_NEWLINE 0xe000\n#define CHAR_EOM 0xfffe',
+  setupC: `static void Kite_Init(Kite *kite) { kite->name = GFL_StrBufCreate(3, heapId); }
+BtlSetupTrainer *TrainerBattleSetup_Create(HeapID heapId) {
+    BtlSetupTrainer *trainer = GFL_HeapAllocate(heapId, sizeof(BtlSetupTrainer), TRUE, "x.c", 9);
+
+    trainer->name = GFL_StrBufCreate(12, heapId);
+    return trainer;
+}`,
 }
 
 // Scene: the direct entry's routine and the page take every number from the generated file.
@@ -94,7 +102,14 @@ describe('entryNumbers', () => {
       SND_CHANNEL_MASK_ALL: 0xff,
       TRAINER_CLASS_YOUNGSTER: 1,
       CONFIG_TEXT_SPEED_FAST: 3,
+      CHAR_EOM: 0xfffe,
     })
+  })
+
+  it("gives the size TrainerBattleSetup_Create makes the trainer's name buffer", () => {
+    expect(entryNumbers(INPUT).bufferSizes).toEqual({ TrainerBattleSetup_Create: 12 })
+    const setupC = INPUT.setupC.replace('GFL_StrBufCreate(12', 'GFL_StrBufCreate(size')
+    expect(() => entryNumbers({ ...INPUT, setupC })).toThrow(/TrainerBattleSetup_Create/)
   })
 
   it('lays out the structs the page writes, nested and 64-bit members as the compiler does', () => {
@@ -108,6 +123,7 @@ describe('entryNumbers', () => {
       'PlayerInfo',
       'Config',
       'BtlFieldStatus',
+      'PartyPkm',
     ])
     expect(layouts.GameProcManager?.fields.nextParam).toEqual({ offset: 0x1c, size: 4 })
     expect(layouts.BtlSetup?.fields['fieldSituation.bgm']).toEqual({ offset: 8, size: 2 })
@@ -116,6 +132,7 @@ describe('entryNumbers', () => {
     expect(layouts.BtlSetup?.size).toBe(0x54)
     expect(layouts.BtlSetupTrainer?.size).toBe(0x14)
     expect(layouts.PokeParty?.fields.pkms).toEqual({ offset: 8, size: 0x60 })
+    expect(layouts.PartyPkm?.size).toBe(0x10)
     expect(layouts.Config?.fields.textSpeed).toEqual({ offset: 0, size: 2, bit: 0, bits: 4 })
   })
 

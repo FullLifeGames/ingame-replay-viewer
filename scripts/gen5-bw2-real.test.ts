@@ -261,9 +261,21 @@ describe.skipIf(!existsSync(FILE))('the Gen 5 code on the generated numbers', ()
       'SND_CHANNEL_MASK_ALL',
       'TRAINER_CLASS_YOUNGSTER',
       'CONFIG_TEXT_SPEED_FAST',
+      'CHAR_EOM',
     ]
     expect(Object.keys(constants).sort()).toEqual([...names].sort())
     const signs = names.filter((name) => (constants[name] ?? 0) < 0 !== (name === 'OVERLAY_NONE'))
     expect(signs).toEqual([])
+  })
+
+  it("fit the terminator in a character, a name in the trainer's buffer, and whole Pokémon in the party", () => {
+    const { constants, layouts, bufferSizes } = real().entry
+    const size = (struct: string, member: string) => layouts[struct]?.fields[member]?.size ?? 0
+    const terminator = constants.CHAR_EOM ?? -1
+    const fits = terminator >= 0 && terminator < 2 ** (8 * size('StrBuf', 'chars'))
+    expect(fits, 'the terminator fits').toBe(true)
+    expect((bufferSizes.TrainerBattleSetup_Create ?? 0) > 1, 'room for a name').toBe(true)
+    const pkm = layouts.PartyPkm?.size ?? 0
+    expect(pkm > 0 && size('PokeParty', 'pkms') % pkm === 0, 'whole Pokémon').toBe(true)
   })
 })

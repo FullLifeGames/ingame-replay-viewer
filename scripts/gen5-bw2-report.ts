@@ -100,6 +100,7 @@ function entryLines(entry: EntryNumbers): string[] {
       (symbol) => `entry data ${symbol.name} ${symbol.module} ${hex(symbol.address)}`,
     ),
     `entry constants ${JSON.stringify(entry.constants)}`,
+    `entry buffer sizes ${JSON.stringify(entry.bufferSizes)}`,
     ...Object.entries(entry.layouts).map(
       ([name, layout]) =>
         `entry layout ${name} size ${hex(layout.size)}, align ${String(layout.align)}`,

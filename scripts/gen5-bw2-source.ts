@@ -54,6 +54,8 @@ export const POKEBW2_FILES: readonly string[] = [
   'include/save/config.h',
   'include/battle/battle_proc.h',
   'generated/trainer_classes.txt',
+  'src/system/printsys.c',
+  'src/system/btl_setup.c',
 ]
 
 /** Reads one file of pokebw2 by its path inside the checkout. */
