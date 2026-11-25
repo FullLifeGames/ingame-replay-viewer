@@ -66,7 +66,7 @@ The tool takes a frame at each scene of `scripts/rom-shot-scenes.ts`, and `scrip
 
 ## The WebAssembly build
 
-The WebAssembly spike (#35) compiles the expansion with our C files to a WebAssembly module that runs in the browser without an emulator. `docs/wasm-spike.md` holds the results. The build lives in `wasm/` and reads the tree that `npm run rom:build` leaves; the ROM build never sees any of it.
+The WebAssembly build (#35, #43) compiles the expansion with our C files to a WebAssembly module that runs in the browser without an emulator. `docs/wasm-spike.md` holds the results. The build lives in `wasm/` and reads the tree that `npm run rom:build` leaves; the ROM build never sees any of it.
 
 - `wasm/wasm.json`: the pinned Emscripten release, the tree files the module leaves out, and per-file defines and compiler flags.
 - `wasm/src/`: the glue, our C files for the module only. It blocks in `VBlankIntrWait`, has our platform layer run the frame, raises the interrupts, hands frames and sound to JavaScript, and stubs flash, the clock, the link cable and multiboot. A run that must not go on stops in `irv_wasm_stop.c`, with a line that `wasm:run` and the page show.

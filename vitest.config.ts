@@ -11,7 +11,7 @@ export default defineConfig({
       include: ['src/**/*.ts'],
       // main.ts, view.ts and replay-view.ts are the page's DOM wiring; the e2e covers them, and the
       // Node specs have no DOM to run them in.
-      // The same holds for the WebAssembly spike page's wiring, its run, its worker and its audio
+      // The same holds for the viewer's wiring in src/web/wasm/, its run, its worker and its audio
       // worklet.
       exclude: [
         'src/**/*.test.ts',

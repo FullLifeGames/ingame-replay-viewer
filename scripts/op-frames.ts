@@ -11,8 +11,8 @@
 // END's finish. The span from one op's start to the next holds the wait for the earlier ops'
 // controllers, text and KO animations and the op's own steps.
 //
-// The compare counts each start from op 0's start, so the engines' boot, which takes mGBA 16 to 22
-// frames longer, parts nothing.
+// The compare counts each start from op 0's start, so the boot parts nothing: mGBA starts op 0
+// later than the module, by a count that differs per stream, and the compare prints it.
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { parseArgs } from 'node:util'
