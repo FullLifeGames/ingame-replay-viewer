@@ -18,6 +18,7 @@ import {
 import type { TestReplay } from './replays'
 import { checkBaseRom, patchBaseRom, readSlotDescription } from './rom'
 import { ROM_FILES } from './rom-files'
+import type { PlayingGame } from './visitor'
 
 /** What the page hands the session: its GETs, the emulator's loader and the crash line's sink. */
 export interface SessionDeps {
@@ -56,11 +57,11 @@ export interface Session {
   start(): Promise<StartSummary>
   restart(): void
   /**
-   * The id of the replay the emulator runs, which a failed pick names (#69): the last Start's,
-   * until the core crashed or a Start took the game down. The page cannot tell END in mGBA, so a
-   * game past END still counts.
+   * The game the emulator runs, which a failed pick names (#69): the last Start's replay, until the
+   * core crashed or a Start took the game down. The page cannot tell END in mGBA, so a game past
+   * END still counts, and the game says so.
    */
-  readonly playing: () => string | undefined
+  readonly playing: () => PlayingGame | undefined
 }
 
 /** `make`'s promise, made at the first call and made again after it failed. */
@@ -140,7 +141,7 @@ export function createSession(deps: SessionDeps): Session {
     pickTestReplay: replays.pickTestReplay,
     loadReplay: replays.loadReplay,
     start,
-    playing: () => playing,
+    playing: () => (playing === undefined ? undefined : { replay: playing, tellsEnd: false }),
     restart: () => {
       try {
         if (loaded === undefined) throw new EmulatorError(NOT_STARTED_LINE)

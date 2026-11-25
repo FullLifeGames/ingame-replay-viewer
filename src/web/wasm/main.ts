@@ -27,7 +27,7 @@ import {
   READY_LINE,
   runningLine,
 } from '../status'
-import { environmentLine } from '../visitor'
+import { environmentLine, type PlayingGame } from '../visitor'
 import { AudioOpener, type Sound } from './audio-opener'
 import { FRAME_HEIGHT, FRAME_WIDTH } from './frame'
 import { readFrame } from './frame-swap'
@@ -112,11 +112,11 @@ function drawLoop(view: WasmView, runs: Runs<NamedRun>, changeSpeed: (speed: Spe
   })
 }
 
-/** The id of the replay the current run plays, while its game plays: not once it failed or ended. */
-const playingId = (run: NamedRun | undefined): string | undefined =>
+/** The game of the current run while it plays: not once it failed or reached END, which it tells. */
+const playingGame = (run: NamedRun | undefined): PlayingGame | undefined =>
   run === undefined || run.failure !== undefined || readStatus(run.control).finished
     ? undefined
-    : run.id
+    : { replay: run.id, tellsEnd: true }
 
 /**
  * Pauses or plays the current run. Resolves with the line for a refused resume while that run is
@@ -212,7 +212,7 @@ function createViewer(view: WasmView) {
     loadReplay: choice.loadReplay,
     loadFile: choice.loadFile,
     /** A failed pick says that this game plays on (#69). */
-    playing: () => playingId(runs.current),
+    playing: () => playingGame(runs.current),
     play,
     /** The stream that ran last, from its start; the picked replay when none ran yet. */
     restart: () => play(last),

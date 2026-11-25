@@ -7,6 +7,8 @@ import { TEST_REPLAYS } from './replays'
 import type { VisitorLine } from './visitor'
 
 const PLAYED = 'smogtours-gen3ou-994052'
+/** The viewer's game: its page tells END. */
+const VIEWER_GAME = () => ({ replay: PLAYED, tellsEnd: true })
 const UNREACHABLE =
   'The page could not reach replay.pokemonshowdown.com. Check your connection and try again.'
 
@@ -37,14 +39,22 @@ const example = (id: string) => {
 }
 
 describe('the line of a failed pick', () => {
-  it('says that the game plays on with the replay it plays', async () => {
+  it('says that the game plays on with the replay it plays, on a page that tells END', async () => {
     const { view, shown } = recordingView()
-    await showPick(view, offline().loadReplay('gen3ou-1'), () => PLAYED, loadedFrom(view))
+    await showPick(view, offline().loadReplay('gen3ou-1'), VIEWER_GAME, loadedFrom(view))
     expect(shown()).toMatchObject({
       line: `${UNREACHABLE} The game plays on with ${PLAYED}.`,
       report: false,
       replay: 'gen3ou-1',
     })
+  })
+
+  // A page that cannot tell END counts a game past its end as playing, so it never says plays on.
+  it('says that the game keeps the replay, on a page that cannot tell END', async () => {
+    const { view, shown } = recordingView()
+    const game = () => ({ replay: PLAYED, tellsEnd: false })
+    await showPick(view, offline().loadReplay('gen3ou-1'), game, loadedFrom(view))
+    expect(shown()?.line).toBe(`${UNREACHABLE} The game keeps ${PLAYED}.`)
   })
 
   it('names no game while none plays', async () => {
@@ -57,17 +67,18 @@ describe('the line of a failed pick', () => {
   it('cuts a long id of the game that plays to 120 characters', async () => {
     const { view, shown } = recordingView()
     const long = 'x'.repeat(5000)
-    await showPick(view, offline().loadReplay('gen3ou-1'), () => long, loadedFrom(view))
+    const game = () => ({ replay: long, tellsEnd: true })
+    await showPick(view, offline().loadReplay('gen3ou-1'), game, loadedFrom(view))
     expect(shown()?.line).toContain(`The game plays on with ${'x'.repeat(119)}….`)
   })
 
   it('goes with the next pick, which asks for Start and leaves nothing under "Details"', async () => {
     const { view, shown } = recordingView()
     const choice = offline()
-    await showPick(view, choice.loadReplay('gen3ou-1'), () => PLAYED, loadedFrom(view))
+    await showPick(view, choice.loadReplay('gen3ou-1'), VIEWER_GAME, loadedFrom(view))
     const next = 'smogtours-gen3ou-994086'
     const picked: Promise<ReplaySummary | undefined> = choice.pickTestReplay(example(next))
-    await showPick(view, picked, () => PLAYED, pickedFrom(view))
+    await showPick(view, picked, VIEWER_GAME, pickedFrom(view))
     expect(shown()).toEqual({
       line: `Picked ${next}. Press Start to play it.`,
       detail: '',

@@ -1,5 +1,5 @@
 // The game the emulator page names after a failed pick (#69): the replay its last Start ran, until
-// the core crashed or a Start took the game down.
+// the core crashed or a Start took the game down. The page cannot tell END.
 import { describe, expect, it } from 'vitest'
 
 import { playingOf, type PickView, showPick } from './pick-lines'
@@ -23,15 +23,18 @@ function recordingView() {
 }
 
 describe('a failed pick on the emulator page', () => {
-  it('says that the game plays on with the replay the emulator runs', async () => {
+  // The page cannot tell END, so a game past its end counts as playing: the line says that the
+  // game keeps the replay, which holds before END and after it, and never that it plays on.
+  it('says that the game keeps the replay the emulator runs', async () => {
     const { session } = world()
     await ready(session)
     await session.start()
     const { view, shown } = recordingView()
     await showPick(view, session.loadReplay('smogtours-gen3ou-1'), playingOf(session))
     expect(shown()).toMatchObject({
-      line: `Showdown has no replay with this ID. The game plays on with ${PLAYED}.`,
+      line: `Showdown has no replay with this ID. The game keeps ${PLAYED}.`,
     })
+    expect(shown()?.line).not.toContain('plays on')
   })
 
   it('names no game before the first Start', async () => {
@@ -50,7 +53,7 @@ describe("the session's game", () => {
     expect(session.playing()).toBeUndefined()
     await session.start()
     session.restart()
-    expect(session.playing()).toBe(PLAYED)
+    expect(session.playing()).toEqual({ replay: PLAYED, tellsEnd: false })
   })
 
   it('is gone once the core crashed', async () => {
@@ -77,6 +80,6 @@ describe("the session's game", () => {
     await session.start()
     await expect(session.pickDump(OTHER_DUMP)).rejects.toThrow()
     await expect(session.start()).rejects.toThrow()
-    expect(session.playing()).toBe(PLAYED)
+    expect(session.playing()).toEqual({ replay: PLAYED, tellsEnd: false })
   })
 })

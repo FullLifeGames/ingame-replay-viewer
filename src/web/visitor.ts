@@ -97,8 +97,10 @@ export const VISITOR_LINES = {
     text: '{file} holds {size} MB, and the viewer reads replay files up to {largest} MB. Pick the replay file you saved from Showdown.',
     report: false,
   },
-  /** The end of a failed pick's line while a game plays (#69), after the pick's own line. */
+  /** The end of a failed pick's line while a game plays (#69), on a page that tells END. */
   playsOn: { text: 'The game plays on with {replay}.', report: false },
+  /** The same on a page that cannot tell END: true while the game plays and after its end. */
+  keeps: { text: 'The game keeps {replay}.', report: false },
   /** A module's words that speak to visitors already: Start, memory, the emulator. */
   kept: { text: '{words}', report: false },
   unknown: { text: `The page hit a problem it has no line for. ${REPORT}`, report: true },
@@ -261,15 +263,24 @@ export function visitorLine(error: unknown, place?: ReplayPlace): VisitorLine {
   return { line, detail: messageOf(error), report: entry.report, ...replay }
 }
 
+/** The game a failed pick names (#69): the replay it plays, and whether its page tells END. */
+export interface PlayingGame {
+  readonly replay: string
+  /** False on a page that counts a game past END as playing, as the emulator page does. */
+  readonly tellsEnd: boolean
+}
+
 /**
- * The line for a pick, a Load or a file that failed. While a game plays, it says that the game
- * plays on with the replay `playing` names, so the failure never reads as the game's (#69).
+ * The line for a pick, a Load or a file that failed. While a game plays, it names the replay that
+ * game plays, so the failure never reads as the game's (#69): it plays on with it on a page that
+ * tells END, and keeps it on a page that cannot, since there the game may stand past its end.
  */
-export function pickFailureLine(error: unknown, playing: string | undefined): VisitorLine {
+export function pickFailureLine(error: unknown, playing: PlayingGame | undefined): VisitorLine {
   const shown = visitorLine(error)
   if (playing === undefined) return shown
-  const playsOn = fillLine(VISITOR_LINES.playsOn.text, { replay: clip(playing, SLOT_LONGEST) })
-  return { ...shown, line: `${shown.line} ${playsOn}` }
+  const ending = playing.tellsEnd ? VISITOR_LINES.playsOn : VISITOR_LINES.keeps
+  const game = fillLine(ending.text, { replay: clip(playing.replay, SLOT_LONGEST) })
+  return { ...shown, line: `${shown.line} ${game}` }
 }
 
 /**

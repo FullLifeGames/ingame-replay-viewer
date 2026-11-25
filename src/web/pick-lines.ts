@@ -3,7 +3,7 @@
 // controls and status line.
 import type { ReplaySummary } from './replay-choice'
 import { pickedLine } from './status'
-import { pickFailureLine, type VisitorLine } from './visitor'
+import { pickFailureLine, type PlayingGame, type VisitorLine } from './visitor'
 
 /** What the flow shows on a page: the controls and the status line of replay-view.ts. */
 export interface PickView {
@@ -18,8 +18,8 @@ export interface PickView {
   readonly visitorLine: (shown: VisitorLine) => void
 }
 
-/** The id of the replay the game plays while one plays; a page that tells none leaves it out. */
-export type Playing = () => string | undefined
+/** The game that plays and its replay, while one plays; a page that tells none leaves it out. */
+export type Playing = () => PlayingGame | undefined
 
 const NO_GAME: Playing = () => undefined
 

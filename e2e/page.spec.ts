@@ -195,7 +195,7 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
   expect(notSameOriginGets).toEqual([])
 })
 
-test('a Load that fails while a game plays says that the game plays on, and the next pick clears it', async ({
+test('a Load that fails while a game plays says that the game keeps its replay, and the next pick clears it', async ({
   page,
   baseURL,
 }) => {
@@ -226,12 +226,10 @@ test('a Load that fails while a game plays says that the game plays on, and the 
   await expect.poll(async () => (await frame(page)).colours, { timeout: 30_000 }).toBeGreaterThan(1)
 
   await loadReplay(page, MISSING)
-  await expect(status).toHaveText(
-    `Showdown has no replay with this ID. The game plays on with ${FIRST}.`,
-  )
+  await expect(status).toHaveText(`Showdown has no replay with this ID. The game keeps ${FIRST}.`)
   await expect(detail).not.toHaveText('')
   await expect(details).toBeVisible()
-  // The game does play on: its frames go on changing.
+  // The game goes on: its frames go on changing.
   const failed = await frame(page)
   await expect.poll(async () => differ(failed, await frame(page)), { timeout: 30_000 }).toBe(true)
 
