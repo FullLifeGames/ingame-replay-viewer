@@ -67,6 +67,16 @@ export interface RunReport {
   loadCheck?: string
 }
 
+/** The game's save as the core holds it (#78). */
+export interface SaveReport {
+  /** The path the core reports for its save file. */
+  path: string
+  /** The file system of the save folder; MEMFS on this page (src/web/gen5/save-load.ts). */
+  mount: string
+  /** The file in base64, its SHA-256 and its size; absent while the core has written none. */
+  file?: { base64: string; sha256: string; bytes: number }
+}
+
 export interface Gen5Hook {
   /** The page's status line. */
   status: () => string
@@ -106,6 +116,11 @@ export interface Gen5Hook {
   runReport: () => RunReport
   /** A reached mark's state and the core's frame near it, in base64, handed over once. */
   takeMark: (name: string) => Promise<{ state: string; shot: string } | undefined>
+  /** Loads these bytes (base64) as the game's save when it starts; call it before the pick. For
+   * the build machine's own saves, which no server serves. A save the address names wins. */
+  queueSave: (base64: string) => void
+  /** The save once the core wrote save RAM to its file; undefined before the game runs. */
+  takeSave: () => Promise<SaveReport | undefined>
 }
 
 /** libretro's joypad index of Start (RETRO_DEVICE_ID_JOYPAD_START in libretro.h). */

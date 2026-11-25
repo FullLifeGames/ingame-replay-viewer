@@ -3,21 +3,31 @@
 // stays in the browser as a Blob URL; EmulatorJS's databases are off, so it never lands in
 // IndexedDB. The address picks the core build and vsync (src/gen5/pacing.ts); vsync is off unless
 // it says `?vsync=1`. The game's clock is fixed and runs with the emulated frames, and a macro can
-// play from boot or from a state (frame-hook.ts). `window.gen5` is the hook that the scripts read.
+// play from boot or from a state (frame-hook.ts). With `?save=<name>` the page fetches that save
+// from its own server and loads it before the game starts; the save folder lives in memory alone,
+// never in IndexedDB (save-load.ts). `window.gen5` is the hook that the scripts read.
 import { figuresLine } from '../../gen5/figures.ts'
-import type { Calibration, Gen5Hook } from '../../gen5/hook.ts'
+import type { Calibration, Gen5Hook, SaveReport } from '../../gen5/hook.ts'
 import type { MainRamFacts } from '../../gen5/main-ram.ts'
 import { checkBlack2, HEADER_SIZE } from '../../gen5/nds-header.ts'
 import { emulatorOptions, pageSettings } from '../../gen5/pacing.ts'
+import { CONTENT_NAME, saveName, saveQueryProblem } from '../../gen5/save-file.ts'
 import { wireControls } from './controls.ts'
-import { toBase64 } from './codec.ts'
+import { fromBase64, sha256, toBase64 } from './codec.ts'
 import { fixClock, frameHook, wrapRuntime } from './frame-hook.ts'
 import { ramHook, readFacts } from './ram-hook.ts'
+import {
+  fetchSave,
+  lockSaveButtons,
+  type SaveManager,
+  takeSave,
+  wrapGameManager,
+} from './save-load.ts'
 import { calibrate, calibrationLine, type Rates, watchSpeed } from './speed.ts'
 
 const DATA_PATH = '/emulatorjs/data/'
 
-interface GameManager {
+interface GameManager extends SaveManager {
   getFrameNum(): number
   screenshot(): Promise<Uint8Array>
   getCoreOptions(): string
@@ -51,6 +61,8 @@ let rates: Rates = { fps5: undefined, fps60: undefined }
 let started = false
 let calibration: Calibration | undefined
 let facts: MainRamFacts | undefined
+/** The save the game loads when it starts: queued by the hook, or fetched for the address. */
+let save: Uint8Array | undefined
 
 function say(text: string): void {
   if (statusLine) statusLine.textContent = text
@@ -69,7 +81,18 @@ const ram = ramHook(
 )
 const frames = frameHook(manager, ram.ram)
 wrapRuntime(frames.preMainLoop)
+wrapGameManager(window, () => save)
 fixClock(frames.frame)
+
+async function saveReport(game: GameManager): Promise<SaveReport> {
+  const { path, mount, bytes } = takeSave(game)
+  if (bytes === undefined) return { path, mount }
+  return {
+    path,
+    mount,
+    file: { base64: toBase64(bytes), sha256: await sha256(bytes), bytes: bytes.length },
+  }
+}
 
 window.gen5 = {
   status: () => statusLine?.textContent ?? '',
@@ -110,6 +133,13 @@ window.gen5 = {
       frames: window.gen5.frames(),
       userAgent: navigator.userAgent,
     }),
+  queueSave: (base64) => {
+    save = fromBase64(base64)
+  },
+  takeSave: async () => {
+    const game = manager()
+    return game ? saveReport(game) : undefined
+  },
   ...ram.hook,
   ...frames.calls,
 }
@@ -119,9 +149,10 @@ function startEmulator(file: File): void {
   window.EJS_core = 'melonds'
   window.EJS_pathtodata = DATA_PATH
   window.EJS_gameUrl = URL.createObjectURL(file)
-  window.EJS_gameName = 'black2.nds'
+  window.EJS_gameName = CONTENT_NAME
   window.EJS_startOnLoaded = true
   window.EJS_disableDatabases = true
+  lockSaveButtons(window)
   window.EJS_threads = settings.threads
   window.EJS_defaultOptions = emulatorOptions(settings)
   window.EJS_onGameStart = () => {
@@ -139,6 +170,25 @@ function startEmulator(file: File): void {
   document.body.append(loader)
 }
 
+/** Fetches the save the address names, if any; false, with the sentence said, when there is none
+ * to load, so the emulator does not start. */
+async function fetchAddressSave(): Promise<boolean> {
+  const bad = saveQueryProblem(location.search)
+  if (bad !== undefined) {
+    say(bad)
+    return false
+  }
+  const name = saveName(location.search)
+  if (name === undefined) return true
+  const fetched = await fetchSave(name, (url) => fetch(url))
+  if ('problem' in fetched) {
+    say(fetched.problem)
+    return false
+  }
+  save = fetched.bytes
+  return true
+}
+
 async function onPick(picker: HTMLInputElement): Promise<void> {
   const file = picker.files?.[0]
   if (!file) return
@@ -148,6 +198,7 @@ async function onPick(picker: HTMLInputElement): Promise<void> {
     say(check.reason)
     return
   }
+  if (!(await fetchAddressSave())) return
   facts = await readFacts(file, check.header, headerBytes)
   picker.disabled = true
   say(`Found ${check.header.title} (${check.header.gameCode}). Starting the emulator.`)

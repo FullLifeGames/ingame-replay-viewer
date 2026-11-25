@@ -58,7 +58,7 @@ export function startBuiltServer(options: BuiltServerOptions): Promise<Server> {
       res.end()
       return
     }
-    sendFile(res, fileFor(url, GEN5_PATHS.built, GEN5_PATHS.site), url)
+    sendFile(res, fileFor(url, GEN5_PATHS.built, GEN5_PATHS.site, GEN5_PATHS.saves), url)
   })
   return new Promise((resolve, reject) => {
     server.once('error', reject)

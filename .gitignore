@@ -16,6 +16,8 @@ playwright-report/
 *.gba
 *.nds
 *.sav
+# The saves we made from New Game ship from this one folder (#78, ADR 0002)
+!/src/web/gen5/saves/*.sav
 *.bps
 *.ss[0-9]
 *.state

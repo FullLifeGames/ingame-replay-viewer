@@ -26,6 +26,9 @@ export const POKEBW2_FILES: readonly string[] = [
   'include/battle/btl_pokeparam.h',
   'res/field/events/aspertia_city.json',
   'res/field/scripts/aspertia_city.s',
+  'res/field/events/route_20.json',
+  'generated/trainers.txt',
+  'src/field/script/trainer_script.c',
   'res/text/system/0016.txt',
   'res/text/system/0019.txt',
 ]

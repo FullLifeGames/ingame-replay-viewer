@@ -1,13 +1,15 @@
 // One Gen 5 spike run (#72): serves the spike page, opens it in Playwright's headless Chromium,
 // hands it the dump from GEN5_DUMP through the file input (nothing copies it), and logs the frame
 // count per second, Chromium's memory and every request the page made. A request that leaves the
-// machine is aborted and fails the run. Frames land in build/gen5/frames/ (gitignored, ADR 0002).
+// machine, or one with a body, fails the run (scripts/gen5-requests.ts). Frames land in
+// build/gen5/frames/ (gitignored, ADR 0002).
 // Usage: GEN5_DUMP=<path> node scripts/gen5-shot.ts [--scene boot|speed|pacing] [--seconds 90]
-// [--start-at-frame <n>] [--threads] [--built] [--label s1] [--page-shot <name>]. The scenes
-// "speed" and "pacing" run scripts/gen5-speed.ts. --built serves the built page
+// [--start-at-frame <n>] [--threads] [--built] [--label s1] [--page-shot <name>] [--save <file>].
+// The scenes "speed" and "pacing" run scripts/gen5-speed.ts. --built serves the built page
 // (scripts/gen5-built.ts) instead of Vite's dev server, and a websocket or a Vite client request
-// fails the run. --page-shot saves the page at a phone's 360 px width before the pick.
-import { mkdirSync } from 'node:fs'
+// fails the run. --page-shot saves the page at a phone's 360 px width before the pick. --save
+// <file> loads that save when the game starts (a save of the build machine, never served).
+import { mkdirSync, readFileSync } from 'node:fs'
 import type { AddressInfo } from 'node:net'
 import { parseArgs } from 'node:util'
 
@@ -15,10 +17,19 @@ import { chromium, type Page } from '@playwright/test'
 
 import type { Gen5Global } from '../src/gen5/hook.ts'
 import { paceBetween, paceLine, type PaceSample, paceWindows } from '../src/gen5/pace.ts'
-import { framesOf, log, pressStart, sampleLine, saveFrame, waitForStart } from './gen5-page.ts'
+import {
+  framesOf,
+  log,
+  logSave,
+  pressStart,
+  sampleLine,
+  saveFrame,
+  waitForStart,
+} from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { loadAverage, sampleMemory } from './gen5-proc.ts'
 import { BUILT_PORT, buildGen5Page, startBuiltServer } from './gen5-built.ts'
+import { logStorage, type RequestLog, watchRequests } from './gen5-requests.ts'
 import { pacingScene, speedScene } from './gen5-speed.ts'
 import { startGen5Server } from './gen5-serve.ts'
 
@@ -53,6 +64,8 @@ interface ShotOptions {
   label: string
   /** The name of a 360 px wide page screenshot before the pick, if any. */
   pageShot: string | undefined
+  /** A save file of the build machine that the page loads when the game starts (#78). */
+  save: string | undefined
 }
 
 /** A phone's width in CSS pixels, for the page screenshot before the pick. */
@@ -62,11 +75,6 @@ export const RUN_VIEWPORT = { width: 640, height: 960 }
 export interface Served {
   port: number
   close: () => Promise<void>
-}
-
-/** Local: the page's own origin, or a blob: or data: URL the page made itself. */
-export function isLocalRequest(url: string, origin: string): boolean {
-  return url.startsWith(`${origin}/`) || url.startsWith('blob:') || url.startsWith('data:')
 }
 
 /** Frames per second over 10-second windows and over the whole run. */
@@ -100,32 +108,6 @@ async function measure(page: Page, options: ShotOptions): Promise<Sample[]> {
     }
   }
   return samples
-}
-
-/** Logs every request; a request that leaves the machine is aborted and lands in `refused`. On
- * the built page (`built`), so does a websocket or a request for Vite's dev client. */
-export function watchRequests(page: Page, origin: string, built: boolean, refused: string[]): void {
-  page.on('request', (request) => {
-    log(`request ${request.method()} ${request.url()}`)
-    if (built && request.url().includes('/@vite/')) refused.push(request.url())
-  })
-  page.on('websocket', (socket) => {
-    log(`websocket ${socket.url()}`)
-    if (built) refused.push(socket.url())
-  })
-  page.on('console', (message) => {
-    log(`console ${message.type()}: ${message.text()}`)
-  })
-  page.on('pageerror', (error) => {
-    log(`pageerror ${error.message}`)
-  })
-  void page.context().route('**/*', async (route) => {
-    const url = route.request().url()
-    if (isLocalRequest(url, origin)) return route.continue()
-    refused.push(url)
-    log(`ABORTED off-machine request ${url}`)
-    return route.abort()
-  })
 }
 
 async function logCalibration(page: Page): Promise<void> {
@@ -206,13 +188,22 @@ async function copyFigures(page: Page): Promise<void> {
 async function drive(page: Page, dump: string, options: ShotOptions): Promise<void> {
   await logCalibration(page)
   if (options.pageShot !== undefined) await pageShot(page, options.pageShot)
+  if (options.save !== undefined) {
+    const base64 = readFileSync(options.save).toString('base64')
+    await page.evaluate((bytes) => {
+      ;(globalThis as unknown as Gen5Global).gen5.queueSave(bytes)
+    }, base64)
+    log(`queued a save of ${String(Buffer.from(base64, 'base64').length)} bytes`)
+  }
   log(`before the dump; ${sampleLine()}`)
   await page.setInputFiles('#dump', dump)
   await waitForStart(page)
+  await logSave(page, 'at the start')
   log(
     `core options: ${await page.evaluate(() => (globalThis as unknown as Gen5Global).gen5.coreOptions())}`,
   )
   await playScene(page, options)
+  await logSave(page, 'at the end')
   await copyFigures(page)
   log(
     `${sampleLine()}; status: ${await page.evaluate(() => (globalThis as unknown as Gen5Global).gen5.status())}`,
@@ -224,26 +215,24 @@ async function run(dump: string, options: ShotOptions): Promise<number> {
   const served = await serve(options.built)
   const origin = `http://${PAGE_HOST}:${String(served.port)}`
   const browser = await chromium.launch({ args: CHROMIUM_ARGS })
-  const refused: string[] = []
+  let requests: RequestLog | undefined
+  let storageClean: boolean
   try {
     const context = await browser.newContext({
       viewport: RUN_VIEWPORT,
       permissions: ['clipboard-read', 'clipboard-write'],
     })
     const page = await context.newPage()
-    watchRequests(page, origin, options.built, refused)
+    requests = watchRequests(page, origin, options.built)
     await page.goto(`${origin}/${options.threads ? '?threads=1' : ''}`)
     await drive(page, dump, options)
+    storageClean = await logStorage(page)
   } finally {
     await browser.close()
     await served.close()
+    if (requests) log(requests.summary())
   }
-  log(
-    refused.length === 0
-      ? `requests: all local${options.built ? ', no websocket, no dev client' : ''}`
-      : `requests: ${String(refused.length)} refused (off the machine, or on the built page a websocket or a dev client)`,
-  )
-  return refused.length === 0 ? 0 : 1
+  return requests.failed || !storageClean ? 1 : 0
 }
 
 async function main(): Promise<void> {
@@ -256,6 +245,7 @@ async function main(): Promise<void> {
       built: { type: 'boolean', default: false },
       label: { type: 'string', default: 's1' },
       'page-shot': { type: 'string' },
+      save: { type: 'string' },
     },
   })
   const dump = process.env.GEN5_DUMP
@@ -272,6 +262,7 @@ async function main(): Promise<void> {
     built: values.built,
     label: values.label,
     pageShot: values['page-shot'],
+    save: values.save,
   })
 }
 
