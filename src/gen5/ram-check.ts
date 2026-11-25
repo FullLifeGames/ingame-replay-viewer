@@ -18,6 +18,8 @@ export interface RamRef {
 
 export interface RamCheck extends RamRef {
   oneOf?: readonly number[]
+  /** Values the check waits to see left behind, such as the row the player stands on now. */
+  noneOf?: readonly number[]
   atMost?: number
   /** The value is a pointer into main RAM. */
   mainRamPointer?: boolean
@@ -50,6 +52,7 @@ function checkFault(check: RamCheck, value: number): string | undefined {
   if (check.oneOf && !check.oneOf.includes(value)) {
     return `${read}, not one of ${check.oneOf.map(hex).join(' ')}`
   }
+  if (check.noneOf?.includes(value)) return `${read}, one of ${check.noneOf.map(hex).join(' ')}`
   if (check.atMost !== undefined && value > check.atMost)
     return `${read}, above ${hex(check.atMost)}`
   if (check.mainRamPointer && !inMainRam(value, 1)) return `${read}, not a pointer into main RAM`

@@ -60,6 +60,7 @@ describe('quietLines', () => {
       outlookTrigger: { x: 1, z: 37, width: 2 },
       bianca: { x: 2, z: 29 },
     },
+    saveTrainer: { x: 3, z: 41 },
   }
 
   it('gives the pin, the count of symbols and the checks, and no address, offset or value', () => {

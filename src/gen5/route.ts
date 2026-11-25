@@ -2,20 +2,18 @@
 // macro that src/web/gen5/frame-hook.ts plays one emulated frame at a time. Each mark is a
 // milestone where a run saves a state and a frame, so the next attempt starts there
 // (scripts/gen5-route.ts). Frame counts were read off frames of earlier runs, never off a clock.
+import { battleEntry, TO_TITLE } from './battle-entry.ts'
 import type { RoutePlaces } from './bw2-numbers.ts'
-import type { Button, MacroStep } from './macro.ts'
+import {
+  type Button,
+  mark,
+  type MacroStep,
+  press,
+  PRESS_FRAMES,
+  TEXT_EVERY,
+  wait,
+} from './macro.ts'
 import type { RamCheck, RamRef } from './ram-check.ts'
-
-/** Frames a scripted press holds its buttons: the game reads its pad once per frame. */
-const PRESS_FRAMES = 4
-
-const wait = (frames: number): MacroStep => ({ kind: 'wait', frames })
-const press = (button: Button, frames = PRESS_FRAMES): MacroStep => ({
-  kind: 'press',
-  buttons: [button],
-  frames,
-})
-const mark = (name: string): MacroStep => ({ kind: 'mark', name })
 
 /** Presses A once every `every` frames for `frames` frames: text boxes, one after the other. */
 const mashA = (frames: number, every: number): MacroStep => ({
@@ -24,12 +22,9 @@ const mashA = (frames: number, every: number): MacroStep => ({
   mash: { buttons: ['A'], every, hold: PRESS_FRAMES },
 })
 
-/** The opening runs until Start skips it, at the frame S1 used (just after the logo). */
-const TO_TITLE: MacroStep[] = [wait(1900), press('Start'), wait(600), mark('title')]
-
 /** A press and a short gap, so the next press is a new one: a cursor moves once per press. */
 const TAP_GAP = 8
-const tap = (button: Button): MacroStep[] => [press(button), wait(TAP_GAP)]
+export const tap = (button: Button): MacroStep[] => [press(button), wait(TAP_GAP)]
 const taps = (button: Button, count: number): MacroStep[] =>
   Array.from({ length: count }, () => tap(button)).flat()
 
@@ -99,6 +94,11 @@ const probe = (moves: readonly Button[], frames: number, first: number): MacroSt
 export const PLAYER_X: RamRef = { name: 'player x', address: 0x0223e4da, width: 2 }
 export const PLAYER_Z: RamRef = { name: 'player z', address: 0x0223e4de, width: 2 }
 
+/** The row the lookout walk goes north to (a lamp post blocks the way west there), and the road
+ * north to the gate of Route 19 (src/gen5/trainer-route.ts): our reading of RAM on the spike's
+ * runs. */
+export const LOOKOUT_ROW = 721
+
 /** Holds `button` until the check holds, for at most 600 frames: a walk that stops at a wall
  * fails at its step instead of drifting. */
 const walkUntil = (name: string, button: Button, check: RamCheck): MacroStep => ({
@@ -162,11 +162,11 @@ const HUGH: MacroStep[] = markedMash('hugh', 3, 300, 20)
  * Pokémon Center (walk-73). There Hugh stops IRV (walk-81: he was just in the Pokémon Center)
  * and turns him back (east-04); then east and north past the Pokémon Center to (54, 729).
  * From there the route walks by the player's position. The lookout's triggers lie one level up
- * in one strip of columns, and Bianca stands above them. North to row 721 (a lamp post blocks the
- * way west there), back to row 724, west to the foot of the stairs at x 46 (walk-100 shows them):
- * these three were read from RAM on the spike's runs, and no event of the lookout lies there.
- * Then one row down onto the stairs, west on the landing to the triggers' last column (from
- * `places.hughTrigger`), north up the stairs to the row of Hugh's "the outlook" talk
+ * in one strip of columns, and Bianca stands above them. North to LOOKOUT_ROW (a lamp post
+ * blocks the way west there), back to row 724, west to the foot of the stairs at x 46 (walk-100
+ * shows them): these three were read from RAM on the spike's runs, and no event of the lookout
+ * lies there. Then one row down onto the stairs, west on the landing to the triggers' last column
+ * (from `places.hughTrigger`), north up the stairs to the row of Hugh's "the outlook" talk
  * (`places.outlookTrigger`), north to row 712 (read from RAM, like the first three), west to
  * Bianca's column and north to the row below her (`places.bianca`), and A to talk to her. */
 const north = ({ hughTrigger, outlookTrigger, bianca }: RoutePlaces): MacroStep[] => [
@@ -180,7 +180,7 @@ const north = ({ hughTrigger, outlookTrigger, bianca }: RoutePlaces): MacroStep[
   ...markedMash('east', 4, 150, 20),
   ...probe(['Right', 'Right', 'Right', 'Up', 'Up', 'Up', 'Up', 'Up', 'Up'], 32, 82),
   ...markedMash('north-east', 4, 150, 20),
-  walkUntil('lookout-row', 'Up', { ...PLAYER_Z, atMost: 721 }),
+  walkUntil('lookout-row', 'Up', { ...PLAYER_Z, atMost: LOOKOUT_ROW }),
   mark('lookout-row'),
   walkUntil('plaza', 'Down', { ...PLAYER_Z, oneOf: [724] }),
   mark('plaza'),
@@ -217,13 +217,12 @@ const STARTER: MacroStep[] = [
 
 /** By to-battle-16 Bianca's part is over and more A only repeats her last words, a message that
  * B does not close (a run that mashed B stood there for 600 frames). So the route holds Down
- * with A every 20 frames: A closes her words, and once they close Down turns IRV away from her
- * and walks him south to the row of the trigger that brings Hugh (`places.hughTrigger`), who
- * asks for a battle. Their talk needs A too (B mashed for 9000 frames left it standing). After
- * it Bianca only repeats her call for a battle; the battle starts from its own trigger
- * (`places.battleTrigger`), so the route holds Down with A again until IRV stands on its row.
- * Then A until the battle has its adapter, then no input until the action menu stands
- * (src/gen5/battle-check.ts) for 60 frames: an A there would pick Fight. */
+ * with A every TEXT_EVERY frames: A closes her words, and once they close Down turns IRV away
+ * from her and walks him south to the row of the trigger that brings Hugh
+ * (`places.hughTrigger`), who asks for a battle. Their talk needs A too (B mashed for 9000 frames
+ * left it standing). After it Bianca only repeats her call for a battle; the battle starts from
+ * its own trigger (`places.battleTrigger`), so the route holds Down with A again until IRV
+ * stands on its row. Then the battle's entry that every route shares (src/gen5/battle-entry.ts). */
 const battle = (places: RoutePlaces, checks: readonly RamCheck[]): MacroStep[] => [
   {
     kind: 'until',
@@ -231,7 +230,7 @@ const battle = (places: RoutePlaces, checks: readonly RamCheck[]): MacroStep[] =
     checks: [{ ...PLAYER_Z, oneOf: [places.hughTrigger.z] }],
     holdFor: 1,
     limit: 900,
-    mash: { buttons: ['A'], every: 20, hold: PRESS_FRAMES, held: ['Down'] },
+    mash: { buttons: ['A'], every: TEXT_EVERY, hold: PRESS_FRAMES, held: ['Down'] },
   },
   mark('hugh-trigger'),
   {
@@ -240,20 +239,10 @@ const battle = (places: RoutePlaces, checks: readonly RamCheck[]): MacroStep[] =
     checks: [{ ...PLAYER_Z, oneOf: [places.battleTrigger.z] }],
     holdFor: 1,
     limit: 3000,
-    mash: { buttons: ['A'], every: 20, hold: PRESS_FRAMES, held: ['Down'] },
+    mash: { buttons: ['A'], every: TEXT_EVERY, hold: PRESS_FRAMES, held: ['Down'] },
   },
   mark('battle-trigger'),
-  {
-    kind: 'until',
-    name: 'battle-start',
-    checks: checks.filter((check) => check.mainRamPointer === true),
-    holdFor: 1,
-    limit: 9000,
-    mash: { buttons: ['A'], every: 20, hold: PRESS_FRAMES },
-  },
-  mark('battle-start'),
-  { kind: 'until', name: 'battle', checks, holdFor: 60, limit: 3000 },
-  mark('battle'),
+  ...battleEntry(checks, { start: 9000, battle: 3000 }),
 ]
 
 /** The route from boot to the places of the map's events (scripts/gen5-bw2-field.ts);

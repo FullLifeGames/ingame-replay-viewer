@@ -11,12 +11,20 @@ import { adapterNumbers, adapterWrites } from '../src/gen5/adapter.ts'
 import { battleRefs } from '../src/gen5/battle-check.ts'
 import { singleBattlePos } from '../src/gen5/battle-mons.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
+import { continueRoute } from '../src/gen5/continue-route.ts'
 import { MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import { momentCommands } from '../src/gen5/moment.ts'
 import { newGameRoute } from '../src/gen5/route.ts'
 import { packCommands } from '../src/gen5/server-cmd.ts'
+import { trainerRoute } from '../src/gen5/trainer-route.ts'
 import { checkAdapterLayout, SYMBOL_NAMES } from './gen5-bw2.ts'
 import { placeMatches, reaches, ROUTE_MAP, scriptLabel } from './gen5-bw2-field.ts'
+import {
+  listConstants,
+  SAVE_TRAINER,
+  trainerMatches,
+  trainerScriptOffset,
+} from './gen5-bw2-trainer.ts'
 import { MOMENT_COMMANDS, namesOutsideMainRam, zeroArguments } from './gen5-bw2-report.ts'
 import { listedReader, POKEBW2 } from './gen5-bw2-source.ts'
 import {
@@ -172,5 +180,28 @@ describe.skipIf(!existsSync(FILE))('the Gen 5 code on the generated numbers', ()
     const numbers = real()
     const built = passes(() => newGameRoute(numbers.route, battleRefs(numbers).checks))
     expect(built, 'newGameRoute').toBe(true)
+  })
+
+  it("find the save's trainer in exactly one trainer NPC of his route, looking along his column", () => {
+    const read = listedReader(GEN5_PATHS.pokebw2)
+    const id = listConstants(read(SAVE_TRAINER.trainers))[SAVE_TRAINER.trainer]
+    expect(id !== undefined, `${SAVE_TRAINER.trainer} in the list`).toBe(true)
+    const script = (id ?? 0) + trainerScriptOffset(read(SAVE_TRAINER.script))
+    const hits = trainerMatches(read(SAVE_TRAINER.events), script)
+    expect(hits.length === 1, 'one trainer NPC with his script').toBe(true)
+    const [him] = hits
+    const { saveTrainer } = real()
+    const same = him?.grid.x === saveTrainer.x && him.grid.z === saveTrainer.z
+    expect(same, 'the generated tile is his').toBe(true)
+    expect(['DIR_UP', 'DIR_DOWN'].includes(him?.direction ?? ''), 'he looks up or down').toBe(true)
+  })
+
+  it('build the continue route and the trainer route from the save', () => {
+    const numbers = real()
+    const { checks } = battleRefs(numbers)
+    const built = passes(() => continueRoute(numbers.saveTrainer, checks))
+    expect(built, 'continueRoute').toBe(true)
+    const trainer = passes(() => trainerRoute(numbers.route, numbers.saveTrainer))
+    expect(trainer, 'trainerRoute').toBe(true)
   })
 })

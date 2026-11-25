@@ -107,7 +107,7 @@ export interface TriggerPlace {
 }
 
 /** The tile an NPC of the map's events stands on. */
-interface ActorPlace {
+export interface ActorPlace {
   x: number
   z: number
 }
@@ -135,4 +135,8 @@ export interface Bw2Numbers extends ServerCmdTable {
   adapter: StructLayout
   battle: BattleNumbers
   route: RoutePlaces
+  /** The trainer the shipped save stands before (#78), Youngster Terrell on Route 20: the tile of
+   * his NPC entry, found by his trainer constant (scripts/gen5-bw2-trainer.ts). He looks up along
+   * his column `x`. */
+  saveTrainer: ActorPlace
 }

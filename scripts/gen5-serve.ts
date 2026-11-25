@@ -1,6 +1,6 @@
 // The Gen 5 spike page's servers (#72). By default Vite's dev server on src/web/gen5/, for the
 // shot script, with /emulatorjs/* served from the fetched packages in .cache/gen5/emulatorjs/site/
-// (scripts/gen5-fetch.ts). With --built it builds the page and serves the build instead, for the
+// (scripts/gen5-fetch.ts) and /saves/* from src/web/gen5/saves/ alone. With --built it builds the page and serves the build instead, for the
 // user's own check (scripts/gen5-built.ts). Every answer is cross-origin isolated, which the
 // core's thread build needs. Both bind to 127.0.0.1 unless the command line says --host.
 // Usage: node scripts/gen5-serve.ts [--host] | --built [--host] [--port N]
@@ -10,13 +10,15 @@ import { join } from 'node:path'
 import { createServer, type Plugin, type ViteDevServer } from 'vite'
 
 import { BUILT_PORT, buildGen5Page, builtServerOptions, startBuiltServer } from './gen5-built.ts'
-import { ISOLATION, sendFile, SITE_PREFIX, siteFileFor } from './gen5-files.ts'
+import { SAVES_PREFIX } from '../src/gen5/save-file.ts'
+import { ISOLATION, savesFileFor, sendFile, SITE_PREFIX, siteFileFor } from './gen5-files.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
 /** Lane a's port (plan section 0); Vite moves to the next free one above it if it is taken. */
 const PORT = 5183
 
-/** Vite's own deny list, plus what /@fs/ must never reach: outputs, fetched files, dumps, saves. */
+/** Vite's own deny list, plus what /@fs/ must never reach: outputs, fetched files, dumps, saves.
+ * Vite checks it for files under the root too, so the saves' own middleware answers first. */
 const FS_DENY = [
   '.env',
   '.env.*',
@@ -37,10 +39,21 @@ function serveSiteFile(req: IncomingMessage, res: ServerResponse, next: () => vo
   sendFile(res, siteFileFor(url, GEN5_PATHS.site), url.split('?')[0] ?? '')
 }
 
+function serveSaveFile(req: IncomingMessage, res: ServerResponse, next: () => void): void {
+  const url = req.url ?? ''
+  if (!url.startsWith(SAVES_PREFIX)) {
+    next()
+    return
+  }
+  sendFile(res, savesFileFor(url, GEN5_PATHS.saves), url.split('?')[0] ?? '')
+}
+
+/** Both mounts answer before Vite's own middlewares. */
 const emulatorjsMount: Plugin = {
   name: 'gen5-emulatorjs',
   configureServer(server) {
     server.middlewares.use(serveSiteFile)
+    server.middlewares.use(serveSaveFile)
   },
 }
 
