@@ -18,6 +18,7 @@ export const POKEBW2_FILES: readonly string[] = [
   'src/battle/btl_adapter.c',
   'src/battle/btl_server_cmd.c',
   'src/battle/btl_server.c',
+  'src/battle/btl_main.c',
   'include/battle/btl_adapter.h',
   'include/battle/btl_server_cmd.h',
   'include/battle/btl_server.h',

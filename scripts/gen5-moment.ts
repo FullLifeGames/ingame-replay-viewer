@@ -171,7 +171,7 @@ async function play(page: Page, numbers: Bw2Numbers, scene: SceneName, deadline:
   const battle = await readBattle(page, numbers)
   log(`adapter ${hex(battle.adapter)}, server ${hex(battle.server)}`)
   const std = textId(bank('standard'), 'Bank0019_Text_ItsSuperEffective')
-  const blocks = sceneBlocks(scene, battle, std)
+  const blocks = sceneBlocks(scene, battle, numbers.battle.single, std)
   for (const { name, moment } of blocks) {
     const variant = moment.attacker.monId === battle.near.monId ? 0 : 2
     log(

@@ -71,6 +71,14 @@ export interface ServerCmdTable {
   messages: MessageRules
 }
 
+/** A single battle's clients and the client at each battle position, as its setup assigns them
+ * (BtlMain_SetupAloneSingle). */
+export interface SingleBattle {
+  clientCount: number
+  /** The client ID at each position, by position. */
+  posClientIds: number[]
+}
+
 /** The battle's structs that lead from the server to the Pokémon, some laid out only up to the
  * member the spike reads (`upTo`), and the server's step while it waits for the actions. */
 export interface BattleNumbers {
@@ -86,6 +94,8 @@ export interface BattleNumbers {
   monCore: StructLayout
   /** BTL_SERVER_ACTION_SEQ_WAIT_SELECT. */
   waitSelectSeq: number
+  /** The single battle's setup. */
+  single: SingleBattle
 }
 
 /** The whole of build/gen5/bw2.json. */

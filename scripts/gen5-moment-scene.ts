@@ -6,6 +6,7 @@
 import { Dex } from '@pkmn/dex'
 
 import { type BattleMonReading, singleBattlePos } from '../src/gen5/battle-mons.ts'
+import type { SingleBattle } from '../src/gen5/bw2-numbers.ts'
 import type { Moment } from '../src/gen5/moment.ts'
 
 export type SceneName = 'known' | 'unknown'
@@ -36,12 +37,13 @@ function moveNumber(name: string): number {
 export function sceneBlocks(
   scene: SceneName,
   mons: { near: BattleMonReading; far: BattleMonReading },
+  single: SingleBattle,
   stdMessage: number,
 ): { name: string; moment: Moment }[] {
   const plan = SCENES[scene]
   const side = (mon: BattleMonReading, client: number) => ({
     monId: mon.monId,
-    pos: singleBattlePos(client),
+    pos: singleBattlePos(single, client),
   })
   const near = side(mons.near, NEAR_CLIENT)
   const far = side(mons.far, FAR_CLIENT)

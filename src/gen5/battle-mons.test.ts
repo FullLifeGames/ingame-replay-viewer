@@ -48,6 +48,7 @@ const BATTLE: BattleNumbers = {
     },
   },
   waitSelectSeq: 7,
+  single: { clientCount: 2, posClientIds: [0, 1] },
 }
 const BASE = 0x02000000
 const PROC = 0x021357a0
@@ -136,9 +137,18 @@ describe('frontMon', () => {
   })
 })
 
+// Scene: the moment's positions follow the single battle's setup, not the client ID.
 describe('singleBattlePos', () => {
-  it("puts each client's Pokémon at the position of its client ID", () => {
-    expect([0, 1].map(singleBattlePos)).toEqual([0, 1])
-    expect(() => singleBattlePos(2)).toThrow(/2/)
+  const swapped = { clientCount: 2, posClientIds: [1, 0] }
+
+  it("puts each client's Pokémon at the position its setup gives it", () => {
+    expect([0, 1].map((client) => singleBattlePos(swapped, client))).toEqual([1, 0])
+  })
+
+  it('refuses a client outside the count', () => {
+    expect(() => singleBattlePos(swapped, 2)).toThrow(/client 2/)
+    expect(() => singleBattlePos(swapped, -1)).toThrow(/client -1/)
+    expect(() => singleBattlePos(swapped, 0.5)).toThrow(/client 0.5/)
+    expect(() => singleBattlePos({ clientCount: 2, posClientIds: [1, 1] }, 0)).toThrow(/client 0/)
   })
 })

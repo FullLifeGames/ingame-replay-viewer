@@ -137,6 +137,7 @@ const SOURCES = {
   adapterC: 'src/battle/btl_adapter.c',
   queueC: 'src/battle/btl_server_cmd.c',
   serverC: 'src/battle/btl_server.c',
+  mainC: 'src/battle/btl_main.c',
   adapterH: 'include/battle/btl_adapter.h',
   queueH: 'include/battle/btl_server_cmd.h',
   serverH: 'include/battle/btl_server.h',

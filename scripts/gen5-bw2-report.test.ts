@@ -52,6 +52,7 @@ describe('quietLines', () => {
       party: LAYOUT,
       monCore: LAYOUT,
       waitSelectSeq: 29,
+      single: { clientCount: 2, posClientIds: [0, 1] },
     },
   }
 

@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest'
 
 import { adapterNumbers, adapterWrites } from '../src/gen5/adapter.ts'
 import { battleRefs } from '../src/gen5/battle-check.ts'
+import { singleBattlePos } from '../src/gen5/battle-mons.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import { momentCommands } from '../src/gen5/moment.ts'
@@ -85,12 +86,23 @@ describe.skipIf(!existsSync(FILE))('the Gen 5 code on the generated numbers', ()
     expect(fails).toEqual([])
   })
 
+  it('give each client of the single battle exactly one position, each its own', () => {
+    const { single } = real().battle
+    const clients = Array.from({ length: single.clientCount }, (_, client) => client)
+    const once = clients.filter(
+      (client) => single.posClientIds.filter((id) => id === client).length === 1,
+    )
+    expect(once.length === clients.length, 'each client at exactly one position').toBe(true)
+    const positions = clients.map((client) => singleBattlePos(single, client))
+    expect(new Set(positions).size === clients.length, 'the positions differ').toBe(true)
+  })
+
   it("hand each scene's moments to the adapter, which takes each block", () => {
     const numbers = real()
     const adapter = adapterNumbers(numbers)
     const scenes: SceneName[] = ['known', 'unknown']
     const fails = scenes.flatMap((scene) =>
-      sceneBlocks(scene, MONS, STD_MESSAGE)
+      sceneBlocks(scene, MONS, numbers.battle.single, STD_MESSAGE)
         .filter(({ moment }) => {
           const block = () => packCommands(numbers, momentCommands(moment))
           return !passes(() => adapterWrites(adapter, MAIN_RAM_START, block()))

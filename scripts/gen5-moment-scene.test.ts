@@ -21,6 +21,9 @@ const FAR: BattleMonReading = {
   maxHp: 30,
   level: 9,
 }
+// The single battle's setup as the game writes it, and an invented one in swapped order.
+const SINGLE = { clientCount: 2, posClientIds: [0, 1] }
+const SWAPPED = { clientCount: 2, posClientIds: [1, 0] }
 const BANK = 'Bank_Text_Zero = zero\nBank_Text_One = {0102:0} used\\nOne!\nBank_Text_Two = two\n'
 
 // Scene: the game decides nothing. The first block's HP is one no damage roll of the move gives,
@@ -29,7 +32,7 @@ describe('sceneBlocks', () => {
   const tackle = Dex.forGen(5).moves.get('Tackle').num
 
   it('lets the near Pokémon hit the far one to 1 HP, then the far one answer', () => {
-    const blocks = sceneBlocks('known', { near: NEAR, far: FAR }, 41)
+    const blocks = sceneBlocks('known', { near: NEAR, far: FAR }, SINGLE, 41)
     expect(blocks.map((block) => block.name)).toEqual(['b1', 'b2'])
     expect(blocks[0]?.moment).toEqual({
       attacker: { monId: 4, pos: 0 },
@@ -46,9 +49,17 @@ describe('sceneBlocks', () => {
   })
 
   it('takes moves by their @pkmn/dex numbers in the unknown scene', () => {
-    const moves = sceneBlocks('unknown', { near: NEAR, far: FAR }, 41).map((b) => b.moment.move)
+    const moves = sceneBlocks('unknown', { near: NEAR, far: FAR }, SINGLE, 41).map(
+      (b) => b.moment.move,
+    )
     const dex = Dex.forGen(5).moves
     expect(moves).toEqual([dex.get('Flamethrower').num, dex.get('Hydro Pump').num])
+  })
+
+  it("takes each side's position from the single battle's setup", () => {
+    const [b1] = sceneBlocks('known', { near: NEAR, far: FAR }, SWAPPED, 41)
+    expect(b1?.moment.attacker).toEqual({ monId: 4, pos: 1 })
+    expect(b1?.moment.target).toMatchObject({ monId: 9, pos: 0 })
   })
 })
 
