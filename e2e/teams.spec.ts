@@ -1,6 +1,7 @@
 // The team list under the game (#87): a replay that opens with Team Preview lists both teams of
 // six, the far side first and each side in the log's order, on a phone-wide screen without a
-// sideways scroll. A replay without Team Preview hides the list. The page needs no dump for this.
+// sideways scroll. Both lists start level when one heading wraps.
+// A replay without Team Preview hides the list. The page needs no dump for this.
 import { expect, type Page, test } from '@playwright/test'
 
 import { scrollWidth } from './page-text.ts'
@@ -19,6 +20,13 @@ const teams = (page: Page) => ({
   farMembers: page.locator('#teams-far-members li'),
   nearMembers: page.locator('#teams-near-members li'),
 })
+
+/** Where an element's top sits in the viewport, in CSS pixels. */
+async function topOf(page: Page, selector: string): Promise<number> {
+  const box = await page.locator(selector).boundingBox()
+  if (box === null) throw new Error(`${selector} is not on the page`)
+  return box.y
+}
 
 test('a Gen 5 pick lists both teams of six under the game, and a Gen 3 pick hides them', async ({
   page,
@@ -59,4 +67,16 @@ test('a Gen 5 pick lists both teams of six under the game, and a Gen 3 pick hide
   await expect(page.locator('#panel-far')).toHaveText('Far side: xXEricXx')
   await expect(list).toBeHidden()
   expect(notSameOriginGets).toEqual([])
+})
+
+test('both lists start level when the near heading wraps to two lines', async ({ page }) => {
+  await page.goto('/')
+  await page.getByLabel('Example replay').selectOption(GEN5)
+  const { list, near } = teams(page)
+  await expect(list).toBeVisible()
+  await expect(near).toHaveText('Near side: tizio potente ao')
+  const far = await topOf(page, '#teams-far-members li:first-child')
+  const nearTop = await topOf(page, '#teams-near-members li:first-child')
+  expect(Math.abs(far - nearTop)).toBeLessThanOrEqual(1)
+  expect(await scrollWidth(page)).toBeLessThanOrEqual(WIDTH)
 })

@@ -44,6 +44,13 @@
         grid-column: 1 / -1;
         margin: 0.5em 0 0;
       }
+      /* Each column spans the grid's heading row and list row, so a heading that wraps pushes both
+         lists down alike. */
+      #teams > div {
+        display: grid;
+        grid-row: span 2;
+        grid-template-rows: subgrid;
+      }
       #teams ol {
         margin: 0;
         padding-left: 1.5em;
