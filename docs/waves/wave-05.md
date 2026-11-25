@@ -4,8 +4,8 @@ Issues #65 to #71 of milestone M2 and #72 of milestone M6. The user set the cour
 
 - #73 (S1, lane b, merge 0dca220, 24.11.2026, closes #65)
 - #74 (lane a, the Gen 5 spike, merge 4e43940, 24.11.2026, closes #72)
-- #81 (S2, lane b, open, head f03a9f2, closes #66, #67, #68)
-- #82 (S3, lane b, open, head 2250a1c, stacked on #81, closes #70 and #71, builds #69 except the emulator page's line after END)
+- #81 (S2, lane b, merge 0a083e9, 25.11.2026, closes #66, #67, #68)
+- #82 (S3, lane b, merge 75d0858, 25.11.2026, closes #70 and #71, builds #69 except the emulator page's line after END; #69 closed by hand, and that line moved to #90)
 
 `wave/05` started from `master` at db7c612 (wave 4 merged) on 24.11.2026. Its first commit (24ed714) records the wave 4 gate in wave 4's booking, the plan and ADR 0003. Lane b, the cleanup, ran three stages on `wave/05-s1b`, `wave/05-s2b` and `wave/05-s3b`; each merged into `wave/05` and froze there as `wave/05-s<k>`. Lane a, the spike, ran beside stages 1 and 2 on `wave/05-s1a` and reached `master` as one squashed commit (W5-43). The working files sit under `.waves/05/` (gitignored); this booking keeps what lasts.
 
@@ -184,14 +184,14 @@ Each entry gives the choice and, where they were weighed, the scene, the options
 
 ## Gate
 
-State on 25.11.2026, before the gate:
+State on 25.11.2026, after the gate:
 
-| Stage  | Lane | Issues        | Pull request | State                                                     |
-| ------ | ---- | ------------- | ------------ | --------------------------------------------------------- |
-| S1     | b    | #65           | #73          | merged, 0dca220                                           |
-| S1, S2 | a    | #72           | #74          | merged, 4e43940                                           |
-| S2     | b    | #66, #67, #68 | #81          | open; #68's third criterion met in part                   |
-| S3     | b    | #69, #70, #71 | #82          | open, stacked on #81; #69 built except the line after END |
+| Stage  | Lane | Issues        | Pull request | State                                                |
+| ------ | ---- | ------------- | ------------ | ---------------------------------------------------- |
+| S1     | b    | #65           | #73          | merged, 0dca220                                      |
+| S1, S2 | a    | #72           | #74          | merged, 4e43940                                      |
+| S2     | b    | #66, #67, #68 | #81          | merged, 0a083e9; #68's third criterion met in part   |
+| S3     | b    | #69, #70, #71 | #82          | merged, 75d0858; #69 built except the line after END |
 
 The user's answers during the wave:
 
@@ -207,16 +207,29 @@ The user's answers during the wave:
   9. a: delete the spike's savestates except eight.
 - Asked which reading of a request for review pages they meant, the user answered "A standing rule". AGENTS.md carries it.
 
-Asked on review pages, open:
+The gate (25.11.2026). The stage 2 page, the stage 3 page and a gate page each put their questions; the user then asked for one page ("I don't want to have 4 review pages, give me only one"), and one page with 15 questions replaced them. The answers, all given on that page:
 
-- The stage 2 page (24.11.2026), six questions: the merge of #81; #68's third criterion; patch 0011; pokebw2's numbers in the write-up (W5-50); three small fixes found in the stage (the Start-twice test, the "Not shown" row at phone width, "the backend" in a census reason); the outro of a replay without a winner.
-- The stage 3 page (25.11.2026), five questions: the merge of #82; the emulator page's line after a replay's end; the labels in the example list; four wording points for one small fix; a written diagnosis of the frame gap between the engines.
+1. The cleanup pull requests, a: merge #81 at f03a9f2, then #82 at 2250a1c. Merged as 0a083e9 and 75d0858; master's CI passed on both.
+2. How a Black 2 battle starts, b: start the trainer battle directly through a small injected routine, the fallback ADR 0007 names. Note: "I mean, this trainer approach and going isn't practical in any way shape or form. It should be exactly like in Gen 3, just starting the battle. What about save states or injecting it?" Wave 6 plans it.
+3. #68's third criterion, a: #68 closes with #81, and the gap between the engines stays with the frame-gap diagnosis.
+4. Patch 0011, a: drop it as a small fix (#91).
+5. The outro of a replay without a winner, a: clear the text box when that outro starts (#91).
+6. pokebw2's values in the Gen 5 write-up, a: replace all of them with their names, the planner's wider list. #77 closes with that edit in wave 6.
+7. The emulator page's line after a replay's end, a: "Started …" in place of "Running …" (#90). #69 closed.
+8. The labels in the example list, a: keep them as built.
+9. The frame gap between the engines, a: a written diagnosis first; its result becomes the issue.
+10. Three public CI logs with six sizes, a: leave them.
+11. Newer formats, a: by generation. Gen 4 opens with its OU test replay, and every Gen 4 singles format plays from then on.
+12. Team Preview, a: keep the intro and list each side's six under the game, beside the panel (#87).
+13. The four proposals for milestone 3, b: all four become issues (#86 to #89).
+14. The Gen 3 lane's order in wave 6, a: the first Gen 4 and Gen 5 replays (#86, #87), then the small fixes.
+15. The small fixes and rests, a: all of them. #90 holds the pages' fixes, #91 the ROM's, #92 the developers', #93 the Gen 5 moment script's, and #94 the written diagnosis of the skipped sound. The move names that Black 2 spells its own way join the Gen 5 backend's first issue. One item of the page's list was already built: stage 3 replaced the browser test that flipped with timing, so no issue holds it.
 
 Still waiting for the user: the phone runs for #47 and #49, the device checks of #56 to #59, two saved files for #56, #59's report link against the issue form, and the speed figures for the Gen 5 page (answer 8b).
 
 ## The next wave
 
-A planner has cut wave 6 for the gate: the first newer format on Gen 3, the Gen 5 issues #75 to #79, and a batch of small fixes. For the gate's pictures, a tester played a Gen 4, a Gen 5 and a Gen 9 OU replay in a page built with the newest generation raised to 9 as an uncommitted line (W5-58); the gate records the results. The gate decides the cut, and its answers go into this booking.
+A planner has cut wave 6 for the gate: the first newer format on Gen 3, the Gen 5 issues #75 to #79, and a batch of small fixes. For the gate's pictures, a tester played a Gen 4, a Gen 5 and a Gen 9 OU replay in a page built with the newest generation raised to 9 as an uncommitted line (W5-58); the gate records the results. The gate decided the cut (answers 11 to 15 above): the Gen 3 lane of wave 6 builds #86 and #87, then the small fixes #90 to #92; #88 and #89 follow. The rests below that no answer names stay rests.
 
 ## Rests
 
