@@ -94,4 +94,14 @@ describe('the audio opener', () => {
     expect(log).toEqual(['resume'])
     await expect(again).resolves.toBe('the audio did not start: refused for the test')
   })
+
+  // #69: Play's resume that the browser refuses shows a line, and the game plays on without sound.
+  it('says why the sound stays off when the browser refuses a later resume', async () => {
+    const log: string[] = []
+    const context = fakeContext(log)
+    const audio = opener(log, context)
+    await audio.open()
+    context.resume = () => Promise.reject(new Error('refused for the test'))
+    await expect(audio.resumeNow()).resolves.toBe('the audio did not resume: refused for the test')
+  })
 })

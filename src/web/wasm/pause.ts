@@ -1,6 +1,7 @@
 // The viewer's Pause and Play (#57): the button's state, the Space rule and the toggle. DOM-free,
 // so a Node spec holds it; main.ts wires the button, the key and the draw loop to it. The pause
 // itself lives in the clock (clock.ts), so the page asks the clock whether a run stands paused.
+import { runningLine } from '../status'
 import type { AudioOpener } from './audio-opener'
 import type { TickClock } from './clock'
 import { grant, readStatus } from './protocol'
@@ -63,37 +64,49 @@ export function spaceToggles(press: KeyPress, run: PausedRun | undefined): boole
   return press.key === ' ' && plain && !ownsSpace(press.target)
 }
 
+/** A run as the toggle sees it: the pause's run, with the id of the replay it plays. */
+export interface ToggledRun extends PausedRun {
+  readonly id: string
+}
+
 /**
  * Pauses a playing run at the frame its game reports and suspends the sound, or plays a paused run
  * on: the sound resumes first, inside the caller's click, then the clock counts on. Writes the
- * grant at once, so the worker stops or goes on before the next animation frame. Returns the
- * sound's promise; nothing happens before the first run or once the run reached END.
+ * grant at once, so the worker stops or goes on before the next animation frame. Nothing happens
+ * before the first run or once the run reached END. Resolves with the status line for a Play whose
+ * resume the browser refused (#69): the game plays on without sound, and the line says why. A
+ * refused suspend gives no line, since the clock holds the game anyway (S5-16).
  */
 export function togglePause(
-  run: PausedRun | undefined,
+  run: ToggledRun | undefined,
   audio: Pick<AudioOpener, 'resumeNow' | 'suspend'>,
   now: number,
-): Promise<void> {
-  if (run === undefined || reachedEnd(run)) return Promise.resolve()
+): Promise<string | undefined> {
+  if (run === undefined || reachedEnd(run)) return Promise.resolve(undefined)
   const { frame } = readStatus(run.control)
   if (!run.clock.paused) {
     grant(run.control, run.clock.pause(frame))
-    return audio.suspend()
+    return audio.suspend().then(
+      () => undefined,
+      () => undefined,
+    )
   }
   const resumed = audio.resumeNow()
   run.clock.play(now)
   grant(run.control, run.clock.allowed(now, frame))
-  return resumed
+  return resumed.then((silence) =>
+    silence === undefined ? undefined : runningLine(run, { silence }),
+  )
 }
 
 /**
  * Asks the sound back for a run that Start or Restart put in place, unless it stands paused: a
- * Pause pressed for the old run while the new one waited suspended the shared sound. Returns the
- * sound's promise.
+ * Pause pressed for the old run while the new one waited suspended the shared sound. Resolves as
+ * resumeNow does.
  */
 export function soundForNewRun(
   run: Pick<PausedRun, 'clock'>,
   audio: Pick<AudioOpener, 'resumeNow'>,
-): Promise<void> {
-  return run.clock.paused ? Promise.resolve() : audio.resumeNow()
+): Promise<string | undefined> {
+  return run.clock.paused ? Promise.resolve(undefined) : audio.resumeNow()
 }

@@ -111,6 +111,17 @@ const playingId = (run: NamedRun | undefined): string | undefined =>
     ? undefined
     : run.id
 
+/**
+ * Pauses or plays the current run. Resolves with the line for a refused resume while that run is
+ * still the current one (#69).
+ */
+function toggleCurrent(runs: Runs<NamedRun>, audio: AudioOpener): Promise<string | undefined> {
+  const run = runs.current
+  return togglePause(run, audio, performance.now()).then((line) =>
+    runs.current === run ? line : undefined,
+  )
+}
+
 /** The newest pick's stream with its replay's id: what the list under the game describes. */
 async function pickedStream(choice: ReplayChoice): Promise<ListedPick | undefined> {
   const chosen = await choice.chosen()
@@ -146,8 +157,8 @@ function createViewer(view: WasmView) {
       if (runs.current === run) view.failure(failure, place)
     })
     runs.replace(run)
-    // A refused resume shows no line, as for Play (S5-16).
-    soundForNewRun(run, audio).catch(() => undefined)
+    // A refused resume here shows no line: the Start's own line follows at once (S5-16).
+    void soundForNewRun(run, audio)
     return run
   }
 
@@ -181,7 +192,7 @@ function createViewer(view: WasmView) {
     restart: () => play(last),
     changeSpeed,
     /** Pauses or plays the current run; the sound's call runs inside the caller's event. */
-    togglePause: () => togglePause(runs.current, audio, performance.now()),
+    togglePause: () => toggleCurrent(runs, audio),
     spaceToggles: (press: KeyPress) => spaceToggles(press, runs.current),
     /** The test hook of e2e/wasm-play.spec.ts: the run's status, its sound and the run counts. */
     status: () =>
@@ -205,12 +216,15 @@ function act(view: WasmView, work: () => Promise<string | undefined>): void {
 
 /**
  * The Pause button and the Space key (#57). Both call the toggle in their own event, with no
- * `act`, so the sound resumes inside it. A refused suspend or resume shows no line: the clock
- * holds or plays the game, and the next press asks the audio again (S5-16).
+ * `act`, so the sound resumes inside it. A refused resume on Play shows the line that the game
+ * plays on without sound (#69); a refused suspend shows none (S5-16). The clock holds or plays the
+ * game either way, and the next press asks the audio again.
  */
 function wirePause(viewer: Viewer, view: WasmView): void {
   const toggle = () => {
-    viewer.togglePause().catch(() => undefined)
+    void viewer.togglePause().then((line) => {
+      if (line !== undefined) view.status(line)
+    })
   }
   view.pause.addEventListener('click', toggle)
   document.addEventListener('keydown', (event) => {

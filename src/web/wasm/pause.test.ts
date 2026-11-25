@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { AudioOpener } from './audio-opener'
 import { TickClock } from './clock'
 import { pauseButton, soundForNewRun, spaceToggles, togglePause } from './pause'
 import { CONTROL, createShared, readStatus, writeStatus } from './protocol'
@@ -12,7 +13,7 @@ function playing(speed: '1x' | 'fast' = '1x') {
   for (let now = 0; now <= 1000; now += 16) clock.allowed(now, 0)
   const control = new Int32Array(createShared(16).control)
   writeStatus(control, 40, progress)
-  return { clock, control }
+  return { id: 'hand-made', clock, control }
 }
 
 /** A run whose game reached END: its interpreter reported finished at frame 2916. */
@@ -27,7 +28,7 @@ function fakeAudio(log: string[]) {
   return {
     resumeNow: () => {
       log.push('resumeNow')
-      return Promise.resolve()
+      return Promise.resolve(undefined)
     },
     suspend: () => {
       log.push('suspend')
@@ -183,10 +184,37 @@ describe('the toggle', () => {
     expect(log).toEqual([])
   })
 
-  it('hands on the promise of the sound', async () => {
+  // S5-16: a refused suspend shows no line; the clock holds the game, and the next press asks again.
+  it('gives no line for a refused suspend', async () => {
     const run = playing()
     const audio = { ...fakeAudio([]), suspend: () => Promise.reject(new Error('refused')) }
-    await expect(togglePause(run, audio, 1500)).rejects.toThrow('refused')
+    await expect(togglePause(run, audio, 1500)).resolves.toBeUndefined()
+    expect(run.clock.paused).toBe(true)
+  })
+
+  it('gives no line for a Play whose sound resumes', async () => {
+    const run = playing()
+    await togglePause(run, fakeAudio([]), 1500)
+    await expect(togglePause(run, fakeAudio([]), 9000)).resolves.toBeUndefined()
+  })
+
+  // #69: an audio context whose resume() the browser refuses on Play. The game plays on without
+  // sound, and the page shows the line that says why.
+  it('plays the run on without sound when the browser refuses the resume, and gives the line', async () => {
+    const context = {
+      resume: () => Promise.resolve(),
+      suspend: () => Promise.resolve(),
+    }
+    const audio = new AudioOpener(() => Promise.resolve(context as unknown as AudioContext))
+    await audio.open()
+    const run = playing()
+    await togglePause(run, audio, 1500)
+    context.resume = () => Promise.reject(new Error('refused for the test'))
+    await expect(togglePause(run, audio, 9000)).resolves.toBe(
+      'Running hand-made. It plays without sound: the audio did not resume: refused for the test.',
+    )
+    expect(run.clock.paused).toBe(false)
+    expect(run.clock.allowed(10_000, 41)).toBe(40 + 59)
   })
 })
 
