@@ -1,4 +1,4 @@
-// One run of the game on the WebAssembly spike page (#35): the module built from the dump, the
+// One run of the game on the viewer (#35): the module built from the dump, the
 // worker, the shared buffers, the tick clock and the sound. main.ts holds the page's state and
 // starts and stops runs through this file. The e2e covers it, as it covers the page's wiring.
 import { applyBps } from '../../patch/bps-apply'
@@ -7,26 +7,19 @@ import { fetchBytes, fetchJson } from '../fetch'
 import { messageOf } from '../message'
 import { checkBaseRom, readSlotDescription } from '../rom'
 import { ROM_FILES } from '../rom-files'
-import { silenceText } from '../status'
-import {
-  AUDIO_PROCESSOR,
-  AUDIO_STOP,
-  AudioMeter,
-  type AudioProcessorOptions,
-  soundLine,
-} from './audio'
+import { AUDIO_PROCESSOR, AUDIO_STOP, AudioMeter, type AudioProcessorOptions } from './audio'
 import type { Sound } from './audio-opener'
 import workletUrl from './audio-worklet.ts?worker&url'
 import { TickClock } from './clock'
 import { buildFailure, type FailedReport, RunFailure, workerFailure } from './failures'
 import { WASM_FILES } from './files'
 import type { StartMessage, WorkerReport } from './messages'
+import type { Speakers } from './pause'
 import {
   createShared,
   GBA_FRAMES_PER_SECOND,
   MIXER_RATE,
   readStatus,
-  type RunStatus,
   type Speed,
   speedAtEnd,
   writePace,
@@ -63,6 +56,8 @@ export interface Run {
   readonly clock: TickClock
   readonly ring: AudioRing
   readonly output: AudioWorkletNode | undefined
+  /** The processor's link to the speakers, which a Start during the run's pause cuts first. */
+  readonly speakers: Speakers
   /** Why the run plays without sound; undefined when it has sound. */
   readonly silence: string | undefined
   readonly startedAt: number
@@ -115,6 +110,24 @@ function connectRing(sound: Sound, ring: SharedArrayBuffer) {
   }
 }
 
+/** The processor's link to the speakers; nothing to cut for a run without sound. */
+function speakersOf(output: AudioWorkletNode | undefined): Speakers {
+  let muted = false
+  return {
+    get muted() {
+      return muted
+    },
+    mute: () => {
+      muted = true
+      output?.disconnect()
+    },
+    unmute: () => {
+      muted = false
+      output?.connect(output.context.destination)
+    },
+  }
+}
+
 /** Starts a run. The sound is connected before the worker exists, so nothing fails in between. */
 export function startRun(built: Built, picked: Picked, speed: Speed, sound: Sound): Run {
   const buffers = createShared(AUDIO_CAPACITY)
@@ -138,6 +151,7 @@ export function startRun(built: Built, picked: Picked, speed: Speed, sound: Soun
     clock: new TickClock(speed, now),
     ring: new AudioRing(buffers.audio),
     output,
+    speakers: speakersOf(output),
     silence,
     startedAt: now,
     finishedMs: undefined,
@@ -177,19 +191,6 @@ export function reachEnd(run: Run, now: number): Speed {
   return speedAtEnd(run.clock.speed)
 }
 
-/** The run's progress, with the sound's skips and dry spells while it has sound (#47). */
-export const progressLine = (status: RunStatus, run: Run): string => {
-  const finished =
-    run.finishedMs === undefined
-      ? ''
-      : ` Finished at frame ${String(status.finishedAt)} after ${(run.finishedMs / 1000).toFixed(1)} s.`
-  const sound = run.output === undefined ? '' : ` ${soundLine(run.ring)}`
-  return `Frame ${String(status.frame)}, instruction ${String(status.done)} of ${String(status.total)}, turn ${String(status.turn)}.${finished}${sound}`
-}
-
-export const runningLine = (picked: Picked, run: Run): string =>
-  `Running ${picked.id}: ${String(picked.stream.length)} bytes of instruction stream.${silenceText(run.silence, 'plays')}`
-
 /** The sound's numbers for the test hook: what went through the ring and how loud it was. */
 function audioStatus(run: Run) {
   const { ring } = run
@@ -211,7 +212,7 @@ function audioStatus(run: Run) {
   }
 }
 
-/** The test hook's view of a run (e2e/wasm-spike.spec.ts). */
+/** The test hook's view of a run (e2e/wasm-play.spec.ts). */
 export function hookStatus(run: Run) {
   return {
     ...readStatus(run.control),

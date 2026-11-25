@@ -1,0 +1,3227 @@
+{"length":40334,"crc32":"f09b8449","trainers":{"near":{"name":"NewbiePlsForgiveMe","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"joltylocks","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":230,"maxHp":100,"level":81,"gender":"male","shiny":false,"nickname":"Kingdra"},{"species":260,"maxHp":100,"level":78,"gender":"male","shiny":false,"nickname":"Swampert"},{"species":213,"maxHp":100,"level":98,"gender":"female","shiny":false,"nickname":"Shuckle"},{"species":164,"maxHp":100,"level":94,"gender":"male","shiny":false,"nickname":"Noctowl"},{"species":53,"maxHp":100,"level":87,"gender":"female","shiny":false,"nickname":"Persian"},{"species":181,"maxHp":100,"level":82,"gender":"male","shiny":false,"nickname":"Ampharos"}],"far":[{"species":195,"maxHp":100,"level":84,"gender":"male","shiny":false,"nickname":"Quagsire"},{"species":45,"maxHp":100,"level":84,"gender":"female","shiny":false,"nickname":"Vileplume"},{"species":335,"maxHp":100,"level":78,"gender":"female","shiny":false,"nickname":"Zangoose"},{"species":198,"maxHp":100,"level":90,"gender":"male","shiny":false,"nickname":"Murkrow"},{"species":235,"maxHp":100,"level":89,"gender":"female","shiny":false,"nickname":"Smeargle"},{"species":193,"maxHp":100,"level":93,"gender":"male","shiny":false,"nickname":"Yanma"}]}}
+{"line":22,"op":"intro"}
+{"line":22,"op":"print","text":"You are challenged by joltylocks!"}
+{"line":24,"op":"print","text":"joltylocks sent out Quagsire!"}
+{"line":24,"op":"sendOut","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":23,"op":"print","text":"Go! Kingdra!"}
+{"line":23,"op":"sendOut","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":25,"op":"turn","number":1}
+{"line":28,"op":"print","text":"Kingdra, come back!"}
+{"line":28,"op":"withdraw","side":"near"}
+{"line":28,"op":"print","text":"Go! Swampert!"}
+{"line":28,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":29,"op":"print","text":"The opposing Quagsire used Toxic!"}
+{"line":29,"op":"move","user":"far","target":"near","move":92,"animTurn":0}
+{"line":30,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":30,"op":"print","text":"Swampert was badly poisoned!"}
+{"line":30,"op":"status","side":"near","slot":1,"status":"tox"}
+{"line":32,"op":"print","text":"Swampert was hurt by its poisoning!"}
+{"line":32,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":32,"op":"hp","side":"near","hp":94}
+{"line":34,"op":"turn","number":2}
+{"line":37,"op":"print","text":"The opposing Quagsire used Protect!"}
+{"line":37,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
+{"line":38,"op":"print","text":"The opposing Quagsire protected itself!"}
+{"line":39,"op":"print","text":"Swampert used Earthquake!"}
+{"line":40,"op":"print","text":"The opposing Quagsire protected itself!"}
+{"line":42,"op":"itemPopUp","side":"near","item":472}
+{"line":42,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":42,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":42,"op":"hp","side":"near","hp":100}
+{"line":43,"op":"print","text":"Swampert was hurt by its poisoning!"}
+{"line":43,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":43,"op":"hp","side":"near","hp":88}
+{"line":45,"op":"turn","number":3}
+{"line":48,"op":"print","text":"joltylocks withdrew Quagsire!"}
+{"line":48,"op":"withdraw","side":"far"}
+{"line":48,"op":"print","text":"joltylocks sent out Vileplume!"}
+{"line":48,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":49,"op":"print","text":"Swampert used Toxic!"}
+{"line":50,"op":"print","text":"It doesn't affect the opposing Vileplume…"}
+{"line":52,"op":"itemPopUp","side":"near","item":472}
+{"line":52,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":52,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":52,"op":"hp","side":"near","hp":94}
+{"line":53,"op":"print","text":"Swampert was hurt by its poisoning!"}
+{"line":53,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":53,"op":"hp","side":"near","hp":76}
+{"line":55,"op":"turn","number":4}
+{"line":58,"op":"print","text":"Swampert, come back!"}
+{"line":58,"op":"withdraw","side":"near"}
+{"line":58,"op":"print","text":"Go! Shuckle!"}
+{"line":58,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":59,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":60,"op":"print","text":"Shuckle avoided the attack!"}
+{"line":63,"op":"turn","number":5}
+{"line":66,"op":"print","text":"Shuckle, come back!"}
+{"line":66,"op":"withdraw","side":"near"}
+{"line":66,"op":"print","text":"Go! Noctowl!"}
+{"line":66,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":67,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":68,"op":"ability","side":"near","ability":15,"show":true}
+{"line":68,"op":"print","text":"It doesn't affect Noctowl…"}
+{"line":68,"op":"ability","side":"near","ability":15,"show":false}
+{"line":71,"op":"turn","number":6}
+{"line":74,"op":"print","text":"joltylocks withdrew Vileplume!"}
+{"line":74,"op":"withdraw","side":"far"}
+{"line":74,"op":"print","text":"joltylocks sent out Zangoose!"}
+{"line":74,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":75,"op":"print","text":"Noctowl used Hypnosis!"}
+{"line":75,"op":"move","user":"near","target":"far","move":95,"animTurn":0}
+{"line":76,"op":"anim","side":"far","anim":"statusSlp"}
+{"line":76,"op":"print","text":"The opposing Zangoose fell asleep!"}
+{"line":76,"op":"status","side":"far","slot":2,"status":"slp"}
+{"line":79,"op":"turn","number":7}
+{"line":82,"op":"print","text":"joltylocks withdrew Zangoose!"}
+{"line":82,"op":"withdraw","side":"far"}
+{"line":82,"op":"print","text":"joltylocks sent out Murkrow!"}
+{"line":82,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":83,"op":"print","text":"Noctowl used Return!"}
+{"line":83,"op":"move","user":"near","target":"far","move":216,"animTurn":0}
+{"line":84,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":84,"op":"hp","side":"far","hp":46}
+{"line":86,"op":"itemPopUp","side":"far","item":472}
+{"line":86,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":86,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":86,"op":"hp","side":"far","hp":52}
+{"line":88,"op":"turn","number":8}
+{"line":91,"op":"print","text":"The opposing Murkrow used Toxic!"}
+{"line":91,"op":"move","user":"far","target":"near","move":92,"animTurn":0}
+{"line":92,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":92,"op":"print","text":"Noctowl was badly poisoned!"}
+{"line":92,"op":"status","side":"near","slot":3,"status":"tox"}
+{"line":93,"op":"print","text":"Noctowl used Return!"}
+{"line":93,"op":"move","user":"near","target":"far","move":216,"animTurn":0}
+{"line":94,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":94,"op":"hp","side":"far","hp":3}
+{"line":96,"op":"itemPopUp","side":"far","item":472}
+{"line":96,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":96,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":96,"op":"hp","side":"far","hp":9}
+{"line":97,"op":"print","text":"Noctowl was hurt by its poisoning!"}
+{"line":97,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":97,"op":"hp","side":"near","hp":94}
+{"line":99,"op":"turn","number":9}
+{"line":102,"op":"print","text":"Noctowl, come back!"}
+{"line":102,"op":"withdraw","side":"near"}
+{"line":102,"op":"print","text":"Go! Shuckle!"}
+{"line":102,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":103,"op":"print","text":"The opposing Murkrow used Drill Peck!"}
+{"line":103,"op":"move","user":"far","target":"near","move":65,"animTurn":0}
+{"line":104,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":104,"op":"hp","side":"near","hp":82}
+{"line":106,"op":"itemPopUp","side":"far","item":472}
+{"line":106,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":106,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":106,"op":"hp","side":"far","hp":15}
+{"line":107,"op":"itemPopUp","side":"near","item":472}
+{"line":107,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":107,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":107,"op":"hp","side":"near","hp":88}
+{"line":109,"op":"turn","number":10}
+{"line":112,"op":"print","text":"The opposing Murkrow used Toxic!"}
+{"line":112,"op":"move","user":"far","target":"near","move":92,"animTurn":0}
+{"line":113,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":113,"op":"print","text":"Shuckle was badly poisoned!"}
+{"line":113,"op":"status","side":"near","slot":2,"status":"tox"}
+{"line":114,"op":"print","text":"Shuckle used Wrap!"}
+{"line":114,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":115,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":115,"op":"hp","side":"far","hp":12}
+{"line":116,"op":"print","text":"The opposing Murkrow was wrapped by Shuckle!"}
+{"line":118,"op":"itemPopUp","side":"far","item":472}
+{"line":118,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":118,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":118,"op":"hp","side":"far","hp":18}
+{"line":119,"op":"trapTurn","side":"far","move":35}
+{"line":119,"op":"print","text":"The opposing Murkrow is hurt by Wrap!"}
+{"line":119,"op":"hp","side":"far","hp":12}
+{"line":120,"op":"itemPopUp","side":"near","item":472}
+{"line":120,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":120,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":120,"op":"hp","side":"near","hp":94}
+{"line":121,"op":"print","text":"Shuckle was hurt by its poisoning!"}
+{"line":121,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":121,"op":"hp","side":"near","hp":88}
+{"line":123,"op":"turn","number":11}
+{"line":126,"op":"print","text":"The opposing Murkrow used Drill Peck!"}
+{"line":126,"op":"move","user":"far","target":"near","move":65,"animTurn":0}
+{"line":127,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":127,"op":"hp","side":"near","hp":72}
+{"line":128,"op":"print","text":"Shuckle used Toxic!"}
+{"line":128,"op":"move","user":"near","target":"far","move":92,"animTurn":0}
+{"line":129,"op":"anim","side":"far","anim":"statusPsn"}
+{"line":129,"op":"print","text":"The opposing Murkrow was badly poisoned!"}
+{"line":129,"op":"status","side":"far","slot":3,"status":"tox"}
+{"line":131,"op":"itemPopUp","side":"far","item":472}
+{"line":131,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":131,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":131,"op":"hp","side":"far","hp":18}
+{"line":132,"op":"print","text":"The opposing Murkrow was hurt by its poisoning!"}
+{"line":132,"op":"anim","side":"far","anim":"statusPsn"}
+{"line":132,"op":"hp","side":"far","hp":12}
+{"line":133,"op":"trapTurn","side":"far","move":35}
+{"line":133,"op":"print","text":"The opposing Murkrow is hurt by Wrap!"}
+{"line":133,"op":"hp","side":"far","hp":6}
+{"line":134,"op":"itemPopUp","side":"near","item":472}
+{"line":134,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":134,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":134,"op":"hp","side":"near","hp":78}
+{"line":135,"op":"print","text":"Shuckle was hurt by its poisoning!"}
+{"line":135,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":135,"op":"hp","side":"near","hp":66}
+{"line":137,"op":"turn","number":12}
+{"line":140,"op":"print","text":"The opposing Murkrow used Drill Peck!"}
+{"line":140,"op":"move","user":"far","target":"near","move":65,"animTurn":0}
+{"line":141,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":141,"op":"hp","side":"near","hp":47}
+{"line":142,"op":"print","text":"Shuckle used Rest!"}
+{"line":142,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":143,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":143,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":144,"op":"hp","side":"near","hp":100}
+{"line":146,"op":"itemPopUp","side":"far","item":472}
+{"line":146,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":146,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":146,"op":"hp","side":"far","hp":12}
+{"line":147,"op":"print","text":"The opposing Murkrow was hurt by its poisoning!"}
+{"line":147,"op":"anim","side":"far","anim":"statusPsn"}
+{"line":147,"op":"hp","side":"far","hp":0}
+{"line":148,"op":"faint","side":"far"}
+{"line":148,"op":"print","text":"The opposing Murkrow fainted!"}
+{"line":152,"op":"print","text":"joltylocks sent out Smeargle!"}
+{"line":152,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":153,"op":"turn","number":13}
+{"line":156,"op":"print","text":"Shuckle, come back!"}
+{"line":156,"op":"withdraw","side":"near"}
+{"line":156,"op":"print","text":"Go! Persian!"}
+{"line":156,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":157,"op":"print","text":"The opposing Smeargle used Spikes!"}
+{"line":157,"op":"move","user":"far","target":"near","move":191,"animTurn":0}
+{"line":158,"op":"print","text":"Spikes were scattered on the ground all around your side!"}
+{"line":161,"op":"turn","number":14}
+{"line":164,"op":"print","text":"Persian used Substitute!"}
+{"line":164,"op":"move","user":"near","target":"near","move":164,"animTurn":0}
+{"line":165,"op":"volatile","side":"near","volatile":"substitute","on":true}
+{"line":166,"op":"hp","side":"near","hp":75}
+{"line":165,"op":"print","text":"Persian put in a substitute!"}
+{"line":167,"op":"print","text":"The opposing Smeargle used Spore!"}
+{"line":168,"op":"print","text":"But it failed!"}
+{"line":171,"op":"turn","number":15}
+{"line":174,"op":"print","text":"Persian used Return!"}
+{"line":174,"op":"move","user":"near","target":"far","move":216,"animTurn":0}
+{"line":175,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":175,"op":"hp","side":"far","hp":41}
+{"line":176,"op":"print","text":"The opposing Smeargle used Spikes!"}
+{"line":176,"op":"move","user":"far","target":"near","move":191,"animTurn":0}
+{"line":177,"op":"print","text":"Spikes were scattered on the ground all around your side!"}
+{"line":179,"op":"itemPopUp","side":"far","item":472}
+{"line":179,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":179,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":179,"op":"hp","side":"far","hp":47}
+{"line":181,"op":"turn","number":16}
+{"line":184,"op":"print","text":"Persian used Return!"}
+{"line":184,"op":"move","user":"near","target":"far","move":216,"animTurn":0}
+{"line":185,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":185,"op":"hp","side":"far","hp":0}
+{"line":186,"op":"faint","side":"far"}
+{"line":186,"op":"print","text":"The opposing Smeargle fainted!"}
+{"line":189,"op":"print","text":"joltylocks sent out Yanma!"}
+{"line":189,"op":"switchIn","side":"far","slot":5,"hp":100,"status":"none"}
+{"line":192,"op":"turn","number":17}
+{"line":195,"op":"print","text":"joltylocks withdrew Yanma!"}
+{"line":195,"op":"withdraw","side":"far"}
+{"line":195,"op":"print","text":"joltylocks sent out Quagsire!"}
+{"line":195,"op":"switchIn","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":196,"op":"print","text":"Persian used Return!"}
+{"line":196,"op":"move","user":"near","target":"far","move":216,"animTurn":0}
+{"line":197,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":197,"op":"hp","side":"far","hp":68}
+{"line":199,"op":"itemPopUp","side":"far","item":472}
+{"line":199,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":199,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":199,"op":"hp","side":"far","hp":74}
+{"line":201,"op":"turn","number":18}
+{"line":204,"op":"print","text":"The opposing Quagsire used Protect!"}
+{"line":204,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
+{"line":205,"op":"print","text":"The opposing Quagsire protected itself!"}
+{"line":206,"op":"print","text":"Persian used Return!"}
+{"line":207,"op":"print","text":"The opposing Quagsire protected itself!"}
+{"line":209,"op":"itemPopUp","side":"far","item":472}
+{"line":209,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":209,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":209,"op":"hp","side":"far","hp":80}
+{"line":211,"op":"turn","number":19}
+{"line":214,"op":"print","text":"Persian used Return!"}
+{"line":214,"op":"move","user":"near","target":"far","move":216,"animTurn":0}
+{"line":215,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":215,"op":"hp","side":"far","hp":49}
+{"line":216,"op":"print","text":"The opposing Quagsire used Earthquake!"}
+{"line":216,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
+{"line":217,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":217,"op":"print","text":"The substitute took damage for Persian!"}
+{"line":217,"op":"anim","side":"near","anim":"substituteFade"}
+{"line":217,"op":"print","text":"Persian's substitute faded!"}
+{"line":217,"op":"volatile","side":"near","volatile":"substitute","on":false}
+{"line":219,"op":"itemPopUp","side":"far","item":472}
+{"line":219,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":219,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":219,"op":"hp","side":"far","hp":56}
+{"line":221,"op":"turn","number":20}
+{"line":224,"op":"print","text":"Persian used Return!"}
+{"line":224,"op":"move","user":"near","target":"far","move":216,"animTurn":0}
+{"line":225,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":225,"op":"hp","side":"far","hp":21}
+{"line":226,"op":"print","text":"The opposing Quagsire used Toxic!"}
+{"line":226,"op":"move","user":"far","target":"near","move":92,"animTurn":0}
+{"line":227,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":227,"op":"print","text":"Persian was badly poisoned!"}
+{"line":227,"op":"status","side":"near","slot":4,"status":"tox"}
+{"line":229,"op":"print","text":"Persian was hurt by its poisoning!"}
+{"line":229,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":229,"op":"hp","side":"near","hp":69}
+{"line":230,"op":"itemPopUp","side":"far","item":472}
+{"line":230,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":230,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":230,"op":"hp","side":"far","hp":27}
+{"line":232,"op":"turn","number":21}
+{"line":235,"op":"print","text":"The opposing Quagsire used Protect!"}
+{"line":235,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
+{"line":236,"op":"print","text":"The opposing Quagsire protected itself!"}
+{"line":237,"op":"print","text":"Persian used Substitute!"}
+{"line":237,"op":"move","user":"near","target":"near","move":164,"animTurn":0}
+{"line":238,"op":"volatile","side":"near","volatile":"substitute","on":true}
+{"line":239,"op":"hp","side":"near","hp":44}
+{"line":238,"op":"print","text":"Persian put in a substitute!"}
+{"line":241,"op":"print","text":"Persian was hurt by its poisoning!"}
+{"line":241,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":241,"op":"hp","side":"near","hp":32}
+{"line":242,"op":"itemPopUp","side":"far","item":472}
+{"line":242,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":242,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":242,"op":"hp","side":"far","hp":33}
+{"line":244,"op":"turn","number":22}
+{"line":247,"op":"print","text":"joltylocks withdrew Quagsire!"}
+{"line":247,"op":"withdraw","side":"far"}
+{"line":247,"op":"print","text":"joltylocks sent out Vileplume!"}
+{"line":247,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":248,"op":"print","text":"Persian used Return!"}
+{"line":248,"op":"move","user":"near","target":"far","move":216,"animTurn":0}
+{"line":249,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":249,"op":"hp","side":"far","hp":65}
+{"line":251,"op":"print","text":"Persian was hurt by its poisoning!"}
+{"line":251,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":251,"op":"hp","side":"near","hp":14}
+{"line":252,"op":"itemPopUp","side":"far","item":472}
+{"line":252,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":252,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":252,"op":"hp","side":"far","hp":71}
+{"line":254,"op":"turn","number":23}
+{"line":257,"op":"print","text":"Persian used Return!"}
+{"line":257,"op":"move","user":"near","target":"far","move":216,"animTurn":0}
+{"line":258,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":258,"op":"hp","side":"far","hp":35}
+{"line":259,"op":"print","text":"The opposing Vileplume used Synthesis!"}
+{"line":259,"op":"move","user":"far","target":"far","move":235,"animTurn":0}
+{"line":260,"op":"hp","side":"far","hp":84}
+{"line":260,"op":"print","text":"The opposing Vileplume's HP was restored."}
+{"line":262,"op":"itemPopUp","side":"near","item":567}
+{"line":262,"op":"anim","side":"near","anim":"heldItemBerry"}
+{"line":262,"op":"item","side":"near","slot":4,"item":0}
+{"line":263,"op":"stat","side":"near","stat":"atk","stages":1,"arrows":"one"}
+{"line":263,"op":"print","text":"The Liechi Berry boosted Persian's Attack!"}
+{"line":264,"op":"print","text":"Persian was hurt by its poisoning!"}
+{"line":264,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":264,"op":"hp","side":"near","hp":0}
+{"line":265,"op":"faint","side":"near"}
+{"line":265,"op":"print","text":"Persian fainted!"}
+{"line":266,"op":"itemPopUp","side":"far","item":472}
+{"line":266,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":266,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":266,"op":"hp","side":"far","hp":90}
+{"line":270,"op":"print","text":"Go! Ampharos!"}
+{"line":270,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
+{"line":271,"op":"hp","side":"near","hp":83}
+{"line":271,"op":"print","text":"Ampharos was hurt by the spikes!"}
+{"line":272,"op":"turn","number":24}
+{"line":275,"op":"print","text":"Ampharos used Heal Bell!"}
+{"line":275,"op":"move","user":"near","target":"near","move":215,"animTurn":0}
+{"line":276,"op":"print","text":"A bell chimed!"}
+{"line":277,"op":"status","side":"near","slot":1,"status":"none"}
+{"line":278,"op":"status","side":"near","slot":3,"status":"none"}
+{"line":279,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":280,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":281,"op":"print","text":"Ampharos avoided the attack!"}
+{"line":283,"op":"itemPopUp","side":"near","item":472}
+{"line":283,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":283,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":283,"op":"hp","side":"near","hp":89}
+{"line":284,"op":"itemPopUp","side":"far","item":472}
+{"line":284,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":284,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":284,"op":"hp","side":"far","hp":97}
+{"line":286,"op":"turn","number":25}
+{"line":289,"op":"print","text":"Ampharos used Fire Punch!"}
+{"line":289,"op":"move","user":"near","target":"far","move":7,"animTurn":0}
+{"line":291,"op":"hit","side":"far","effectiveness":"super"}
+{"line":291,"op":"hp","side":"far","hp":51}
+{"line":291,"op":"print","text":"It's super effective!"}
+{"line":292,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":292,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":293,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":293,"op":"hp","side":"near","hp":54}
+{"line":294,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":294,"op":"print","text":"Ampharos was poisoned!"}
+{"line":294,"op":"status","side":"near","slot":5,"status":"psn"}
+{"line":296,"op":"itemPopUp","side":"near","item":472}
+{"line":296,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":296,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":296,"op":"hp","side":"near","hp":60}
+{"line":297,"op":"print","text":"Ampharos was hurt by its poisoning!"}
+{"line":297,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":297,"op":"hp","side":"near","hp":48}
+{"line":298,"op":"itemPopUp","side":"far","item":472}
+{"line":298,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":298,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":298,"op":"hp","side":"far","hp":57}
+{"line":300,"op":"turn","number":26}
+{"line":303,"op":"print","text":"Ampharos, come back!"}
+{"line":303,"op":"withdraw","side":"near"}
+{"line":303,"op":"print","text":"Go! Noctowl!"}
+{"line":303,"op":"switchIn","side":"near","slot":3,"hp":94,"status":"none"}
+{"line":304,"op":"print","text":"The opposing Vileplume used Synthesis!"}
+{"line":304,"op":"move","user":"far","target":"far","move":235,"animTurn":0}
+{"line":305,"op":"hp","side":"far","hp":100}
+{"line":305,"op":"print","text":"The opposing Vileplume's HP was restored."}
+{"line":307,"op":"itemPopUp","side":"near","item":472}
+{"line":307,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":307,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":307,"op":"hp","side":"near","hp":100}
+{"line":309,"op":"turn","number":27}
+{"line":312,"op":"print","text":"Noctowl used Return!"}
+{"line":312,"op":"move","user":"near","target":"far","move":216,"animTurn":0}
+{"line":313,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":313,"op":"hp","side":"far","hp":66}
+{"line":314,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":314,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":315,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":315,"op":"hp","side":"near","hp":65}
+{"line":317,"op":"itemPopUp","side":"near","item":472}
+{"line":317,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":317,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":317,"op":"hp","side":"near","hp":71}
+{"line":318,"op":"itemPopUp","side":"far","item":472}
+{"line":318,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":318,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":318,"op":"hp","side":"far","hp":72}
+{"line":320,"op":"turn","number":28}
+{"line":323,"op":"print","text":"Noctowl used Hidden Power!"}
+{"line":323,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
+{"line":325,"op":"hit","side":"far","effectiveness":"super"}
+{"line":325,"op":"hp","side":"far","hp":36}
+{"line":325,"op":"print","text":"It's super effective!"}
+{"line":326,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":326,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":327,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":327,"op":"hp","side":"near","hp":41}
+{"line":329,"op":"itemPopUp","side":"near","item":472}
+{"line":329,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":329,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":329,"op":"hp","side":"near","hp":47}
+{"line":330,"op":"itemPopUp","side":"far","item":472}
+{"line":330,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":330,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":330,"op":"hp","side":"far","hp":42}
+{"line":332,"op":"turn","number":29}
+{"line":335,"op":"print","text":"Noctowl used Return!"}
+{"line":335,"op":"move","user":"near","target":"far","move":216,"animTurn":0}
+{"line":336,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":336,"op":"hp","side":"far","hp":11}
+{"line":337,"op":"print","text":"The opposing Vileplume used Synthesis!"}
+{"line":337,"op":"move","user":"far","target":"far","move":235,"animTurn":0}
+{"line":338,"op":"hp","side":"far","hp":61}
+{"line":338,"op":"print","text":"The opposing Vileplume's HP was restored."}
+{"line":340,"op":"itemPopUp","side":"near","item":472}
+{"line":340,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":340,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":340,"op":"hp","side":"near","hp":53}
+{"line":341,"op":"itemPopUp","side":"far","item":472}
+{"line":341,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":341,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":341,"op":"hp","side":"far","hp":67}
+{"line":343,"op":"turn","number":30}
+{"line":346,"op":"print","text":"Noctowl, come back!"}
+{"line":346,"op":"withdraw","side":"near"}
+{"line":346,"op":"print","text":"Go! Shuckle!"}
+{"line":346,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":347,"op":"hp","side":"near","hp":83}
+{"line":347,"op":"print","text":"Shuckle was hurt by the spikes!"}
+{"line":348,"op":"print","text":"The opposing Vileplume used Synthesis!"}
+{"line":348,"op":"move","user":"far","target":"far","move":235,"animTurn":0}
+{"line":349,"op":"hp","side":"far","hp":100}
+{"line":349,"op":"print","text":"The opposing Vileplume's HP was restored."}
+{"line":351,"op":"itemPopUp","side":"near","item":472}
+{"line":351,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":351,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":351,"op":"hp","side":"near","hp":89}
+{"line":353,"op":"turn","number":31}
+{"line":356,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":356,"op":"move","user":"far","target":"near","move":79,"animTurn":0}
+{"line":357,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":357,"op":"print","text":"Shuckle fell asleep!"}
+{"line":357,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":358,"op":"print","text":"Shuckle is fast asleep."}
+{"line":358,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":360,"op":"itemPopUp","side":"near","item":472}
+{"line":360,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":360,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":360,"op":"hp","side":"near","hp":95}
+{"line":362,"op":"turn","number":32}
+{"line":365,"op":"print","text":"joltylocks withdrew Vileplume!"}
+{"line":365,"op":"withdraw","side":"far"}
+{"line":365,"op":"print","text":"joltylocks sent out Yanma!"}
+{"line":365,"op":"switchIn","side":"far","slot":5,"hp":100,"status":"none"}
+{"line":366,"op":"print","text":"Shuckle, come back!"}
+{"line":366,"op":"withdraw","side":"near"}
+{"line":366,"op":"print","text":"Go! Swampert!"}
+{"line":366,"op":"switchIn","side":"near","slot":1,"hp":76,"status":"none"}
+{"line":367,"op":"hp","side":"near","hp":60}
+{"line":367,"op":"print","text":"Swampert was hurt by the spikes!"}
+{"line":369,"op":"itemPopUp","side":"near","item":472}
+{"line":369,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":369,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":369,"op":"hp","side":"near","hp":65}
+{"line":371,"op":"turn","number":33}
+{"line":374,"op":"print","text":"The opposing Yanma used Substitute!"}
+{"line":374,"op":"move","user":"far","target":"far","move":164,"animTurn":0}
+{"line":375,"op":"volatile","side":"far","volatile":"substitute","on":true}
+{"line":376,"op":"hp","side":"far","hp":75}
+{"line":375,"op":"print","text":"The opposing Yanma put in a substitute!"}
+{"line":377,"op":"print","text":"Swampert used Ice Beam!"}
+{"line":377,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
+{"line":380,"op":"hit","side":"far","effectiveness":"super"}
+{"line":380,"op":"print","text":"The substitute took damage for the opposing Yanma!"}
+{"line":380,"op":"anim","side":"far","anim":"substituteFade"}
+{"line":380,"op":"print","text":"The opposing Yanma's substitute faded!"}
+{"line":380,"op":"volatile","side":"far","volatile":"substitute","on":false}
+{"line":380,"op":"print","text":"A critical hit!"}
+{"line":380,"op":"print","text":"It's super effective!"}
+{"line":382,"op":"itemPopUp","side":"near","item":472}
+{"line":382,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":382,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":382,"op":"hp","side":"near","hp":71}
+{"line":384,"op":"turn","number":34}
+{"line":387,"op":"print","text":"The opposing Yanma used Substitute!"}
+{"line":387,"op":"move","user":"far","target":"far","move":164,"animTurn":0}
+{"line":388,"op":"volatile","side":"far","volatile":"substitute","on":true}
+{"line":389,"op":"hp","side":"far","hp":51}
+{"line":388,"op":"print","text":"The opposing Yanma put in a substitute!"}
+{"line":390,"op":"print","text":"Swampert used Ice Beam!"}
+{"line":390,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
+{"line":392,"op":"hit","side":"far","effectiveness":"super"}
+{"line":392,"op":"print","text":"The substitute took damage for the opposing Yanma!"}
+{"line":392,"op":"anim","side":"far","anim":"substituteFade"}
+{"line":392,"op":"print","text":"The opposing Yanma's substitute faded!"}
+{"line":392,"op":"volatile","side":"far","volatile":"substitute","on":false}
+{"line":392,"op":"print","text":"It's super effective!"}
+{"line":394,"op":"itemPopUp","side":"near","item":472}
+{"line":394,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":394,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":394,"op":"hp","side":"near","hp":77}
+{"line":396,"op":"turn","number":35}
+{"line":399,"op":"print","text":"The opposing Yanma used Substitute!"}
+{"line":399,"op":"move","user":"far","target":"far","move":164,"animTurn":0}
+{"line":400,"op":"volatile","side":"far","volatile":"substitute","on":true}
+{"line":401,"op":"hp","side":"far","hp":26}
+{"line":400,"op":"print","text":"The opposing Yanma put in a substitute!"}
+{"line":402,"op":"print","text":"Swampert used Ice Beam!"}
+{"line":402,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
+{"line":404,"op":"hit","side":"far","effectiveness":"super"}
+{"line":404,"op":"print","text":"The substitute took damage for the opposing Yanma!"}
+{"line":404,"op":"anim","side":"far","anim":"substituteFade"}
+{"line":404,"op":"print","text":"The opposing Yanma's substitute faded!"}
+{"line":404,"op":"volatile","side":"far","volatile":"substitute","on":false}
+{"line":404,"op":"print","text":"It's super effective!"}
+{"line":406,"op":"itemPopUp","side":"near","item":472}
+{"line":406,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":406,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":406,"op":"hp","side":"near","hp":83}
+{"line":408,"op":"turn","number":36}
+{"line":411,"op":"print","text":"joltylocks withdrew Yanma!"}
+{"line":411,"op":"withdraw","side":"far"}
+{"line":411,"op":"print","text":"joltylocks sent out Quagsire!"}
+{"line":411,"op":"switchIn","side":"far","slot":0,"hp":33,"status":"none"}
+{"line":412,"op":"print","text":"Swampert used Ice Beam!"}
+{"line":412,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
+{"line":413,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":413,"op":"hp","side":"far","hp":12}
+{"line":415,"op":"itemPopUp","side":"near","item":472}
+{"line":415,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":415,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":415,"op":"hp","side":"near","hp":89}
+{"line":416,"op":"itemPopUp","side":"far","item":472}
+{"line":416,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":416,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":416,"op":"hp","side":"far","hp":18}
+{"line":418,"op":"turn","number":37}
+{"line":421,"op":"print","text":"The opposing Quagsire used Protect!"}
+{"line":421,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
+{"line":422,"op":"print","text":"The opposing Quagsire protected itself!"}
+{"line":423,"op":"print","text":"Swampert used Earthquake!"}
+{"line":424,"op":"print","text":"The opposing Quagsire protected itself!"}
+{"line":426,"op":"itemPopUp","side":"near","item":472}
+{"line":426,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":426,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":426,"op":"hp","side":"near","hp":95}
+{"line":427,"op":"itemPopUp","side":"far","item":472}
+{"line":427,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":427,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":427,"op":"hp","side":"far","hp":24}
+{"line":429,"op":"turn","number":38}
+{"line":432,"op":"print","text":"joltylocks withdrew Quagsire!"}
+{"line":432,"op":"withdraw","side":"far"}
+{"line":432,"op":"print","text":"joltylocks sent out Vileplume!"}
+{"line":432,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":433,"op":"print","text":"Swampert used Earthquake!"}
+{"line":433,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
+{"line":434,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":434,"op":"hp","side":"far","hp":62}
+{"line":436,"op":"itemPopUp","side":"near","item":472}
+{"line":436,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":436,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":436,"op":"hp","side":"near","hp":100}
+{"line":437,"op":"itemPopUp","side":"far","item":472}
+{"line":437,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":437,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":437,"op":"hp","side":"far","hp":68}
+{"line":439,"op":"turn","number":39}
+{"line":442,"op":"print","text":"Swampert, come back!"}
+{"line":442,"op":"withdraw","side":"near"}
+{"line":442,"op":"print","text":"Go! Ampharos!"}
+{"line":442,"op":"switchIn","side":"near","slot":5,"hp":48,"status":"psn"}
+{"line":443,"op":"hp","side":"near","hp":31}
+{"line":443,"op":"print","text":"Ampharos was hurt by the spikes!"}
+{"line":444,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":444,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":445,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":445,"op":"hp","side":"near","hp":1}
+{"line":447,"op":"itemPopUp","side":"near","item":472}
+{"line":447,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":447,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":447,"op":"hp","side":"near","hp":6}
+{"line":448,"op":"print","text":"Ampharos was hurt by its poisoning!"}
+{"line":448,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":448,"op":"hp","side":"near","hp":0}
+{"line":449,"op":"faint","side":"near"}
+{"line":449,"op":"print","text":"Ampharos fainted!"}
+{"line":450,"op":"itemPopUp","side":"far","item":472}
+{"line":450,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":450,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":450,"op":"hp","side":"far","hp":74}
+{"line":454,"op":"print","text":"Go! Noctowl!"}
+{"line":454,"op":"switchIn","side":"near","slot":3,"hp":53,"status":"none"}
+{"line":455,"op":"turn","number":40}
+{"line":458,"op":"print","text":"Noctowl used Return!"}
+{"line":458,"op":"move","user":"near","target":"far","move":216,"animTurn":0}
+{"line":459,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":459,"op":"hp","side":"far","hp":41}
+{"line":460,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":460,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":461,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":461,"op":"hp","side":"near","hp":19}
+{"line":463,"op":"itemPopUp","side":"near","item":472}
+{"line":463,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":463,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":463,"op":"hp","side":"near","hp":25}
+{"line":464,"op":"itemPopUp","side":"far","item":472}
+{"line":464,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":464,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":464,"op":"hp","side":"far","hp":48}
+{"line":466,"op":"turn","number":41}
+{"line":469,"op":"print","text":"Noctowl used Return!"}
+{"line":469,"op":"move","user":"near","target":"far","move":216,"animTurn":0}
+{"line":470,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":470,"op":"hp","side":"far","hp":14}
+{"line":471,"op":"print","text":"The opposing Vileplume used Synthesis!"}
+{"line":471,"op":"move","user":"far","target":"far","move":235,"animTurn":0}
+{"line":472,"op":"hp","side":"far","hp":64}
+{"line":472,"op":"print","text":"The opposing Vileplume's HP was restored."}
+{"line":474,"op":"itemPopUp","side":"near","item":472}
+{"line":474,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":474,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":474,"op":"hp","side":"near","hp":31}
+{"line":475,"op":"itemPopUp","side":"far","item":472}
+{"line":475,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":475,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":475,"op":"hp","side":"far","hp":70}
+{"line":477,"op":"turn","number":42}
+{"line":480,"op":"print","text":"Noctowl used Return!"}
+{"line":480,"op":"move","user":"near","target":"far","move":216,"animTurn":0}
+{"line":481,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":481,"op":"hp","side":"far","hp":39}
+{"line":482,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":482,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":483,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":483,"op":"hp","side":"near","hp":0}
+{"line":484,"op":"faint","side":"near"}
+{"line":484,"op":"print","text":"Noctowl fainted!"}
+{"line":487,"op":"print","text":"Go! Kingdra!"}
+{"line":487,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":488,"op":"hp","side":"near","hp":83}
+{"line":488,"op":"print","text":"Kingdra was hurt by the spikes!"}
+{"line":490,"op":"itemPopUp","side":"far","item":472}
+{"line":490,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":490,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":490,"op":"hp","side":"far","hp":45}
+{"line":492,"op":"turn","number":43}
+{"line":495,"op":"print","text":"Kingdra used Rain Dance!"}
+{"line":495,"op":"move","user":"near","target":"near","move":240,"animTurn":0}
+{"line":496,"op":"weather","weather":"rain"}
+{"line":496,"op":"print","text":"It started to rain!"}
+{"line":497,"op":"print","text":"The opposing Vileplume used Synthesis!"}
+{"line":497,"op":"move","user":"far","target":"far","move":235,"animTurn":0}
+{"line":498,"op":"hp","side":"far","hp":70}
+{"line":498,"op":"print","text":"The opposing Vileplume's HP was restored."}
+{"line":500,"op":"print","text":"Rain continues to fall."}
+{"line":500,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":501,"op":"itemPopUp","side":"far","item":472}
+{"line":501,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":501,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":501,"op":"hp","side":"far","hp":76}
+{"line":503,"op":"turn","number":44}
+{"line":506,"op":"print","text":"Kingdra used Ice Beam!"}
+{"line":506,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
+{"line":508,"op":"hit","side":"far","effectiveness":"super"}
+{"line":508,"op":"hp","side":"far","hp":30}
+{"line":508,"op":"print","text":"It's super effective!"}
+{"line":509,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":509,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":510,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":510,"op":"hp","side":"near","hp":51}
+{"line":511,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":511,"op":"print","text":"Kingdra was poisoned!"}
+{"line":511,"op":"status","side":"near","slot":0,"status":"psn"}
+{"line":513,"op":"print","text":"Rain continues to fall."}
+{"line":513,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":514,"op":"print","text":"Kingdra was hurt by its poisoning!"}
+{"line":514,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":514,"op":"hp","side":"near","hp":39}
+{"line":515,"op":"itemPopUp","side":"far","item":472}
+{"line":515,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":515,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":515,"op":"hp","side":"far","hp":37}
+{"line":517,"op":"turn","number":45}
+{"line":520,"op":"print","text":"joltylocks withdrew Vileplume!"}
+{"line":520,"op":"withdraw","side":"far"}
+{"line":520,"op":"print","text":"joltylocks sent out Zangoose!"}
+{"line":520,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"slp"}
+{"line":521,"op":"print","text":"Kingdra used Ice Beam!"}
+{"line":521,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
+{"line":522,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":522,"op":"hp","side":"far","hp":67}
+{"line":524,"op":"print","text":"Rain continues to fall."}
+{"line":524,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":525,"op":"print","text":"Kingdra was hurt by its poisoning!"}
+{"line":525,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":525,"op":"hp","side":"near","hp":27}
+{"line":527,"op":"turn","number":46}
+{"line":530,"op":"print","text":"Kingdra used Hidden Power!"}
+{"line":530,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
+{"line":531,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":531,"op":"hp","side":"far","hp":39}
+{"line":532,"op":"print","text":"The opposing Zangoose is fast asleep."}
+{"line":532,"op":"anim","side":"far","anim":"statusSlp"}
+{"line":534,"op":"print","text":"Rain continues to fall."}
+{"line":534,"op":"anim","side":"near","anim":"rainContinues"}
+{"line":535,"op":"print","text":"Kingdra was hurt by its poisoning!"}
+{"line":535,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":535,"op":"hp","side":"near","hp":15}
+{"line":537,"op":"turn","number":47}
+{"line":540,"op":"print","text":"The opposing Zangoose is fast asleep."}
+{"line":540,"op":"anim","side":"far","anim":"statusSlp"}
+{"line":541,"op":"print","text":"Kingdra used Surf!"}
+{"line":541,"op":"move","user":"near","target":"far","move":57,"animTurn":0}
+{"line":542,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":542,"op":"hp","side":"far","hp":0}
+{"line":543,"op":"faint","side":"far"}
+{"line":543,"op":"print","text":"The opposing Zangoose fainted!"}
+{"line":546,"op":"print","text":"joltylocks sent out Yanma!"}
+{"line":546,"op":"switchIn","side":"far","slot":5,"hp":26,"status":"none"}
+{"line":548,"op":"weather","weather":"none"}
+{"line":548,"op":"print","text":"The rain stopped."}
+{"line":549,"op":"itemPopUp","side":"near","item":570}
+{"line":549,"op":"anim","side":"near","anim":"heldItemBerry"}
+{"line":549,"op":"item","side":"near","slot":0,"item":0}
+{"line":550,"op":"stat","side":"near","stat":"spa","stages":1,"arrows":"one"}
+{"line":550,"op":"print","text":"The Petaya Berry boosted Kingdra's Sp. Atk!"}
+{"line":551,"op":"print","text":"Kingdra was hurt by its poisoning!"}
+{"line":551,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":551,"op":"hp","side":"near","hp":2}
+{"line":553,"op":"turn","number":48}
+{"line":556,"op":"print","text":"The opposing Yanma used Substitute!"}
+{"line":556,"op":"move","user":"far","target":"far","move":164,"animTurn":0}
+{"line":557,"op":"volatile","side":"far","volatile":"substitute","on":true}
+{"line":558,"op":"hp","side":"far","hp":1}
+{"line":557,"op":"print","text":"The opposing Yanma put in a substitute!"}
+{"line":559,"op":"print","text":"Kingdra used Ice Beam!"}
+{"line":559,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
+{"line":561,"op":"hit","side":"far","effectiveness":"super"}
+{"line":561,"op":"print","text":"The substitute took damage for the opposing Yanma!"}
+{"line":561,"op":"anim","side":"far","anim":"substituteFade"}
+{"line":561,"op":"print","text":"The opposing Yanma's substitute faded!"}
+{"line":561,"op":"volatile","side":"far","volatile":"substitute","on":false}
+{"line":561,"op":"print","text":"It's super effective!"}
+{"line":563,"op":"itemPopUp","side":"far","item":567}
+{"line":563,"op":"anim","side":"far","anim":"heldItemBerry"}
+{"line":563,"op":"item","side":"far","slot":5,"item":0}
+{"line":564,"op":"stat","side":"far","stat":"atk","stages":1,"arrows":"one"}
+{"line":564,"op":"print","text":"The Liechi Berry boosted the opposing Yanma's Attack!"}
+{"line":565,"op":"print","text":"Kingdra was hurt by its poisoning!"}
+{"line":565,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":565,"op":"hp","side":"near","hp":0}
+{"line":566,"op":"faint","side":"near"}
+{"line":566,"op":"print","text":"Kingdra fainted!"}
+{"line":570,"op":"print","text":"Go! Swampert!"}
+{"line":570,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":571,"op":"hp","side":"near","hp":83}
+{"line":571,"op":"print","text":"Swampert was hurt by the spikes!"}
+{"line":572,"op":"turn","number":49}
+{"line":575,"op":"print","text":"The opposing Yanma used Reversal!"}
+{"line":575,"op":"move","user":"far","target":"near","move":179,"animTurn":0}
+{"line":576,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":576,"op":"hp","side":"near","hp":17}
+{"line":577,"op":"print","text":"Swampert used Ice Beam!"}
+{"line":577,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
+{"line":579,"op":"hit","side":"far","effectiveness":"super"}
+{"line":579,"op":"hp","side":"far","hp":0}
+{"line":579,"op":"print","text":"It's super effective!"}
+{"line":580,"op":"faint","side":"far"}
+{"line":580,"op":"print","text":"The opposing Yanma fainted!"}
+{"line":583,"op":"print","text":"joltylocks sent out Vileplume!"}
+{"line":583,"op":"switchIn","side":"far","slot":1,"hp":37,"status":"none"}
+{"line":585,"op":"itemPopUp","side":"near","item":472}
+{"line":585,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":585,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":585,"op":"hp","side":"near","hp":23}
+{"line":586,"op":"itemPopUp","side":"far","item":472}
+{"line":586,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":586,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":586,"op":"hp","side":"far","hp":43}
+{"line":588,"op":"turn","number":50}
+{"line":591,"op":"print","text":"Swampert, come back!"}
+{"line":591,"op":"withdraw","side":"near"}
+{"line":591,"op":"print","text":"Go! Shuckle!"}
+{"line":591,"op":"switchIn","side":"near","slot":2,"hp":95,"status":"slp"}
+{"line":592,"op":"hp","side":"near","hp":79}
+{"line":592,"op":"print","text":"Shuckle was hurt by the spikes!"}
+{"line":593,"op":"print","text":"joltylocks withdrew Vileplume!"}
+{"line":593,"op":"withdraw","side":"far"}
+{"line":593,"op":"print","text":"joltylocks sent out Quagsire!"}
+{"line":593,"op":"switchIn","side":"far","slot":0,"hp":24,"status":"none"}
+{"line":595,"op":"itemPopUp","side":"far","item":472}
+{"line":595,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":595,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":595,"op":"hp","side":"far","hp":30}
+{"line":596,"op":"itemPopUp","side":"near","item":472}
+{"line":596,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":596,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":596,"op":"hp","side":"near","hp":85}
+{"line":598,"op":"turn","number":51}
+{"line":601,"op":"print","text":"The opposing Quagsire used Earthquake!"}
+{"line":601,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
+{"line":602,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":602,"op":"hp","side":"near","hp":64}
+{"line":603,"op":"print","text":"Shuckle is fast asleep."}
+{"line":603,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":605,"op":"itemPopUp","side":"far","item":472}
+{"line":605,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":605,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":605,"op":"hp","side":"far","hp":36}
+{"line":606,"op":"itemPopUp","side":"near","item":472}
+{"line":606,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":606,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":606,"op":"hp","side":"near","hp":70}
+{"line":608,"op":"turn","number":52}
+{"line":611,"op":"print","text":"The opposing Quagsire used Protect!"}
+{"line":611,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
+{"line":612,"op":"print","text":"The opposing Quagsire protected itself!"}
+{"line":613,"op":"print","text":"Shuckle woke up!"}
+{"line":613,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":614,"op":"print","text":"Shuckle used Toxic!"}
+{"line":615,"op":"print","text":"The opposing Quagsire avoided the attack!"}
+{"line":617,"op":"itemPopUp","side":"far","item":472}
+{"line":617,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":617,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":617,"op":"hp","side":"far","hp":42}
+{"line":618,"op":"itemPopUp","side":"near","item":472}
+{"line":618,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":618,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":618,"op":"hp","side":"near","hp":76}
+{"line":620,"op":"turn","number":53}
+{"line":623,"op":"print","text":"The opposing Quagsire used Ice Beam!"}
+{"line":623,"op":"move","user":"far","target":"near","move":58,"animTurn":0}
+{"line":624,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":624,"op":"hp","side":"near","hp":66}
+{"line":625,"op":"print","text":"Shuckle used Wrap!"}
+{"line":625,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":626,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":626,"op":"hp","side":"far","hp":40}
+{"line":627,"op":"print","text":"The opposing Quagsire was wrapped by Shuckle!"}
+{"line":629,"op":"itemPopUp","side":"far","item":472}
+{"line":629,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":629,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":629,"op":"hp","side":"far","hp":46}
+{"line":630,"op":"trapTurn","side":"far","move":35}
+{"line":630,"op":"print","text":"The opposing Quagsire is hurt by Wrap!"}
+{"line":630,"op":"hp","side":"far","hp":40}
+{"line":631,"op":"itemPopUp","side":"near","item":472}
+{"line":631,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":631,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":631,"op":"hp","side":"near","hp":72}
+{"line":633,"op":"turn","number":54}
+{"line":636,"op":"print","text":"The opposing Quagsire used Protect!"}
+{"line":636,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
+{"line":637,"op":"print","text":"The opposing Quagsire protected itself!"}
+{"line":638,"op":"print","text":"Shuckle used Toxic!"}
+{"line":639,"op":"print","text":"The opposing Quagsire protected itself!"}
+{"line":641,"op":"itemPopUp","side":"far","item":472}
+{"line":641,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":641,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":641,"op":"hp","side":"far","hp":46}
+{"line":642,"op":"trapTurn","side":"far","move":35}
+{"line":642,"op":"print","text":"The opposing Quagsire is hurt by Wrap!"}
+{"line":642,"op":"hp","side":"far","hp":40}
+{"line":643,"op":"itemPopUp","side":"near","item":472}
+{"line":643,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":643,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":643,"op":"hp","side":"near","hp":78}
+{"line":645,"op":"turn","number":55}
+{"line":648,"op":"print","text":"The opposing Quagsire used Toxic!"}
+{"line":648,"op":"move","user":"far","target":"near","move":92,"animTurn":0}
+{"line":649,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":649,"op":"print","text":"Shuckle was badly poisoned!"}
+{"line":649,"op":"status","side":"near","slot":2,"status":"tox"}
+{"line":650,"op":"print","text":"Shuckle used Toxic!"}
+{"line":651,"op":"print","text":"The opposing Quagsire avoided the attack!"}
+{"line":653,"op":"itemPopUp","side":"far","item":472}
+{"line":653,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":653,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":653,"op":"hp","side":"far","hp":46}
+{"line":654,"op":"trapTurn","side":"far","move":35}
+{"line":654,"op":"print","text":"The opposing Quagsire is hurt by Wrap!"}
+{"line":654,"op":"hp","side":"far","hp":40}
+{"line":655,"op":"itemPopUp","side":"near","item":472}
+{"line":655,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":655,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":655,"op":"hp","side":"near","hp":84}
+{"line":656,"op":"print","text":"Shuckle was hurt by its poisoning!"}
+{"line":656,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":656,"op":"hp","side":"near","hp":78}
+{"line":658,"op":"turn","number":56}
+{"line":661,"op":"print","text":"The opposing Quagsire used Protect!"}
+{"line":661,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
+{"line":662,"op":"print","text":"The opposing Quagsire protected itself!"}
+{"line":663,"op":"print","text":"Shuckle used Toxic!"}
+{"line":664,"op":"print","text":"The opposing Quagsire protected itself!"}
+{"line":666,"op":"itemPopUp","side":"far","item":472}
+{"line":666,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":666,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":666,"op":"hp","side":"far","hp":46}
+{"line":667,"op":"trapTurn","side":"far","move":35}
+{"line":667,"op":"print","text":"The opposing Quagsire is hurt by Wrap!"}
+{"line":667,"op":"hp","side":"far","hp":40}
+{"line":668,"op":"itemPopUp","side":"near","item":472}
+{"line":668,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":668,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":668,"op":"hp","side":"near","hp":84}
+{"line":669,"op":"print","text":"Shuckle was hurt by its poisoning!"}
+{"line":669,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":669,"op":"hp","side":"near","hp":72}
+{"line":671,"op":"turn","number":57}
+{"line":674,"op":"print","text":"The opposing Quagsire used Earthquake!"}
+{"line":674,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
+{"line":675,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":675,"op":"hp","side":"near","hp":52}
+{"line":676,"op":"print","text":"Shuckle used Wrap!"}
+{"line":676,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":677,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":677,"op":"hp","side":"far","hp":39}
+{"line":679,"op":"itemPopUp","side":"far","item":472}
+{"line":679,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":679,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":679,"op":"hp","side":"far","hp":45}
+{"line":680,"op":"print","text":"The opposing Quagsire was freed from Wrap!"}
+{"line":681,"op":"itemPopUp","side":"near","item":472}
+{"line":681,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":681,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":681,"op":"hp","side":"near","hp":58}
+{"line":682,"op":"print","text":"Shuckle was hurt by its poisoning!"}
+{"line":682,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":682,"op":"hp","side":"near","hp":39}
+{"line":684,"op":"turn","number":58}
+{"line":687,"op":"print","text":"The opposing Quagsire used Earthquake!"}
+{"line":687,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
+{"line":688,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":688,"op":"hp","side":"near","hp":21}
+{"line":689,"op":"print","text":"Shuckle used Rest!"}
+{"line":689,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":690,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":690,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":691,"op":"hp","side":"near","hp":100}
+{"line":693,"op":"itemPopUp","side":"far","item":472}
+{"line":693,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":693,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":693,"op":"hp","side":"far","hp":51}
+{"line":695,"op":"turn","number":59}
+{"line":698,"op":"print","text":"joltylocks withdrew Quagsire!"}
+{"line":698,"op":"withdraw","side":"far"}
+{"line":698,"op":"print","text":"joltylocks sent out Vileplume!"}
+{"line":698,"op":"switchIn","side":"far","slot":1,"hp":43,"status":"none"}
+{"line":699,"op":"print","text":"Shuckle is fast asleep."}
+{"line":699,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":701,"op":"itemPopUp","side":"far","item":472}
+{"line":701,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":701,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":701,"op":"hp","side":"far","hp":49}
+{"line":703,"op":"turn","number":60}
+{"line":706,"op":"print","text":"The opposing Vileplume used Synthesis!"}
+{"line":706,"op":"move","user":"far","target":"far","move":235,"animTurn":0}
+{"line":707,"op":"hp","side":"far","hp":98}
+{"line":707,"op":"print","text":"The opposing Vileplume's HP was restored."}
+{"line":708,"op":"print","text":"Shuckle is fast asleep."}
+{"line":708,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":710,"op":"itemPopUp","side":"far","item":472}
+{"line":710,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":710,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":710,"op":"hp","side":"far","hp":100}
+{"line":712,"op":"turn","number":61}
+{"line":715,"op":"print","text":"joltylocks withdrew Vileplume!"}
+{"line":715,"op":"withdraw","side":"far"}
+{"line":715,"op":"print","text":"joltylocks sent out Quagsire!"}
+{"line":715,"op":"switchIn","side":"far","slot":0,"hp":51,"status":"none"}
+{"line":716,"op":"print","text":"Shuckle woke up!"}
+{"line":716,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":717,"op":"print","text":"Shuckle used Toxic!"}
+{"line":717,"op":"move","user":"near","target":"far","move":92,"animTurn":0}
+{"line":718,"op":"anim","side":"far","anim":"statusPsn"}
+{"line":718,"op":"print","text":"The opposing Quagsire was badly poisoned!"}
+{"line":718,"op":"status","side":"far","slot":0,"status":"tox"}
+{"line":720,"op":"itemPopUp","side":"far","item":472}
+{"line":720,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":720,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":720,"op":"hp","side":"far","hp":57}
+{"line":721,"op":"print","text":"The opposing Quagsire was hurt by its poisoning!"}
+{"line":721,"op":"anim","side":"far","anim":"statusPsn"}
+{"line":721,"op":"hp","side":"far","hp":51}
+{"line":723,"op":"turn","number":62}
+{"line":726,"op":"print","text":"The opposing Quagsire used Toxic!"}
+{"line":726,"op":"move","user":"far","target":"near","move":92,"animTurn":0}
+{"line":727,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":727,"op":"print","text":"Shuckle was badly poisoned!"}
+{"line":727,"op":"status","side":"near","slot":2,"status":"tox"}
+{"line":728,"op":"print","text":"Shuckle used Wrap!"}
+{"line":728,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":729,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":729,"op":"hp","side":"far","hp":49}
+{"line":730,"op":"print","text":"The opposing Quagsire was wrapped by Shuckle!"}
+{"line":732,"op":"itemPopUp","side":"far","item":472}
+{"line":732,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":732,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":732,"op":"hp","side":"far","hp":55}
+{"line":733,"op":"print","text":"The opposing Quagsire was hurt by its poisoning!"}
+{"line":733,"op":"anim","side":"far","anim":"statusPsn"}
+{"line":733,"op":"hp","side":"far","hp":43}
+{"line":734,"op":"trapTurn","side":"far","move":35}
+{"line":734,"op":"print","text":"The opposing Quagsire is hurt by Wrap!"}
+{"line":734,"op":"hp","side":"far","hp":37}
+{"line":735,"op":"print","text":"Shuckle was hurt by its poisoning!"}
+{"line":735,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":735,"op":"hp","side":"near","hp":94}
+{"line":737,"op":"turn","number":63}
+{"line":740,"op":"print","text":"The opposing Quagsire used Protect!"}
+{"line":740,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
+{"line":741,"op":"print","text":"The opposing Quagsire protected itself!"}
+{"line":742,"op":"print","text":"Shuckle used Wrap!"}
+{"line":743,"op":"print","text":"The opposing Quagsire avoided the attack!"}
+{"line":745,"op":"itemPopUp","side":"far","item":472}
+{"line":745,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":745,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":745,"op":"hp","side":"far","hp":43}
+{"line":746,"op":"print","text":"The opposing Quagsire was hurt by its poisoning!"}
+{"line":746,"op":"anim","side":"far","anim":"statusPsn"}
+{"line":746,"op":"hp","side":"far","hp":25}
+{"line":747,"op":"trapTurn","side":"far","move":35}
+{"line":747,"op":"print","text":"The opposing Quagsire is hurt by Wrap!"}
+{"line":747,"op":"hp","side":"far","hp":19}
+{"line":748,"op":"itemPopUp","side":"near","item":472}
+{"line":748,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":748,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":748,"op":"hp","side":"near","hp":100}
+{"line":749,"op":"print","text":"Shuckle was hurt by its poisoning!"}
+{"line":749,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":749,"op":"hp","side":"near","hp":88}
+{"line":751,"op":"turn","number":64}
+{"line":754,"op":"print","text":"The opposing Quagsire used Ice Beam!"}
+{"line":754,"op":"move","user":"far","target":"near","move":58,"animTurn":0}
+{"line":755,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":755,"op":"hp","side":"near","hp":78}
+{"line":756,"op":"print","text":"Shuckle used Wrap!"}
+{"line":756,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":757,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":757,"op":"hp","side":"far","hp":17}
+{"line":759,"op":"itemPopUp","side":"far","item":472}
+{"line":759,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":759,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":759,"op":"hp","side":"far","hp":23}
+{"line":760,"op":"print","text":"The opposing Quagsire was hurt by its poisoning!"}
+{"line":760,"op":"anim","side":"far","anim":"statusPsn"}
+{"line":760,"op":"hp","side":"far","hp":0}
+{"line":761,"op":"faint","side":"far"}
+{"line":761,"op":"print","text":"The opposing Quagsire fainted!"}
+{"line":762,"op":"itemPopUp","side":"near","item":472}
+{"line":762,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":762,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":762,"op":"hp","side":"near","hp":84}
+{"line":763,"op":"print","text":"Shuckle was hurt by its poisoning!"}
+{"line":763,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":763,"op":"hp","side":"near","hp":66}
+{"line":767,"op":"print","text":"joltylocks sent out Vileplume!"}
+{"line":767,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":768,"op":"turn","number":65}
+{"line":771,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":771,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":772,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":772,"op":"hp","side":"near","hp":55}
+{"line":773,"op":"print","text":"Shuckle used Rest!"}
+{"line":773,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":774,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":774,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":775,"op":"hp","side":"near","hp":100}
+{"line":778,"op":"turn","number":66}
+{"line":781,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":782,"op":"print","text":"Shuckle is already asleep!"}
+{"line":783,"op":"print","text":"Shuckle is fast asleep."}
+{"line":783,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":786,"op":"turn","number":67}
+{"line":789,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":790,"op":"print","text":"Shuckle avoided the attack!"}
+{"line":791,"op":"print","text":"Shuckle is fast asleep."}
+{"line":791,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":794,"op":"turn","number":68}
+{"line":797,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":798,"op":"print","text":"Shuckle avoided the attack!"}
+{"line":799,"op":"print","text":"Shuckle woke up!"}
+{"line":799,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":800,"op":"print","text":"Shuckle used Wrap!"}
+{"line":800,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":801,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":801,"op":"hp","side":"far","hp":98}
+{"line":802,"op":"print","text":"The opposing Vileplume was wrapped by Shuckle!"}
+{"line":804,"op":"itemPopUp","side":"far","item":472}
+{"line":804,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":804,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":804,"op":"hp","side":"far","hp":100}
+{"line":805,"op":"trapTurn","side":"far","move":35}
+{"line":805,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":805,"op":"hp","side":"far","hp":94}
+{"line":807,"op":"turn","number":69}
+{"line":810,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":810,"op":"move","user":"far","target":"near","move":79,"animTurn":0}
+{"line":811,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":811,"op":"print","text":"Shuckle fell asleep!"}
+{"line":811,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":812,"op":"print","text":"Shuckle is fast asleep."}
+{"line":812,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":814,"op":"itemPopUp","side":"far","item":472}
+{"line":814,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":814,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":814,"op":"hp","side":"far","hp":100}
+{"line":815,"op":"trapTurn","side":"far","move":35}
+{"line":815,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":815,"op":"hp","side":"far","hp":94}
+{"line":817,"op":"turn","number":70}
+{"line":820,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":821,"op":"print","text":"Shuckle is already asleep!"}
+{"line":822,"op":"print","text":"Shuckle is fast asleep."}
+{"line":822,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":824,"op":"itemPopUp","side":"far","item":472}
+{"line":824,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":824,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":824,"op":"hp","side":"far","hp":100}
+{"line":825,"op":"print","text":"The opposing Vileplume was freed from Wrap!"}
+{"line":827,"op":"turn","number":71}
+{"line":830,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":831,"op":"print","text":"Shuckle is already asleep!"}
+{"line":832,"op":"print","text":"Shuckle woke up!"}
+{"line":832,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":833,"op":"print","text":"Shuckle used Wrap!"}
+{"line":833,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":834,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":834,"op":"hp","side":"far","hp":98}
+{"line":835,"op":"print","text":"The opposing Vileplume was wrapped by Shuckle!"}
+{"line":837,"op":"itemPopUp","side":"far","item":472}
+{"line":837,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":837,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":837,"op":"hp","side":"far","hp":100}
+{"line":838,"op":"trapTurn","side":"far","move":35}
+{"line":838,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":838,"op":"hp","side":"far","hp":94}
+{"line":840,"op":"turn","number":72}
+{"line":843,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":843,"op":"move","user":"far","target":"near","move":79,"animTurn":0}
+{"line":844,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":844,"op":"print","text":"Shuckle fell asleep!"}
+{"line":844,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":845,"op":"print","text":"Shuckle is fast asleep."}
+{"line":845,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":847,"op":"itemPopUp","side":"far","item":472}
+{"line":847,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":847,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":847,"op":"hp","side":"far","hp":100}
+{"line":848,"op":"trapTurn","side":"far","move":35}
+{"line":848,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":848,"op":"hp","side":"far","hp":94}
+{"line":850,"op":"turn","number":73}
+{"line":853,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":854,"op":"print","text":"Shuckle is already asleep!"}
+{"line":855,"op":"print","text":"Shuckle is fast asleep."}
+{"line":855,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":857,"op":"itemPopUp","side":"far","item":472}
+{"line":857,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":857,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":857,"op":"hp","side":"far","hp":100}
+{"line":858,"op":"trapTurn","side":"far","move":35}
+{"line":858,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":858,"op":"hp","side":"far","hp":94}
+{"line":860,"op":"turn","number":74}
+{"line":863,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":864,"op":"print","text":"Shuckle avoided the attack!"}
+{"line":865,"op":"print","text":"Shuckle woke up!"}
+{"line":865,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":866,"op":"print","text":"Shuckle used Wrap!"}
+{"line":866,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":867,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":867,"op":"hp","side":"far","hp":92}
+{"line":869,"op":"itemPopUp","side":"far","item":472}
+{"line":869,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":869,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":869,"op":"hp","side":"far","hp":98}
+{"line":870,"op":"print","text":"The opposing Vileplume was freed from Wrap!"}
+{"line":872,"op":"turn","number":75}
+{"line":875,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":875,"op":"move","user":"far","target":"near","move":79,"animTurn":0}
+{"line":876,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":876,"op":"print","text":"Shuckle fell asleep!"}
+{"line":876,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":877,"op":"print","text":"Shuckle is fast asleep."}
+{"line":877,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":879,"op":"itemPopUp","side":"far","item":472}
+{"line":879,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":879,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":879,"op":"hp","side":"far","hp":100}
+{"line":881,"op":"turn","number":76}
+{"line":884,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":885,"op":"print","text":"Shuckle is already asleep!"}
+{"line":886,"op":"print","text":"Shuckle woke up!"}
+{"line":886,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":887,"op":"print","text":"Shuckle used Wrap!"}
+{"line":887,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":888,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":888,"op":"hp","side":"far","hp":98}
+{"line":889,"op":"print","text":"The opposing Vileplume was wrapped by Shuckle!"}
+{"line":891,"op":"itemPopUp","side":"far","item":472}
+{"line":891,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":891,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":891,"op":"hp","side":"far","hp":100}
+{"line":892,"op":"trapTurn","side":"far","move":35}
+{"line":892,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":892,"op":"hp","side":"far","hp":94}
+{"line":894,"op":"turn","number":77}
+{"line":897,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":897,"op":"move","user":"far","target":"near","move":79,"animTurn":0}
+{"line":898,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":898,"op":"print","text":"Shuckle fell asleep!"}
+{"line":898,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":899,"op":"print","text":"Shuckle is fast asleep."}
+{"line":899,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":901,"op":"itemPopUp","side":"far","item":472}
+{"line":901,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":901,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":901,"op":"hp","side":"far","hp":100}
+{"line":902,"op":"trapTurn","side":"far","move":35}
+{"line":902,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":902,"op":"hp","side":"far","hp":94}
+{"line":904,"op":"turn","number":78}
+{"line":907,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":908,"op":"print","text":"Shuckle is already asleep!"}
+{"line":909,"op":"print","text":"Shuckle is fast asleep."}
+{"line":909,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":911,"op":"itemPopUp","side":"far","item":472}
+{"line":911,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":911,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":911,"op":"hp","side":"far","hp":100}
+{"line":912,"op":"trapTurn","side":"far","move":35}
+{"line":912,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":912,"op":"hp","side":"far","hp":94}
+{"line":914,"op":"turn","number":79}
+{"line":917,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":918,"op":"print","text":"Shuckle is already asleep!"}
+{"line":919,"op":"print","text":"Shuckle is fast asleep."}
+{"line":919,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":921,"op":"itemPopUp","side":"far","item":472}
+{"line":921,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":921,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":921,"op":"hp","side":"far","hp":100}
+{"line":922,"op":"trapTurn","side":"far","move":35}
+{"line":922,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":922,"op":"hp","side":"far","hp":94}
+{"line":924,"op":"turn","number":80}
+{"line":927,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":928,"op":"print","text":"Shuckle is already asleep!"}
+{"line":929,"op":"print","text":"Shuckle woke up!"}
+{"line":929,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":930,"op":"print","text":"Shuckle used Encore!"}
+{"line":930,"op":"move","user":"near","target":"far","move":227,"animTurn":0}
+{"line":931,"op":"print","text":"The opposing Vileplume must do an encore!"}
+{"line":933,"op":"itemPopUp","side":"far","item":472}
+{"line":933,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":933,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":933,"op":"hp","side":"far","hp":100}
+{"line":934,"op":"print","text":"The opposing Vileplume was freed from Wrap!"}
+{"line":936,"op":"turn","number":81}
+{"line":939,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":939,"op":"move","user":"far","target":"near","move":79,"animTurn":0}
+{"line":940,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":940,"op":"print","text":"Shuckle fell asleep!"}
+{"line":940,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":941,"op":"print","text":"Shuckle is fast asleep."}
+{"line":941,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":944,"op":"turn","number":82}
+{"line":947,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":948,"op":"print","text":"Shuckle is already asleep!"}
+{"line":949,"op":"print","text":"Shuckle is fast asleep."}
+{"line":949,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":952,"op":"turn","number":83}
+{"line":955,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":956,"op":"print","text":"Shuckle avoided the attack!"}
+{"line":957,"op":"print","text":"Shuckle is fast asleep."}
+{"line":957,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":959,"op":"print","text":"The opposing Vileplume ended its encore!"}
+{"line":961,"op":"turn","number":84}
+{"line":964,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":965,"op":"print","text":"Shuckle is already asleep!"}
+{"line":966,"op":"print","text":"Shuckle woke up!"}
+{"line":966,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":967,"op":"print","text":"Shuckle used Encore!"}
+{"line":967,"op":"move","user":"near","target":"far","move":227,"animTurn":0}
+{"line":968,"op":"print","text":"The opposing Vileplume must do an encore!"}
+{"line":971,"op":"turn","number":85}
+{"line":974,"op":"print","text":"Shuckle, come back!"}
+{"line":974,"op":"withdraw","side":"near"}
+{"line":974,"op":"print","text":"Go! Swampert!"}
+{"line":974,"op":"switchIn","side":"near","slot":1,"hp":23,"status":"none"}
+{"line":975,"op":"hp","side":"near","hp":6}
+{"line":975,"op":"print","text":"Swampert was hurt by the spikes!"}
+{"line":976,"op":"print","text":"The opposing Vileplume used Sleep Powder!"}
+{"line":976,"op":"move","user":"far","target":"near","move":79,"animTurn":0}
+{"line":977,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":977,"op":"print","text":"Swampert fell asleep!"}
+{"line":977,"op":"status","side":"near","slot":1,"status":"slp"}
+{"line":979,"op":"itemPopUp","side":"near","item":472}
+{"line":979,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":979,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":979,"op":"hp","side":"near","hp":12}
+{"line":980,"op":"print","text":"The opposing Vileplume ended its encore!"}
+{"line":982,"op":"turn","number":86}
+{"line":985,"op":"print","text":"Swampert, come back!"}
+{"line":985,"op":"withdraw","side":"near"}
+{"line":985,"op":"print","text":"Go! Shuckle!"}
+{"line":985,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":986,"op":"hp","side":"near","hp":83}
+{"line":986,"op":"print","text":"Shuckle was hurt by the spikes!"}
+{"line":987,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":987,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":989,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":989,"op":"hp","side":"near","hp":76}
+{"line":989,"op":"print","text":"It's not very effective…"}
+{"line":991,"op":"itemPopUp","side":"near","item":472}
+{"line":991,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":991,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":991,"op":"hp","side":"near","hp":82}
+{"line":993,"op":"turn","number":87}
+{"line":996,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":996,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":997,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":997,"op":"hp","side":"near","hp":72}
+{"line":998,"op":"print","text":"Shuckle used Rest!"}
+{"line":998,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":999,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":999,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":1000,"op":"hp","side":"near","hp":100}
+{"line":1003,"op":"turn","number":88}
+{"line":1006,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1006,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1007,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1007,"op":"hp","side":"near","hp":89}
+{"line":1008,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1008,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1010,"op":"itemPopUp","side":"near","item":472}
+{"line":1010,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1010,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1010,"op":"hp","side":"near","hp":95}
+{"line":1012,"op":"turn","number":89}
+{"line":1015,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1015,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1016,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1016,"op":"hp","side":"near","hp":85}
+{"line":1017,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1017,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1019,"op":"itemPopUp","side":"near","item":472}
+{"line":1019,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1019,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1019,"op":"hp","side":"near","hp":91}
+{"line":1021,"op":"turn","number":90}
+{"line":1024,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1024,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1025,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1025,"op":"hp","side":"near","hp":81}
+{"line":1026,"op":"print","text":"Shuckle woke up!"}
+{"line":1026,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":1027,"op":"print","text":"Shuckle used Encore!"}
+{"line":1027,"op":"move","user":"near","target":"far","move":227,"animTurn":0}
+{"line":1028,"op":"print","text":"The opposing Vileplume must do an encore!"}
+{"line":1030,"op":"itemPopUp","side":"near","item":472}
+{"line":1030,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1030,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1030,"op":"hp","side":"near","hp":87}
+{"line":1032,"op":"turn","number":91}
+{"line":1035,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1035,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1036,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1036,"op":"hp","side":"near","hp":77}
+{"line":1037,"op":"print","text":"Shuckle used Rest!"}
+{"line":1037,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":1038,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":1038,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":1039,"op":"hp","side":"near","hp":100}
+{"line":1042,"op":"turn","number":92}
+{"line":1045,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1045,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1046,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1046,"op":"hp","side":"near","hp":90}
+{"line":1047,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1047,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1049,"op":"itemPopUp","side":"near","item":472}
+{"line":1049,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1049,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1049,"op":"hp","side":"near","hp":96}
+{"line":1051,"op":"turn","number":93}
+{"line":1054,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1054,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1055,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1055,"op":"hp","side":"near","hp":86}
+{"line":1056,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1056,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1058,"op":"itemPopUp","side":"near","item":472}
+{"line":1058,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1058,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1058,"op":"hp","side":"near","hp":92}
+{"line":1060,"op":"turn","number":94}
+{"line":1063,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1063,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1064,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1064,"op":"hp","side":"near","hp":82}
+{"line":1065,"op":"print","text":"Shuckle woke up!"}
+{"line":1065,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":1066,"op":"print","text":"Shuckle used Encore!"}
+{"line":1067,"op":"print","text":"But it failed!"}
+{"line":1069,"op":"print","text":"The opposing Vileplume ended its encore!"}
+{"line":1070,"op":"itemPopUp","side":"near","item":472}
+{"line":1070,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1070,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1070,"op":"hp","side":"near","hp":88}
+{"line":1072,"op":"turn","number":95}
+{"line":1075,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1075,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1076,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1076,"op":"hp","side":"near","hp":79}
+{"line":1077,"op":"print","text":"Shuckle used Encore!"}
+{"line":1077,"op":"move","user":"near","target":"far","move":227,"animTurn":0}
+{"line":1078,"op":"print","text":"The opposing Vileplume must do an encore!"}
+{"line":1080,"op":"itemPopUp","side":"near","item":472}
+{"line":1080,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1080,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1080,"op":"hp","side":"near","hp":85}
+{"line":1082,"op":"turn","number":96}
+{"line":1085,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1085,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1086,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1086,"op":"hp","side":"near","hp":76}
+{"line":1087,"op":"print","text":"Shuckle used Rest!"}
+{"line":1087,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":1088,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":1088,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":1089,"op":"hp","side":"near","hp":100}
+{"line":1092,"op":"turn","number":97}
+{"line":1095,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1095,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1096,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1096,"op":"hp","side":"near","hp":89}
+{"line":1097,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1097,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1099,"op":"itemPopUp","side":"near","item":472}
+{"line":1099,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1099,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1099,"op":"hp","side":"near","hp":95}
+{"line":1101,"op":"turn","number":98}
+{"line":1104,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1104,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1105,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1105,"op":"hp","side":"near","hp":85}
+{"line":1106,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1106,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1108,"op":"itemPopUp","side":"near","item":472}
+{"line":1108,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1108,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1108,"op":"hp","side":"near","hp":91}
+{"line":1110,"op":"turn","number":99}
+{"line":1113,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1113,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1114,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1114,"op":"hp","side":"near","hp":82}
+{"line":1115,"op":"print","text":"Shuckle woke up!"}
+{"line":1115,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":1116,"op":"print","text":"Shuckle used Rest!"}
+{"line":1116,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":1117,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":1117,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":1118,"op":"hp","side":"near","hp":100}
+{"line":1120,"op":"print","text":"The opposing Vileplume ended its encore!"}
+{"line":1122,"op":"turn","number":100}
+{"line":1125,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1125,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1126,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1126,"op":"hp","side":"near","hp":90}
+{"line":1127,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1127,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1129,"op":"itemPopUp","side":"near","item":472}
+{"line":1129,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1129,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1129,"op":"hp","side":"near","hp":96}
+{"line":1131,"op":"turn","number":101}
+{"line":1134,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1134,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1135,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1135,"op":"hp","side":"near","hp":85}
+{"line":1136,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1136,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1138,"op":"itemPopUp","side":"near","item":472}
+{"line":1138,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1138,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1138,"op":"hp","side":"near","hp":91}
+{"line":1140,"op":"turn","number":102}
+{"line":1143,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1143,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1144,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1144,"op":"hp","side":"near","hp":81}
+{"line":1145,"op":"print","text":"Shuckle woke up!"}
+{"line":1145,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":1146,"op":"print","text":"Shuckle used Toxic!"}
+{"line":1147,"op":"print","text":"It doesn't affect the opposing Vileplume…"}
+{"line":1149,"op":"itemPopUp","side":"near","item":472}
+{"line":1149,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1149,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1149,"op":"hp","side":"near","hp":87}
+{"line":1151,"op":"turn","number":103}
+{"line":1154,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1154,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1155,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1155,"op":"hp","side":"near","hp":77}
+{"line":1156,"op":"print","text":"Shuckle used Rest!"}
+{"line":1156,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":1157,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":1157,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":1158,"op":"hp","side":"near","hp":100}
+{"line":1161,"op":"turn","number":104}
+{"line":1164,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1164,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1165,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1165,"op":"hp","side":"near","hp":90}
+{"line":1166,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1166,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1168,"op":"itemPopUp","side":"near","item":472}
+{"line":1168,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1168,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1168,"op":"hp","side":"near","hp":96}
+{"line":1170,"op":"turn","number":105}
+{"line":1173,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1173,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1174,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1174,"op":"hp","side":"near","hp":86}
+{"line":1175,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1175,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1177,"op":"itemPopUp","side":"near","item":472}
+{"line":1177,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1177,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1177,"op":"hp","side":"near","hp":92}
+{"line":1179,"op":"turn","number":106}
+{"line":1182,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1182,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1183,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1183,"op":"hp","side":"near","hp":83}
+{"line":1184,"op":"print","text":"Shuckle woke up!"}
+{"line":1184,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":1185,"op":"print","text":"Shuckle used Toxic!"}
+{"line":1186,"op":"print","text":"The opposing Vileplume avoided the attack!"}
+{"line":1188,"op":"itemPopUp","side":"near","item":472}
+{"line":1188,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1188,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1188,"op":"hp","side":"near","hp":89}
+{"line":1190,"op":"turn","number":107}
+{"line":1193,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1193,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1194,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1194,"op":"hp","side":"near","hp":79}
+{"line":1195,"op":"print","text":"Shuckle used Rest!"}
+{"line":1195,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":1196,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":1196,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":1197,"op":"hp","side":"near","hp":100}
+{"line":1200,"op":"turn","number":108}
+{"line":1203,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1203,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1204,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1204,"op":"hp","side":"near","hp":90}
+{"line":1205,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1205,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1207,"op":"itemPopUp","side":"near","item":472}
+{"line":1207,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1207,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1207,"op":"hp","side":"near","hp":96}
+{"line":1209,"op":"turn","number":109}
+{"line":1212,"op":"print","text":"The opposing Vileplume used Hidden Power!"}
+{"line":1212,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":1213,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1213,"op":"hp","side":"near","hp":86}
+{"line":1214,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1214,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1216,"op":"itemPopUp","side":"near","item":472}
+{"line":1216,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1216,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1216,"op":"hp","side":"near","hp":92}
+{"line":1218,"op":"turn","number":110}
+{"line":1221,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":1221,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":1223,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":1223,"op":"hp","side":"near","hp":83}
+{"line":1223,"op":"print","text":"It's not very effective…"}
+{"line":1224,"op":"print","text":"Shuckle woke up!"}
+{"line":1224,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":1225,"op":"print","text":"Shuckle used Toxic!"}
+{"line":1226,"op":"print","text":"The opposing Vileplume avoided the attack!"}
+{"line":1228,"op":"itemPopUp","side":"near","item":472}
+{"line":1228,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1228,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1228,"op":"hp","side":"near","hp":89}
+{"line":1230,"op":"turn","number":111}
+{"line":1233,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":1233,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":1235,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":1235,"op":"hp","side":"near","hp":81}
+{"line":1235,"op":"print","text":"It's not very effective…"}
+{"line":1236,"op":"print","text":"Shuckle used Toxic!"}
+{"line":1237,"op":"print","text":"It doesn't affect the opposing Vileplume…"}
+{"line":1239,"op":"itemPopUp","side":"near","item":472}
+{"line":1239,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1239,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1239,"op":"hp","side":"near","hp":87}
+{"line":1241,"op":"turn","number":112}
+{"line":1244,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":1244,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":1246,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":1246,"op":"hp","side":"near","hp":79}
+{"line":1246,"op":"print","text":"It's not very effective…"}
+{"line":1247,"op":"print","text":"Shuckle used Toxic!"}
+{"line":1248,"op":"print","text":"It doesn't affect the opposing Vileplume…"}
+{"line":1250,"op":"itemPopUp","side":"near","item":472}
+{"line":1250,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1250,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1250,"op":"hp","side":"near","hp":85}
+{"line":1252,"op":"turn","number":113}
+{"line":1255,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":1255,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":1257,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":1257,"op":"hp","side":"near","hp":77}
+{"line":1257,"op":"print","text":"It's not very effective…"}
+{"line":1258,"op":"print","text":"Shuckle used Toxic!"}
+{"line":1259,"op":"print","text":"It doesn't affect the opposing Vileplume…"}
+{"line":1261,"op":"itemPopUp","side":"near","item":472}
+{"line":1261,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1261,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1261,"op":"hp","side":"near","hp":83}
+{"line":1263,"op":"turn","number":114}
+{"line":1266,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":1266,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":1268,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":1268,"op":"hp","side":"near","hp":75}
+{"line":1268,"op":"print","text":"It's not very effective…"}
+{"line":1269,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":1269,"op":"print","text":"Shuckle was poisoned!"}
+{"line":1269,"op":"status","side":"near","slot":2,"status":"psn"}
+{"line":1270,"op":"print","text":"Shuckle used Toxic!"}
+{"line":1271,"op":"print","text":"It doesn't affect the opposing Vileplume…"}
+{"line":1273,"op":"itemPopUp","side":"near","item":472}
+{"line":1273,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1273,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1273,"op":"hp","side":"near","hp":81}
+{"line":1274,"op":"print","text":"Shuckle was hurt by its poisoning!"}
+{"line":1274,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":1274,"op":"hp","side":"near","hp":69}
+{"line":1276,"op":"turn","number":115}
+{"line":1279,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":1279,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":1282,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":1282,"op":"hp","side":"near","hp":51}
+{"line":1282,"op":"print","text":"A critical hit!"}
+{"line":1282,"op":"print","text":"It's not very effective…"}
+{"line":1283,"op":"print","text":"Shuckle used Rest!"}
+{"line":1283,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":1284,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":1284,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":1285,"op":"hp","side":"near","hp":100}
+{"line":1288,"op":"turn","number":116}
+{"line":1291,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":1291,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":1293,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":1293,"op":"hp","side":"near","hp":91}
+{"line":1293,"op":"print","text":"It's not very effective…"}
+{"line":1294,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1294,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1296,"op":"itemPopUp","side":"near","item":472}
+{"line":1296,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1296,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1296,"op":"hp","side":"near","hp":97}
+{"line":1298,"op":"turn","number":117}
+{"line":1301,"op":"print","text":"The opposing Vileplume used Sludge Bomb!"}
+{"line":1301,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":1303,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":1303,"op":"hp","side":"near","hp":89}
+{"line":1303,"op":"print","text":"It's not very effective…"}
+{"line":1304,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1304,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1306,"op":"itemPopUp","side":"near","item":472}
+{"line":1306,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1306,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1306,"op":"hp","side":"near","hp":95}
+{"line":1308,"op":"turn","number":118}
+{"line":1311,"op":"print","text":"The opposing Vileplume used Synthesis!"}
+{"line":1311,"op":"move","user":"far","target":"far","move":235,"animTurn":0}
+{"line":1312,"op":"print","text":"Shuckle woke up!"}
+{"line":1312,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":1313,"op":"print","text":"Shuckle used Toxic!"}
+{"line":1314,"op":"print","text":"It doesn't affect the opposing Vileplume…"}
+{"line":1316,"op":"itemPopUp","side":"near","item":472}
+{"line":1316,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1316,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1316,"op":"hp","side":"near","hp":100}
+{"line":1318,"op":"turn","number":119}
+{"line":1321,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1321,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1322,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1322,"op":"hp","side":"near","hp":93}
+{"line":1323,"op":"hp","side":"far","hp":99}
+{"line":1323,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1324,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1324,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1325,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1325,"op":"hp","side":"far","hp":97}
+{"line":1326,"op":"print","text":"The opposing Vileplume was wrapped by Shuckle!"}
+{"line":1328,"op":"itemPopUp","side":"far","item":472}
+{"line":1328,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1328,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1328,"op":"hp","side":"far","hp":100}
+{"line":1329,"op":"trapTurn","side":"far","move":35}
+{"line":1329,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1329,"op":"hp","side":"far","hp":94}
+{"line":1330,"op":"itemPopUp","side":"near","item":472}
+{"line":1330,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1330,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1330,"op":"hp","side":"near","hp":99}
+{"line":1332,"op":"turn","number":120}
+{"line":1335,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1335,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1336,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1336,"op":"hp","side":"near","hp":93}
+{"line":1337,"op":"hp","side":"far","hp":93}
+{"line":1337,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1338,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1338,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1339,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1339,"op":"hp","side":"far","hp":91}
+{"line":1341,"op":"itemPopUp","side":"far","item":472}
+{"line":1341,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1341,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1341,"op":"hp","side":"far","hp":97}
+{"line":1342,"op":"trapTurn","side":"far","move":35}
+{"line":1342,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1342,"op":"hp","side":"far","hp":91}
+{"line":1343,"op":"itemPopUp","side":"near","item":472}
+{"line":1343,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1343,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1343,"op":"hp","side":"near","hp":99}
+{"line":1345,"op":"turn","number":121}
+{"line":1348,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1348,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1349,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1349,"op":"hp","side":"near","hp":92}
+{"line":1350,"op":"hp","side":"far","hp":90}
+{"line":1350,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1351,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1351,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1352,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1352,"op":"hp","side":"far","hp":88}
+{"line":1354,"op":"itemPopUp","side":"far","item":472}
+{"line":1354,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1354,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1354,"op":"hp","side":"far","hp":94}
+{"line":1355,"op":"print","text":"The opposing Vileplume was freed from Wrap!"}
+{"line":1356,"op":"itemPopUp","side":"near","item":472}
+{"line":1356,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1356,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1356,"op":"hp","side":"near","hp":98}
+{"line":1358,"op":"turn","number":122}
+{"line":1361,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1361,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1362,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1362,"op":"hp","side":"near","hp":92}
+{"line":1363,"op":"hp","side":"far","hp":93}
+{"line":1363,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1364,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1365,"op":"print","text":"The opposing Vileplume avoided the attack!"}
+{"line":1367,"op":"itemPopUp","side":"far","item":472}
+{"line":1367,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1367,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1367,"op":"hp","side":"far","hp":99}
+{"line":1368,"op":"itemPopUp","side":"near","item":472}
+{"line":1368,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1368,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1368,"op":"hp","side":"near","hp":98}
+{"line":1370,"op":"turn","number":123}
+{"line":1373,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1373,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1374,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1374,"op":"hp","side":"near","hp":91}
+{"line":1375,"op":"hp","side":"far","hp":98}
+{"line":1375,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1376,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1377,"op":"print","text":"The opposing Vileplume avoided the attack!"}
+{"line":1379,"op":"itemPopUp","side":"far","item":472}
+{"line":1379,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1379,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1379,"op":"hp","side":"far","hp":100}
+{"line":1380,"op":"itemPopUp","side":"near","item":472}
+{"line":1380,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1380,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1380,"op":"hp","side":"near","hp":97}
+{"line":1382,"op":"turn","number":124}
+{"line":1385,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1385,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1386,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1386,"op":"hp","side":"near","hp":91}
+{"line":1387,"op":"hp","side":"far","hp":99}
+{"line":1387,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1388,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1389,"op":"print","text":"The opposing Vileplume avoided the attack!"}
+{"line":1391,"op":"itemPopUp","side":"far","item":472}
+{"line":1391,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1391,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1391,"op":"hp","side":"far","hp":100}
+{"line":1392,"op":"itemPopUp","side":"near","item":472}
+{"line":1392,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1392,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1392,"op":"hp","side":"near","hp":97}
+{"line":1394,"op":"turn","number":125}
+{"line":1397,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1397,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1398,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1398,"op":"hp","side":"near","hp":91}
+{"line":1399,"op":"hp","side":"far","hp":99}
+{"line":1399,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1400,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1400,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1401,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1401,"op":"hp","side":"far","hp":97}
+{"line":1402,"op":"print","text":"The opposing Vileplume was wrapped by Shuckle!"}
+{"line":1404,"op":"itemPopUp","side":"far","item":472}
+{"line":1404,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1404,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1404,"op":"hp","side":"far","hp":100}
+{"line":1405,"op":"trapTurn","side":"far","move":35}
+{"line":1405,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1405,"op":"hp","side":"far","hp":94}
+{"line":1406,"op":"itemPopUp","side":"near","item":472}
+{"line":1406,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1406,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1406,"op":"hp","side":"near","hp":97}
+{"line":1408,"op":"turn","number":126}
+{"line":1411,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1411,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1412,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1412,"op":"hp","side":"near","hp":91}
+{"line":1413,"op":"hp","side":"far","hp":93}
+{"line":1413,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1414,"op":"print","text":"Shuckle used Toxic!"}
+{"line":1415,"op":"print","text":"The opposing Vileplume avoided the attack!"}
+{"line":1417,"op":"itemPopUp","side":"far","item":472}
+{"line":1417,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1417,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1417,"op":"hp","side":"far","hp":99}
+{"line":1418,"op":"trapTurn","side":"far","move":35}
+{"line":1418,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1418,"op":"hp","side":"far","hp":93}
+{"line":1419,"op":"itemPopUp","side":"near","item":472}
+{"line":1419,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1419,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1419,"op":"hp","side":"near","hp":97}
+{"line":1421,"op":"turn","number":127}
+{"line":1424,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1424,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1425,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1425,"op":"hp","side":"near","hp":91}
+{"line":1426,"op":"hp","side":"far","hp":92}
+{"line":1426,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1427,"op":"print","text":"Shuckle used Toxic!"}
+{"line":1428,"op":"print","text":"It doesn't affect the opposing Vileplume…"}
+{"line":1430,"op":"itemPopUp","side":"far","item":472}
+{"line":1430,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1430,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1430,"op":"hp","side":"far","hp":98}
+{"line":1431,"op":"trapTurn","side":"far","move":35}
+{"line":1431,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1431,"op":"hp","side":"far","hp":92}
+{"line":1432,"op":"itemPopUp","side":"near","item":472}
+{"line":1432,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1432,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1432,"op":"hp","side":"near","hp":97}
+{"line":1434,"op":"turn","number":128}
+{"line":1437,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1437,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1438,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1438,"op":"hp","side":"near","hp":91}
+{"line":1439,"op":"hp","side":"far","hp":90}
+{"line":1439,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1440,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1440,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1441,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1441,"op":"hp","side":"far","hp":89}
+{"line":1443,"op":"itemPopUp","side":"far","item":472}
+{"line":1443,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1443,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1443,"op":"hp","side":"far","hp":95}
+{"line":1444,"op":"trapTurn","side":"far","move":35}
+{"line":1444,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1444,"op":"hp","side":"far","hp":89}
+{"line":1445,"op":"itemPopUp","side":"near","item":472}
+{"line":1445,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1445,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1445,"op":"hp","side":"near","hp":97}
+{"line":1447,"op":"turn","number":129}
+{"line":1450,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1450,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1451,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1451,"op":"hp","side":"near","hp":91}
+{"line":1452,"op":"hp","side":"far","hp":87}
+{"line":1452,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1453,"op":"print","text":"Shuckle used Encore!"}
+{"line":1454,"op":"print","text":"But it failed!"}
+{"line":1456,"op":"itemPopUp","side":"far","item":472}
+{"line":1456,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1456,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1456,"op":"hp","side":"far","hp":94}
+{"line":1457,"op":"trapTurn","side":"far","move":35}
+{"line":1457,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1457,"op":"hp","side":"far","hp":87}
+{"line":1458,"op":"itemPopUp","side":"near","item":472}
+{"line":1458,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1458,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1458,"op":"hp","side":"near","hp":97}
+{"line":1460,"op":"turn","number":130}
+{"line":1463,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1463,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1464,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1464,"op":"hp","side":"near","hp":91}
+{"line":1465,"op":"hp","side":"far","hp":86}
+{"line":1465,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1466,"op":"print","text":"Shuckle used Encore!"}
+{"line":1467,"op":"print","text":"But it failed!"}
+{"line":1469,"op":"itemPopUp","side":"far","item":472}
+{"line":1469,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1469,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1469,"op":"hp","side":"far","hp":92}
+{"line":1470,"op":"print","text":"The opposing Vileplume was freed from Wrap!"}
+{"line":1471,"op":"itemPopUp","side":"near","item":472}
+{"line":1471,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1471,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1471,"op":"hp","side":"near","hp":97}
+{"line":1473,"op":"turn","number":131}
+{"line":1476,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1476,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1478,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1478,"op":"hp","side":"near","hp":83}
+{"line":1478,"op":"print","text":"A critical hit!"}
+{"line":1479,"op":"hp","side":"far","hp":90}
+{"line":1479,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1480,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1480,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1481,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1481,"op":"hp","side":"far","hp":88}
+{"line":1482,"op":"print","text":"The opposing Vileplume was wrapped by Shuckle!"}
+{"line":1484,"op":"itemPopUp","side":"far","item":472}
+{"line":1484,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1484,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1484,"op":"hp","side":"far","hp":94}
+{"line":1485,"op":"trapTurn","side":"far","move":35}
+{"line":1485,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1485,"op":"hp","side":"far","hp":88}
+{"line":1486,"op":"itemPopUp","side":"near","item":472}
+{"line":1486,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1486,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1486,"op":"hp","side":"near","hp":89}
+{"line":1488,"op":"turn","number":132}
+{"line":1491,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1491,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1492,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1492,"op":"hp","side":"near","hp":83}
+{"line":1493,"op":"hp","side":"far","hp":87}
+{"line":1493,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1494,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1494,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1495,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1495,"op":"hp","side":"far","hp":85}
+{"line":1497,"op":"itemPopUp","side":"far","item":472}
+{"line":1497,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1497,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1497,"op":"hp","side":"far","hp":91}
+{"line":1498,"op":"trapTurn","side":"far","move":35}
+{"line":1498,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1498,"op":"hp","side":"far","hp":85}
+{"line":1499,"op":"itemPopUp","side":"near","item":472}
+{"line":1499,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1499,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1499,"op":"hp","side":"near","hp":89}
+{"line":1501,"op":"turn","number":133}
+{"line":1504,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1504,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1505,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1505,"op":"hp","side":"near","hp":83}
+{"line":1506,"op":"hp","side":"far","hp":84}
+{"line":1506,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1507,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1507,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1508,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1508,"op":"hp","side":"far","hp":82}
+{"line":1510,"op":"itemPopUp","side":"far","item":472}
+{"line":1510,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1510,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1510,"op":"hp","side":"far","hp":88}
+{"line":1511,"op":"trapTurn","side":"far","move":35}
+{"line":1511,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1511,"op":"hp","side":"far","hp":82}
+{"line":1512,"op":"itemPopUp","side":"near","item":472}
+{"line":1512,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1512,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1512,"op":"hp","side":"near","hp":89}
+{"line":1514,"op":"turn","number":134}
+{"line":1517,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1517,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1518,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1518,"op":"hp","side":"near","hp":82}
+{"line":1519,"op":"hp","side":"far","hp":81}
+{"line":1519,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1520,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1520,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1522,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1522,"op":"hp","side":"far","hp":77}
+{"line":1522,"op":"print","text":"A critical hit!"}
+{"line":1524,"op":"itemPopUp","side":"far","item":472}
+{"line":1524,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1524,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1524,"op":"hp","side":"far","hp":83}
+{"line":1525,"op":"print","text":"The opposing Vileplume was freed from Wrap!"}
+{"line":1526,"op":"itemPopUp","side":"near","item":472}
+{"line":1526,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1526,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1526,"op":"hp","side":"near","hp":88}
+{"line":1528,"op":"turn","number":135}
+{"line":1531,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1531,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1532,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1532,"op":"hp","side":"near","hp":82}
+{"line":1533,"op":"hp","side":"far","hp":82}
+{"line":1533,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1534,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1534,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1535,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1535,"op":"hp","side":"far","hp":80}
+{"line":1536,"op":"print","text":"The opposing Vileplume was wrapped by Shuckle!"}
+{"line":1538,"op":"itemPopUp","side":"far","item":472}
+{"line":1538,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1538,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1538,"op":"hp","side":"far","hp":86}
+{"line":1539,"op":"trapTurn","side":"far","move":35}
+{"line":1539,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1539,"op":"hp","side":"far","hp":80}
+{"line":1540,"op":"itemPopUp","side":"near","item":472}
+{"line":1540,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1540,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1540,"op":"hp","side":"near","hp":88}
+{"line":1542,"op":"turn","number":136}
+{"line":1545,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1545,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1546,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1546,"op":"hp","side":"near","hp":81}
+{"line":1547,"op":"hp","side":"far","hp":79}
+{"line":1547,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1548,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1548,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1549,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1549,"op":"hp","side":"far","hp":77}
+{"line":1551,"op":"itemPopUp","side":"far","item":472}
+{"line":1551,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1551,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1551,"op":"hp","side":"far","hp":83}
+{"line":1552,"op":"trapTurn","side":"far","move":35}
+{"line":1552,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1552,"op":"hp","side":"far","hp":77}
+{"line":1553,"op":"itemPopUp","side":"near","item":472}
+{"line":1553,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1553,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1553,"op":"hp","side":"near","hp":87}
+{"line":1555,"op":"turn","number":137}
+{"line":1558,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1558,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1559,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1559,"op":"hp","side":"near","hp":81}
+{"line":1560,"op":"hp","side":"far","hp":76}
+{"line":1560,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1561,"op":"print","text":"Shuckle used Encore!"}
+{"line":1562,"op":"print","text":"But it failed!"}
+{"line":1564,"op":"itemPopUp","side":"far","item":472}
+{"line":1564,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1564,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1564,"op":"hp","side":"far","hp":82}
+{"line":1565,"op":"print","text":"The opposing Vileplume was freed from Wrap!"}
+{"line":1566,"op":"itemPopUp","side":"near","item":472}
+{"line":1566,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1566,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1566,"op":"hp","side":"near","hp":87}
+{"line":1568,"op":"turn","number":138}
+{"line":1571,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1571,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1572,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1572,"op":"hp","side":"near","hp":81}
+{"line":1573,"op":"hp","side":"far","hp":81}
+{"line":1573,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1574,"op":"print","text":"Shuckle used Rest!"}
+{"line":1574,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":1575,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":1575,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":1576,"op":"hp","side":"near","hp":100}
+{"line":1578,"op":"itemPopUp","side":"far","item":472}
+{"line":1578,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1578,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1578,"op":"hp","side":"far","hp":87}
+{"line":1580,"op":"turn","number":139}
+{"line":1583,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1583,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1584,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1584,"op":"hp","side":"near","hp":94}
+{"line":1585,"op":"hp","side":"far","hp":86}
+{"line":1585,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1586,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1586,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1588,"op":"itemPopUp","side":"far","item":472}
+{"line":1588,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1588,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1588,"op":"hp","side":"far","hp":92}
+{"line":1589,"op":"itemPopUp","side":"near","item":472}
+{"line":1589,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1589,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1589,"op":"hp","side":"near","hp":100}
+{"line":1591,"op":"turn","number":140}
+{"line":1594,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1594,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1595,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1595,"op":"hp","side":"near","hp":93}
+{"line":1596,"op":"hp","side":"far","hp":91}
+{"line":1596,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1597,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1597,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1599,"op":"itemPopUp","side":"far","item":472}
+{"line":1599,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1599,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1599,"op":"hp","side":"far","hp":97}
+{"line":1600,"op":"itemPopUp","side":"near","item":472}
+{"line":1600,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1600,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1600,"op":"hp","side":"near","hp":99}
+{"line":1602,"op":"turn","number":141}
+{"line":1605,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1605,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1606,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1606,"op":"hp","side":"near","hp":93}
+{"line":1607,"op":"hp","side":"far","hp":96}
+{"line":1607,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1608,"op":"print","text":"Shuckle woke up!"}
+{"line":1608,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":1609,"op":"print","text":"Shuckle used Rest!"}
+{"line":1609,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":1610,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":1610,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":1611,"op":"hp","side":"near","hp":100}
+{"line":1613,"op":"itemPopUp","side":"far","item":472}
+{"line":1613,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1613,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1613,"op":"hp","side":"far","hp":100}
+{"line":1615,"op":"turn","number":142}
+{"line":1618,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1618,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1619,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1619,"op":"hp","side":"near","hp":93}
+{"line":1620,"op":"hp","side":"far","hp":99}
+{"line":1620,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1621,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1621,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1623,"op":"itemPopUp","side":"far","item":472}
+{"line":1623,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1623,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1623,"op":"hp","side":"far","hp":100}
+{"line":1624,"op":"itemPopUp","side":"near","item":472}
+{"line":1624,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1624,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1624,"op":"hp","side":"near","hp":99}
+{"line":1626,"op":"turn","number":143}
+{"line":1629,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1629,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1630,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1630,"op":"hp","side":"near","hp":93}
+{"line":1631,"op":"hp","side":"far","hp":99}
+{"line":1631,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1632,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1632,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1634,"op":"itemPopUp","side":"far","item":472}
+{"line":1634,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1634,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1634,"op":"hp","side":"far","hp":100}
+{"line":1635,"op":"itemPopUp","side":"near","item":472}
+{"line":1635,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1635,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1635,"op":"hp","side":"near","hp":99}
+{"line":1637,"op":"turn","number":144}
+{"line":1640,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1640,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1641,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1641,"op":"hp","side":"near","hp":93}
+{"line":1642,"op":"hp","side":"far","hp":99}
+{"line":1642,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1643,"op":"print","text":"Shuckle woke up!"}
+{"line":1643,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":1644,"op":"print","text":"Shuckle used Rest!"}
+{"line":1644,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":1645,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":1645,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":1646,"op":"hp","side":"near","hp":100}
+{"line":1648,"op":"itemPopUp","side":"far","item":472}
+{"line":1648,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1648,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1648,"op":"hp","side":"far","hp":100}
+{"line":1650,"op":"turn","number":145}
+{"line":1653,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1653,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1654,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1654,"op":"hp","side":"near","hp":94}
+{"line":1655,"op":"hp","side":"far","hp":99}
+{"line":1655,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1656,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1656,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1658,"op":"itemPopUp","side":"far","item":472}
+{"line":1658,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1658,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1658,"op":"hp","side":"far","hp":100}
+{"line":1659,"op":"itemPopUp","side":"near","item":472}
+{"line":1659,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1659,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1659,"op":"hp","side":"near","hp":100}
+{"line":1661,"op":"turn","number":146}
+{"line":1664,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1664,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1665,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1665,"op":"hp","side":"near","hp":93}
+{"line":1666,"op":"hp","side":"far","hp":99}
+{"line":1666,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1667,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1667,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1669,"op":"itemPopUp","side":"far","item":472}
+{"line":1669,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1669,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1669,"op":"hp","side":"far","hp":100}
+{"line":1670,"op":"itemPopUp","side":"near","item":472}
+{"line":1670,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1670,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1670,"op":"hp","side":"near","hp":99}
+{"line":1672,"op":"turn","number":147}
+{"line":1675,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1675,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1677,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1677,"op":"hp","side":"near","hp":86}
+{"line":1677,"op":"print","text":"A critical hit!"}
+{"line":1678,"op":"hp","side":"far","hp":98}
+{"line":1678,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1679,"op":"print","text":"Shuckle woke up!"}
+{"line":1679,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":1680,"op":"print","text":"Shuckle used Rest!"}
+{"line":1680,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":1681,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":1681,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":1682,"op":"hp","side":"near","hp":100}
+{"line":1684,"op":"itemPopUp","side":"far","item":472}
+{"line":1684,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1684,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1684,"op":"hp","side":"far","hp":100}
+{"line":1686,"op":"turn","number":148}
+{"line":1689,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1689,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1690,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1690,"op":"hp","side":"near","hp":93}
+{"line":1691,"op":"hp","side":"far","hp":99}
+{"line":1691,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1692,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1692,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1694,"op":"itemPopUp","side":"far","item":472}
+{"line":1694,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1694,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1694,"op":"hp","side":"far","hp":100}
+{"line":1695,"op":"itemPopUp","side":"near","item":472}
+{"line":1695,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1695,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1695,"op":"hp","side":"near","hp":99}
+{"line":1697,"op":"turn","number":149}
+{"line":1700,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1700,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1701,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1701,"op":"hp","side":"near","hp":93}
+{"line":1702,"op":"hp","side":"far","hp":99}
+{"line":1702,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1703,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1703,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1705,"op":"itemPopUp","side":"far","item":472}
+{"line":1705,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1705,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1705,"op":"hp","side":"far","hp":100}
+{"line":1706,"op":"itemPopUp","side":"near","item":472}
+{"line":1706,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1706,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1706,"op":"hp","side":"near","hp":99}
+{"line":1708,"op":"turn","number":150}
+{"line":1711,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1711,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1712,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1712,"op":"hp","side":"near","hp":93}
+{"line":1713,"op":"hp","side":"far","hp":99}
+{"line":1713,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1714,"op":"print","text":"Shuckle woke up!"}
+{"line":1714,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":1715,"op":"print","text":"Shuckle used Rest!"}
+{"line":1715,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":1716,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":1716,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":1717,"op":"hp","side":"near","hp":100}
+{"line":1719,"op":"itemPopUp","side":"far","item":472}
+{"line":1719,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1719,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1719,"op":"hp","side":"far","hp":100}
+{"line":1721,"op":"turn","number":151}
+{"line":1724,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1724,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1725,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1725,"op":"hp","side":"near","hp":93}
+{"line":1726,"op":"hp","side":"far","hp":99}
+{"line":1726,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1727,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1727,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1729,"op":"itemPopUp","side":"far","item":472}
+{"line":1729,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1729,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1729,"op":"hp","side":"far","hp":100}
+{"line":1730,"op":"itemPopUp","side":"near","item":472}
+{"line":1730,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1730,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1730,"op":"hp","side":"near","hp":99}
+{"line":1732,"op":"turn","number":152}
+{"line":1735,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1735,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1736,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1736,"op":"hp","side":"near","hp":93}
+{"line":1737,"op":"hp","side":"far","hp":99}
+{"line":1737,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1738,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1738,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1740,"op":"itemPopUp","side":"far","item":472}
+{"line":1740,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1740,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1740,"op":"hp","side":"far","hp":100}
+{"line":1741,"op":"itemPopUp","side":"near","item":472}
+{"line":1741,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1741,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1741,"op":"hp","side":"near","hp":99}
+{"line":1743,"op":"turn","number":153}
+{"line":1746,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1746,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1747,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1747,"op":"hp","side":"near","hp":93}
+{"line":1748,"op":"hp","side":"far","hp":99}
+{"line":1748,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1749,"op":"print","text":"Shuckle woke up!"}
+{"line":1749,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":1750,"op":"print","text":"Shuckle used Rest!"}
+{"line":1750,"op":"move","user":"near","target":"near","move":156,"animTurn":0}
+{"line":1751,"op":"print","text":"Shuckle slept and restored its HP!"}
+{"line":1751,"op":"status","side":"near","slot":2,"status":"slp"}
+{"line":1752,"op":"hp","side":"near","hp":100}
+{"line":1754,"op":"itemPopUp","side":"far","item":472}
+{"line":1754,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1754,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1754,"op":"hp","side":"far","hp":100}
+{"line":1756,"op":"turn","number":154}
+{"line":1759,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1759,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1760,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1760,"op":"hp","side":"near","hp":94}
+{"line":1761,"op":"hp","side":"far","hp":99}
+{"line":1761,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1762,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1762,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1764,"op":"itemPopUp","side":"far","item":472}
+{"line":1764,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1764,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1764,"op":"hp","side":"far","hp":100}
+{"line":1765,"op":"itemPopUp","side":"near","item":472}
+{"line":1765,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1765,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1765,"op":"hp","side":"near","hp":100}
+{"line":1767,"op":"turn","number":155}
+{"line":1770,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1770,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1771,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1771,"op":"hp","side":"near","hp":93}
+{"line":1772,"op":"hp","side":"far","hp":99}
+{"line":1772,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1773,"op":"print","text":"Shuckle is fast asleep."}
+{"line":1773,"op":"anim","side":"near","anim":"statusSlp"}
+{"line":1775,"op":"itemPopUp","side":"far","item":472}
+{"line":1775,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1775,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1775,"op":"hp","side":"far","hp":100}
+{"line":1776,"op":"itemPopUp","side":"near","item":472}
+{"line":1776,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1776,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1776,"op":"hp","side":"near","hp":99}
+{"line":1778,"op":"turn","number":156}
+{"line":1781,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1781,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1782,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1782,"op":"hp","side":"near","hp":93}
+{"line":1783,"op":"hp","side":"far","hp":99}
+{"line":1783,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1784,"op":"print","text":"Shuckle woke up!"}
+{"line":1784,"op":"status","side":"near","slot":2,"status":"none"}
+{"line":1785,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1785,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1786,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1786,"op":"hp","side":"far","hp":97}
+{"line":1787,"op":"print","text":"The opposing Vileplume was wrapped by Shuckle!"}
+{"line":1789,"op":"itemPopUp","side":"far","item":472}
+{"line":1789,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1789,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1789,"op":"hp","side":"far","hp":100}
+{"line":1790,"op":"trapTurn","side":"far","move":35}
+{"line":1790,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1790,"op":"hp","side":"far","hp":94}
+{"line":1791,"op":"itemPopUp","side":"near","item":472}
+{"line":1791,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1791,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1791,"op":"hp","side":"near","hp":99}
+{"line":1793,"op":"turn","number":157}
+{"line":1796,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1796,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1797,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1797,"op":"hp","side":"near","hp":92}
+{"line":1798,"op":"hp","side":"far","hp":93}
+{"line":1798,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1799,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1799,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1800,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1800,"op":"hp","side":"far","hp":91}
+{"line":1802,"op":"itemPopUp","side":"far","item":472}
+{"line":1802,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1802,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1802,"op":"hp","side":"far","hp":97}
+{"line":1803,"op":"trapTurn","side":"far","move":35}
+{"line":1803,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1803,"op":"hp","side":"far","hp":91}
+{"line":1804,"op":"itemPopUp","side":"near","item":472}
+{"line":1804,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1804,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1804,"op":"hp","side":"near","hp":98}
+{"line":1806,"op":"turn","number":158}
+{"line":1809,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1809,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1810,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1810,"op":"hp","side":"near","hp":92}
+{"line":1811,"op":"hp","side":"far","hp":90}
+{"line":1811,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1812,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1812,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1813,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1813,"op":"hp","side":"far","hp":88}
+{"line":1815,"op":"itemPopUp","side":"far","item":472}
+{"line":1815,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1815,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1815,"op":"hp","side":"far","hp":94}
+{"line":1816,"op":"print","text":"The opposing Vileplume was freed from Wrap!"}
+{"line":1817,"op":"itemPopUp","side":"near","item":472}
+{"line":1817,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1817,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1817,"op":"hp","side":"near","hp":98}
+{"line":1819,"op":"turn","number":159}
+{"line":1822,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1822,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1824,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1824,"op":"hp","side":"near","hp":84}
+{"line":1824,"op":"print","text":"A critical hit!"}
+{"line":1825,"op":"hp","side":"far","hp":92}
+{"line":1825,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1826,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1826,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1827,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1827,"op":"hp","side":"far","hp":90}
+{"line":1828,"op":"print","text":"The opposing Vileplume was wrapped by Shuckle!"}
+{"line":1830,"op":"itemPopUp","side":"far","item":472}
+{"line":1830,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1830,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1830,"op":"hp","side":"far","hp":96}
+{"line":1831,"op":"trapTurn","side":"far","move":35}
+{"line":1831,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1831,"op":"hp","side":"far","hp":90}
+{"line":1832,"op":"itemPopUp","side":"near","item":472}
+{"line":1832,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1832,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1832,"op":"hp","side":"near","hp":90}
+{"line":1834,"op":"turn","number":160}
+{"line":1837,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1837,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1838,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1838,"op":"hp","side":"near","hp":83}
+{"line":1839,"op":"hp","side":"far","hp":89}
+{"line":1839,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1840,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1840,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1841,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1841,"op":"hp","side":"far","hp":87}
+{"line":1843,"op":"itemPopUp","side":"far","item":472}
+{"line":1843,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1843,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1843,"op":"hp","side":"far","hp":93}
+{"line":1844,"op":"trapTurn","side":"far","move":35}
+{"line":1844,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1844,"op":"hp","side":"far","hp":87}
+{"line":1845,"op":"itemPopUp","side":"near","item":472}
+{"line":1845,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1845,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1845,"op":"hp","side":"near","hp":89}
+{"line":1847,"op":"turn","number":161}
+{"line":1850,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1850,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1851,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1851,"op":"hp","side":"near","hp":83}
+{"line":1852,"op":"hp","side":"far","hp":86}
+{"line":1852,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1853,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1853,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1854,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1854,"op":"hp","side":"far","hp":84}
+{"line":1856,"op":"itemPopUp","side":"far","item":472}
+{"line":1856,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1856,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1856,"op":"hp","side":"far","hp":90}
+{"line":1857,"op":"trapTurn","side":"far","move":35}
+{"line":1857,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1857,"op":"hp","side":"far","hp":84}
+{"line":1858,"op":"itemPopUp","side":"near","item":472}
+{"line":1858,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1858,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1858,"op":"hp","side":"near","hp":89}
+{"line":1860,"op":"turn","number":162}
+{"line":1863,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1863,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1864,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1864,"op":"hp","side":"near","hp":82}
+{"line":1865,"op":"hp","side":"far","hp":83}
+{"line":1865,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1866,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1866,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1867,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1867,"op":"hp","side":"far","hp":81}
+{"line":1869,"op":"itemPopUp","side":"far","item":472}
+{"line":1869,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1869,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1869,"op":"hp","side":"far","hp":87}
+{"line":1870,"op":"print","text":"The opposing Vileplume was freed from Wrap!"}
+{"line":1871,"op":"itemPopUp","side":"near","item":472}
+{"line":1871,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1871,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1871,"op":"hp","side":"near","hp":88}
+{"line":1873,"op":"turn","number":163}
+{"line":1876,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1876,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1878,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1878,"op":"hp","side":"near","hp":75}
+{"line":1878,"op":"print","text":"A critical hit!"}
+{"line":1879,"op":"hp","side":"far","hp":84}
+{"line":1879,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1880,"op":"print","text":"Shuckle used Wrap!"}
+{"line":1880,"op":"move","user":"near","target":"far","move":35,"animTurn":0}
+{"line":1881,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1881,"op":"hp","side":"far","hp":83}
+{"line":1882,"op":"print","text":"The opposing Vileplume was wrapped by Shuckle!"}
+{"line":1884,"op":"itemPopUp","side":"far","item":472}
+{"line":1884,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1884,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1884,"op":"hp","side":"far","hp":89}
+{"line":1885,"op":"trapTurn","side":"far","move":35}
+{"line":1885,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1885,"op":"hp","side":"far","hp":83}
+{"line":1886,"op":"itemPopUp","side":"near","item":472}
+{"line":1886,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1886,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1886,"op":"hp","side":"near","hp":81}
+{"line":1888,"op":"turn","number":164}
+{"line":1892,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1892,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1893,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1893,"op":"hp","side":"near","hp":75}
+{"line":1894,"op":"hp","side":"far","hp":81}
+{"line":1894,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1895,"op":"print","text":"Shuckle used Struggle!"}
+{"line":1895,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":1896,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1896,"op":"hp","side":"far","hp":76}
+{"line":1897,"op":"hp","side":"near","hp":73}
+{"line":1897,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":1899,"op":"itemPopUp","side":"far","item":472}
+{"line":1899,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1899,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1899,"op":"hp","side":"far","hp":82}
+{"line":1900,"op":"trapTurn","side":"far","move":35}
+{"line":1900,"op":"print","text":"The opposing Vileplume is hurt by Wrap!"}
+{"line":1900,"op":"hp","side":"far","hp":76}
+{"line":1901,"op":"itemPopUp","side":"near","item":472}
+{"line":1901,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1901,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1901,"op":"hp","side":"near","hp":79}
+{"line":1903,"op":"turn","number":165}
+{"line":1906,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1906,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1907,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1907,"op":"hp","side":"near","hp":73}
+{"line":1908,"op":"hp","side":"far","hp":75}
+{"line":1908,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1909,"op":"print","text":"Shuckle used Struggle!"}
+{"line":1909,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":1910,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1910,"op":"hp","side":"far","hp":68}
+{"line":1911,"op":"hp","side":"near","hp":71}
+{"line":1911,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":1913,"op":"itemPopUp","side":"far","item":472}
+{"line":1913,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1913,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1913,"op":"hp","side":"far","hp":74}
+{"line":1914,"op":"print","text":"The opposing Vileplume was freed from Wrap!"}
+{"line":1915,"op":"itemPopUp","side":"near","item":472}
+{"line":1915,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1915,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1915,"op":"hp","side":"near","hp":77}
+{"line":1917,"op":"turn","number":166}
+{"line":1920,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1920,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1921,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1921,"op":"hp","side":"near","hp":72}
+{"line":1922,"op":"hp","side":"far","hp":73}
+{"line":1922,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1923,"op":"print","text":"Shuckle used Struggle!"}
+{"line":1923,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":1924,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1924,"op":"hp","side":"far","hp":67}
+{"line":1925,"op":"hp","side":"near","hp":70}
+{"line":1925,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":1927,"op":"itemPopUp","side":"far","item":472}
+{"line":1927,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1927,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1927,"op":"hp","side":"far","hp":73}
+{"line":1928,"op":"itemPopUp","side":"near","item":472}
+{"line":1928,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1928,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1928,"op":"hp","side":"near","hp":76}
+{"line":1930,"op":"turn","number":167}
+{"line":1933,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1933,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1934,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1934,"op":"hp","side":"near","hp":70}
+{"line":1935,"op":"hp","side":"far","hp":72}
+{"line":1935,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1936,"op":"print","text":"Shuckle used Struggle!"}
+{"line":1936,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":1937,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1937,"op":"hp","side":"far","hp":66}
+{"line":1938,"op":"hp","side":"near","hp":68}
+{"line":1938,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":1940,"op":"itemPopUp","side":"far","item":472}
+{"line":1940,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1940,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1940,"op":"hp","side":"far","hp":72}
+{"line":1941,"op":"itemPopUp","side":"near","item":472}
+{"line":1941,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1941,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1941,"op":"hp","side":"near","hp":74}
+{"line":1943,"op":"turn","number":168}
+{"line":1946,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1946,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1947,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1947,"op":"hp","side":"near","hp":68}
+{"line":1948,"op":"hp","side":"far","hp":71}
+{"line":1948,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1949,"op":"print","text":"Shuckle used Struggle!"}
+{"line":1949,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":1950,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1950,"op":"hp","side":"far","hp":64}
+{"line":1951,"op":"hp","side":"near","hp":66}
+{"line":1951,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":1953,"op":"itemPopUp","side":"far","item":472}
+{"line":1953,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1953,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1953,"op":"hp","side":"far","hp":70}
+{"line":1954,"op":"itemPopUp","side":"near","item":472}
+{"line":1954,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1954,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1954,"op":"hp","side":"near","hp":72}
+{"line":1956,"op":"turn","number":169}
+{"line":1959,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1959,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1960,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1960,"op":"hp","side":"near","hp":65}
+{"line":1961,"op":"hp","side":"far","hp":69}
+{"line":1961,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1962,"op":"print","text":"Shuckle used Struggle!"}
+{"line":1962,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":1963,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1963,"op":"hp","side":"far","hp":63}
+{"line":1964,"op":"hp","side":"near","hp":63}
+{"line":1964,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":1966,"op":"itemPopUp","side":"far","item":472}
+{"line":1966,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1966,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1966,"op":"hp","side":"far","hp":69}
+{"line":1967,"op":"itemPopUp","side":"near","item":472}
+{"line":1967,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1967,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1967,"op":"hp","side":"near","hp":69}
+{"line":1969,"op":"turn","number":170}
+{"line":1972,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1972,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1973,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1973,"op":"hp","side":"near","hp":63}
+{"line":1974,"op":"hp","side":"far","hp":68}
+{"line":1974,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1975,"op":"print","text":"Shuckle used Struggle!"}
+{"line":1975,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":1976,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1976,"op":"hp","side":"far","hp":61}
+{"line":1977,"op":"hp","side":"near","hp":61}
+{"line":1977,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":1979,"op":"itemPopUp","side":"far","item":472}
+{"line":1979,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1979,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1979,"op":"hp","side":"far","hp":67}
+{"line":1980,"op":"itemPopUp","side":"near","item":472}
+{"line":1980,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1980,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1980,"op":"hp","side":"near","hp":67}
+{"line":1982,"op":"turn","number":171}
+{"line":1985,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1985,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1986,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1986,"op":"hp","side":"near","hp":61}
+{"line":1987,"op":"hp","side":"far","hp":66}
+{"line":1987,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":1988,"op":"print","text":"Shuckle used Struggle!"}
+{"line":1988,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":1989,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":1989,"op":"hp","side":"far","hp":60}
+{"line":1990,"op":"hp","side":"near","hp":60}
+{"line":1990,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":1992,"op":"itemPopUp","side":"far","item":472}
+{"line":1992,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":1992,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":1992,"op":"hp","side":"far","hp":67}
+{"line":1993,"op":"itemPopUp","side":"near","item":472}
+{"line":1993,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":1993,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":1993,"op":"hp","side":"near","hp":66}
+{"line":1995,"op":"turn","number":172}
+{"line":1998,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":1998,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":1999,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":1999,"op":"hp","side":"near","hp":59}
+{"line":2000,"op":"hp","side":"far","hp":65}
+{"line":2000,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2001,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2001,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2002,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2002,"op":"hp","side":"far","hp":59}
+{"line":2003,"op":"hp","side":"near","hp":57}
+{"line":2003,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2005,"op":"itemPopUp","side":"far","item":472}
+{"line":2005,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2005,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2005,"op":"hp","side":"far","hp":65}
+{"line":2006,"op":"itemPopUp","side":"near","item":472}
+{"line":2006,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2006,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2006,"op":"hp","side":"near","hp":63}
+{"line":2008,"op":"turn","number":173}
+{"line":2011,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2011,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2012,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2012,"op":"hp","side":"near","hp":57}
+{"line":2013,"op":"hp","side":"far","hp":64}
+{"line":2013,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2014,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2014,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2015,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2015,"op":"hp","side":"far","hp":58}
+{"line":2016,"op":"hp","side":"near","hp":55}
+{"line":2016,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2018,"op":"itemPopUp","side":"far","item":472}
+{"line":2018,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2018,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2018,"op":"hp","side":"far","hp":64}
+{"line":2019,"op":"itemPopUp","side":"near","item":472}
+{"line":2019,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2019,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2019,"op":"hp","side":"near","hp":61}
+{"line":2021,"op":"turn","number":174}
+{"line":2024,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2024,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2025,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2025,"op":"hp","side":"near","hp":54}
+{"line":2026,"op":"hp","side":"far","hp":63}
+{"line":2026,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2027,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2027,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2029,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2029,"op":"hp","side":"far","hp":50}
+{"line":2029,"op":"print","text":"A critical hit!"}
+{"line":2030,"op":"hp","side":"near","hp":50}
+{"line":2030,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2032,"op":"itemPopUp","side":"far","item":472}
+{"line":2032,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2032,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2032,"op":"hp","side":"far","hp":56}
+{"line":2033,"op":"itemPopUp","side":"near","item":472}
+{"line":2033,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2033,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2033,"op":"hp","side":"near","hp":56}
+{"line":2035,"op":"turn","number":175}
+{"line":2038,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2038,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2039,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2039,"op":"hp","side":"near","hp":50}
+{"line":2040,"op":"hp","side":"far","hp":55}
+{"line":2040,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2041,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2041,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2042,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2042,"op":"hp","side":"far","hp":49}
+{"line":2043,"op":"hp","side":"near","hp":48}
+{"line":2043,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2045,"op":"itemPopUp","side":"far","item":472}
+{"line":2045,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2045,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2045,"op":"hp","side":"far","hp":55}
+{"line":2046,"op":"itemPopUp","side":"near","item":472}
+{"line":2046,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2046,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2046,"op":"hp","side":"near","hp":54}
+{"line":2048,"op":"turn","number":176}
+{"line":2051,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2051,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2052,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2052,"op":"hp","side":"near","hp":48}
+{"line":2053,"op":"hp","side":"far","hp":54}
+{"line":2053,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2054,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2054,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2055,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2055,"op":"hp","side":"far","hp":48}
+{"line":2056,"op":"hp","side":"near","hp":46}
+{"line":2056,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2058,"op":"itemPopUp","side":"far","item":472}
+{"line":2058,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2058,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2058,"op":"hp","side":"far","hp":54}
+{"line":2059,"op":"itemPopUp","side":"near","item":472}
+{"line":2059,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2059,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2059,"op":"hp","side":"near","hp":52}
+{"line":2061,"op":"turn","number":177}
+{"line":2064,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2064,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2065,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2065,"op":"hp","side":"near","hp":46}
+{"line":2066,"op":"hp","side":"far","hp":53}
+{"line":2066,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2067,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2067,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2068,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2068,"op":"hp","side":"far","hp":47}
+{"line":2069,"op":"hp","side":"near","hp":44}
+{"line":2069,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2071,"op":"itemPopUp","side":"far","item":472}
+{"line":2071,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2071,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2071,"op":"hp","side":"far","hp":53}
+{"line":2072,"op":"itemPopUp","side":"near","item":472}
+{"line":2072,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2072,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2072,"op":"hp","side":"near","hp":50}
+{"line":2074,"op":"turn","number":178}
+{"line":2077,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2077,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2078,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2078,"op":"hp","side":"near","hp":44}
+{"line":2079,"op":"hp","side":"far","hp":52}
+{"line":2079,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2080,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2080,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2081,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2081,"op":"hp","side":"far","hp":45}
+{"line":2082,"op":"hp","side":"near","hp":42}
+{"line":2082,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2084,"op":"itemPopUp","side":"far","item":472}
+{"line":2084,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2084,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2084,"op":"hp","side":"far","hp":51}
+{"line":2085,"op":"itemPopUp","side":"near","item":472}
+{"line":2085,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2085,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2085,"op":"hp","side":"near","hp":48}
+{"line":2087,"op":"turn","number":179}
+{"line":2090,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2090,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2092,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2092,"op":"hp","side":"near","hp":35}
+{"line":2092,"op":"print","text":"A critical hit!"}
+{"line":2093,"op":"hp","side":"far","hp":49}
+{"line":2093,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2094,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2094,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2095,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2095,"op":"hp","side":"far","hp":43}
+{"line":2096,"op":"hp","side":"near","hp":33}
+{"line":2096,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2098,"op":"itemPopUp","side":"far","item":472}
+{"line":2098,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2098,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2098,"op":"hp","side":"far","hp":49}
+{"line":2099,"op":"itemPopUp","side":"near","item":472}
+{"line":2099,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2099,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2099,"op":"hp","side":"near","hp":39}
+{"line":2101,"op":"turn","number":180}
+{"line":2104,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2104,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2105,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2105,"op":"hp","side":"near","hp":33}
+{"line":2106,"op":"hp","side":"far","hp":48}
+{"line":2106,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2107,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2107,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2109,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2109,"op":"hp","side":"far","hp":36}
+{"line":2109,"op":"print","text":"A critical hit!"}
+{"line":2110,"op":"hp","side":"near","hp":29}
+{"line":2110,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2112,"op":"itemPopUp","side":"far","item":472}
+{"line":2112,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2112,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2112,"op":"hp","side":"far","hp":42}
+{"line":2113,"op":"itemPopUp","side":"near","item":472}
+{"line":2113,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2113,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2113,"op":"hp","side":"near","hp":35}
+{"line":2115,"op":"turn","number":181}
+{"line":2118,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2118,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2119,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2119,"op":"hp","side":"near","hp":29}
+{"line":2120,"op":"hp","side":"far","hp":41}
+{"line":2120,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2121,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2121,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2122,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2122,"op":"hp","side":"far","hp":35}
+{"line":2123,"op":"hp","side":"near","hp":27}
+{"line":2123,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2125,"op":"itemPopUp","side":"far","item":472}
+{"line":2125,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2125,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2125,"op":"hp","side":"far","hp":41}
+{"line":2126,"op":"itemPopUp","side":"near","item":472}
+{"line":2126,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2126,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2126,"op":"hp","side":"near","hp":33}
+{"line":2128,"op":"turn","number":182}
+{"line":2131,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2131,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2132,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2132,"op":"hp","side":"near","hp":26}
+{"line":2133,"op":"hp","side":"far","hp":40}
+{"line":2133,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2134,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2134,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2135,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2135,"op":"hp","side":"far","hp":34}
+{"line":2136,"op":"hp","side":"near","hp":25}
+{"line":2136,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2138,"op":"itemPopUp","side":"far","item":472}
+{"line":2138,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2138,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2138,"op":"hp","side":"far","hp":40}
+{"line":2139,"op":"itemPopUp","side":"near","item":472}
+{"line":2139,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2139,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2139,"op":"hp","side":"near","hp":31}
+{"line":2141,"op":"turn","number":183}
+{"line":2144,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2144,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2145,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2145,"op":"hp","side":"near","hp":24}
+{"line":2146,"op":"hp","side":"far","hp":39}
+{"line":2146,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2147,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2147,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2148,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2148,"op":"hp","side":"far","hp":33}
+{"line":2149,"op":"hp","side":"near","hp":23}
+{"line":2149,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2151,"op":"itemPopUp","side":"far","item":472}
+{"line":2151,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2151,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2151,"op":"hp","side":"far","hp":39}
+{"line":2152,"op":"itemPopUp","side":"near","item":472}
+{"line":2152,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2152,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2152,"op":"hp","side":"near","hp":29}
+{"line":2154,"op":"turn","number":184}
+{"line":2157,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2157,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2158,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2158,"op":"hp","side":"near","hp":22}
+{"line":2159,"op":"hp","side":"far","hp":38}
+{"line":2159,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2160,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2160,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2161,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2161,"op":"hp","side":"far","hp":32}
+{"line":2162,"op":"hp","side":"near","hp":20}
+{"line":2162,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2164,"op":"itemPopUp","side":"far","item":472}
+{"line":2164,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2164,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2164,"op":"hp","side":"far","hp":38}
+{"line":2165,"op":"itemPopUp","side":"near","item":472}
+{"line":2165,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2165,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2165,"op":"hp","side":"near","hp":26}
+{"line":2167,"op":"turn","number":185}
+{"line":2170,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2170,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2171,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2171,"op":"hp","side":"near","hp":20}
+{"line":2172,"op":"hp","side":"far","hp":37}
+{"line":2172,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2173,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2173,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2175,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2175,"op":"hp","side":"far","hp":23}
+{"line":2175,"op":"print","text":"A critical hit!"}
+{"line":2176,"op":"hp","side":"near","hp":16}
+{"line":2176,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2178,"op":"itemPopUp","side":"far","item":472}
+{"line":2178,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2178,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2178,"op":"hp","side":"far","hp":29}
+{"line":2179,"op":"itemPopUp","side":"near","item":472}
+{"line":2179,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2179,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2179,"op":"hp","side":"near","hp":22}
+{"line":2181,"op":"turn","number":186}
+{"line":2184,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2184,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2185,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2185,"op":"hp","side":"near","hp":16}
+{"line":2186,"op":"hp","side":"far","hp":28}
+{"line":2186,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2187,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2187,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2188,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2188,"op":"hp","side":"far","hp":22}
+{"line":2189,"op":"hp","side":"near","hp":14}
+{"line":2189,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2191,"op":"itemPopUp","side":"far","item":472}
+{"line":2191,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2191,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2191,"op":"hp","side":"far","hp":28}
+{"line":2192,"op":"itemPopUp","side":"near","item":472}
+{"line":2192,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2192,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2192,"op":"hp","side":"near","hp":20}
+{"line":2194,"op":"turn","number":187}
+{"line":2197,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2197,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2198,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2198,"op":"hp","side":"near","hp":13}
+{"line":2199,"op":"hp","side":"far","hp":27}
+{"line":2199,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2200,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2200,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2202,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2202,"op":"hp","side":"far","hp":14}
+{"line":2202,"op":"print","text":"A critical hit!"}
+{"line":2203,"op":"hp","side":"near","hp":9}
+{"line":2203,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2205,"op":"itemPopUp","side":"far","item":472}
+{"line":2205,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2205,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2205,"op":"hp","side":"far","hp":20}
+{"line":2206,"op":"itemPopUp","side":"near","item":472}
+{"line":2206,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2206,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2206,"op":"hp","side":"near","hp":15}
+{"line":2208,"op":"turn","number":188}
+{"line":2211,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2211,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2212,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2212,"op":"hp","side":"near","hp":10}
+{"line":2213,"op":"hp","side":"far","hp":19}
+{"line":2213,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2214,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2214,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2215,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2215,"op":"hp","side":"far","hp":14}
+{"line":2216,"op":"hp","side":"near","hp":8}
+{"line":2216,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2218,"op":"itemPopUp","side":"far","item":472}
+{"line":2218,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2218,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2218,"op":"hp","side":"far","hp":20}
+{"line":2219,"op":"itemPopUp","side":"near","item":472}
+{"line":2219,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2219,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2219,"op":"hp","side":"near","hp":14}
+{"line":2221,"op":"turn","number":189}
+{"line":2224,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2224,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2225,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2225,"op":"hp","side":"near","hp":8}
+{"line":2226,"op":"hp","side":"far","hp":19}
+{"line":2226,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2227,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2227,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2228,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2228,"op":"hp","side":"far","hp":13}
+{"line":2229,"op":"hp","side":"near","hp":7}
+{"line":2229,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2231,"op":"itemPopUp","side":"far","item":472}
+{"line":2231,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2231,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2231,"op":"hp","side":"far","hp":19}
+{"line":2232,"op":"itemPopUp","side":"near","item":472}
+{"line":2232,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2232,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2232,"op":"hp","side":"near","hp":13}
+{"line":2234,"op":"turn","number":190}
+{"line":2238,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2238,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2239,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2239,"op":"hp","side":"near","hp":7}
+{"line":2240,"op":"hp","side":"far","hp":18}
+{"line":2240,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2241,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2241,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2242,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2242,"op":"hp","side":"far","hp":11}
+{"line":2243,"op":"hp","side":"near","hp":5}
+{"line":2243,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2245,"op":"itemPopUp","side":"far","item":472}
+{"line":2245,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2245,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2245,"op":"hp","side":"far","hp":17}
+{"line":2246,"op":"itemPopUp","side":"near","item":472}
+{"line":2246,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2246,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2246,"op":"hp","side":"near","hp":11}
+{"line":2248,"op":"turn","number":191}
+{"line":2251,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2251,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2252,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2252,"op":"hp","side":"near","hp":4}
+{"line":2253,"op":"hp","side":"far","hp":16}
+{"line":2253,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2254,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2254,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2255,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2255,"op":"hp","side":"far","hp":10}
+{"line":2256,"op":"hp","side":"near","hp":2}
+{"line":2256,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2258,"op":"itemPopUp","side":"far","item":472}
+{"line":2258,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":2258,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":2258,"op":"hp","side":"far","hp":16}
+{"line":2259,"op":"itemPopUp","side":"near","item":472}
+{"line":2259,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":2259,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":2259,"op":"hp","side":"near","hp":8}
+{"line":2261,"op":"turn","number":192}
+{"line":2264,"op":"print","text":"The opposing Vileplume used Struggle!"}
+{"line":2264,"op":"move","user":"far","target":"near","move":165,"animTurn":0}
+{"line":2265,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":2265,"op":"hp","side":"near","hp":2}
+{"line":2266,"op":"hp","side":"far","hp":14}
+{"line":2266,"op":"print","text":"The opposing Vileplume was damaged by the recoil!"}
+{"line":2267,"op":"print","text":"Shuckle used Struggle!"}
+{"line":2267,"op":"move","user":"near","target":"far","move":165,"animTurn":0}
+{"line":2268,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":2268,"op":"hp","side":"far","hp":8}
+{"line":2269,"op":"hp","side":"near","hp":0}
+{"line":2269,"op":"print","text":"Shuckle was damaged by the recoil!"}
+{"line":2270,"op":"faint","side":"near"}
+{"line":2270,"op":"print","text":"Shuckle fainted!"}
+{"line":2273,"op":"print","text":"Go! Swampert!"}
+{"line":2273,"op":"switchIn","side":"near","slot":1,"hp":12,"status":"slp"}
+{"line":2274,"op":"hp","side":"near","hp":0}
+{"line":2274,"op":"print","text":"Swampert was hurt by the spikes!"}
+{"line":2275,"op":"faint","side":"near"}
+{"line":2275,"op":"print","text":"Swampert fainted!"}
+{"line":2277,"op":"print","text":"joltylocks won the battle!"}
+{"line":2277,"op":"end","outcome":"farWon"}

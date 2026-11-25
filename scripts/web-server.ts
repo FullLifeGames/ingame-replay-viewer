@@ -1,6 +1,6 @@
 // The dev and preview server for the page (plan S5b §2): every response is cross-origin isolated,
 // which the emulator's threads need, and /rom/ serves the patch and the slot description straight
-// from build/rom/ and nothing else there. /wasm/ serves the WebAssembly spike's glue and module
+// from build/rom/ and nothing else there. /wasm/ serves the WebAssembly build's glue and module
 // patch from build/wasm/ (#35), never the module. Nothing is copied into src/ or dist/ (ADR 0002).
 import { createReadStream, statSync } from 'node:fs'
 import type { IncomingMessage, ServerResponse } from 'node:http'
@@ -64,7 +64,7 @@ const romMount = (dir: string): Mount => ({
   build: 'npm run rom:build',
 })
 
-// In dev, Vite serves the spike page's own modules (src/web/wasm/) under the same prefix.
+// In dev, Vite serves the viewer's own modules (src/web/wasm/) under the same prefix.
 const PAGE_WASM_DIR = join(REPO_DIR, 'src', 'web', 'wasm')
 const isPageModule = (path: string) =>
   statSync(join(PAGE_WASM_DIR, path.slice('/wasm/'.length)), {

@@ -8,6 +8,7 @@ import {
   showFailure,
   showLine,
   showOnly,
+  showVisitorLine,
 } from '../replay-view'
 import type { PanelText } from '../status'
 import type { VisitorLine } from '../visitor'
@@ -74,7 +75,7 @@ function findShownReplayView() {
 }
 
 /** The page's controls, and the calls that show the run's state. */
-export function findSpikeView() {
+export function findWasmView() {
   const progress = element('progress', HTMLParagraphElement)
   const speeds = element('speed', HTMLFieldSetElement)
   const checkedSpeed = (): Speed => {
@@ -107,6 +108,9 @@ export function findSpikeView() {
     status: (line: string): void => {
       showLine(PAGE, line)
     },
+    visitorLine: (shown: VisitorLine): void => {
+      showVisitorLine(PAGE, shown)
+    },
     /** A failure's visitor line; a run's failure names the place of the pick it plays. */
     failure: (error: unknown, place?: ReplayPlace): void => {
       showFailure(PAGE, error, place)
@@ -121,4 +125,4 @@ export function findSpikeView() {
   }
 }
 
-export type SpikeView = ReturnType<typeof findSpikeView>
+export type WasmView = ReturnType<typeof findWasmView>

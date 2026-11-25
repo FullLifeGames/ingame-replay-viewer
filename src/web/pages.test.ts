@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import LICENSE from '../../LICENSE?raw'
 import LICENCES from './public/licences.html?raw'
-import { PLAYED_FORMATS } from './visitor'
+import README from './README.md?raw'
+import { fillLine, PLAYED_FORMATS, VISITOR_LINES } from './visitor'
 import { pauseButton } from './wasm/pause'
 
 // Every page in src/web, by its address: the viewer at index.html runs the WebAssembly build, and
@@ -166,6 +167,12 @@ describe('the words for visitors', () => {
     const details = /<details id="details">([\s\S]*?)<\/details>/.exec(page(VIEWER))?.[1]
     expect(details).toContain('<p id="progress"></p>')
     expect(page(VIEWER).match(/id="progress"/g)).toHaveLength(1)
+  })
+
+  // The web README quotes the line a Gen 9 replay gets; the quote follows PLAYED_FORMATS.
+  it('quotes the generation line in the web README as the viewer shows it', () => {
+    const line = fillLine(VISITOR_LINES.generation.text, { gen: '9', formats: PLAYED_FORMATS })
+    expect(squeezed(README)).toContain(`"${line}"`)
   })
 
   it('opens the viewer with an intro that names the formats and links the other pages', () => {

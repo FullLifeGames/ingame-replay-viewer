@@ -34,7 +34,7 @@ interface PageWindow {
     getElementById(id: string): { textContent: string | null } | null
   }
   requestAnimationFrame(callback: () => void): number
-  irvWasmSpike: { status(): { turn: number } | undefined }
+  irvWasmViewer: { status(): { turn: number } | undefined }
 }
 
 /** The panel's turn and the hook's, read in one animation frame after the page's own draw. */
@@ -46,7 +46,7 @@ const sampleTurn = (page: Page) =>
         window.requestAnimationFrame(() => {
           resolve({
             panel: window.document.getElementById('panel-turn')?.textContent ?? '',
-            hook: window.irvWasmSpike.status()?.turn,
+            hook: window.irvWasmViewer.status()?.turn,
           })
         })
       }),

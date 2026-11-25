@@ -2,8 +2,13 @@
 // wasm-page.spec.ts compares its list). Showdown is a route that answers from the test fixture,
 // so no request leaves the machine; the page needs no dump for this. A failure shows its visitor
 // line, the module's words under "Details" and, where the line offers one, the report link (#59).
+// The select labels each example replay by its format, players and number (#69).
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { expect, test } from '@playwright/test'
 
+import { REPO_DIR } from '../scripts/rom-paths.ts'
 import { notShownCount } from './page-text.ts'
 import { guardRequests } from './requests.ts'
 import { loadReplay, routeShowdown, showdownUrl } from './showdown.ts'
@@ -123,4 +128,38 @@ test('an example replay that fails to load leaves the select on the replay the p
   await expect(summary).toHaveText(new RegExp(`^${LINKED}: `))
   await expect(testReplay).toHaveValue('')
   expect(notSameOriginGets).toEqual([`GET ${SHOWDOWN}`])
+})
+
+/** The generated list the labels come from: each replay's own format and players. */
+const EXAMPLES = JSON.parse(
+  readFileSync(join(REPO_DIR, 'src', 'web', 'example-replays.json'), 'utf8'),
+) as Record<string, { format: string; players: string[] }>
+
+test('the example select labels each replay by its format, players and number', async ({
+  page,
+  baseURL,
+}) => {
+  const notSameOriginGets = await guardRequests(page, baseURL)
+  await page.goto('/')
+  const options = page.locator('#test-replay option')
+  await expect(options).toHaveCount(Object.keys(EXAMPLES).length)
+  const shown = await options.evaluateAll((list: { value: string; textContent: string | null }[]) =>
+    list.map(({ value, textContent }) => ({ value, text: textContent ?? '' })),
+  )
+  expect(shown[0]).toEqual({ value: FIRST, text: 'Gen 3 OU: A Welcome Guest vs xXEricXx (994052)' })
+  expect(shown).toContainEqual({
+    value: 'gen3randombattle-2717609379',
+    text: 'Gen 3 Random Battle: NewbiePlsForgiveMe vs joltylocks (2717609379)',
+  })
+  // Each option holds a replay of the list, with its players in order and its number at the end.
+  expect(shown.map(({ value }) => value).toSorted()).toEqual(Object.keys(EXAMPLES).toSorted())
+  for (const { value, text } of shown) {
+    const { players } = EXAMPLES[value] ?? { players: [] }
+    expect(text).toContain(`: ${players.join(' vs ')} (`)
+    expect(text.endsWith(`(${value.slice(value.lastIndexOf('-') + 1)})`)).toBe(true)
+  }
+  // The value stays the id, so a pick by id still loads the replay.
+  await page.getByLabel('Example replay').selectOption(OTHER)
+  await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${OTHER}: `))
+  expect(notSameOriginGets).toEqual([])
 })

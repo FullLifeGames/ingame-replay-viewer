@@ -4,17 +4,21 @@ import replay994086 from '../../test/fixtures/replays/smogtours-gen3ou-994086.js
 import {
   BUILDING_LINE,
   BUILT_LINE,
+  CHECKING_LINE,
   countText,
   dumpLine,
   endedLine,
   notShownHeading,
   panelText,
   pickedLine,
+  progressLine,
   READY_LINE,
   replayLine,
   restartLine,
   rowText,
+  runningLine,
   silenceText,
+  STARTING_LINE,
   startLine,
 } from './status'
 import type { ReplaySummary } from './replay-choice'
@@ -28,17 +32,20 @@ describe('the status lines', () => {
     expect(READY_LINE).toBe('Pick your US Emerald dump, then press Start.')
   })
 
-  it('names the patched ROM by its SHA1 once the dump passed', () => {
-    expect(dumpLine({ romSha1: ROM_SHA1 })).toBe(
-      `Your dump is US Emerald, and the page patched it (ROM SHA1 ${ROM_SHA1}). Press Start.`,
-    )
+  // #69: the SHA1 is a developer's number, so it waits under "Details".
+  it('asks for Start once the dump passed, with the patched ROM\'s SHA1 under "Details"', () => {
+    expect(dumpLine({ romSha1: ROM_SHA1 })).toEqual({
+      line: 'Your dump is US Emerald, and the page patched it. Press Start.',
+      detail: `The patched ROM's SHA1 is ${ROM_SHA1}.`,
+    })
   })
 
   // The running ROM holds the stream, so the patched ROM's SHA1 (the dump line's) is not its own.
-  it('names the replay and its stream in bytes, and no SHA1', () => {
-    expect(startLine({ id: ID, streamBytes: 8346 })).toBe(
-      `Running ${ID}: 8346 bytes of instruction stream.`,
-    )
+  it('names the replay, with its stream in bytes under "Details" and no SHA1', () => {
+    expect(startLine({ id: ID, streamBytes: 8346 })).toEqual({
+      line: `Running ${ID}.`,
+      detail: '8346 bytes of instruction stream.',
+    })
   })
 
   // A new pick or a Load changes nothing in the running game until the next Start.
@@ -47,7 +54,7 @@ describe('the status lines', () => {
   })
 
   it('writes large byte counts without separators, as the specs and the snapshot do', () => {
-    expect(startLine({ id: ID, streamBytes: 30914 })).toContain('30914 bytes')
+    expect(startLine({ id: ID, streamBytes: 30914 }).detail).toContain('30914 bytes')
   })
 
   // The game reaches END at the win or tie line; the outro after it belongs to no battle line.
@@ -196,5 +203,79 @@ describe('the panel', () => {
       far: 'Far side: <b>x</b> &amp;',
       near: `Near side: ${long}`,
     })
+  })
+})
+
+describe("the viewer's run lines", () => {
+  const status = {
+    frame: 9120,
+    finishedAt: 9000,
+    done: 461,
+    total: 462,
+    turn: 30,
+    error: 0,
+    finished: true,
+    playing: false,
+  }
+  const ring = { skipped: 1, underruns: 2 }
+  const silent = {
+    finishedMs: undefined,
+    output: undefined,
+    ring,
+    silence: 'no audio worklet',
+    streamBytes: 8346,
+  }
+
+  it('names the replay once a run starts, and why it plays without sound', () => {
+    const picked = { id: ID }
+    expect(runningLine(picked, { ...silent, silence: undefined })).toBe(`Running ${ID}.`)
+    expect(runningLine(picked, silent)).toBe(
+      `Running ${ID}. It plays without sound: no audio worklet.`,
+    )
+  })
+
+  // #69: the stream's bytes moved from the running line to the progress line under "Details".
+  it('counts the frames, the instructions, the stream in bytes and the turn, and the sound', () => {
+    expect(progressLine(status, silent)).toBe(
+      'Frame 9120, instruction 461 of 462 (8346 bytes of instruction stream), turn 30.',
+    )
+    expect(progressLine(status, { ...silent, finishedMs: 150_040, output: {} })).toBe(
+      'Frame 9120, instruction 461 of 462 (8346 bytes of instruction stream), turn 30. ' +
+        'Finished at frame 9000 after 150.0 s. ' +
+        'The page skipped 1 sound sample and ran out of sound 2 times.',
+    )
+  })
+})
+
+// #69: the status line says what plays and what to press; the developer's numbers wait under
+// "Details". The words of the developers' tools stay off it as well (visitor-report.test.ts).
+describe('the status lines a visitor reads', () => {
+  const DEVELOPER_WORDS = /bytes|instruction stream|SHA1|npm run|localhost|devbox|tailscale|README/i
+  const lineOf = (shown: string | { readonly line: string }) =>
+    typeof shown === 'string' ? shown : shown.line
+
+  it.each([
+    ['ready', () => READY_LINE],
+    ['checking', () => CHECKING_LINE],
+    ['patched', () => lineOf(dumpLine({ romSha1: ROM_SHA1 }))],
+    ['starting', () => STARTING_LINE],
+    ['running on the emulator page', () => lineOf(startLine({ id: ID, streamBytes: 8346 }))],
+    ['building', () => BUILDING_LINE],
+    ['built', () => BUILT_LINE],
+    ['running in the viewer', () => runningLine({ id: ID }, { silence: 'no audio worklet' })],
+    ['restarted', () => restartLine(ID)],
+    ['picked', () => pickedLine(ID)],
+    ['ended', () => endedLine(ID, 'no audio worklet')],
+  ])('holds no byte count, SHA1 or developer word: %s', (_, line) => {
+    expect(line()).not.toMatch(DEVELOPER_WORDS)
+  })
+
+  // The guard itself: a line with a developer's number fails it.
+  it.each([
+    'Running x: 8346 bytes of instruction stream.',
+    'Patched (ROM SHA1 0123).',
+    'Run npm run rom:build.',
+  ])('fails a line such as %s', (line) => {
+    expect(line).toMatch(DEVELOPER_WORDS)
   })
 })

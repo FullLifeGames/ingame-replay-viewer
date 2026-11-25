@@ -1,5 +1,5 @@
 // The WebAssembly page's test hook for the e2e: the module's build outputs and the dump the page
-// needs, the run's status through `irvWasmSpike`, its pace and sound over a stretch of wall time
+// needs, the run's status through `irvWasmViewer`, its pace and sound over a stretch of wall time
 // against the tick rule, and the report line. Only numbers leave this module; the frames and the
 // sound stay in the page.
 import { existsSync, readFileSync } from 'node:fs'
@@ -80,13 +80,13 @@ interface Hook {
 }
 
 export const status = (page: Page): Promise<Status | undefined> =>
-  page.evaluate(() => (globalThis as unknown as { irvWasmSpike: Hook }).irvWasmSpike.status())
+  page.evaluate(() => (globalThis as unknown as { irvWasmViewer: Hook }).irvWasmViewer.status())
 
 /** Starts the stream `bytes` under the replay id `id` through the hook, with no click. */
 export async function playStream(page: Page, id: string, bytes: number[]): Promise<void> {
   await page.evaluate(
     async ([name, stream]) =>
-      (globalThis as unknown as { irvWasmSpike: Hook }).irvWasmSpike.play(name, stream),
+      (globalThis as unknown as { irvWasmViewer: Hook }).irvWasmViewer.play(name, stream),
     [id, bytes] as const,
   )
 }
@@ -139,7 +139,7 @@ export async function rate(page: Page, ms: number) {
 }
 
 export const report = (numbers: Record<string, number | string>): void => {
-  process.stdout.write(`wasm-spike: ${JSON.stringify(numbers)}\n`)
+  process.stdout.write(`wasm-play: ${JSON.stringify(numbers)}\n`)
 }
 
 type Measured = Awaited<ReturnType<typeof rate>>
