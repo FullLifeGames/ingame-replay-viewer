@@ -2,11 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import { readHeader, readStreamsInfo } from './seven-zip-header'
 import { ByteReader } from './seven-zip-reader'
+import { crcBytes } from './seven-zip.fixtures'
 
 const reader = (bytes: number[]) => new ByteReader(Uint8Array.from(bytes))
-
-/** A CRC as the four little-endian bytes the header stores. */
-const crcBytes = (crc: number) => [crc & 0xff, (crc >>> 8) & 0xff, (crc >>> 16) & 0xff, crc >>> 24]
 
 /** Coders info for folders of one LZMA2 coder (property 0x15) each, unpacking to `sizes`. */
 const lzma2Folders = (sizes: number[]) => [

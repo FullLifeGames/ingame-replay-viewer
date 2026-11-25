@@ -1,7 +1,10 @@
 // Fixtures of the 7z spec: small archives built by hand (a script outside the tree) around LZMA2
-// and LZMA streams of our own bytes (src/gen5/lzma.fixtures.ts names the rules). Nothing here
-// comes from the emulator or a game; the tree spec refuses a tracked file with 7z's magic, so the
-// archives live here as base64.
+// and LZMA streams of our own bytes (src/gen5/lzma.fixtures.ts names the rules), and the helpers
+// that build an archive around a header a spec writes. Nothing here comes from the emulator or a
+// game; the tree spec refuses a tracked file with 7z's magic, so the archives live here as base64.
+
+import { crc32 } from '../patch/crc32.ts'
+import { joined } from './lzma.fixtures.ts'
 
 /** Each archive with what it holds:
  * - encodedHeader: one LZMA2 folder with two files, alpha.txt (textBytes(1500)) and
@@ -53,3 +56,27 @@ export const ARCHIVES = {
     'AABmAG8AbABkAGUAcgAAAHQAdwBvAC4AYgBpAG4AAABlAG0AcAB0AHkALgB0AHgAdAAAAAAA',
   ].join(''),
 }
+
+/** A 7z archive of `packed` and then `header`, with both CRCs right. */
+export function build(packed: Uint8Array, header: number[]): Uint8Array {
+  const body = Uint8Array.from(header)
+  const start = new Uint8Array(20)
+  const view = new DataView(start.buffer)
+  view.setUint32(0, packed.length, true)
+  view.setUint32(8, body.length, true)
+  view.setUint32(16, crc32(body), true)
+  const signature = Uint8Array.of(0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c, 0, 4, 0, 0, 0, 0)
+  new DataView(signature.buffer).setUint32(8, crc32(start), true)
+  return joined(signature, start, packed, body)
+}
+
+/** A 7z archive of `header` alone: for headers that hold no stream. */
+export const headerOnly = (header: number[]) => build(new Uint8Array(0), header)
+
+/** A CRC as the four little-endian bytes the header stores. */
+export const crcBytes = (crc: number) => [
+  crc & 0xff,
+  (crc >>> 8) & 0xff,
+  (crc >>> 16) & 0xff,
+  crc >>> 24,
+]

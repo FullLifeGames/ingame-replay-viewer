@@ -84,7 +84,7 @@ The page sets `window.EJS_paths` so that EmulatorJS fetches `/extract7z.js` inst
 
 The code:
 
-- `src/gen5/range-decoder.ts` and `src/gen5/lzma.ts` decode LZMA, `src/gen5/lzma2.ts` LZMA2's chunks, and `src/gen5/seven-zip.ts` with its header and reader modules the 7z container. It reads LZMA2 and LZMA, the two methods the cores use, checks every CRC the archive carries and refuses any other method by name.
+- `src/gen5/range-decoder.ts` and `src/gen5/lzma.ts` decode LZMA, `src/gen5/lzma2.ts` LZMA2's chunks, and `src/gen5/seven-zip.ts` with its header, files and reader modules the 7z container. It reads LZMA2 and LZMA, the two methods the cores use, checks every CRC the archive carries and refuses any other method by name. Before it allocates, it refuses a header that names more items than its bytes can hold, and folders that unpack to more than 64 MiB; the largest core unpacks to about 6 MB.
 - `src/gen5/core-unpack.ts` holds the worker's logic, and `src/gen5/unpacker.ts` the script's name and its path.
 - `src/web/gen5/extract7z.ts` is the worker's shell. EmulatorJS starts it from a Blob URL, where a module could not load its imports, so `scripts/gen5-built.ts` bundles it into one classic script, for the build and for the dev server.
 

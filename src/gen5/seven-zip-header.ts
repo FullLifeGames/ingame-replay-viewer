@@ -1,10 +1,12 @@
 // The 7z header, after 7zFormat.txt (LZMA SDK, public domain): the streams info (packed streams,
-// folders, sub-streams) and the files info. It reads what the core archives use and refuses the
-// rest with a sentence that names it. The code is our own, under the repository's licence.
+// folders, sub-streams), with the files info from src/gen5/seven-zip-files.ts. It reads what the
+// core archives use and refuses the rest with a sentence that names it, and it refuses a count or
+// a size before it builds anything that large. The code is our own, under the repository's
+// licence.
 import { hex } from './lzma.ts'
-import { ByteReader } from './seven-zip-reader.ts'
+import { type FileItem, readFiles } from './seven-zip-files.ts'
+import { type ByteReader, END, expectEnd, refuse } from './seven-zip-reader.ts'
 
-const END = 0x00
 const ARCHIVE_PROPERTIES = 0x02
 const ADDITIONAL_STREAMS = 0x03
 const MAIN_STREAMS = 0x04
@@ -17,14 +19,16 @@ const CRC = 0x0a
 const FOLDER = 0x0b
 const CODERS_UNPACK_SIZE = 0x0c
 const NUM_UNPACK_STREAM = 0x0d
-const EMPTY_STREAM = 0x0e
-const EMPTY_FILE = 0x0f
-const ANTI = 0x10
-const NAME = 0x11
 
-/** File properties the unpacker passes over: the three times, the attributes, a comment, the
- * start position and padding. They change no file's bytes. */
-const PASSED_OVER = new Set([0x12, 0x13, 0x14, 0x15, 0x16, 0x18, 0x19])
+/** The bytes the folders of one streams info may unpack to, together. The page's largest core,
+ * the thread build, unpacks to 6,070,528 bytes in two folders; 64 MiB leaves room for a larger
+ * core and still keeps a header of a few bytes from making the worker allocate gigabytes. */
+export const UNPACKED_LIMIT = 64 * 2 ** 20
+
+/** Each counted item takes a byte at least: a coder its flags, a folder its count of coders, a
+ * packed stream its size. A packed stream without a size names no folder's data, so this reader
+ * could not unpack one anyway. */
+const ITEM_BITS = 8
 
 /** A coder's method id in hex, and its properties. */
 export interface Coder {
@@ -55,12 +59,6 @@ export interface StreamsInfo {
   streams: SubStream[][]
 }
 
-interface FileItem {
-  name: string
-  hasStream: boolean
-  directory: boolean
-}
-
 export interface Header {
   main: StreamsInfo | undefined
   files: FileItem[]
@@ -86,14 +84,6 @@ export function methodName(id: string): string {
   return METHODS[id] ?? `of id ${id}`
 }
 
-function refuse(id: number, where: string): never {
-  throw new Error(`The 7z header holds the property ${hex(id)} where it reads ${where}.`)
-}
-
-function expectEnd(id: number, where: string): void {
-  if (id !== END) refuse(id, where)
-}
-
 function readCoder(reader: ByteReader): Coder {
   const flags = reader.byte()
   const id = Array.from(reader.take(flags & 0x0f), (byte) => hex(byte).slice(2)).join('')
@@ -111,7 +101,7 @@ function readCoder(reader: ByteReader): Coder {
 }
 
 function readFolder(reader: ByteReader): Coder {
-  const coders = Array.from({ length: reader.number() }, () => readCoder(reader))
+  const coders = Array.from({ length: reader.count('coders', ITEM_BITS) }, () => readCoder(reader))
   if (coders.length !== 1) {
     const names = coders.map((coder) => methodName(coder.id)).join(', ')
     throw new Error(
@@ -124,7 +114,7 @@ function readFolder(reader: ByteReader): Coder {
 function readFolders(reader: ByteReader): Folder[] {
   const id = reader.byte()
   if (id !== FOLDER) refuse(id, 'the folders')
-  const count = reader.number()
+  const count = reader.count('folders', ITEM_BITS)
   if (reader.byte() !== 0) {
     throw new Error(
       'The 7z header keeps its folders outside itself, which this unpacker does not read.',
@@ -134,6 +124,12 @@ function readFolders(reader: ByteReader): Folder[] {
   const sizesId = reader.byte()
   if (sizesId !== CODERS_UNPACK_SIZE) refuse(sizesId, 'the folders')
   const sizes = coders.map(() => reader.number())
+  const total = sizes.reduce((sum, size) => sum + size, 0)
+  if (total > UNPACKED_LIMIT) {
+    throw new Error(
+      `The 7z header's folders unpack to ${String(total)} bytes, more than the ${String(UNPACKED_LIMIT)} this unpacker allows.`,
+    )
+  }
   let next = reader.byte()
   let crcs: (number | undefined)[] = []
   if (next === CRC) {
@@ -146,7 +142,7 @@ function readFolders(reader: ByteReader): Folder[] {
 
 function readPackInfo(reader: ByteReader, info: StreamsInfo): void {
   info.packPos = reader.number()
-  const count = reader.number()
+  const count = reader.count('packed streams', ITEM_BITS)
   let id = reader.byte()
   if (id === SIZE) {
     info.packSizes = Array.from({ length: count }, () => reader.number())
@@ -216,52 +212,6 @@ export function readStreamsInfo(reader: ByteReader): StreamsInfo {
   }
   expectEnd(id, 'the streams')
   return info
-}
-
-/** What the files info's properties set, before they become files. */
-interface FileFlags {
-  emptyStream: boolean[]
-  emptyFile: boolean[]
-  names: string[]
-}
-
-function fileProperty(type: number, body: ByteReader, size: number, flags: FileFlags): void {
-  if (type === EMPTY_STREAM) flags.emptyStream = body.bits(flags.emptyStream.length)
-  else if (type === EMPTY_FILE) {
-    flags.emptyFile = body.bits(flags.emptyStream.filter(Boolean).length)
-  } else if (type === NAME) {
-    if (body.byte() !== 0) throw new Error('The 7z header keeps its names outside itself.')
-    flags.names = new TextDecoder('utf-16le')
-      .decode(body.take(size - 1))
-      .split('\0')
-      .slice(0, -1)
-  } else if (type === ANTI) {
-    throw new Error('The 7z archive holds anti items, which this unpacker does not read.')
-  } else if (!PASSED_OVER.has(type)) refuse(type, 'the files')
-}
-
-function readFiles(reader: ByteReader): FileItem[] {
-  const count = reader.number()
-  const flags: FileFlags = {
-    emptyStream: new Array<boolean>(count).fill(false),
-    emptyFile: [],
-    names: [],
-  }
-  for (let type = reader.byte(); type !== END; type = reader.byte()) {
-    const size = reader.number()
-    fileProperty(type, new ByteReader(reader.take(size)), size, flags)
-  }
-  if (flags.names.length !== count) {
-    throw new Error(
-      `The 7z header names ${String(flags.names.length)} of its ${String(count)} files.`,
-    )
-  }
-  let empty = 0
-  return flags.names.map((name, i) => {
-    const hasStream = !flags.emptyStream[i]
-    const directory = !hasStream && !flags.emptyFile[empty++]
-    return { name, hasStream, directory }
-  })
 }
 
 /** The header, from the byte after its own id. */

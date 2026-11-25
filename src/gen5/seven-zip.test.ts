@@ -1,36 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import { crc32 } from '../patch/crc32'
-import {
-  fromBase64,
-  joined,
-  LZMA_STREAMS,
-  OTHER_PHRASE,
-  seededBytes,
-  textBytes,
-} from './lzma.fixtures'
+import { fromBase64, LZMA_STREAMS, OTHER_PHRASE, seededBytes, textBytes } from './lzma.fixtures'
 import { unpack7z } from './seven-zip'
-import { ARCHIVES } from './seven-zip.fixtures'
+import { ARCHIVES, build, crcBytes, headerOnly } from './seven-zip.fixtures'
 
 const archive = (name: keyof typeof ARCHIVES) => fromBase64(ARCHIVES[name])
 
 const ascii = (text: string) => new TextEncoder().encode(text)
-
-/** A 7z archive of `packed` and then `header`, with both CRCs right. */
-function build(packed: Uint8Array, header: number[]): Uint8Array {
-  const body = Uint8Array.from(header)
-  const start = new Uint8Array(20)
-  const view = new DataView(start.buffer)
-  view.setUint32(0, packed.length, true)
-  view.setUint32(8, body.length, true)
-  view.setUint32(16, crc32(body), true)
-  const signature = Uint8Array.of(0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c, 0, 4, 0, 0, 0, 0)
-  new DataView(signature.buffer).setUint32(8, crc32(start), true)
-  return joined(signature, start, packed, body)
-}
-
-/** A 7z archive of `header` alone: for headers that hold no stream. */
-const headerOnly = (header: number[]) => build(new Uint8Array(0), header)
 
 /** The archive with its header's CRC and the start header's CRC made right again. */
 function resigned(bytes: Uint8Array): Uint8Array {
@@ -40,9 +17,6 @@ function resigned(bytes: Uint8Array): Uint8Array {
   view.setUint32(8, crc32(bytes.subarray(12, 32)), true)
   return bytes
 }
-
-/** A CRC as the four little-endian bytes the header stores. */
-const crcBytes = (crc: number) => [crc & 0xff, (crc >>> 8) & 0xff, (crc >>> 16) & 0xff, crc >>> 24]
 
 /** The LZMA2 stream of textBytes(3000), 75 bytes. */
 const TEXT = fromBase64(LZMA_STREAMS.text)

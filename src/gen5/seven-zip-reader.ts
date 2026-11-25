@@ -2,6 +2,19 @@
 // about Notation and encoding": little-endian numbers, the variable-length UINT64, and bit
 // vectors with the first item in the highest bit. The code is our own, under the repository's
 // licence.
+import { hex } from './lzma.ts'
+
+/** The id that ends each list of properties. */
+export const END = 0x00
+
+/** Throws for a property id the header holds where the reader expects another. */
+export function refuse(id: number, where: string): never {
+  throw new Error(`The 7z header holds the property ${hex(id)} where it reads ${where}.`)
+}
+
+export function expectEnd(id: number, where: string): void {
+  if (id !== END) refuse(id, where)
+}
 
 export class ByteReader {
   private at = 0
@@ -28,6 +41,19 @@ export class ByteReader {
       throw new Error('The 7z header holds a number past what this unpacker reads.')
     }
     return value
+  }
+
+  /** A count of `items`, each of which takes at least `bits` of the header's bytes after it. A
+   * count those bytes cannot hold is refused here, before anything of that length is built. */
+  count(items: string, bits: number): number {
+    const count = this.number()
+    const left = this.bytes.length - this.at
+    if (count * bits > left * 8) {
+      throw new Error(
+        `The 7z header names ${String(count)} ${items}, more than its ${String(left)} bytes left can hold.`,
+      )
+    }
+    return count
   }
 
   uint32(): number {
