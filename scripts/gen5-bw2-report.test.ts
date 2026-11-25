@@ -62,14 +62,34 @@ describe('quietLines', () => {
     },
   }
 
-  it('gives the pin, the counts and the checks, and no address, offset or value', () => {
+  it('gives the pin, the count of symbols and the checks, and no address, offset or value', () => {
     expect(quietLines(numbers)).toEqual([
       'pokebw2 c0ffee',
-      'symbols 2, adapter commands 2, adapter states 1',
-      'server commands 3, formats 1, format table entries 2',
+      'symbols 2',
       'outside main RAM: itcm',
       'adapter layout checked: members present, offsets rising, inside the struct, bit-fields shared',
     ])
+  })
+
+  // Scene: each of pokebw2's lists runs from 0, so its size would give away its last entry's
+  // number. The invented lists here have sizes of their own; no line but the pin's and the count
+  // of our own symbol names may hold a digit.
+  it("prints no size of pokebw2's lists", () => {
+    const names = <T>(prefix: string, size: number, value: T) =>
+      Object.fromEntries(
+        Array.from({ length: size }, (_, at) => [`${prefix}_${String(at)}`, value]),
+      )
+    const sized: Bw2Numbers = {
+      ...numbers,
+      adapterCommands: names('ACMD', 3, 0),
+      adapterStates: names('STATE', 4, 0),
+      serverCommands: names('CMD', 5, 0),
+      argFormats: names('ARGS', 6, { code: 0, argCount: 0, puts: [] }),
+      commandFormats: names('CMD', 7, 'ARGS_0'),
+    }
+    const [pin, ...rest] = quietLines(sized)
+    expect(pin).toBe('pokebw2 c0ffee')
+    expect(rest.filter((line) => line !== 'symbols 2' && /\d/.test(line))).toEqual([])
   })
 
   it('says so when every symbol lies in main RAM', () => {

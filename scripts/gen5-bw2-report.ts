@@ -54,14 +54,14 @@ const count = (table: object) => String(Object.keys(table).length)
 const LAYOUT_CHECKED =
   'adapter layout checked: members present, offsets rising, inside the struct, bit-fields shared'
 
-/** The report for a public log: the pin, the counts and the two checks, and no number of pokebw2:
- * no address, offset, value or size. */
+/** The report for a public log: the pin, the count of the symbols it looked up by our own names,
+ * and the two checks, and no number of pokebw2: no address, offset, value or size. Each of
+ * pokebw2's lists runs from 0, so a list's size would give away its last entry's number. */
 export function quietLines(numbers: Bw2Numbers): string[] {
   const outside = namesOutsideMainRam(numbers.symbols)
   return [
     `pokebw2 ${numbers.pokebw2.commit}`,
-    `symbols ${count(numbers.symbols)}, adapter commands ${count(numbers.adapterCommands)}, adapter states ${count(numbers.adapterStates)}`,
-    `server commands ${count(numbers.serverCommands)}, formats ${count(numbers.argFormats)}, format table entries ${count(numbers.commandFormats)}`,
+    `symbols ${count(numbers.symbols)}`,
     outside.length === 0 ? 'all symbols in main RAM' : `outside main RAM: ${outside.join(', ')}`,
     LAYOUT_CHECKED,
   ]
