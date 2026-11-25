@@ -104,19 +104,6 @@ function unpackFolders(archive: Uint8Array, info: StreamsInfo): Uint8Array[] {
   })
 }
 
-/** The packed header, unpacked and checked. */
-function encodedHeader(archive: Uint8Array, info: StreamsInfo): Uint8Array {
-  if (info.folders.length !== 1) {
-    throw new Error('The 7z archive packs its header in other than one folder.')
-  }
-  const output = unpackFolders(archive, info)[0] as Uint8Array
-  const folder = info.folders[0] as Folder
-  if (folder.crc !== undefined && crc32(output) !== folder.crc) {
-    throw new Error("The 7z archive's packed header fails its CRC.")
-  }
-  return output
-}
-
 /** A folder's output cut into its sub-streams; a folder of one stream keeps its own array. */
 function cut(
   output: Uint8Array,
@@ -140,6 +127,23 @@ function streamsOf(archive: Uint8Array, info: StreamsInfo) {
     }
     return cut(output, streams)
   })
+}
+
+/** The packed header, unpacked and checked: one folder of one stream, whose CRC sits on the
+ * folder or in the sub-streams. */
+function encodedHeader(archive: Uint8Array, info: StreamsInfo): Uint8Array {
+  if (info.folders.length !== 1) {
+    throw new Error('The 7z archive packs its header in other than one folder.')
+  }
+  const streams = streamsOf(archive, info)
+  const stream = streams[0]
+  if (stream === undefined || streams.length !== 1) {
+    throw new Error('The 7z archive packs its header in other than one stream.')
+  }
+  if (stream.crc !== undefined && crc32(stream.bytes) !== stream.crc) {
+    throw new Error("The 7z archive's packed header fails its CRC.")
+  }
+  return stream.bytes
 }
 
 function entries(archive: Uint8Array, header: Header): SevenZipEntry[] {

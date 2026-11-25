@@ -39,6 +39,25 @@ const filesAB = [0x05, 0x02, 0x11, 0x09, 0x00, 0x61, 0x00, 0x00, 0x00, 0x62, 0x0
 /** Main streams of one folder with one coder `coder` (its first byte, id and properties). */
 const oneFolder = (coder: number[]) => [0x04, 0x07, 0x0b, 0x01, 0x00, 0x01, ...coder, 0x0c, 0x01]
 
+/** The header of an archive with no files. */
+const EMPTY_HEADER = Uint8Array.of(0x01, 0x00)
+
+/** EMPTY_HEADER as LZMA2 stores it: one uncompressed chunk with a dictionary reset, then the end. */
+const STORED_EMPTY_HEADER = Uint8Array.of(0x01, 0x00, 0x01, ...EMPTY_HEADER, 0x00)
+
+/** An encoded header: one folder of one LZMA2 coder, no folder CRC, `subStreams` after it. */
+const packedHeader = (subStreams: number[]) => [
+  0x17,
+  ...[0x06, 0x00, 0x01, 0x09, STORED_EMPTY_HEADER.length, 0x00],
+  ...[0x07, 0x0b, 0x01, 0x00, 0x01, 0x21, 0x21, 0x01, 0x10, 0x0c, EMPTY_HEADER.length, 0x00],
+  ...subStreams,
+  0x00,
+]
+
+/** An archive whose packed header carries its CRC `crc` in the sub-streams alone. */
+const packedEmptyHeader = (crc: number) =>
+  build(STORED_EMPTY_HEADER, packedHeader([0x08, 0x0a, 0x01, ...crcBytes(crc), 0x00]))
+
 describe('unpack7z', () => {
   // Scene: the core archives pack their header with LZMA and their files with LZMA2.
   it('gives two files with their names and bytes from an archive with an encoded header', () => {
@@ -214,6 +233,22 @@ describe('unpack7z on archives built in the spec', () => {
     const bytes = archive('encodedHeader')
     bytes[bytes.length - 3] = (bytes[bytes.length - 3] as number) ^ 0x01
     expect(() => unpack7z(resigned(bytes))).toThrow("The 7z archive's packed header fails its CRC.")
+  })
+
+  // Scene: 7-Zip puts a packed header's CRC on its folder; a header may also carry it in its
+  // sub-streams, and the unpacker checks it there too (review U1).
+  it("checks a packed header's CRC that sits in its sub-streams", () => {
+    expect(unpack7z(packedEmptyHeader(crc32(EMPTY_HEADER)))).toEqual([])
+    expect(() => unpack7z(packedEmptyHeader(crc32(EMPTY_HEADER) ^ 1))).toThrow(
+      "The 7z archive's packed header fails its CRC.",
+    )
+  })
+
+  it('refuses a packed header cut into other than one stream', () => {
+    const subStreams = [0x08, 0x0d, 0x00, 0x00]
+    expect(() => unpack7z(build(STORED_EMPTY_HEADER, packedHeader(subStreams)))).toThrow(
+      'The 7z archive packs its header in other than one stream.',
+    )
   })
 
   it('refuses a header packed in no folder', () => {
