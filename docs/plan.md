@@ -61,6 +61,7 @@ Order after milestone 2 (user, 22.11.2026): milestone 3 starts first, and Gen 5 
    - Open: how it is deployed to vserver, including the COOP/COEP headers the page needs for `SharedArrayBuffer`.
 3. **Newer formats on Gen 3.** Gen 4–9 singles, including Tera, Mega Evolution, Z-Moves and Dynamax.
    - Order (user, 24.11.2026): Gen 4 OU and Gen 5 OU first, with Team Preview as their only new mechanic; then Gen 9 OU with Tera; then Gen 6 to 8 with Mega Evolution, Z-Moves and Dynamax.
+   - Gen 4 OU plays since #86: its two test replays play to the end in mGBA and in the module. The viewer opens by generation (gate, 25.11.2026), so every Gen 4 singles format plays, and the lines it has no rule for show under "Not shown in the game".
 4. **Doubles on Gen 3.** VGC, including Champions formats with open team sheets.
    - Open: which Champions mechanics the expansion covers.
 5. **Viewer v2.** Jump to a turn, flip sides, exact HP for random formats (re-running the battle from the published seed and inputs), backgrounds per format, music, rating display.
