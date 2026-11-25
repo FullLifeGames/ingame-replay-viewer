@@ -2,16 +2,24 @@ import { describe, expect, it } from 'vitest'
 
 import { PACKAGES } from './gen5-fetch'
 import {
+  archiveName,
   COMPONENTS,
   type Component,
   isListed,
   isServedSitePath,
+  isSourceArchive,
   OWN_FILES,
   SITE_FILES,
+  SOURCES,
 } from './gen5-manifest'
 import { checkManifest, type ManifestDraft, unnamedLicenceFiles } from './gen5-manifest-check'
 
-const SOURCE = { repository: 'https://github.com/example/tool', commit: 'a'.repeat(40) }
+const SOURCE = {
+  name: 'tool',
+  repository: 'https://github.com/example/tool',
+  commit: 'a'.repeat(40),
+  tar: 'b'.repeat(64),
+}
 const TOOL: Component = {
   name: 'Tool',
   version: '1.0.0',
@@ -172,5 +180,39 @@ describe('the manifest', () => {
   it("describes the page's own files and the saves by rule, under this repository's licence", () => {
     expect(OWN_FILES.map((own) => own.licence)).toEqual(['MIT', 'MIT'])
     expect(OWN_FILES.map((own) => own.files).join(' ')).toContain('/saves/<name>.sav')
+  })
+})
+
+// Scene: every component names its source by commit, and each source gets one archive.
+describe('the sources', () => {
+  it('fetches each repository once, under its own name, as the components name it', () => {
+    expect(SOURCES.map((source) => source.name)).toEqual([
+      'emulatorjs',
+      'melonds',
+      'retroarch',
+      'emulatorjs-build',
+      'nipplejs',
+      'socket.io',
+    ])
+    expect(new Set(SOURCES.map((source) => source.repository)).size).toBe(SOURCES.length)
+    for (const part of Object.values(COMPONENTS)) {
+      const named = SOURCES.filter((source) => source.name === part.source.name)
+      expect(named, part.name).toEqual([part.source])
+    }
+  })
+
+  it("names EmulatorJS at the registry's gitHead of both pinned packages", () => {
+    const commit = COMPONENTS.emulatorjs.source.commit
+    expect(PACKAGES.map((pkg) => pkg.gitHead)).toEqual([commit, commit])
+  })
+
+  it('names each archive by its source and commit, and knows no other name', () => {
+    expect(archiveName(COMPONENTS.melonds.source)).toBe(
+      'melonds-18a057d372783b42d7e297b8731f3c3d673cdcab.tar.gz',
+    )
+    expect(SOURCES.map(archiveName).filter((name) => !isSourceArchive(name))).toEqual([])
+    const listed = archiveName(COMPONENTS.melonds.source)
+    for (const name of ['melonds.tar.gz', `${listed}.part`, '', 'git/melonds.git', `./${listed}`])
+      expect(isSourceArchive(name), name).toBe(false)
   })
 })

@@ -7,6 +7,8 @@ const REPO = fileURLToPath(new URL('..', import.meta.url)).replace(/\/$/, '')
 
 export const GEN5_PATHS = {
   repo: REPO,
+  /** The source archives and their bare repositories (scripts/gen5-sources.ts), never committed. */
+  sources: `${REPO}/.cache/gen5/sources`,
   /** The fetched EmulatorJS packages: tarballs, a staging folder, and the served site. */
   emulatorjs: `${REPO}/.cache/gen5/emulatorjs`,
   site: `${REPO}/.cache/gen5/emulatorjs/site`,

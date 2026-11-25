@@ -13,19 +13,22 @@ interface PinnedPackage {
   spec: string
   tarball: string
   integrity: string
+  /** The registry's gitHead: the commit of EmulatorJS the package was packed from. */
+  gitHead: string
   /** Where the package's files go under the served site; the loader expects cores in data/cores. */
   mount: string
 }
 
 const REGISTRY = 'https://registry.npmjs.org'
 
-/** `npm view <spec> dist.integrity`, read 24.11.2026. */
+/** `npm view <spec> dist.integrity gitHead`, read 24.11.2026. */
 export const PACKAGES: readonly PinnedPackage[] = [
   {
     spec: '@emulatorjs/emulatorjs@4.2.3',
     tarball: `${REGISTRY}/@emulatorjs/emulatorjs/-/emulatorjs-4.2.3.tgz`,
     integrity:
       'sha512-7z3qaA4LwyurhuGvdMUDF9xJpEbxC3SNy9+E9tSaOsRo8FCS2QXam/0k/lc9kqHWRFIlLKWahNjPAStyL0rFnw==',
+    gitHead: 'e150dc0491ae747028919fb82d6598954976ede6',
     mount: '',
   },
   {
@@ -33,6 +36,7 @@ export const PACKAGES: readonly PinnedPackage[] = [
     tarball: `${REGISTRY}/@emulatorjs/core-melonds/-/core-melonds-4.2.3.tgz`,
     integrity:
       'sha512-IjsEBNLPPbqU2GSeWEoEkOgAonK3JEyzvoYR3ucgOXu6InzDNdfuA5kP/mMh3d6DwCUbOwfnqGZuZXMTyNE2wA==',
+    gitHead: 'e150dc0491ae747028919fb82d6598954976ede6',
     mount: 'data/cores',
   },
 ]

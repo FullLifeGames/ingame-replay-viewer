@@ -1,8 +1,8 @@
 // The checks on the manifest of the Gen 5 page's served files (#79, scripts/gen5-manifest.ts):
 // every component names its licence and its source by commit, every file names a known
-// component, and no path stands twice. They take a loose shape, so a spec can hand them a draft
-// that lacks a field.
-import type { Component } from './gen5-manifest.ts'
+// component, no path stands twice, and each source's pin is well formed. They take a loose shape,
+// so a spec can hand them a draft that lacks a field.
+import type { Component, Source } from './gen5-manifest.ts'
 
 export interface ManifestDraft {
   components: Readonly<Record<string, Partial<Component>>>
@@ -38,4 +38,22 @@ export function checkManifest(manifest: ManifestDraft): void {
 export function unnamedLicenceFiles(manifest: ManifestDraft): string[] {
   const unnamed = (id: string): boolean => typeof manifest.components[id]?.licence === 'object'
   return manifest.files.filter((file) => file.components.some(unnamed)).map((file) => file.path)
+}
+
+const PIN_RULES: readonly [keyof Source, RegExp, string][] = [
+  ['name', /^[a-z0-9][a-z0-9.-]*$/, 'the name is not lower-case letters, digits, dots and dashes'],
+  [
+    'repository',
+    /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+(?<!\.git)$/,
+    'the repository is no https://github.com/<owner>/<repo>',
+  ],
+  ['commit', FULL_COMMIT, 'the commit is no full 40-hex id'],
+  ['tar', /^[0-9a-f]{64}$/, "the tar's SHA-256 is no 64-hex digest"],
+]
+
+/** The faults of one source's pin (scripts/gen5-sources.ts), each naming the source. */
+export function pinFaults(source: Source): string[] {
+  return PIN_RULES.filter(([field, rule]) => !rule.test(source[field])).map(
+    ([, , fault]) => `${source.name}: ${fault}`,
+  )
 }
