@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { AudioOpener } from './audio-opener'
+import { AudioOpener, type Silence } from './audio-opener'
 import { TickClock } from './clock'
 import { pauseButton, soundForNewRun, spaceToggles, togglePause } from './pause'
 import { CONTROL, createShared, readStatus, writeStatus } from './protocol'
@@ -17,7 +17,7 @@ function playing(speed: '1x' | 'fast' = '1x') {
     label: 'Gen 3: A vs B (hand-made)',
     clock,
     control,
-    silence: undefined as string | undefined,
+    silence: undefined as Silence | undefined,
   }
 }
 
@@ -215,9 +215,10 @@ describe('the toggle', () => {
     const run = playing()
     await togglePause(run, audio, 1500)
     context.resume = () => Promise.reject(new Error('refused for the test'))
-    await expect(togglePause(run, audio, 9000)).resolves.toBe(
-      'Running Gen 3: A vs B (hand-made). It plays without sound: the audio did not resume: refused for the test.',
-    )
+    await expect(togglePause(run, audio, 9000)).resolves.toEqual({
+      line: 'Running Gen 3: A vs B (hand-made). It plays without sound: the audio did not resume.',
+      detail: 'refused for the test',
+    })
     expect(run.clock.paused).toBe(false)
     expect(run.clock.allowed(10_000, 41)).toBe(40 + 59)
   })
@@ -225,10 +226,13 @@ describe('the toggle', () => {
   // The tester's finding 2: after one refused Play, a Play whose resume succeeds gives the plain
   // running line back. A run that opened without sound keeps its own reason.
   it.each([
-    [undefined, 'Running Gen 3: A vs B (hand-made).'],
+    [undefined, { line: 'Running Gen 3: A vs B (hand-made).', detail: '' }],
     [
-      'the audio worklet failed: no worklet',
-      'Running Gen 3: A vs B (hand-made). It plays without sound: the audio worklet failed: no worklet.',
+      { reason: 'the audio worklet failed', words: 'no worklet' },
+      {
+        line: 'Running Gen 3: A vs B (hand-made). It plays without sound: the audio worklet failed.',
+        detail: 'no worklet',
+      },
     ],
   ])(
     'gives the running line back once a Play resumes the sound (own reason %s)',
@@ -242,7 +246,7 @@ describe('the toggle', () => {
       await togglePause(run, audio, 9000)
       context.resume = () => Promise.resolve()
       await expect(togglePause(run, audio, 9500)).resolves.toBeUndefined()
-      await expect(togglePause(run, audio, 9800)).resolves.toBe(line)
+      await expect(togglePause(run, audio, 9800)).resolves.toEqual(line)
       await togglePause(run, audio, 9900)
       await expect(togglePause(run, audio, 9950)).resolves.toBeUndefined()
     },

@@ -26,6 +26,7 @@ import {
   progressLine,
   READY_LINE,
   runningLine,
+  type StatusLine,
 } from '../status'
 import { environmentLine, type PlayingGame } from '../visitor'
 import { AudioOpener, type Sound } from './audio-opener'
@@ -122,7 +123,7 @@ const playingGame = (run: NamedRun | undefined): PlayingGame | undefined =>
  * Pauses or plays the current run. Resolves with the line for a refused resume while that run is
  * still the current one (#69).
  */
-function toggleCurrent(runs: Runs<NamedRun>, audio: AudioOpener): Promise<string | undefined> {
+function toggleCurrent(runs: Runs<NamedRun>, audio: AudioOpener): Promise<StatusLine | undefined> {
   const run = runs.current
   return togglePause(run, audio, performance.now()).then((line) =>
     runs.current === run ? line : undefined,
@@ -182,7 +183,7 @@ function createViewer(view: WasmView) {
   }
   drawLoop(view, runs, changeSpeed)
 
-  const play = async (stream?: ListedPick): Promise<string | undefined> => {
+  const play = async (stream?: ListedPick): Promise<StatusLine | undefined> => {
     const ticket = runs.nextPlay()
     const picked = stream ?? pickedStream(choice)
     // Before the context resumes, a paused run's sound leaves the speakers (R39).
@@ -230,7 +231,7 @@ function createViewer(view: WasmView) {
 type Viewer = ReturnType<typeof createViewer>
 
 /** Runs a handler's work; its line or its failure's visitor line becomes the status line. */
-function act(view: WasmView, work: () => Promise<string | undefined>): void {
+function act(view: WasmView, work: () => Promise<string | StatusLine | undefined>): void {
   work().then(
     (line) => {
       if (line !== undefined) view.status(line)
@@ -270,7 +271,7 @@ function wirePause(viewer: Viewer, view: WasmView): void {
 function playFrom(
   view: WasmView,
   button: HTMLButtonElement,
-  play: () => Promise<string | undefined>,
+  play: () => Promise<StatusLine | undefined>,
 ): void {
   const held = document.activeElement === button
   act(view, async () => {

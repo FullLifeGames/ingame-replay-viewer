@@ -62,22 +62,23 @@ describe('the status lines', () => {
 
   // The game reaches END at the win or tie line; the outro after it belongs to no battle line.
   it('says the replay played to the end of the battle once the game reached END', () => {
-    expect(endedLine(LABEL)).toBe(`Played ${LABEL} to the end of the battle.`)
-    expect(endedLine(LABEL, undefined)).toBe(`Played ${LABEL} to the end of the battle.`)
+    expect(endedLine(LABEL).line).toBe(`Played ${LABEL} to the end of the battle.`)
+    expect(endedLine(LABEL, undefined).line).toBe(`Played ${LABEL} to the end of the battle.`)
   })
 
   // #59: the END line replaces the running line, so it keeps the reason a run had no sound.
   it('keeps at END the reason a run played without sound', () => {
-    expect(endedLine(LABEL, 'the audio did not start: refused for the test')).toBe(
-      `Played ${LABEL} to the end of the battle. It played without sound: the audio did not start: refused for the test.`,
+    expect(endedLine(LABEL, { reason: 'the audio did not start', words: 'refused' }).line).toBe(
+      `Played ${LABEL} to the end of the battle. It played without sound: the audio did not start.`,
     )
   })
 
   it('gives the running line and the END line one rule for the reason', () => {
     expect(silenceText(undefined, 'plays')).toBe('')
-    expect(silenceText('no context', 'plays')).toBe(' It plays without sound: no context.')
-    expect(endedLine(LABEL, 'no context')).toBe(
-      `Played ${LABEL} to the end of the battle.${silenceText('no context', 'played')}`,
+    const silence = { reason: 'no context', words: 'refused' }
+    expect(silenceText(silence, 'plays')).toBe(' It plays without sound: no context.')
+    expect(endedLine(LABEL, silence).line).toBe(
+      `Played ${LABEL} to the end of the battle.${silenceText(silence, 'played')}`,
     )
   })
 
@@ -220,15 +221,15 @@ describe("the viewer's run lines", () => {
     finishedMs: undefined,
     output: undefined,
     ring,
-    silence: 'no audio worklet',
+    silence: { reason: 'the audio worklet failed', words: '' },
     streamBytes: 8346,
   }
 
   it('names the replay once a run starts, and why it plays without sound', () => {
     const picked = { label: LABEL }
-    expect(runningLine(picked, { ...silent, silence: undefined })).toBe(`Running ${LABEL}.`)
-    expect(runningLine(picked, silent)).toBe(
-      `Running ${LABEL}. It plays without sound: no audio worklet.`,
+    expect(runningLine(picked, { ...silent, silence: undefined }).line).toBe(`Running ${LABEL}.`)
+    expect(runningLine(picked, silent).line).toBe(
+      `Running ${LABEL}. It plays without sound: the audio worklet failed.`,
     )
   })
 
@@ -249,6 +250,7 @@ describe("the viewer's run lines", () => {
 // "Details". The words of the developers' tools stay off it as well (visitor-report.test.ts).
 describe('the status lines a visitor reads', () => {
   const DEVELOPER_WORDS = /bytes|instruction stream|SHA1|npm run|localhost|devbox|tailscale|README/i
+  const NO_WORKLET = { reason: 'the audio worklet failed', words: 'refused' }
   const lineOf = (shown: string | { readonly line: string }) =>
     typeof shown === 'string' ? shown : shown.line
 
@@ -260,10 +262,10 @@ describe('the status lines a visitor reads', () => {
     ['running on the emulator page', () => lineOf(startLine({ label: LABEL, streamBytes: 8346 }))],
     ['building', () => BUILDING_LINE],
     ['built', () => BUILT_LINE],
-    ['running in the viewer', () => runningLine({ label: LABEL }, { silence: 'no audio worklet' })],
+    ['running in the viewer', () => lineOf(runningLine({ label: LABEL }, { silence: NO_WORKLET }))],
     ['restarted', () => restartLine(LABEL)],
     ['picked', () => pickedLine(LABEL)],
-    ['ended', () => endedLine(LABEL, 'no audio worklet')],
+    ['ended', () => lineOf(endedLine(LABEL, NO_WORKLET))],
     ['replay summary', () => replaySummaryLine({ label: LABEL })],
   ])('holds no byte count, SHA1 or developer word: %s', (_, line) => {
     expect(line()).not.toMatch(DEVELOPER_WORDS)

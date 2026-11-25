@@ -9,6 +9,7 @@ import type { ReplaySummary } from './replay-choice'
 import type { DumpSummary, StartSummary } from './session'
 import type { NotShownCount, NotShownRow } from './stream'
 import { soundLine } from './wasm/audio'
+import type { Silence } from './wasm/audio-opener'
 import type { RunStatus } from './wasm/protocol'
 
 export const READY_LINE = 'Pick your US Emerald dump, then press Start.'
@@ -50,18 +51,25 @@ export const BUILT_LINE =
   'Your dump is US Emerald, and the page built the game from it. Press Start.'
 
 /**
- * Why a run plays or played without sound, as the end of its line; empty for a run with sound.
- * The running line and the END line share it (#59).
+ * Why a run plays or played without sound, in our words, as the end of its line; empty for a run
+ * with sound. The running line and the END line share it (#59).
  */
-export const silenceText = (silence: string | undefined, verb: 'plays' | 'played'): string =>
-  silence === undefined ? '' : ` It ${verb} without sound: ${silence}.`
+export const silenceText = (silence: Silence | undefined, verb: 'plays' | 'played'): string =>
+  silence === undefined ? '' : ` It ${verb} without sound: ${silence.reason}.`
+
+/** A viewer's line with the browser's own words for a run without sound under "Details" (#90). */
+const soundStatus = (
+  line: string,
+  silence: Silence | undefined,
+  verb: 'plays' | 'played',
+): StatusLine => ({ line: `${line}${silenceText(silence, verb)}`, detail: silence?.words ?? '' })
 
 /**
  * Once the game reached END, at the win or tie line; the outro that follows belongs to no line.
  * It replaces the running line, so it keeps the reason a run had no sound.
  */
-export const endedLine = (label: string, silence?: string): string =>
-  `Played ${label} to the end of the battle.${silenceText(silence, 'played')}`
+export const endedLine = (label: string, silence?: Silence): StatusLine =>
+  soundStatus(`Played ${label} to the end of the battle.`, silence, 'played')
 
 /** What the viewer's lines read of a run (run.ts's Run): its time to END and its sound. */
 interface LineRun {
@@ -71,7 +79,7 @@ interface LineRun {
   /** The audio worklet's node; undefined for a run without sound. */
   readonly output: unknown
   readonly ring: { readonly skipped: number; readonly underruns: number }
-  readonly silence: string | undefined
+  readonly silence: Silence | undefined
 }
 
 /**
@@ -92,7 +100,7 @@ export const progressLine = (status: RunStatus, run: LineRun): string => {
 export const runningLine = (
   picked: { readonly label: string },
   run: Pick<LineRun, 'silence'>,
-): string => `Running ${picked.label}.${silenceText(run.silence, 'plays')}`
+): StatusLine => soundStatus(`Running ${picked.label}.`, run.silence, 'plays')
 
 const PRESS_START = 'Press Start to play it.'
 

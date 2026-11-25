@@ -2,7 +2,8 @@
 // game" list before Start, with the same counts as the emulator page. Showdown is a route that
 // answers from the test fixture; the page needs no dump and no module for this. With the dump and
 // the module, the replay by link starts at fast and plays its first instructions (#50), and a run
-// without sound keeps the reason in its END line (#59).
+// without sound keeps the reason in its END line (#59), with the browser's words under "Details"
+// (#90).
 import { expect, test } from '@playwright/test'
 
 import { WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'
@@ -139,7 +140,8 @@ const REFUSING_AUDIO =
   "resume() { return Promise.reject(new Error('refused for the test')) } }"
 
 // #59: the END line replaces the running line, so a run without sound keeps the reason there. The
-// page's AudioContext refuses to resume, as a browser that blocks the page's sound does.
+// page's AudioContext refuses to resume, as a browser that blocks the page's sound does; its words
+// wait under "Details" (#90).
 test('a run without sound keeps the reason in its END line', async ({ page, baseURL }) => {
   const missing = missingForModule()
   test.skip(
@@ -158,12 +160,15 @@ test('a run without sound keeps the reason in its END line', async ({ page, base
 
   await page.getByLabel('Fast').check()
   await playStream(page, HAND_MADE, await handMadeBytes())
-  const reason = 'the audio did not start: refused for the test'
   const end = await finished(page, 180_000)
-  expect(end.audio.silence).toBe(reason)
+  expect(end.audio.silence).toEqual({
+    reason: 'the audio did not start',
+    words: 'refused for the test',
+  })
   await expect(line).toHaveText(
-    `Played ${HAND_MADE} to the end of the battle. It played without sound: ${reason}.`,
+    `Played ${HAND_MADE} to the end of the battle. It played without sound: the audio did not start.`,
   )
+  await expect(page.locator('#status-detail')).toHaveText('refused for the test')
   expect(notSameOriginGets).toEqual([])
   expect(errors).toEqual([])
 })

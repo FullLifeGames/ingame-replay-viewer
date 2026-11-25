@@ -3,8 +3,23 @@
 // context; run.ts hands it the factory that opens the real one.
 import { messageOf } from '../message'
 
-/** The page's audio context, or the line that says why a run plays without sound. */
-export type Sound = AudioContext | string
+/**
+ * Why a run plays without sound: our reason in plain words for the status line, and the browser's
+ * own words, which wait under "Details" (#90). The words may be empty.
+ */
+export interface Silence {
+  readonly reason: string
+  readonly words: string
+}
+
+/** The one rule that builds a Silence: our reason, and the browser's words from its error. */
+export const silenceOf = (reason: string, error: unknown): Silence => ({
+  reason,
+  words: messageOf(error),
+})
+
+/** The page's audio context, or why a run plays without sound. */
+export type Sound = AudioContext | Silence
 
 /**
  * The page's one audio context. When it fails to open, the run plays without sound, and the next
@@ -21,7 +36,7 @@ export class AudioOpener {
     this.create = create
   }
 
-  /** The open context, resumed, or the line that says why a run plays without sound. */
+  /** The open context, resumed, or why a run plays without sound. */
   open(): Promise<Sound> {
     if (this.opened !== undefined) return this.started(this.opened)
     this.pending ??= this.create()
@@ -32,7 +47,7 @@ export class AudioOpener {
       },
       (error: unknown) => {
         this.pending = undefined
-        return `the page could not open its audio: ${messageOf(error)}`
+        return silenceOf('the page could not open its audio', error)
       },
     )
   }
@@ -41,11 +56,11 @@ export class AudioOpener {
    * Resumes the open context at once; nothing before the first open. Resolves with why the sound
    * stays off when the browser refuses the resume (#69), and with undefined otherwise.
    */
-  resumeNow(): Promise<string | undefined> {
+  resumeNow(): Promise<Silence | undefined> {
     if (this.opened === undefined) return Promise.resolve(undefined)
     return this.opened.resume().then(
       () => undefined,
-      (error: unknown) => `the audio did not resume: ${messageOf(error)}`,
+      (error: unknown) => silenceOf('the audio did not resume', error),
     )
   }
 
@@ -57,7 +72,7 @@ export class AudioOpener {
   private started(context: AudioContext): Promise<Sound> {
     return context.resume().then(
       () => context,
-      (error: unknown) => `the audio did not start: ${messageOf(error)}`,
+      (error: unknown) => silenceOf('the audio did not start', error),
     )
   }
 }

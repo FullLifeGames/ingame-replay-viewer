@@ -53,7 +53,8 @@ interface Sound {
   rms: number
   rate: number | undefined
   state: string | undefined
-  silence: string | undefined
+  /** Why the run plays without sound: our reason and the browser's words (#90). */
+  silence: { reason: string; words: string } | undefined
 }
 
 interface Status {

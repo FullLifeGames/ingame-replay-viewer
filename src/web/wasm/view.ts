@@ -12,7 +12,7 @@ import {
   showOnly,
   showVisitorLine,
 } from '../replay-view'
-import type { PanelText } from '../status'
+import type { PanelText, StatusLine } from '../status'
 import { TEAM_SIDES, teamLists } from '../teams'
 import type { VisitorLine } from '../visitor'
 import type { PauseButton } from './pause'
@@ -133,7 +133,8 @@ export function findWasmView() {
     showOnly: (shown: VisitorLine): void => {
       showOnly(PAGE, shown)
     },
-    status: (line: string): void => {
+    /** A line of the page's own, with the words its "Details" holds, if any. */
+    status: (line: string | StatusLine): void => {
       showLine(PAGE, line)
     },
     visitorLine: (shown: VisitorLine): void => {

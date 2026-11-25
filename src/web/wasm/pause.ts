@@ -1,8 +1,8 @@
 // The viewer's Pause and Play (#57): the button's state, the Space rule and the toggle. DOM-free,
 // so a Node spec holds it; main.ts wires the button, the key and the draw loop to it. The pause
 // itself lives in the clock (clock.ts), so the page asks the clock whether a run stands paused.
-import { runningLine } from '../status'
-import type { AudioOpener, Sound } from './audio-opener'
+import { runningLine, type StatusLine } from '../status'
+import type { AudioOpener, Silence, Sound } from './audio-opener'
 import type { TickClock } from './clock'
 import { grant, readStatus } from './protocol'
 import type { Runs } from './runs'
@@ -68,7 +68,7 @@ export function spaceToggles(press: KeyPress, run: PausedRun | undefined): boole
 /** A run as the toggle sees it: the pause's run, its replay label and why it has no sound. */
 export interface ToggledRun extends PausedRun {
   readonly label: string
-  readonly silence: string | undefined
+  readonly silence: Silence | undefined
 }
 
 /** The runs whose last Play the browser refused to resume, so their line says so. */
@@ -78,7 +78,7 @@ const refused = new WeakSet<ToggledRun>()
  * The status line after a Play: the refusal's line, or the running line once a Play resumes the
  * sound after a refusal. The run's own reason for no sound stays in it. Undefined otherwise.
  */
-function playLine(run: ToggledRun, silence: string | undefined): string | undefined {
+function playLine(run: ToggledRun, silence: Silence | undefined): StatusLine | undefined {
   if (silence !== undefined) {
     refused.add(run)
     return runningLine(run, { silence })
@@ -99,7 +99,7 @@ export function togglePause(
   run: ToggledRun | undefined,
   audio: Pick<AudioOpener, 'resumeNow' | 'suspend'>,
   now: number,
-): Promise<string | undefined> {
+): Promise<StatusLine | undefined> {
   if (run === undefined || reachedEnd(run)) return Promise.resolve(undefined)
   const { frame } = readStatus(run.control)
   if (!run.clock.paused) {
@@ -123,7 +123,7 @@ export function togglePause(
 export function soundForNewRun(
   run: Pick<PausedRun, 'clock'>,
   audio: Pick<AudioOpener, 'resumeNow'>,
-): Promise<string | undefined> {
+): Promise<Silence | undefined> {
   return run.clock.paused ? Promise.resolve(undefined) : audio.resumeNow()
 }
 
