@@ -203,10 +203,11 @@ class FrameDriver {
 
   private apply(write: MemoryWrite): void {
     const ram = this.ram()
-    for (const word of wordWrites(write, ram.read32)) ram.write32(word.address, word.value)
-    this.report.watch.push(
-      `${String(this.frame)}: wrote ${write.field} at 0x${write.address.toString(16)}`,
-    )
+    const words = wordWrites(write, ram.read32)
+    if ('fault' in words) throw new Error(words.fault)
+    for (const word of words.words) ram.write32(word.address, word.value)
+    // The field alone: an address behind pointers is the game's heap, which no log line shows.
+    this.report.watch.push(`${String(this.frame)}: wrote ${write.field}`)
   }
 
   private watch(run: Run): void {

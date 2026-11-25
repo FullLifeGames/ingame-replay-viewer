@@ -20,6 +20,7 @@ import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import type { Gen5Global, MarkRecord, RunPlan, RunReport } from '../src/gen5/hook.ts'
 import { MAIN_RAM_SIZE, MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import type { RamRef } from '../src/gen5/ram-check.ts'
+import type { MemoryWrite } from '../src/gen5/ram-write.ts'
 import {
   firstRun,
   type MomentOptions,
@@ -43,6 +44,14 @@ import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve } from './gen5-shot.ts'
 
 const POLL_MS = 1000
 const hex = (value: number) => `0x${value.toString(16)}`
+
+/** One write for the build machine's log: its field, its fixed address and what it writes. */
+function writeText(write: MemoryWrite): string {
+  if (write.kind === 'copy') return `${write.field} copy of ${String(write.length)} bytes`
+  const at = `${write.field} @${hex(write.address)}${write.hops ? ` hops ${write.hops.map(hex).join(' ')}` : ''}`
+  if (write.kind === 'bits') return `${at} bits ${hex(write.mask)}=${String(write.value)}`
+  return `${at} ${write.bytes.map((b) => b.toString(16).padStart(2, '0')).join(' ')}`
+}
 /** The page's hook; spelled out in each evaluate, since those run in the page, not here. */
 const hook = (page: Page) => ({
   readBytes: (at: number, n: number) =>
@@ -219,10 +228,7 @@ async function play(page: Page, dump: string, numbers: Bw2Numbers, options: Mome
   })
   for (const step of steps) {
     if (step.kind === 'write')
-      for (const w of step.writes)
-        log(
-          `step write ${step.name}: ${w.field} @${hex(w.address)} ${w.kind === 'bytes' ? w.bytes.map((b) => b.toString(16).padStart(2, '0')).join(' ') : `bits ${hex(w.mask)}=${String(w.value)}`}`,
-        )
+      for (const w of step.writes) log(`step write ${step.name}: ${writeText(w)}`)
   }
   const second: RunPlan = {
     steps,

@@ -84,7 +84,7 @@ describe('frameHook', () => {
     expect(game.seen).toEqual([0, 0, 0x5a, 0x5a])
     expect(hook.calls.runReport()).toMatchObject({
       status: 'done',
-      watch: ['2: wrote flag at 0x2000100'],
+      watch: ['2: wrote flag'],
     })
   })
 

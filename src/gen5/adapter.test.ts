@@ -42,11 +42,13 @@ const OTHER_COMMAND = 6
 const ADAPTER = 0x02180000
 
 const shown = (writes: MemoryWrite[]) =>
-  writes.map((write) =>
-    write.kind === 'bytes'
-      ? `${write.field} @${write.address.toString(16)} ${[...write.bytes].join(',')}`
-      : `${write.field} @${write.address.toString(16)} bits ${String(write.mask)}=${String(write.value)}`,
-  )
+  writes.map((write) => {
+    if (write.kind === 'copy') return `${write.field} copy`
+    const at = `${write.field} @${write.address.toString(16)}`
+    return write.kind === 'bytes'
+      ? `${at} ${[...write.bytes].join(',')}`
+      : `${at} bits ${String(write.mask)}=${String(write.value)}`
+  })
 
 // Scene: the client reads the block only once `returned` drops to 0, so every other field must be
 // in place before that last write. The server is held: the adapter's state stays IDLE, which
