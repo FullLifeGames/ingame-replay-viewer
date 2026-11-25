@@ -2,7 +2,8 @@
 // test fixture as Showdown saves it, fills the list as the same replay loaded by link does. The
 // file stays in the tab, so the link's request to Showdown is the only one that leaves the page,
 // and a route answers it from the fixture. On a phone-wide screen, the longest replay ID the
-// reader takes wraps in the status line, its detail and the summary.
+// reader takes wraps in the status line, its detail and the summary, which names the replay by its
+// label (#90).
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -65,7 +66,7 @@ test('each kind of saved file fills the list as the replay loaded by link does',
   await page.goto('/')
   const status = page.getByRole('status')
   const testReplay = page.locator('#test-replay')
-  await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${FIRST}: `))
+  await expect(page.locator('#replay-summary')).toHaveText(FIRST_LABEL)
 
   await loadReplay(page, `https://replay.pokemonshowdown.com/${FIRST}`)
   await expect(status).toHaveText(`Picked ${FIRST_LABEL}. Press Start to play it.`)
@@ -91,7 +92,7 @@ test('a file of no kind the viewer reads gets its line and leaves the list on th
   const notSameOriginGets = await guardRequests(page, baseURL)
   await page.goto('/')
   const status = page.getByRole('status')
-  await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${FIRST}: `))
+  await expect(page.locator('#replay-summary')).toHaveText(FIRST_LABEL)
   const before = await notShownList(page)
 
   await pickFile(page, { name: 'notes.txt', mimeType: 'text/plain', text: 'Bring snacks.\n' })
@@ -129,17 +130,17 @@ test.describe('on a phone-wide screen', () => {
     const notSameOriginGets = await guardRequests(page, baseURL)
     const id = 'w'.repeat(LONGEST_REPLAY_ID)
     await page.goto('/')
-    await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${FIRST}: `))
+    await expect(page.locator('#replay-summary')).toHaveText(FIRST_LABEL)
 
     const text = downloadedFile({ ...REPLAY, id })
     await pickFile(page, { name: 'long.html', mimeType: 'text/html', text })
     await expect(page.getByRole('status')).toHaveText(
       `Picked ${replayLabel(id, REPLAY)}. Press Start to play it.`,
     )
-    await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${id}: `))
+    await expect(page.locator('#replay-summary')).toHaveText(replayLabel(id, REPLAY))
     expect(await scrollWidth(page)).toBeLessThanOrEqual(WIDTH)
 
-    // "Details" shows once it holds words (#59): the failed file's.
+    // "Details" holds the failed file's words (#59) beside the replay's counts (#90).
     await pickFile(page, { name: `${id}.txt`, mimeType: 'text/plain', text: 'Bring snacks.\n' })
     await expect(page.locator('#status-detail')).toHaveText(
       new RegExp(`^Could not read the replay file ${id}\\.txt: `),

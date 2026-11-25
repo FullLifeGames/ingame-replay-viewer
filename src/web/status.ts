@@ -101,12 +101,15 @@ export const pickedLine = (label: string): string => `Picked ${label}. ${PRESS_S
 
 export const restartLine = (label: string): string => `Restarted ${label} from the beginning.`
 
-export const replayLine = ({
-  id,
+/** The summary above "Not shown": the picked replay by its label, as the select names it (#90). */
+export const replaySummaryLine = ({ label }: Pick<ReplaySummary, 'label'>): string => label
+
+/** The picked replay's counts, a developer's numbers, under the page's "Details" (#90). */
+export const replayDetail = ({
   instructions,
   streamBytes,
-}: Pick<ReplaySummary, 'id' | 'instructions' | 'streamBytes'>): string =>
-  `${id}: ${String(instructions)} instructions, ${String(streamBytes)} bytes of instruction stream.`
+}: Pick<ReplaySummary, 'instructions' | 'streamBytes'>): string =>
+  `${String(instructions)} instructions, ${streamText(streamBytes)}.`
 
 export const notShownHeading = (rows: number): string => `Not shown in the game (${String(rows)})`
 

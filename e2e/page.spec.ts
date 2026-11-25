@@ -15,7 +15,7 @@ import { buildPaths, REPO_DIR } from '../scripts/rom-paths.ts'
 import { readPreflightInput } from '../scripts/rom-preflight.ts'
 import { readSeries } from '../scripts/rom-upstream.ts'
 import { differ, frame } from './frames.ts'
-import { labelOf, notShownCount } from './page-text.ts'
+import { COUNTS, labelOf, notShownCount } from './page-text.ts'
 import { guardRequests } from './requests.ts'
 import { loadReplay, showdownUrl } from './showdown.ts'
 
@@ -183,7 +183,7 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
   await test.step('a second Start runs another test replay', async () => {
     const before = await frame(page)
     await page.getByLabel('Example replay').selectOption(SECOND)
-    await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${SECOND}: `))
+    await expect(page.locator('#replay-summary')).toHaveText(SECOND_LABEL)
     await page.getByRole('button', { name: 'Start', exact: true }).click()
     await expect(status).toHaveText(`Started ${SECOND_LABEL}.`, { timeout: 60_000 })
     await expect.poll(async () => differ(before, await frame(page)), { timeout: 30_000 }).toBe(true)
@@ -240,7 +240,9 @@ test('a Load that fails while a game plays says that the game keeps its replay, 
   await page.getByLabel('Example replay').selectOption(SECOND)
   await expect(status).toHaveText(`Picked ${SECOND_LABEL}. Press Start to play it.`)
   await expect(detail).toHaveText('')
-  await expect(details).toBeHidden()
+  // "Details" holds the new pick's counts alone (#90).
+  await expect(page.locator('#details p:not(:empty)')).toHaveCount(1)
+  await expect(page.locator('#replay-detail')).toHaveText(COUNTS)
   await expect(page.locator('#report')).toBeHidden()
   expect(errors).toEqual([])
   expect(requests).toEqual([`GET ${showdownUrl(MISSING)}`])

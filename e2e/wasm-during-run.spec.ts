@@ -8,7 +8,7 @@ import { expect, type Page, test } from '@playwright/test'
 
 import { WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'
 import { GBA_FRAMES_PER_SECOND } from '../src/web/wasm/protocol.ts'
-import { labelOf } from './page-text.ts'
+import { COUNTS, labelOf } from './page-text.ts'
 import { guardRequests } from './requests.ts'
 import { loadReplay, showdownUrl } from './showdown.ts'
 import { DUMP, missingForModule, report, status, waitFor } from './wasm-hook.ts'
@@ -149,11 +149,13 @@ test('a Load that fails during a run says that the game plays on, and the next p
   expect(later.runs).toEqual(played.runs)
 
   await page.getByLabel('Example replay').selectOption(OTHER)
-  await expect(line).toHaveText(`Picked ${OTHER}. Press Start to play it.`)
+  await expect(line).toHaveText(`Picked ${labelOf(OTHER)}. Press Start to play it.`)
   await expect(detail).toHaveText('')
-  // "Details" stays for the run's progress line alone, which it holds while a game plays.
+  // "Details" stays for the new pick's counts (#90) and the run's progress line, which it holds
+  // while a game plays.
   await expect(details).toBeVisible()
-  await expect(page.locator('#details p:not(:empty)')).toHaveCount(1)
+  await expect(page.locator('#details p:not(:empty)')).toHaveCount(2)
+  await expect(page.locator('#replay-detail')).toHaveText(COUNTS)
   await expect(page.locator('#progress')).toHaveText(/^Frame \d+, /)
   await expect(reportLink).toBeHidden()
   expect((await status(page))?.runs).toEqual(played.runs)

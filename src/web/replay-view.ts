@@ -16,7 +16,14 @@ import {
   showPick,
   type Then,
 } from './pick-lines'
-import { countText, notShownHeading, replayLine, rowText, type StatusLine } from './status'
+import {
+  countText,
+  notShownHeading,
+  replayDetail,
+  replaySummaryLine,
+  rowText,
+  type StatusLine,
+} from './status'
 import { detailShown, type VisitorLine, visitorLine } from './visitor'
 
 /** The element `#id` of `page`, which must be a `type`. */
@@ -114,8 +121,12 @@ export function findReplayView(page: string) {
         ...examples.map(({ id, label }) => new Option(label, id, false, id === first)),
       )
     },
+    /** The summary by its label, its counts under "Details" (#90), and the "Not shown" list. */
     showReplay: (summary: ReplaySummary): void => {
-      element(page, 'replay-summary', HTMLParagraphElement).textContent = replayLine(summary)
+      element(page, 'replay-summary', HTMLParagraphElement).textContent = replaySummaryLine(summary)
+      const detail = element(page, 'replay-detail', HTMLParagraphElement)
+      detail.textContent = replayDetail(summary)
+      fitDetails(detail)
       element(page, 'not-shown', HTMLHeadingElement).textContent = notShownHeading(
         summary.rows.length,
       )

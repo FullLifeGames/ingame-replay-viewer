@@ -13,7 +13,7 @@ import {
   pickedLine,
   progressLine,
   READY_LINE,
-  replayLine,
+  replaySummaryLine,
   restartLine,
   rowText,
   runningLine,
@@ -93,12 +93,6 @@ describe('the status lines', () => {
 
   it('says a Restart plays the replay from the start', () => {
     expect(restartLine(LABEL)).toBe(`Restarted ${LABEL} from the beginning.`)
-  })
-
-  it('sums up the picked replay', () => {
-    expect(replayLine({ id: ID, instructions: 461, streamBytes: 8346 })).toBe(
-      `${ID}: 461 instructions, 8346 bytes of instruction stream.`,
-    )
   })
 })
 
@@ -270,6 +264,7 @@ describe('the status lines a visitor reads', () => {
     ['restarted', () => restartLine(LABEL)],
     ['picked', () => pickedLine(LABEL)],
     ['ended', () => endedLine(LABEL, 'no audio worklet')],
+    ['replay summary', () => replaySummaryLine({ label: LABEL })],
   ])('holds no byte count, SHA1 or developer word: %s', (_, line) => {
     expect(line()).not.toMatch(DEVELOPER_WORDS)
   })

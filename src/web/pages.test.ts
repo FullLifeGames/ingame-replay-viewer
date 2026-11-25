@@ -154,6 +154,13 @@ describe('the words for visitors', () => {
       expect(details?.[0]).not.toMatch(/<details[^>]*\bopen\b/)
     })
 
+    // #90: the summary names the replay; its counts wait in the page's one "Details".
+    it(`keeps the replay's counts inside "Details" on ${name}`, () => {
+      const details = /<details id="details">([\s\S]*?)<\/details>/.exec(page(name))
+      expect(details?.[1]).toContain('<p id="replay-detail"></p>')
+      expect(page(name).match(/id="replay-detail"/g)).toHaveLength(1)
+    })
+
     // The report opens in a tab of its own, so the page keeps the dump and the run.
     it(`puts the report link under the status line on ${name}`, () => {
       expect(page(name)).toMatch(

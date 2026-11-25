@@ -7,7 +7,14 @@ import { expect, test } from '@playwright/test'
 
 import { WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'
 import { frame } from './frames.ts'
-import { labelOf, notShownCount, notShownList, startsWith } from './page-text.ts'
+import {
+  COUNTS,
+  detailText,
+  labelOf,
+  notShownCount,
+  notShownList,
+  startsWith,
+} from './page-text.ts'
 import { guardRequests } from './requests.ts'
 import { loadReplay, routeShowdown, showdownUrl } from './showdown.ts'
 import {
@@ -32,15 +39,16 @@ test('a replay loaded by link in the viewer lists what the emulator page lists',
   await page.goto('/')
   const summary = page.locator('#replay-summary')
   const status = page.getByRole('status')
-  await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
+  await expect(summary).toHaveText(labelOf(FIRST))
   await expect(status).toHaveText(/^Pick your US Emerald dump/)
 
   await loadReplay(page, 'https://example.com/smogtours-gen3ou-994176')
   await expect(status).toHaveText(/^"Replay link or ID" takes a replay ID such as /)
-  await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
+  await expect(summary).toHaveText(labelOf(FIRST))
 
   await loadReplay(page, `https://replay.pokemonshowdown.com/${LINKED}`)
-  await expect(summary).toHaveText(new RegExp(`^${LINKED}: \\d+ instructions`))
+  await expect(summary).toHaveText(labelOf(LINKED))
+  await expect(page.locator('#replay-detail')).toHaveText(COUNTS)
   await expect(status).toHaveText(`Picked ${labelOf(LINKED)}. Press Start to play it.`)
   await expect(page.getByLabel('Example replay')).toHaveValue('')
   const onWasm = await notShownList(page)
@@ -49,7 +57,7 @@ test('a replay loaded by link in the viewer lists what the emulator page lists',
 
   await page.goto('/emulator.html')
   await loadReplay(page, LINKED)
-  await expect(summary).toHaveText(new RegExp(`^${LINKED}: `))
+  await expect(summary).toHaveText(labelOf(LINKED))
   expect(await notShownList(page)).toEqual(onWasm)
   expect(notSameOriginGets).toEqual([`GET ${showdownUrl(LINKED)}`, `GET ${showdownUrl(LINKED)}`])
 })
@@ -65,7 +73,7 @@ test('a test replay picked in the viewer shows its list and asks for Start, and 
   await expect(page.getByRole('status')).toHaveText(
     `Picked ${labelOf(second)}. Press Start to play it.`,
   )
-  await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${second}: `))
+  await expect(page.locator('#replay-summary')).toHaveText(labelOf(second))
 
   await test.step('the viewer links the emulator page as the fallback, and it links back', async () => {
     await page.getByRole('link', { name: 'emulator page' }).click()
@@ -109,7 +117,7 @@ test('a replay loaded by link starts at fast in the viewer and plays its instruc
   await expect(line).toHaveText(/^Your dump is US Emerald/, { timeout: 180_000 })
   await loadReplay(page, LINKED)
   await expect(line).toHaveText(`Picked ${labelOf(LINKED)}. Press Start to play it.`)
-  const listed = /: (\d+) instructions/.exec(await page.locator('#replay-summary').innerText())
+  const listed = /^(\d+) instructions/.exec(await detailText(page, 'replay-detail'))
 
   await page.getByLabel('Fast').check()
   await page.getByRole('button', { name: 'Start', exact: true }).click()
