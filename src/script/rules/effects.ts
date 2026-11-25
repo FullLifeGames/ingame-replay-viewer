@@ -39,7 +39,7 @@ export const EFFECT_RULES = {
   },
   '|-activate|': {
     arity: 2,
-    reads: ['damage'],
+    reads: ['damage', 'consumed'],
     build: ({ line, args: [, ident, effect], kwArgs, battle }) => {
       const who = refIfAny(battle, ident, line)
       return [
@@ -48,7 +48,7 @@ export const EFFECT_RULES = {
           line,
           ...(who ? { who } : {}),
           effect: effectOf(effect),
-          ...flagsOf(kwArgs, ['damage']),
+          ...flagsOf(kwArgs, ['damage', 'consumed']),
         },
       ]
     },

@@ -26,6 +26,7 @@ export interface EffectEndEvent extends Caused, Hit {
 /**
  * A Substitute that takes a hit is one (`[damage]`). Splash's `|-nothing` is one on no Pokémon:
  * the parser reads it as `-activate||move: Splash`, and the game says "But nothing happened!".
+ * An item that acts as it is used up carries `[consumed]` (Custap Berry, after its `[eat]`).
  */
 export interface EffectActivateEvent extends Hit {
   readonly kind: 'effectActivate'
@@ -33,6 +34,7 @@ export interface EffectActivateEvent extends Hit {
   readonly who?: PokemonRef
   readonly effect: Effect
   readonly damage?: true
+  readonly consumed?: true
 }
 
 /** `who` turns into a copy of `into` (Transform). */

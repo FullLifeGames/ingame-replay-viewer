@@ -11,8 +11,8 @@ type Named = typeof NAMED_KINDS
 
 const KINDS = Object.keys(Protocol.ARGS) as Protocol.ArgName[]
 
-// `dropReasonOf` decides `||` by its text. `|player|` has a rule and drops by its line too; the
-// rule is its place.
+// `dropReasonOf` decides `||` by its text. `|player|` and `|-singleturn|` (Roost's) have a rule
+// and drop by their line too; the rule is their place.
 const BY_LINE: readonly Protocol.ArgName[] = ['||']
 
 function placesOf(kind: Protocol.ArgName, named: Named = NAMED_KINDS): string[] {
@@ -51,6 +51,12 @@ describe('the kind census', () => {
   it('gives a kind its reason from the list, and "no rule for" a kind off it', () => {
     expect(noRuleReason('|-fieldstart|')).toMatch(/^a field condition starting: /)
     expect(noRuleReason('|move|')).toBe('no rule for |move|')
+  })
+
+  it('groups a kind that only Gen 4 and later log apart from the refused formats (#86)', () => {
+    expect(NAMED_KINDS['|-fieldstart|']?.group).toBe('newer generation')
+    expect(NAMED_KINDS['|-terastallize|']?.group).toBe('newer generation')
+    expect(NAMED_KINDS['|swap|']?.group).toBe('refused format')
   })
 
   it('gives every named kind a reason', () => {

@@ -1,19 +1,22 @@
 // A replay on its way into the game: its battle script and instruction stream, and the list of
 // what the game does not show (plan "No silent drops"): the battle script's dropped lines and the
-// backend's fallbacks, by log line. The names of the two players come from the battle script too.
+// backend's fallbacks, by log line. The names of the two players and the teams of Team Preview
+// come from the battle script too.
 import { buildGen3Stream, type Gen3Stream } from '../gen3/backend'
 import { showsInPlace, type Fallback } from '../gen3/fallbacks'
 import { buildBattleScript } from '../script/build'
 import type { ScriptEvent } from '../script/events'
 import { lineNumber, readLines, type LogLine } from '../script/lines'
 import { readReplay, type Replay } from '../script/replay'
-import type { Side } from '../script/types'
+import type { Preview, Side } from '../script/types'
 
 export interface ReplayStream {
   readonly replay: Replay
   readonly stream: Gen3Stream
   /** The players by side, as the log's intro names them; player 1 is the near side. */
   readonly players: Readonly<Record<Side, string>>
+  /** Both teams of Team Preview, for a log that holds it (#87). */
+  readonly preview?: Preview
 }
 
 /** One row of the page's "Not shown in the game" list. */
@@ -41,7 +44,13 @@ export interface NotShownCount {
  */
 export function streamOfLoaded(replay: Replay): ReplayStream {
   const script = buildBattleScript(replay.log)
-  return { replay, stream: buildGen3Stream(script), players: playersOf(script.events) }
+  const { preview } = script
+  return {
+    replay,
+    stream: buildGen3Stream(script),
+    players: playersOf(script.events),
+    ...(preview === undefined ? {} : { preview }),
+  }
 }
 
 /**

@@ -5,7 +5,7 @@
 // the page shows under "Details" below the visitor line (#59).
 import type { Replay } from '../script/replay'
 import { readSavedFile, type SavedKind } from '../script/saved-replay'
-import type { Side } from '../script/types'
+import type { Preview, Side } from '../script/types'
 import { messageOf } from './message'
 import { replayJsonUrl } from './replay-input'
 import type { TestReplay } from './replays'
@@ -56,6 +56,8 @@ export interface ReplaySummary {
   readonly counts: readonly NotShownCount[]
   /** The players by side, from the battle log, for the panel (#58). */
   readonly players: Readonly<Record<Side, string>>
+  /** Both teams of Team Preview, for the team list (#87); absent for a log without it. */
+  readonly preview?: Preview
 }
 
 /**
@@ -113,7 +115,7 @@ export function newest<T>(keepEarlier: boolean) {
   }
 }
 
-function chosenOf({ replay, stream, players }: ReplayStream, place: ReplayPlace): Chosen {
+function chosenOf({ replay, stream, players, preview }: ReplayStream, place: ReplayPlace): Chosen {
   const rows = notShown(replay, stream)
   const summary: ReplaySummary = {
     id: replay.id,
@@ -122,6 +124,7 @@ function chosenOf({ replay, stream, players }: ReplayStream, place: ReplayPlace)
     rows,
     counts: notShownCounts(rows),
     players,
+    ...(preview === undefined ? {} : { preview }),
   }
   return { bytes: stream.bytes, summary, place }
 }

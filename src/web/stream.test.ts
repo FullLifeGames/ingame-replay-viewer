@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import replay994052 from '../../test/fixtures/replays/smogtours-gen3ou-994052.json'
 import replay994176 from '../../test/fixtures/replays/smogtours-gen3ou-994176.json'
-import { buildGen3Stream, type Gen3Stream } from '../gen3/backend'
+import { buildGen3Stream, type Gen3Stream, NEWEST_GEN } from '../gen3/backend'
 import { Gen3Error } from '../gen3/errors'
 import { showsInPlace } from '../gen3/fallbacks'
 import { buildBattleScript } from '../script/build'
@@ -21,7 +21,9 @@ describe('streamOfReplay', () => {
   it('lets the backend refuse a Gen 9 replay', () => {
     const gen9 = { ...replay994052, log: replay994052.log.replace('|gen|3\n', '|gen|9\n') }
     expect(() => streamOfReplay(gen9)).toThrow(Gen3Error)
-    expect(() => streamOfReplay(gen9)).toThrow('the stream plays Gen 3 battles, this one is Gen 9')
+    expect(() => streamOfReplay(gen9)).toThrow(
+      `the stream plays Gen 1 to ${String(NEWEST_GEN)} battles, this one is Gen 9`,
+    )
   })
 
   it('lets the replay reader refuse JSON without a log', () => {

@@ -1,0 +1,574 @@
+{"gen":4,"format":"[Gen 4] OU","teams":{"near":[{"species":"Swampert","name":"Malekith","gender":"M","level":100,"shiny":false},{"species":"Gengar","name":"Gengar","gender":"M","level":100,"shiny":false},{"species":"Magneton","name":"ForteDosReisMagos","level":100,"shiny":false},{"species":"Skarmory","name":"Skarmory","gender":"F","level":100,"shiny":false},{"species":"Latias","name":"Latias","gender":"F","level":100,"shiny":false},{"species":"Scizor","name":"Scizor","gender":"M","level":100,"shiny":false}],"far":[{"species":"Azelf","name":"Azelf","level":100,"shiny":true},{"species":"Jirachi","name":"Jirachi","level":100,"shiny":false},{"species":"Gyarados","name":"Gyarados","gender":"M","level":100,"shiny":false},{"species":"Tyranitar","name":"Tyranitar","gender":"M","level":100,"shiny":false},{"species":"Dragonite","name":"Dragonite","gender":"M","level":100,"shiny":false},{"species":"Donphan","name":"Donphan","gender":"M","level":100,"shiny":false}]}}
+{"line":0,"text":"|inactive|Battle timer is ON: inactive players will automatically lose when time's up.","reason":"timer"}
+{"line":1,"text":"|t:|1682875449","reason":"timestamp"}
+{"line":2,"text":"|gametype|singles","reason":"metadata"}
+{"kind":"player","line":3,"side":"near","name":"UnMecQuiS'enBranle","avatar":"fantina"}
+{"kind":"player","line":4,"side":"far","name":"Malekith","avatar":"bruno"}
+{"kind":"teamSize","line":5,"side":"near","size":6}
+{"kind":"teamSize","line":6,"side":"far","size":6}
+{"line":7,"text":"|gen|4","reason":"metadata"}
+{"line":8,"text":"|tier|[Gen 4] OU","reason":"metadata"}
+{"line":9,"text":"|rule|Sleep Clause Mod: Limit one foe put to sleep","reason":"rule"}
+{"line":10,"text":"|rule|Species Clause: Limit one of each Pokémon","reason":"rule"}
+{"line":11,"text":"|rule|OHKO Clause: OHKO moves are banned","reason":"rule"}
+{"line":12,"text":"|rule|Evasion Items Clause: Evasion items are banned","reason":"rule"}
+{"line":13,"text":"|rule|Evasion Moves Clause: Evasion moves are banned","reason":"rule"}
+{"line":14,"text":"|rule|Endless Battle Clause: Forcing endless battles is banned","reason":"rule"}
+{"line":15,"text":"|rule|HP Percentage Mod: HP is shown in percentages","reason":"rule"}
+{"line":16,"text":"|rule|Freeze Clause Mod: Limit one foe frozen","reason":"rule"}
+{"line":17,"text":"|","reason":"spacer"}
+{"line":18,"text":"|t:|1682875449","reason":"timestamp"}
+{"kind":"battleStart","line":19}
+{"kind":"switchIn","line":20,"who":{"side":"near","index":0},"dragged":false,"hp":{"hp":403,"max":403}}
+{"kind":"switchIn","line":21,"who":{"side":"far","index":0},"dragged":false,"hp":{"hp":351,"max":351}}
+{"kind":"turn","line":22,"number":1}
+{"line":23,"text":"|c|☆Malekith|hf","reason":"chat"}
+{"line":24,"text":"|c|☆UnMecQuiS'enBranle|hf","reason":"chat"}
+{"line":25,"text":"|","reason":"spacer"}
+{"line":26,"text":"|t:|1682875472","reason":"timestamp"}
+{"kind":"move","line":27,"user":{"side":"far","index":0},"move":"Taunt","target":{"side":"near","index":0}}
+{"kind":"effectStart","line":28,"who":{"side":"near","index":0},"effect":{"name":"Taunt","kind":"move"}}
+{"kind":"move","line":29,"user":{"side":"near","index":0},"move":"Waterfall","target":{"side":"far","index":0}}
+{"kind":"damage","line":30,"who":{"side":"far","index":0},"hp":{"hp":191,"max":351}}
+{"line":31,"text":"|","reason":"spacer"}
+{"line":32,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":33,"number":2}
+{"line":34,"text":"|inactive|UnMecQuiS'enBranle has 270 seconds left.","reason":"timer"}
+{"line":35,"text":"|","reason":"spacer"}
+{"line":36,"text":"|t:|1682875524","reason":"timestamp"}
+{"kind":"switchIn","line":37,"who":{"side":"near","index":1},"replaces":{"side":"near","index":0},"dragged":false,"hp":{"hp":287,"max":287}}
+{"kind":"move","line":38,"user":{"side":"far","index":0},"move":"Stealth Rock","target":{"side":"near","index":1}}
+{"kind":"sideStart","line":39,"side":"near","condition":{"name":"Stealth Rock","kind":"move"}}
+{"line":40,"text":"|","reason":"spacer"}
+{"line":41,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":42,"number":3}
+{"line":43,"text":"|inactive|Malekith has 270 seconds left.","reason":"timer"}
+{"line":44,"text":"|","reason":"spacer"}
+{"line":45,"text":"|t:|1682875560","reason":"timestamp"}
+{"kind":"switchIn","line":46,"who":{"side":"far","index":1},"replaces":{"side":"far","index":0},"dragged":false,"hp":{"hp":349,"max":349}}
+{"kind":"move","line":47,"user":{"side":"near","index":1},"move":"Shadow Ball","target":{"side":"far","index":1}}
+{"kind":"damage","line":48,"who":{"side":"far","index":1},"hp":{"hp":214,"max":349}}
+{"kind":"statChange","line":49,"who":{"side":"far","index":1},"stat":"spd","stages":-1}
+{"line":50,"text":"|","reason":"spacer"}
+{"line":51,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":52,"number":4}
+{"line":53,"text":"|inactive|Malekith has 270 seconds left.","reason":"timer"}
+{"line":54,"text":"|inactive|UnMecQuiS'enBranle has 240 seconds left.","reason":"timer"}
+{"line":55,"text":"|inactive|Malekith has 240 seconds left.","reason":"timer"}
+{"line":56,"text":"|inactive|UnMecQuiS'enBranle has 210 seconds left.","reason":"timer"}
+{"line":57,"text":"|","reason":"spacer"}
+{"line":58,"text":"|t:|1682875643","reason":"timestamp"}
+{"kind":"switchIn","line":59,"who":{"side":"near","index":2},"replaces":{"side":"near","index":1},"dragged":false,"hp":{"hp":241,"max":241}}
+{"kind":"damage","line":60,"who":{"side":"near","index":2},"hp":{"hp":226,"max":241},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":61,"user":{"side":"far","index":1},"move":"Thunder Wave","target":{"side":"near","index":2}}
+{"kind":"status","line":62,"who":{"side":"near","index":2},"status":"par"}
+{"line":63,"text":"|","reason":"spacer"}
+{"line":64,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":65,"number":5}
+{"line":66,"text":"|c|☆Malekith|Lol nice nick","reason":"chat"}
+{"line":67,"text":"|c|☆Malekith|nicks*","reason":"chat"}
+{"line":68,"text":"|","reason":"spacer"}
+{"line":69,"text":"|t:|1682875666","reason":"timestamp"}
+{"kind":"switchIn","line":70,"who":{"side":"near","index":0},"replaces":{"side":"near","index":2},"dragged":false,"hp":{"hp":403,"max":403}}
+{"kind":"damage","line":71,"who":{"side":"near","index":0},"hp":{"hp":378,"max":403},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":72,"user":{"side":"far","index":1},"move":"Iron Head","target":{"side":"near","index":0}}
+{"kind":"damage","line":74,"who":{"side":"near","index":0},"hp":{"hp":315,"max":403},"effectiveness":"resisted","folded":[73]}
+{"line":75,"text":"|","reason":"spacer"}
+{"kind":"heal","line":76,"who":{"side":"near","index":0},"hp":{"hp":340,"max":403},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":77,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":78,"number":6}
+{"line":79,"text":"|inactive|Malekith has 210 seconds left.","reason":"timer"}
+{"line":80,"text":"|","reason":"spacer"}
+{"line":81,"text":"|t:|1682875708","reason":"timestamp"}
+{"kind":"switchIn","line":82,"who":{"side":"far","index":2},"replaces":{"side":"far","index":1},"dragged":false,"hp":{"hp":333,"max":333}}
+{"kind":"ability","line":83,"who":{"side":"far","index":2},"ability":"Intimidate","detail":"boost"}
+{"kind":"statChange","line":84,"who":{"side":"near","index":0},"stat":"atk","stages":-1}
+{"kind":"move","line":85,"user":{"side":"near","index":0},"move":"Stealth Rock","target":{"side":"far","index":2}}
+{"kind":"sideStart","line":86,"side":"far","condition":{"name":"Stealth Rock","kind":"move"}}
+{"line":87,"text":"|","reason":"spacer"}
+{"kind":"heal","line":88,"who":{"side":"near","index":0},"hp":{"hp":365,"max":403},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":89,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":90,"number":7}
+{"line":91,"text":"|","reason":"spacer"}
+{"line":92,"text":"|t:|1682875718","reason":"timestamp"}
+{"kind":"switchIn","line":93,"who":{"side":"near","index":3},"replaces":{"side":"near","index":0},"dragged":false,"hp":{"hp":334,"max":334}}
+{"kind":"damage","line":94,"who":{"side":"near","index":3},"hp":{"hp":293,"max":334},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":95,"user":{"side":"far","index":2},"move":"Waterfall","target":{"side":"near","index":3}}
+{"kind":"damage","line":96,"who":{"side":"near","index":3},"hp":{"hp":188,"max":334}}
+{"line":97,"text":"|","reason":"spacer"}
+{"kind":"heal","line":98,"who":{"side":"near","index":3},"hp":{"hp":208,"max":334},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":99,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":100,"number":8}
+{"line":101,"text":"|","reason":"spacer"}
+{"line":102,"text":"|t:|1682875733","reason":"timestamp"}
+{"kind":"move","line":103,"user":{"side":"far","index":2},"move":"Thunder Wave","target":{"side":"near","index":3}}
+{"kind":"status","line":104,"who":{"side":"near","index":3},"status":"par"}
+{"kind":"move","line":105,"user":{"side":"near","index":3},"move":"Roost","target":{"side":"near","index":3}}
+{"kind":"heal","line":106,"who":{"side":"near","index":3},"hp":{"hp":334,"max":334},"status":"par"}
+{"line":107,"text":"|-singleturn|p1a: Skarmory|move: Roost","reason":"state"}
+{"line":108,"text":"|","reason":"spacer"}
+{"line":109,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":110,"number":9}
+{"line":111,"text":"|inactive|Malekith has 180 seconds left.","reason":"timer"}
+{"line":112,"text":"|inactive|UnMecQuiS'enBranle has 180 seconds left.","reason":"timer"}
+{"line":113,"text":"|","reason":"spacer"}
+{"line":114,"text":"|t:|1682875771","reason":"timestamp"}
+{"kind":"switchIn","line":115,"who":{"side":"far","index":3},"replaces":{"side":"far","index":2},"dragged":false,"hp":{"hp":341,"max":341}}
+{"kind":"damage","line":116,"who":{"side":"far","index":3},"hp":{"hp":299,"max":341},"cause":{"name":"Stealth Rock"}}
+{"kind":"weather","line":117,"weather":"Sand","phase":"start","cause":{"name":"Sand Stream","kind":"ability"},"source":{"side":"far","index":3}}
+{"kind":"move","line":118,"user":{"side":"near","index":3},"move":"Whirlwind","target":{"side":"far","index":3}}
+{"kind":"switchIn","line":119,"who":{"side":"far","index":0},"replaces":{"side":"far","index":3},"dragged":true,"hp":{"hp":191,"max":351}}
+{"kind":"damage","line":120,"who":{"side":"far","index":0},"hp":{"hp":148,"max":351},"cause":{"name":"Stealth Rock"}}
+{"kind":"itemEnd","line":121,"who":{"side":"far","index":0},"item":"Sitrus Berry","eaten":true}
+{"kind":"heal","line":122,"who":{"side":"far","index":0},"hp":{"hp":235,"max":351},"cause":{"name":"Sitrus Berry","kind":"item"}}
+{"line":123,"text":"|","reason":"spacer"}
+{"kind":"weather","line":124,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":125,"who":{"side":"far","index":0},"hp":{"hp":214,"max":351},"cause":{"name":"Sandstorm"}}
+{"line":126,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":127,"number":10}
+{"line":128,"text":"|inactive|UnMecQuiS'enBranle has 150 seconds left.","reason":"timer"}
+{"line":129,"text":"|","reason":"spacer"}
+{"line":130,"text":"|t:|1682875814","reason":"timestamp"}
+{"kind":"switchIn","line":131,"who":{"side":"near","index":1},"replaces":{"side":"near","index":3},"dragged":false,"hp":{"hp":287,"max":287}}
+{"kind":"damage","line":132,"who":{"side":"near","index":1},"hp":{"hp":252,"max":287},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":133,"user":{"side":"far","index":0},"move":"Thunder Wave","target":{"side":"near","index":1}}
+{"kind":"status","line":134,"who":{"side":"near","index":1},"status":"par"}
+{"kind":"itemEnd","line":135,"who":{"side":"near","index":1},"item":"Lum Berry","eaten":true}
+{"kind":"cureStatus","line":136,"who":{"side":"near","index":1},"status":"par","msg":true}
+{"line":137,"text":"|","reason":"spacer"}
+{"kind":"weather","line":138,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":139,"who":{"side":"near","index":1},"hp":{"hp":235,"max":287},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":140,"who":{"side":"far","index":0},"hp":{"hp":193,"max":351},"cause":{"name":"Sandstorm"}}
+{"line":141,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":142,"number":11}
+{"line":143,"text":"|inactive|Malekith has 150 seconds left.","reason":"timer"}
+{"line":144,"text":"|","reason":"spacer"}
+{"line":145,"text":"|t:|1682875841","reason":"timestamp"}
+{"kind":"move","line":146,"user":{"side":"near","index":1},"move":"Shadow Ball","target":{"side":"far","index":0}}
+{"kind":"damage","line":148,"who":{"side":"far","index":0},"hp":{"hp":0,"max":351},"effectiveness":"super","folded":[147]}
+{"kind":"faint","line":149,"who":{"side":"far","index":0}}
+{"line":150,"text":"|","reason":"spacer"}
+{"kind":"weather","line":151,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":152,"who":{"side":"near","index":1},"hp":{"hp":218,"max":287},"cause":{"name":"Sandstorm"}}
+{"line":153,"text":"|upkeep","reason":"upkeep"}
+{"line":154,"text":"|","reason":"spacer"}
+{"line":155,"text":"|t:|1682875844","reason":"timestamp"}
+{"kind":"switchIn","line":156,"who":{"side":"far","index":2},"dragged":false,"hp":{"hp":333,"max":333}}
+{"kind":"damage","line":157,"who":{"side":"far","index":2},"hp":{"hp":250,"max":333},"cause":{"name":"Stealth Rock"}}
+{"kind":"ability","line":158,"who":{"side":"far","index":2},"ability":"Intimidate","detail":"boost"}
+{"kind":"statChange","line":159,"who":{"side":"near","index":1},"stat":"atk","stages":-1}
+{"kind":"turn","line":160,"number":12}
+{"line":161,"text":"|inactive|UnMecQuiS'enBranle has 150 seconds left.","reason":"timer"}
+{"line":162,"text":"|","reason":"spacer"}
+{"line":163,"text":"|t:|1682875883","reason":"timestamp"}
+{"kind":"move","line":164,"user":{"side":"near","index":1},"move":"Will-O-Wisp","target":{"side":"far","index":2}}
+{"kind":"status","line":165,"who":{"side":"far","index":2},"status":"brn"}
+{"kind":"move","line":166,"user":{"side":"far","index":2},"move":"Waterfall","target":{"side":"near","index":1}}
+{"kind":"damage","line":167,"who":{"side":"near","index":1},"hp":{"hp":109,"max":287}}
+{"line":168,"text":"|","reason":"spacer"}
+{"kind":"weather","line":169,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":170,"who":{"side":"near","index":1},"hp":{"hp":92,"max":287},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":171,"who":{"side":"far","index":2},"hp":{"hp":230,"max":333},"status":"brn","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":172,"who":{"side":"far","index":2},"hp":{"hp":250,"max":333},"status":"brn","cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"damage","line":173,"who":{"side":"far","index":2},"hp":{"hp":209,"max":333},"status":"brn","cause":{"name":"brn"}}
+{"line":174,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":175,"number":13}
+{"line":176,"text":"|","reason":"spacer"}
+{"line":177,"text":"|t:|1682875895","reason":"timestamp"}
+{"kind":"switchIn","line":178,"who":{"side":"near","index":3},"replaces":{"side":"near","index":1},"dragged":false,"hp":{"hp":334,"max":334},"status":"par"}
+{"kind":"damage","line":179,"who":{"side":"near","index":3},"hp":{"hp":293,"max":334},"status":"par","cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":180,"user":{"side":"far","index":2},"move":"Waterfall","target":{"side":"near","index":3}}
+{"kind":"damage","line":181,"who":{"side":"near","index":3},"hp":{"hp":238,"max":334},"status":"par"}
+{"line":182,"text":"|","reason":"spacer"}
+{"kind":"weather","line":183,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":184,"who":{"side":"far","index":2},"hp":{"hp":189,"max":333},"status":"brn","cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":185,"who":{"side":"far","index":2},"hp":{"hp":209,"max":333},"status":"brn","cause":{"name":"Leftovers","kind":"item"}}
+{"kind":"damage","line":186,"who":{"side":"far","index":2},"hp":{"hp":168,"max":333},"status":"brn","cause":{"name":"brn"}}
+{"kind":"heal","line":187,"who":{"side":"near","index":3},"hp":{"hp":258,"max":334},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":188,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":189,"number":14}
+{"line":190,"text":"|","reason":"spacer"}
+{"line":191,"text":"|t:|1682875899","reason":"timestamp"}
+{"kind":"switchIn","line":192,"who":{"side":"far","index":3},"replaces":{"side":"far","index":2},"dragged":false,"hp":{"hp":299,"max":341}}
+{"kind":"damage","line":193,"who":{"side":"far","index":3},"hp":{"hp":257,"max":341},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":194,"user":{"side":"near","index":3},"move":"Spikes","target":{"side":"far","index":3}}
+{"kind":"sideStart","line":195,"side":"far","condition":{"name":"Spikes"}}
+{"line":196,"text":"|","reason":"spacer"}
+{"kind":"weather","line":197,"weather":"Sand","phase":"upkeep"}
+{"kind":"heal","line":198,"who":{"side":"near","index":3},"hp":{"hp":278,"max":334},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":199,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":200,"number":15}
+{"line":201,"text":"|","reason":"spacer"}
+{"line":202,"text":"|t:|1682875903","reason":"timestamp"}
+{"kind":"switchIn","line":203,"who":{"side":"near","index":0},"replaces":{"side":"near","index":3},"dragged":false,"hp":{"hp":365,"max":403}}
+{"kind":"damage","line":204,"who":{"side":"near","index":0},"hp":{"hp":340,"max":403},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":205,"user":{"side":"far","index":3},"move":"Dragon Dance","target":{"side":"far","index":3}}
+{"kind":"statChange","line":206,"who":{"side":"far","index":3},"stat":"atk","stages":1}
+{"kind":"statChange","line":207,"who":{"side":"far","index":3},"stat":"spe","stages":1}
+{"line":208,"text":"|","reason":"spacer"}
+{"kind":"weather","line":209,"weather":"Sand","phase":"upkeep"}
+{"kind":"heal","line":210,"who":{"side":"near","index":0},"hp":{"hp":365,"max":403},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":211,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":212,"number":16}
+{"line":213,"text":"|inactive|UnMecQuiS'enBranle has 150 seconds left.","reason":"timer"}
+{"line":214,"text":"|inactive|Malekith has 180 seconds left.","reason":"timer"}
+{"line":215,"text":"|inactive|UnMecQuiS'enBranle has 120 seconds left.","reason":"timer"}
+{"line":216,"text":"|inactive|Malekith has 150 seconds left.","reason":"timer"}
+{"line":217,"text":"|inactive|Malekith has 120 seconds left.","reason":"timer"}
+{"line":218,"text":"|","reason":"spacer"}
+{"line":219,"text":"|t:|1682875980","reason":"timestamp"}
+{"kind":"move","line":220,"user":{"side":"far","index":3},"move":"Natural Gift","target":{"side":"near","index":0}}
+{"kind":"damage","line":222,"who":{"side":"near","index":0},"hp":{"hp":0,"max":403},"effectiveness":"super","folded":[221]}
+{"kind":"faint","line":223,"who":{"side":"near","index":0}}
+{"line":224,"text":"|","reason":"spacer"}
+{"kind":"weather","line":225,"weather":"Sand","phase":"upkeep"}
+{"line":226,"text":"|upkeep","reason":"upkeep"}
+{"line":227,"text":"|c|+McMeghan|.","reason":"chat"}
+{"line":228,"text":"|c|+McMeghan|gone","reason":"chat"}
+{"line":229,"text":"|inactive|UnMecQuiS'enBranle has 90 seconds left.","reason":"timer"}
+{"line":230,"text":"|","reason":"spacer"}
+{"line":231,"text":"|t:|1682876020","reason":"timestamp"}
+{"kind":"switchIn","line":232,"who":{"side":"near","index":3},"dragged":false,"hp":{"hp":278,"max":334},"status":"par"}
+{"kind":"damage","line":233,"who":{"side":"near","index":3},"hp":{"hp":237,"max":334},"status":"par","cause":{"name":"Stealth Rock"}}
+{"kind":"turn","line":234,"number":17}
+{"line":235,"text":"|","reason":"spacer"}
+{"line":236,"text":"|t:|1682876023","reason":"timestamp"}
+{"kind":"move","line":237,"user":{"side":"far","index":3},"move":"Fire Punch","target":{"side":"near","index":3}}
+{"kind":"damage","line":239,"who":{"side":"near","index":3},"hp":{"hp":23,"max":334},"status":"par","effectiveness":"super","folded":[238]}
+{"kind":"move","line":240,"user":{"side":"near","index":3},"move":"Whirlwind","target":{"side":"far","index":3}}
+{"kind":"switchIn","line":241,"who":{"side":"far","index":4},"replaces":{"side":"far","index":3},"dragged":true,"hp":{"hp":323,"max":323}}
+{"kind":"damage","line":242,"who":{"side":"far","index":4},"hp":{"hp":243,"max":323},"cause":{"name":"Stealth Rock"}}
+{"line":243,"text":"|","reason":"spacer"}
+{"kind":"weather","line":244,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":245,"who":{"side":"far","index":4},"hp":{"hp":223,"max":323},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":246,"who":{"side":"near","index":3},"hp":{"hp":43,"max":334},"status":"par","cause":{"name":"Leftovers","kind":"item"}}
+{"line":247,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":248,"number":18}
+{"line":249,"text":"|inactive|UnMecQuiS'enBranle has 90 seconds left.","reason":"timer"}
+{"line":250,"text":"|","reason":"spacer"}
+{"line":251,"text":"|t:|1682876068","reason":"timestamp"}
+{"kind":"move","line":252,"user":{"side":"far","index":4},"move":"Fire Punch","target":{"side":"near","index":3}}
+{"kind":"damage","line":254,"who":{"side":"near","index":3},"hp":{"hp":0,"max":334},"effectiveness":"super","folded":[253]}
+{"kind":"faint","line":255,"who":{"side":"near","index":3}}
+{"line":256,"text":"|","reason":"spacer"}
+{"kind":"weather","line":257,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":258,"who":{"side":"far","index":4},"hp":{"hp":203,"max":323},"cause":{"name":"Sandstorm"}}
+{"line":259,"text":"|upkeep","reason":"upkeep"}
+{"line":260,"text":"|inactive|UnMecQuiS'enBranle has 60 seconds left.","reason":"timer"}
+{"line":261,"text":"|","reason":"spacer"}
+{"line":262,"text":"|t:|1682876100","reason":"timestamp"}
+{"kind":"switchIn","line":263,"who":{"side":"near","index":4},"dragged":false,"hp":{"hp":364,"max":364}}
+{"kind":"damage","line":264,"who":{"side":"near","index":4},"hp":{"hp":319,"max":364},"cause":{"name":"Stealth Rock"}}
+{"kind":"turn","line":265,"number":19}
+{"line":266,"text":"|inactive|Malekith has 150 seconds left.","reason":"timer"}
+{"line":267,"text":"|","reason":"spacer"}
+{"line":268,"text":"|t:|1682876110","reason":"timestamp"}
+{"kind":"switchIn","line":269,"who":{"side":"far","index":2},"replaces":{"side":"far","index":4},"dragged":false,"hp":{"hp":168,"max":333},"status":"brn"}
+{"kind":"damage","line":270,"who":{"side":"far","index":2},"hp":{"hp":85,"max":333},"status":"brn","cause":{"name":"Stealth Rock"}}
+{"kind":"ability","line":271,"who":{"side":"far","index":2},"ability":"Intimidate","detail":"boost"}
+{"kind":"statChange","line":272,"who":{"side":"near","index":4},"stat":"atk","stages":-1}
+{"kind":"move","line":273,"user":{"side":"near","index":4},"move":"Dragon Pulse","target":{"side":"far","index":2}}
+{"kind":"damage","line":274,"who":{"side":"far","index":2},"hp":{"hp":0,"max":333}}
+{"kind":"faint","line":275,"who":{"side":"far","index":2}}
+{"line":276,"text":"|","reason":"spacer"}
+{"kind":"weather","line":277,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":278,"who":{"side":"near","index":4},"hp":{"hp":297,"max":364},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":279,"who":{"side":"near","index":4},"hp":{"hp":319,"max":364},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":280,"text":"|upkeep","reason":"upkeep"}
+{"line":281,"text":"|","reason":"spacer"}
+{"line":282,"text":"|t:|1682876132","reason":"timestamp"}
+{"kind":"switchIn","line":283,"who":{"side":"far","index":5},"dragged":false,"hp":{"hp":384,"max":384}}
+{"kind":"damage","line":284,"who":{"side":"far","index":5},"hp":{"hp":360,"max":384},"cause":{"name":"Stealth Rock"}}
+{"kind":"damage","line":285,"who":{"side":"far","index":5},"hp":{"hp":312,"max":384},"cause":{"name":"Spikes"}}
+{"kind":"turn","line":286,"number":20}
+{"line":287,"text":"|inactive|UnMecQuiS'enBranle has 60 seconds left.","reason":"timer"}
+{"line":288,"text":"|","reason":"spacer"}
+{"line":289,"text":"|t:|1682876153","reason":"timestamp"}
+{"kind":"move","line":290,"user":{"side":"near","index":4},"move":"Calm Mind","target":{"side":"near","index":4}}
+{"kind":"statChange","line":291,"who":{"side":"near","index":4},"stat":"spa","stages":1}
+{"kind":"statChange","line":292,"who":{"side":"near","index":4},"stat":"spd","stages":1}
+{"kind":"move","line":293,"user":{"side":"far","index":5},"move":"Rapid Spin","target":{"side":"near","index":4}}
+{"kind":"damage","line":294,"who":{"side":"near","index":4},"hp":{"hp":292,"max":364}}
+{"kind":"sideEnd","line":295,"side":"far","condition":{"name":"Spikes"},"cause":{"name":"Rapid Spin","kind":"move"},"source":{"side":"far","index":5}}
+{"kind":"sideEnd","line":296,"side":"far","condition":{"name":"Stealth Rock"},"cause":{"name":"Rapid Spin","kind":"move"},"source":{"side":"far","index":5}}
+{"line":297,"text":"|","reason":"spacer"}
+{"kind":"weather","line":298,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":299,"who":{"side":"near","index":4},"hp":{"hp":270,"max":364},"cause":{"name":"Sandstorm"}}
+{"kind":"heal","line":300,"who":{"side":"near","index":4},"hp":{"hp":292,"max":364},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":301,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":302,"number":21}
+{"line":303,"text":"|inactive|Malekith has 120 seconds left.","reason":"timer"}
+{"line":304,"text":"|inactive|UnMecQuiS'enBranle has 30 seconds left.","reason":"timer"}
+{"line":305,"text":"|","reason":"spacer"}
+{"line":306,"text":"|t:|1682876190","reason":"timestamp"}
+{"kind":"move","line":307,"user":{"side":"near","index":4},"move":"Dragon Pulse","target":{"side":"far","index":5}}
+{"kind":"damage","line":308,"who":{"side":"far","index":5},"hp":{"hp":33,"max":384}}
+{"kind":"move","line":309,"user":{"side":"far","index":5},"move":"Knock Off","target":{"side":"near","index":4}}
+{"kind":"damage","line":311,"who":{"side":"near","index":4},"hp":{"hp":238,"max":364},"effectiveness":"super","folded":[310]}
+{"kind":"itemEnd","line":312,"who":{"side":"near","index":4},"item":"Leftovers","cause":{"name":"Knock Off","kind":"move"}}
+{"line":313,"text":"|-hint|In Gens 3-4, Knock Off only makes the target's item unusable; it cannot obtain a new item.","reason":"hint"}
+{"line":314,"text":"|","reason":"spacer"}
+{"kind":"weather","line":315,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":316,"who":{"side":"near","index":4},"hp":{"hp":216,"max":364},"cause":{"name":"Sandstorm"}}
+{"line":317,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":318,"number":22}
+{"line":319,"text":"|inactive|UnMecQuiS'enBranle has 30 seconds left.","reason":"timer"}
+{"line":320,"text":"|inactive|UnMecQuiS'enBranle has 20 seconds left.","reason":"timer"}
+{"line":321,"text":"|inactive|Malekith has 90 seconds left.","reason":"timer"}
+{"line":322,"text":"|inactive|Malekith has 60 seconds left.","reason":"timer"}
+{"line":323,"text":"|","reason":"spacer"}
+{"line":324,"text":"|t:|1682876246","reason":"timestamp"}
+{"kind":"move","line":325,"user":{"side":"far","index":5},"move":"Ice Shard","target":{"side":"near","index":4}}
+{"kind":"damage","line":327,"who":{"side":"near","index":4},"hp":{"hp":104,"max":364},"effectiveness":"super","folded":[326]}
+{"kind":"move","line":328,"user":{"side":"near","index":4},"move":"Recover","target":{"side":"near","index":4}}
+{"kind":"heal","line":329,"who":{"side":"near","index":4},"hp":{"hp":286,"max":364}}
+{"line":330,"text":"|","reason":"spacer"}
+{"kind":"weather","line":331,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":332,"who":{"side":"near","index":4},"hp":{"hp":264,"max":364},"cause":{"name":"Sandstorm"}}
+{"line":333,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":334,"number":23}
+{"line":335,"text":"|inactive|UnMecQuiS'enBranle has 30 seconds left this turn.","reason":"timer"}
+{"line":336,"text":"|inactive|Malekith has 60 seconds left.","reason":"timer"}
+{"line":337,"text":"|inactive|UnMecQuiS'enBranle has 20 seconds left.","reason":"timer"}
+{"line":338,"text":"|inactive|UnMecQuiS'enBranle has 15 seconds left.","reason":"timer"}
+{"line":339,"text":"|","reason":"spacer"}
+{"line":340,"text":"|t:|1682876265","reason":"timestamp"}
+{"kind":"switchIn","line":341,"who":{"side":"far","index":1},"replaces":{"side":"far","index":5},"dragged":false,"hp":{"hp":214,"max":349}}
+{"kind":"move","line":342,"user":{"side":"near","index":4},"move":"Calm Mind","target":{"side":"near","index":4}}
+{"kind":"statChange","line":343,"who":{"side":"near","index":4},"stat":"spa","stages":1}
+{"kind":"statChange","line":344,"who":{"side":"near","index":4},"stat":"spd","stages":1}
+{"line":345,"text":"|","reason":"spacer"}
+{"kind":"weather","line":346,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":347,"who":{"side":"near","index":4},"hp":{"hp":242,"max":364},"cause":{"name":"Sandstorm"}}
+{"line":348,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":349,"number":24}
+{"line":350,"text":"|inactive|UnMecQuiS'enBranle has 25 seconds left this turn.","reason":"timer"}
+{"line":351,"text":"|","reason":"spacer"}
+{"line":352,"text":"|t:|1682876269","reason":"timestamp"}
+{"kind":"move","line":353,"user":{"side":"near","index":4},"move":"Safeguard","target":{"side":"near","index":4}}
+{"kind":"sideStart","line":354,"side":"near","condition":{"name":"Safeguard"}}
+{"kind":"move","line":355,"user":{"side":"far","index":1},"move":"Thunder Wave","target":{"side":"near","index":4}}
+{"kind":"block","line":356,"who":{"side":"near","index":4},"effect":{"name":"Safeguard","kind":"move"}}
+{"line":357,"text":"|","reason":"spacer"}
+{"kind":"weather","line":358,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":359,"who":{"side":"near","index":4},"hp":{"hp":220,"max":364},"cause":{"name":"Sandstorm"}}
+{"line":360,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":361,"number":25}
+{"line":362,"text":"|inactive|UnMecQuiS'enBranle has 30 seconds left.","reason":"timer"}
+{"line":363,"text":"|inactive|Malekith has 60 seconds left.","reason":"timer"}
+{"line":364,"text":"|","reason":"spacer"}
+{"line":365,"text":"|t:|1682876291","reason":"timestamp"}
+{"kind":"move","line":366,"user":{"side":"near","index":4},"move":"Dragon Pulse","target":{"side":"far","index":1}}
+{"kind":"damage","line":368,"who":{"side":"far","index":1},"hp":{"hp":109,"max":349},"effectiveness":"resisted","folded":[367]}
+{"kind":"move","line":369,"user":{"side":"far","index":1},"move":"Ice Punch","target":{"side":"near","index":4}}
+{"kind":"damage","line":371,"who":{"side":"near","index":4},"hp":{"hp":68,"max":364},"effectiveness":"super","folded":[370]}
+{"line":372,"text":"|","reason":"spacer"}
+{"kind":"weather","line":373,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":374,"who":{"side":"near","index":4},"hp":{"hp":46,"max":364},"cause":{"name":"Sandstorm"}}
+{"line":375,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":376,"number":26}
+{"line":377,"text":"|inactive|UnMecQuiS'enBranle has 30 seconds left.","reason":"timer"}
+{"line":378,"text":"|","reason":"spacer"}
+{"line":379,"text":"|t:|1682876305","reason":"timestamp"}
+{"kind":"move","line":380,"user":{"side":"near","index":4},"move":"Dragon Pulse","target":{"side":"far","index":1}}
+{"kind":"damage","line":382,"who":{"side":"far","index":1},"hp":{"hp":4,"max":349},"effectiveness":"resisted","folded":[381]}
+{"kind":"move","line":383,"user":{"side":"far","index":1},"move":"Ice Punch","target":{"side":"near","index":4}}
+{"kind":"damage","line":385,"who":{"side":"near","index":4},"hp":{"hp":0,"max":364},"effectiveness":"super","folded":[384]}
+{"kind":"faint","line":386,"who":{"side":"near","index":4}}
+{"line":387,"text":"|","reason":"spacer"}
+{"kind":"weather","line":388,"weather":"Sand","phase":"upkeep"}
+{"line":389,"text":"|upkeep","reason":"upkeep"}
+{"line":390,"text":"|inactive|UnMecQuiS'enBranle has 30 seconds left.","reason":"timer"}
+{"line":391,"text":"|inactive|UnMecQuiS'enBranle has 20 seconds left.","reason":"timer"}
+{"line":392,"text":"|inactive|UnMecQuiS'enBranle has 15 seconds left.","reason":"timer"}
+{"line":393,"text":"|","reason":"spacer"}
+{"line":394,"text":"|t:|1682876329","reason":"timestamp"}
+{"kind":"switchIn","line":395,"who":{"side":"near","index":2},"dragged":false,"hp":{"hp":226,"max":241},"status":"par"}
+{"kind":"damage","line":396,"who":{"side":"near","index":2},"hp":{"hp":211,"max":241},"status":"par","cause":{"name":"Stealth Rock"}}
+{"kind":"turn","line":397,"number":27}
+{"line":398,"text":"|inactive|UnMecQuiS'enBranle has 25 seconds left this turn.","reason":"timer"}
+{"line":399,"text":"|inactive|UnMecQuiS'enBranle has 20 seconds left.","reason":"timer"}
+{"line":400,"text":"|","reason":"spacer"}
+{"line":401,"text":"|t:|1682876341","reason":"timestamp"}
+{"kind":"move","line":402,"user":{"side":"far","index":1},"move":"Iron Head","target":{"side":"near","index":2}}
+{"kind":"damage","line":404,"who":{"side":"near","index":2},"hp":{"hp":181,"max":241},"status":"par","effectiveness":"resisted","folded":[403]}
+{"kind":"move","line":405,"user":{"side":"near","index":2},"move":"Thunder Wave","target":{"side":"far","index":1}}
+{"kind":"status","line":406,"who":{"side":"far","index":1},"status":"par"}
+{"kind":"itemEnd","line":407,"who":{"side":"far","index":1},"item":"Lum Berry","eaten":true}
+{"kind":"cureStatus","line":408,"who":{"side":"far","index":1},"status":"par","msg":true}
+{"line":409,"text":"|","reason":"spacer"}
+{"kind":"weather","line":410,"weather":"Sand","phase":"upkeep"}
+{"line":411,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":412,"number":28}
+{"line":413,"text":"|inactive|UnMecQuiS'enBranle has 30 seconds left this turn.","reason":"timer"}
+{"line":414,"text":"|","reason":"spacer"}
+{"line":415,"text":"|t:|1682876350","reason":"timestamp"}
+{"kind":"move","line":416,"user":{"side":"far","index":1},"move":"Iron Head","target":{"side":"near","index":2}}
+{"kind":"damage","line":418,"who":{"side":"near","index":2},"hp":{"hp":148,"max":241},"status":"par","effectiveness":"resisted","folded":[417]}
+{"kind":"move","line":419,"user":{"side":"near","index":2},"move":"Thunder Wave","target":{"side":"far","index":1}}
+{"kind":"status","line":420,"who":{"side":"far","index":1},"status":"par"}
+{"line":421,"text":"|","reason":"spacer"}
+{"kind":"sideEnd","line":422,"side":"near","condition":{"name":"Safeguard"}}
+{"kind":"weather","line":423,"weather":"Sand","phase":"upkeep"}
+{"line":424,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":425,"number":29}
+{"line":426,"text":"|","reason":"spacer"}
+{"line":427,"text":"|t:|1682876371","reason":"timestamp"}
+{"kind":"cant","line":428,"who":{"side":"near","index":2},"reason":{"name":"par"}}
+{"kind":"move","line":429,"user":{"side":"far","index":1},"move":"Thunder Wave","target":{"side":"near","index":2}}
+{"kind":"fail","line":430,"who":{"side":"near","index":2},"effect":{"name":"par"}}
+{"line":431,"text":"|","reason":"spacer"}
+{"kind":"weather","line":432,"weather":"Sand","phase":"upkeep"}
+{"line":433,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":434,"number":30}
+{"line":435,"text":"|","reason":"spacer"}
+{"line":436,"text":"|t:|1682876376","reason":"timestamp"}
+{"kind":"move","line":437,"user":{"side":"near","index":2},"move":"Thunder Wave","target":{"side":"far","index":1}}
+{"kind":"fail","line":438,"who":{"side":"far","index":1},"effect":{"name":"par"}}
+{"kind":"move","line":439,"user":{"side":"far","index":1},"move":"Iron Head","target":{"side":"near","index":2}}
+{"kind":"damage","line":441,"who":{"side":"near","index":2},"hp":{"hp":118,"max":241},"status":"par","effectiveness":"resisted","folded":[440]}
+{"line":442,"text":"|","reason":"spacer"}
+{"kind":"weather","line":443,"weather":"Sand","phase":"upkeep"}
+{"line":444,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":445,"number":31}
+{"line":446,"text":"|","reason":"spacer"}
+{"line":447,"text":"|t:|1682876383","reason":"timestamp"}
+{"kind":"cant","line":448,"who":{"side":"near","index":2},"reason":{"name":"par"}}
+{"kind":"cant","line":449,"who":{"side":"far","index":1},"reason":{"name":"par"}}
+{"line":450,"text":"|","reason":"spacer"}
+{"kind":"weather","line":451,"weather":"Sand","phase":"upkeep"}
+{"line":452,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":453,"number":32}
+{"line":454,"text":"|","reason":"spacer"}
+{"line":455,"text":"|t:|1682876387","reason":"timestamp"}
+{"kind":"move","line":456,"user":{"side":"near","index":2},"move":"Thunder Wave","target":{"side":"far","index":1}}
+{"kind":"fail","line":457,"who":{"side":"far","index":1},"effect":{"name":"par"}}
+{"kind":"move","line":458,"user":{"side":"far","index":1},"move":"Iron Head","target":{"side":"near","index":2}}
+{"kind":"damage","line":460,"who":{"side":"near","index":2},"hp":{"hp":87,"max":241},"status":"par","effectiveness":"resisted","folded":[459]}
+{"line":461,"text":"|","reason":"spacer"}
+{"kind":"weather","line":462,"weather":"Sand","phase":"upkeep"}
+{"line":463,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":464,"number":33}
+{"line":465,"text":"|","reason":"spacer"}
+{"line":466,"text":"|t:|1682876390","reason":"timestamp"}
+{"kind":"move","line":467,"user":{"side":"near","index":2},"move":"Thunder Wave","target":{"side":"far","index":1}}
+{"kind":"fail","line":468,"who":{"side":"far","index":1},"effect":{"name":"par"}}
+{"kind":"move","line":469,"user":{"side":"far","index":1},"move":"Iron Head","target":{"side":"near","index":2}}
+{"kind":"damage","line":471,"who":{"side":"near","index":2},"hp":{"hp":55,"max":241},"status":"par","effectiveness":"resisted","folded":[470]}
+{"line":472,"text":"|","reason":"spacer"}
+{"kind":"weather","line":473,"weather":"Sand","phase":"upkeep"}
+{"line":474,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":475,"number":34}
+{"line":476,"text":"|","reason":"spacer"}
+{"line":477,"text":"|t:|1682876393","reason":"timestamp"}
+{"kind":"move","line":478,"user":{"side":"near","index":2},"move":"Thunder Wave","target":{"side":"far","index":1}}
+{"kind":"fail","line":479,"who":{"side":"far","index":1},"effect":{"name":"par"}}
+{"kind":"move","line":480,"user":{"side":"far","index":1},"move":"Ice Punch","target":{"side":"near","index":2}}
+{"kind":"damage","line":482,"who":{"side":"near","index":2},"hp":{"hp":14,"max":241},"status":"par","effectiveness":"resisted","folded":[481]}
+{"line":483,"text":"|","reason":"spacer"}
+{"kind":"weather","line":484,"weather":"Sand","phase":"upkeep"}
+{"line":485,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":486,"number":35}
+{"line":487,"text":"|","reason":"spacer"}
+{"line":488,"text":"|t:|1682876396","reason":"timestamp"}
+{"kind":"move","line":489,"user":{"side":"near","index":2},"move":"Thunder Wave","target":{"side":"far","index":1}}
+{"kind":"fail","line":490,"who":{"side":"far","index":1},"effect":{"name":"par"}}
+{"kind":"cant","line":491,"who":{"side":"far","index":1},"reason":{"name":"par"}}
+{"line":492,"text":"|","reason":"spacer"}
+{"kind":"weather","line":493,"weather":"Sand","phase":"upkeep"}
+{"line":494,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":495,"number":36}
+{"line":496,"text":"|","reason":"spacer"}
+{"line":497,"text":"|t:|1682876399","reason":"timestamp"}
+{"kind":"move","line":498,"user":{"side":"near","index":2},"move":"Thunder Wave","target":{"side":"far","index":1}}
+{"kind":"fail","line":499,"who":{"side":"far","index":1},"effect":{"name":"par"}}
+{"kind":"cant","line":500,"who":{"side":"far","index":1},"reason":{"name":"par"}}
+{"line":501,"text":"|","reason":"spacer"}
+{"kind":"weather","line":502,"weather":"Sand","phase":"upkeep"}
+{"line":503,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":504,"number":37}
+{"line":505,"text":"|","reason":"spacer"}
+{"line":506,"text":"|t:|1682876401","reason":"timestamp"}
+{"kind":"cant","line":507,"who":{"side":"near","index":2},"reason":{"name":"par"}}
+{"kind":"move","line":508,"user":{"side":"far","index":1},"move":"Ice Punch","target":{"side":"near","index":2}}
+{"kind":"damage","line":510,"who":{"side":"near","index":2},"hp":{"hp":0,"max":241},"effectiveness":"resisted","folded":[509]}
+{"kind":"faint","line":511,"who":{"side":"near","index":2}}
+{"line":512,"text":"|","reason":"spacer"}
+{"kind":"weather","line":513,"weather":"Sand","phase":"upkeep"}
+{"line":514,"text":"|upkeep","reason":"upkeep"}
+{"line":515,"text":"|","reason":"spacer"}
+{"line":516,"text":"|t:|1682876413","reason":"timestamp"}
+{"kind":"switchIn","line":517,"who":{"side":"near","index":1},"dragged":false,"hp":{"hp":92,"max":287}}
+{"kind":"damage","line":518,"who":{"side":"near","index":1},"hp":{"hp":57,"max":287},"cause":{"name":"Stealth Rock"}}
+{"kind":"turn","line":519,"number":38}
+{"line":520,"text":"|inactive|Malekith has 120 seconds left.","reason":"timer"}
+{"line":521,"text":"|","reason":"spacer"}
+{"line":522,"text":"|t:|1682876454","reason":"timestamp"}
+{"kind":"move","line":523,"user":{"side":"near","index":1},"move":"Shadow Ball","target":{"side":"far","index":1}}
+{"kind":"damage","line":525,"who":{"side":"far","index":1},"hp":{"hp":0,"max":349},"crit":true,"folded":[524]}
+{"kind":"faint","line":526,"who":{"side":"far","index":1}}
+{"line":527,"text":"|","reason":"spacer"}
+{"kind":"weather","line":528,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":529,"who":{"side":"near","index":1},"hp":{"hp":40,"max":287},"cause":{"name":"Sandstorm"}}
+{"line":530,"text":"|upkeep","reason":"upkeep"}
+{"line":531,"text":"|inactive|Malekith has 90 seconds left.","reason":"timer"}
+{"line":532,"text":"|","reason":"spacer"}
+{"line":533,"text":"|t:|1682876490","reason":"timestamp"}
+{"kind":"switchIn","line":534,"who":{"side":"far","index":4},"dragged":false,"hp":{"hp":203,"max":323}}
+{"kind":"turn","line":535,"number":39}
+{"line":536,"text":"|inactive|UnMecQuiS'enBranle has 120 seconds left.","reason":"timer"}
+{"line":537,"text":"|","reason":"spacer"}
+{"line":538,"text":"|t:|1682876517","reason":"timestamp"}
+{"kind":"switchIn","line":539,"who":{"side":"far","index":5},"replaces":{"side":"far","index":4},"dragged":false,"hp":{"hp":33,"max":384}}
+{"kind":"move","line":540,"user":{"side":"near","index":1},"move":"Will-O-Wisp","target":{"side":"far","index":5}}
+{"kind":"status","line":541,"who":{"side":"far","index":5},"status":"brn"}
+{"line":542,"text":"|","reason":"spacer"}
+{"kind":"weather","line":543,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":544,"who":{"side":"near","index":1},"hp":{"hp":23,"max":287},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":545,"who":{"side":"far","index":5},"hp":{"hp":0,"max":384},"cause":{"name":"brn"}}
+{"kind":"faint","line":546,"who":{"side":"far","index":5}}
+{"line":547,"text":"|upkeep","reason":"upkeep"}
+{"line":548,"text":"|","reason":"spacer"}
+{"line":549,"text":"|t:|1682876521","reason":"timestamp"}
+{"kind":"switchIn","line":550,"who":{"side":"far","index":4},"dragged":false,"hp":{"hp":203,"max":323}}
+{"kind":"turn","line":551,"number":40}
+{"line":552,"text":"|inactive|UnMecQuiS'enBranle has 120 seconds left.","reason":"timer"}
+{"line":553,"text":"|","reason":"spacer"}
+{"line":554,"text":"|t:|1682876545","reason":"timestamp"}
+{"kind":"move","line":555,"user":{"side":"near","index":1},"move":"Will-O-Wisp","target":{"side":"far","index":4}}
+{"kind":"status","line":556,"who":{"side":"far","index":4},"status":"brn"}
+{"kind":"itemEnd","line":557,"who":{"side":"far","index":4},"item":"Lum Berry","eaten":true}
+{"kind":"cureStatus","line":558,"who":{"side":"far","index":4},"status":"brn","msg":true}
+{"kind":"move","line":559,"user":{"side":"far","index":4},"move":"Dragon Dance","target":{"side":"far","index":4}}
+{"kind":"statChange","line":560,"who":{"side":"far","index":4},"stat":"atk","stages":1}
+{"kind":"statChange","line":561,"who":{"side":"far","index":4},"stat":"spe","stages":1}
+{"line":562,"text":"|","reason":"spacer"}
+{"kind":"weather","line":563,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":564,"who":{"side":"far","index":4},"hp":{"hp":183,"max":323},"cause":{"name":"Sandstorm"}}
+{"kind":"damage","line":565,"who":{"side":"near","index":1},"hp":{"hp":6,"max":287},"cause":{"name":"Sandstorm"}}
+{"line":566,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":567,"number":41}
+{"line":568,"text":"|","reason":"spacer"}
+{"line":569,"text":"|t:|1682876550","reason":"timestamp"}
+{"kind":"move","line":570,"user":{"side":"far","index":4},"move":"Fire Punch","target":{"side":"near","index":1}}
+{"kind":"damage","line":571,"who":{"side":"near","index":1},"hp":{"hp":0,"max":287}}
+{"kind":"faint","line":572,"who":{"side":"near","index":1}}
+{"line":573,"text":"|","reason":"spacer"}
+{"kind":"weather","line":574,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":575,"who":{"side":"far","index":4},"hp":{"hp":163,"max":323},"cause":{"name":"Sandstorm"}}
+{"line":576,"text":"|upkeep","reason":"upkeep"}
+{"line":577,"text":"|","reason":"spacer"}
+{"line":578,"text":"|t:|1682876552","reason":"timestamp"}
+{"kind":"switchIn","line":579,"who":{"side":"near","index":5},"dragged":false,"hp":{"hp":343,"max":343}}
+{"kind":"damage","line":580,"who":{"side":"near","index":5},"hp":{"hp":301,"max":343},"cause":{"name":"Stealth Rock"}}
+{"kind":"turn","line":581,"number":42}
+{"line":582,"text":"|","reason":"spacer"}
+{"line":583,"text":"|t:|1682876558","reason":"timestamp"}
+{"kind":"move","line":584,"user":{"side":"near","index":5},"move":"Bullet Punch","target":{"side":"far","index":4}}
+{"kind":"damage","line":585,"who":{"side":"far","index":4},"hp":{"hp":48,"max":323}}
+{"kind":"move","line":586,"user":{"side":"far","index":4},"move":"Fire Punch","target":{"side":"near","index":5}}
+{"kind":"damage","line":588,"who":{"side":"near","index":5},"hp":{"hp":0,"max":343},"effectiveness":"super","folded":[587]}
+{"kind":"faint","line":589,"who":{"side":"near","index":5}}
+{"line":590,"text":"|","reason":"spacer"}
+{"kind":"win","line":591,"side":"far","name":"Malekith"}
+{"line":592,"text":"","reason":"spacer"}

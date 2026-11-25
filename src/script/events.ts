@@ -23,7 +23,15 @@ import type {
   StatLimitEvent,
   StatResetEvent,
 } from './stat-events'
-import type { DroppedLine, Effect, HpFraction, PokemonRef, Side, TeamMember } from './types'
+import type {
+  DroppedLine,
+  Effect,
+  HpFraction,
+  PokemonRef,
+  Preview,
+  Side,
+  TeamMember,
+} from './types'
 
 /** What `[from]` and `[of]` name: the effect behind a line and the Pokémon it came from. */
 export interface Caused {
@@ -348,6 +356,8 @@ export interface BattleScript {
   /** The format as `|tier|` names it, such as `[Gen 3] OU`. */
   readonly format: string
   readonly teams: Readonly<Record<Side, readonly TeamMember[]>>
+  /** Both teams of Team Preview, for a log that holds it (#87); the page lists them. */
+  readonly preview?: Preview
   /** In log order. */
   readonly events: readonly ScriptEvent[]
   /** In log order. */

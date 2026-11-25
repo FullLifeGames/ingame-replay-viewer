@@ -120,6 +120,23 @@ describe('the pause button', () => {
   })
 })
 
+// #87: the viewer lists both teams of Team Preview directly under the game, before the summary
+// and the "Not shown" list, hidden until a replay with Team Preview fills it. The emulator page
+// has no panel and no list.
+describe('the team list', () => {
+  it('sits hidden on the viewer between the game and the summary', () => {
+    const viewer = page(VIEWER)
+    expect(viewer).toMatch(
+      /<canvas id="screen"[^>]*><\/canvas>\s*<section id="teams" hidden>[\s\S]*?<\/section>\s*<p id="replay-summary">/,
+    )
+    expect(viewer.match(/id="teams"/g)).toHaveLength(1)
+  })
+
+  it('is not on the emulator page', () => {
+    expect(page(EMULATOR)).not.toContain('id="teams"')
+  })
+})
+
 // #59: the pages speak to visitors. The viewer's intro says what it does, what it needs, that
 // nothing leaves the tab and which formats it plays; the module's own words sit in a "Details"
 // disclosure that starts closed, and a failure's report link sits under the status line.

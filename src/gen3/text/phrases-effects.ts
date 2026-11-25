@@ -106,6 +106,8 @@ export const EFFECT_TEMPLATES = {
     start('is hoping to take its attacker down with it!'),
   ),
   grudge: tagged('STRINGID_PKMNWANTSGRUDGE', start('wants its target to bear a grudge!')),
+  // `BattleScript_SafeguardProtected`, with the Pokémon Safeguard guards as B_SCR.
+  safeguarded: tagged('STRINGID_PKMNUSEDSAFEGUARD', start('is protected by Safeguard!')),
   // `BattleScript_EffectPsychUp`, with the user as B_SCR and the target as B_EFF.
   copiedStats: tagged('STRINGID_PKMNCOPIEDSTATCHANGES', (who: Mon, from: Mon) => {
     return `${nameAtStart(who)} copied ${nameInside(from)}'s stat changes!`
@@ -272,9 +274,11 @@ export const transformed = (who: Mon, species: string) =>
 /** `who` took another form of its species. */
 export const formChanged = (who: Mon) => E.formChanged.render(who)
 
-/** A move `who` kept off, such as by Protect. */
+/** A move `who` kept off, such as by Protect or Safeguard. */
 export function blocked(who: Mon, effect: Effect): Phrase {
-  if (toID(effect.name) === 'protect') return { text: E.protected.render(who) }
+  const id = toID(effect.name)
+  if (id === 'protect') return { text: E.protected.render(who) }
+  if (id === 'safeguard') return { text: E.safeguarded.render(who) }
   const own = `${nameAtStart(who)} was protected by ${held(effect.name)}!`
   return ownPhrase(own, `a block by ${effect.name}`)
 }

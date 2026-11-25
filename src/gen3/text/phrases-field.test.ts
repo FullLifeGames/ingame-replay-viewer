@@ -114,8 +114,31 @@ describe('sides and the field (P1)', () => {
     expect(sideEnded(event.side, event.condition, source)).toEqual({ text })
   })
 
+  it('words Stealth Rock set on a side, the way Spikes reads', () => {
+    const near = sceneOf('sideStart', '|-sidestart|p1: Alice|move: Stealth Rock').event
+    expect(sideStarted(near.side, near.condition)).toEqual({
+      text: 'Pointed stones float in the air on your side!',
+    })
+    const far = sceneOf('sideStart', '|-sidestart|p2: Bob|move: Stealth Rock').event
+    expect(sideStarted(far.side, far.condition)).toEqual({
+      text: 'Pointed stones float in the air on the\u00a0opposing side!',
+    })
+  })
+
+  it.each([
+    [
+      'Stealth Rock|[from] move: Rapid Spin|[of] p2a: Tyranitar',
+      'The opposing Tyranitar blew away Stealth Rock!',
+    ],
+    ['Stealth Rock', 'The pointed stones disappeared from the\u00a0opposing side!'],
+  ])('words %s ending with its source or without one (D3)', (condition, text) => {
+    const { event, mon } = sceneOf('sideEnd', `|-sideend|p2: Bob|${condition}`)
+    const source = event.source && mon(event.source)
+    expect(sideEnded(event.side, event.condition, source)).toEqual({ text })
+  })
+
   it('gives side conditions without a message our wording and a fallback', () => {
-    const started = sceneOf('sideStart', '|-sidestart|p2: Bob|Stealth Rock').event
+    const started = sceneOf('sideStart', '|-sidestart|p2: Bob|move: Toxic Spikes').event
     expect(sideStarted(started.side, started.condition).fallback).toMatchObject({ kind: 'phrase' })
     const ended = sceneOf('sideEnd', '|-sideend|p2: Bob|Spikes').event
     expect(sideEnded(ended.side, ended.condition, undefined)).toEqual({

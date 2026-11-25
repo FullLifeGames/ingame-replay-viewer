@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import replay994052 from '../../test/fixtures/replays/smogtours-gen3ou-994052.json'
 import replay994176 from '../../test/fixtures/replays/smogtours-gen3ou-994176.json'
+import { NEWEST_GEN } from '../gen3/backend'
 import { readReplay } from '../script/replay'
 import { downloadedFile, jsonFile, rawLog, replayPage } from '../script/saved-replay-testing'
 import {
@@ -167,7 +168,7 @@ describe('a replay file', () => {
     const failure = choice.loadFile(savedFile('gen9.log', gen9).file)
     await expect(failure).rejects.toThrow(SessionError)
     await expect(failure).rejects.toThrow(
-      'Could not turn the replay into a stream: the stream plays Gen 3 battles, this one is Gen 9',
+      `Could not turn the replay into a stream: the stream plays Gen 1 to ${String(NEWEST_GEN)} battles, this one is Gen 9`,
     )
     expect((await choice.chosen())?.summary.id).toBe('smogtours-gen3ou-994086')
   })
