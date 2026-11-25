@@ -9,6 +9,8 @@ export interface Bw2Symbol {
   address: number
   /** A function's size in bytes; data and bss lines carry none. */
   size?: number
+  /** A function's or a label's instruction set, from its line; data and bss lines carry none. */
+  mode?: 'thumb' | 'arm'
   /** The module whose symbols list names it: `arm9` or an overlay such as `ov167`. */
   module: string
 }
