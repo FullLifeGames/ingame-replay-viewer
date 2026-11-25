@@ -60,7 +60,18 @@ interface Licences {
   hrefs: string[]
 }
 
-/** Follows the notice's link and saves the licences page's first screen and its two lists. */
+/** The parts of the licences page saved as frames, each at the top of the screen: the two lists,
+ * the row of the file without a named licence, libretro-common's notices and its files without
+ * one. */
+const SECTIONS: readonly (readonly [string, string])[] = [
+  ['files', '#files'],
+  ['sources', '#sources'],
+  ['unpacker', 'tr[data-path$="/extract7z.js"]'],
+  ['libretro-common', 'h4:text-is("libretro-common")'],
+  ['no-notice', 'p.from:has-text("No notice in the file")'],
+]
+
+/** Follows the notice's link and saves the licences page's first screen and its SECTIONS. */
 async function licencesPage(page: Page): Promise<Licences> {
   const [response] = await Promise.all([
     page.waitForResponse((answer) => answer.url().endsWith(`/${LICENCES_PAGE}`)),
@@ -69,9 +80,10 @@ async function licencesPage(page: Page): Promise<Licences> {
   await page.waitForURL(`**/${LICENCES_PAGE}`)
   log(`licences page: ${String(response.status())} ${page.url()}`)
   await frame(page, 'licences-top', false)
-  for (const id of ['files', 'sources']) {
-    await page.evaluate(`document.getElementById(${JSON.stringify(id)}).scrollIntoView()`)
-    await frame(page, `licences-${id}`, false)
+  for (const [name, selector] of SECTIONS) {
+    const box = await page.locator(selector).first().boundingBox()
+    await page.evaluate(`window.scrollBy(0, ${String(box?.y ?? 0)})`)
+    await frame(page, `licences-${name}`, false)
   }
   const wide = await overflows(page, 'licences page')
   const hrefs: string[] = []
