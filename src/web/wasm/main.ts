@@ -31,7 +31,14 @@ import { environmentLine } from '../visitor'
 import { AudioOpener, type Sound } from './audio-opener'
 import { FRAME_HEIGHT, FRAME_WIDTH } from './frame'
 import { readFrame } from './frame-swap'
-import { type KeyPress, pauseButton, soundForNewRun, spaceToggles, togglePause } from './pause'
+import {
+  type KeyPress,
+  pauseButton,
+  soundForNewRun,
+  soundForPress,
+  spaceToggles,
+  togglePause,
+} from './pause'
 import { grant, readStatus, type Speed, writePace } from './protocol'
 import {
   type Built,
@@ -130,6 +137,35 @@ async function pickedStream(choice: ReplayChoice): Promise<ListedPick | undefine
     : { id: chosen.summary.id, stream: chosen.bytes, summary: chosen.summary, place: chosen.place }
 }
 
+/** What a run's beginning touches of the page: its view, its runs and its sound. */
+interface Viewing {
+  readonly view: WasmView
+  readonly runs: Runs<NamedRun>
+  readonly audio: AudioOpener
+}
+
+/** Begins the run of `chosen` in place of the current one, which it stops. */
+function beginRun(
+  { view, runs, audio }: Viewing,
+  module: Built,
+  chosen: ListedPick,
+  sound: Sound,
+): Run {
+  const { id, summary, place } = chosen
+  const run = Object.assign(startRun(module, chosen, view.speed(), sound), {
+    id,
+    summary,
+    streamBytes: chosen.stream.length,
+  })
+  watchRun(run, (failure) => {
+    if (runs.current === run) view.failure(failure, place)
+  })
+  runs.replace(run)
+  // A refused resume here shows no line: the Start's own line follows at once (S5-16).
+  void soundForNewRun(run, audio)
+  return run
+}
+
 /** The page's state and its actions; the view's events call them. */
 function createViewer(view: WasmView) {
   let built: Promise<Built> | undefined
@@ -146,32 +182,22 @@ function createViewer(view: WasmView) {
   }
   drawLoop(view, runs, changeSpeed)
 
-  const begin = (module: Built, chosen: ListedPick, sound: Sound): Run => {
-    const { id, summary, place } = chosen
-    const run = Object.assign(startRun(module, chosen, view.speed(), sound), {
-      id,
-      summary,
-      streamBytes: chosen.stream.length,
-    })
-    watchRun(run, (failure) => {
-      if (runs.current === run) view.failure(failure, place)
-    })
-    runs.replace(run)
-    // A refused resume here shows no line: the Start's own line follows at once (S5-16).
-    void soundForNewRun(run, audio)
-    return run
-  }
-
   const play = async (stream?: ListedPick): Promise<string | undefined> => {
     const ticket = runs.nextPlay()
     const picked = stream ?? pickedStream(choice)
-    const [module, chosen, sound] = await Promise.all([built, picked, audio.open()])
-    if (module === undefined) throw new SessionError(PICK_DUMP)
-    if (chosen === undefined) throw new SessionError(PICK_REPLAY)
-    // A later Start or Restart came while this one waited; that one runs.
-    if (!runs.isNewest(ticket)) return undefined
-    last = chosen
-    return runningLine(chosen, begin(module, chosen, sound))
+    // Before the context resumes, a paused run's sound leaves the speakers (R39).
+    const press = soundForPress(runs, ticket, audio)
+    try {
+      const [module, chosen, sound] = await Promise.all([built, picked, press.sound])
+      if (module === undefined) throw new SessionError(PICK_DUMP)
+      if (chosen === undefined) throw new SessionError(PICK_REPLAY)
+      // A later Start or Restart came while this one waited; that one runs.
+      if (!runs.isNewest(ticket)) return undefined
+      last = chosen
+      return runningLine(chosen, beginRun({ view, runs, audio }, module, chosen, sound))
+    } finally {
+      void press.settle()
+    }
   }
 
   return {

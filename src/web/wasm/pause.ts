@@ -2,9 +2,10 @@
 // so a Node spec holds it; main.ts wires the button, the key and the draw loop to it. The pause
 // itself lives in the clock (clock.ts), so the page asks the clock whether a run stands paused.
 import { runningLine } from '../status'
-import type { AudioOpener } from './audio-opener'
+import type { AudioOpener, Sound } from './audio-opener'
 import type { TickClock } from './clock'
 import { grant, readStatus } from './protocol'
+import type { Runs } from './runs'
 
 const PAUSE_LABEL = 'Pause'
 const PLAY_LABEL = 'Play'
@@ -109,4 +110,50 @@ export function soundForNewRun(
   audio: Pick<AudioOpener, 'resumeNow'>,
 ): Promise<string | undefined> {
   return run.clock.paused ? Promise.resolve(undefined) : audio.resumeNow()
+}
+
+/** A run's sound on the speakers, which a Start during its pause takes off first (R39). */
+export interface Speakers {
+  /** Takes the run's sound off the speakers; its ring keeps what it holds. */
+  readonly mute: () => void
+  readonly unmute: () => void
+}
+
+/** A run as the sound of a Start sees it: its clock and its sound on the speakers. */
+export interface HeldRun extends Pick<PausedRun, 'clock'> {
+  readonly speakers: Speakers
+}
+
+/** The sound of a press on Start or Restart, and what the press does with it once it ends. */
+interface PressSound {
+  readonly sound: Promise<Sound>
+  readonly settle: () => Promise<void>
+}
+
+/**
+ * Opens the sound for the press `ticket` on Start or Restart, inside the press. A run that stands
+ * paused holds sound in its ring, and the context's resume would play it until the new run
+ * replaces that run: its sound leaves the speakers first (R39, #69). `settle` runs once the play
+ * ends. When that run is still the page's and no newer press came, it gets its sound back; while
+ * it stands paused, the context suspends first, so it does not run under the paused run.
+ */
+export function soundForPress<R extends HeldRun>(
+  runs: Pick<Runs<R>, 'current' | 'isNewest'>,
+  ticket: number,
+  audio: Pick<AudioOpener, 'open' | 'suspend'>,
+): PressSound {
+  const held = runs.current?.clock.paused === true ? runs.current : undefined
+  held?.speakers.mute()
+  const settle = (): Promise<void> => {
+    if (held === undefined || runs.current !== held || !runs.isNewest(ticket)) {
+      return Promise.resolve()
+    }
+    const back = () => {
+      held.speakers.unmute()
+    }
+    if (held.clock.paused) return audio.suspend().then(back, back)
+    back()
+    return Promise.resolve()
+  }
+  return { sound: audio.open(), settle }
 }

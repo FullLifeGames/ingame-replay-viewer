@@ -14,6 +14,7 @@ import { TickClock } from './clock'
 import { buildFailure, type FailedReport, RunFailure, workerFailure } from './failures'
 import { WASM_FILES } from './files'
 import type { StartMessage, WorkerReport } from './messages'
+import type { Speakers } from './pause'
 import {
   createShared,
   GBA_FRAMES_PER_SECOND,
@@ -55,6 +56,8 @@ export interface Run {
   readonly clock: TickClock
   readonly ring: AudioRing
   readonly output: AudioWorkletNode | undefined
+  /** The processor's link to the speakers, which a Start during the run's pause cuts first. */
+  readonly speakers: Speakers
   /** Why the run plays without sound; undefined when it has sound. */
   readonly silence: string | undefined
   readonly startedAt: number
@@ -107,6 +110,16 @@ function connectRing(sound: Sound, ring: SharedArrayBuffer) {
   }
 }
 
+/** The processor's link to the speakers; nothing to cut for a run without sound. */
+const speakersOf = (output: AudioWorkletNode | undefined): Speakers => ({
+  mute: () => {
+    output?.disconnect()
+  },
+  unmute: () => {
+    output?.connect(output.context.destination)
+  },
+})
+
 /** Starts a run. The sound is connected before the worker exists, so nothing fails in between. */
 export function startRun(built: Built, picked: Picked, speed: Speed, sound: Sound): Run {
   const buffers = createShared(AUDIO_CAPACITY)
@@ -130,6 +143,7 @@ export function startRun(built: Built, picked: Picked, speed: Speed, sound: Soun
     clock: new TickClock(speed, now),
     ring: new AudioRing(buffers.audio),
     output,
+    speakers: speakersOf(output),
     silence,
     startedAt: now,
     finishedMs: undefined,
