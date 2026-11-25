@@ -162,6 +162,10 @@ _Avoid_: old page, mGBA page
 A test replay that both pages offer in their select.
 _Avoid_: demo, sample
 
+**Replay label**:
+How the pages name a replay: its format, its players and the number its replay ID ends in, such as "Gen 3 OU: A Welcome Guest vs xXEricXx (994052)". The example select and every status line use it. A replay without a format leaves that part out, and one with neither format nor players goes by its replay ID.
+_Avoid_: replay name, title
+
 **Panel**:
 The lines above the game on the viewer: the two players' names by side and the turn the game has reached.
 _Avoid_: HUD, scoreboard
