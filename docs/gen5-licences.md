@@ -25,9 +25,9 @@ The notice stands in `src/web/gen5/index.html` as `#licence-notice`, above the f
 
 The licences page holds, in this order:
 
-1. what the page runs and how it is licensed;
+1. what the page runs and how it is licensed, and that the viewer unpacks the core with its own code;
 2. the build's date and commit, with a link to the repository at that commit, and a sentence when the build machine had changes the commit lacks;
-3. a table of every file the page sends, with its component, version, licence and source, or the reason no source is offered;
+3. a table of every file the page sends, with its component, version, licence and source, and the viewer's own files by rule: the page, its unpacker of the core and the saves;
 4. one line per source archive: its commit and how we know that commit, its size, the SHA-256 of its tar, a link to the archive and one to the upstream repository at that commit;
 5. the copyright notices, each quoted whole from its file at the pin;
 6. the licence texts: the GPL, the MIT texts and the licences of the parts the core compiles in.
@@ -39,6 +39,7 @@ The licences page holds, in this order:
 - `scripts/gen5-sources.ts` fetches each source's commit into a bare repository under `.cache/gen5/sources/git/`. It keeps a ref under `refs/pins/` on that commit, writes the archive with `git archive` and checks the tar's SHA-256 against the pin before it places the file.
 - `scripts/gen5-licences-read.ts` reads each notice and the GPL's text from the bare repositories with `git show <commit>:<path>`, and every file of such a folder in one `git cat-file --batch`. `scripts/gen5-notice-groups.ts` groups those files by their opening comment. `scripts/gen5-licences.ts` turns them into the page and escapes every string it got from a file.
 - `scripts/gen5-built.ts` writes `licences.html` beside the built page. The dev server (`scripts/gen5-serve.ts`) makes it on each request. Both answer `/source/<archive>` for the manifest's archives alone.
+- `src/gen5/core-unpack.ts` names the page's unpacker and its path, which the page, the build, the manifest and both servers read (see "The core's unpacker").
 - `scripts/gen5-licences-shot.ts` checks it all in a browser: the notice above the file input at 360 px, the licences page, and a `HEAD` to every source link.
 
 Run `node scripts/gen5-sources.ts` once before you build. Without the archives the build stops and says so.
@@ -75,6 +76,23 @@ The page now runs on the build machine alone. Before it goes public:
 
 The public Gen 5 page's own issue takes these, next to #62.
 
-## Open: `extract7z.js`
+## The core's unpacker
 
-EmulatorJS ships `data/compression/extract7z.js` with no licence. The file came from another website in 2021 and has not changed since. Nobody names its author or its source. The page needs it to unpack the core. Until the user rules on it (U1), the manifest marks its licence as unnamed and offers no source for it: EmulatorJS's repository holds the same compiled file, not its source code. Its row on the licences page says both.
+EmulatorJS packs each core as a 7z archive and unpacks it with `data/compression/extract7z.js`. That file ships with no licence. It came from another website in 2021 and has not changed since, and nobody names its author or its source. So the page no longer sends it: on 25.11.2026 the user chose that the viewer unpacks the core with its own code.
+
+The page sets `window.EJS_paths` so that EmulatorJS fetches `/extract7z.js` instead: a worker of the viewer's own, under the repository's MIT licence. It speaks the messages EmulatorJS's `compression.js` waits for: progress, one message per file, then done. On a broken archive it posts done and throws the decoder's sentence, so EmulatorJS stops with its own error instead of waiting. The manifest no longer lists EmulatorJS's file, both servers answer it with a 404, and a run whose page asks for it fails on its request log.
+
+The code:
+
+- `src/gen5/range-decoder.ts` and `src/gen5/lzma.ts` decode LZMA, `src/gen5/lzma2.ts` LZMA2's chunks, and `src/gen5/seven-zip.ts` with its header and reader modules the 7z container. It reads LZMA2 and LZMA, the two methods the cores use, checks every CRC the archive carries and refuses any other method by name.
+- `src/gen5/core-unpack.ts` holds the worker's logic, the script's name and its path.
+- `src/web/gen5/extract7z.ts` is the worker's shell. EmulatorJS starts it from a Blob URL, where a module could not load its imports, so `scripts/gen5-built.ts` bundles it into one classic script, for the build and for the dev server.
+
+We wrote the decoder from these texts:
+
+- `lzma-specification.txt` by Igor Pavlov (2015), from the LZMA SDK, which is in the public domain: the range coder and LZMA's symbols.
+- `7zFormat.txt` from the LZMA SDK: the 7z container.
+- "The .xz File Format" by Lasse Collin and Igor Pavlov, in the public domain, section 5.3.1: LZMA2's dictionary property.
+- The section "LZMA2 format" of the English Wikipedia article "Lempel-Ziv-Markov chain algorithm": LZMA2's chunk layout. We took the layout's facts from it, and no code or text.
+
+The builders of the decoder did not open `extract7z.js`, the LZMA SDK's code, any npm package of a 7z or LZMA decoder, or the planner's probe script, which they only ran. They checked the decoder against that probe: for all four fetched cores, every unpacked file had the same SHA-256. A spec unpacks the four cores with our decoder and finds the commits of melonDS and RetroArch in them; CI runs it on the fetched packages.

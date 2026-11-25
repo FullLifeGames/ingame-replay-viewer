@@ -5,12 +5,14 @@ import {
   archiveName,
   type Component,
   COMPONENTS,
+  SITE_FILES,
   type SiteFile,
   type Source,
   VIEWER_REPOSITORY,
 } from './gen5-manifest'
+import { UNPACKER_PATH } from '../src/gen5/core-unpack'
 
-// Invented inputs: two sources, three components (one with an unnamed licence), invented texts.
+// Invented inputs: two sources, three components, invented texts.
 const CORE: Source = {
   name: 'core',
   repository: 'https://github.com/example/core',
@@ -42,13 +44,11 @@ const COMPONENTS_INVENTED = {
   emulatorjs: part('Shell', CORE, 'GPL-3.0-or-later'),
   melonds: part('Core', CORE, 'GPL-3.0-or-later'),
   nipplejs: part('Pad', PAD, 'MIT'),
-  extract7z: part('Unpacker', { none: 'Nobody names its source.' }, { unnamed: 'nobody names it' }),
 }
 const FILES: readonly SiteFile[] = [
   { path: 'data/shell.js', components: ['emulatorjs'], presence: 'served', why: 'logged' },
   { path: 'data/core.data', components: ['melonds'], presence: 'served', why: 'logged' },
   { path: 'data/pad.js', components: ['nipplejs'], presence: 'served', why: 'logged' },
-  { path: 'data/unpack.js', components: ['extract7z'], presence: 'served', why: 'logged' },
   { path: 'data/shell.min.js', components: ['emulatorjs'], presence: 'absent', why: 'logged' },
 ]
 const NOTICES: readonly ReadNotice[] = [
@@ -112,25 +112,34 @@ describe('licencesHtml', () => {
       '<tr data-path="/emulatorjs/data/shell.js">',
       '<tr data-path="/emulatorjs/data/core.data">',
       '<tr data-path="/emulatorjs/data/pad.js">',
-      '<tr data-path="/emulatorjs/data/unpack.js">',
     ])
   })
 
-  it('reads the row of a file with an unnamed licence as the plan writes it', () => {
-    const row = /<tr data-path="\/emulatorjs\/data\/unpack.js">.*?<\/tr>/s.exec(html)?.[0] ?? ''
-    expect(textOf(row)).toContain('Licence not named. EmulatorJS ships this file without one.')
+  it('links the source of every file it sends', () => {
+    const rows = html.match(/<tr data-path="[^"]*">.*?<\/tr>/gs) ?? []
+    expect(rows).toHaveLength(3)
+    for (const row of rows)
+      expect({ row, link: row.includes('href="/source/') }).toEqual({ row, link: true })
   })
 
-  // Scene: extract7z.js has no source to offer (review W3).
-  it('offers no source link for a file without a named licence, and one for every other', () => {
-    const rows = html.match(/<tr data-path="[^"]*">.*?<\/tr>/gs) ?? []
-    expect(rows).toHaveLength(4)
-    for (const row of rows) {
-      const unnamed = row.includes('data/unpack.js')
-      expect({ row, link: row.includes('href="/source/') }).toEqual({ row, link: !unnamed })
-    }
-    const unpacker = rows.find((row) => row.includes('data/unpack.js')) ?? ''
-    expect(textOf(unpacker)).toContain('No source offered. Nobody names its source.')
+  // Scene: the page unpacks the core in a worker of its own (79-4b), so EmulatorJS's unpacker and
+  // its sentence on a licence nobody names leave the page.
+  it("says the viewer unpacks the core with its own code, and lists that worker as the viewer's", () => {
+    const text = textOf(html).replace(/\s+/g, ' ')
+    expect(text).toContain(
+      "The viewer unpacks the emulator's core with its own code, in place of EmulatorJS's 7z unpacker.",
+    )
+    const own = /<tr data-own="unpacker">.*?<\/tr>/s.exec(html)?.[0] ?? ''
+    expect(textOf(own)).toContain(`${UNPACKER_PATH}, the viewer&#39;s worker that unpacks`)
+    expect(textOf(own)).toContain('MIT')
+    expect(text).not.toContain('Licence not named')
+    expect(text).not.toContain('No source offered')
+  })
+
+  it('shows no row of EmulatorJS for its 7z unpacker on the real manifest', () => {
+    const real = licencesHtml({ ...INPUT, components: COMPONENTS, files: SITE_FILES })
+    expect(real).not.toContain('data-path="/emulatorjs/data/compression/extract7z.js"')
+    expect(real).toContain('data-path="/emulatorjs/data/src/compression.js"')
   })
 
   // Scene: the build scripts' commit is an inference, and the page says so (review W4).

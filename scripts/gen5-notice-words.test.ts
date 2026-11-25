@@ -5,8 +5,6 @@ import { readFileSync } from 'node:fs'
 
 import { describe, expect, it } from 'vitest'
 
-import { COMPONENTS, SITE_FILES } from './gen5-manifest'
-import { unnamedLicenceFiles } from './gen5-manifest-check'
 import { UNFOUND } from './gen5-notices'
 import { GEN5_PATHS } from './gen5-paths'
 
@@ -17,10 +15,9 @@ const notice = (/<section id="licence-notice">(.*?)<\/section>/s.exec(html)?.[1]
 
 // Scene: the licences page lists parts it cannot cover yet, so the notice claims no "every".
 describe('the notice before the file input', () => {
-  const gaps = unnamedLicenceFiles({ components: COMPONENTS, files: SITE_FILES }).length
-  const open = gaps + UNFOUND.length > 0
+  const open = UNFOUND.length > 0
 
-  it('says neither "every" nor "each" while a licence is unnamed or a notice unfound', () => {
+  it('says neither "every" nor "each" while a notice is unfound', () => {
     expect({ open, claims: /\b(every|each)\b/i.test(notice) }).not.toEqual({
       open: true,
       claims: true,

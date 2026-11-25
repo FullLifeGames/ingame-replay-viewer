@@ -12,7 +12,8 @@ import {
   SITE_FILES,
   SOURCES,
 } from './gen5-manifest'
-import { checkManifest, type ManifestDraft, unnamedLicenceFiles } from './gen5-manifest-check'
+import { checkManifest, type ManifestDraft } from './gen5-manifest-check'
+import { UNPACKER_PATH } from '../src/gen5/core-unpack'
 
 const SOURCE = {
   name: 'tool',
@@ -97,7 +98,8 @@ describe('checkManifest', () => {
 
 describe('the manifest', () => {
   // Scene: the stage-2 run asked for these. The 16 paths under /emulatorjs/ that the request logs
-  // of #78's moment run (78-5) and continue run (78-4b) list, the same set in both runs.
+  // of #78's moment run (78-5) and continue run (78-4b) list, the same set in both runs, but
+  // data/compression/extract7z.js, for which the page now names its own worker (79-4b).
   const LOGGED = [
     'data/loader.js',
     'data/emulator.css',
@@ -112,7 +114,6 @@ describe('the manifest', () => {
     'data/src/socket.io.min.js',
     'data/src/storage.js',
     'data/localization/en-US.json',
-    'data/compression/extract7z.js',
     'data/cores/reports/melonds.json',
     'data/cores/melonds-wasm.data',
   ]
@@ -137,7 +138,7 @@ describe('the manifest', () => {
     const absent = SITE_FILES.filter((file) => file.presence === 'absent').map((file) => file.path)
     expect(absent).toEqual(['data/emulator.min.css', 'data/emulator.min.js'])
     expect(absent.filter(isServedSitePath)).toEqual([])
-    expect(SITE_FILES.filter((file) => file.presence === 'served')).toHaveLength(35)
+    expect(SITE_FILES.filter((file) => file.presence === 'served')).toHaveLength(34)
   })
 
   it('refuses what the site holds beside them, and a path that is not normalized', () => {
@@ -148,10 +149,20 @@ describe('the manifest', () => {
     expect(isListed('data/version.json')).toBe(false)
   })
 
-  it('names exactly one file whose licence nobody can name: extract7z.js (U1)', () => {
-    expect(unnamedLicenceFiles({ components: COMPONENTS, files: SITE_FILES })).toEqual([
-      'data/compression/extract7z.js',
-    ])
+  // Scene: the page unpacks the core in a worker of its own (79-4b), so EmulatorJS's unpacker,
+  // whose licence nobody names (U1), leaves the page.
+  it("lists neither EmulatorJS's 7z unpacker nor a component for it", () => {
+    expect(isServedSitePath('data/compression/extract7z.js')).toBe(false)
+    expect(isListed('data/compression/extract7z.js')).toBe(false)
+    expect(Object.keys(COMPONENTS)).not.toContain('extract7z')
+    expect(Object.values(COMPONENTS).map((part) => part.name)).not.toContain(
+      "EmulatorJS's 7z unpacker",
+    )
+  })
+
+  it('names a licence for every component', () => {
+    const named = Object.values(COMPONENTS).filter((part) => typeof part.licence === 'string')
+    expect(named).toHaveLength(Object.keys(COMPONENTS).length)
   })
 
   it('takes every component from a pinned package of the fetch script', () => {
@@ -187,8 +198,9 @@ describe('the manifest', () => {
   })
 
   // Scene: the save is the game's bytes from our play (review U-e), not code under MIT alone.
-  it("describes the page's own files and the saves by rule, the save's licence in words", () => {
+  it("describes the page's own files, its unpacker and the saves by rule, the save's licence in words", () => {
     expect(OWN_FILES.map((own) => own.licence)).toEqual([
+      'MIT',
       'MIT',
       {
         words:
@@ -196,6 +208,17 @@ describe('the manifest', () => {
       },
     ])
     expect(OWN_FILES.map((own) => own.files).join(' ')).toContain('/saves/<name>.sav')
+  })
+
+  // Scene: the worker that stands in for EmulatorJS's unpacker is the viewer's own code.
+  it("lists the page's unpacker script as the viewer's code under the repository's licence", () => {
+    const unpacker = OWN_FILES.find((own) => own.files.startsWith(`${UNPACKER_PATH},`))
+    expect(unpacker).toEqual({
+      id: 'unpacker',
+      files: `${UNPACKER_PATH}, the viewer's worker that unpacks the emulator's core in place of EmulatorJS's data/compression/extract7z.js`,
+      licence: 'MIT',
+      source: 'this repository: src/web/gen5/extract7z.ts and the 7z decoder in src/gen5/',
+    })
   })
 
   // Scene: each GPL notice at the pins says "or (at your option) any later version" (review W6).
@@ -214,16 +237,12 @@ describe('the manifest', () => {
     expect(Object.values(ids)).not.toContain('GPL-3.0')
   })
 
-  // Scene: extract7z.js has no source to offer (review W3).
-  it('offers no source, with the reason, for a component without a named licence, and one for every other', () => {
-    for (const [id, part] of Object.entries(COMPONENTS)) {
-      const named = typeof part.licence === 'string'
-      const offered = !('none' in part.source)
-      expect({ id, offered }).toEqual({ id, offered: named })
-    }
-    expect(COMPONENTS.extract7z.source).toEqual({
-      none: "EmulatorJS's repository holds this same compiled file, not its source code, and nobody names where that lives.",
-    })
+  it('offers a source by commit for every component', () => {
+    for (const [id, part] of Object.entries(COMPONENTS))
+      expect({ id, commit: part.source.commit }).toEqual({
+        id,
+        commit: expect.stringMatching(/^[0-9a-f]{40}$/) as unknown,
+      })
   })
 })
 
@@ -240,7 +259,6 @@ describe('the sources', () => {
     ])
     expect(new Set(SOURCES.map((source) => source.repository)).size).toBe(SOURCES.length)
     for (const part of Object.values(COMPONENTS)) {
-      if ('none' in part.source) continue
       const { source } = part
       expect(
         SOURCES.filter((each) => each.name === source.name),

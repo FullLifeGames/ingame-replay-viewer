@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import { fileFor, savesFileFor, siteFileFor, sitePathOf, sourceFileFor } from './gen5-files'
-import { archiveName, COMPONENTS, sourceOf } from './gen5-manifest'
+import { archiveName, COMPONENTS } from './gen5-manifest'
 
-const ARCHIVE = archiveName(sourceOf(COMPONENTS.melonds))
+const ARCHIVE = archiveName(COMPONENTS.melonds.source)
 
 describe('fileFor', () => {
   const page = '/repo/build/gen5/page'
@@ -80,6 +80,7 @@ describe('siteFileFor', () => {
       'index.html',
       'package.json',
       'data/compression/extractzip.js',
+      'data/compression/extract7z.js',
       'data/emulator.min.js',
       '',
     ])

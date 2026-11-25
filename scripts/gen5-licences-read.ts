@@ -27,7 +27,6 @@ import {
   type ComponentId,
   COMPONENTS,
   SITE_FILES,
-  sourceOf,
   SOURCES,
 } from './gen5-manifest.ts'
 import { groupNotices, type ReadTree, type TreeFile } from './gen5-notice-groups.ts'
@@ -56,7 +55,7 @@ export function readNotices(
   return (Object.keys(components) as ComponentId[]).flatMap((id) => {
     const part = components[id]
     return part.notices.map((notice) => {
-      const source = sourceOf(part)
+      const { source } = part
       let text: string
       try {
         text = read(source, notice.path)
@@ -78,7 +77,7 @@ export function readNoticeTrees(
 ): ReadTree[] {
   return trees.map((tree) => {
     const part = components[tree.component]
-    const source = sourceOf(part)
+    const { source } = part
     let files: readonly TreeFile[]
     try {
       files = readTree(source, tree.folder)
@@ -134,7 +133,7 @@ export function readLicencesInput(sources: string): LicencesInput {
     notices: readNotices(COMPONENTS, read),
     trees,
     unfound: UNFOUND,
-    gpl: read(sourceOf(COMPONENTS[GPL_TEXT.component]), GPL_TEXT.path),
+    gpl: read(COMPONENTS[GPL_TEXT.component].source, GPL_TEXT.path),
     viewerLicence: readFileSync(join(GEN5_PATHS.repo, 'LICENSE'), 'utf8'),
   }
 }

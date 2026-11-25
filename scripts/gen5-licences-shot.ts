@@ -61,12 +61,11 @@ interface Licences {
 }
 
 /** The parts of the licences page saved as frames, each at the top of the screen: the two lists,
- * the row of the file without a named licence, libretro-common's notices and its files without
- * one. */
+ * the row of the page's own unpacker, libretro-common's notices and its files without one. */
 const SECTIONS: readonly (readonly [string, string])[] = [
   ['files', '#files'],
   ['sources', '#sources'],
-  ['unpacker', 'tr[data-path$="/extract7z.js"]'],
+  ['unpacker', 'tr[data-own="unpacker"]'],
   ['libretro-common', 'h4:text-is("libretro-common")'],
   ['no-notice', 'p.from:has-text("No notice in the file")'],
 ]

@@ -76,7 +76,6 @@ export const NOTICES: Readonly<Record<ComponentId, readonly Notice[]>> = {
   build: GPL_APPENDIX("EmulatorJS's build scripts"),
   nipplejs: [licence('nipplejs', 'LICENSE')],
   socketio: SOCKET_IO_PACKAGES.map((name) => licence(name, `packages/${name}/LICENSE`)),
-  extract7z: [],
 }
 
 /** libretro-common's files each carry a notice of their own; RetroArch compiles many of them. */

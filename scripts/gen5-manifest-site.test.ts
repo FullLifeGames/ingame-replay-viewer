@@ -23,7 +23,8 @@ function siteFiles(): string[] {
     .sort()
 }
 
-/** What the site holds and the servers refuse: its docs, its demo page, the other unpackers. */
+/** What the site holds and the servers refuse: its docs, its demo page, its unpackers (the page
+ * unpacks the core in a worker of its own). */
 const REFUSED = [
   '.gitattributes',
   'CHANGES.md',
@@ -32,6 +33,7 @@ const REFUSED = [
   'LICENSE',
   'README.md',
   'data/compression/README.md',
+  'data/compression/extract7z.js',
   'data/compression/extractzip.js',
   'data/compression/libunrar.js',
   'data/compression/libunrar.wasm',
@@ -61,7 +63,7 @@ describe.skipIf(!existsSync(SITE))('the manifest and the fetched site', () => {
     expect(paths('absent').filter((path) => files.includes(path))).toEqual([])
   })
 
-  it('leaves out exactly the docs, the demo page and the unpackers the page never asks for', () => {
+  it('leaves out exactly the docs, the demo page and the unpackers', () => {
     const served = new Set(paths('served'))
     expect(files.filter((path) => !served.has(path))).toEqual(REFUSED)
   })

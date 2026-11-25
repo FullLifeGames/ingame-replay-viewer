@@ -6,13 +6,11 @@ import {
   archiveName,
   type Component,
   type ComponentId,
-  isOffered,
   type Licence,
   type LicenceInWords,
   OWN_FILES,
   type SiteFile,
   type Source,
-  sourceOf,
   VIEWER_REPOSITORY,
 } from './gen5-manifest.ts'
 import { archiveHref, SITE_PREFIX } from './gen5-files.ts'
@@ -56,20 +54,13 @@ export interface LicencesInput {
 
 const treeOf = (repository: string, commit: string) => `${repository}/tree/${commit}`
 
-/** A licence's id or words; until U1 is ruled, the words of plan section 6, point 7, for a
- * licence nobody names. */
-function licenceWords(licence: Licence | LicenceInWords): string {
-  if (typeof licence === 'string') return licence
-  return 'words' in licence
-    ? licence.words
-    : 'Licence not named. EmulatorJS ships this file without one.'
-}
+/** A licence's id or words. */
+const licenceWords = (licence: Licence | LicenceInWords): string =>
+  typeof licence === 'string' ? licence : licence.words
 
 /** The name the page gives `source`: that of the first component it is the source of. */
 function sourceName(input: LicencesInput, source: Source): string {
-  const owner = Object.values(input.components).find(
-    (part) => isOffered(part.source) && part.source.name === source.name,
-  )
+  const owner = Object.values(input.components).find((part) => part.source.name === source.name)
   return owner?.name ?? source.name
 }
 
@@ -79,7 +70,7 @@ function intro(input: LicencesInput): string {
   const changes = dirty ? ' The build machine had changes that are not in that commit.' : ''
   return `<h1>Licences and source code</h1>
 <p>This page runs EmulatorJS ${version}, its melonDS core and RetroArch. All three are under the GNU General Public License, version 3 (GPL-3.0). The viewer's own code drives the emulator in the same tab, so we treat the page and the emulator as one program and license the page as a whole to you under GPL-3.0. The viewer's repository stays under the MIT licence, which GPL-3.0 allows.</p>
-<p>Built on ${escapeHtml(date)} from commit ${escapeHtml(commit)} of the viewer's repository. The build adds the viewer's code to EmulatorJS ${version} and changes none of EmulatorJS's files.${changes} ${link(treeOf(VIEWER_REPOSITORY, commit), "The viewer's repository at that commit")}.</p>
+<p>Built on ${escapeHtml(date)} from commit ${escapeHtml(commit)} of the viewer's repository. The build adds the viewer's code to EmulatorJS ${version} and changes none of EmulatorJS's files. The viewer unpacks the emulator's core with its own code, in place of EmulatorJS's 7z unpacker.${changes} ${link(treeOf(VIEWER_REPOSITORY, commit), "The viewer's repository at that commit")}.</p>
 <p>${link('./', 'Back to the page')}</p>`
 }
 
@@ -89,16 +80,14 @@ const COLUMNS = ['Path', 'Component', 'Version', 'Licence', 'Source']
 const cellsOf = (cells: readonly string[]) =>
   cells.map((cell, at) => `<td data-label="${COLUMNS[at] ?? ''}">${cell}</td>`).join('')
 
-/** A link to each offered source of `parts` once, and for a part with none the reason. */
+/** A link to each source of `parts` once. */
 function sourceCell(input: LicencesInput, parts: readonly Component[]): string {
-  const offered = parts.map((part) => part.source).filter(isOffered)
-  const links = [...new Map(offered.map((source) => [source.name, source])).values()].map(
-    (source) => link(archiveHref(source), `${sourceName(input, source)} ${short(source.commit)}`),
-  )
-  const reasons = parts.flatMap(({ source }) =>
-    isOffered(source) ? [] : [escapeHtml(`No source offered. ${source.none}`)],
-  )
-  return [...links, ...reasons].join('<br>')
+  const sources = new Map(parts.map(({ source }) => [source.name, source]))
+  return [...sources.values()]
+    .map((source) =>
+      link(archiveHref(source), `${sourceName(input, source)} ${short(source.commit)}`),
+    )
+    .join('<br>')
 }
 
 function fileRow(input: LicencesInput, file: SiteFile): string {
@@ -119,7 +108,7 @@ function filesTable(input: LicencesInput): string {
   const tree = treeOf(VIEWER_REPOSITORY, input.build.commit)
   const own = OWN_FILES.map(
     (rule) =>
-      `<tr>${cellsOf([
+      `<tr data-own="${rule.id}">${cellsOf([
         escapeHtml(rule.files),
         'the viewer',
         `commit ${short(input.build.commit)}`,
@@ -158,7 +147,7 @@ function whereFrom(input: LicencesInput, notice: ReadNotice): string {
     notice.lines === undefined
       ? ''
       : `, lines ${String(notice.lines[0])} to ${String(notice.lines[1])}`
-  const commit = short(sourceOf(input.components[notice.component]).commit)
+  const commit = short(input.components[notice.component].source.commit)
   return `<p class="from">${escapeHtml(notice.path)}${lines}, at commit ${commit}</p>`
 }
 
@@ -203,7 +192,7 @@ function licenceTexts(input: LicencesInput): string {
   const ids = Object.keys(input.components) as ComponentId[]
   const mit = ids.filter((id) => input.components[id].licence === 'MIT')
   const rest = ids.filter((id) => !mit.includes(id))
-  const gplFrom = short(sourceOf(input.components.melonds).commit)
+  const gplFrom = short(input.components.melonds.source.commit)
   return `<h2 id="licence-texts">Licence texts</h2>
 <h3>GNU General Public License, version 3</h3>
 <p class="from">LICENSE of melonDS, at commit ${gplFrom}</p>

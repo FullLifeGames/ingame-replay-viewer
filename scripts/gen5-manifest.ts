@@ -5,6 +5,7 @@
 // (scripts/gen5-requests.ts). The page's own files are described as rules in OWN_FILES. Each
 // component's notice files stand in scripts/gen5-notices.ts, its source's pin in
 // scripts/gen5-pins.ts.
+import { UNPACKER_PATH } from '../src/gen5/core-unpack.ts'
 import { type Notice, NOTICES } from './gen5-notices.ts'
 import {
   BUILD_SOURCE,
@@ -15,9 +16,8 @@ import {
   SOCKET_IO_SOURCE,
 } from './gen5-pins.ts'
 
-/** A licence by its SPDX id as the component's notice states it, or the reason nobody can name
- * one. */
-export type Licence = 'GPL-3.0-or-later' | 'GPL-3.0-only' | 'MIT' | { unnamed: string }
+/** A licence by its SPDX id as the component's notice states it. */
+export type Licence = 'GPL-3.0-or-later' | 'GPL-3.0-only' | 'MIT'
 
 /** A licence stated in words, for a rule of the page's own files that no id fits. */
 export interface LicenceInWords {
@@ -35,13 +35,7 @@ export interface Source {
   basis: string
 }
 
-/** A component whose source nobody offers, with the reason in words. */
-export interface NoSource {
-  none: string
-}
-
-export type ComponentId =
-  'emulatorjs' | 'melonds' | 'retroarch' | 'build' | 'nipplejs' | 'socketio' | 'extract7z'
+export type ComponentId = 'emulatorjs' | 'melonds' | 'retroarch' | 'build' | 'nipplejs' | 'socketio'
 
 export interface Component {
   name: string
@@ -49,7 +43,7 @@ export interface Component {
   licence: Licence
   /** The pinned npm package (scripts/gen5-fetch.ts) that brings the component's files. */
   from: string
-  source: Source | NoSource
+  source: Source
   /** The files in `source` that hold its notices and those of the parts compiled into it. */
   notices: readonly Notice[]
 }
@@ -69,20 +63,11 @@ export interface SiteFile {
 
 /** The page's own files, by rule: their licence is the repository's. */
 export interface OwnFiles {
+  /** The rule's name, which its row on the licences page carries. */
+  id: 'page' | 'unpacker' | 'saves'
   files: string
   licence: Licence | LicenceInWords
   source: string
-}
-
-/** True when `source` is one we offer, not the reason we offer none. */
-export function isOffered(source: Source | NoSource): source is Source {
-  return !('none' in source)
-}
-
-/** The source of `part`; throws for a component that offers none. */
-export function sourceOf(part: Component): Source {
-  if (!isOffered(part.source)) throw new Error(`${part.name} offers no source: ${part.source.none}`)
-  return part.source
 }
 
 const EMULATORJS_PACKAGE = '@emulatorjs/emulatorjs@4.2.3'
@@ -145,18 +130,6 @@ export const COMPONENTS: Readonly<Record<ComponentId, Component>> = {
     source: SOCKET_IO_SOURCE,
     notices: NOTICES.socketio,
   },
-  // An old Emscripten build of a small 7z unpacker, unchanged in EmulatorJS since 2021. Nobody
-  // names its licence (U1, for the user), and EmulatorJS's tree holds the same compiled file.
-  extract7z: {
-    name: "EmulatorJS's 7z unpacker",
-    version: 'unversioned, unchanged since EmulatorJS 0.4.23',
-    licence: { unnamed: 'no licence in the file, its folder or EmulatorJS since 2021' },
-    from: EMULATORJS_PACKAGE,
-    source: {
-      none: "EmulatorJS's repository holds this same compiled file, not its source code, and nobody names where that lives.",
-    },
-    notices: NOTICES.extract7z,
-  },
 }
 
 const CORE: readonly ComponentId[] = ['melonds', 'retroarch', 'build']
@@ -168,7 +141,8 @@ const served = (path: string, components: readonly ComponentId[], why: Why): Sit
   why,
 })
 
-/** The EmulatorJS files the runs of stage 2 (#78) asked for, the plain core among them. */
+/** The EmulatorJS files the runs of stage 2 (#78) asked for, the plain core among them, but
+ * its 7z unpacker, which the page replaces with its own worker (OWN_FILES). */
 const LOGGED: readonly SiteFile[] = [
   ...[
     'data/loader.js',
@@ -183,7 +157,6 @@ const LOGGED: readonly SiteFile[] = [
   ].map((path) => served(path, ['emulatorjs'], 'logged')),
   served('data/src/nipplejs.js', ['nipplejs'], 'logged'),
   served('data/src/socket.io.min.js', ['socketio'], 'logged'),
-  served('data/compression/extract7z.js', ['extract7z'], 'logged'),
   served('data/cores/reports/melonds.json', ['build'], 'logged'),
   served('data/cores/melonds-wasm.data', CORE, 'logged'),
   // loader.js asks for the minified files first and falls back to the plain ones on a 404.
@@ -224,11 +197,21 @@ export const VIEWER_REPOSITORY = 'https://github.com/FullLifeGames/ingame-replay
 
 export const OWN_FILES: readonly OwnFiles[] = [
   {
+    id: 'page',
     files: "the page's modules on the dev server, its build output on the built server",
     licence: 'MIT',
     source: 'this repository at the commit the page was built from',
   },
+  // EmulatorJS's compression.js asks for data/compression/extract7z.js, whose licence nobody names
+  // (U1); the page's window.EJS_paths sends it to this worker instead (src/gen5/core-unpack.ts).
   {
+    id: 'unpacker',
+    files: `${UNPACKER_PATH}, the viewer's worker that unpacks the emulator's core in place of EmulatorJS's data/compression/extract7z.js`,
+    licence: 'MIT',
+    source: 'this repository: src/web/gen5/extract7z.ts and the 7z decoder in src/gen5/',
+  },
+  {
+    id: 'saves',
     files: '/saves/<name>.sav, by a name src/gen5/save-file.ts allows',
     licence: {
       words:
@@ -256,12 +239,7 @@ export function isListed(path: string): boolean {
 /** Each component's source once, by its name, in the order of COMPONENTS: what
  * scripts/gen5-sources.ts fetches and /source/ serves. */
 export const SOURCES: readonly Source[] = [
-  ...new Map(
-    Object.values(COMPONENTS)
-      .map((part) => part.source)
-      .filter(isOffered)
-      .map((source) => [source.name, source]),
-  ).values(),
+  ...new Map(Object.values(COMPONENTS).map(({ source }) => [source.name, source])).values(),
 ]
 
 /** The file name of `source`'s archive under /source/: its name and commit, a gzipped tar. */

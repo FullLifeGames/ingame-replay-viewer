@@ -15,7 +15,7 @@ import {
   writeUnpackerScript,
 } from './gen5-built'
 import { writeLicencesPage } from './gen5-licences-read'
-import { archiveName, COMPONENTS, SITE_FILES, sourceOf } from './gen5-manifest'
+import { archiveName, COMPONENTS, SITE_FILES } from './gen5-manifest'
 import { GEN5_PATHS } from './gen5-paths'
 import { DONE, FILE, UNPACKER_PATH, UNPACKER_SCRIPT } from '../src/gen5/core-unpack'
 import { fromBase64 } from '../src/gen5/lzma.fixtures'
@@ -86,7 +86,7 @@ describe('startBuiltServer', () => {
     saves: join(root, 'saves'),
     sources: join(root, 'sources'),
   }
-  const archive = archiveName(sourceOf(COMPONENTS.melonds))
+  const archive = archiveName(COMPONENTS.melonds.source)
   let server: Server | undefined
 
   beforeAll(async () => {
@@ -153,10 +153,11 @@ describe('startBuiltServer', () => {
   })
 
   // Scene: the page names its own worker for EmulatorJS's unpacker (79-4b).
-  it("answers the page's unpacker as JavaScript", async () => {
+  it("answers the page's unpacker as JavaScript, and 404 for EmulatorJS's", async () => {
     const response = await answer(UNPACKER_PATH)
     expect(response.status).toBe(200)
     expect(response.headers.get('content-type')).toBe('text/javascript')
+    expect(await status('/emulatorjs/data/compression/extract7z.js')).toBe(404)
   })
 
   it('answers an archive the manifest names as gzip, and 404 for another name', async () => {
