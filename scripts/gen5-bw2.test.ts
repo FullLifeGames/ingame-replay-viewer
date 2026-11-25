@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { ArgFormat, StructLayout } from '../src/gen5/bw2-numbers'
-import { checkAdapterLayout, checkCommandFormats, outsideMainRam } from './gen5-bw2'
+import { checkAdapterLayout, checkCommandFormats } from './gen5-bw2'
 
 // An invented adapter layout: every member the spike reads, at offsets of its own.
 const LAYOUT: StructLayout = {
@@ -62,25 +62,6 @@ describe('checkAdapterLayout', () => {
     expect(() => {
       checkAdapterLayout({ ...LAYOUT, fields: overlap })
     }).toThrow(/returned.*isNet/)
-  })
-})
-
-describe('outsideMainRam', () => {
-  it('names each symbol outside 0x02000000 to 0x023FFFFF', () => {
-    const at = (name: string, address: number) => ({
-      name,
-      kind: 'bss' as const,
-      address,
-      module: 'ov001',
-    })
-    expect(
-      outsideMainRam({
-        low: at('low', 0x02000000),
-        high: at('high', 0x023ffffc),
-        itcm: at('itcm', 0x01ff8000),
-        mirror: at('mirror', 0x027ffe00),
-      }),
-    ).toEqual(['itcm 0x01FF8000', 'mirror 0x027FFE00'])
   })
 })
 

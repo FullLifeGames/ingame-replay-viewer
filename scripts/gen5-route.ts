@@ -14,7 +14,7 @@ import { chromium, type Page } from '@playwright/test'
 import { battleRefs } from '../src/gen5/battle-check.ts'
 
 type BattleRefs = ReturnType<typeof battleRefs>
-import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
+import type { Bw2Numbers, RoutePlaces } from '../src/gen5/bw2-numbers.ts'
 import type { Gen5Global, MarkRecord, RunPlan, RunReport } from '../src/gen5/hook.ts'
 import { routeSlice } from '../src/gen5/macro.ts'
 import { maskedValue, type RamRef, refAddress } from '../src/gen5/ram-check.ts'
@@ -49,9 +49,9 @@ const hook = (page: Page) => ({
     page.evaluate((at) => (globalThis as unknown as Gen5Global).gen5.readWord(at), address),
 })
 
-function readPlan(options: RouteOptions, refs: BattleRefs): RunPlan {
+function readPlan(options: RouteOptions, refs: BattleRefs, places: RoutePlaces): RunPlan {
   const { watch } = refs
-  const steps = routeSlice(newGameRoute(refs.checks), options.from, options.to)
+  const steps = routeSlice(newGameRoute(places, refs.checks), options.from, options.to)
   const markRefs = [PLAYER_X, PLAYER_Z]
   if (options.from === undefined) return { steps, startFrame: 0, watch, markRefs }
   const base = join(GEN5_PATHS.states, `s5-${options.from}`)
@@ -148,7 +148,7 @@ async function run(dump: string, options: RouteOptions): Promise<number> {
   const numbers = JSON.parse(readFileSync(GEN5_PATHS.bw2Json, 'utf8')) as Bw2Numbers
   const refs = battleRefs(numbers)
   const { watch } = refs
-  const plan = readPlan(options, refs)
+  const plan = readPlan(options, refs, numbers.route)
   log(
     `route: ${String(plan.steps.length)} steps from ${options.from ?? 'boot'} to ${options.to ?? 'the end'}`,
   )

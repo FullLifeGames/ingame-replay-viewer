@@ -1,14 +1,10 @@
 // The steps of the S6 run of the Gen 5 spike (#72): from the battle state, hold the server, let
 // the player answer the action menu, then hand the player's client one block per moment, each
-// once it answered the one before, and ask for the player's action again at the end. The page
-// plays the steps frame by frame (src/web/gen5/frame-hook.ts); scripts/gen5-moment.ts reads the
-// addresses and the Pokémon from RAM first.
-import {
-  type AdapterNumbers,
-  adapterWrites,
-  commandWrites,
-  holdWrites,
-} from '../src/gen5/adapter.ts'
+// once it answered the one before. No write after the hold asks for the player's action: the
+// client then starts no action selection, and no trainer's hint line shows (#76,
+// CheckTrainerHintMsg). The page plays the steps frame by frame (src/web/gen5/frame-hook.ts);
+// scripts/gen5-moment.ts reads the addresses and the Pokémon from RAM first.
+import { type AdapterNumbers, adapterWrites, holdWrites } from '../src/gen5/adapter.ts'
 import type { ServerCmdTable } from '../src/gen5/bw2-numbers.ts'
 import type { MacroStep } from '../src/gen5/macro.ts'
 import { momentCommands, type Moment } from '../src/gen5/moment.ts'
@@ -21,9 +17,6 @@ const MASH_EVERY = 30
 /** Frames a block may take, and a frame of it every BLOCK_FRAMES_EVERY frames. */
 const BLOCK_LIMIT = 3000
 const BLOCK_FRAMES_EVERY = 10
-/** After the last command: a frame every MENU_FRAMES_EVERY frames, MENU_FRAMES times. */
-const MENU_FRAMES_EVERY = 120
-const MENU_FRAMES = 5
 
 export interface MomentSetup {
   adapterNumbers: AdapterNumbers
@@ -60,7 +53,6 @@ function blockSteps(setup: MomentSetup, name: string, moment: Moment): MacroStep
 
 export function momentSteps(setup: MomentSetup): MacroStep[] {
   const { adapterNumbers, adapter } = setup
-  const ask = commandWrites(adapterNumbers, adapter, adapterNumbers.selectAction, new Uint8Array())
   return [
     { kind: 'write', name: 'hold', writes: holdWrites(adapterNumbers, adapter) },
     {
@@ -74,11 +66,6 @@ export function momentSteps(setup: MomentSetup): MacroStep[] {
     },
     { kind: 'mark', name: 'hp-before' },
     ...setup.blocks.flatMap(({ name, moment }) => blockSteps(setup, name, moment)),
-    { kind: 'write', name: 'select-action', writes: ask },
-    ...Array.from({ length: MENU_FRAMES }, (_, i): MacroStep[] => [
-      { kind: 'wait', frames: MENU_FRAMES_EVERY },
-      { kind: 'mark', name: `menu-${String(i + 1)}` },
-    ]).flat(),
     { kind: 'mark', name: 'end' },
   ]
 }

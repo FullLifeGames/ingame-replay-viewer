@@ -7,6 +7,8 @@ import type { Moment } from '../src/gen5/moment'
 import { momentSteps } from './gen5-moment-plan'
 
 // Invented numbers in the shapes of bw2.json: offsets, command numbers, IDs and the address.
+/** The adapter command that starts an action selection (BTL_ACMD_SELECT_ACTION), invented. */
+const SELECT_ACTION = 6
 const ADAPTER_NUMBERS: AdapterNumbers = {
   layout: {
     size: 0x4c,
@@ -23,7 +25,6 @@ const ADAPTER_NUMBERS: AdapterNumbers = {
     },
   },
   serverCmd: 0x0b,
-  selectAction: 6,
   heldState: 2,
   queueSize: 0x40,
 }
@@ -60,7 +61,7 @@ const named = (step: MacroStep) => ('name' in step ? `${step.kind} ${step.name}`
 // Scene: the server is held before any button reaches the menu, the player answers the menu,
 // then each block goes in once the client answered the one before, with no button press between.
 describe('momentSteps', () => {
-  it('holds, answers the menu, writes each block after the last answer, then asks again', () => {
+  it('holds, answers the menu, writes each block after the last answer, then ends', () => {
     expect(steps.map(named)).toEqual([
       'write hold',
       'until answer-menu',
@@ -71,11 +72,6 @@ describe('momentSteps', () => {
       'write b2',
       'until b2',
       'mark b2-answered',
-      'write select-action',
-      ...['menu-1', 'menu-2', 'menu-3', 'menu-4', 'menu-5'].flatMap((mark) => [
-        'wait',
-        `mark ${mark}`,
-      ]),
       'mark end',
     ])
   })
@@ -100,5 +96,28 @@ describe('momentSteps', () => {
     const block = steps[3]
     if (block?.kind !== 'write') throw new Error('step 3 is no write')
     expect(block.writes[0]).toMatchObject({ field: 'sendCmd.data', bytes: [1, 0x31, 1, 0x22] })
+  })
+})
+
+/** The adapter commands that the writes after the hold put into `cmd` or `sendCmd.cmd`. */
+function commandsAfterHold(plan: MacroStep[]): Set<number> {
+  const afterHold = plan.slice(plan.findIndex((step) => 'name' in step && step.name === 'hold') + 1)
+  const writes = afterHold.flatMap((step) => (step.kind === 'write' ? step.writes : []))
+  return new Set(
+    writes.flatMap((write) =>
+      write.kind === 'bytes' && (write.field === 'cmd' || write.field === 'sendCmd.cmd')
+        ? [write.bytes.reduceRight((value, byte) => value * 256 + byte, 0)]
+        : [],
+    ),
+  )
+}
+
+// Scene: the client never starts an action selection during a replay, so no trainer's hint line
+// shows (CheckTrainerHintMsg in pokebw2's btl_client.c); after the hold it gets server commands only.
+describe('momentSteps after the hold', () => {
+  it('writes no action-selection command, only the server command', () => {
+    const commands = commandsAfterHold(steps)
+    expect(commands).not.toContain(SELECT_ACTION)
+    expect([...commands]).toEqual([ADAPTER_NUMBERS.serverCmd])
   })
 })
