@@ -16,6 +16,9 @@ export const ITEM_TEMPLATES = {
   knockedOff: tagged('STRINGID_PKMNKNOCKEDOFF', (user: Mon, target: Mon, item: string) => {
     return `${nameAtStart(user)} knocked off ${nameInside(target)}'s ${item}!`
   }),
+  actsFaster: tagged('STRINGID_CANACTFASTERTHANKSTO', (who: Mon, item: string) => {
+    return `${nameAtStart(who)} can act faster than normal, thanks to its ${item}!`
+  }),
   whiteHerb: tagged('STRINGID_PKMNSITEMRESTOREDSTATUS', (who: Mon, item: string) => {
     return `${nameAtStart(who)} returned its stats to normal using its ${item}!`
   }),
@@ -60,6 +63,11 @@ export function itemRemoved(
   }
   return ownPhrase(`${ownerAtStart(who)} ${name} was used up!`, `${item} used up`)
 }
+
+/** The berry `who` ate let it move first in its priority (Custap Berry). */
+export const actedFaster = (who: Mon, item: string): Phrase => ({
+  text: ITEM_TEMPLATES.actsFaster.render(who, itemName(item)),
+})
 
 /**
  * Lowered stages back to 0: by the item `who` used up just before (White Herb), or else in a line

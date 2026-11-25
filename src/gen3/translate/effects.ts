@@ -31,7 +31,7 @@ import { type Context, type EventOf, type PrintText, sameMon } from './context'
 import { HIT_TURN, isFutureMove } from './anim-turn'
 import { hit, hitLines } from './hits'
 import { bar, drain, isSubstituteCost } from './hp'
-import { eatenForConfusion, endsConfusion } from './items'
+import { berryConsumed, eatenForConfusion, endsConfusion } from './items'
 import { playMove } from './moves'
 
 const VOLATILES: Partial<Readonly<Record<string, Volatile>>> = { substitute: 'substitute' }
@@ -136,9 +136,13 @@ function substituteBreaks(event: EventOf<'effectEnd'>, ctx: Context): void {
   hitLines(event, ctx)
 }
 
-/** A substitute that takes a hit (`[damage]`) plays the hit first; any other effect is a line. */
+/**
+ * A substitute that takes a hit (`[damage]`) plays the hit first; a berry eaten as it acts says its
+ * own line; any other effect is a line.
+ */
 export function effectActivate(event: EventOf<'effectActivate'>, ctx: Context): void {
   const { who, effect, line } = event
+  if (berryConsumed(event, ctx)) return
   if (toID(effect.name) === PURSUIT && who !== undefined) {
     ctx.print(line, withdrawn(ctx.mon(who), ctx.player(who.side).text))
     return

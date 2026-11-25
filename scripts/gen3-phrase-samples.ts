@@ -139,4 +139,5 @@ export const SAMPLES: Readonly<Record<string, Sample>> = {
     fill: { B_ATK_NAME_WITH_PREFIX: 'Dugtrio', B_LAST_ITEM: nb('Choice Band') },
   },
   'items.whiteHerb': withValue('B_LAST_ITEM', nb('White Herb'), FAR),
+  'items.actsFaster': withValue('B_BUFF1', nb('Custap Berry'), FAR),
 }
