@@ -15,6 +15,10 @@
     "format": "[Gen 3] Random Battle",
     "players": ["NewbiePlsForgiveMe", "joltylocks"]
   },
+  "gen4ou-2719079523": {
+    "format": "[Gen 4] OU",
+    "players": ["beanstockg", "Model Magneton"]
+  },
   "smogtours-gen1ou-995161": {
     "format": "[Gen 1] OU",
     "players": ["DADDY TAUROS", "koalacancee"]
@@ -42,5 +46,9 @@
   "smogtours-gen3ou-994176": {
     "format": "[Gen 3] OU",
     "players": ["Mindnight", "KeshBa45"]
+  },
+  "smogtours-gen4ou-690421": {
+    "format": "[Gen 4] OU",
+    "players": ["UnMecQuiS'enBranle", "Malekith"]
   }
 }

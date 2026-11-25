@@ -1,0 +1,674 @@
+{"length":11233,"crc32":"abd3a5e5","trainers":{"near":{"name":"UnMecQuiS'enBranle","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Malekith","trainerPic":138,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":260,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Malekith"},{"species":94,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gengar"},{"species":82,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"ForteDosReis"},{"species":227,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skarmory"},{"species":380,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Latias"},{"species":212,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Scizor"}],"far":[{"species":482,"maxHp":100,"level":100,"gender":"none","shiny":true,"nickname":"Azelf"},{"species":385,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Jirachi"},{"species":130,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gyarados"},{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"},{"species":149,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Dragonite"},{"species":232,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Donphan"}]}}
+{"line":19,"op":"intro"}
+{"line":19,"op":"print","text":"You are challenged by Malekith!"}
+{"line":21,"op":"print","text":"Malekith sent out Azelf!"}
+{"line":21,"op":"sendOut","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":20,"op":"print","text":"Go! Malekith!"}
+{"line":20,"op":"sendOut","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":22,"op":"turn","number":1}
+{"line":27,"op":"print","text":"The opposing Azelf used Taunt!"}
+{"line":27,"op":"move","user":"far","target":"near","move":269,"animTurn":0}
+{"line":28,"op":"print","text":"Malekith fell for the taunt!"}
+{"line":29,"op":"print","text":"Malekith used Waterfall!"}
+{"line":29,"op":"move","user":"near","target":"far","move":127,"animTurn":0}
+{"line":30,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":30,"op":"hp","side":"far","hp":54}
+{"line":33,"op":"turn","number":2}
+{"line":37,"op":"print","text":"Malekith, come back!"}
+{"line":37,"op":"withdraw","side":"near"}
+{"line":37,"op":"print","text":"Go! Gengar!"}
+{"line":37,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":38,"op":"print","text":"The opposing Azelf used Stealth Rock!"}
+{"line":38,"op":"move","user":"far","target":"near","move":446,"animTurn":0}
+{"line":39,"op":"print","text":"Pointed stones float in the air on your side!"}
+{"line":42,"op":"turn","number":3}
+{"line":46,"op":"print","text":"Malekith withdrew Azelf!"}
+{"line":46,"op":"withdraw","side":"far"}
+{"line":46,"op":"print","text":"Malekith sent out Jirachi!"}
+{"line":46,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":47,"op":"print","text":"Gengar used Shadow Ball!"}
+{"line":47,"op":"move","user":"near","target":"far","move":247,"animTurn":0}
+{"line":48,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":48,"op":"hp","side":"far","hp":61}
+{"line":49,"op":"stat","side":"far","stat":"spd","stages":-1,"arrows":"one"}
+{"line":49,"op":"print","text":"The opposing Jirachi's Sp. Def fell!"}
+{"line":52,"op":"turn","number":4}
+{"line":59,"op":"print","text":"Gengar, come back!"}
+{"line":59,"op":"withdraw","side":"near"}
+{"line":59,"op":"print","text":"Go! ForteDosReisMagos!"}
+{"line":59,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":60,"op":"hp","side":"near","hp":94}
+{"line":60,"op":"print","text":"Pointed stones dug into ForteDosReisMagos!"}
+{"line":61,"op":"print","text":"The opposing Jirachi used Thunder Wave!"}
+{"line":61,"op":"move","user":"far","target":"near","move":86,"animTurn":0}
+{"line":62,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":62,"op":"print","text":"ForteDosReisMagos is paralyzed, so it may be unable to move!"}
+{"line":62,"op":"status","side":"near","slot":2,"status":"par"}
+{"line":65,"op":"turn","number":5}
+{"line":70,"op":"print","text":"ForteDosReisMagos, come back!"}
+{"line":70,"op":"withdraw","side":"near"}
+{"line":70,"op":"print","text":"Go! Malekith!"}
+{"line":70,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":71,"op":"hp","side":"near","hp":94}
+{"line":71,"op":"print","text":"Pointed stones dug into Malekith!"}
+{"line":72,"op":"print","text":"The opposing Jirachi used Iron Head!"}
+{"line":72,"op":"move","user":"far","target":"near","move":442,"animTurn":0}
+{"line":74,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":74,"op":"hp","side":"near","hp":78}
+{"line":74,"op":"print","text":"It's not very effective…"}
+{"line":76,"op":"itemPopUp","side":"near","item":472}
+{"line":76,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":76,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":76,"op":"hp","side":"near","hp":84}
+{"line":78,"op":"turn","number":6}
+{"line":82,"op":"print","text":"Malekith withdrew Jirachi!"}
+{"line":82,"op":"withdraw","side":"far"}
+{"line":82,"op":"print","text":"Malekith sent out Gyarados!"}
+{"line":82,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":83,"op":"ability","side":"far","ability":22,"show":true}
+{"line":84,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"one"}
+{"line":84,"op":"print","text":"Malekith's Attack fell!"}
+{"line":83,"op":"ability","side":"far","ability":22,"show":false}
+{"line":85,"op":"print","text":"Malekith used Stealth Rock!"}
+{"line":85,"op":"move","user":"near","target":"far","move":446,"animTurn":0}
+{"line":86,"op":"print","text":"Pointed stones float in the air on the opposing side!"}
+{"line":88,"op":"itemPopUp","side":"near","item":472}
+{"line":88,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":88,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":88,"op":"hp","side":"near","hp":91}
+{"line":90,"op":"turn","number":7}
+{"line":93,"op":"print","text":"Malekith, come back!"}
+{"line":93,"op":"withdraw","side":"near"}
+{"line":93,"op":"print","text":"Go! Skarmory!"}
+{"line":93,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":94,"op":"hp","side":"near","hp":88}
+{"line":94,"op":"print","text":"Pointed stones dug into Skarmory!"}
+{"line":95,"op":"print","text":"The opposing Gyarados used Waterfall!"}
+{"line":95,"op":"move","user":"far","target":"near","move":127,"animTurn":0}
+{"line":96,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":96,"op":"hp","side":"near","hp":56}
+{"line":98,"op":"itemPopUp","side":"near","item":472}
+{"line":98,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":98,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":98,"op":"hp","side":"near","hp":62}
+{"line":100,"op":"turn","number":8}
+{"line":103,"op":"print","text":"The opposing Gyarados used Thunder Wave!"}
+{"line":103,"op":"move","user":"far","target":"near","move":86,"animTurn":0}
+{"line":104,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":104,"op":"print","text":"Skarmory is paralyzed, so it may be unable to move!"}
+{"line":104,"op":"status","side":"near","slot":3,"status":"par"}
+{"line":105,"op":"print","text":"Skarmory used Roost!"}
+{"line":105,"op":"move","user":"near","target":"near","move":355,"animTurn":0}
+{"line":106,"op":"hp","side":"near","hp":100}
+{"line":106,"op":"print","text":"Skarmory's HP was restored."}
+{"line":110,"op":"turn","number":9}
+{"line":115,"op":"print","text":"Malekith withdrew Gyarados!"}
+{"line":115,"op":"withdraw","side":"far"}
+{"line":115,"op":"print","text":"Malekith sent out Tyranitar!"}
+{"line":115,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":116,"op":"hp","side":"far","hp":88}
+{"line":116,"op":"print","text":"Pointed stones dug into the opposing Tyranitar!"}
+{"line":117,"op":"ability","side":"far","ability":45,"show":true}
+{"line":117,"op":"weather","weather":"sand"}
+{"line":117,"op":"print","text":"A sandstorm kicked up!"}
+{"line":117,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":117,"op":"ability","side":"far","ability":45,"show":false}
+{"line":118,"op":"print","text":"Skarmory used Whirlwind!"}
+{"line":118,"op":"move","user":"near","target":"far","move":18,"animTurn":0}
+{"line":119,"op":"withdraw","side":"far"}
+{"line":119,"op":"switchIn","side":"far","slot":0,"hp":54,"status":"none"}
+{"line":119,"op":"print","text":"The opposing Azelf was dragged out!"}
+{"line":120,"op":"hp","side":"far","hp":42}
+{"line":120,"op":"print","text":"Pointed stones dug into the opposing Azelf!"}
+{"line":121,"op":"itemPopUp","side":"far","item":523}
+{"line":121,"op":"anim","side":"far","anim":"heldItemBerry"}
+{"line":121,"op":"item","side":"far","slot":0,"item":0}
+{"line":122,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":122,"op":"hp","side":"far","hp":67}
+{"line":124,"op":"print","text":"The sandstorm is raging."}
+{"line":124,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":125,"op":"print","text":"The opposing Azelf is buffeted by the sandstorm!"}
+{"line":125,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":125,"op":"hp","side":"far","hp":61}
+{"line":127,"op":"turn","number":10}
+{"line":131,"op":"print","text":"Skarmory, come back!"}
+{"line":131,"op":"withdraw","side":"near"}
+{"line":131,"op":"print","text":"Go! Gengar!"}
+{"line":131,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":132,"op":"hp","side":"near","hp":88}
+{"line":132,"op":"print","text":"Pointed stones dug into Gengar!"}
+{"line":133,"op":"print","text":"The opposing Azelf used Thunder Wave!"}
+{"line":133,"op":"move","user":"far","target":"near","move":86,"animTurn":0}
+{"line":134,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":134,"op":"print","text":"Gengar is paralyzed, so it may be unable to move!"}
+{"line":134,"op":"status","side":"near","slot":1,"status":"par"}
+{"line":135,"op":"itemPopUp","side":"near","item":522}
+{"line":135,"op":"anim","side":"near","anim":"heldItemBerry"}
+{"line":135,"op":"item","side":"near","slot":1,"item":0}
+{"line":136,"op":"print","text":"Gengar's Lum Berry cured its paralysis!"}
+{"line":136,"op":"status","side":"near","slot":1,"status":"none"}
+{"line":138,"op":"print","text":"The sandstorm is raging."}
+{"line":138,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":139,"op":"print","text":"Gengar is buffeted by the sandstorm!"}
+{"line":139,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":139,"op":"hp","side":"near","hp":82}
+{"line":140,"op":"print","text":"The opposing Azelf is buffeted by the sandstorm!"}
+{"line":140,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":140,"op":"hp","side":"far","hp":55}
+{"line":142,"op":"turn","number":11}
+{"line":146,"op":"print","text":"Gengar used Shadow Ball!"}
+{"line":146,"op":"move","user":"near","target":"far","move":247,"animTurn":0}
+{"line":148,"op":"hit","side":"far","effectiveness":"super"}
+{"line":148,"op":"hp","side":"far","hp":0}
+{"line":148,"op":"print","text":"It's super effective!"}
+{"line":149,"op":"faint","side":"far"}
+{"line":149,"op":"print","text":"The opposing Azelf fainted!"}
+{"line":151,"op":"print","text":"The sandstorm is raging."}
+{"line":151,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":152,"op":"print","text":"Gengar is buffeted by the sandstorm!"}
+{"line":152,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":152,"op":"hp","side":"near","hp":76}
+{"line":156,"op":"print","text":"Malekith sent out Gyarados!"}
+{"line":156,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":157,"op":"hp","side":"far","hp":75}
+{"line":157,"op":"print","text":"Pointed stones dug into the opposing Gyarados!"}
+{"line":158,"op":"ability","side":"far","ability":22,"show":true}
+{"line":159,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"one"}
+{"line":159,"op":"print","text":"Gengar's Attack fell!"}
+{"line":158,"op":"ability","side":"far","ability":22,"show":false}
+{"line":160,"op":"turn","number":12}
+{"line":164,"op":"print","text":"Gengar used Will-O-Wisp!"}
+{"line":164,"op":"move","user":"near","target":"far","move":261,"animTurn":0}
+{"line":165,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":165,"op":"print","text":"The opposing Gyarados was burned!"}
+{"line":165,"op":"status","side":"far","slot":2,"status":"brn"}
+{"line":166,"op":"print","text":"The opposing Gyarados used Waterfall!"}
+{"line":166,"op":"move","user":"far","target":"near","move":127,"animTurn":0}
+{"line":167,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":167,"op":"hp","side":"near","hp":38}
+{"line":169,"op":"print","text":"The sandstorm is raging."}
+{"line":169,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":170,"op":"print","text":"Gengar is buffeted by the sandstorm!"}
+{"line":170,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":170,"op":"hp","side":"near","hp":32}
+{"line":171,"op":"print","text":"The opposing Gyarados is buffeted by the sandstorm!"}
+{"line":171,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":171,"op":"hp","side":"far","hp":69}
+{"line":172,"op":"itemPopUp","side":"far","item":472}
+{"line":172,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":172,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":172,"op":"hp","side":"far","hp":75}
+{"line":173,"op":"print","text":"The opposing Gyarados was hurt by its burn!"}
+{"line":173,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":173,"op":"hp","side":"far","hp":63}
+{"line":175,"op":"turn","number":13}
+{"line":178,"op":"print","text":"Gengar, come back!"}
+{"line":178,"op":"withdraw","side":"near"}
+{"line":178,"op":"print","text":"Go! Skarmory!"}
+{"line":178,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"par"}
+{"line":179,"op":"hp","side":"near","hp":88}
+{"line":179,"op":"print","text":"Pointed stones dug into Skarmory!"}
+{"line":180,"op":"print","text":"The opposing Gyarados used Waterfall!"}
+{"line":180,"op":"move","user":"far","target":"near","move":127,"animTurn":0}
+{"line":181,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":181,"op":"hp","side":"near","hp":71}
+{"line":183,"op":"print","text":"The sandstorm is raging."}
+{"line":183,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":184,"op":"print","text":"The opposing Gyarados is buffeted by the sandstorm!"}
+{"line":184,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":184,"op":"hp","side":"far","hp":57}
+{"line":185,"op":"itemPopUp","side":"far","item":472}
+{"line":185,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":185,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":185,"op":"hp","side":"far","hp":63}
+{"line":186,"op":"print","text":"The opposing Gyarados was hurt by its burn!"}
+{"line":186,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":186,"op":"hp","side":"far","hp":50}
+{"line":187,"op":"itemPopUp","side":"near","item":472}
+{"line":187,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":187,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":187,"op":"hp","side":"near","hp":77}
+{"line":189,"op":"turn","number":14}
+{"line":192,"op":"print","text":"Malekith withdrew Gyarados!"}
+{"line":192,"op":"withdraw","side":"far"}
+{"line":192,"op":"print","text":"Malekith sent out Tyranitar!"}
+{"line":192,"op":"switchIn","side":"far","slot":3,"hp":88,"status":"none"}
+{"line":193,"op":"hp","side":"far","hp":75}
+{"line":193,"op":"print","text":"Pointed stones dug into the opposing Tyranitar!"}
+{"line":194,"op":"print","text":"Skarmory used Spikes!"}
+{"line":194,"op":"move","user":"near","target":"far","move":191,"animTurn":0}
+{"line":195,"op":"print","text":"Spikes were scattered on the ground all around the opposing side!"}
+{"line":197,"op":"print","text":"The sandstorm is raging."}
+{"line":197,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":198,"op":"itemPopUp","side":"near","item":472}
+{"line":198,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":198,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":198,"op":"hp","side":"near","hp":83}
+{"line":200,"op":"turn","number":15}
+{"line":203,"op":"print","text":"Skarmory, come back!"}
+{"line":203,"op":"withdraw","side":"near"}
+{"line":203,"op":"print","text":"Go! Malekith!"}
+{"line":203,"op":"switchIn","side":"near","slot":0,"hp":91,"status":"none"}
+{"line":204,"op":"hp","side":"near","hp":84}
+{"line":204,"op":"print","text":"Pointed stones dug into Malekith!"}
+{"line":205,"op":"print","text":"The opposing Tyranitar used Dragon Dance!"}
+{"line":205,"op":"move","user":"far","target":"far","move":349,"animTurn":0}
+{"line":206,"op":"stat","side":"far","stat":"atk","stages":1,"arrows":"several"}
+{"line":206,"op":"print","text":"The opposing Tyranitar's Attack rose!"}
+{"line":207,"op":"stat","side":"far","stat":"spe","stages":1,"arrows":"none"}
+{"line":207,"op":"print","text":"The opposing Tyranitar's Speed rose!"}
+{"line":209,"op":"print","text":"The sandstorm is raging."}
+{"line":209,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":210,"op":"itemPopUp","side":"near","item":472}
+{"line":210,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":210,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":210,"op":"hp","side":"near","hp":91}
+{"line":212,"op":"turn","number":16}
+{"line":220,"op":"print","text":"The opposing Tyranitar used Natural Gift!"}
+{"line":220,"op":"move","user":"far","target":"near","move":363,"animTurn":0}
+{"line":222,"op":"hit","side":"near","effectiveness":"super"}
+{"line":222,"op":"hp","side":"near","hp":0}
+{"line":222,"op":"print","text":"It's super effective!"}
+{"line":223,"op":"faint","side":"near"}
+{"line":223,"op":"print","text":"Malekith fainted!"}
+{"line":225,"op":"print","text":"The sandstorm is raging."}
+{"line":225,"op":"anim","side":"far","anim":"sandstormContinues"}
+{"line":232,"op":"print","text":"Go! Skarmory!"}
+{"line":232,"op":"switchIn","side":"near","slot":3,"hp":83,"status":"par"}
+{"line":233,"op":"hp","side":"near","hp":71}
+{"line":233,"op":"print","text":"Pointed stones dug into Skarmory!"}
+{"line":234,"op":"turn","number":17}
+{"line":237,"op":"print","text":"The opposing Tyranitar used Fire Punch!"}
+{"line":237,"op":"move","user":"far","target":"near","move":7,"animTurn":0}
+{"line":239,"op":"hit","side":"near","effectiveness":"super"}
+{"line":239,"op":"hp","side":"near","hp":7}
+{"line":239,"op":"print","text":"It's super effective!"}
+{"line":240,"op":"print","text":"Skarmory used Whirlwind!"}
+{"line":240,"op":"move","user":"near","target":"far","move":18,"animTurn":0}
+{"line":241,"op":"withdraw","side":"far"}
+{"line":241,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":241,"op":"print","text":"The opposing Dragonite was dragged out!"}
+{"line":242,"op":"hp","side":"far","hp":75}
+{"line":242,"op":"print","text":"Pointed stones dug into the opposing Dragonite!"}
+{"line":244,"op":"print","text":"The sandstorm is raging."}
+{"line":244,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":245,"op":"print","text":"The opposing Dragonite is buffeted by the sandstorm!"}
+{"line":245,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":245,"op":"hp","side":"far","hp":69}
+{"line":246,"op":"itemPopUp","side":"near","item":472}
+{"line":246,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":246,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":246,"op":"hp","side":"near","hp":13}
+{"line":248,"op":"turn","number":18}
+{"line":252,"op":"print","text":"The opposing Dragonite used Fire Punch!"}
+{"line":252,"op":"move","user":"far","target":"near","move":7,"animTurn":0}
+{"line":254,"op":"hit","side":"near","effectiveness":"super"}
+{"line":254,"op":"hp","side":"near","hp":0}
+{"line":254,"op":"print","text":"It's super effective!"}
+{"line":255,"op":"faint","side":"near"}
+{"line":255,"op":"print","text":"Skarmory fainted!"}
+{"line":257,"op":"print","text":"The sandstorm is raging."}
+{"line":257,"op":"anim","side":"far","anim":"sandstormContinues"}
+{"line":258,"op":"print","text":"The opposing Dragonite is buffeted by the sandstorm!"}
+{"line":258,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":258,"op":"hp","side":"far","hp":63}
+{"line":263,"op":"print","text":"Go! Latias!"}
+{"line":263,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":264,"op":"hp","side":"near","hp":88}
+{"line":264,"op":"print","text":"Pointed stones dug into Latias!"}
+{"line":265,"op":"turn","number":19}
+{"line":269,"op":"print","text":"Malekith withdrew Dragonite!"}
+{"line":269,"op":"withdraw","side":"far"}
+{"line":269,"op":"print","text":"Malekith sent out Gyarados!"}
+{"line":269,"op":"switchIn","side":"far","slot":2,"hp":50,"status":"brn"}
+{"line":270,"op":"hp","side":"far","hp":26}
+{"line":270,"op":"print","text":"Pointed stones dug into the opposing Gyarados!"}
+{"line":271,"op":"ability","side":"far","ability":22,"show":true}
+{"line":272,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"one"}
+{"line":272,"op":"print","text":"Latias's Attack fell!"}
+{"line":271,"op":"ability","side":"far","ability":22,"show":false}
+{"line":273,"op":"print","text":"Latias used Dragon Pulse!"}
+{"line":273,"op":"move","user":"near","target":"far","move":406,"animTurn":0}
+{"line":274,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":274,"op":"hp","side":"far","hp":0}
+{"line":275,"op":"faint","side":"far"}
+{"line":275,"op":"print","text":"The opposing Gyarados fainted!"}
+{"line":277,"op":"print","text":"The sandstorm is raging."}
+{"line":277,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":278,"op":"print","text":"Latias is buffeted by the sandstorm!"}
+{"line":278,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":278,"op":"hp","side":"near","hp":82}
+{"line":279,"op":"itemPopUp","side":"near","item":472}
+{"line":279,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":279,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":279,"op":"hp","side":"near","hp":88}
+{"line":283,"op":"print","text":"Malekith sent out Donphan!"}
+{"line":283,"op":"switchIn","side":"far","slot":5,"hp":100,"status":"none"}
+{"line":284,"op":"hp","side":"far","hp":94}
+{"line":284,"op":"print","text":"Pointed stones dug into the opposing Donphan!"}
+{"line":285,"op":"hp","side":"far","hp":81}
+{"line":285,"op":"print","text":"The opposing Donphan was hurt by the spikes!"}
+{"line":286,"op":"turn","number":20}
+{"line":290,"op":"print","text":"Latias used Calm Mind!"}
+{"line":290,"op":"move","user":"near","target":"near","move":347,"animTurn":0}
+{"line":291,"op":"stat","side":"near","stat":"spa","stages":1,"arrows":"several"}
+{"line":291,"op":"print","text":"Latias's Sp. Atk rose!"}
+{"line":292,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
+{"line":292,"op":"print","text":"Latias's Sp. Def rose!"}
+{"line":293,"op":"print","text":"The opposing Donphan used Rapid Spin!"}
+{"line":293,"op":"move","user":"far","target":"near","move":229,"animTurn":0}
+{"line":294,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":294,"op":"hp","side":"near","hp":80}
+{"line":295,"op":"print","text":"The opposing Donphan blew away Spikes!"}
+{"line":296,"op":"print","text":"The opposing Donphan blew away Stealth Rock!"}
+{"line":298,"op":"print","text":"The sandstorm is raging."}
+{"line":298,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":299,"op":"print","text":"Latias is buffeted by the sandstorm!"}
+{"line":299,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":299,"op":"hp","side":"near","hp":74}
+{"line":300,"op":"itemPopUp","side":"near","item":472}
+{"line":300,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":300,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":300,"op":"hp","side":"near","hp":80}
+{"line":302,"op":"turn","number":21}
+{"line":307,"op":"print","text":"Latias used Dragon Pulse!"}
+{"line":307,"op":"move","user":"near","target":"far","move":406,"animTurn":0}
+{"line":308,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":308,"op":"hp","side":"far","hp":9}
+{"line":309,"op":"print","text":"The opposing Donphan used Knock Off!"}
+{"line":309,"op":"move","user":"far","target":"near","move":282,"animTurn":0}
+{"line":311,"op":"hit","side":"near","effectiveness":"super"}
+{"line":311,"op":"hp","side":"near","hp":65}
+{"line":311,"op":"print","text":"It's super effective!"}
+{"line":312,"op":"print","text":"The opposing Donphan knocked off Latias's Leftovers!"}
+{"line":312,"op":"item","side":"near","slot":4,"item":0}
+{"line":315,"op":"print","text":"The sandstorm is raging."}
+{"line":315,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":316,"op":"print","text":"Latias is buffeted by the sandstorm!"}
+{"line":316,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":316,"op":"hp","side":"near","hp":59}
+{"line":318,"op":"turn","number":22}
+{"line":325,"op":"print","text":"The opposing Donphan used Ice Shard!"}
+{"line":325,"op":"move","user":"far","target":"near","move":420,"animTurn":0}
+{"line":327,"op":"hit","side":"near","effectiveness":"super"}
+{"line":327,"op":"hp","side":"near","hp":29}
+{"line":327,"op":"print","text":"It's super effective!"}
+{"line":328,"op":"print","text":"Latias used Recover!"}
+{"line":328,"op":"move","user":"near","target":"near","move":105,"animTurn":0}
+{"line":329,"op":"hp","side":"near","hp":79}
+{"line":329,"op":"print","text":"Latias's HP was restored."}
+{"line":331,"op":"print","text":"The sandstorm is raging."}
+{"line":331,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":332,"op":"print","text":"Latias is buffeted by the sandstorm!"}
+{"line":332,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":332,"op":"hp","side":"near","hp":73}
+{"line":334,"op":"turn","number":23}
+{"line":341,"op":"print","text":"Malekith withdrew Donphan!"}
+{"line":341,"op":"withdraw","side":"far"}
+{"line":341,"op":"print","text":"Malekith sent out Jirachi!"}
+{"line":341,"op":"switchIn","side":"far","slot":1,"hp":61,"status":"none"}
+{"line":342,"op":"print","text":"Latias used Calm Mind!"}
+{"line":342,"op":"move","user":"near","target":"near","move":347,"animTurn":0}
+{"line":343,"op":"stat","side":"near","stat":"spa","stages":1,"arrows":"several"}
+{"line":343,"op":"print","text":"Latias's Sp. Atk rose!"}
+{"line":344,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
+{"line":344,"op":"print","text":"Latias's Sp. Def rose!"}
+{"line":346,"op":"print","text":"The sandstorm is raging."}
+{"line":346,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":347,"op":"print","text":"Latias is buffeted by the sandstorm!"}
+{"line":347,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":347,"op":"hp","side":"near","hp":66}
+{"line":349,"op":"turn","number":24}
+{"line":353,"op":"print","text":"Latias used Safeguard!"}
+{"line":353,"op":"move","user":"near","target":"near","move":219,"animTurn":0}
+{"line":354,"op":"print","text":"Your side became cloaked in a mystical veil!"}
+{"line":355,"op":"print","text":"The opposing Jirachi used Thunder Wave!"}
+{"line":356,"op":"print","text":"Latias is protected by Safeguard!"}
+{"line":358,"op":"print","text":"The sandstorm is raging."}
+{"line":358,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":359,"op":"print","text":"Latias is buffeted by the sandstorm!"}
+{"line":359,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":359,"op":"hp","side":"near","hp":60}
+{"line":361,"op":"turn","number":25}
+{"line":366,"op":"print","text":"Latias used Dragon Pulse!"}
+{"line":366,"op":"move","user":"near","target":"far","move":406,"animTurn":0}
+{"line":368,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":368,"op":"hp","side":"far","hp":31}
+{"line":368,"op":"print","text":"It's not very effective…"}
+{"line":369,"op":"print","text":"The opposing Jirachi used Ice Punch!"}
+{"line":369,"op":"move","user":"far","target":"near","move":8,"animTurn":0}
+{"line":371,"op":"hit","side":"near","effectiveness":"super"}
+{"line":371,"op":"hp","side":"near","hp":19}
+{"line":371,"op":"print","text":"It's super effective!"}
+{"line":373,"op":"print","text":"The sandstorm is raging."}
+{"line":373,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":374,"op":"print","text":"Latias is buffeted by the sandstorm!"}
+{"line":374,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":374,"op":"hp","side":"near","hp":13}
+{"line":376,"op":"turn","number":26}
+{"line":380,"op":"print","text":"Latias used Dragon Pulse!"}
+{"line":380,"op":"move","user":"near","target":"far","move":406,"animTurn":0}
+{"line":382,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":382,"op":"hp","side":"far","hp":1}
+{"line":382,"op":"print","text":"It's not very effective…"}
+{"line":383,"op":"print","text":"The opposing Jirachi used Ice Punch!"}
+{"line":383,"op":"move","user":"far","target":"near","move":8,"animTurn":0}
+{"line":385,"op":"hit","side":"near","effectiveness":"super"}
+{"line":385,"op":"hp","side":"near","hp":0}
+{"line":385,"op":"print","text":"It's super effective!"}
+{"line":386,"op":"faint","side":"near"}
+{"line":386,"op":"print","text":"Latias fainted!"}
+{"line":388,"op":"print","text":"The sandstorm is raging."}
+{"line":388,"op":"anim","side":"far","anim":"sandstormContinues"}
+{"line":395,"op":"print","text":"Go! ForteDosReisMagos!"}
+{"line":395,"op":"switchIn","side":"near","slot":2,"hp":94,"status":"par"}
+{"line":396,"op":"hp","side":"near","hp":88}
+{"line":396,"op":"print","text":"Pointed stones dug into ForteDosReisMagos!"}
+{"line":397,"op":"turn","number":27}
+{"line":402,"op":"print","text":"The opposing Jirachi used Iron Head!"}
+{"line":402,"op":"move","user":"far","target":"near","move":442,"animTurn":0}
+{"line":404,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":404,"op":"hp","side":"near","hp":75}
+{"line":404,"op":"print","text":"It's not very effective…"}
+{"line":405,"op":"print","text":"ForteDosReisMagos used Thunder Wave!"}
+{"line":405,"op":"move","user":"near","target":"far","move":86,"animTurn":0}
+{"line":406,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":406,"op":"print","text":"The opposing Jirachi is paralyzed, so it may be unable to move!"}
+{"line":406,"op":"status","side":"far","slot":1,"status":"par"}
+{"line":407,"op":"itemPopUp","side":"far","item":522}
+{"line":407,"op":"anim","side":"far","anim":"heldItemBerry"}
+{"line":407,"op":"item","side":"far","slot":1,"item":0}
+{"line":408,"op":"print","text":"The opposing Jirachi's Lum Berry cured its paralysis!"}
+{"line":408,"op":"status","side":"far","slot":1,"status":"none"}
+{"line":410,"op":"print","text":"The sandstorm is raging."}
+{"line":410,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":412,"op":"turn","number":28}
+{"line":416,"op":"print","text":"The opposing Jirachi used Iron Head!"}
+{"line":416,"op":"move","user":"far","target":"near","move":442,"animTurn":0}
+{"line":418,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":418,"op":"hp","side":"near","hp":61}
+{"line":418,"op":"print","text":"It's not very effective…"}
+{"line":419,"op":"print","text":"ForteDosReisMagos used Thunder Wave!"}
+{"line":419,"op":"move","user":"near","target":"far","move":86,"animTurn":0}
+{"line":420,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":420,"op":"print","text":"The opposing Jirachi is paralyzed, so it may be unable to move!"}
+{"line":420,"op":"status","side":"far","slot":1,"status":"par"}
+{"line":422,"op":"print","text":"Your side is no longer protected by the mystical veil!"}
+{"line":423,"op":"print","text":"The sandstorm is raging."}
+{"line":423,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":425,"op":"turn","number":29}
+{"line":428,"op":"print","text":"ForteDosReisMagos couldn't move because it's paralyzed!"}
+{"line":428,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":429,"op":"print","text":"The opposing Jirachi used Thunder Wave!"}
+{"line":430,"op":"print","text":"ForteDosReisMagos is already paralyzed!"}
+{"line":432,"op":"print","text":"The sandstorm is raging."}
+{"line":432,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":434,"op":"turn","number":30}
+{"line":437,"op":"print","text":"ForteDosReisMagos used Thunder Wave!"}
+{"line":438,"op":"print","text":"The opposing Jirachi is already paralyzed!"}
+{"line":439,"op":"print","text":"The opposing Jirachi used Iron Head!"}
+{"line":439,"op":"move","user":"far","target":"near","move":442,"animTurn":0}
+{"line":441,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":441,"op":"hp","side":"near","hp":49}
+{"line":441,"op":"print","text":"It's not very effective…"}
+{"line":443,"op":"print","text":"The sandstorm is raging."}
+{"line":443,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":445,"op":"turn","number":31}
+{"line":448,"op":"print","text":"ForteDosReisMagos couldn't move because it's paralyzed!"}
+{"line":448,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":449,"op":"print","text":"The opposing Jirachi couldn't move because it's paralyzed!"}
+{"line":449,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":451,"op":"print","text":"The sandstorm is raging."}
+{"line":451,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":453,"op":"turn","number":32}
+{"line":456,"op":"print","text":"ForteDosReisMagos used Thunder Wave!"}
+{"line":457,"op":"print","text":"The opposing Jirachi is already paralyzed!"}
+{"line":458,"op":"print","text":"The opposing Jirachi used Iron Head!"}
+{"line":458,"op":"move","user":"far","target":"near","move":442,"animTurn":0}
+{"line":460,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":460,"op":"hp","side":"near","hp":36}
+{"line":460,"op":"print","text":"It's not very effective…"}
+{"line":462,"op":"print","text":"The sandstorm is raging."}
+{"line":462,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":464,"op":"turn","number":33}
+{"line":467,"op":"print","text":"ForteDosReisMagos used Thunder Wave!"}
+{"line":468,"op":"print","text":"The opposing Jirachi is already paralyzed!"}
+{"line":469,"op":"print","text":"The opposing Jirachi used Iron Head!"}
+{"line":469,"op":"move","user":"far","target":"near","move":442,"animTurn":0}
+{"line":471,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":471,"op":"hp","side":"near","hp":23}
+{"line":471,"op":"print","text":"It's not very effective…"}
+{"line":473,"op":"print","text":"The sandstorm is raging."}
+{"line":473,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":475,"op":"turn","number":34}
+{"line":478,"op":"print","text":"ForteDosReisMagos used Thunder Wave!"}
+{"line":479,"op":"print","text":"The opposing Jirachi is already paralyzed!"}
+{"line":480,"op":"print","text":"The opposing Jirachi used Ice Punch!"}
+{"line":480,"op":"move","user":"far","target":"near","move":8,"animTurn":0}
+{"line":482,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":482,"op":"hp","side":"near","hp":6}
+{"line":482,"op":"print","text":"It's not very effective…"}
+{"line":484,"op":"print","text":"The sandstorm is raging."}
+{"line":484,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":486,"op":"turn","number":35}
+{"line":489,"op":"print","text":"ForteDosReisMagos used Thunder Wave!"}
+{"line":490,"op":"print","text":"The opposing Jirachi is already paralyzed!"}
+{"line":491,"op":"print","text":"The opposing Jirachi couldn't move because it's paralyzed!"}
+{"line":491,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":493,"op":"print","text":"The sandstorm is raging."}
+{"line":493,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":495,"op":"turn","number":36}
+{"line":498,"op":"print","text":"ForteDosReisMagos used Thunder Wave!"}
+{"line":499,"op":"print","text":"The opposing Jirachi is already paralyzed!"}
+{"line":500,"op":"print","text":"The opposing Jirachi couldn't move because it's paralyzed!"}
+{"line":500,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":502,"op":"print","text":"The sandstorm is raging."}
+{"line":502,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":504,"op":"turn","number":37}
+{"line":507,"op":"print","text":"ForteDosReisMagos couldn't move because it's paralyzed!"}
+{"line":507,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":508,"op":"print","text":"The opposing Jirachi used Ice Punch!"}
+{"line":508,"op":"move","user":"far","target":"near","move":8,"animTurn":0}
+{"line":510,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":510,"op":"hp","side":"near","hp":0}
+{"line":510,"op":"print","text":"It's not very effective…"}
+{"line":511,"op":"faint","side":"near"}
+{"line":511,"op":"print","text":"ForteDosReisMagos fainted!"}
+{"line":513,"op":"print","text":"The sandstorm is raging."}
+{"line":513,"op":"anim","side":"far","anim":"sandstormContinues"}
+{"line":517,"op":"print","text":"Go! Gengar!"}
+{"line":517,"op":"switchIn","side":"near","slot":1,"hp":32,"status":"none"}
+{"line":518,"op":"hp","side":"near","hp":20}
+{"line":518,"op":"print","text":"Pointed stones dug into Gengar!"}
+{"line":519,"op":"turn","number":38}
+{"line":523,"op":"print","text":"Gengar used Shadow Ball!"}
+{"line":523,"op":"move","user":"near","target":"far","move":247,"animTurn":0}
+{"line":525,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":525,"op":"hp","side":"far","hp":0}
+{"line":525,"op":"print","text":"A critical hit!"}
+{"line":526,"op":"faint","side":"far"}
+{"line":526,"op":"print","text":"The opposing Jirachi fainted!"}
+{"line":528,"op":"print","text":"The sandstorm is raging."}
+{"line":528,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":529,"op":"print","text":"Gengar is buffeted by the sandstorm!"}
+{"line":529,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":529,"op":"hp","side":"near","hp":14}
+{"line":534,"op":"print","text":"Malekith sent out Dragonite!"}
+{"line":534,"op":"switchIn","side":"far","slot":4,"hp":63,"status":"none"}
+{"line":535,"op":"turn","number":39}
+{"line":539,"op":"print","text":"Malekith withdrew Dragonite!"}
+{"line":539,"op":"withdraw","side":"far"}
+{"line":539,"op":"print","text":"Malekith sent out Donphan!"}
+{"line":539,"op":"switchIn","side":"far","slot":5,"hp":9,"status":"none"}
+{"line":540,"op":"print","text":"Gengar used Will-O-Wisp!"}
+{"line":540,"op":"move","user":"near","target":"far","move":261,"animTurn":0}
+{"line":541,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":541,"op":"print","text":"The opposing Donphan was burned!"}
+{"line":541,"op":"status","side":"far","slot":5,"status":"brn"}
+{"line":543,"op":"print","text":"The sandstorm is raging."}
+{"line":543,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":544,"op":"print","text":"Gengar is buffeted by the sandstorm!"}
+{"line":544,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":544,"op":"hp","side":"near","hp":8}
+{"line":545,"op":"print","text":"The opposing Donphan was hurt by its burn!"}
+{"line":545,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":545,"op":"hp","side":"far","hp":0}
+{"line":546,"op":"faint","side":"far"}
+{"line":546,"op":"print","text":"The opposing Donphan fainted!"}
+{"line":550,"op":"print","text":"Malekith sent out Dragonite!"}
+{"line":550,"op":"switchIn","side":"far","slot":4,"hp":63,"status":"none"}
+{"line":551,"op":"turn","number":40}
+{"line":555,"op":"print","text":"Gengar used Will-O-Wisp!"}
+{"line":555,"op":"move","user":"near","target":"far","move":261,"animTurn":0}
+{"line":556,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":556,"op":"print","text":"The opposing Dragonite was burned!"}
+{"line":556,"op":"status","side":"far","slot":4,"status":"brn"}
+{"line":557,"op":"itemPopUp","side":"far","item":522}
+{"line":557,"op":"anim","side":"far","anim":"heldItemBerry"}
+{"line":557,"op":"item","side":"far","slot":4,"item":0}
+{"line":558,"op":"print","text":"The opposing Dragonite's Lum Berry cured its burn!"}
+{"line":558,"op":"status","side":"far","slot":4,"status":"none"}
+{"line":559,"op":"print","text":"The opposing Dragonite used Dragon Dance!"}
+{"line":559,"op":"move","user":"far","target":"far","move":349,"animTurn":0}
+{"line":560,"op":"stat","side":"far","stat":"atk","stages":1,"arrows":"several"}
+{"line":560,"op":"print","text":"The opposing Dragonite's Attack rose!"}
+{"line":561,"op":"stat","side":"far","stat":"spe","stages":1,"arrows":"none"}
+{"line":561,"op":"print","text":"The opposing Dragonite's Speed rose!"}
+{"line":563,"op":"print","text":"The sandstorm is raging."}
+{"line":563,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":564,"op":"print","text":"The opposing Dragonite is buffeted by the sandstorm!"}
+{"line":564,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":564,"op":"hp","side":"far","hp":57}
+{"line":565,"op":"print","text":"Gengar is buffeted by the sandstorm!"}
+{"line":565,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":565,"op":"hp","side":"near","hp":2}
+{"line":567,"op":"turn","number":41}
+{"line":570,"op":"print","text":"The opposing Dragonite used Fire Punch!"}
+{"line":570,"op":"move","user":"far","target":"near","move":7,"animTurn":0}
+{"line":571,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":571,"op":"hp","side":"near","hp":0}
+{"line":572,"op":"faint","side":"near"}
+{"line":572,"op":"print","text":"Gengar fainted!"}
+{"line":574,"op":"print","text":"The sandstorm is raging."}
+{"line":574,"op":"anim","side":"far","anim":"sandstormContinues"}
+{"line":575,"op":"print","text":"The opposing Dragonite is buffeted by the sandstorm!"}
+{"line":575,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":575,"op":"hp","side":"far","hp":50}
+{"line":579,"op":"print","text":"Go! Scizor!"}
+{"line":579,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
+{"line":580,"op":"hp","side":"near","hp":88}
+{"line":580,"op":"print","text":"Pointed stones dug into Scizor!"}
+{"line":581,"op":"turn","number":42}
+{"line":584,"op":"print","text":"Scizor used Bullet Punch!"}
+{"line":584,"op":"move","user":"near","target":"far","move":418,"animTurn":0}
+{"line":585,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":585,"op":"hp","side":"far","hp":15}
+{"line":586,"op":"print","text":"The opposing Dragonite used Fire Punch!"}
+{"line":586,"op":"move","user":"far","target":"near","move":7,"animTurn":0}
+{"line":588,"op":"hit","side":"near","effectiveness":"super"}
+{"line":588,"op":"hp","side":"near","hp":0}
+{"line":588,"op":"print","text":"It's super effective!"}
+{"line":589,"op":"faint","side":"near"}
+{"line":589,"op":"print","text":"Scizor fainted!"}
+{"line":591,"op":"print","text":"Malekith won the battle!"}
+{"line":591,"op":"end","outcome":"farWon"}

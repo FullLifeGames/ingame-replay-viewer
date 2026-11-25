@@ -1,0 +1,268 @@
+{"gen":4,"format":"[Gen 4] OU","teams":{"near":[{"species":"Kangaskhan","name":"Kangaskhan","gender":"F","level":100,"shiny":false},{"species":"Skarmory","name":"Skarmory","gender":"M","level":100,"shiny":false},{"species":"Magnezone","name":"Magnezone","level":100,"shiny":false},{"species":"Rotom-Heat","name":"Rotom","level":100,"shiny":false},{"species":"Swampert","name":"Swampert","gender":"F","level":100,"shiny":false},{"species":"Aerodactyl","name":"Aerodactyl","gender":"M","level":100,"shiny":false}],"far":[{"species":"Latias","name":"Latias","gender":"F","level":100,"shiny":false},{"species":"Metagross","name":"Metagross","level":100,"shiny":false},{"species":"Flygon","name":"Flygon","gender":"M","level":100,"shiny":false},{"species":"Magnezone","name":"Magnezone","level":100,"shiny":false},{"species":"Gengar","name":"Gengar","gender":"F","level":100,"shiny":false},{"species":"Tyranitar","name":"Tyranitar","gender":"M","level":100,"shiny":false}]}}
+{"line":0,"text":"|j|☆beanstockg","reason":"chat"}
+{"line":1,"text":"|j|☆Model Magneton","reason":"chat"}
+{"line":2,"text":"|t:|1795578447","reason":"timestamp"}
+{"line":3,"text":"|gametype|singles","reason":"metadata"}
+{"kind":"player","line":4,"side":"near","name":"beanstockg","avatar":"red","rating":1256}
+{"kind":"player","line":5,"side":"far","name":"Model Magneton","avatar":"wattson-gen3","rating":1494}
+{"line":6,"text":"|gen|4","reason":"metadata"}
+{"line":7,"text":"|tier|[Gen 4] OU","reason":"metadata"}
+{"line":8,"text":"|rated|","reason":"metadata"}
+{"line":9,"text":"|rule|HP Percentage Mod: HP is shown in percentages","reason":"rule"}
+{"line":10,"text":"|rule|Beat Up Nicknames Mod: Beat Up will not reveal any party members","reason":"rule"}
+{"line":11,"text":"|rule|Endless Battle Clause: Forcing endless battles is banned","reason":"rule"}
+{"line":12,"text":"|rule|Species Clause: Limit one of each Pokemon","reason":"rule"}
+{"line":13,"text":"|rule|OHKO Clause: OHKO moves are banned","reason":"rule"}
+{"line":14,"text":"|rule|Evasion Items Clause: Evasion items are banned","reason":"rule"}
+{"line":15,"text":"|rule|Evasion Moves Clause: Evasion moves are banned","reason":"rule"}
+{"line":16,"text":"|rule|Evasion Abilities Clause: Evasion abilities are banned","reason":"rule"}
+{"line":17,"text":"|rule|Baton Pass Stat Trap Clause: No Baton Passer may have a way to boost stats or trap Pokemon","reason":"rule"}
+{"line":18,"text":"|rule|Freeze Clause Mod: Limit one foe frozen","reason":"rule"}
+{"line":19,"text":"|rule|Sleep Moves Clause: Sleep-inducing moves are banned","reason":"rule"}
+{"line":20,"text":"|","reason":"spacer"}
+{"line":21,"text":"|t:|1795578447","reason":"timestamp"}
+{"kind":"teamSize","line":22,"side":"near","size":6}
+{"kind":"teamSize","line":23,"side":"far","size":6}
+{"kind":"battleStart","line":24}
+{"kind":"switchIn","line":25,"who":{"side":"near","index":0},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"switchIn","line":26,"who":{"side":"far","index":0},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"turn","line":27,"number":1}
+{"line":28,"text":"|inactive|Battle timer is ON: inactive players will automatically lose when time's up. (requested by Model Magneton)","reason":"timer"}
+{"line":29,"text":"|c|☆Model Magneton|hf!","reason":"chat"}
+{"line":30,"text":"|","reason":"spacer"}
+{"line":31,"text":"|t:|1795578450","reason":"timestamp"}
+{"kind":"move","line":32,"user":{"side":"near","index":0},"move":"Fake Out","target":{"side":"far","index":0}}
+{"kind":"damage","line":34,"who":{"side":"far","index":0},"hp":{"hp":44,"max":100},"crit":true,"folded":[33]}
+{"kind":"cant","line":35,"who":{"side":"far","index":0},"reason":{"name":"flinch"}}
+{"line":36,"text":"|","reason":"spacer"}
+{"line":37,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":38,"number":2}
+{"line":39,"text":"|","reason":"spacer"}
+{"line":40,"text":"|t:|1795578452","reason":"timestamp"}
+{"kind":"move","line":41,"user":{"side":"near","index":0},"move":"Sucker Punch","target":{"side":"far","index":0}}
+{"kind":"damage","line":43,"who":{"side":"far","index":0},"hp":{"hp":0,"max":100},"effectiveness":"super","folded":[42]}
+{"kind":"faint","line":44,"who":{"side":"far","index":0}}
+{"line":45,"text":"|","reason":"spacer"}
+{"line":46,"text":"|upkeep","reason":"upkeep"}
+{"line":47,"text":"|","reason":"spacer"}
+{"line":48,"text":"|t:|1795578453","reason":"timestamp"}
+{"kind":"switchIn","line":49,"who":{"side":"far","index":1},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"turn","line":50,"number":3}
+{"line":51,"text":"|","reason":"spacer"}
+{"line":52,"text":"|t:|1795578459","reason":"timestamp"}
+{"kind":"move","line":53,"user":{"side":"near","index":0},"move":"Earthquake","target":{"side":"far","index":1}}
+{"kind":"damage","line":55,"who":{"side":"far","index":1},"hp":{"hp":57,"max":100},"effectiveness":"super","folded":[54]}
+{"kind":"move","line":56,"user":{"side":"far","index":1},"move":"Stealth Rock","target":{"side":"near","index":0}}
+{"kind":"sideStart","line":57,"side":"near","condition":{"name":"Stealth Rock","kind":"move"}}
+{"line":58,"text":"|","reason":"spacer"}
+{"kind":"heal","line":59,"who":{"side":"far","index":1},"hp":{"hp":63,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":60,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":61,"number":4}
+{"line":62,"text":"|","reason":"spacer"}
+{"line":63,"text":"|t:|1795578464","reason":"timestamp"}
+{"kind":"move","line":64,"user":{"side":"near","index":0},"move":"Earthquake","target":{"side":"far","index":1}}
+{"kind":"damage","line":66,"who":{"side":"far","index":1},"hp":{"hp":20,"max":100},"effectiveness":"super","folded":[65]}
+{"kind":"move","line":67,"user":{"side":"far","index":1},"move":"Explosion","target":{"side":"near","index":0}}
+{"kind":"damage","line":68,"who":{"side":"near","index":0},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":69,"who":{"side":"far","index":1}}
+{"kind":"faint","line":70,"who":{"side":"near","index":0}}
+{"line":71,"text":"|","reason":"spacer"}
+{"line":72,"text":"|upkeep","reason":"upkeep"}
+{"line":73,"text":"|","reason":"spacer"}
+{"line":74,"text":"|t:|1795578468","reason":"timestamp"}
+{"kind":"switchIn","line":75,"who":{"side":"near","index":1},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":76,"who":{"side":"near","index":1},"hp":{"hp":88,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"switchIn","line":77,"who":{"side":"far","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"turn","line":78,"number":5}
+{"line":79,"text":"|","reason":"spacer"}
+{"line":80,"text":"|t:|1795578471","reason":"timestamp"}
+{"kind":"move","line":81,"user":{"side":"far","index":2},"move":"U-turn","target":{"side":"near","index":1}}
+{"kind":"damage","line":84,"who":{"side":"near","index":1},"hp":{"hp":81,"max":100},"crit":true,"effectiveness":"resisted","folded":[82,83]}
+{"line":85,"text":"|","reason":"spacer"}
+{"line":86,"text":"|t:|1795578471","reason":"timestamp"}
+{"kind":"switchIn","line":87,"who":{"side":"far","index":3},"replaces":{"side":"far","index":2},"dragged":false,"cause":{"name":"U-turn"},"hp":{"hp":100,"max":100}}
+{"kind":"move","line":88,"user":{"side":"near","index":1},"move":"Stealth Rock","target":{"side":"far","index":3}}
+{"kind":"sideStart","line":89,"side":"far","condition":{"name":"Stealth Rock","kind":"move"}}
+{"line":90,"text":"|","reason":"spacer"}
+{"kind":"heal","line":91,"who":{"side":"near","index":1},"hp":{"hp":87,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":92,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":93,"number":6}
+{"line":94,"text":"|","reason":"spacer"}
+{"line":95,"text":"|t:|1795578475","reason":"timestamp"}
+{"kind":"move","line":96,"user":{"side":"far","index":3},"move":"Thunderbolt","target":{"side":"near","index":1}}
+{"kind":"damage","line":98,"who":{"side":"near","index":1},"hp":{"hp":0,"max":100},"effectiveness":"super","folded":[97]}
+{"kind":"faint","line":99,"who":{"side":"near","index":1}}
+{"line":100,"text":"|","reason":"spacer"}
+{"line":101,"text":"|upkeep","reason":"upkeep"}
+{"line":102,"text":"|","reason":"spacer"}
+{"line":103,"text":"|t:|1795578486","reason":"timestamp"}
+{"kind":"switchIn","line":104,"who":{"side":"near","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":105,"who":{"side":"near","index":2},"hp":{"hp":94,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"turn","line":106,"number":7}
+{"line":107,"text":"|","reason":"spacer"}
+{"line":108,"text":"|t:|1795578488","reason":"timestamp"}
+{"kind":"move","line":109,"user":{"side":"near","index":2},"move":"Hidden Power","target":{"side":"far","index":3}}
+{"kind":"damage","line":111,"who":{"side":"far","index":3},"hp":{"hp":32,"max":100},"effectiveness":"super","folded":[110]}
+{"kind":"move","line":112,"user":{"side":"far","index":3},"move":"Thunder Wave","target":{"side":"near","index":2}}
+{"kind":"status","line":113,"who":{"side":"near","index":2},"status":"par"}
+{"line":114,"text":"|","reason":"spacer"}
+{"kind":"heal","line":115,"who":{"side":"far","index":3},"hp":{"hp":38,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":116,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":117,"number":8}
+{"line":118,"text":"|","reason":"spacer"}
+{"line":119,"text":"|t:|1795578493","reason":"timestamp"}
+{"kind":"move","line":120,"user":{"side":"far","index":3},"move":"Hidden Power","target":{"side":"near","index":2}}
+{"kind":"damage","line":122,"who":{"side":"near","index":2},"hp":{"hp":28,"max":100},"status":"par","effectiveness":"super","folded":[121]}
+{"kind":"move","line":123,"user":{"side":"near","index":2},"move":"Hidden Power","target":{"side":"far","index":3}}
+{"kind":"damage","line":125,"who":{"side":"far","index":3},"hp":{"hp":0,"max":100},"effectiveness":"super","folded":[124]}
+{"kind":"faint","line":126,"who":{"side":"far","index":3}}
+{"line":127,"text":"|","reason":"spacer"}
+{"line":128,"text":"|upkeep","reason":"upkeep"}
+{"line":129,"text":"|","reason":"spacer"}
+{"line":130,"text":"|t:|1795578494","reason":"timestamp"}
+{"kind":"switchIn","line":131,"who":{"side":"far","index":4},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":132,"who":{"side":"far","index":4},"hp":{"hp":88,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"turn","line":133,"number":9}
+{"line":134,"text":"|","reason":"spacer"}
+{"line":135,"text":"|t:|1795578496","reason":"timestamp"}
+{"kind":"move","line":136,"user":{"side":"far","index":4},"move":"Substitute","target":{"side":"far","index":4}}
+{"kind":"effectStart","line":137,"who":{"side":"far","index":4},"effect":{"name":"Substitute"}}
+{"kind":"damage","line":138,"who":{"side":"far","index":4},"hp":{"hp":63,"max":100}}
+{"kind":"move","line":139,"user":{"side":"near","index":2},"move":"Hidden Power","target":{"side":"far","index":4}}
+{"kind":"effectEnd","line":140,"who":{"side":"far","index":4},"effect":{"name":"Substitute"}}
+{"line":141,"text":"|","reason":"spacer"}
+{"line":142,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":143,"number":10}
+{"line":144,"text":"|","reason":"spacer"}
+{"line":145,"text":"|t:|1795578499","reason":"timestamp"}
+{"kind":"move","line":146,"user":{"side":"far","index":4},"move":"Focus Blast","target":{"side":"near","index":2},"miss":true}
+{"kind":"miss","line":147,"user":{"side":"far","index":4},"target":{"side":"near","index":2}}
+{"kind":"cant","line":148,"who":{"side":"near","index":2},"reason":{"name":"par"}}
+{"line":149,"text":"|","reason":"spacer"}
+{"line":150,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":151,"number":11}
+{"line":152,"text":"|","reason":"spacer"}
+{"line":153,"text":"|t:|1795578501","reason":"timestamp"}
+{"kind":"move","line":154,"user":{"side":"far","index":4},"move":"Substitute","target":{"side":"far","index":4}}
+{"kind":"effectStart","line":155,"who":{"side":"far","index":4},"effect":{"name":"Substitute"}}
+{"kind":"damage","line":156,"who":{"side":"far","index":4},"hp":{"hp":38,"max":100}}
+{"kind":"move","line":157,"user":{"side":"near","index":2},"move":"Hidden Power","target":{"side":"far","index":4}}
+{"kind":"effectEnd","line":158,"who":{"side":"far","index":4},"effect":{"name":"Substitute"}}
+{"line":159,"text":"|","reason":"spacer"}
+{"line":160,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":161,"number":12}
+{"line":162,"text":"|","reason":"spacer"}
+{"line":163,"text":"|t:|1795578503","reason":"timestamp"}
+{"kind":"move","line":164,"user":{"side":"far","index":4},"move":"Focus Blast","target":{"side":"near","index":2}}
+{"kind":"damage","line":166,"who":{"side":"near","index":2},"hp":{"hp":0,"max":100},"effectiveness":"super","folded":[165]}
+{"kind":"faint","line":167,"who":{"side":"near","index":2}}
+{"kind":"damage","line":168,"who":{"side":"far","index":4},"hp":{"hp":28,"max":100},"cause":{"name":"Life Orb","kind":"item"}}
+{"line":169,"text":"|","reason":"spacer"}
+{"line":170,"text":"|upkeep","reason":"upkeep"}
+{"line":171,"text":"|","reason":"spacer"}
+{"line":172,"text":"|t:|1795578508","reason":"timestamp"}
+{"kind":"switchIn","line":173,"who":{"side":"near","index":3},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":174,"who":{"side":"near","index":3},"hp":{"hp":88,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"turn","line":175,"number":13}
+{"line":176,"text":"|","reason":"spacer"}
+{"line":177,"text":"|t:|1795578511","reason":"timestamp"}
+{"kind":"move","line":178,"user":{"side":"near","index":3},"move":"Shadow Ball","target":{"side":"far","index":4}}
+{"kind":"damage","line":180,"who":{"side":"far","index":4},"hp":{"hp":0,"max":100},"effectiveness":"super","folded":[179]}
+{"kind":"faint","line":181,"who":{"side":"far","index":4}}
+{"line":182,"text":"|","reason":"spacer"}
+{"line":183,"text":"|upkeep","reason":"upkeep"}
+{"line":184,"text":"|","reason":"spacer"}
+{"line":185,"text":"|t:|1795578511","reason":"timestamp"}
+{"kind":"switchIn","line":186,"who":{"side":"far","index":5},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":187,"who":{"side":"far","index":5},"hp":{"hp":88,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"weather","line":188,"weather":"Sand","phase":"start","cause":{"name":"Sand Stream","kind":"ability"},"source":{"side":"far","index":5}}
+{"kind":"turn","line":189,"number":14}
+{"line":190,"text":"|","reason":"spacer"}
+{"line":191,"text":"|t:|1795578514","reason":"timestamp"}
+{"kind":"switchIn","line":192,"who":{"side":"near","index":4},"replaces":{"side":"near","index":3},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":193,"who":{"side":"near","index":4},"hp":{"hp":94,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":194,"user":{"side":"far","index":5},"move":"Dragon Dance","target":{"side":"far","index":5}}
+{"kind":"statChange","line":195,"who":{"side":"far","index":5},"stat":"atk","stages":1}
+{"kind":"statChange","line":196,"who":{"side":"far","index":5},"stat":"spe","stages":1}
+{"line":197,"text":"|","reason":"spacer"}
+{"kind":"weather","line":198,"weather":"Sand","phase":"upkeep"}
+{"line":199,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":200,"number":15}
+{"line":201,"text":"|","reason":"spacer"}
+{"line":202,"text":"|t:|1795578520","reason":"timestamp"}
+{"kind":"move","line":203,"user":{"side":"far","index":5},"move":"Crunch","target":{"side":"near","index":4}}
+{"kind":"damage","line":204,"who":{"side":"near","index":4},"hp":{"hp":27,"max":100}}
+{"kind":"statChange","line":205,"who":{"side":"near","index":4},"stat":"def","stages":-1}
+{"kind":"move","line":206,"user":{"side":"near","index":4},"move":"Earthquake","target":{"side":"far","index":5}}
+{"kind":"damage","line":208,"who":{"side":"far","index":5},"hp":{"hp":1,"max":100},"effectiveness":"super","folded":[207]}
+{"line":209,"text":"|","reason":"spacer"}
+{"kind":"weather","line":210,"weather":"Sand","phase":"upkeep"}
+{"line":211,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":212,"number":16}
+{"line":213,"text":"|","reason":"spacer"}
+{"line":214,"text":"|t:|1795578531","reason":"timestamp"}
+{"kind":"move","line":215,"user":{"side":"near","index":4},"move":"Protect","target":{"side":"near","index":4}}
+{"kind":"singleTurn","line":216,"who":{"side":"near","index":4},"effect":{"name":"Protect"}}
+{"kind":"move","line":217,"user":{"side":"far","index":5},"move":"Crunch","target":{"side":"near","index":4}}
+{"kind":"block","line":218,"who":{"side":"near","index":4},"effect":{"name":"Protect"}}
+{"line":219,"text":"|","reason":"spacer"}
+{"kind":"weather","line":220,"weather":"Sand","phase":"upkeep"}
+{"line":221,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":222,"number":17}
+{"line":223,"text":"|","reason":"spacer"}
+{"line":224,"text":"|t:|1795578551","reason":"timestamp"}
+{"kind":"switchIn","line":225,"who":{"side":"near","index":5},"replaces":{"side":"near","index":4},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":226,"who":{"side":"near","index":5},"hp":{"hp":76,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":227,"user":{"side":"far","index":5},"move":"Crunch","target":{"side":"near","index":5}}
+{"kind":"damage","line":228,"who":{"side":"near","index":5},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":229,"who":{"side":"near","index":5}}
+{"line":230,"text":"|","reason":"spacer"}
+{"kind":"weather","line":231,"weather":"Sand","phase":"upkeep"}
+{"line":232,"text":"|upkeep","reason":"upkeep"}
+{"line":233,"text":"|","reason":"spacer"}
+{"line":234,"text":"|t:|1795578556","reason":"timestamp"}
+{"kind":"switchIn","line":235,"who":{"side":"near","index":3},"dragged":false,"hp":{"hp":88,"max":100}}
+{"kind":"damage","line":236,"who":{"side":"near","index":3},"hp":{"hp":76,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"turn","line":237,"number":18}
+{"line":238,"text":"|","reason":"spacer"}
+{"line":239,"text":"|t:|1795578559","reason":"timestamp"}
+{"kind":"move","line":240,"user":{"side":"near","index":3},"move":"Shadow Ball","target":{"side":"far","index":5}}
+{"kind":"damage","line":242,"who":{"side":"far","index":5},"hp":{"hp":0,"max":100},"effectiveness":"resisted","folded":[241]}
+{"kind":"faint","line":243,"who":{"side":"far","index":5}}
+{"line":244,"text":"|","reason":"spacer"}
+{"kind":"weather","line":245,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":246,"who":{"side":"near","index":3},"hp":{"hp":69,"max":100},"cause":{"name":"Sandstorm"}}
+{"line":247,"text":"|upkeep","reason":"upkeep"}
+{"line":248,"text":"|","reason":"spacer"}
+{"line":249,"text":"|t:|1795578559","reason":"timestamp"}
+{"kind":"switchIn","line":250,"who":{"side":"far","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":251,"who":{"side":"far","index":2},"hp":{"hp":95,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"turn","line":252,"number":19}
+{"line":253,"text":"|","reason":"spacer"}
+{"line":254,"text":"|t:|1795578562","reason":"timestamp"}
+{"kind":"move","line":255,"user":{"side":"far","index":2},"move":"Outrage","target":{"side":"near","index":3}}
+{"kind":"damage","line":256,"who":{"side":"near","index":3},"hp":{"hp":5,"max":100}}
+{"kind":"move","line":257,"user":{"side":"near","index":3},"move":"Shadow Ball","target":{"side":"far","index":2}}
+{"kind":"damage","line":258,"who":{"side":"far","index":2},"hp":{"hp":44,"max":100}}
+{"line":259,"text":"|","reason":"spacer"}
+{"kind":"weather","line":260,"weather":"Sand","phase":"upkeep"}
+{"kind":"damage","line":261,"who":{"side":"near","index":3},"hp":{"hp":0,"max":100},"cause":{"name":"Sandstorm"}}
+{"kind":"faint","line":262,"who":{"side":"near","index":3}}
+{"line":263,"text":"|upkeep","reason":"upkeep"}
+{"line":264,"text":"|","reason":"spacer"}
+{"line":265,"text":"|t:|1795578564","reason":"timestamp"}
+{"kind":"switchIn","line":266,"who":{"side":"near","index":4},"dragged":false,"hp":{"hp":27,"max":100}}
+{"kind":"damage","line":267,"who":{"side":"near","index":4},"hp":{"hp":20,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"itemEnd","line":268,"who":{"side":"near","index":4},"item":"Salac Berry","eaten":true}
+{"kind":"statChange","line":269,"who":{"side":"near","index":4},"stat":"spe","stages":1,"cause":{"name":"Salac Berry","kind":"item"}}
+{"kind":"turn","line":270,"number":20}
+{"line":271,"text":"|","reason":"spacer"}
+{"line":272,"text":"|t:|1795578565","reason":"timestamp"}
+{"kind":"move","line":273,"user":{"side":"far","index":2},"move":"Outrage","target":{"side":"near","index":4},"calledBy":{"name":"lockedmove"}}
+{"kind":"damage","line":274,"who":{"side":"near","index":4},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":275,"who":{"side":"near","index":4}}
+{"line":276,"text":"|","reason":"spacer"}
+{"kind":"win","line":277,"side":"far","name":"Model Magneton"}
+{"line":278,"text":"|raw|beanstockg's rating: 1256 &rarr; <strong>1246</strong><br />(-10 for losing)","reason":"room"}
+{"line":279,"text":"|raw|Model Magneton's rating: 1494 &rarr; <strong>1502</strong><br />(+8 for winning)","reason":"room"}
+{"line":280,"text":"|c|☆Model Magneton|gg","reason":"chat"}
