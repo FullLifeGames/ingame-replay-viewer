@@ -31,9 +31,9 @@ The licences page holds, in this order:
 ## Where it lives
 
 - `scripts/gen5-manifest.ts` lists every file the page serves from EmulatorJS's packages. Each file names its components; each component names its version, licence, source by commit and notice files. The servers answer no other file of the site.
-- `scripts/gen5-notices.ts` names, for each component, the files at its pin that hold its notices and those of the parts its build compiles in. It quotes nothing. The list comes from the build files at the pins: RetroArch's `Makefile.emulatorjs` and `Makefile.common`, melonDS's `Makefile.common`.
+- `scripts/gen5-notices.ts` names, for each component, the files at its pin that hold its notices and those of the parts its build compiles in, and the folders whose files each carry their own notice. It quotes nothing. The list comes from the build files at the pins: RetroArch's `Makefile.emulatorjs` and `Makefile.common`, melonDS's `Makefile.common`.
 - `scripts/gen5-sources.ts` fetches each source's commit into a bare repository under `.cache/gen5/sources/git/`. It keeps a ref under `refs/pins/` on that commit, writes the archive with `git archive` and checks the tar's SHA-256 against the pin before it places the file.
-- `scripts/gen5-licences-read.ts` reads each notice and the GPL's text from the bare repositories with `git show <commit>:<path>`. `scripts/gen5-licences.ts` turns them into the page and escapes every string it got from a file.
+- `scripts/gen5-licences-read.ts` reads each notice and the GPL's text from the bare repositories with `git show <commit>:<path>`, and every file of such a folder in one `git cat-file --batch`. `scripts/gen5-notice-groups.ts` groups those files by their opening comment. `scripts/gen5-licences.ts` turns them into the page and escapes every string it got from a file.
 - `scripts/gen5-built.ts` writes `licences.html` beside the built page. The dev server (`scripts/gen5-serve.ts`) makes it on each request. Both answer `/source/<archive>` for the manifest's archives alone.
 - `scripts/gen5-licences-shot.ts` checks it all in a browser: the notice above the file input at 360 px, the licences page, and a `HEAD` to every source link.
 
@@ -52,7 +52,9 @@ Two parts the core holds carry no notice in any pinned source. The licences page
 - Emscripten's runtime. EmulatorJS's build scripts install emsdk 3.1.74. No pinned tree holds Emscripten.
 - zlib. RetroArch's web build links Emscripten's own zlib port. RetroArch's copy in `deps/libz` is not compiled in.
 
-libretro-common's files each carry their own MIT notice. The page quotes one of them, from `archive_file.c`.
+## libretro-common's notices
+
+The files of libretro-common carry notices of their own, and they differ. Two files the build compiles, `encodings/encoding_base64.c` and `utils/md5.c`, state other terms than the MIT notice most files carry, and some files carry no notice at all. So no notice is typed for the folder. The page takes the opening comment of every `.c` and `.h` file under `libretro-common/` at RetroArch's pin, which is more than the build compiles, and groups the files by that text. Each distinct text stands once, with how many files carry it and, for ten files or fewer, their paths. Where a comment names its own file, the page reads `<this file>` in its place, so the MIT notices that differ only in that name form one group. Files that open with no comment stand by path under "No notice in the file".
 
 ## What a public page still needs
 

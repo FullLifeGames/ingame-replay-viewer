@@ -96,6 +96,7 @@ describe('startBuiltServer', () => {
       files: SITE_FILES,
       archives: [],
       notices: [],
+      trees: [],
       unfound: [],
       gpl: 'invented',
       viewerLicence: 'invented',

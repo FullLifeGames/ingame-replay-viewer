@@ -17,6 +17,16 @@ export interface Notice {
   kind: 'notice' | 'licence'
 }
 
+/** A folder whose files each state their own notice: the reader takes the opening comment of
+ * every file under `folder` with one of `extensions` at the component's pin and groups the files
+ * by its text (scripts/gen5-notice-groups.ts). The folder may hold more than the build compiles. */
+export interface NoticeTree {
+  component: ComponentId
+  part: string
+  folder: string
+  extensions: readonly string[]
+}
+
 /** A part compiled in whose notice no pinned source holds, with what the files say of it. */
 export interface Unfound {
   component: ComponentId
@@ -56,11 +66,6 @@ export const NOTICES: Readonly<Record<ComponentId, readonly Notice[]>> = {
   ],
   retroarch: [
     notice('RetroArch', 'retroarch.c', [1, 18]),
-    notice(
-      'libretro-common (each of its files states its own notice of this form)',
-      'libretro-common/file/archive_file.c',
-      [1, 22],
-    ),
     notice('LZMA SDK', 'deps/7zip/7z.h', [1, 2]),
     notice('stb_truetype', 'deps/stb/stb_truetype.h', [1, 3]),
     notice('stb_truetype', 'deps/stb/stb_truetype.h', [84, 88]),
@@ -73,6 +78,16 @@ export const NOTICES: Readonly<Record<ComponentId, readonly Notice[]>> = {
   socketio: SOCKET_IO_PACKAGES.map((name) => licence(name, `packages/${name}/LICENSE`)),
   extract7z: [],
 }
+
+/** libretro-common's files each carry a notice of their own; RetroArch compiles many of them. */
+export const NOTICE_TREES: readonly NoticeTree[] = [
+  {
+    component: 'retroarch',
+    part: 'libretro-common',
+    folder: 'libretro-common/',
+    extensions: ['.c', '.h'],
+  },
+]
 
 /** The GPL's full text: melonDS's LICENSE at its pin, the text the core's license.txt holds. */
 export const GPL_TEXT = { component: 'melonds', path: 'LICENSE' } as const

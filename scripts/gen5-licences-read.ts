@@ -4,47 +4,28 @@
 // the archives it stops with the sentence that names the fetch script; a notice it cannot read
 // stops it with the component's and the file's name.
 import { execFileSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { type Archive, type LicencesInput, licencesHtml, type ReadNotice } from './gen5-licences.ts'
+import {
+  FETCH_FIRST,
+  gitReader,
+  gitTreeReader,
+  type Reader,
+  type TreeReader,
+} from './gen5-licences-git.ts'
 import {
   archiveName,
   type Component,
   type ComponentId,
   COMPONENTS,
   SITE_FILES,
-  type Source,
   SOURCES,
 } from './gen5-manifest.ts'
-import { GPL_TEXT, type Notice, UNFOUND } from './gen5-notices.ts'
+import { groupNotices, type ReadTree, type TreeFile } from './gen5-notice-groups.ts'
+import { GPL_TEXT, type Notice, NOTICE_TREES, type NoticeTree, UNFOUND } from './gen5-notices.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
-
-/** Reads the file `path` of `source` at its pinned commit; throws when it cannot. */
-export type Reader = (source: Source, path: string) => string
-
-const FETCH_FIRST = 'run node scripts/gen5-sources.ts first'
-
-/** `bytes` as UTF-8, or as Latin-1 for a file that is no valid UTF-8, so no byte is lost. */
-function decoded(bytes: Uint8Array): string {
-  try {
-    return new TextDecoder('utf-8', { fatal: true }).decode(bytes)
-  } catch {
-    return new TextDecoder('latin1').decode(bytes)
-  }
-}
-
-/** A reader on the bare repositories under `sources`/git/ (scripts/gen5-sources.ts). */
-function gitReader(sources: string): Reader {
-  return (source, path) => {
-    const dir = join(sources, 'git', `${source.name}.git`)
-    if (!existsSync(join(dir, 'HEAD'))) {
-      throw new Error(`gen5-licences: no repository of ${source.name}; ${FETCH_FIRST}`)
-    }
-    const show = ['-C', dir, 'show', `${source.commit}:${path}`]
-    return decoded(execFileSync('git', show, { stdio: ['ignore', 'pipe', 'pipe'] }))
-  }
-}
 
 /** The lines of `text` a notice names, or the whole text; throws when the file is too short. */
 function noticeText(part: Component, notice: Notice, text: string): string {
@@ -79,6 +60,30 @@ export function readNotices(
   })
 }
 
+/** Each notice tree of `components`, its files read through `readTree` and grouped by their
+ * opening comment; throws naming the component and the folder it cannot read. */
+export function readNoticeTrees(
+  components: Readonly<Record<ComponentId, Component>>,
+  trees: readonly NoticeTree[],
+  readTree: TreeReader,
+): ReadTree[] {
+  return trees.map((tree) => {
+    const part = components[tree.component]
+    let files: readonly TreeFile[]
+    try {
+      files = readTree(part.source, tree.folder)
+    } catch (error) {
+      const at = `${tree.folder} at ${part.source.commit}`
+      throw new Error(`${part.name}: cannot read ${at}`, { cause: error })
+    }
+    const kept = files.filter(
+      ({ path }) =>
+        path.startsWith(tree.folder) && tree.extensions.some((ending) => path.endsWith(ending)),
+    )
+    return { ...tree, commit: part.source.commit, ...groupNotices(kept) }
+  })
+}
+
 /** Each source's archive in `sources` with its size; throws when one is missing. */
 function archivesIn(sources: string): Archive[] {
   return SOURCES.map((source) => {
@@ -98,6 +103,7 @@ const repoGit = (...args: string[]) =>
 export function readLicencesInput(sources: string): LicencesInput {
   const archives = archivesIn(sources)
   const read = gitReader(sources)
+  const trees = readNoticeTrees(COMPONENTS, NOTICE_TREES, gitTreeReader(sources))
   return {
     build: {
       commit: repoGit('rev-parse', 'HEAD').trim(),
@@ -108,6 +114,7 @@ export function readLicencesInput(sources: string): LicencesInput {
     files: SITE_FILES,
     archives,
     notices: readNotices(COMPONENTS, read),
+    trees,
     unfound: UNFOUND,
     gpl: read(COMPONENTS[GPL_TEXT.component].source, GPL_TEXT.path),
     viewerLicence: readFileSync(join(GEN5_PATHS.repo, 'LICENSE'), 'utf8'),

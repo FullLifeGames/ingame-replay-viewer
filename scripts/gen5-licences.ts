@@ -12,6 +12,8 @@ import {
   type Source,
   VIEWER_REPOSITORY,
 } from './gen5-manifest.ts'
+import { escapeHtml, link, pre, short } from './gen5-html.ts'
+import { type ReadTree, treeHtml } from './gen5-notice-groups.ts'
 import type { Notice, Unfound } from './gen5-notices.ts'
 
 /** The build's commit and date, and whether the tree had changes the commit lacks (D9). */
@@ -39,26 +41,14 @@ export interface LicencesInput {
   files: readonly SiteFile[]
   archives: readonly Archive[]
   notices: readonly ReadNotice[]
+  /** The folders whose files each carry their own notice, grouped by its text. */
+  trees: readonly ReadTree[]
   unfound: readonly Unfound[]
   /** The GPL's full text, from melonDS's LICENSE at its pin (D6). */
   gpl: string
   /** The viewer repository's LICENSE. */
   viewerLicence: string
 }
-
-/** `text` with the five characters HTML gives a meaning escaped. */
-function escapeHtml(text: string): string {
-  return text
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;')
-}
-
-const link = (href: string, text: string) => `<a href="${escapeHtml(href)}">${escapeHtml(text)}</a>`
-
-const short = (commit: string) => commit.slice(0, 7)
 
 const treeOf = (repository: string, commit: string) => `${repository}/tree/${commit}`
 
@@ -160,8 +150,6 @@ function whereFrom(input: LicencesInput, notice: ReadNotice): string {
   return `<p class="from">${escapeHtml(notice.path)}${lines}, at commit ${commit}</p>`
 }
 
-const pre = (text: string) => `<pre>${escapeHtml(text)}</pre>`
-
 /** Each notice of `kind` under its part, grouped under its component's name. */
 function noticesOf(
   input: LicencesInput,
@@ -171,11 +159,13 @@ function noticesOf(
   return ids
     .map((id) => {
       const own = input.notices.filter((notice) => notice.component === id && notice.kind === kind)
-      if (own.length === 0) return ''
+      const trees = kind === 'notice' ? input.trees.filter((tree) => tree.component === id) : []
+      if (own.length + trees.length === 0) return ''
       const items = own.map(
         (notice) =>
           `<h4>${escapeHtml(notice.part)}</h4>\n${whereFrom(input, notice)}\n${pre(notice.text)}`,
       )
+      items.push(...trees.map(treeHtml))
       return `<h3>${escapeHtml(input.components[id].name)}</h3>\n${items.join('\n')}`
     })
     .filter((block) => block !== '')

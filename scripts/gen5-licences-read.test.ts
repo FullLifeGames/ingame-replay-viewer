@@ -5,8 +5,10 @@ import { join } from 'node:path'
 
 import { afterAll, describe, expect, it } from 'vitest'
 
-import { readLicencesInput, readNotices, type Reader } from './gen5-licences-read'
+import type { Reader, TreeReader } from './gen5-licences-git'
+import { readLicencesInput, readNotices, readNoticeTrees } from './gen5-licences-read'
 import { type ComponentId, COMPONENTS } from './gen5-manifest'
+import type { NoticeTree } from './gen5-notices'
 import { GEN5_PATHS } from './gen5-paths'
 
 // Scene: every component has its notice.
@@ -63,6 +65,44 @@ describe('readNotices', () => {
   it('stops on a notice whose lines run past the end of its file', () => {
     expect(() => readNotices(only('melonds'), known)).toThrow(
       "EmulatorJS's melonDS: src/NDS.cpp has 3 lines, not 1 to 18",
+    )
+  })
+})
+
+// Scene: libretro-common's notices are read from every file under its folder at the pin.
+describe('readNoticeTrees', () => {
+  const tree: NoticeTree = {
+    component: 'retroarch',
+    part: 'lib',
+    folder: 'lib/',
+    extensions: ['.c', '.h'],
+  }
+  const files: TreeReader = (source, folder) => [
+    { path: `${folder}one.c`, text: `/* MIT, at ${source.commit.slice(0, 7)} */\n` },
+    { path: `${folder}two.h`, text: '/* zlib */\n' },
+    { path: `${folder}read.me`, text: '/* not a source file */\n' },
+    { path: 'other/three.c', text: '/* outside the folder */\n' },
+  ]
+
+  it("groups the folder's files of the tree's extensions, at the component's pinned commit", () => {
+    const [read] = readNoticeTrees(COMPONENTS, [tree], files)
+    expect(read).toEqual({
+      ...tree,
+      commit: COMPONENTS.retroarch.source.commit,
+      groups: [
+        { text: '/* MIT, at 6dd4353 */', paths: ['lib/one.c'] },
+        { text: '/* zlib */', paths: ['lib/two.h'] },
+      ],
+      bare: [],
+    })
+  })
+
+  it('stops, naming the component and the folder, on a folder the reader cannot read', () => {
+    const none: TreeReader = () => {
+      throw new Error('no such folder')
+    }
+    expect(() => readNoticeTrees(COMPONENTS, [tree], none)).toThrow(
+      "EmulatorJS's RetroArch: cannot read lib/ at 6dd4353937ef48b6ec0bfbdbb15d1c5992d86927",
     )
   })
 })

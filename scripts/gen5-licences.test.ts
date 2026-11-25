@@ -66,6 +66,17 @@ const INPUT: LicencesInput = {
     { source: PAD, bytes: 89 },
   ],
   notices: NOTICES,
+  trees: [
+    {
+      component: 'melonds',
+      part: 'Core library',
+      folder: 'lib/',
+      extensions: ['.c'],
+      commit: CORE.commit,
+      groups: [{ text: '/* Copyright 2021 Lib */', paths: ['lib/a.c', 'lib/b.c'] }],
+      bare: ['lib/c.c'],
+    },
+  ],
   unfound: [{ component: 'melonds', part: 'Runtime', says: 'No pinned source holds it.' }],
   gpl: 'GNU GENERAL PUBLIC LICENSE\nVersion 3 <invented>',
   viewerLicence: 'MIT License\n\nCopyright (c) invented',
@@ -123,6 +134,14 @@ describe('licencesHtml', () => {
     expect(text).toContain('Runtime')
     expect(text).toContain('No pinned source holds it.')
     expect(text).toContain(`src/core.c, lines 1 to 2, at commit ${CORE.commit.slice(0, 7)}`)
+  })
+
+  it("shows a notice tree's groups under its component, after the component's own notices", () => {
+    const section = textOf(html.slice(html.indexOf('<h2 id="notices">')))
+    expect(section).toContain('Core library')
+    expect(section).toContain('2 files carry this text: lib/a.c, lib/b.c')
+    expect(section).toContain('No notice in the file: lib/c.c')
+    expect(section.indexOf('Copyright 2020 Core')).toBeLessThan(section.indexOf('Core library'))
   })
 
   it('escapes < and & from a fetched notice', () => {
