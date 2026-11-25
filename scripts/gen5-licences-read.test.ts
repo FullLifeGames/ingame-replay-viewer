@@ -6,7 +6,13 @@ import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 
 import type { Reader, TreeReader } from './gen5-licences-git'
-import { readLicencesInput, readNotices, readNoticeTrees } from './gen5-licences-read'
+import {
+  buildStamp,
+  readLicencesInput,
+  readNotices,
+  readNoticeTrees,
+  type RepoGit,
+} from './gen5-licences-read'
 import { type ComponentId, COMPONENTS, sourceOf } from './gen5-manifest'
 import type { NoticeTree } from './gen5-notices'
 import { GEN5_PATHS } from './gen5-paths'
@@ -104,6 +110,34 @@ describe('readNoticeTrees', () => {
     expect(() => readNoticeTrees(COMPONENTS, [tree], none)).toThrow(
       "EmulatorJS's RetroArch: cannot read lib/ at 6dd4353937ef48b6ec0bfbdbb15d1c5992d86927",
     )
+  })
+})
+
+// Scene: the build stamp says when the build machine had changes the commit lacks (D9).
+describe('buildStamp', () => {
+  const COMMIT = '1'.repeat(40)
+  const now = new Date('2026-11-25T23:30:00Z')
+  /** A git that prints `status` for `status --porcelain`, and records what it was asked. */
+  const git = (status: string) => {
+    const asked: string[][] = []
+    const run: RepoGit = (...args) => {
+      asked.push(args)
+      if (args.join(' ') === 'rev-parse HEAD') return `${COMMIT}\n`
+      if (args.join(' ') === 'status --porcelain') return status
+      throw new Error(`git ${args.join(' ')}`)
+    }
+    return { asked, run }
+  }
+
+  it('names the commit and the UTC day, and no changes for a clean tree', () => {
+    const clean = git('')
+    expect(buildStamp(clean.run, now)).toEqual({ commit: COMMIT, date: '2026-11-25', dirty: false })
+    expect(clean.asked).toContainEqual(['status', '--porcelain'])
+  })
+
+  it('says the tree had changes when git status lists one', () => {
+    expect(buildStamp(git(' M scripts/gen5-licences.ts\n').run, now).dirty).toBe(true)
+    expect(buildStamp(git('?? scripts/new.ts\n').run, now).dirty).toBe(true)
   })
 })
 

@@ -2,7 +2,11 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 
 import { describe, expect, it } from 'vitest'
 
-import { licencesMount } from './gen5-serve'
+import { isFileLoadingAllowed, resolveConfig } from 'vite'
+
+import { archiveName, SOURCES } from './gen5-manifest'
+import { GEN5_PATHS } from './gen5-paths'
+import { gen5ServerConfig, licencesMount } from './gen5-serve'
 
 /** Runs `url` through the mount with an invented page; gives the answer, or 'next'. */
 function answer(url: string, page: () => string) {
@@ -48,5 +52,23 @@ describe('licencesMount', () => {
 
   it('passes every other path on', () => {
     expect(answer('/index.html', () => '')).toMatchObject({ next: true, status: 0 })
+  })
+})
+
+// Scene: Vite's own paths (/@fs/, ?raw) reach no fetched file and no build output (review).
+describe("the dev server's deny list", () => {
+  const archives = SOURCES.map((source) => `${GEN5_PATHS.sources}/${archiveName(source)}`)
+
+  it('refuses the source archives, the bare repositories, the build and a save', async () => {
+    const config = await resolveConfig(gen5ServerConfig(false), 'serve')
+    const files = [
+      ...archives,
+      `${GEN5_PATHS.sources}/git/melonds.git/HEAD`,
+      `${GEN5_PATHS.site}/data/version.json`,
+      `${GEN5_PATHS.built}/licences.html`,
+      `${GEN5_PATHS.saves}/route-20.sav`,
+    ]
+    expect(files.filter((file) => isFileLoadingAllowed(config, file))).toEqual([])
+    expect(isFileLoadingAllowed(config, `${GEN5_PATHS.page}/index.html`)).toBe(true)
   })
 })

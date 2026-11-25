@@ -9,12 +9,13 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { join } from 'node:path'
 
-import { createServer, type Plugin, type ViteDevServer } from 'vite'
+import { createServer, type InlineConfig, type Plugin, type ViteDevServer } from 'vite'
 
 import { BUILT_PORT, buildGen5Page, builtServerOptions, startBuiltServer } from './gen5-built.ts'
 import { SAVES_PREFIX } from '../src/gen5/save-file.ts'
 import {
   ISOLATION,
+  LICENCES_PAGE,
   savesFileFor,
   sendFile,
   SITE_PREFIX,
@@ -29,8 +30,7 @@ import { GEN5_PATHS } from './gen5-paths.ts'
 /** Lane a's port (plan section 0); Vite moves to the next free one above it if it is taken. */
 const PORT = 5183
 
-/** Where both servers answer the licences page (D13). */
-const LICENCES_PATH = '/licences.html'
+const LICENCES_PATH = `/${LICENCES_PAGE}`
 
 /** Vite's own deny list, plus what /@fs/ must never reach: outputs, fetched files, dumps, saves.
  * Vite checks it for files under the root too, so the saves' own middleware answers first. */
@@ -90,9 +90,9 @@ const emulatorjsMount: Plugin = {
   },
 }
 
-/** Starts the page's dev server; `host` true listens on every interface. */
-export async function startGen5Server(host = false): Promise<ViteDevServer> {
-  const server = await createServer({
+/** The dev server's config; `host` true listens on every interface. */
+export function gen5ServerConfig(host: boolean): InlineConfig {
+  return {
     configFile: false,
     root: GEN5_PATHS.page,
     cacheDir: join(GEN5_PATHS.runs, '..', 'vite-cache'),
@@ -104,7 +104,12 @@ export async function startGen5Server(host = false): Promise<ViteDevServer> {
       headers: ISOLATION,
       fs: { deny: FS_DENY },
     },
-  })
+  }
+}
+
+/** Starts the page's dev server; `host` true listens on every interface. */
+export async function startGen5Server(host = false): Promise<ViteDevServer> {
+  const server = await createServer(gen5ServerConfig(host))
   await server.listen()
   return server
 }

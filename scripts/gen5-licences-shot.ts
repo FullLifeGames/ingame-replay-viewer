@@ -11,6 +11,7 @@ import { join } from 'node:path'
 
 import { chromium, type Page } from '@playwright/test'
 
+import { LICENCES_PAGE, SOURCE_PREFIX } from './gen5-files.ts'
 import { log } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { watchRequests } from './gen5-requests.ts'
@@ -62,10 +63,10 @@ interface Licences {
 /** Follows the notice's link and saves the licences page's first screen and its two lists. */
 async function licencesPage(page: Page): Promise<Licences> {
   const [response] = await Promise.all([
-    page.waitForResponse((answer) => answer.url().endsWith('/licences.html')),
+    page.waitForResponse((answer) => answer.url().endsWith(`/${LICENCES_PAGE}`)),
     page.click('#licence-notice a'),
   ])
-  await page.waitForURL('**/licences.html')
+  await page.waitForURL(`**/${LICENCES_PAGE}`)
   log(`licences page: ${String(response.status())} ${page.url()}`)
   await frame(page, 'licences-top', false)
   for (const id of ['files', 'sources']) {
@@ -74,7 +75,7 @@ async function licencesPage(page: Page): Promise<Licences> {
   }
   const wide = await overflows(page, 'licences page')
   const hrefs: string[] = []
-  for (const link of await page.locator('a[href^="/source/"]').all()) {
+  for (const link of await page.locator(`a[href^="${SOURCE_PREFIX}"]`).all()) {
     hrefs.push((await link.getAttribute('href')) ?? '')
   }
   return { good: response.status() === 200 && !wide, hrefs: [...new Set(hrefs)] }
@@ -86,7 +87,7 @@ async function headSources(port: number, hrefs: readonly string[]): Promise<bool
   for (const href of hrefs) {
     const response = await fetch(`http://127.0.0.1:${String(port)}${href}`, { method: 'HEAD' })
     const length = response.headers.get('content-length')
-    const file = statSync(join(GEN5_PATHS.sources, href.slice('/source/'.length)), {
+    const file = statSync(join(GEN5_PATHS.sources, href.slice(SOURCE_PREFIX.length)), {
       throwIfNoEntry: false,
     })
     const ok = response.status === 200 && length === String(file?.size)

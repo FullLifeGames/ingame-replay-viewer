@@ -15,6 +15,7 @@ import {
   sourceOf,
   VIEWER_REPOSITORY,
 } from './gen5-manifest.ts'
+import { archiveHref, SITE_PREFIX } from './gen5-files.ts'
 import { escapeHtml, link, pre, short } from './gen5-html.ts'
 import { type ReadTree, treeHtml } from './gen5-notice-groups.ts'
 import type { Notice, Unfound } from './gen5-notices.ts'
@@ -92,11 +93,7 @@ const cellsOf = (cells: readonly string[]) =>
 function sourceCell(input: LicencesInput, parts: readonly Component[]): string {
   const offered = parts.map((part) => part.source).filter(isOffered)
   const links = [...new Map(offered.map((source) => [source.name, source])).values()].map(
-    (source) =>
-      link(
-        `/source/${archiveName(source)}`,
-        `${sourceName(input, source)} ${short(source.commit)}`,
-      ),
+    (source) => link(archiveHref(source), `${sourceName(input, source)} ${short(source.commit)}`),
   )
   const reasons = parts.flatMap(({ source }) =>
     isOffered(source) ? [] : [escapeHtml(`No source offered. ${source.none}`)],
@@ -107,13 +104,13 @@ function sourceCell(input: LicencesInput, parts: readonly Component[]): string {
 function fileRow(input: LicencesInput, file: SiteFile): string {
   const parts = file.components.map((id) => input.components[id])
   const cells = [
-    `<code>${escapeHtml(`/emulatorjs/${file.path}`)}</code>`,
+    `<code>${escapeHtml(`${SITE_PREFIX}${file.path}`)}</code>`,
     parts.map((part) => escapeHtml(part.name)).join('<br>'),
     parts.map((part) => escapeHtml(part.version)).join('<br>'),
     parts.map((part) => escapeHtml(licenceWords(part.licence))).join('<br>'),
     sourceCell(input, parts),
   ]
-  const path = escapeHtml(`/emulatorjs/${file.path}`)
+  const path = escapeHtml(`${SITE_PREFIX}${file.path}`)
   return `<tr data-path="${path}">${cellsOf(cells)}</tr>`
 }
 
@@ -143,7 +140,7 @@ function sourcesList(input: LicencesInput): string {
   const lines = input.archives.map(({ source, bytes }) => {
     const archive = archiveName(source)
     const size = bytes.toLocaleString('en-US')
-    return `<li>${escapeHtml(sourceName(input, source))} at commit ${escapeHtml(source.commit)} (${escapeHtml(source.basis)}): ${link(`/source/${archive}`, archive)} (${size} bytes). SHA-256 of the unpacked tar: <code>${escapeHtml(source.tar)}</code>. ${link(treeOf(source.repository, source.commit), 'The repository at that commit')}.</li>`
+    return `<li>${escapeHtml(sourceName(input, source))} at commit ${escapeHtml(source.commit)} (${escapeHtml(source.basis)}): ${link(archiveHref(source), archive)} (${size} bytes). SHA-256 of the unpacked tar: <code>${escapeHtml(source.tar)}</code>. ${link(treeOf(source.repository, source.commit), 'The repository at that commit')}.</li>`
   })
   const { commit } = input.build
   lines.push(

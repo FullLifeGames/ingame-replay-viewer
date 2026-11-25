@@ -43,6 +43,20 @@ describe('fileFor', () => {
     expect(fileFor('/source/index.html', folders)).toBeUndefined()
   })
 
+  // Scene: the review's probe saw both refused; the spec holds it (review, missing tests).
+  it('refuses an upper-case variant of a served path and a double slash after the prefix', () => {
+    for (const url of [
+      '/EMULATORJS/data/loader.js',
+      '/emulatorjs/DATA/loader.js',
+      '/emulatorjs/data/LOADER.JS',
+      '/emulatorjs//data/loader.js',
+      '/emulatorjs//data/version.json',
+    ]) {
+      expect(siteFileFor(url, site), url).toBeUndefined()
+      expect(fileFor(url, folders)?.startsWith(site) ?? false, url).toBe(false)
+    }
+  })
+
   it('refuses a malformed escape and a NUL byte', () => {
     expect(fileFor('/%E0%A4%A', folders)).toBeUndefined()
     expect(fileFor('/index.html%00.js', folders)).toBeUndefined()

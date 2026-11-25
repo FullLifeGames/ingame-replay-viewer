@@ -8,6 +8,7 @@ import { cpSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join, normalize, relative } from 'node:path'
 
 import { GEN5_PATHS } from './gen5-paths.ts'
+import { EMULATORJS_COMMIT } from './gen5-pins.ts'
 
 interface PinnedPackage {
   spec: string
@@ -28,7 +29,7 @@ export const PACKAGES: readonly PinnedPackage[] = [
     tarball: `${REGISTRY}/@emulatorjs/emulatorjs/-/emulatorjs-4.2.3.tgz`,
     integrity:
       'sha512-7z3qaA4LwyurhuGvdMUDF9xJpEbxC3SNy9+E9tSaOsRo8FCS2QXam/0k/lc9kqHWRFIlLKWahNjPAStyL0rFnw==',
-    gitHead: 'e150dc0491ae747028919fb82d6598954976ede6',
+    gitHead: EMULATORJS_COMMIT,
     mount: '',
   },
   {
@@ -36,7 +37,7 @@ export const PACKAGES: readonly PinnedPackage[] = [
     tarball: `${REGISTRY}/@emulatorjs/core-melonds/-/core-melonds-4.2.3.tgz`,
     integrity:
       'sha512-IjsEBNLPPbqU2GSeWEoEkOgAonK3JEyzvoYR3ucgOXu6InzDNdfuA5kP/mMh3d6DwCUbOwfnqGZuZXMTyNE2wA==',
-    gitHead: 'e150dc0491ae747028919fb82d6598954976ede6',
+    gitHead: EMULATORJS_COMMIT,
     mount: 'data/cores',
   },
 ]

@@ -10,7 +10,7 @@ import type { ServerResponse } from 'node:http'
 import { extname, isAbsolute, join, normalize } from 'node:path'
 
 import { isSaveName, SAVES_PREFIX } from '../src/gen5/save-file.ts'
-import { isServedSitePath, isSourceArchive } from './gen5-manifest.ts'
+import { archiveName, isServedSitePath, isSourceArchive, type Source } from './gen5-manifest.ts'
 
 /** Where the fetched EmulatorJS site answers on both servers. */
 export const SITE_PREFIX = '/emulatorjs/'
@@ -81,6 +81,13 @@ export function savesFileFor(url: string, saves: string): string | undefined {
 
 /** Where the source archives answer on both servers (scripts/gen5-sources.ts). */
 export const SOURCE_PREFIX = '/source/'
+
+/** Where `source`'s archive answers on both servers. */
+export const archiveHref = (source: Source) => `${SOURCE_PREFIX}${archiveName(source)}`
+
+/** The licences page's file name: the build writes it beside the page, and both servers answer
+ * it at the root (D13). */
+export const LICENCES_PAGE = 'licences.html'
 
 /** The archive in `sources` for `/source/<archive>` with a name the manifest gives one of its
  * sources; undefined for any other path. */

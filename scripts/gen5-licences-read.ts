@@ -7,7 +7,13 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { type Archive, type LicencesInput, licencesHtml, type ReadNotice } from './gen5-licences.ts'
+import {
+  type Archive,
+  type BuildStamp,
+  type LicencesInput,
+  licencesHtml,
+  type ReadNotice,
+} from './gen5-licences.ts'
 import {
   FETCH_FIRST,
   gitReader,
@@ -26,6 +32,7 @@ import {
 } from './gen5-manifest.ts'
 import { groupNotices, type ReadTree, type TreeFile } from './gen5-notice-groups.ts'
 import { GPL_TEXT, type Notice, NOTICE_TREES, type NoticeTree, UNFOUND } from './gen5-notices.ts'
+import { LICENCES_PAGE } from './gen5-files.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
 /** The lines of `text` a notice names, or the whole text; throws when the file is too short. */
@@ -99,8 +106,20 @@ function archivesIn(sources: string): Archive[] {
   })
 }
 
-const repoGit = (...args: string[]) =>
+/** Runs git in the viewer's repository with `args` and gives what it prints. */
+export type RepoGit = (...args: string[]) => string
+
+const repoGit: RepoGit = (...args) =>
   execFileSync('git', ['-C', GEN5_PATHS.repo, ...args], { encoding: 'utf8' })
+
+/** The build's commit, its UTC day `now`, and whether `git status --porcelain` lists a change. */
+export function buildStamp(git: RepoGit, now: Date): BuildStamp {
+  return {
+    commit: git('rev-parse', 'HEAD').trim(),
+    date: now.toISOString().slice(0, 10),
+    dirty: git('status', '--porcelain').trim() !== '',
+  }
+}
 
 /** The licences page's inputs from the archives and bare repositories in `sources`. */
 export function readLicencesInput(sources: string): LicencesInput {
@@ -108,11 +127,7 @@ export function readLicencesInput(sources: string): LicencesInput {
   const read = gitReader(sources)
   const trees = readNoticeTrees(COMPONENTS, NOTICE_TREES, gitTreeReader(sources))
   return {
-    build: {
-      commit: repoGit('rev-parse', 'HEAD').trim(),
-      date: new Date().toISOString().slice(0, 10),
-      dirty: repoGit('status', '--porcelain').trim() !== '',
-    },
+    build: buildStamp(repoGit, new Date()),
     components: COMPONENTS,
     files: SITE_FILES,
     archives,
@@ -124,8 +139,8 @@ export function readLicencesInput(sources: string): LicencesInput {
   }
 }
 
-/** Writes the licences page for `input` into `folder` as licences.html. */
+/** Writes the licences page for `input` into `folder` as LICENCES_PAGE. */
 export function writeLicencesPage(folder: string, input: LicencesInput): void {
   mkdirSync(folder, { recursive: true })
-  writeFileSync(join(folder, 'licences.html'), licencesHtml(input))
+  writeFileSync(join(folder, LICENCES_PAGE), licencesHtml(input))
 }
