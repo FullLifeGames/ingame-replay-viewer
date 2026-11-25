@@ -8,6 +8,7 @@ import {
   showFailure,
   showLine,
   showOnly,
+  showVisitorLine,
 } from '../replay-view'
 import type { PanelText } from '../status'
 import type { VisitorLine } from '../visitor'
@@ -106,6 +107,9 @@ export function findWasmView() {
     },
     status: (line: string): void => {
       showLine(PAGE, line)
+    },
+    visitorLine: (shown: VisitorLine): void => {
+      showVisitorLine(PAGE, shown)
     },
     /** A failure's visitor line; a run's failure names the place of the pick it plays. */
     failure: (error: unknown, place?: ReplayPlace): void => {

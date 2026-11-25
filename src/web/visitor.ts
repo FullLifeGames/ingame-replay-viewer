@@ -97,6 +97,8 @@ export const VISITOR_LINES = {
     text: '{file} holds {size} MB, and the viewer reads replay files up to {largest} MB. Pick the replay file you saved from Showdown.',
     report: false,
   },
+  /** The end of a failed pick's line while a game plays (#69), after the pick's own line. */
+  playsOn: { text: 'The game plays on with {replay}.', report: false },
   /** A module's words that speak to visitors already: Start, memory, the emulator. */
   kept: { text: '{words}', report: false },
   unknown: { text: `The page hit a problem it has no line for. ${REPORT}`, report: true },
@@ -257,6 +259,17 @@ export function visitorLine(error: unknown, place?: ReplayPlace): VisitorLine {
   const line = fillLine(entry.text, match.values ?? {})
   const replay = at === undefined ? {} : { replay: at.replay }
   return { line, detail: messageOf(error), report: entry.report, ...replay }
+}
+
+/**
+ * The line for a pick, a Load or a file that failed. While a game plays, it says that the game
+ * plays on with the replay `playing` names, so the failure never reads as the game's (#69).
+ */
+export function pickFailureLine(error: unknown, playing: string | undefined): VisitorLine {
+  const shown = visitorLine(error)
+  if (playing === undefined) return shown
+  const playsOn = fillLine(VISITOR_LINES.playsOn.text, { replay: clip(playing, SLOT_LONGEST) })
+  return { ...shown, line: `${shown.line} ${playsOn}` }
 }
 
 /**

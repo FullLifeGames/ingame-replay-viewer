@@ -98,6 +98,12 @@ function drawLoop(view: WasmView, runs: Runs<NamedRun>, changeSpeed: (speed: Spe
   })
 }
 
+/** The id of the replay the current run plays, while its game plays: not once it failed or ended. */
+const playingId = (run: NamedRun | undefined): string | undefined =>
+  run === undefined || run.failure !== undefined || readStatus(run.control).finished
+    ? undefined
+    : run.id
+
 /** The newest pick's stream with its replay's id: what the list under the game describes. */
 async function pickedStream(choice: ReplayChoice): Promise<ListedPick | undefined> {
   const chosen = await choice.chosen()
@@ -157,6 +163,8 @@ function createViewer(view: WasmView) {
     pickTestReplay: choice.pickTestReplay,
     loadReplay: choice.loadReplay,
     loadFile: choice.loadFile,
+    /** A failed pick says that this game plays on (#69). */
+    playing: () => playingId(runs.current),
     play,
     /** The stream that ran last, from its start; the picked replay when none ran yet. */
     restart: () => play(last),

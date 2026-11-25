@@ -1,12 +1,21 @@
 // The replay controls both pages share (#52): the "Example replay" select, the form "Replay link
 // or ID" and the "Not shown in the game" list under the game. A pick or a Load fills the list
-// before Start; the texts come from status.ts, and the flow's rules from replay-choice.ts. The
-// viewer alone reads a replay file (#56). Both pages write their status line here (#59): a
-// failure's visitor line, its module's words under "Details", and the report link under it.
+// before Start; the texts come from status.ts, the flow's rules from replay-choice.ts, and what a
+// settled pick shows from pick-lines.ts. The viewer alone reads a replay file (#56). Both pages
+// write their status line here (#59): a failure's visitor line, its module's words under
+// "Details", and the report link under it.
 import type { ReplayChoice, ReplayPlace, ReplaySummary } from './replay-choice'
 import { FIRST_REPLAY, TEST_REPLAYS } from './replays'
 import { reportLink } from './report-link'
-import { countText, notShownHeading, pickedLine, replayLine, rowText } from './status'
+import {
+  loadedFrom,
+  pickedFrom,
+  type PickView,
+  type Playing,
+  showPick,
+  type Then,
+} from './pick-lines'
+import { countText, notShownHeading, replayLine, rowText } from './status'
 import { detailShown, type VisitorLine, visitorLine } from './visitor'
 
 /** The element `#id` of `page`, which must be a `type`. */
@@ -62,9 +71,14 @@ export function showLine(page: string, line: string): void {
   writeLine(page, STATUS_PARTS, { line, detail: '', report: false })
 }
 
+/** A visitor line (visitor.ts) on the status line, with its detail and report link. */
+export function showVisitorLine(page: string, shown: VisitorLine): void {
+  writeLine(page, STATUS_PARTS, shown)
+}
+
 /** A failure as its visitor line (visitor.ts); `place` names the replay when the error names none. */
 export function showFailure(page: string, error: unknown, place?: ReplayPlace): void {
-  writeLine(page, STATUS_PARTS, visitorLine(error, place))
+  showVisitorLine(page, visitorLine(error, place))
 }
 
 /** Hides everything but `shown`, for a browser that cannot run the game. */
@@ -112,64 +126,35 @@ export function findReplayView(page: string) {
 
 type ReplayView = ReturnType<typeof findReplayView>
 
-/** The replay controls with the page's status line and its failures. */
-type StatusView = ReplayView & {
-  readonly status: (line: string) => void
-  readonly failure: (error: unknown) => void
-}
-
-/** What the controls ask of a page's flow: the session's or the WebAssembly page's picks. */
-type ReplayChooser = Pick<ReplayChoice, 'pickTestReplay' | 'loadReplay'>
-
-type Then = (summary: ReplaySummary) => void
+/** The replay controls with the page's status line. */
+type StatusView = ReplayView & PickView
 
 /**
- * Shows the list of a pick, a Load or a file once it settles, then runs `then`. A failure becomes
- * the status line and puts the select back on the replay the page holds (#32).
+ * What the controls ask of a page's flow: the session's or the viewer's picks, and the replay the
+ * viewer's game plays, which a failed pick names (#69).
  */
-function showPick(
-  view: StatusView,
-  pending: Promise<ReplaySummary | undefined>,
-  then?: Then,
-): void {
-  pending
-    .then((summary) => {
-      if (summary === undefined) return
-      view.showReplay(summary)
-      then?.(summary)
-      view.keepPick()
-    })
-    .catch((error: unknown) => {
-      view.restorePick()
-      view.failure(error)
-    })
+type ReplayChooser = Pick<ReplayChoice, 'pickTestReplay' | 'loadReplay'> & {
+  readonly playing?: Playing
 }
 
-/** After a Load or a file: no test replay is picked, and the page asks for Start. */
-const loadedFrom =
-  (view: StatusView): Then =>
-  (summary) => {
-    view.testReplay.selectedIndex = -1
-    view.status(pickedLine(summary.id))
-  }
+const NO_GAME: Playing = () => undefined
 
 /**
  * Offers the test replays and picks the first, so the list shows at once; a later pick or Load
  * shows its list and asks for Start.
  */
 export function wireReplays(chooser: ReplayChooser, view: StatusView): void {
+  const playing = chooser.playing ?? NO_GAME
   const pick = (id: string, then?: Then): void => {
     const replay = TEST_REPLAYS.find((test) => test.id === id)
-    if (replay !== undefined) showPick(view, chooser.pickTestReplay(replay), then)
+    if (replay !== undefined) void showPick(view, chooser.pickTestReplay(replay), playing, then)
   }
   view.testReplay.addEventListener('change', () => {
-    pick(view.testReplay.value, (summary) => {
-      view.status(pickedLine(summary.id))
-    })
+    pick(view.testReplay.value, pickedFrom(view))
   })
   view.replayForm.addEventListener('submit', (event) => {
     event.preventDefault()
-    showPick(view, chooser.loadReplay(view.replayInput.value), loadedFrom(view))
+    void showPick(view, chooser.loadReplay(view.replayInput.value), playing, loadedFrom(view))
   })
   view.offer(
     TEST_REPLAYS.map((test) => test.id),
@@ -183,13 +168,13 @@ export function wireReplays(chooser: ReplayChooser, view: StatusView): void {
  * at once, so the same file picked again fires a change; the file stays in the tab.
  */
 export function wireReplayFile(
-  chooser: Pick<ReplayChoice, 'loadFile'>,
+  chooser: Pick<ReplayChoice, 'loadFile'> & { readonly playing?: Playing },
   view: StatusView & { readonly replayFile: HTMLInputElement },
 ): void {
   view.replayFile.addEventListener('change', () => {
     const file = view.replayFile.files?.[0]
     if (file === undefined) return
     view.replayFile.value = ''
-    showPick(view, chooser.loadFile(file), loadedFrom(view))
+    void showPick(view, chooser.loadFile(file), chooser.playing ?? NO_GAME, loadedFrom(view))
   })
 }
