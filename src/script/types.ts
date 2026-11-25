@@ -4,10 +4,10 @@
 /**
  * Why a battle log line is a dropped line. `state` marks a line whose state the client keeps and
  * a later line shows (`-mustrecharge`: the next turn's `cant`). `preview` marks a Team Preview
- * line: the intro's balls show each team. `format` marks a line a format writes for its own
- * client (`|custom|`). `unknown` and `unsupported` mark lines the battle script cannot show yet;
- * no test replay may contain them, except an `unsupported` line of a kind the named list keeps
- * as "no rule yet" (`census.ts`).
+ * line: the intro's balls show each team, and the page lists both teams. `format` marks a line a
+ * format writes for its own client (`|custom|`). `unknown` and `unsupported` mark lines the
+ * battle script cannot show yet; no test replay may contain them, except an `unsupported` line of
+ * a kind the named list keeps as "no rule yet" (`census.ts`).
  */
 export type DropReason =
   | 'spacer'
@@ -65,3 +65,14 @@ export interface TeamMember {
   readonly level: number
   readonly shiny: boolean
 }
+
+/** A team member as Team Preview shows it, before the battle reveals any nickname. */
+export interface PreviewMember {
+  /** @pkmn's species name; a hidden forme such as `Arceus-*` reads as its base species. */
+  readonly species: string
+  readonly gender?: 'M' | 'F'
+  readonly level: number
+}
+
+/** Both sides' teams as Team Preview shows them, each in the log's order. */
+export type Preview = Readonly<Record<Side, readonly PreviewMember[]>>

@@ -10,12 +10,13 @@ import { dropReasonOf } from './drops'
 import { GameTypeRefusal, ScriptError } from './errors'
 import { HitFolder } from './hits'
 import { readLines } from './lines'
+import { genderOf, previewOf } from './preview'
 import { bySide } from './refs'
 import type { LogLine } from './lines'
 import { eventsOf, ruleFor, unreadPart } from './rules/index'
 import type { Before } from './rules/index'
 import type { BattleScript, ScriptEvent } from './events'
-import type { DroppedLine, DropReason, Side, TeamMember } from './types'
+import type { DroppedLine, DropReason, Preview, Side, TeamMember } from './types'
 
 interface Build {
   readonly battle: Battle
@@ -24,6 +25,8 @@ interface Build {
   readonly hits: HitFolder
   readonly players: Partial<Record<Side, string>>
   started: boolean
+  /** The teams as `|teampreview|` left them, for the page's list (#87). */
+  preview?: Preview
 }
 
 function drop(build: Build, line: LogLine, reason: DropReason, detail?: string): void {
@@ -69,6 +72,7 @@ function readLine(build: Build, line: LogLine): void {
   refuseGameType(line)
   const before = beforeOf(build)
   addToClient(build.battle, line)
+  if (line.key === '|teampreview|') build.preview = previewOf(build.battle)
   const reason = dropReasonOf(line, build.started)
   build.started ||= line.key === '|start|'
   const rule = ruleFor(line.key)
@@ -91,8 +95,8 @@ function readLine(build: Build, line: LogLine): void {
  * `speciesForme` is the form of a form change or Transform while it lasts.
  */
 function memberOf(pokemon: Pokemon): TeamMember {
-  const { baseSpeciesForme: species, name, gender, level, shiny } = pokemon
-  return { species, name, ...(gender === 'M' || gender === 'F' ? { gender } : {}), level, shiny }
+  const { baseSpeciesForme: species, name, level, shiny } = pokemon
+  return { species, name, ...genderOf(pokemon), level, shiny }
 }
 
 /** Turns a battle log into its battle script. Throws a ScriptError the script cannot follow. */
@@ -109,12 +113,13 @@ export function buildBattleScript(log: string): BattleScript {
   for (const line of readLines(log)) {
     readLine(build, line)
   }
-  const { battle, events, dropped } = build
+  const { battle, events, dropped, preview } = build
   events.push(...hits.flush())
   return {
     gen: battle.gen.num,
     format: battle.tier,
     teams: bySide(battle, (side) => side.team.map(memberOf)),
+    ...(preview === undefined ? {} : { preview }),
     events,
     dropped,
   }

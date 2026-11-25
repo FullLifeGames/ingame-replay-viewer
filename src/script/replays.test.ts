@@ -37,9 +37,12 @@ function isSorted(numbers: readonly number[]): boolean {
  * The battle script as JSON lines: first the header, then the events and the dropped lines,
  * merged in log order, so a snapshot diff reads along the battle log.
  */
-function toJsonl({ gen, format, teams, events, dropped }: BattleScript): string {
+function toJsonl({ gen, format, teams, preview, events, dropped }: BattleScript): string {
   const rows = [...events, ...dropped].sort((a, b) => a.line - b.line)
-  return [{ gen, format, teams }, ...rows].map((row) => `${JSON.stringify(row)}\n`).join('')
+  // JSON drops an absent `preview`, so the header of a log without Team Preview stays as it was.
+  return [{ gen, format, teams, preview }, ...rows]
+    .map((row) => `${JSON.stringify(row)}\n`)
+    .join('')
 }
 
 describe.each(replays)('the battle script of $id', ({ id, log, script }) => {

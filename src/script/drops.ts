@@ -42,7 +42,8 @@ const REASONS: Partial<Record<Protocol.ArgName, DropReason>> = {
   '|warning|': 'room',
   '|-hint|': 'hint',
   '|debug|': 'debug',
-  // Team Preview, which a format can add as a rule: the intro's balls show each team.
+  // Team Preview, which a format can add as a rule: the intro's balls show each team, and the
+  // page lists both teams from the script's `preview` (#87).
   '|clearpoke|': 'preview',
   '|poke|': 'preview',
   '|teampreview|': 'preview',
