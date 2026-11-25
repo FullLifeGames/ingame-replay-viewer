@@ -2,9 +2,9 @@
 
 Two pages. The viewer (`index.html`, at `/`) runs the game as WebAssembly, without an emulator. The emulator page (`emulator.html`) plays the replay in the patched ROM in mGBA (`@thenick775/mgba-wasm`) and stays as the fallback. Each page links the other. On both you pick your US Emerald dump and a replay, then press Start. Below the game, each page lists every battle log line the game does not show: the dropped lines and the backend's fallbacks.
 
-On the emulator page, the Start tap opens the page's audio context and hands it to mGBA, which loads seconds later. Firefox opens audio only while a tap lasts, so a context opened after the load stays silent there. If the browser refuses the context, the replay plays without sound. Each Start opens a new context, because mGBA closes its audio when it quits the last game.
+On the emulator page, the Start tap opens the page's audio context and hands it to mGBA, which loads seconds later. Firefox opens audio only while a tap lasts, so a context opened after the load stays silent there. If the browser refuses the context, the replay plays without sound. Each Start opens a new context, because mGBA closes its audio when it quits the last game. Restart resumes the context inside its own tap, before the handler waits for anything (`emulator-presses.ts`).
 
-The DOM-free modules (`session.ts`, `replay-choice.ts`, `pick-lines.ts`, `fetch.ts`, `rom.ts`, `stream.ts`, `visitor.ts` and the rest) have specs in Node. `main.ts`, `view.ts` and `replay-view.ts` hold the DOM wiring; the e2e covers them, and coverage leaves them out.
+The DOM-free modules (`session.ts`, `replay-choice.ts`, `pick-lines.ts`, `emulator-presses.ts`, `fetch.ts`, `rom.ts`, `stream.ts`, `visitor.ts` and the rest) have specs in Node. `main.ts`, `view.ts` and `replay-view.ts` hold the DOM wiring; the e2e covers them, and coverage leaves them out.
 
 ## Starting the pages
 

@@ -38,8 +38,11 @@ export const DESCRIPTION: SlotDescription = {
 export const SHOWDOWN_994176 = 'https://replay.pokemonshowdown.com/smogtours-gen3ou-994176.json'
 export const MISSING = 'build/rom/irv-emerald.bps is missing: run npm run rom:build'
 
-/** The page's world: its server, Showdown and the emulator, with a log of what the session did. */
-export function world() {
+/**
+ * The page's world: its server, Showdown and the emulator, with a log of what the session did.
+ * `adapter` stands in for the fake emulator, such as createEmulator over a fake core.
+ */
+export function world(adapter?: Emulator) {
   const answers = new Map<string, unknown>([
     [ROM_FILES.patch, PATCH],
     [ROM_FILES.slot, DESCRIPTION],
@@ -76,7 +79,7 @@ export function world() {
       log.loads += 1
       if (log.refuseLoad)
         return Promise.reject(new Error('WebAssembly.instantiate(): out of memory'))
-      return Promise.resolve(emulator)
+      return Promise.resolve(adapter ?? emulator)
     },
     onCrash: (line) => crashLines.push(line),
     baseSha1: BASE_SHA1,
