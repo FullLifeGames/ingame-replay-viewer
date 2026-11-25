@@ -1,6 +1,6 @@
 // The team list under the game (#87): a replay that opens with Team Preview lists both teams of
 // six, the far side first and each side in the log's order, on a phone-wide screen without a
-// sideways scroll. Both lists start level when one heading wraps.
+// sideways scroll. Both lists start level when one heading wraps, and a second pick replaces them.
 // A replay without Team Preview hides the list. The page needs no dump for this.
 import { expect, type Page, test } from '@playwright/test'
 
@@ -8,6 +8,7 @@ import { scrollWidth } from './page-text.ts'
 import { guardRequests } from './requests.ts'
 
 const GEN5 = 'smogtours-gen5ou-862240'
+const GEN5_LADDER = 'gen5ou-2718717830'
 const GEN3 = 'smogtours-gen3ou-994052'
 const WIDTH = 390
 
@@ -79,4 +80,32 @@ test('both lists start level when the near heading wraps to two lines', async ({
   const nearTop = await topOf(page, '#teams-near-members li:first-child')
   expect(Math.abs(far - nearTop)).toBeLessThanOrEqual(1)
   expect(await scrollWidth(page)).toBeLessThanOrEqual(WIDTH)
+})
+
+test('a second Gen 5 pick replaces both teams and their headings', async ({ page }) => {
+  await page.goto('/')
+  const { list, far, near, farMembers, nearMembers } = teams(page)
+  await page.getByLabel('Example replay').selectOption(GEN5)
+  await expect(far).toHaveText('Far side: Monai')
+
+  await page.getByLabel('Example replay').selectOption(GEN5_LADDER)
+  await expect(list).toBeVisible()
+  await expect(far).toHaveText('Far side: abc2158')
+  await expect(near).toHaveText('Near side: isolatedstar')
+  await expect(farMembers).toHaveText([
+    'Ninetales ♂',
+    'Volcarona ♂',
+    'Starmie',
+    'Darmanitan ♀',
+    'Blissey ♀',
+    'Ferrothorn ♂',
+  ])
+  await expect(nearMembers).toHaveText([
+    'Ferrothorn ♀',
+    'Keldeo',
+    'Politoed ♂',
+    'Tentacruel ♀',
+    'Thundurus-Therian ♂',
+    'Scizor ♀',
+  ])
 })
