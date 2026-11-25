@@ -20,7 +20,15 @@ import { MAIN_RAM_SIZE, MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import type { RamRef } from '../src/gen5/ram-check.ts'
 import { momentSteps } from './gen5-moment-plan.ts'
 import { listedReader } from './gen5-bw2-source.ts'
-import { type SceneName, sceneBlocks, TEXT_BANKS, textId, textLine } from './gen5-moment-scene.ts'
+import {
+  moveLineLabel,
+  type SceneName,
+  sceneBlocks,
+  sceneMove,
+  TEXT_BANKS,
+  textId,
+  textLine,
+} from './gen5-moment-scene.ts'
 import { log, sampleLine, waitForStart } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve, watchRequests } from './gen5-shot.ts'
@@ -173,9 +181,10 @@ async function play(page: Page, numbers: Bw2Numbers, scene: SceneName, deadline:
   const std = textId(bank('standard'), 'Bank0019_Text_ItsSuperEffective')
   const blocks = sceneBlocks(scene, battle, numbers.battle.single, std)
   for (const { name, moment } of blocks) {
-    const variant = moment.attacker.monId === battle.near.monId ? 0 : 2
+    const side = moment.attacker.monId === battle.near.monId ? 'near' : 'far'
+    const label = moveLineLabel(sceneMove(scene, side), side)
     log(
-      `${name}: ${JSON.stringify(moment)}; bank 16 line ${String(moment.move * 3 + variant)}: ${textLine(bank('move'), moment.move * 3 + variant)}`,
+      `${name}: ${JSON.stringify(moment)}; ${label}: ${textLine(bank('move'), textId(bank('move'), label))}`,
     )
   }
   log(`standard line ${String(std)}: ${textLine(bank('standard'), std)}`)

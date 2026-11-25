@@ -2,7 +2,7 @@ import { Dex } from '@pkmn/dex'
 import { describe, expect, it } from 'vitest'
 
 import type { BattleMonReading } from '../src/gen5/battle-mons'
-import { sceneBlocks, textId, textLine } from './gen5-moment-scene'
+import { moveLineLabel, sceneBlocks, sceneMove, textId, textLine } from './gen5-moment-scene'
 
 // Invented readings in the shape the page reads from the clients' container.
 const NEAR: BattleMonReading = {
@@ -69,5 +69,24 @@ describe('textId and textLine', () => {
     expect(textLine(BANK, 1)).toBe('{0102:0} used\\nOne!')
     expect(() => textId(BANK, 'Bank_Text_Absent')).toThrow(/Absent/)
     expect(() => textLine(BANK, 9)).toThrow(/9/)
+  })
+})
+
+// Scene: the log names a move's line by its label, as it names the standard line, so no rule of
+// the bank's order stays in code. The bank and its order are invented.
+describe('moveLineLabel and sceneMove', () => {
+  const MOVES = 'Bank0016_Text_FoesUsedHydroPump = f\nBank0016_Text_UsedDoubleEdge = n\n'
+
+  it("gives the near side's and the far side's label of a move, its name without spaces", () => {
+    expect(moveLineLabel('Hydro Pump', 'far')).toBe('Bank0016_Text_FoesUsedHydroPump')
+    expect(textId(MOVES, moveLineLabel('Double-Edge', 'near'))).toBe(1)
+    expect(() => moveLineLabel('No Such Move', 'near')).toThrow(/No Such Move/)
+  })
+
+  it("names each side's move of a scene", () => {
+    expect([sceneMove('unknown', 'near'), sceneMove('unknown', 'far')]).toEqual([
+      'Flamethrower',
+      'Hydro Pump',
+    ])
   })
 })

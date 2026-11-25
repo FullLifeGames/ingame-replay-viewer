@@ -16,8 +16,16 @@ import { momentCommands } from '../src/gen5/moment.ts'
 import { packCommands } from '../src/gen5/server-cmd.ts'
 import { checkAdapterLayout, SYMBOL_NAMES } from './gen5-bw2.ts'
 import { MOMENT_COMMANDS, namesOutsideMainRam, zeroArguments } from './gen5-bw2-report.ts'
-import { POKEBW2 } from './gen5-bw2-source.ts'
-import { type SceneName, sceneBlocks } from './gen5-moment-scene.ts'
+import { listedReader, POKEBW2 } from './gen5-bw2-source.ts'
+import {
+  moveLineLabel,
+  type SceneName,
+  sceneBlocks,
+  sceneMove,
+  type Side,
+  TEXT_BANKS,
+  textId,
+} from './gen5-moment-scene.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
 const FILE = GEN5_PATHS.bw2Json
@@ -48,6 +56,9 @@ const MONS = {
 
 /** An invented standard line's ID: the largest moment carries one after the bar. */
 const STD_MESSAGE = 1
+
+const SCENES: SceneName[] = ['known', 'unknown']
+const SIDES: Side[] = ['near', 'far']
 
 describe.skipIf(!existsSync(FILE))('the Gen 5 code on the generated numbers', () => {
   it('come from the pinned commit', () => {
@@ -100,8 +111,7 @@ describe.skipIf(!existsSync(FILE))('the Gen 5 code on the generated numbers', ()
   it("hand each scene's moments to the adapter, which takes each block", () => {
     const numbers = real()
     const adapter = adapterNumbers(numbers)
-    const scenes: SceneName[] = ['known', 'unknown']
-    const fails = scenes.flatMap((scene) =>
+    const fails = SCENES.flatMap((scene) =>
       sceneBlocks(scene, MONS, numbers.battle.single, STD_MESSAGE)
         .filter(({ moment }) => {
           const block = () => packCommands(numbers, momentCommands(moment))
@@ -110,5 +120,17 @@ describe.skipIf(!existsSync(FILE))('the Gen 5 code on the generated numbers', ()
         .map(({ name }) => `${scene} ${name}`),
     )
     expect(fails).toEqual([])
+  })
+
+  it("find the lines the log names by label in pokebw2's text banks", () => {
+    const read = listedReader(GEN5_PATHS.pokebw2)
+    const has = (bank: string, label: string) => passes(() => textId(bank, label))
+    const moves = read(TEXT_BANKS.move)
+    const labels = SCENES.flatMap((scene) =>
+      SIDES.flatMap((mover) => SIDES.map((side) => moveLineLabel(sceneMove(scene, mover), side))),
+    )
+    expect(labels.filter((label) => !has(moves, label))).toEqual([])
+    const standard = 'Bank0019_Text_ItsSuperEffective'
+    expect(has(read(TEXT_BANKS.standard), standard), standard).toBe(true)
   })
 })

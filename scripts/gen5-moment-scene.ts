@@ -11,6 +11,9 @@ import type { Moment } from '../src/gen5/moment.ts'
 
 export type SceneName = 'known' | 'unknown'
 
+/** A replay side: the near one at the bottom of the screen, the far one at the top. */
+export type Side = 'near' | 'far'
+
 /** The text banks of pokebw2 that the run reads its lines from: the move lines and the
  * standard lines. */
 export const TEXT_BANKS = {
@@ -28,10 +31,24 @@ const SCENES: Record<SceneName, { near: string; farHp: number; far: string; near
   unknown: { near: 'Flamethrower', farHp: 3, far: 'Hydro Pump', nearHp: 2 },
 }
 
-function moveNumber(name: string): number {
+function dexMove(name: string) {
   const move = Dex.forGen(5).moves.get(name)
   if (!move.exists) throw new Error(`@pkmn/dex knows no move ${name}`)
-  return move.num
+  return move
+}
+
+const moveNumber = (name: string) => dexMove(name).num
+
+/** The move that `side`'s Pokémon uses in `scene`. */
+export function sceneMove(scene: SceneName, side: Side): string {
+  return SCENES[scene][side]
+}
+
+/** The label in the move bank of the line "X used Y!" for `side`'s Pokémon: the far side's
+ * line names it as the foe's. */
+export function moveLineLabel(moveName: string, side: Side): string {
+  const name = dexMove(moveName).name.replace(/[^A-Za-z0-9]/g, '')
+  return `Bank0016_Text_${side === 'far' ? 'FoesUsed' : 'Used'}${name}`
 }
 
 export function sceneBlocks(
