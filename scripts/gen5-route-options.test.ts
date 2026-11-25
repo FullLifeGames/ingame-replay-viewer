@@ -44,6 +44,11 @@ describe('readRouteOptions', () => {
     expect(readRouteOptions(['--query', 'save=x'], NOW).query).toBe('?save=x')
   })
 
+  it('reads the continue route with the probe east after it', () => {
+    const args = ['--route', 'continue-probe', '--save', 'build/gen5/saves/route-20.sav']
+    expect(readRouteOptions(args, NOW).route).toBe('continue-probe')
+  })
+
   it('reads the trainer route from a state of the rival battle', () => {
     const args = ['--route', 'trainer', '--state', 's5-battle', '--label', 's78t1']
     const options = readRouteOptions([...args, '--uncapped', '--minutes', '19'], NOW)
@@ -58,7 +63,7 @@ describe('readRouteOptions', () => {
 
   it('refuses a route it does not know', () => {
     expect(() => readRouteOptions(['--route', 'gym'], NOW)).toThrow(
-      '--route takes new-game, save-here, continue or trainer, not "gym".',
+      '--route takes new-game, save-here, continue, continue-probe or trainer, not "gym".',
     )
   })
 

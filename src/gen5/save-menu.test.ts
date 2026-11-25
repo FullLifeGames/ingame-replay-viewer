@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import type { MacroStep } from './macro'
-import { SAVE_SLOT_BEFORE_POKEMON, saveGame, WRITE_FRAMES } from './save-menu'
+import {
+  fastText,
+  OPTIONS_SLOT_WITH_POKEDEX,
+  SAVE_SLOT_BEFORE_POKEMON,
+  SAVE_SLOT_WITH_POKEDEX,
+  saveGame,
+  WRITE_FRAMES,
+} from './save-menu'
 
 const pressed = (steps: readonly MacroStep[]) =>
   steps.flatMap((step) => (step.kind === 'press' ? step.buttons : []))
@@ -66,9 +73,55 @@ describe('saveGame', () => {
     }
   })
 
-  it("places the Save button of the menu before the first Pokémon in the menu's grid", () => {
-    const { row, column } = SAVE_SLOT_BEFORE_POKEMON
-    expect([0, 1, 2]).toContain(row)
-    expect([0, 1]).toContain(column)
+  it("places the Save button of each menu in the menu's grid", () => {
+    for (const { row, column } of [SAVE_SLOT_BEFORE_POKEMON, SAVE_SLOT_WITH_POKEDEX]) {
+      expect([0, 1, 2]).toContain(row)
+      expect([0, 1]).toContain(column)
+    }
+  })
+})
+
+/** Whether no more than 30 frames pass between two marks. */
+function markedOften(steps: readonly MacroStep[]): boolean {
+  let since = 0
+  return steps.every((step) => {
+    since = step.kind === 'mark' ? 0 : since + ('frames' in step ? step.frames : 0)
+    return since <= 30
+  })
+}
+
+// Scene: IRV stands on Route 20 with Pokémon and a Pokédex, and the macro sets the text speed to
+// fast in Options before the save, so the battle's text after Continue prints quicker.
+describe('fastText', () => {
+  const steps = fastText(OPTIONS_SLOT_WITH_POKEDEX)
+  const open = nthPress(steps, 'A', 1)
+  const confirm = nthPress(steps, 'A', 2)
+
+  it('opens the menu with X and takes the Options button with the first A', () => {
+    expect(pressed(steps)[0]).toBe('X')
+    const toOptions = pressed(steps.slice(0, open))
+    expect(toOptions.filter((button) => button === 'Down')).toHaveLength(2)
+    expect(toOptions.filter((button) => button === 'Right')).toHaveLength(1)
+  })
+
+  it('steps the text speed right past fast and confirms with A, with no B in the panel', () => {
+    const inPanel = pressed(steps.slice(open + 1, confirm))
+    expect(inPanel.filter((button) => button === 'Right').length).toBeGreaterThanOrEqual(3)
+    expect(inPanel.filter((button) => button !== 'Right')).toEqual([])
+  })
+
+  it('closes the menu with B after the panel and ends with the mark "text-fast"', () => {
+    expect(pressed(steps.slice(confirm + 1))).toEqual(['B', 'B'])
+    expect(steps.at(-1)).toEqual({ kind: 'mark', name: 'text-fast' })
+  })
+
+  it("names each mark once, apart from the save's, and marks every 30 frames at most", () => {
+    const names = [...markNames(steps), ...markNames(saveGame(SAVE_SLOT_WITH_POKEDEX))]
+    expect(new Set(names).size).toBe(names.length)
+    expect(markedOften(steps)).toBe(true)
+  })
+
+  it('finds Options beside Save in the bottom row of the menu with the Pokédex', () => {
+    expect(OPTIONS_SLOT_WITH_POKEDEX).toEqual({ ...SAVE_SLOT_WITH_POKEDEX, column: 1 })
   })
 })

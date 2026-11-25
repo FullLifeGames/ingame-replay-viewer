@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest'
 import type { RoutePlaces } from './bw2-numbers'
 import type { MacroStep } from './macro'
 import { PLAYER_Z } from './route'
-import { trainerRoute } from './trainer-route'
+import { fastText, OPTIONS_SLOT_WITH_POKEDEX, SAVE_SLOT_WITH_POKEDEX, saveGame } from './save-menu'
+import { FIELD_X, trainerRoute } from './trainer-route'
 
 /** Invented places of the map's events, far from any real town's. */
 const PLACES: RoutePlaces = {
@@ -27,13 +28,16 @@ const waitMarks = (steps: readonly MacroStep[]) =>
       : [],
   )
 
+/** A mark a beat hands out (`<scene>-NN`), as against the mark that ends a scene. */
+const isBeat = (name: string) => /-\d+$/.test(name)
+
 const pressedA = (step: MacroStep) =>
   (step.kind === 'press' && step.buttons.includes('A')) ||
   ((step.kind === 'mash' || step.kind === 'until') && step.mash?.buttons.includes('A') === true)
 
 // Scene: IRV stands in the rival battle's action menu (the spike's state s5-battle), and the
-// macro plays the story on from there towards a save before a trainer on Route 20. This session's
-// part ends in Floccesy Town after Alder's errand; the save comes in a later one.
+// macro plays the story on from there to a save on Route 20, a few tiles west of Youngster
+// Terrell's sight line, with the text speed set to fast.
 describe('trainerRoute', () => {
   const { steps, stateMarks } = trainerRoute(PLACES)
 
@@ -53,7 +57,15 @@ describe('trainerRoute', () => {
 
   it('passes the scenes in story order', () => {
     const scenes = ['center-door', 'center-tour', 'center-exit', 'city-free', 'gate-road']
-    scenes.push('route-19', 'capture-over', 'alder-gone', 'house-08', 'errand-12')
+    scenes.push(
+      'bianca-call',
+      'capture-over',
+      'alder-gone',
+      'house-08',
+      'errand-12',
+      'before-terrell',
+    )
+    scenes.push('text-fast', 'saved')
     const names = markNames(steps)
     expect(scenes.map((scene) => names.indexOf(scene))).toEqual(
       [...scenes.map((scene) => names.indexOf(scene))].sort((a, b) => a - b),
@@ -61,18 +73,33 @@ describe('trainerRoute', () => {
     expect(scenes.filter((scene) => !names.includes(scene))).toEqual([])
   })
 
-  it('presses no A after the battle: B closes the text and starts no talk', () => {
-    expect(steps.slice(1).filter(pressedA)).toEqual([])
+  it("walks east to the save's place by the field's position, Right held", () => {
+    const walk =
+      steps[steps.findIndex((step) => step.kind === 'mark' && step.name === 'before-terrell') - 1]
+    expect(walk).toMatchObject({ kind: 'until', mash: { buttons: ['Right'] } })
+    expect(walk?.kind === 'until' && walk.checks[0]?.address).toBe(FIELD_X.address)
   })
 
-  it('keeps a state at every mark of its own, and none at the marks of its waits', () => {
-    expect(stateMarks).toEqual(markNames(steps))
+  it('ends with the text speed set in Options and the save in the menu with the Pokédex', () => {
+    const menu = [...fastText(OPTIONS_SLOT_WITH_POKEDEX), ...saveGame(SAVE_SLOT_WITH_POKEDEX)]
+    expect(steps.slice(-menu.length)).toEqual(menu)
+  })
+
+  it('presses no A between the battle and the menu: B closes the text and starts no talk', () => {
+    const menu =
+      fastText(OPTIONS_SLOT_WITH_POKEDEX).length + saveGame(SAVE_SLOT_WITH_POKEDEX).length
+    expect(steps.slice(1, -menu).filter(pressedA)).toEqual([])
+  })
+
+  it('keeps a state at the marks that end a scene, and none at the beats or the waits', () => {
+    expect(stateMarks).toEqual(markNames(steps).filter((name) => !isBeat(name)))
+    expect(stateMarks).toEqual(expect.arrayContaining(['center-door', 'before-terrell', 'saved']))
   })
 
   it('plays on after the mark of the state it starts from, and keeps the states after it', () => {
     const from = trainerRoute(PLACES, 'city-free')
     expect(markNames(from.steps)[0]).toBe('gate-column')
-    expect(from.stateMarks).toEqual(markNames(from.steps))
+    expect(from.stateMarks).toEqual(markNames(from.steps).filter((name) => !isBeat(name)))
     expect(trainerRoute(PLACES, 'battle').steps).toEqual(steps)
   })
 })

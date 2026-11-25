@@ -1,11 +1,11 @@
 // The route runs of the Gen 5 spike (#72, #78): plays a route on the spike page in headless
 // Chromium, from boot or from a state under build/gen5/states/: the new game of src/gen5/route.ts
 // up to a mark or its end, the save from the field menu (src/gen5/save-menu.ts), the continue
-// from a save (src/gen5/continue-route.ts), or the story on from the rival battle
-// (src/gen5/trainer-route.ts). At each mark the page saves a state and the core's frame;
-// scripts/gen5-route-run.ts writes them to build/gen5/states/ and build/gen5/frames/
-// (gitignored, ADR 0002; never served or committed) and logs the emulated frame, the wall time and
-// a hash of main RAM. Requests stay on the machine and carry no body (scripts/gen5-requests.ts).
+// from a save (src/gen5/continue-route.ts), with or without a probe east after it, or the story
+// on from the rival battle (src/gen5/trainer-route.ts). At each mark the page saves a state and
+// the core's frame; scripts/gen5-route-run.ts writes them to build/gen5/states/ and
+// build/gen5/frames/ (gitignored, ADR 0002; never served or committed) and logs the emulated
+// frame, the wall time and a hash of main RAM. Requests stay on the machine and carry no body (scripts/gen5-requests.ts).
 // Usage: GEN5_DUMP=<path> node scripts/gen5-route.ts with the options of
 // scripts/gen5-route-options.ts.
 import { mkdirSync, readFileSync } from 'node:fs'
@@ -15,12 +15,12 @@ import { chromium, type Page } from '@playwright/test'
 
 import { battleRefs } from '../src/gen5/battle-check.ts'
 import type { Bw2Numbers, RoutePlaces } from '../src/gen5/bw2-numbers.ts'
-import { continueRoute } from '../src/gen5/continue-route.ts'
+import { continueRoute, probeEast } from '../src/gen5/continue-route.ts'
 import type { Gen5Global, RunPlan } from '../src/gen5/hook.ts'
 import { routeSlice } from '../src/gen5/macro.ts'
 import { newGameRoute, PLAYER_X, PLAYER_Z } from '../src/gen5/route.ts'
 import { SAVE_SLOT_BEFORE_POKEMON, saveGame } from '../src/gen5/save-menu.ts'
-import { trainerRoute } from '../src/gen5/trainer-route.ts'
+import { FIELD_X, FIELD_Z, trainerRoute } from '../src/gen5/trainer-route.ts'
 import { log, logSave, sampleLine, waitForStart } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { readRouteOptions, type RouteOptions, stateBase } from './gen5-route-options.ts'
@@ -31,6 +31,10 @@ import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve } from './gen5-shot.ts'
 type BattleRefs = ReturnType<typeof battleRefs>
 
 type Route = Pick<RunPlan, 'steps' | 'stateMarks'>
+
+/** The probe's beats after Continue: 40 of 30 frames, room for a few tiles' walk, the trainer's
+ * walk-up and line, and the battle's opening. */
+const PROBE_BEATS = 40
 
 /** The steps of the chosen route; the save route keeps one state, at its mark `saved`, and the
  * trainer route plays on after `from`, the mark of the state it starts from. */
@@ -43,13 +47,15 @@ function routeOf(
   if (options.route === 'save-here')
     return { steps: saveGame(SAVE_SLOT_BEFORE_POKEMON), stateMarks: ['saved'] }
   if (options.route === 'continue') return { steps: continueRoute() }
+  if (options.route === 'continue-probe')
+    return { steps: [...continueRoute(), ...probeEast(PROBE_BEATS)] }
   if (options.route === 'trainer') return trainerRoute(places, from)
   return { steps: routeSlice(newGameRoute(places, refs.checks), options.from, options.to) }
 }
 
 function readPlan(options: RouteOptions, refs: BattleRefs, places: RoutePlaces): RunPlan {
   const { watch } = refs
-  const markRefs = [PLAYER_X, PLAYER_Z]
+  const markRefs = [PLAYER_X, PLAYER_Z, FIELD_X, FIELD_Z]
   const base = stateBase(options)
   if (base === undefined)
     return { ...routeOf(options, refs, places), watch, markRefs, startFrame: 0 }

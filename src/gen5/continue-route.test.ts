@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { RoutePlaces } from './bw2-numbers'
-import { continueRoute } from './continue-route'
+import { continueRoute, probeEast } from './continue-route'
 import { type MacroStep, routeSlice } from './macro'
 import { newGameRoute } from './route'
 
@@ -43,5 +43,26 @@ describe('continueRoute', () => {
 
   it('waits through the wipe and the fade before the mark "field"', () => {
     expect(framesOf(routeSlice(steps, 'continue', 'field'))).toBeGreaterThanOrEqual(600)
+  })
+})
+
+// Scene: IRV stands on Route 20 after CONTINUE, a few tiles west of a trainer's sight line, and the
+// probe walks him east into it, so the frames show the trainer's "!" and the battle's start.
+describe('probeEast', () => {
+  const steps = probeEast(3)
+
+  it("holds Right on every frame and presses A to close the trainer's line", () => {
+    for (const step of steps.filter((each) => each.kind !== 'mark')) {
+      expect(step).toMatchObject({ kind: 'mash', mash: { buttons: ['A'], held: ['Right'] } })
+    }
+  })
+
+  it('marks probe-01 on, every 30 frames', () => {
+    expect(steps.flatMap((step) => (step.kind === 'mark' ? [step.name] : []))).toEqual([
+      'probe-01',
+      'probe-02',
+      'probe-03',
+    ])
+    expect(framesOf(steps)).toBe(90)
   })
 })
