@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import type { ActorPlace } from '../src/gen5/bw2-numbers'
 import { continueRoute } from '../src/gen5/continue-route'
 import type { RamCheck, RamRef } from '../src/gen5/ram-check'
 import { firstRun, readMomentOptions, type StateFile } from './gen5-moment-args'
@@ -13,6 +14,9 @@ const CHECKS: RamCheck[] = [
 ]
 const WATCH: RamRef[] = [{ name: 'mode', address: 0x02100000, width: 4 }]
 const REFS = { checks: CHECKS, watch: WATCH }
+
+/** An invented tile of the save's trainer, far from any real route's. */
+const TRAINER: ActorPlace = { x: 30, z: 300 }
 
 /** An invented state file: its base64, frame and main RAM hash. */
 const STATE: StateFile = { state: 'c3RhdGU=', frame: 1234, ramSha: 'ab'.repeat(32) }
@@ -68,8 +72,8 @@ describe('firstRun', () => {
 
   it('starts from boot with the continue route to the action menu, and loads no state', () => {
     const start = readMomentOptions(['--save', 'route-20'], NOW).start
-    const plan = firstRun(start, REFS, noState)
-    expect(plan.steps).toEqual(continueRoute(CHECKS))
+    const plan = firstRun(start, REFS, TRAINER, noState)
+    expect(plan.steps).toEqual(continueRoute(TRAINER, CHECKS))
     expect(plan.state).toBeUndefined()
     expect(plan.stateSha).toBeUndefined()
     expect(plan.startFrame).toBe(0)
@@ -79,7 +83,7 @@ describe('firstRun', () => {
 
   it('ends the route at the mark battle, where the action menu stands untouched', () => {
     const start = readMomentOptions(['--save', 'route-20'], NOW).start
-    const marks = firstRun(start, REFS, noState).steps.flatMap((step) =>
+    const marks = firstRun(start, REFS, TRAINER, noState).steps.flatMap((step) =>
       step.kind === 'mark' ? [step.name] : [],
     )
     expect(marks.at(-1)).toBe('battle')
@@ -87,7 +91,7 @@ describe('firstRun', () => {
 
   it('loads the spike state with no flag and waits two frames, as the spike did', () => {
     const read: string[] = []
-    const plan = firstRun(readMomentOptions([], NOW).start, REFS, (base) => {
+    const plan = firstRun(readMomentOptions([], NOW).start, REFS, TRAINER, (base) => {
       read.push(base)
       return STATE
     })

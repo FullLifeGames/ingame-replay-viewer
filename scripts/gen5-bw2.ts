@@ -1,8 +1,8 @@
 // Generates build/gen5/bw2.json, the Gen 5 spike's numbers of Black 2 (USA) (#72, D4), from
 // pokebw2 at its pin (gen5-bw2-source.ts): the addresses S6 needs, the adapter and server command
-// enums, each argument format's puts, the message rules, the adapter's layout and the route's
-// places in the map's events. The checkout lives in .cache/gen5/pokebw2/ and the output in
-// build/gen5/; nothing of pokebw2 is committed.
+// enums, each argument format's puts, the message rules, the adapter's layout, the route's places
+// in the map's events and the tile of the shipped save's trainer. The checkout lives in
+// .cache/gen5/pokebw2/ and the output in build/gen5/; nothing of pokebw2 is committed.
 // Usage: node scripts/gen5-bw2.ts [--checkout <dir>] [--quiet] (fetches on the first run). With
 // --quiet the report gives the pin, counts and checks and no number of pokebw2, as CI's public log
 // needs.
@@ -24,6 +24,7 @@ import { parseArgFormats, parseMessageRules } from './gen5-bw2-put.ts'
 import { fullLines, quietLines, report } from './gen5-bw2-report.ts'
 import { checkout, listedReader, POKEBW2, type Pokebw2Read } from './gen5-bw2-source.ts'
 import { structLayout } from './gen5-bw2-struct.ts'
+import { SAVE_TRAINER, saveTrainer } from './gen5-bw2-trainer.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
 /** The symbols the spike reads or names: the adapter list, the server's and the client's loops,
@@ -147,6 +148,9 @@ const SOURCES = {
   pokeparamH: 'include/battle/btl_pokeparam.h',
   mapEvents: ROUTE_MAP.events,
   mapScript: ROUTE_MAP.script,
+  trainerEvents: SAVE_TRAINER.events,
+  trainerList: SAVE_TRAINER.trainers,
+  trainerScript: SAVE_TRAINER.script,
 }
 
 type Sources = Record<keyof typeof SOURCES, string>
@@ -180,6 +184,11 @@ function parse(sources: Sources): Bw2Numbers {
     adapter,
     battle: battleNumbers(sources),
     route: routePlaces(sources.mapEvents, sources.mapScript),
+    saveTrainer: saveTrainer({
+      events: sources.trainerEvents,
+      trainers: sources.trainerList,
+      script: sources.trainerScript,
+    }),
   }
 }
 

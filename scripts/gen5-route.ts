@@ -15,7 +15,7 @@ import { join } from 'node:path'
 import { chromium, type Page } from '@playwright/test'
 
 import { battleRefs } from '../src/gen5/battle-check.ts'
-import type { Bw2Numbers, RoutePlaces } from '../src/gen5/bw2-numbers.ts'
+import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { continueRoute, MENU_LIMIT } from '../src/gen5/continue-route.ts'
 import type { Gen5Global, RunPlan, RunReport } from '../src/gen5/hook.ts'
 import { routeSlice } from '../src/gen5/macro.ts'
@@ -33,22 +33,21 @@ type BattleRefs = ReturnType<typeof battleRefs>
 
 type Route = Pick<RunPlan, 'steps' | 'stateMarks'>
 
+/** The generated places the routes walk to: the long route's in Aspertia City and the save's
+ * trainer on Route 20. */
+type Places = Pick<Bw2Numbers, 'route' | 'saveTrainer'>
+
 /** The steps of the chosen route; the save route keeps one state, at its mark `saved`, and the
  * trainer route plays on after `from`, the mark of the state it starts from. */
-function routeOf(
-  options: RouteOptions,
-  refs: BattleRefs,
-  places: RoutePlaces,
-  from?: string,
-): Route {
+function routeOf(options: RouteOptions, refs: BattleRefs, places: Places, from?: string): Route {
   if (options.route === 'save-here')
     return { steps: saveGame(SAVE_SLOT_BEFORE_POKEMON), stateMarks: ['saved'] }
-  if (options.route === 'continue') return { steps: continueRoute(refs.checks) }
-  if (options.route === 'trainer') return trainerRoute(places, from)
-  return { steps: routeSlice(newGameRoute(places, refs.checks), options.from, options.to) }
+  if (options.route === 'continue') return { steps: continueRoute(places.saveTrainer, refs.checks) }
+  if (options.route === 'trainer') return trainerRoute(places.route, places.saveTrainer, from)
+  return { steps: routeSlice(newGameRoute(places.route, refs.checks), options.from, options.to) }
 }
 
-function readPlan(options: RouteOptions, refs: BattleRefs, places: RoutePlaces): RunPlan {
+function readPlan(options: RouteOptions, refs: BattleRefs, places: Places): RunPlan {
   const { watch } = refs
   const markRefs = [PLAYER_X, PLAYER_Z, FIELD_X, FIELD_Z]
   const base = stateBase(options)
@@ -121,7 +120,7 @@ async function run(dump: string, options: RouteOptions): Promise<number> {
   mkdirSync(GEN5_PATHS.frames, { recursive: true })
   mkdirSync(GEN5_PATHS.states, { recursive: true })
   const numbers = JSON.parse(readFileSync(GEN5_PATHS.bw2Json, 'utf8')) as Bw2Numbers
-  const plan = readPlan(options, battleRefs(numbers), numbers.route)
+  const plan = readPlan(options, battleRefs(numbers), numbers)
   log(
     `route ${options.route}: ${String(plan.steps.length)} steps from ${stateBase(options) ?? 'boot'}`,
   )

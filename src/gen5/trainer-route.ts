@@ -5,9 +5,10 @@
 // and the next run starts from the state of the last good mark (scripts/gen5-route.ts --route
 // trainer --state <state>). After the battle B closes the text: it also closes a message, but it
 // starts no talk with the person the player faces and answers NO to a question, so a beat too many
-// does no harm. Frame counts are our readings of
-// earlier runs' frames, and every position is our reading of RAM in a run.
-import type { RoutePlaces } from './bw2-numbers.ts'
+// does no harm. Frame counts are our readings of earlier runs' frames, and every position but the
+// save's is our reading of RAM in a run; the save's place lies a count of tiles west of the
+// trainer's column, which the generated numbers give (scripts/gen5-bw2-trainer.ts).
+import type { ActorPlace, RoutePlaces } from './bw2-numbers.ts'
 import {
   type Button,
   mark,
@@ -154,11 +155,20 @@ const HOUSE: MacroStep[] = [
 /** Frames of two tiles' walk. */
 const TWO_TILES = 32
 
+/** Tiles between the save's place and the trainer's column: our choice, so that Continue puts
+ * the player outside his sight and a short walk east enters it. */
+const TILES_BEFORE_SIGHT = 2
+
 /** East along the road out of Floccesy Town onto Route 20, Right held, until the player stands
- * two tiles west of the column Youngster Terrell looks up across the road on, facing east; a
- * walk of two tiles east from there enters his sight. The column the walk stops on is our
- * reading of the field's position in 78-2b's first run. The text speed and the save follow. */
-const ROAD: MacroStep[] = walkTo('before-terrell', 'Right', { ...FIELD_X, oneOf: [139] }, TWO_TILES)
+ * TILES_BEFORE_SIGHT tiles west of the column the trainer looks up across the road on, facing
+ * east. The text speed and the save follow. */
+const road = (trainer: ActorPlace): MacroStep[] =>
+  walkTo(
+    'before-terrell',
+    'Right',
+    { ...FIELD_X, oneOf: [trainer.x - TILES_BEFORE_SIGHT] },
+    TWO_TILES,
+  )
 
 /** Options: the text speed fast; then the save. */
 const MENU: MacroStep[] = [
@@ -166,8 +176,8 @@ const MENU: MacroStep[] = [
   ...saveGame(SAVE_SLOT_WITH_POKEDEX),
 ]
 
-/** The route from the rival battle's action menu. */
-const route = (places: RoutePlaces): MacroStep[] => [
+/** The route from the rival battle's action menu to the save before `trainer`. */
+const route = (places: RoutePlaces, trainer: ActorPlace): MacroStep[] => [
   ...battle(places),
   ...CENTER,
   ...EXIT,
@@ -179,7 +189,7 @@ const route = (places: RoutePlaces): MacroStep[] => [
   ...ALDER,
   ...FLOCCESY,
   ...HOUSE,
-  ...ROAD,
+  ...road(trainer),
   ...MENU,
 ]
 
@@ -189,14 +199,16 @@ const markNames = (steps: readonly MacroStep[]) =>
 /** A mark a beat hands out (`<scene>-NN`), as against the mark that ends a scene. */
 const isBeat = (name: string) => /-\d+$/.test(name)
 
-/** The route from the state a run starts from: the steps after the state's mark when it is one of
- * the route's, else the whole route (from the spike's s5-battle). A run keeps a state at the marks
- * that end a scene alone: a state at every mark slows a run to about 14 frames per second. */
+/** The route to the save before `trainer` from the state a run starts from: the steps after the
+ * state's mark when it is one of the route's, else the whole route (from the spike's s5-battle).
+ * A run keeps a state at the marks that end a scene alone: a state at every mark slows a run to
+ * about 14 frames per second. */
 export function trainerRoute(
   places: RoutePlaces,
+  trainer: ActorPlace,
   from?: string,
 ): { steps: MacroStep[]; stateMarks: string[] } {
-  const all = route(places)
+  const all = route(places, trainer)
   const steps =
     from !== undefined && markNames(all).includes(from) ? routeSlice(all, from, undefined) : all
   return { steps, stateMarks: markNames(steps).filter((name) => !isBeat(name)) }

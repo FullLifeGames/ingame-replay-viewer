@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { RoutePlaces } from './bw2-numbers'
+import type { ActorPlace, RoutePlaces } from './bw2-numbers'
 import type { MacroStep } from './macro'
 import { PLAYER_Z } from './route'
 import { fastText, OPTIONS_SLOT_WITH_POKEDEX, SAVE_SLOT_WITH_POKEDEX, saveGame } from './save-menu'
@@ -13,6 +13,9 @@ const PLACES: RoutePlaces = {
   outlookTrigger: { x: 10, z: 105, width: 5 },
   bianca: { x: 12, z: 90 },
 }
+
+/** An invented tile of the save's trainer, far from any real route's. */
+const TRAINER: ActorPlace = { x: 30, z: 300 }
 
 const markNames = (steps: readonly MacroStep[]) =>
   steps.flatMap((step) => (step.kind === 'mark' ? [step.name] : []))
@@ -39,7 +42,7 @@ const pressedA = (step: MacroStep) =>
 // macro plays the story on from there to a save on Route 20, a few tiles west of Youngster
 // Terrell's sight line, with the text speed set to fast.
 describe('trainerRoute', () => {
-  const { steps, stateMarks } = trainerRoute(PLACES)
+  const { steps, stateMarks } = trainerRoute(PLACES, TRAINER)
 
   it("starts with A for the battle, until the player leaves the battle's row", () => {
     expect(steps[0]).toMatchObject({
@@ -80,6 +83,12 @@ describe('trainerRoute', () => {
     expect(walk?.kind === 'until' && walk.checks[0]?.address).toBe(FIELD_X.address)
   })
 
+  it("stops the walk two tiles west of the trainer's column, before his sight line", () => {
+    const walk =
+      steps[steps.findIndex((step) => step.kind === 'mark' && step.name === 'before-terrell') - 1]
+    expect(walk?.kind === 'until' && walk.checks).toEqual([{ ...FIELD_X, oneOf: [TRAINER.x - 2] }])
+  })
+
   it('ends with the text speed set in Options and the save in the menu with the Pokédex', () => {
     const menu = [...fastText(OPTIONS_SLOT_WITH_POKEDEX), ...saveGame(SAVE_SLOT_WITH_POKEDEX)]
     expect(steps.slice(-menu.length)).toEqual(menu)
@@ -97,9 +106,9 @@ describe('trainerRoute', () => {
   })
 
   it('plays on after the mark of the state it starts from, and keeps the states after it', () => {
-    const from = trainerRoute(PLACES, 'city-free')
+    const from = trainerRoute(PLACES, TRAINER, 'city-free')
     expect(markNames(from.steps)[0]).toBe('gate-column')
     expect(from.stateMarks).toEqual(markNames(from.steps).filter((name) => !isBeat(name)))
-    expect(trainerRoute(PLACES, 'battle').steps).toEqual(steps)
+    expect(trainerRoute(PLACES, TRAINER, 'battle').steps).toEqual(steps)
   })
 })

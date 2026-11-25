@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { RoutePlaces } from './bw2-numbers'
+import type { ActorPlace, RoutePlaces } from './bw2-numbers'
 import { continueRoute, MENU_LIMIT } from './continue-route'
 import { type MacroStep, routeSlice } from './macro'
 import type { RamCheck } from './ram-check'
@@ -14,6 +14,9 @@ const PLACES: RoutePlaces = {
   outlookTrigger: { x: 10, z: 105, width: 5 },
   bianca: { x: 12, z: 90 },
 }
+
+/** An invented tile of the save's trainer, far from any real route's. */
+const TRAINER: ActorPlace = { x: 30, z: 300 }
 
 /** Invented battle checks: one value and one pointer, far from any real address. */
 const CHECKS: RamCheck[] = [
@@ -44,7 +47,7 @@ function worstFrames(steps: readonly MacroStep[]): number {
 // battle's opening follow with A, which stops once the battle checks first hold, and the run ends
 // once the action menu stands.
 describe('continueRoute', () => {
-  const steps = continueRoute(CHECKS)
+  const steps = continueRoute(TRAINER, CHECKS)
 
   it("starts with the new game's opening up to the title", () => {
     const opening = routeSlice(newGameRoute(PLACES, []), undefined, 'title')
@@ -69,6 +72,11 @@ describe('continueRoute', () => {
     expect(walk?.checks.map(({ name, address }) => ({ name, address }))).toEqual([
       { name: FIELD_X.name, address: FIELD_X.address },
     ])
+  })
+
+  it("stops the walk in the trainer's own column, the one he looks along", () => {
+    const [walk] = untils(routeSlice(steps, 'continue', 'field'))
+    expect(walk?.checks).toEqual([{ ...FIELD_X, oneOf: [TRAINER.x] }])
   })
 
   it('presses only A, and Right in the field step, until the battle checks first hold', () => {

@@ -181,7 +181,7 @@ function readStateFile(base: string): StateFile {
  * before the pick, so it counts from the first frame; a run from a state once the game is up. */
 async function startSession(page: Page, dump: string, numbers: Bw2Numbers, options: MomentOptions) {
   const { start } = options
-  const first = firstRun(start, battleRefs(numbers), readStateFile)
+  const first = firstRun(start, battleRefs(numbers), numbers.saveTrainer, readStateFile)
   const fromBoot = start.from === 'boot'
   const from = start.from === 'boot' ? `boot with the save ${start.save}` : `state ${start.state}`
   log(`first run: ${String(first.steps.length)} steps from ${from}`)

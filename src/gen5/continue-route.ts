@@ -7,8 +7,9 @@
 // as soon as the field lets him, into the trainer's sight. Then the battle's entry that every route
 // shares (src/gen5/battle-entry.ts), in its form through the opening: A on the same beat through
 // his line and the battle's opening until the battle checks first hold, then no input while the
-// action menu stands. Frame counts are our readings of earlier runs' frames, and the column is our
-// reading of RAM in a run.
+// action menu stands. Frame counts are our readings of earlier runs' frames; the walk stops in the
+// trainer's own column, which the generated numbers give (scripts/gen5-bw2-trainer.ts).
+import type { ActorPlace } from './bw2-numbers.ts'
 import { battleEntry, type EntryLimits, type EntryPace, TO_TITLE } from './battle-entry.ts'
 import { mark, type MacroStep, press, wait } from './macro.ts'
 import type { RamCheck } from './ram-check.ts'
@@ -29,10 +30,6 @@ const START_MENU_FRAMES = 170
  * every few frames, and A held through most of the text, which prints it faster. */
 const QUICK_A = 4
 
-/** The column where the walk east from the save stops under the trainer's "!": our reading of
- * FIELD_X in 78-2b's probe of the save, two tiles east of the save's column. */
-const SIGHT_COLUMN = 141
-
 /** Frames from A on CONTINUE to the player in the trainer's sight: the start menu's blink and
  * fade, the save's place loading, the season card cut short, the field's fade and the walk. 78-4's
  * proving runs took 370; the rest is room. */
@@ -48,9 +45,10 @@ const ENTRY_LIMITS: EntryLimits = { start: 460, battle: 680 }
  * the same beat through the battle's opening. */
 const ENTRY_PACE: EntryPace = { markEvery: 30, every: QUICK_A, throughOpening: true }
 
-/** The steps from boot to the action menu of the trainer's battle; `battleChecks` is the end
- * condition (src/gen5/battle-check.ts). */
-export function continueRoute(battleChecks: readonly RamCheck[]): MacroStep[] {
+/** The steps from boot to the action menu of the battle with `trainer`, the save's trainer; the
+ * walk east stops in his column, where his "!" comes. `battleChecks` is the end condition
+ * (src/gen5/battle-check.ts). */
+export function continueRoute(trainer: ActorPlace, battleChecks: readonly RamCheck[]): MacroStep[] {
   return [
     ...TO_TITLE,
     press('A'),
@@ -60,7 +58,7 @@ export function continueRoute(battleChecks: readonly RamCheck[]): MacroStep[] {
     {
       kind: 'until',
       name: 'field',
-      checks: [{ ...FIELD_X, oneOf: [SIGHT_COLUMN] }],
+      checks: [{ ...FIELD_X, oneOf: [trainer.x] }],
       holdFor: 1,
       limit: FIELD_LIMIT,
       mash: { buttons: ['A'], every: QUICK_A, hold: QUICK_A / 2, held: ['Right'] },

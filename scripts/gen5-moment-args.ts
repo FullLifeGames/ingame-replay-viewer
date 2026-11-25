@@ -5,6 +5,7 @@
 // starts. Usage: --scene known|unknown, --save <name>, --minutes <n>.
 import { parseArgs } from 'node:util'
 
+import type { ActorPlace } from '../src/gen5/bw2-numbers.ts'
 import { continueRoute } from '../src/gen5/continue-route.ts'
 import type { RunPlan } from '../src/gen5/hook.ts'
 import type { RamCheck, RamRef } from '../src/gen5/ram-check.ts'
@@ -59,16 +60,18 @@ export function readMomentOptions(args: string[], now: number): MomentOptions {
 }
 
 /** The session's first run, which ends where the moment starts. From boot: the continue route to
- * the action menu, standing untouched at its mark `battle`, with no state loaded. From a state:
- * two frames after the load, as the spike did. No mark saves a state. */
+ * the action menu of the battle with `trainer`, the save's trainer, standing untouched at its mark
+ * `battle`, with no state loaded. From a state: two frames after the load, as the spike did. No
+ * mark saves a state. */
 export function firstRun(
   start: MomentStart,
   refs: { checks: readonly RamCheck[]; watch: RamRef[] },
+  trainer: ActorPlace,
   readState: (base: string) => StateFile,
 ): RunPlan {
   const { watch } = refs
   if (start.from === 'boot')
-    return { steps: continueRoute(refs.checks), startFrame: 0, watch, stateMarks: [] }
+    return { steps: continueRoute(trainer, refs.checks), startFrame: 0, watch, stateMarks: [] }
   const file = readState(start.state)
   return {
     steps: [{ kind: 'wait', frames: 2 }],
