@@ -53,6 +53,12 @@ describe('the kind census', () => {
     expect(noRuleReason('|move|')).toBe('no rule for |move|')
   })
 
+  it('groups a kind that only Gen 4 and later log apart from the refused formats (#86)', () => {
+    expect(NAMED_KINDS['|-fieldstart|']?.group).toBe('newer generation')
+    expect(NAMED_KINDS['|-terastallize|']?.group).toBe('newer generation')
+    expect(NAMED_KINDS['|swap|']?.group).toBe('refused format')
+  })
+
   it('gives every named kind a reason', () => {
     const silent = Object.entries(NAMED_KINDS).filter(([, entry]) => entry.reason.trim() === '')
     expect(silent).toEqual([])

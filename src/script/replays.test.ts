@@ -75,3 +75,12 @@ describe.each(replays)('the battle script of $id', ({ id, log, script }) => {
     await expect(toJsonl(script)).toMatchFileSnapshot(`./__snapshots__/${id}.jsonl`)
   })
 })
+
+describe('a named gap in a test replay', () => {
+  it('is a line of a kind with no rule yet, never one that only Gen 4 and later log (#86)', () => {
+    const fieldStart = '|-fieldstart|move: Trick Room|[of] p1a: Dugtrio'
+    const dropped = buildBattleScript(`|gen|4\n${fieldStart}\n`).dropped.at(-1)
+    expect(dropped).toMatchObject({ text: fieldStart, reason: 'unsupported' })
+    expect(dropped === undefined || isNamedGap(dropped)).toBe(false)
+  })
+})
