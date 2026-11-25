@@ -1,7 +1,8 @@
 // One Gen 5 spike run (#72): serves the spike page, opens it in Playwright's headless Chromium,
 // hands it the dump from GEN5_DUMP through the file input (nothing copies it), and logs the frame
 // count per second, Chromium's memory and every request the page made. A request that leaves the
-// machine is aborted and fails the run. Frames land in build/gen5/frames/ (gitignored, ADR 0002).
+// machine, or one with a body, fails the run (scripts/gen5-requests.ts). Frames land in
+// build/gen5/frames/ (gitignored, ADR 0002).
 // Usage: GEN5_DUMP=<path> node scripts/gen5-shot.ts [--scene boot|speed|pacing] [--seconds 90]
 // [--start-at-frame <n>] [--threads] [--built] [--label s1] [--page-shot <name>] [--save <file>].
 // The scenes "speed" and "pacing" run scripts/gen5-speed.ts. --built serves the built page
@@ -28,6 +29,7 @@ import {
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { loadAverage, sampleMemory } from './gen5-proc.ts'
 import { BUILT_PORT, buildGen5Page, startBuiltServer } from './gen5-built.ts'
+import { logStorage, type RequestLog, watchRequests } from './gen5-requests.ts'
 import { pacingScene, speedScene } from './gen5-speed.ts'
 import { startGen5Server } from './gen5-serve.ts'
 
@@ -75,11 +77,6 @@ export interface Served {
   close: () => Promise<void>
 }
 
-/** Local: the page's own origin, or a blob: or data: URL the page made itself. */
-export function isLocalRequest(url: string, origin: string): boolean {
-  return url.startsWith(`${origin}/`) || url.startsWith('blob:') || url.startsWith('data:')
-}
-
 /** Frames per second over 10-second windows and over the whole run. */
 function logPace(samples: readonly Sample[]): void {
   for (const pace of paceWindows(samples, 10_000)) {
@@ -111,32 +108,6 @@ async function measure(page: Page, options: ShotOptions): Promise<Sample[]> {
     }
   }
   return samples
-}
-
-/** Logs every request; a request that leaves the machine is aborted and lands in `refused`. On
- * the built page (`built`), so does a websocket or a request for Vite's dev client. */
-export function watchRequests(page: Page, origin: string, built: boolean, refused: string[]): void {
-  page.on('request', (request) => {
-    log(`request ${request.method()} ${request.url()}`)
-    if (built && request.url().includes('/@vite/')) refused.push(request.url())
-  })
-  page.on('websocket', (socket) => {
-    log(`websocket ${socket.url()}`)
-    if (built) refused.push(socket.url())
-  })
-  page.on('console', (message) => {
-    log(`console ${message.type()}: ${message.text()}`)
-  })
-  page.on('pageerror', (error) => {
-    log(`pageerror ${error.message}`)
-  })
-  void page.context().route('**/*', async (route) => {
-    const url = route.request().url()
-    if (isLocalRequest(url, origin)) return route.continue()
-    refused.push(url)
-    log(`ABORTED off-machine request ${url}`)
-    return route.abort()
-  })
 }
 
 async function logCalibration(page: Page): Promise<void> {
@@ -244,26 +215,24 @@ async function run(dump: string, options: ShotOptions): Promise<number> {
   const served = await serve(options.built)
   const origin = `http://${PAGE_HOST}:${String(served.port)}`
   const browser = await chromium.launch({ args: CHROMIUM_ARGS })
-  const refused: string[] = []
+  let requests: RequestLog | undefined
+  let storageClean: boolean
   try {
     const context = await browser.newContext({
       viewport: RUN_VIEWPORT,
       permissions: ['clipboard-read', 'clipboard-write'],
     })
     const page = await context.newPage()
-    watchRequests(page, origin, options.built, refused)
+    requests = watchRequests(page, origin, options.built)
     await page.goto(`${origin}/${options.threads ? '?threads=1' : ''}`)
     await drive(page, dump, options)
+    storageClean = await logStorage(page)
   } finally {
     await browser.close()
     await served.close()
+    if (requests) log(requests.summary())
   }
-  log(
-    refused.length === 0
-      ? `requests: all local${options.built ? ', no websocket, no dev client' : ''}`
-      : `requests: ${String(refused.length)} refused (off the machine, or on the built page a websocket or a dev client)`,
-  )
-  return refused.length === 0 ? 0 : 1
+  return requests.failed || !storageClean ? 1 : 0
 }
 
 async function main(): Promise<void> {

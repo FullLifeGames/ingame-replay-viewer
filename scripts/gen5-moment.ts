@@ -31,7 +31,8 @@ import {
 } from './gen5-moment-scene.ts'
 import { log, sampleLine, waitForStart } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
-import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve, watchRequests } from './gen5-shot.ts'
+import { logStorage, type RequestLog, watchRequests } from './gen5-requests.ts'
+import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve } from './gen5-shot.ts'
 
 const FROM = 's5-battle'
 const POLL_MS = 1000
@@ -227,10 +228,10 @@ async function main(): Promise<void> {
   const served = await serve(false)
   const origin = `http://${PAGE_HOST}:${String(served.port)}`
   const browser = await chromium.launch({ args: CHROMIUM_ARGS })
-  const refused: string[] = []
+  let requests: RequestLog | undefined
   try {
     const page = await (await browser.newContext({ viewport: RUN_VIEWPORT })).newPage()
-    watchRequests(page, origin, false, refused)
+    requests = watchRequests(page, origin, false)
     await page.goto(`${origin}/`)
     await page.setInputFiles('#dump', dump)
     await waitForStart(page)
@@ -241,13 +242,14 @@ async function main(): Promise<void> {
       scene,
       Date.now() + Number(values.minutes) * 60_000,
     )
+    if (!(await logStorage(page))) process.exitCode = 1
   } finally {
     await browser.close()
     await served.close()
+    log(sampleLine())
+    if (requests) log(requests.summary())
   }
-  log(
-    `${sampleLine()}; requests: ${refused.length === 0 ? 'all local' : `${String(refused.length)} refused`}`,
-  )
+  if (requests.failed) process.exitCode = 1
 }
 
 if (import.meta.main) await main()

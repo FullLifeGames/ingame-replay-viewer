@@ -2,9 +2,9 @@
 // headless Chromium, from boot or from a state saved at one of its marks, up to a mark or its
 // end. At each mark the page saves a state and the core's frame; this script writes them to
 // build/gen5/states/ and build/gen5/frames/ (gitignored, ADR 0002; never served or committed) and
-// logs the emulated frame, the wall time and a hash of main RAM. Requests stay on the machine as
-// in scripts/gen5-shot.ts. Usage: GEN5_DUMP=<path> node scripts/gen5-route.ts [--from <mark>]
-// [--to <mark>] [--label s5] [--uncapped] [--minutes 18].
+// logs the emulated frame, the wall time and a hash of main RAM. Requests stay on the machine and
+// carry no body (scripts/gen5-requests.ts). Usage: GEN5_DUMP=<path> node scripts/gen5-route.ts
+// [--from <mark>] [--to <mark>] [--label s5] [--uncapped] [--minutes 18].
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { parseArgs } from 'node:util'
@@ -21,7 +21,8 @@ import { maskedValue, type RamRef, refAddress } from '../src/gen5/ram-check.ts'
 import { newGameRoute, PLAYER_X, PLAYER_Z } from '../src/gen5/route.ts'
 import { log, sampleLine, waitForStart } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
-import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve, watchRequests } from './gen5-shot.ts'
+import { logStorage, type RequestLog, watchRequests } from './gen5-requests.ts'
+import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve } from './gen5-shot.ts'
 
 interface RouteOptions {
   from: string | undefined
@@ -155,10 +156,11 @@ async function run(dump: string, options: RouteOptions): Promise<number> {
   const served = await serve(false)
   const origin = `http://${PAGE_HOST}:${String(served.port)}`
   const browser = await chromium.launch({ args: CHROMIUM_ARGS })
-  const refused: string[] = []
+  let requests: RequestLog | undefined
+  let storageClean: boolean
   try {
     const page = await (await browser.newContext({ viewport: RUN_VIEWPORT })).newPage()
-    watchRequests(page, origin, false, refused)
+    requests = watchRequests(page, origin, false)
     await page.goto(`${origin}/`)
     await page.evaluate((queued) => {
       ;(globalThis as unknown as Gen5Global).gen5.queueRun(queued)
@@ -173,12 +175,13 @@ async function run(dump: string, options: RouteOptions): Promise<number> {
     const report = await follow(page, options)
     await logEnd(page, options, watch)
     log(`${sampleLine()}; status: ${report.status}`)
+    storageClean = await logStorage(page)
   } finally {
     await browser.close()
     await served.close()
+    if (requests) log(requests.summary())
   }
-  log(refused.length === 0 ? 'requests: all local' : `requests: ${String(refused.length)} refused`)
-  return refused.length === 0 ? 0 : 1
+  return requests.failed || !storageClean ? 1 : 0
 }
 
 async function main(): Promise<void> {
