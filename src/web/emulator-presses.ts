@@ -38,7 +38,7 @@ export function emulatorPresses(
         const started = await session.start().finally(() => {
           view.start.disabled = false
         })
-        running = started.id
+        running = started.label
         view.status(say.startLine(started))
         view.restart.disabled = false
       })

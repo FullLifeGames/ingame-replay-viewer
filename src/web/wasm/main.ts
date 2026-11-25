@@ -63,11 +63,11 @@ import { findWasmView, type WasmView } from './view'
 type ListedPick = Picked & { readonly summary?: ReplaySummary; readonly place?: ReplayPlace }
 
 /**
- * A run with the id of the replay it plays, for the status line at END, its summary, and its
- * stream's length for the progress line.
+ * A run with the replay label of the replay it plays, for the status lines, its summary, and its
+ * stream's length for the progress line. The hook's own stream has no summary: its id labels it.
  */
 type NamedRun = Run & {
-  readonly id: string
+  readonly label: string
   readonly summary: ReplaySummary | undefined
   readonly streamBytes: number
 }
@@ -95,7 +95,7 @@ function drawLoop(view: WasmView, runs: Runs<NamedRun>, changeSpeed: (speed: Spe
       // At END fast gives way to 1x (speedAtEnd), and the speed control shows it.
       const speed = reachEnd(run, now)
       // The draw loop looks at the current run only, so a later Start never gets this line.
-      view.status(endedLine(run.id, run.silence))
+      view.status(endedLine(run.label, run.silence))
       if (speed !== run.clock.speed) {
         changeSpeed(speed)
         view.showSpeed(speed)
@@ -116,7 +116,7 @@ function drawLoop(view: WasmView, runs: Runs<NamedRun>, changeSpeed: (speed: Spe
 const playingGame = (run: NamedRun | undefined): PlayingGame | undefined =>
   run === undefined || run.failure !== undefined || readStatus(run.control).finished
     ? undefined
-    : { replay: run.id, tellsEnd: true }
+    : { replay: run.label, tellsEnd: true }
 
 /**
  * Pauses or plays the current run. Resolves with the line for a refused resume while that run is
@@ -150,10 +150,10 @@ function beginRun(
   module: Built,
   chosen: ListedPick,
   sound: Sound,
-): Run {
+): NamedRun {
   const { id, summary, place } = chosen
   const run = Object.assign(startRun(module, chosen, view.speed(), sound), {
-    id,
+    label: summary?.label ?? id,
     summary,
     streamBytes: chosen.stream.length,
   })
@@ -194,7 +194,8 @@ function createViewer(view: WasmView) {
       // A later Start or Restart came while this one waited; that one runs.
       if (!runs.isNewest(ticket)) return undefined
       last = chosen
-      return runningLine(chosen, beginRun({ view, runs, audio }, module, chosen, sound))
+      const run = beginRun({ view, runs, audio }, module, chosen, sound)
+      return runningLine(run, run)
     } finally {
       void press.settle()
     }

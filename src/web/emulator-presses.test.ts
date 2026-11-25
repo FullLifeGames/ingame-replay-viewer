@@ -38,13 +38,19 @@ async function started() {
 }
 
 describe('the emulator page', () => {
-  it('opens the sound inside the Start click and names the replay once it runs', async () => {
+  it('opens the sound inside the Start click and names the replay by its label once it runs', async () => {
     const { askedInClick, view, shown } = await started()
     expect(askedInClick).toEqual(['resume'])
     expect(view.start.disabled).toBe(false)
     expect(shown).toEqual([
       'Starting the emulator.',
-      startLine({ id: 'smogtours-gen3ou-994052', streamBytes: STREAM_994052.length }),
+      {
+        line: 'Running Gen 3 OU: A Welcome Guest vs xXEricXx (994052).',
+        detail: startLine({
+          label: 'Gen 3 OU: A Welcome Guest vs xXEricXx (994052)',
+          streamBytes: STREAM_994052.length,
+        }).detail,
+      },
     ])
   })
 
@@ -56,7 +62,9 @@ describe('the emulator page', () => {
     presses.restart()
     expect(context.asked).toEqual(['resume'])
     expect(core.calls.at(-1)).toBe('quickReload')
-    expect(shown.at(-1)).toBe('Restarted smogtours-gen3ou-994052 from the beginning.')
+    expect(shown.at(-1)).toBe(
+      'Restarted Gen 3 OU: A Welcome Guest vs xXEricXx (994052) from the beginning.',
+    )
   })
 
   it('shows the refusal of a Restart before any Start', () => {

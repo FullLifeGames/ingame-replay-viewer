@@ -8,12 +8,14 @@ import { expect, type Page, test } from '@playwright/test'
 
 import { WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'
 import { GBA_FRAMES_PER_SECOND } from '../src/web/wasm/protocol.ts'
+import { labelOf } from './page-text.ts'
 import { guardRequests } from './requests.ts'
 import { loadReplay, showdownUrl } from './showdown.ts'
 import { DUMP, missingForModule, report, status, waitFor } from './wasm-hook.ts'
 
 const FIRST = 'smogtours-gen3ou-994052'
 const OTHER = 'smogtours-gen3ou-994086'
+const FIRST_LABEL = labelOf(FIRST)
 const MISSING = 'smogtours-gen3ou-1'
 
 type Hooked = typeof globalThis & {
@@ -48,7 +50,7 @@ const startButton = (page: Page) => page.getByRole('button', { name: 'Start', ex
 /** Presses Start on the picked 994052 and waits until its game reached `frame`. */
 async function playFirst(page: Page, frame: number) {
   await startButton(page).click()
-  await expect(page.getByRole('status')).toHaveText(`Running ${FIRST}.`, { timeout: 60_000 })
+  await expect(page.getByRole('status')).toHaveText(`Running ${FIRST_LABEL}.`, { timeout: 60_000 })
   return waitFor(page, (now) => now.frame >= frame, 60_000)
 }
 
@@ -92,7 +94,7 @@ test('a double click on Start during a run leaves one run, from the beginning, a
     // The current run began after the mark, so its game counts its frames from the beginning.
     expect(wallMs).toBeLessThanOrEqual(sinceMark)
     expect(now.frame).toBeLessThanOrEqual(GBA_FRAMES_PER_SECOND * (now.wallMs / 1000) + 60)
-    await expect(page.getByRole('status')).toHaveText(`Running ${FIRST}.`)
+    await expect(page.getByRole('status')).toHaveText(`Running ${FIRST_LABEL}.`)
   })
 
   await test.step('two clicks in one task start one run', async () => {
@@ -138,7 +140,7 @@ test('a Load that fails during a run says that the game plays on, and the next p
 
   await loadReplay(page, MISSING)
   await expect(line).toHaveText(
-    `Showdown has no replay with this ID. The game plays on with ${FIRST}.`,
+    `Showdown has no replay with this ID. The game plays on with ${FIRST_LABEL}.`,
   )
   await expect(detail).not.toHaveText('')
   await expect(details).toBeVisible()

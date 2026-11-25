@@ -12,7 +12,8 @@ import { REPO_DIR } from '../scripts/rom-paths.ts'
 import { readReplay } from '../src/script/replay.ts'
 import { LONGEST_REPLAY_ID } from '../src/script/replay-id.ts'
 import { downloadedFile, jsonFile, rawLog, replayPage } from '../src/script/saved-replay-testing.ts'
-import { notShownList, scrollWidth } from './page-text.ts'
+import { replayLabel } from '../src/web/label.ts'
+import { labelOf, notShownList, scrollWidth } from './page-text.ts'
 import { guardRequests } from './requests.ts'
 import { loadReplay, routeShowdown, showdownUrl } from './showdown.ts'
 
@@ -22,6 +23,7 @@ const FILE_LINE =
   'This file holds no Showdown replay. The viewer reads a replay saved with "Download replay", ' +
   "a saved replay page, a battle log, or a replay's JSON file."
 const OTHER = 'smogtours-gen3ou-994086'
+const FIRST_LABEL = labelOf(FIRST)
 const REPLAY = readReplay(
   JSON.parse(readFileSync(join(REPO_DIR, 'test', 'fixtures', 'replays', `${FIRST}.json`), 'utf8')),
 )
@@ -66,16 +68,16 @@ test('each kind of saved file fills the list as the replay loaded by link does',
   await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${FIRST}: `))
 
   await loadReplay(page, `https://replay.pokemonshowdown.com/${FIRST}`)
-  await expect(status).toHaveText(`Picked ${FIRST}. Press Start to play it.`)
+  await expect(status).toHaveText(`Picked ${FIRST_LABEL}. Press Start to play it.`)
   const byLink = await notShownList(page)
   expect(byLink.rows.length).toBeGreaterThan(0)
 
   for (const file of FILES) {
     // A pick between the files changes the status, so each file's own line shows.
     await testReplay.selectOption(OTHER)
-    await expect(status).toHaveText(`Picked ${OTHER}. Press Start to play it.`)
+    await expect(status).toHaveText(`Picked ${labelOf(OTHER)}. Press Start to play it.`)
     await pickFile(page, file)
-    await expect(status, file.name).toHaveText(`Picked ${FIRST}. Press Start to play it.`)
+    await expect(status, file.name).toHaveText(`Picked ${FIRST_LABEL}. Press Start to play it.`)
     await expect(testReplay, file.name).toHaveValue('')
     expect(await notShownList(page), file.name).toEqual(byLink)
   }
@@ -111,7 +113,7 @@ test('a file of no kind the viewer reads gets its line and leaves the list on th
 
   // The input forgets each file it read, so the same file picked again fires a change.
   await pickFile(page, DOWNLOADED)
-  await expect(status).toHaveText(`Picked ${FIRST}. Press Start to play it.`)
+  await expect(status).toHaveText(`Picked ${FIRST_LABEL}. Press Start to play it.`)
   await expect(page.locator('#replay-file')).toHaveValue('')
   expect(notSameOriginGets).toEqual([])
 })
@@ -131,7 +133,9 @@ test.describe('on a phone-wide screen', () => {
 
     const text = downloadedFile({ ...REPLAY, id })
     await pickFile(page, { name: 'long.html', mimeType: 'text/html', text })
-    await expect(page.getByRole('status')).toHaveText(`Picked ${id}. Press Start to play it.`)
+    await expect(page.getByRole('status')).toHaveText(
+      `Picked ${replayLabel(id, REPLAY)}. Press Start to play it.`,
+    )
     await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${id}: `))
     expect(await scrollWidth(page)).toBeLessThanOrEqual(WIDTH)
 

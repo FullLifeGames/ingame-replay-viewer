@@ -65,9 +65,9 @@ export function spaceToggles(press: KeyPress, run: PausedRun | undefined): boole
   return press.key === ' ' && plain && !ownsSpace(press.target)
 }
 
-/** A run as the toggle sees it: the pause's run, the id of its replay and why it has no sound. */
+/** A run as the toggle sees it: the pause's run, its replay label and why it has no sound. */
 export interface ToggledRun extends PausedRun {
-  readonly id: string
+  readonly label: string
   readonly silence: string | undefined
 }
 

@@ -17,6 +17,7 @@ import { OUTPUT_NAMES } from '../scripts/rom-outputs.ts'
 import { buildPaths } from '../scripts/rom-paths.ts'
 import { WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'
 import { frame } from './frames.ts'
+import { labelOf, startsWith } from './page-text.ts'
 import {
   DUMP,
   finished,
@@ -108,7 +109,7 @@ async function startFirst(page: Page): Promise<void> {
   await expect
     .poll(async () => (await status(page))?.runs.started, { timeout: 60_000, intervals: [500] })
     .toBe(before + 1)
-  await expect(page.getByRole('status')).toHaveText(new RegExp(`^Running ${FIRST}`))
+  await expect(page.getByRole('status')).toHaveText(startsWith(`Running ${labelOf(FIRST)}.`))
 }
 
 // #43: 994052 plays with its sound at 1x and at 2x too, a short window of each; the switch comes
@@ -247,7 +248,7 @@ test('mGBA on the emulator page plays 994052 at fast-forward (B7 measurement)', 
   await expect(page.locator('#status-detail')).toHaveText(`The patched ROM's SHA1 is ${romSha1}.`)
   await expect(page.getByLabel('Example replay')).toHaveValue(FIRST)
   await page.getByRole('button', { name: 'Start', exact: true }).click()
-  await expect(line).toHaveText(new RegExp(`^Running ${FIRST}`), { timeout: 60_000 })
+  await expect(line).toHaveText(`Running ${labelOf(FIRST)}.`, { timeout: 60_000 })
   await page.evaluate(() => {
     const probe = globalThis as Probe
     probe.irvFrames = 0

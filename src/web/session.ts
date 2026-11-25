@@ -40,6 +40,8 @@ export interface DumpSummary {
 
 export interface StartSummary {
   readonly id: string
+  /** The replay label the line names the replay by (#90). */
+  readonly label: string
   readonly streamBytes: number
 }
 
@@ -128,9 +130,9 @@ export function createSession(deps: SessionDeps): Session {
     await step('Could not start the emulator', () => {
       running.run(rom)
     })
-    const { id, streamBytes } = chosen.summary
-    playing = id
-    return { id, streamBytes }
+    const { id, label, streamBytes } = chosen.summary
+    playing = label
+    return { id, label, streamBytes }
   }
 
   return {

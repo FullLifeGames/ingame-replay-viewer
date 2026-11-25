@@ -8,6 +8,7 @@
 import { expect, type Page, test } from '@playwright/test'
 
 import { WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'
+import { labelOf, startsWith } from './page-text.ts'
 import { guardRequests } from './requests.ts'
 import {
   DUMP,
@@ -64,7 +65,7 @@ async function openWithDump(page: Page, baseURL: string | undefined) {
 async function startReplay(page: Page, id: string): Promise<void> {
   await page.locator('#test-replay').selectOption(id)
   await page.getByRole('button', { name: 'Start', exact: true }).click()
-  await expect(page.getByRole('status')).toHaveText(new RegExp(`^Running ${id}`), {
+  await expect(page.getByRole('status')).toHaveText(startsWith(`Running ${labelOf(id)}.`), {
     timeout: 60_000,
   })
 }

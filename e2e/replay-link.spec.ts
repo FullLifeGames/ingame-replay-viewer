@@ -9,7 +9,7 @@ import { join } from 'node:path'
 import { expect, test } from '@playwright/test'
 
 import { REPO_DIR } from '../scripts/rom-paths.ts'
-import { notShownCount } from './page-text.ts'
+import { labelOf, notShownCount } from './page-text.ts'
 import { guardRequests } from './requests.ts'
 import { loadReplay, routeShowdown, showdownUrl } from './showdown.ts'
 
@@ -78,14 +78,16 @@ test('after a new pick or a Load the page asks for Start and shows which replay 
   await expect(status).toHaveText(/^Pick your US Emerald dump/)
 
   await testReplay.selectOption('smogtours-gen3ou-994086')
-  await expect(status).toHaveText(/^Picked smogtours-gen3ou-994086\. Press Start/)
+  await expect(status).toHaveText(
+    `Picked ${labelOf('smogtours-gen3ou-994086')}. Press Start to play it.`,
+  )
 
   await loadReplay(page, LINKED)
-  await expect(status).toHaveText(new RegExp(`^Picked ${LINKED}\\. Press Start`))
+  await expect(status).toHaveText(`Picked ${labelOf(LINKED)}. Press Start to play it.`)
   await expect(testReplay).toHaveValue('')
 
   await testReplay.selectOption(FIRST)
-  await expect(status).toHaveText(new RegExp(`^Picked ${FIRST}\\. Press Start`))
+  await expect(status).toHaveText(`Picked ${labelOf(FIRST)}. Press Start to play it.`)
 })
 
 test('an example replay that fails to load leaves the select on the replay the page holds', async ({
@@ -119,7 +121,7 @@ test('an example replay that fails to load leaves the select on the replay the p
 
   // A line that went well clears the old failure's words, and "Details" hides with nothing in it.
   await loadReplay(page, LINKED)
-  await expect(status).toHaveText(new RegExp(`^Picked ${LINKED}\\. Press Start`))
+  await expect(status).toHaveText(`Picked ${labelOf(LINKED)}. Press Start to play it.`)
   await expect(detail).toHaveText('')
   await expect(page.locator('#details')).toBeHidden()
   await expect(report).toBeHidden()

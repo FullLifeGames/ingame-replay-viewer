@@ -1,7 +1,8 @@
 // The page's own words: the status line after each step, the viewer's progress line under
 // "Details", the panel above the game with the side headings it shares with the team list, and
 // the texts of the "Not shown in the game" list. A failure's line comes from visitor.ts, and the
-// words of the step that failed (replay-choice.ts, session.ts) become its detail.
+// words of the step that failed (replay-choice.ts, session.ts) become its detail. A line names a
+// replay by its replay label (label.ts), as the example select does (#90).
 import type { Side } from '../script/types'
 import { plainText } from './markup'
 import type { ReplaySummary } from './replay-choice'
@@ -31,8 +32,11 @@ export const dumpLine = ({ romSha1 }: DumpSummary): StatusLine => ({
 
 const streamText = (bytes: number): string => `${String(bytes)} bytes of instruction stream`
 
-export const startLine = ({ id, streamBytes }: StartSummary): StatusLine => ({
-  line: `Running ${id}.`,
+export const startLine = ({
+  label,
+  streamBytes,
+}: Pick<StartSummary, 'label' | 'streamBytes'>): StatusLine => ({
+  line: `Running ${label}.`,
   detail: `${streamText(streamBytes)}.`,
 })
 
@@ -52,8 +56,8 @@ export const silenceText = (silence: string | undefined, verb: 'plays' | 'played
  * Once the game reached END, at the win or tie line; the outro that follows belongs to no line.
  * It replaces the running line, so it keeps the reason a run had no sound.
  */
-export const endedLine = (id: string, silence?: string): string =>
-  `Played ${id} to the end of the battle.${silenceText(silence, 'played')}`
+export const endedLine = (label: string, silence?: string): string =>
+  `Played ${label} to the end of the battle.${silenceText(silence, 'played')}`
 
 /** What the viewer's lines read of a run (run.ts's Run): its time to END and its sound. */
 interface LineRun {
@@ -80,18 +84,18 @@ export const progressLine = (status: RunStatus, run: LineRun): string => {
   return `Frame ${String(status.frame)}, ${instruction}, turn ${String(status.turn)}.${finished}${sound}`
 }
 
-/** Once a run starts: the replay it plays, and why it plays without sound. */
+/** Once a run starts: the replay it plays, by its label, and why it plays without sound. */
 export const runningLine = (
-  picked: { readonly id: string },
+  picked: { readonly label: string },
   run: Pick<LineRun, 'silence'>,
-): string => `Running ${picked.id}.${silenceText(run.silence, 'plays')}`
+): string => `Running ${picked.label}.${silenceText(run.silence, 'plays')}`
 
 const PRESS_START = 'Press Start to play it.'
 
 /** After the user picks or loads a replay: the running game, if any, keeps its own. */
-export const pickedLine = (id: string): string => `Picked ${id}. ${PRESS_START}`
+export const pickedLine = (label: string): string => `Picked ${label}. ${PRESS_START}`
 
-export const restartLine = (id: string): string => `Restarted ${id} from the beginning.`
+export const restartLine = (label: string): string => `Restarted ${label} from the beginning.`
 
 export const replayLine = ({
   id,
