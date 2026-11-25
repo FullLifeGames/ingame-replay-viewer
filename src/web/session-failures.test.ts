@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import replay994176 from '../../test/fixtures/replays/smogtours-gen3ou-994176.json'
+import { NEWEST_GEN } from '../gen3/backend'
 import { FetchError } from './fetch'
 import type { TestReplay } from './replays'
 import { ROM_FILES } from './rom-files'
@@ -59,7 +60,7 @@ describe('a replay from Showdown', () => {
     answers.set(SHOWDOWN_994176, { ...replay994176, log })
     await expect(session.loadReplay('smogtours-gen3ou-994176')).rejects.toThrow(
       new SessionError(
-        'Could not turn the replay into a stream: the stream plays Gen 3 battles, this one is Gen 9',
+        `Could not turn the replay into a stream: the stream plays Gen 1 to ${String(NEWEST_GEN)} battles, this one is Gen 9`,
         undefined,
         { source: 'link', replay: 'smogtours-gen3ou-994176' },
       ),

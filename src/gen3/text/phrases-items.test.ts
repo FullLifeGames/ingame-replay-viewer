@@ -49,6 +49,17 @@ describe('items (P1)', () => {
     })
   })
 
+  it('says an Air Balloon floats as its holder comes in, and pops', () => {
+    const shown = sceneOf('item', '|-item|p2a: Tyranitar|Air Balloon')
+    expect(itemShown(shown.mon(shown.event.who), shown.event.item, undefined, undefined)).toEqual({
+      text: 'The opposing Tyranitar floats in the air with its Air Balloon!',
+    })
+    const gone = sceneOf('itemEnd', '|-enditem|p2a: Tyranitar|Air Balloon')
+    expect(itemRemoved(gone.mon(gone.event.who), gone.event.item, undefined, undefined)).toEqual({
+      text: "The opposing Tyranitar's Air Balloon popped!",
+    })
+  })
+
   it('gives an item used up another way our wording and a fallback', () => {
     const { event, mon } = sceneOf('itemEnd', '|-enditem|p1a: Dugtrio|White Herb')
     expect(itemRemoved(mon(event.who), event.item, event.cause, undefined)).toEqual({

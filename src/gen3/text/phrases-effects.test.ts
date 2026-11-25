@@ -160,4 +160,15 @@ describe('an effect for one turn, and a block (P1)', () => {
       fallback: { kind: 'phrase', detail: 'no game message for a block by Magic Coat' },
     })
   })
+
+  it("says Safeguard's block, which the parser reads from Gen 4's `-activate` line", () => {
+    const { event, mon } = sceneOf(
+      'block',
+      '|move|p2a: Tyranitar|Thunder Wave|p1a: Dugtrio',
+      '|-activate|p1a: Dugtrio|move: Safeguard',
+    )
+    expect(blocked(mon(event.who), event.effect)).toEqual({
+      text: 'Dugtrio is protected by Safeguard!',
+    })
+  })
 })

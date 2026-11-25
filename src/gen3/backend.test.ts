@@ -76,20 +76,42 @@ describe('buildGen3Stream', () => {
     expect(result.instructions.at(-2)).toEqual({ line: 9, instruction: { op: 'turn', number: 1 } })
   })
 
-  it('refuses a battle newer than Gen 3 (X16, D11)', () => {
-    const script = { ...scriptOf(), gen: 4 }
-    expect(() => buildGen3Stream(script)).toThrow(Gen3Error)
-    expect(() => buildGen3Stream(script)).toThrow(/Gen 4/)
+  it('builds a stream for a Gen 4 battle (#86)', () => {
+    const script = buildBattleScript(
+      ['|gen|4', '|player|p1|Alice|1|', '|player|p2|Bob|2|', '|start'].join('\n') +
+        '\n|switch|p1a: Dugtrio|Dugtrio, M|100/100\n|switch|p2a: Tyranitar|Tyranitar, M|100/100\n',
+    )
+    expect(buildGen3Stream(script).instructions.at(-1)).toEqual({
+      line: 5,
+      instruction: { op: 'end', outcome: 'unknown' },
+    })
+  })
+
+  it('builds a stream for a Gen 5 battle (#87)', () => {
+    const script = buildBattleScript(
+      ['|gen|5', '|player|p1|Alice|1|', '|player|p2|Bob|2|', '|start'].join('\n') +
+        '\n|switch|p1a: Jirachi|Jirachi|100/100\n|switch|p2a: Tyranitar|Tyranitar, M|100/100\n',
+    )
+    expect(buildGen3Stream(script).instructions.at(-1)).toEqual({
+      line: 5,
+      instruction: { op: 'end', outcome: 'unknown' },
+    })
+  })
+
+  it('refuses a Gen 6 battle with a GenerationRefusal that carries the gen (#87)', () => {
+    const script = buildBattleScript('|gen|6\n')
+    expect(() => buildGen3Stream(script)).toThrow(GenerationRefusal)
+    expect(() => buildGen3Stream(script)).toThrow(expect.objectContaining({ gen: 6 }))
   })
 
   it('refuses a Gen 9 log with a GenerationRefusal that carries the gen (#59)', () => {
     const script = buildBattleScript('|gen|9\n')
-    expect(() => buildGen3Stream(script)).toThrow(GenerationRefusal)
+    expect(() => buildGen3Stream(script)).toThrow(Gen3Error)
     expect(() => buildGen3Stream(script)).toThrow(
       expect.objectContaining({
         name: 'GenerationRefusal',
         gen: 9,
-        message: 'the stream plays Gen 3 battles, this one is Gen 9',
+        message: 'the stream plays Gen 1 to 5 battles, this one is Gen 9',
       }),
     )
   })

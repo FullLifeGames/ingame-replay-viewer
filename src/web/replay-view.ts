@@ -93,7 +93,8 @@ export function showOnly(page: string, shown: VisitorLine): void {
   element(page, 'app', HTMLDivElement).hidden = true
 }
 
-function fill(list: HTMLElement, texts: readonly string[]): void {
+/** Fills `list` with one item per text, written as text, never as markup. */
+export function fill(list: HTMLElement, texts: readonly string[]): void {
   list.replaceChildren(
     ...texts.map((text) => Object.assign(document.createElement('li'), { textContent: text })),
   )

@@ -164,14 +164,13 @@ describe('buildBattleScript: lines it cannot show', () => {
   })
 
   it('lists a line of a kind on the named list as unsupported, with the census reason', () => {
-    // Only Gen 4 and later log it, so it stays on the named list as a refused-format kind.
+    // Only Gen 4 and later log it, and no rule shows it yet: it stays on the named list (#86).
     const line = '|-fieldstart|move: Trick Room|[of] p1a: Dugtrio'
     expect(scriptOf(line).dropped.at(-1)).toEqual({
       line: NEXT,
       text: line,
       reason: 'unsupported',
-      detail:
-        'a field condition starting: only Gen 4 and later log it, and the backend refuses those battles',
+      detail: 'a field condition starting: only Gen 4 and later log it, and no rule shows it yet',
     })
   })
 
