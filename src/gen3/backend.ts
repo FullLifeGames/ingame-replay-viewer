@@ -8,8 +8,8 @@ import { encodeStream } from './stream/encode'
 import type { Placed } from './translate/context'
 import { translate } from './translate'
 
-/** The newest generation the stream plays (#86). */
-export const NEWEST_GEN = 4
+/** The newest generation the stream plays (#86, #87). */
+export const NEWEST_GEN = 5
 
 export interface Gen3Stream {
   /** The stream for the replay slot, starting with its version. */
