@@ -72,4 +72,33 @@ describe('battleRefs', () => {
     const numbers: Bw2Numbers = { ...NUMBERS, adapter: { ...NUMBERS.adapter, fields } }
     expect(() => battleRefs(numbers)).toThrow("the adapter's layout has no field state")
   })
+
+  // Scene: a layout that gives a field a size no single read covers; a check of it would compare
+  // only part of the value.
+  it('refuses a field of three bytes', () => {
+    const fields = { ...NUMBERS.adapter.fields, cmd: { offset: 0x22, size: 3 } }
+    const numbers: Bw2Numbers = { ...NUMBERS, adapter: { ...NUMBERS.adapter, fields } }
+    expect(() => battleRefs(numbers)).toThrow("the adapter's field cmd has 3 bytes")
+  })
+
+  // Scene: a bw2.json generated from a checkout that lacks a symbol or a command the end needs.
+  it('refuses numbers without sCommMode', () => {
+    const symbols = Object.fromEntries(
+      Object.entries(NUMBERS.symbols).filter(([name]) => name !== 'sCommMode'),
+    )
+    const numbers: Bw2Numbers = { ...NUMBERS, symbols }
+    expect(() => battleRefs(numbers)).toThrow('bw2.json names no symbol sCommMode')
+  })
+
+  it('refuses numbers without BTL_ACMD_SELECT_ACTION', () => {
+    const numbers: Bw2Numbers = { ...NUMBERS, adapterCommands: { BTL_ACMD_SERVER_CMD: 0x0b } }
+    expect(() => battleRefs(numbers)).toThrow('bw2.json names no BTL_ACMD_SELECT_ACTION')
+  })
+
+  // Scene: a bitfield in the low bits of its byte, which the layout gives without `bit`.
+  it('masks a bitfield without its first bit from bit 0', () => {
+    const fields = { ...NUMBERS.adapter.fields, isNet: { offset: 0x20, size: 1, bits: 2 } }
+    const numbers: Bw2Numbers = { ...NUMBERS, adapter: { ...NUMBERS.adapter, fields } }
+    expect(battleRefs(numbers).watch.find((ref) => ref.name === 'isNet')?.mask).toBe(0x03)
+  })
 })

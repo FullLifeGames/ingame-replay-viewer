@@ -95,6 +95,23 @@ describe('adapterWrites', () => {
       adapterWrites({ ...NUMBERS, layout: { ...LAYOUT, fields } }, ADAPTER, Uint8Array.of(1)),
     ).toThrow(/sendCmd\.size/)
   })
+
+  // Scene: `returned` drops to 0 in one read-modify-write of its byte; a wider field would take
+  // two, and the client could read the block between them.
+  it('refuses a returned field of two bytes', () => {
+    const fields = { ...LAYOUT.fields, returned: { offset: 0x20, size: 2 } }
+    expect(() =>
+      adapterWrites({ ...NUMBERS, layout: { ...LAYOUT, fields } }, ADAPTER, Uint8Array.of(1)),
+    ).toThrow('returned must sit in one byte for a bits write')
+  })
+
+  // Scene: a layout where `returned` is a plain byte, not a bitfield.
+  it('clears the whole byte when returned is no bitfield', () => {
+    const fields = { ...LAYOUT.fields, returned: { offset: 0x24, size: 1 } }
+    const layout = { ...LAYOUT, fields }
+    const writes = adapterWrites({ ...NUMBERS, layout }, ADAPTER, Uint8Array.of(1))
+    expect(shown(writes).at(-1)).toBe('returned @2180024 bits 255=0')
+  })
 })
 
 // Scene: the server waits for the player's action; once the adapter's state is IDLE it waits for
