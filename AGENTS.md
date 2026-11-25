@@ -47,6 +47,7 @@ The viewer plays Pokémon Showdown replays back inside real Pokémon games. A ga
 
 - `npm run check` runs lint, `tsc -b`, the Prettier check, knip and the unit specs with coverage. Run it before every push; CI runs the same.
 - Coverage of `src/script/`, `src/gen3/`, `src/gen5/` and `src/patch/` stays at 90 % of lines and branches or more.
+- CI fetches pokebw2 at its pin (depth 1, partial and sparse: the files in `POKEBW2_FILES` alone), generates `build/gen5/bw2.json` with `node scripts/gen5-bw2.ts --quiet` and runs the Gen 5 code on it in `scripts/gen5-bw2-real.test.ts`. Without the file that spec skips on your machine and fails under CI. CI's log is public, so the quiet report and the spec's assertions show no number of pokebw2. The fallback, a committed table, goes to a gate when CI cannot fetch the pin on two runs at least a day apart, or when the fetch and the generator add more than 30 s to the check job (the median of five runs against the five before).
 - Test first: a red test that fails for the right reason, then the code.
 - lefthook runs Prettier and ESLint on staged files before each commit.
 - devbox: one heavy check at a time (the full suite, a ROM build, the expansion's `make check`, e2e, a dev server for a tester). Vitest runs with at most 4 workers. Long runs go to the background. Another session may share the machine: read `free -g` before a heavy run.

@@ -232,6 +232,12 @@ The second route avoids the question: SkyEmu is MIT, and its web build runs Blac
 
 The spike recommends route one, EmulatorJS's melonDS, with the Gen 5 page served under reading (a): everything the spike proved runs on it, and reading (a) costs a notice and a source offer beside a public MIT repository. A choice of SkyEmu would first need a speed figure of both emulators on a real GPU, SkyEmu's write proof, and one moment of a battle in it. The call belongs to the user at the gate.
 
+## pokebw2's numbers in CI
+
+The user's answer to question 7 (24.11.2026, #77): commit none of pokebw2's numbers. CI fetches pokebw2 at its pin before the check, at depth 1, with no blob fetched before the checkout and a sparse tree of exactly the files in `POKEBW2_FILES` (`scripts/gen5-bw2-source.ts`). `node scripts/gen5-bw2.ts --quiet` then generates `build/gen5/bw2.json`. Its report gives the pin, the fetch time, counts and its two checks, and no address, offset or value, because the log is public. `scripts/gen5-bw2-real.test.ts` runs the Gen 5 code on the real numbers and asserts names and truth values only. On a machine without the file the spec skips; under CI its guard fails.
+
+When the fetch fails, the generator step fails with git's message. The check still runs, so lint and types report as usual, and the guard turns the job red. Nothing falls back to invented numbers. A committed table goes to a gate on either trigger: CI cannot fetch the pin on two runs at least a day apart, or the fetch and the generator add more than 30 s to the check job, the median of five runs against the five before.
+
 ## What a Gen 5 backend needs next
 
 - A writer of server commands per turn of a battle script, from the moment's shape: `SC_DAMAGE` for the hit flash, faints, switches, status, weather and the set lines of bank 18, each with its handler's arguments read from pokebw2.
