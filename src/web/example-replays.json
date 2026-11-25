@@ -19,6 +19,10 @@
     "format": "[Gen 4] OU",
     "players": ["beanstockg", "Model Magneton"]
   },
+  "gen5ou-2718717830": {
+    "format": "[Gen 5] OU",
+    "players": ["isolatedstar", "abc2158"]
+  },
   "smogtours-gen1ou-995161": {
     "format": "[Gen 1] OU",
     "players": ["DADDY TAUROS", "koalacancee"]
@@ -50,5 +54,9 @@
   "smogtours-gen4ou-690421": {
     "format": "[Gen 4] OU",
     "players": ["UnMecQuiS'enBranle", "Malekith"]
+  },
+  "smogtours-gen5ou-862240": {
+    "format": "[Gen 5] OU",
+    "players": ["tizio potente ao", "Monai"]
   }
 }
