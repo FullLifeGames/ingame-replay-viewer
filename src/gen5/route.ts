@@ -7,15 +7,15 @@ import type { Button, MacroStep } from './macro.ts'
 import type { RamCheck, RamRef } from './ram-check.ts'
 
 /** Frames a scripted press holds its buttons: the game reads its pad once per frame. */
-const PRESS_FRAMES = 4
+export const PRESS_FRAMES = 4
 
-const wait = (frames: number): MacroStep => ({ kind: 'wait', frames })
-const press = (button: Button, frames = PRESS_FRAMES): MacroStep => ({
+export const wait = (frames: number): MacroStep => ({ kind: 'wait', frames })
+export const press = (button: Button, frames = PRESS_FRAMES): MacroStep => ({
   kind: 'press',
   buttons: [button],
   frames,
 })
-const mark = (name: string): MacroStep => ({ kind: 'mark', name })
+export const mark = (name: string): MacroStep => ({ kind: 'mark', name })
 
 /** Presses A once every `every` frames for `frames` frames: text boxes, one after the other. */
 const mashA = (frames: number, every: number): MacroStep => ({
@@ -25,11 +25,11 @@ const mashA = (frames: number, every: number): MacroStep => ({
 })
 
 /** The opening runs until Start skips it, at the frame S1 used (just after the logo). */
-const TO_TITLE: MacroStep[] = [wait(1900), press('Start'), wait(600), mark('title')]
+export const TO_TITLE: MacroStep[] = [wait(1900), press('Start'), wait(600), mark('title')]
 
 /** A press and a short gap, so the next press is a new one: a cursor moves once per press. */
 const TAP_GAP = 8
-const tap = (button: Button): MacroStep[] => [press(button), wait(TAP_GAP)]
+export const tap = (button: Button): MacroStep[] => [press(button), wait(TAP_GAP)]
 const taps = (button: Button, count: number): MacroStep[] =>
   Array.from({ length: count }, () => tap(button)).flat()
 

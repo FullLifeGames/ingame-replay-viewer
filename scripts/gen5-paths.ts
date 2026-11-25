@@ -13,6 +13,9 @@ export const GEN5_PATHS = {
   page: `${REPO}/src/web/gen5`,
   /** The saves we made from New Game that the servers answer under /saves/ (#78, ADR 0002). */
   saves: `${REPO}/src/web/gen5/saves`,
+  /** The saves the run script takes from the game (scripts/gen5-route.ts --take-save), never
+   * served or committed. */
+  madeSaves: `${REPO}/build/gen5/saves`,
   /** The page as Vite builds it, for the user's own check (scripts/gen5-built.ts). */
   built: `${REPO}/build/gen5/page`,
   frames: `${REPO}/build/gen5/frames`,
