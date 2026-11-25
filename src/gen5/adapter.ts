@@ -7,7 +7,7 @@
 // The layout and the values come from build/gen5/bw2.json; this module holds none of the game's
 // numbers. Adapter fields are ARM9 words, little-endian, unlike the block's own bytes.
 import type { Bw2Numbers, FieldLayout, StructLayout } from './bw2-numbers'
-import type { MemoryWrite } from './ram-write.ts'
+import { littleEndian, type MemoryWrite } from './ram-write.ts'
 
 export interface AdapterNumbers {
   layout: StructLayout
@@ -39,13 +39,6 @@ function fieldOf(layout: StructLayout, name: string): FieldLayout {
   const field = layout.fields[name]
   if (field === undefined) throw new Error(`the adapter's layout has no field ${name}`)
   return field
-}
-
-function littleEndian(value: number, size: number, field: string): number[] {
-  if (!Number.isInteger(value) || value < 0 || value >= 2 ** (size * 8)) {
-    throw new RangeError(`${field} cannot hold ${String(value)} in ${String(size)} bytes`)
-  }
-  return Array.from({ length: size }, (_, i) => Math.floor(value / 2 ** (i * 8)) % 256)
 }
 
 /** Throws unless the block holds a command and fits both the adapter and the client's queue. */

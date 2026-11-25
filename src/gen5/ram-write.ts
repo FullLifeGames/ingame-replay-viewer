@@ -12,6 +12,14 @@ export type MemoryWrite =
   | ({ kind: 'bits'; field: string; mask: number; value: number } & PointerChain)
   | { kind: 'copy'; field: string; from: PointerChain; to: PointerChain; length: number }
 
+/** The `size` bytes of `value`, lowest first; throws when it does not fit them unsigned. */
+export function littleEndian(value: number, size: number, field: string): number[] {
+  if (!Number.isInteger(value) || value < 0 || value >= 2 ** (size * 8)) {
+    throw new RangeError(`${field} cannot hold ${String(value)} in ${String(size)} bytes`)
+  }
+  return Array.from({ length: size }, (_, i) => Math.floor(value / 2 ** (i * 8)) % 256)
+}
+
 type CopyWrite = Extract<MemoryWrite, { kind: 'copy' }>
 
 /** The words to write, or why the write leads out of main RAM. */
