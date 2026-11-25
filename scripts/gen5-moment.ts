@@ -1,7 +1,7 @@
 // The S6 run of the Gen 5 spike (#72): one battle moment driven from outside. It loads the battle
 // state of S5, reads the player's adapter, the server and both Pokémon from main RAM, then plays
-// the steps of gen5-moment-plan.ts: hold the server, answer the action menu, write one block per
-// moment and ask for the player's action again. It writes a frame per mark under
+// the steps of gen5-moment-plan.ts: hold the server, answer the action menu and write one block
+// per moment. It writes a frame per mark under
 // build/gen5/frames/ and the last mark's state under build/gen5/states/ (gitignored, ADR 0002).
 // Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts [--scene known|unknown] [--minutes 15].
 import { readFileSync, writeFileSync } from 'node:fs'

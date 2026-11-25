@@ -34,10 +34,11 @@ const LAYOUT: StructLayout = {
 const NUMBERS: AdapterNumbers = {
   layout: LAYOUT,
   serverCmd: 0x0b,
-  selectAction: 6,
   heldState: 2,
   queueSize: 0x40,
 }
+/** Another adapter command, invented, that carries no data. */
+const OTHER_COMMAND = 6
 const ADAPTER = 0x02180000
 
 const shown = (writes: MemoryWrite[]) =>
@@ -122,20 +123,18 @@ describe('holdWrites', () => {
   })
 })
 
-// Scene: after the moments the page asks the client for the player's action again.
+// Scene: an adapter command other than the server command, one that carries no data.
 describe('commandWrites', () => {
   it('hands over an adapter command without data: no data write, size 0', () => {
-    expect(shown(commandWrites(NUMBERS, ADAPTER, NUMBERS.selectAction, new Uint8Array(0)))).toEqual(
-      [
-        'sendCmd.size @2180028 0,0',
-        'sendCmd.cmd @218002a 6,0',
-        'cmd @2180022 6',
-        'state @2180023 2',
-        'returnData @2180010 0,0,0,0',
-        'returnSize @2180008 0,0,0,0',
-        'returned @2180020 bits 112=0',
-      ],
-    )
+    expect(shown(commandWrites(NUMBERS, ADAPTER, OTHER_COMMAND, new Uint8Array(0)))).toEqual([
+      'sendCmd.size @2180028 0,0',
+      'sendCmd.cmd @218002a 6,0',
+      'cmd @2180022 6',
+      'state @2180023 2',
+      'returnData @2180010 0,0,0,0',
+      'returnSize @2180008 0,0,0,0',
+      'returned @2180020 bits 112=0',
+    ])
   })
 })
 
@@ -150,7 +149,6 @@ describe('adapterNumbers', () => {
     expect(adapterNumbers(numbers)).toEqual({
       layout: LAYOUT,
       serverCmd: 0x0b,
-      selectAction: 6,
       heldState: 2,
       queueSize: 0x40,
     })
