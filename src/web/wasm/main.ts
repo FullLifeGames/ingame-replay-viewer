@@ -121,11 +121,15 @@ const playingGame = (run: NamedRun | undefined): PlayingGame | undefined =>
 
 /**
  * Pauses or plays the current run. Resolves with the line for a refused resume while that run is
- * still the current one (#69).
+ * still the current one (#69) and the page shows its pick, `shown` (#90).
  */
-function toggleCurrent(runs: Runs<NamedRun>, audio: AudioOpener): Promise<StatusLine | undefined> {
+function toggleCurrent(
+  runs: Runs<NamedRun>,
+  audio: AudioOpener,
+  shown: ReplaySummary | undefined,
+): Promise<StatusLine | undefined> {
   const run = runs.current
-  return togglePause(run, audio, performance.now()).then((line) =>
+  return togglePause(run, audio, performance.now(), shown).then((line) =>
     runs.current === run ? line : undefined,
   )
 }
@@ -220,7 +224,7 @@ function createViewer(view: WasmView) {
     restart: () => play(last),
     changeSpeed,
     /** Pauses or plays the current run; the sound's call runs inside the caller's event. */
-    togglePause: () => toggleCurrent(runs, audio),
+    togglePause: () => toggleCurrent(runs, audio, view.shownReplay()),
     spaceToggles: (press: KeyPress) => spaceToggles(press, runs.current),
     /** The test hook of e2e/wasm-play.spec.ts: the run's status, its sound and the run counts. */
     status: () =>

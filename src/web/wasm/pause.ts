@@ -65,10 +65,14 @@ export function spaceToggles(press: KeyPress, run: PausedRun | undefined): boole
   return press.key === ' ' && plain && !ownsSpace(press.target)
 }
 
-/** A run as the toggle sees it: the pause's run, its replay label and why it has no sound. */
+/**
+ * A run as the toggle sees it: the pause's run, its replay label, why it has no sound, and the
+ * summary of the pick it plays, which the hook's own stream lacks.
+ */
 export interface ToggledRun extends PausedRun {
   readonly label: string
   readonly silence: Silence | undefined
+  readonly summary?: object | undefined
 }
 
 /** The runs whose last Play the browser refused to resume, so their line says so. */
@@ -87,18 +91,27 @@ function playLine(run: ToggledRun, silence: Silence | undefined): StatusLine | u
 }
 
 /**
+ * Whether the page shows another pick than the one `run` plays: a pick during the pause wrote
+ * "Picked …", which stays until the next Start makes a run with its own line (#90, D4).
+ */
+const showsOtherPick = (run: ToggledRun, shown: object | undefined): boolean =>
+  run.summary !== undefined && run.summary !== shown
+
+/**
  * Pauses a playing run at the frame its game reports and suspends the sound, or plays a paused run
  * on: the sound resumes first, inside the caller's click, then the clock counts on. Writes the
  * grant at once, so the worker stops or goes on before the next animation frame. Nothing happens
  * before the first run or once the run reached END. Resolves with the status line for a Play whose
  * resume the browser refused (#69): the game plays on without sound, and the line says why. The
  * next Play whose resume succeeds resolves with the running line again. A refused suspend gives no
- * line, since the clock holds the game anyway (S5-16).
+ * line, since the clock holds the game anyway (S5-16). Neither line comes while the page shows
+ * `shown`, the summary of another pick than the run's.
  */
 export function togglePause(
   run: ToggledRun | undefined,
   audio: Pick<AudioOpener, 'resumeNow' | 'suspend'>,
   now: number,
+  shown?: object,
 ): Promise<StatusLine | undefined> {
   if (run === undefined || reachedEnd(run)) return Promise.resolve(undefined)
   const { frame } = readStatus(run.control)
@@ -112,7 +125,10 @@ export function togglePause(
   const resumed = audio.resumeNow()
   run.clock.play(now)
   grant(run.control, run.clock.allowed(now, frame))
-  return resumed.then((silence) => playLine(run, silence))
+  return resumed.then((silence) => {
+    const line = playLine(run, silence)
+    return showsOtherPick(run, shown) ? undefined : line
+  })
 }
 
 /**
