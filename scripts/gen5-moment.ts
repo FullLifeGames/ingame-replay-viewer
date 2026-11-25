@@ -1,12 +1,14 @@
-// The S6 run of the Gen 5 spike (#72): one battle moment driven from outside. It loads the battle
-// state of S5, reads the player's adapter, the server and both Pokémon from main RAM, then plays
-// the steps of gen5-moment-plan.ts: hold the server, answer the action menu and write one block
-// per moment. It writes a frame per mark under
-// build/gen5/frames/ and the last mark's state under build/gen5/states/ (gitignored, ADR 0002).
-// Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts [--scene known|unknown] [--minutes 15].
+// The S6 run of the Gen 5 spike (#72) and its run from the shipped save (#78): one battle moment
+// driven from outside. It starts the session as gen5-moment-args.ts says: from the spike's battle
+// state, or from boot with a save the page fetches from /saves/ and the continue route to the
+// trainer's action menu. Then it reads the player's adapter, the server and both Pokémon from main
+// RAM and plays the steps of gen5-moment-plan.ts: hold the server, answer the action menu and
+// write one block per moment. It writes a frame per mark under build/gen5/frames/ and the last
+// mark's state under build/gen5/states/ (gitignored, ADR 0002).
+// Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts [--scene known|unknown] [--save <name>]
+// [--minutes 15].
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { parseArgs } from 'node:util'
 
 import { Dex } from '@pkmn/dex'
 import { chromium, type Page } from '@playwright/test'
@@ -18,23 +20,27 @@ import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import type { Gen5Global, MarkRecord, RunPlan, RunReport } from '../src/gen5/hook.ts'
 import { MAIN_RAM_SIZE, MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import type { RamRef } from '../src/gen5/ram-check.ts'
+import {
+  firstRun,
+  type MomentOptions,
+  readMomentOptions,
+  type StateFile,
+} from './gen5-moment-args.ts'
 import { momentSteps } from './gen5-moment-plan.ts'
 import { listedReader } from './gen5-bw2-source.ts'
 import {
   moveLineLabel,
-  type SceneName,
   sceneBlocks,
   sceneMove,
   TEXT_BANKS,
   textId,
   textLine,
 } from './gen5-moment-scene.ts'
-import { log, sampleLine, waitForStart } from './gen5-page.ts'
+import { log, logSave, sampleLine, waitForStart } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { logStorage, type RequestLog, watchRequests } from './gen5-requests.ts'
 import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve } from './gen5-shot.ts'
 
-const FROM = 's5-battle'
 const POLL_MS = 1000
 const hex = (value: number) => `0x${value.toString(16)}`
 /** The page's hook; spelled out in each evaluate, since those run in the page, not here. */
@@ -139,9 +145,10 @@ async function saveMark(page: Page, record: MarkRecord, label: string): Promise<
   log(`mark ${record.name}: frame ${String(record.frame)}, ${wall} s; ${saved.join(', ')}`)
 }
 
-async function runPlan(page: Page, plan: RunPlan, label: string, deadline: number) {
-  await hook(page).queueRun(plan)
-  let written = 0
+/** The run's report each POLL_MS, its new marks written, until it ends or the deadline passes.
+ * The page's report keeps the marks of the session's earlier runs; `known` of them are written. */
+async function follow(page: Page, label: string, deadline: number, known = 0) {
+  let written = known
   for (;;) {
     await new Promise((resolve) => setTimeout(resolve, POLL_MS))
     const report: RunReport = await hook(page).runReport()
@@ -161,31 +168,46 @@ function logReport(report: RunReport): void {
   for (const line of report.watch) log(`watch ${line}`)
 }
 
-async function play(page: Page, numbers: Bw2Numbers, scene: SceneName, deadline: number) {
-  const meta = JSON.parse(readFileSync(join(GEN5_PATHS.states, `${FROM}.json`), 'utf8')) as {
+function readStateFile(base: string): StateFile {
+  const meta = JSON.parse(readFileSync(join(GEN5_PATHS.states, `${base}.json`), 'utf8')) as {
     frame: number
-    ramSha: string
+    ramSha: string | undefined
   }
-  const state = readFileSync(join(GEN5_PATHS.states, `${FROM}.state`)).toString('base64')
-  const watch = battleRefs(numbers).watch
-  const first: RunPlan = {
-    steps: [{ kind: 'wait', frames: 2 }],
-    state,
-    stateSha: meta.ramSha,
-    startFrame: meta.frame,
-    watch,
-    stateMarks: [],
-  }
-  logReport(await runPlan(page, first, `s6-${scene}`, deadline))
+  const state = readFileSync(join(GEN5_PATHS.states, `${base}.state`)).toString('base64')
+  return { state, frame: meta.frame, ramSha: meta.ramSha }
+}
+
+/** Picks the dump and plays the first run to where the moment starts. A run from boot is queued
+ * before the pick, so it counts from the first frame; a run from a state once the game is up. */
+async function startSession(page: Page, dump: string, numbers: Bw2Numbers, options: MomentOptions) {
+  const { start } = options
+  const first = firstRun(start, battleRefs(numbers), readStateFile)
+  const fromBoot = start.from === 'boot'
+  const from = start.from === 'boot' ? `boot with the save ${start.save}` : `state ${start.state}`
+  log(`first run: ${String(first.steps.length)} steps from ${from}`)
+  if (fromBoot) await hook(page).queueRun(first)
+  await page.setInputFiles('#dump', dump)
+  await waitForStart(page)
+  await logSave(page, 'at the start')
+  if (!fromBoot) await hook(page).queueRun(first)
+  return follow(page, options.label, options.deadlineMs)
+}
+
+async function play(page: Page, dump: string, numbers: Bw2Numbers, options: MomentOptions) {
+  const { scene, label, deadlineMs } = options
+  const first = await startSession(page, dump, numbers, options)
+  logReport(first)
+  if (first.status !== 'done') return 1
+  await hook(page).uncapped()
   const battle = await readBattle(page, numbers)
   log(`adapter ${hex(battle.adapter)}, server ${hex(battle.server)}`)
   const std = textId(bank('standard'), 'Bank0019_Text_ItsSuperEffective')
   const blocks = sceneBlocks(scene, battle, numbers.battle.single, std)
   for (const { name, moment } of blocks) {
     const side = moment.attacker.monId === battle.near.monId ? 'near' : 'far'
-    const label = moveLineLabel(sceneMove(scene, side), side)
+    const line = moveLineLabel(sceneMove(scene, side), side)
     log(
-      `${name}: ${JSON.stringify(moment)}; ${label}: ${textLine(bank('move'), textId(bank('move'), label))}`,
+      `${name}: ${JSON.stringify(moment)}; ${line}: ${textLine(bank('move'), textId(bank('move'), line))}`,
     )
   }
   log(`standard line ${String(std)}: ${textLine(bank('standard'), std)}`)
@@ -208,22 +230,17 @@ async function play(page: Page, numbers: Bw2Numbers, scene: SceneName, deadline:
     watch: watchOf(numbers, battle),
     stateMarks: ['end'],
   }
-  const report = await runPlan(page, second, `s6-${scene}`, deadline)
+  await hook(page).queueRun(second)
+  const report = await follow(page, label, deadlineMs, first.marks.length)
   logReport(report)
   return report.status === 'done' ? 0 : 1
 }
 
 async function main(): Promise<void> {
-  const { values } = parseArgs({
-    options: {
-      scene: { type: 'string', default: 'known' },
-      minutes: { type: 'string', default: '15' },
-    },
-  })
-  const scene = values.scene === 'unknown' ? 'unknown' : 'known'
+  const options = readMomentOptions(process.argv.slice(2), Date.now())
   const dump = process.env.GEN5_DUMP
   if (!dump) throw new Error('set GEN5_DUMP to the path of the Black 2 (USA) dump')
-  log(`gen5-moment: scene ${scene}; ${sampleLine()}`)
+  log(`gen5-moment: ${JSON.stringify(options)}; ${sampleLine()}`)
   const numbers = JSON.parse(readFileSync(GEN5_PATHS.bw2Json, 'utf8')) as Bw2Numbers
   const served = await serve(false)
   const origin = `http://${PAGE_HOST}:${String(served.port)}`
@@ -232,16 +249,9 @@ async function main(): Promise<void> {
   try {
     const page = await (await browser.newContext({ viewport: RUN_VIEWPORT })).newPage()
     requests = watchRequests(page, origin, false)
-    await page.goto(`${origin}/`)
-    await page.setInputFiles('#dump', dump)
-    await waitForStart(page)
-    await hook(page).uncapped()
-    process.exitCode = await play(
-      page,
-      numbers,
-      scene,
-      Date.now() + Number(values.minutes) * 60_000,
-    )
+    await page.goto(`${origin}/${options.start.from === 'boot' ? options.start.query : ''}`)
+    process.exitCode = await play(page, dump, numbers, options)
+    await logSave(page, 'at the end')
     if (!(await logStorage(page))) process.exitCode = 1
   } finally {
     await browser.close()

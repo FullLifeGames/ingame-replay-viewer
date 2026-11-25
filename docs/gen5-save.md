@@ -24,7 +24,7 @@ On Route 20, on the dirt road from Floccesy Town, two tiles west of the column T
 
 ## The steps by hand
 
-Anyone with their own dump can make a save like it on the Gen 5 page:
+These steps follow the scenes that the build machine's macro played (below). Nobody has played them by hand yet. Anyone with their own dump can try them on the Gen 5 page:
 
 1. New Game. Through Professor Juniper's talk, answer that you are a boy, name the player IRV and keep the rival's name Hugh.
 2. In Aspertia City follow the story to the lookout: Hugh's talk, then Bianca's. Say yes to her Pokédex request, take Tepig and give it no nickname.
@@ -37,7 +37,7 @@ Anyone with their own dump can make a save like it on the Gen 5 page:
 
 ## How the build machine made it
 
-The spike's route (`src/gen5/route.ts`) played from New Game to the rival battle's action menu in pieces, each run starting from a state that an earlier run saved. From there `src/gen5/trainer-route.ts` played the battle and every step above to the save, and `scripts/gen5-route.ts --route trainer --take-save route-20` read the file out of the core once the game had written it. The read-out took 28,387 frames from the battle's menu and ended 61,957 frames after New Game.
+The spike's route (`src/gen5/route.ts`) played from New Game to the rival battle's action menu in pieces, each run starting from a state that an earlier run saved. From there `src/gen5/trainer-route.ts` played the battle and every step above to the save, and `scripts/gen5-route.ts --route trainer --take-save route-20` read the file out of the core once the game had written it. The play from the rival battle's menu to the save took 28,387 frames, and the game had saved 61,957 frames after New Game.
 
 The stretch before the rival battle rests on states made under earlier versions of the spike's route (`docs/gen5-spike.md`, "Into a battle"). A remake from boot plays other frames, so it gives another file with another hash.
 
