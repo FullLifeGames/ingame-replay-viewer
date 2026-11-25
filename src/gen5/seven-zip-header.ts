@@ -30,6 +30,10 @@ export const UNPACKED_LIMIT = 64 * 2 ** 20
  * could not unpack one anyway. */
 const ITEM_BITS = 8
 
+/** A coder's top flag bit: more alternative methods follow. 7zFormat.txt: "Not used anymore,
+ * must be 0". */
+const ALTERNATIVE_METHODS = 0x80
+
 /** A coder's method id in hex, and its properties. */
 export interface Coder {
   id: string
@@ -87,6 +91,11 @@ export function methodName(id: string): string {
 function readCoder(reader: ByteReader): Coder {
   const flags = reader.byte()
   const id = Array.from(reader.take(flags & 0x0f), (byte) => hex(byte).slice(2)).join('')
+  if (flags & ALTERNATIVE_METHODS) {
+    throw new Error(
+      `The 7z archive holds a coder ${methodName(id)} with the flag for alternative methods, which the format no longer uses.`,
+    )
+  }
   if (flags & 0x10) {
     const inputs = reader.number()
     const outputs = reader.number()

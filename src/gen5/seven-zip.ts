@@ -171,6 +171,8 @@ function entries(archive: Uint8Array, header: Header): SevenZipEntry[] {
 /** The files and directories of a 7z archive, in the archive's order. */
 export function unpack7z(archive: Uint8Array): SevenZipEntry[] {
   let header = nextHeader(archive)
+  // 7-Zip writes an archive with no files as its start header alone, naming a header of size 0.
+  if (header.length === 0) return []
   for (let round = 0; round < PACKINGS; round++) {
     const reader = new ByteReader(header)
     const id = reader.byte()

@@ -80,6 +80,15 @@ describe('unpack7z', () => {
     expect(unpack7z(headerOnly([0x01, 0x00]))).toEqual([])
   })
 
+  // Scene: 7-Zip writes an archive with no files as its start header alone, with a next header of
+  // size 0 (review U3).
+  it('gives nothing from a bare archive of 32 bytes', () => {
+    const bare = headerOnly([])
+    expect(bare.length).toBe(32)
+    expect(() => unpack7z(bare)).not.toThrow()
+    expect(unpack7z(bare)).toEqual([])
+  })
+
   // Scene: every CRC the archive carries holds, or the unpacker says which one fails.
   it('names the file whose CRC fails', () => {
     expect(() => unpack7z(archive('badCrc'))).toThrow(

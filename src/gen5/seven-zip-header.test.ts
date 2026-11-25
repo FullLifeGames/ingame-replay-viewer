@@ -102,6 +102,14 @@ describe('readStreamsInfo', () => {
     )
   })
 
+  // Scene: 7zFormat.txt keeps a coder's top flag bit, more alternative methods, at 0 (review U2).
+  it("refuses a coder's flag for alternative methods by name", () => {
+    const coder = [0x07, 0x0b, 0x01, 0x00, 0x01, 0xa1, 0x21, 0x01, 0x15, 0x0c, 0x05, 0x00, 0x00]
+    expect(() => readStreamsInfo(reader(coder))).toThrow(
+      'The 7z archive holds a coder LZMA2 with the flag for alternative methods, which the format no longer uses.',
+    )
+  })
+
   it('refuses a folder split without sizes', () => {
     const bytes = [...lzma2Folders([10]), 0x00, 0x08, 0x0d, 0x02, 0x00, 0x00]
     expect(() => readStreamsInfo(reader(bytes))).toThrow(

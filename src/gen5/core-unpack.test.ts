@@ -9,7 +9,7 @@ import {
   type UnpackPort,
 } from './core-unpack'
 import { fromBase64, OTHER_PHRASE, seededBytes, textBytes } from './lzma.fixtures'
-import { ARCHIVES } from './seven-zip.fixtures'
+import { ARCHIVES, headerOnly } from './seven-zip.fixtures'
 
 const archive = (name: keyof typeof ARCHIVES) => fromBase64(ARCHIVES[name])
 
@@ -81,6 +81,14 @@ describe('unpackCore', () => {
   it('reports how many files and bytes it unpacked and how long the archive took', () => {
     const { port } = fakePort()
     expect(unpackCore(archive('encodedHeader'), port)).toEqual({ files: 2, bytes: 5500, ms: 5 })
+  })
+
+  it('posts done alone for an archive with no files', () => {
+    const { port, messages } = fakePort()
+    let report: unknown
+    expect(() => (report = unpackCore(headerOnly([]), port))).not.toThrow()
+    expect(report).toEqual({ files: 0, bytes: 0, ms: 5 })
+    expect(messages()).toEqual([{ t: DONE }])
   })
 
   // Scene: a broken core must end EmulatorJS's wait, not leave it hanging (compression.js resolves
