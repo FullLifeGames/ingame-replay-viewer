@@ -111,14 +111,22 @@ function connectRing(sound: Sound, ring: SharedArrayBuffer) {
 }
 
 /** The processor's link to the speakers; nothing to cut for a run without sound. */
-const speakersOf = (output: AudioWorkletNode | undefined): Speakers => ({
-  mute: () => {
-    output?.disconnect()
-  },
-  unmute: () => {
-    output?.connect(output.context.destination)
-  },
-})
+function speakersOf(output: AudioWorkletNode | undefined): Speakers {
+  let muted = false
+  return {
+    get muted() {
+      return muted
+    },
+    mute: () => {
+      muted = true
+      output?.disconnect()
+    },
+    unmute: () => {
+      muted = false
+      output?.connect(output.context.destination)
+    },
+  }
+}
 
 /** Starts a run. The sound is connected before the worker exists, so nothing fails in between. */
 export function startRun(built: Built, picked: Picked, speed: Speed, sound: Sound): Run {

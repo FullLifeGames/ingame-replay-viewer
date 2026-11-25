@@ -8,11 +8,21 @@ import { Runs } from './runs'
 function heldRun(log: string[], name: string, paused: boolean): HeldRun {
   const clock = new TickClock('1x', 0)
   if (paused) clock.pause(40)
+  let muted = false
   return {
     clock,
     speakers: {
-      mute: () => log.push(`mute ${name}`),
-      unmute: () => log.push(`unmute ${name}`),
+      get muted() {
+        return muted
+      },
+      mute: () => {
+        muted = true
+        log.push(`mute ${name}`)
+      },
+      unmute: () => {
+        muted = false
+        log.push(`unmute ${name}`)
+      },
     },
   }
 }
@@ -90,6 +100,32 @@ describe('the sound of a Start or Restart during a pause', () => {
     old.clock.play(1000)
     await press.settle()
     expect(log).toEqual(['mute old', 'open', 'unmute old'])
+  })
+
+  // W11: Play during the first press's wait leaves the run playing with its sound off, so the
+  // second press finds no paused run; neither press starts a run (the new dump's build failed).
+  it('gives the sound back after two presses that began no run, when Play came between them', async () => {
+    const log: string[] = []
+    const old = heldRun(log, 'old', true)
+    const { runs, ticket } = pageWith(old)
+    const first = soundForPress(runs, ticket, fakeAudio(log))
+    old.clock.play(1000)
+    const second = soundForPress(runs, runs.nextPlay(), fakeAudio(log))
+    await first.settle()
+    await second.settle()
+    expect(log).toEqual(['mute old', 'open', 'open', 'unmute old'])
+  })
+
+  it('gives the sound back when the second press ends before the first', async () => {
+    const log: string[] = []
+    const old = heldRun(log, 'old', true)
+    const { runs, ticket } = pageWith(old)
+    const first = soundForPress(runs, ticket, fakeAudio(log))
+    old.clock.play(1000)
+    const second = soundForPress(runs, runs.nextPlay(), fakeAudio(log))
+    await second.settle()
+    await first.settle()
+    expect(log).toEqual(['mute old', 'open', 'open', 'unmute old'])
   })
 
   it('leaves the end to a newer press', async () => {

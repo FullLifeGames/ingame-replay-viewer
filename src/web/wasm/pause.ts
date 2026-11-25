@@ -114,6 +114,8 @@ export function soundForNewRun(
 
 /** A run's sound on the speakers, which a Start during its pause takes off first (R39). */
 export interface Speakers {
+  /** Whether a press took the run's sound off the speakers and nobody gave it back yet. */
+  readonly muted: boolean
   /** Takes the run's sound off the speakers; its ring keeps what it holds. */
   readonly mute: () => void
   readonly unmute: () => void
@@ -130,20 +132,28 @@ interface PressSound {
   readonly settle: () => Promise<void>
 }
 
+/** The run a press holds: the current one while it stands paused or an earlier press muted it. */
+function heldBy<R extends HeldRun>(current: R | undefined): R | undefined {
+  if (current === undefined) return undefined
+  return current.clock.paused || current.speakers.muted ? current : undefined
+}
+
 /**
  * Opens the sound for the press `ticket` on Start or Restart, inside the press. A run that stands
  * paused holds sound in its ring, and the context's resume would play it until the new run
  * replaces that run: its sound leaves the speakers first (R39, #69). `settle` runs once the play
  * ends. When that run is still the page's and no newer press came, it gets its sound back; while
- * it stands paused, the context suspends first, so it does not run under the paused run.
+ * it stands paused, the context suspends first, so it does not run under the paused run. A newer
+ * press holds a run that an earlier one muted, even after Play took it on, so the newest press
+ * gives the sound back whichever press ends last (W11).
  */
 export function soundForPress<R extends HeldRun>(
   runs: Pick<Runs<R>, 'current' | 'isNewest'>,
   ticket: number,
   audio: Pick<AudioOpener, 'open' | 'suspend'>,
 ): PressSound {
-  const held = runs.current?.clock.paused === true ? runs.current : undefined
-  held?.speakers.mute()
+  const held = heldBy(runs.current)
+  if (held?.speakers.muted === false) held.speakers.mute()
   const settle = (): Promise<void> => {
     if (held === undefined || runs.current !== held || !runs.isNewest(ticket)) {
       return Promise.resolve()
