@@ -12,7 +12,8 @@ struct BtlServer { u8 open; u16 round; Turn turn; void *pokeCon; Mystery tail[CO
 struct BtlPokeCon { BOOL forServer; BattleParty parties[2]; void *mainModule; };
 struct BtlMainModule { u16 id; void *server; Mystery rest[COUNT]; };`,
   // The setup puts the clients in swapped order, so a reader that assumed client = position fails.
-  mainC: `static BOOL BtlMain_SetupMulti(u32 *state, BtlMainModule *m) { m->clientCount = 4; }
+  // The multi battle's setup before it, with an invented count, is a decoy for the reader.
+  mainC: `static BOOL BtlMain_SetupMulti(u32 *state, BtlMainModule *m) { m->clientCount = 5; }
 BOOL BtlMain_SetupAloneSingle(u32 *state, BtlMainModule *mainModule) {
     switch (*state) {
     case 0:

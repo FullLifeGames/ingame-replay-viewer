@@ -52,7 +52,7 @@ describe('quietLines', () => {
       party: LAYOUT,
       monCore: LAYOUT,
       waitSelectSeq: 29,
-      single: { clientCount: 2, posClientIds: [0, 1] },
+      single: { clientCount: 3, posClientIds: [2, 0, 1] },
     },
     route: {
       hughTrigger: { x: 1, z: 31, width: 2 },
