@@ -182,9 +182,11 @@ class FrameDriver {
   }
 
   private step(g: FrameGame, run: Run, page: number, skipped: number): void {
-    for (let i = 0; i < skipped; i += 1) this.applyAll(run.player.next(this.read))
+    for (let i = 0; i < skipped; i += 1) {
+      if (!this.applied(g, run, run.player.next(this.read), page)) return
+    }
     const input = run.player.next(this.read)
-    this.applyAll(input)
+    if (!this.applied(g, run, input, page)) return
     for (const name of input.marks) this.capture(g, name, page)
     for (const change of buttonChanges(run.held, input.buttons)) {
       g.simulateInput(0, change.index, change.value)
@@ -195,19 +197,31 @@ class FrameDriver {
     if (input.done) this.finish(g, run, input.failed, page)
   }
 
-  /** A frame's writes into main RAM, applied before it runs and logged among the watched values;
-   * a frame the hook did not see still gets its writes. */
-  private applyAll(input: FrameInput): void {
-    for (const write of input.writes ?? []) this.apply(write)
+  /** A frame's writes, applied before it runs, also for a frame the hook did not see. A write
+   * whose chain leaves main RAM fails the run at its step, as an `until` past its limit does,
+   * and none of the step's later writes follow: false then. */
+  private applied(g: FrameGame, run: Run, input: FrameInput, page: number): boolean {
+    for (const write of input.writes ?? []) {
+      const fault = this.apply(write)
+      if (fault === undefined) continue
+      const step = run.plan.steps[input.step]
+      const name = step?.kind === 'write' ? `"${step.name}" ` : ''
+      this.report.step = input.step
+      for (const mark of input.marks) this.capture(g, mark, page)
+      this.finish(g, run, `step ${String(input.step)} ${name}could not write ${fault}`, page)
+      return false
+    }
+    return true
   }
 
-  private apply(write: MemoryWrite): void {
+  /** Writes `write` and logs its field, never a heap address; or gives its chain's fault. */
+  private apply(write: MemoryWrite): string | undefined {
     const ram = this.ram()
     const words = wordWrites(write, ram.read32)
-    if ('fault' in words) throw new Error(words.fault)
+    if ('fault' in words) return words.fault
     for (const word of words.words) ram.write32(word.address, word.value)
-    // The field alone: an address behind pointers is the game's heap, which no log line shows.
     this.report.watch.push(`${String(this.frame)}: wrote ${write.field}`)
+    return undefined
   }
 
   private watch(run: Run): void {
