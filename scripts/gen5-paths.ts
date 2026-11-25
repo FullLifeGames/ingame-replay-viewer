@@ -28,6 +28,7 @@ export const GEN5_PATHS = {
   pokebw2: `${REPO}/.cache/gen5/pokebw2`,
   /** The numbers scripts/gen5-bw2.ts generates from it. */
   bw2Json: `${REPO}/build/gen5/bw2.json`,
-  /** The direct entry's routine: our C source. */
+  /** The direct entry's routine: our C source, and what scripts/gen5-routine.ts builds from it. */
   routineSource: `${REPO}/rom/gen5/routine.c`,
+  routineJson: `${REPO}/build/gen5/routine.json`,
 }

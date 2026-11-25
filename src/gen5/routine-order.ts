@@ -70,3 +70,19 @@ export function orderBytes(values: Readonly<Record<string, number>>): number[] {
     return [0, 8, 16, 24].map((shift) => (word >>> shift) & 0xff)
   })
 }
+
+/** What scripts/gen5-routine.ts writes into build/gen5/routine.json. */
+export interface RoutineBuild {
+  /** The code's bytes, from the start of its one section. */
+  bytes: number[]
+  size: number
+  /** Each proc function's byte offset in the code; the page adds the Thumb bit to its address. */
+  functions: { init: number; main: number; exit: number }
+  /** The order members the build was checked against. */
+  order: string[]
+  /** The compiler's first `--version` line and the flags it ran with. */
+  compiler: string
+  flags: string[]
+  /** The SHA-256 of the bytes, in hex. */
+  sha256: string
+}
