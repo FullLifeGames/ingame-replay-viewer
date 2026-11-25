@@ -1,9 +1,9 @@
 // 7z archives whose folders hold one LZMA2 or LZMA coder each, as EmulatorJS packs its cores:
 // the signature header with its CRC, the header or the packed header, the folders, the files with
 // their names and CRCs. It follows 7zFormat.txt (LZMA SDK, public domain) for the container and
-// lzma-specification.txt with the xz format's LZMA2 description for the coders. The code is our
-// own, under the repository's licence. It checks every CRC the archive carries and throws on what
-// it does not read, naming it.
+// lzma-specification.txt for the coders; src/gen5/lzma2.ts names the sources of LZMA2's layout.
+// The code is our own, under the repository's licence. It checks every CRC the archive carries and
+// throws on what it does not read, naming it.
 import { crc32 } from '../patch/crc32.ts'
 import { decodeLzma, hex } from './lzma.ts'
 import { decodeLzma2 } from './lzma2.ts'

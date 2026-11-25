@@ -1,9 +1,11 @@
 // LZMA2, the chunked LZMA of 7z's method 0x21. The dictionary property follows "The .xz File
-// Format" (xz-file-format.txt, section 5.3.1, by Lasse Collin and Igor Pavlov, public domain); the
-// chunks follow the LZMA2 layout as the format is commonly described: a control byte, then for an
-// uncompressed chunk its size, for an LZMA chunk its unpacked and packed sizes, the properties
-// byte where the chunk sets them, and a range-coded stretch of its own. The symbols inside follow
-// lzma-specification.txt (src/gen5/lzma.ts). The code is our own, under the repository's licence.
+// Format" (xz-file-format.txt, section 5.3.1, by Lasse Collin and Igor Pavlov, public domain).
+// The chunk layout follows the section "LZMA2 format" of the English Wikipedia article
+// "Lempel-Ziv-Markov chain algorithm", from which we took the layout's facts and no code or text:
+// a control byte, then for an uncompressed chunk its size, for an LZMA chunk its unpacked and
+// packed sizes, the properties byte where the chunk sets them, and a range-coded stretch of its
+// own, with the four resets. The symbols inside follow lzma-specification.txt (src/gen5/lzma.ts).
+// The code is our own, under the repository's licence.
 import { hex, LzmaDecoder, lzmaProperties } from './lzma.ts'
 import { RangeDecoder } from './range-decoder.ts'
 
