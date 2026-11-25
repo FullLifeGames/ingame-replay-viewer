@@ -6,10 +6,14 @@
 // `BattleScript_ConsumableBerryStatRaise`); the cure or heal after it names the berry. An item
 // used for the stat change the next line makes, such as Berserk Gene, shows its pop-up and plays
 // the held item animation (`BattleScript_BerserkGene`); the change names the item. White Herb does
-// the same before the reset of the lowered stages (`BattleScript_WhiteHerbRet`). An item the
-// expansion lacks is text alone (plan §4) and shows no pop-up.
+// the same before the reset of the lowered stages (`BattleScript_WhiteHerbRet`), and Berry Juice
+// before its heal (`BattleScript_ItemHealHP_RemoveItem`). A berry eaten for confusion alone plays
+// its animation with no pop-up (`BattleScript_BerryCureConfusionRet`); one that cures a status
+// too names itself again as the confusion ends (`BattleScript_BerryCureStatusAndConfusionRet`).
+// An item the expansion lacks is text alone (plan §4) and shows no pop-up.
 import { Dex, toID } from '@pkmn/dex'
 
+import type { ScriptEvent } from '../../script/events'
 import type { PokemonRef } from '../../script/types'
 import { itemOf } from '../tables/lookup'
 import { isSteal, itemRemoved, itemShown } from '../text/phrases-items'
@@ -50,19 +54,39 @@ function showPopUp(who: PokemonRef, name: string, line: number, ctx: Context): b
   return item !== undefined
 }
 
-/** The berry `who` ate on the line before the event in hand, if it ate one there. */
-export function eatenBefore(who: PokemonRef, ctx: Context): string | undefined {
-  const before = ctx.near(-1)
-  return before?.kind === 'itemEnd' && before.eaten && sameMon(before.who, who)
-    ? before.item
+/** The berry `who` ate `offset` events from the one in hand, if it ate one there. */
+function eatenAt(offset: number, who: PokemonRef, ctx: Context): string | undefined {
+  const event = ctx.near(offset)
+  return event?.kind === 'itemEnd' && event.eaten && sameMon(event.who, who)
+    ? event.item
     : undefined
 }
 
-/** Whether the berry `name` that `who` ate on the line before showed its pop-up. */
-export function shownBefore(who: PokemonRef, name: string, ctx: Context): boolean {
-  const eaten = eatenBefore(who, ctx)
-  return eaten !== undefined && toID(eaten) === toID(name) && popUpOf(name) !== undefined
+/** The berry `who` ate on the line before the event in hand, if it ate one there. */
+export const eatenBefore = (who: PokemonRef, ctx: Context) => eatenAt(-1, who, ctx)
+
+/**
+ * The berry `who` ate for the confusion the event in hand ends: on the line before, or on the
+ * line before its status cure (Lum Berry, `BattleScript_BerryCureStatusAndConfusionRet`).
+ */
+export function eatenForConfusion(who: PokemonRef, ctx: Context): string | undefined {
+  const before = ctx.near(-1)
+  const cured = before?.kind === 'cureStatus' && sameMon(before.who, who)
+  return eatenAt(cured ? -2 : -1, who, ctx)
 }
+
+/**
+ * Whether the item `name` that `who` ate or used up on the line before showed its pop-up: a berry
+ * eaten for its heal (Sitrus Berry), or an item used up for it (Berry Juice).
+ */
+export function shownBefore(who: PokemonRef, name: string, ctx: Context): boolean {
+  const before = eatenBefore(who, ctx) ?? usedUpBefore(who, ctx)
+  return before !== undefined && toID(before) === toID(name) && popUpOf(name) !== undefined
+}
+
+/** Whether `event` ends the confusion of `who`. */
+export const endsConfusion = (event: ScriptEvent | undefined, who: PokemonRef) =>
+  event?.kind === 'effectEnd' && sameMon(event.who, who) && toID(event.effect.name) === 'confusion'
 
 export function item(event: EventOf<'item'>, ctx: Context): void {
   const { who, cause, source, line } = event
@@ -88,22 +112,31 @@ export function usedUpBefore(who: PokemonRef, ctx: Context): string | undefined 
     : undefined
 }
 
+/** Whether `next` is the heal of `who` by the item `name`. */
+const healsBy = (next: ScriptEvent | undefined, who: PokemonRef, name: string) =>
+  next?.kind === 'heal' &&
+  sameMon(next.who, who) &&
+  next.cause?.kind === 'item' &&
+  toID(next.cause.name) === toID(name)
+
 /**
- * An item used up for what the next line does: the stat changes @pkmn gives it (`boosts`), or
- * the reset of the lowered stages that names it (White Herb).
+ * An item used up for what the next line does: the stat changes @pkmn gives it (`boosts`), the
+ * reset of the lowered stages that names it (White Herb), or the heal that names it (Berry Juice,
+ * `BattleScript_ItemHealHP_RemoveItem`).
  */
 function usedForNext(event: EventOf<'itemEnd'>, ctx: Context): boolean {
   if (!usedUp(event)) return false
   const next = ctx.near(1)
   const resets = next?.kind === 'negativeStatReset' && sameMon(next.who, event.who)
-  return resets || Boolean(Dex.items.get(event.item).boosts)
+  return resets || healsBy(next, event.who, event.item) || Boolean(Dex.items.get(event.item).boosts)
 }
 
 export function itemEnd(event: EventOf<'itemEnd'>, ctx: Context): void {
   const { who, cause, source, line } = event
   const number = heldItem(ctx, line, event.item)
   if (event.eaten || usedForNext(event, ctx)) {
-    showPopUp(who, event.item, line, ctx)
+    // A berry eaten for confusion alone shows none (`BattleScript_BerryCureConfusionRet`).
+    if (!(event.eaten && endsConfusion(ctx.near(1), who))) showPopUp(who, event.item, line, ctx)
     const anim = event.eaten ? 'heldItemBerry' : 'heldItemEffect'
     ctx.emit(line, { op: 'anim', side: ctx.activeSide(who), anim })
   } else if (!event.silent) {

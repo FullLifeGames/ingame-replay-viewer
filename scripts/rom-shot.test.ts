@@ -1,6 +1,16 @@
+import { existsSync, readFileSync } from 'node:fs'
+
 import { describe, expect, it } from 'vitest'
 
-import { parseShotArgs, replayFile, requiresEveryScene } from './rom-shot.ts'
+import { buildPaths } from './rom-paths.ts'
+import {
+  parseShotArgs,
+  planStreams,
+  replayFile,
+  requiresEveryScene,
+  withEveryTestReplay,
+} from './rom-shot.ts'
+import { PROGRESS_HEADER_PATH, readProgressLayout } from './rom-shot-run.ts'
 
 describe('the arguments of rom:shots', () => {
   it('plays test replay 994052 when it gets no name', () => {
@@ -15,9 +25,13 @@ describe('the arguments of rom:shots', () => {
     ])
   })
 
-  it('refuses a name that is neither a replay id nor hand-made', () => {
+  it('takes the send-out streams by their name', () => {
+    expect(parseShotArgs(['send-outs', 'hand-made'])).toEqual(['send-outs', 'hand-made'])
+  })
+
+  it('refuses a name that is neither a replay id, hand-made nor send-outs', () => {
     expect(() => parseShotArgs(['gen3ou-994052'])).toThrow(
-      '"gen3ou-994052" is neither a test replay id (its digits, such as 994052) nor hand-made',
+      '"gen3ou-994052" is neither a test replay id (its digits, such as 994052), hand-made nor send-outs',
     )
   })
 
@@ -50,6 +64,25 @@ describe('the file of a test replay', () => {
   })
 })
 
+describe('every test replay (wasm:run --all, #66)', () => {
+  const files = ['gen2ou-2718267553.json', 'smogtours-gen3ou-994052.json', 'README.md']
+
+  it('follows the named streams, each test replay once, in the order of the files', () => {
+    expect(withEveryTestReplay(['hand-made', '994052'], files)).toEqual([
+      'hand-made',
+      '994052',
+      '2718267553',
+    ])
+  })
+
+  it('is every test replay in test/fixtures/replays/ when no stream is named', () => {
+    const ids = withEveryTestReplay([])
+    expect(ids).toContain('994052')
+    expect(ids).toContain('995161')
+    expect(ids.length).toBeGreaterThanOrEqual(10)
+  })
+})
+
 describe('the scenes a run must have', () => {
   it('are all of them for the default runs, 994052 and hand-made', () => {
     expect(requiresEveryScene('994052')).toBe(true)
@@ -59,4 +92,19 @@ describe('the scenes a run must have', () => {
   it('are those the stream holds for another test replay', () => {
     expect(requiresEveryScene('994086')).toBe(false)
   })
+})
+
+describe.skipIf(!existsSync(buildPaths().tree))('the send-out plans (#66, pinned tree)', () => {
+  it('are one plan per battle, each to its end, before the two refusals', async () => {
+    const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
+    const plans = await planStreams(['send-outs'], layout)
+    const names = plans.map((plan) => plan.name)
+    expect(names.slice(0, 2)).toEqual(['send-outs-1', 'send-outs-2'])
+    expect(names.slice(-2)).toEqual(['empty-slot', 'version-4'])
+    expect(names.length).toBeGreaterThan(12)
+    for (const plan of plans.slice(0, -2)) {
+      expect(plan.expect).toBe('finished')
+      expect(requiresEveryScene(plan.name)).toBe(false)
+    }
+  }, 60_000)
 })

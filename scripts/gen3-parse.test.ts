@@ -4,6 +4,7 @@ import {
   parseCharmap,
   parseDefine,
   parseDisplayNames,
+  parseEntryFields,
   parseEntryValues,
   parseEnum,
   parseIncludes,
@@ -139,6 +140,25 @@ describe('parseDisplayNames (T2)', () => {
   it('fails on one key with two names', () => {
     const text = '[MOVE_A] = { .name = _("A") },\n[MOVE_A] = { .name = _("B") },\n'
     expect(() => parseDisplayNames(text, 'MOVE', 'name')).toThrow(/MOVE_A is "A" and "B"/)
+  })
+
+  it('reads any field by its pattern, through a macro, and fails on two values', () => {
+    const text = [
+      '#define FORM_INFO(x) { .frontAnimId = ANIM_GROW, .backAnimId = BACK_ANIM_H_SLIDE, }',
+      '[SPECIES_A] = { .frontAnimId = P_GBA_STYLE_SPECIES_GFX ? ANIM_H_SLIDE : ANIM_V_SLIDE, },',
+      '[SPECIES_B] = FORM_INFO(B),',
+      '[SPECIES_C] = { .baseHP = 1 },',
+    ].join('\n')
+    const front = /\.frontAnimId\s*=\s*([^,]+?)\s*,/
+    expect(Object.fromEntries(parseEntryFields(text, 'SPECIES', front))).toEqual({
+      SPECIES_A: 'P_GBA_STYLE_SPECIES_GFX ? ANIM_H_SLIDE : ANIM_V_SLIDE',
+      SPECIES_B: 'ANIM_GROW',
+    })
+    const twice =
+      '[SPECIES_A] = { .frontAnimId = ANIM_A, },\n[SPECIES_A] = { .frontAnimId = ANIM_B, },'
+    expect(() => parseEntryFields(twice, 'SPECIES', front)).toThrow(
+      /SPECIES_A is "ANIM_A" and "ANIM_B"/,
+    )
   })
 
   it('lists the included files', () => {

@@ -3,7 +3,7 @@
 import { Protocol } from '@pkmn/protocol'
 import { describe, expect, it } from 'vitest'
 
-import { NAMED_KINDS } from './census'
+import { NAMED_KINDS, noRuleReason } from './census'
 import { dropReasonOfKind } from './drops'
 import { ruleFor } from './rules/index'
 
@@ -46,6 +46,11 @@ describe('the kind census', () => {
 
   it('counts a kind on no place as none', () => {
     expect(placesOf('|init|', {})).toEqual([])
+  })
+
+  it('gives a kind its reason from the list, and "no rule for" a kind off it', () => {
+    expect(noRuleReason('|-fieldstart|')).toMatch(/^a field condition starting: /)
+    expect(noRuleReason('|move|')).toBe('no rule for |move|')
   })
 
   it('gives every named kind a reason', () => {

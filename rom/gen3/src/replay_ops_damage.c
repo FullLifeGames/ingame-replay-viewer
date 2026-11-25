@@ -8,9 +8,10 @@
 #include "replay_stream.h"
 #include "test_runner.h"
 #include "constants/battle.h"
+#include "constants/battle_move_effects.h"
 #include "constants/songs.h"
 
-// The ops of a move and its damage (#6, #65): MOVE, HIT, HP, FAINT and SHOW_MON. Each emits its
+// The ops of a move and its damage (#6, #65, #68): MOVE, HIT, HP, FAINT and SHOW_MON. Each emits its
 // controller commands as the battle engine does for a move that hits (CancelerMoveAnimation,
 // CancelerEffectivenessSound, CancelerHitAnimation, CancelerHealthBarUpdate in
 // battle_move_resolution.c), for a mon that faints (BattleScript_FaintBattler) and for a user that
@@ -24,6 +25,24 @@ static const u16 sEffectivenessSounds[] =
     [REPLAY_EFFECTIVENESS_SUPER]    = SE_SUPER_EFFECTIVE,
     [REPLAY_EFFECTIVENESS_RESISTED] = SE_NOT_EFFECTIVE,
 };
+
+// Transform's copy, as Cmd_transformdataexecution sets it before the move animation: the user
+// counts as transformed and takes the target's personality and, by the Gen 4 rule
+// (B_TRANSFORM_SHINY), its shininess. The controller hands both to the animation
+// (BtlController_EmitMoveAnimation), which draws the copy's pic and palette from them
+// (HandleSpeciesGfxDataChange); a later reload of the sprite, as after a substitute fades, draws
+// them again for a transformed mon (BattleLoadMonSpriteGfx). The target's battle mon is the copy
+// of its party mon (Replay_PutMonOnField). SwitchInClearSetData clears all three when the next mon
+// enters (Replay_OpSwitchIn).
+static void SetTransformedMon(u32 user, u32 target)
+{
+    gBattleMons[user].volatiles.transformed = TRUE;
+    gBattleMons[user].volatiles.transformedMonPID = gBattleMons[target].personality;
+    if (B_TRANSFORM_SHINY >= GEN_4)
+        gBattleMons[user].volatiles.isTransformedMonShiny = gBattleMons[target].isShiny;
+    else
+        gBattleMons[user].volatiles.isTransformedMonShiny = gBattleMons[user].isShiny;
+}
 
 // MOVE: the user's move animation against the target. The animation reads gBattlerAttacker and
 // gBattlerTarget (DoMoveAnim), so they and gCurrentMove are set first. The animation turn goes to
@@ -40,6 +59,8 @@ bool32 Replay_OpMove(const volatile u8 *operands, u32 step)
     gBattlerAttacker = user;
     gBattlerTarget = Replay_GetBattler(operands[1]);
     gCurrentMove = move;
+    if (GetMoveEffect(move) == EFFECT_TRANSFORM)
+        SetTransformedMon(user, gBattlerTarget);
     BtlController_EmitMoveAnimation(user, B_COMM_TO_CONTROLLER, move, animTurn, GetMovePower(move), 0, gBattleMons[user].friendship, 0);
     MarkBattlerForControllerExec(user);
     return FALSE;

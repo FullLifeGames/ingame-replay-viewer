@@ -11,6 +11,12 @@ const CHOICE_BAND = itemOf('Choice Band').number
 const shown = (side: Side, name: string) => ({ op: 'itemPopUp', side, item: itemOf(name).number })
 const anim = (side: Side, name: string) => ({ op: 'anim', side, anim: name })
 
+/** The instructions of the log lines from `first` on, without the closing END. */
+const sceneFrom = (result: ReturnType<typeof streamOfLog>, first: number) =>
+  result.instructions
+    .filter(({ line, instruction }) => line >= first && instruction.op !== 'end')
+    .map(({ instruction }) => instruction)
+
 describe('held items', () => {
   it('moves the item a Thief takes, plays the theft and says it', () => {
     const scene = sceneOf(
@@ -131,6 +137,64 @@ describe('item pop-ups (BattleScript_ItemPopUp_Scripting)', () => {
       anim('far', 'simpleHeal'),
       { op: 'hp', side: 'far', hp: 65 },
     ])
+  })
+
+  // `BattleScript_ItemHealHP_RemoveItem`: Berry Juice is no berry, so the held item animation
+  // plays, and the heal says nothing. Showdown logs it used up (`useItem`), then the heal.
+  it('shows Berry Juice used up for its heal once, plays it, then heals with no line', () => {
+    const result = streamOfLog(
+      '|-damage|p2a: Tyranitar|40/100',
+      '|-enditem|p2a: Tyranitar|Berry Juice',
+      '|-heal|p2a: Tyranitar|52/100|[from] item: Berry Juice',
+    )
+    expect(sceneFrom(result, NEXT + 1).map(plain)).toEqual([
+      shown('far', 'Berry Juice'),
+      anim('far', 'heldItemEffect'),
+      held('far', 0),
+      anim('far', 'simpleHeal'),
+      { op: 'hp', side: 'far', hp: 52 },
+    ])
+    expect(result.fallbacks).toEqual([])
+  })
+
+  // `BattleScript_BerryCureConfusionRet`: the berry animation with no pop-up, then
+  // STRINGID_PKMNSITEMSNAPPEDOUT. Lum Berry takes the script when confusion is all it cures.
+  it.each(['Persim Berry', 'Lum Berry'])(
+    'plays a %s eaten for confusion alone with no pop-up and names it at the end',
+    (berry) => {
+      const result = streamOfLog(
+        '|-start|p1a: Dugtrio|confusion',
+        `|-enditem|p1a: Dugtrio|${berry}|[eat]`,
+        '|-end|p1a: Dugtrio|confusion',
+      )
+      expect(sceneFrom(result, NEXT + 1).map(plain)).toEqual([
+        anim('near', 'heldItemBerry'),
+        held('near', 0),
+        `Dugtrio's ${berry} snapped it out of its confusion!`,
+      ])
+      expect(result.fallbacks).toEqual([])
+    },
+  )
+
+  // `BattleScript_BerryCureStatusAndConfusionRet`: pop-up, berry animation, the cure line, then
+  // STRINGID_PKMNSITEMSNAPPEDOUT. Showdown logs the status cure between the berry and the end.
+  it('names a Lum Berry that cures a status and confusion in both lines', () => {
+    const result = streamOfLog(
+      '|-status|p1a: Dugtrio|par',
+      '|-start|p1a: Dugtrio|confusion',
+      '|-enditem|p1a: Dugtrio|Lum Berry|[eat]',
+      '|-curestatus|p1a: Dugtrio|par|[msg]',
+      '|-end|p1a: Dugtrio|confusion',
+    )
+    expect(sceneFrom(result, NEXT + 2).map(plain)).toEqual([
+      shown('near', 'Lum Berry'),
+      anim('near', 'heldItemBerry'),
+      held('near', 0),
+      "Dugtrio's Lum Berry cured its paralysis!",
+      { op: 'status', side: 'near', slot: 0, status: 'none' },
+      "Dugtrio's Lum Berry snapped it out of its confusion!",
+    ])
+    expect(result.fallbacks).toEqual([])
   })
 
   it('shows the pop-up of a berry eaten for a stat', () => {

@@ -31,6 +31,7 @@
     "wasm:run": "node scripts/wasm-run.ts",
     "wasm:oracle": "node scripts/wasm-oracle.ts",
     "wasm:diff": "node scripts/wasm-diff.ts",
+    "wasm:divide": "node scripts/wasm-divide.ts",
     "gen3:tables": "node scripts/gen3-tables.ts"
   },
   "devDependencies": {

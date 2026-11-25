@@ -1,4 +1,4 @@
-{"length":19136,"crc32":"1b2f2547","trainers":{"near":{"name":"dark premonitions","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"tylerkehne","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":243,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Raikou"},{"species":145,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zapdos"},{"species":91,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Cloyster"},{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"},{"species":94,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gengar"},{"species":143,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Snorlax"}],"far":[{"species":103,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Exeggutor"},{"species":143,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Snorlax"},{"species":145,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zapdos"},{"species":94,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gengar"},{"species":205,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Forretress"},{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"}]}}
+{"length":19169,"crc32":"3f421060","trainers":{"near":{"name":"dark premonitions","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"tylerkehne","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":243,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Raikou"},{"species":145,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zapdos"},{"species":91,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Cloyster"},{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"},{"species":94,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gengar"},{"species":143,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Snorlax"}],"far":[{"species":103,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Exeggutor"},{"species":143,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Snorlax"},{"species":145,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zapdos"},{"species":94,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Gengar"},{"species":205,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Forretress"},{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"}]}}
 {"line":20,"op":"intro"}
 {"line":20,"op":"print","text":"You are challenged by tylerkehne!"}
 {"line":22,"op":"print","text":"tylerkehne sent out Exeggutor!"}
@@ -168,6 +168,7 @@
 {"line":133,"op":"anim","side":"far","anim":"simpleHeal"}
 {"line":133,"op":"hp","side":"far","hp":31}
 {"line":135,"op":"turn","number":12}
+{"line":139,"op":"print","text":"tylerkehne withdrew Exeggutor!"}
 {"line":140,"op":"print","text":"Tyranitar used Pursuit!"}
 {"line":140,"op":"move","user":"near","target":"far","move":228,"animTurn":0}
 {"line":142,"op":"hit","side":"far","effectiveness":"super"}
@@ -1553,6 +1554,5 @@
 {"line":1105,"op":"print","text":"Cloyster fainted!"}
 {"line":1107,"op":"print","text":"tylerkehne won the battle!"}
 {"line":1107,"op":"end","outcome":"farWon"}
-{"line":139,"fallback":"mechanic","detail":"no state in the stream for Pursuit acting"}
 {"line":585,"fallback":"mechanic","detail":"no state in the stream for perish3 starting"}
 {"line":586,"fallback":"mechanic","detail":"no state in the stream for perish3 starting"}

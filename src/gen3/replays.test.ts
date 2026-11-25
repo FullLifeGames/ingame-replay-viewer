@@ -1,16 +1,19 @@
 import { describe, expect, it } from 'vitest'
 
 import slotHeader from '../../rom/gen3/include/replay_slot.h?raw'
+import { buildBattleScript } from '../script/build'
 import type { ScriptEvent } from '../script/events'
 import type { Side } from '../script/types'
 import { REPLAYS, replayScript } from '../script/testing'
 import { crc32 } from '../patch/crc32'
 import { buildGen3Stream, type Gen3Stream } from './backend'
-import { mechanicGap, showsInPlace } from './fallbacks'
+import { type Fallback, mechanicGap, showsInPlace } from './fallbacks'
 import { decodeStream } from './stream/decode'
 import { itemOf } from './tables/lookup'
 import { itemGaps } from './tables/testing'
 import { decodeText, encodeText } from './text/charset'
+import { PARTIAL_TRAP_SCENE } from './text/phrases-status'
+import { phraseGap } from './text/template'
 import { translate, type Translation } from './translate'
 
 /** A define of `replay_slot.h`, which holds the slot's layout (ADR 0008). */
@@ -34,15 +37,20 @@ const charsetRead = (text: string) => decodeText(encodeText(text))
 
 /**
  * The mechanic fallbacks the test replays may take, each a line the game shows nothing for:
- * Perish Song's first count, whose later counts print; Pursuit's activation, whose withdraw
- * line the switch after the hit prints (none after a knockout); Bide's first turn, which the
- * expansion shows as the move alone. A new one fails until it is named here.
+ * Perish Song's first count, whose later counts print; Bide's first turn, which the expansion
+ * shows as the move alone. A new one fails until it is named here.
  */
 const NAMED_MECHANICS: ReadonlySet<string> = new Set([
   mechanicGap('perish3', 'starting').detail,
-  mechanicGap('Pursuit', 'acting').detail,
   mechanicGap('Bide', 'starting').detail,
 ])
+
+/**
+ * The phrase fallbacks a test replay may take, each a scene the game has no message for: Gen 1's
+ * partial trap that keeps its target from moving, which the expansion's traps never do. A new one
+ * fails until it is named here.
+ */
+const NAMED_PHRASES: ReadonlySet<string> = new Set([phraseGap(PARTIAL_TRAP_SCENE).detail])
 
 /**
  * The item fallbacks a test replay may take: the items of its generation the expansion lacks
@@ -50,6 +58,22 @@ const NAMED_MECHANICS: ReadonlySet<string> = new Set([
  */
 const itemGapDetails = (gen: number): ReadonlySet<string> =>
   new Set(itemGaps(gen).flatMap((name) => itemOf(name).fallback?.detail ?? []))
+
+/** Whether a list above names `fallback`, from a battle of `gen`. */
+function isNamed({ kind, detail }: Fallback, gen: number): boolean {
+  if (kind === 'item') return itemGapDetails(gen).has(detail)
+  return kind === 'phrase' && NAMED_PHRASES.has(detail)
+}
+
+/**
+ * The fallbacks of `stream`, from a battle of `gen`, that show something in place of a content
+ * gap and that no list above names.
+ */
+const contentGaps = (stream: Gen3Stream, gen: number): Fallback[] =>
+  stream.fallbacks.filter((fallback) => showsInPlace(fallback) && !isNamed(fallback, gen))
+
+const listed = (fallbacks: readonly Fallback[]) =>
+  fallbacks.map(({ line, detail }) => `${String(line)}: ${detail}`)
 
 const replays = REPLAYS.map(({ id }) => {
   const script = replayScript(id)
@@ -77,14 +101,8 @@ describe.each(replays)('the instruction stream of $id', ({ id, script, stream, t
   })
 
   it('takes no fallback that shows something in place of a content gap', () => {
-    const items = itemGapDetails(script.gen)
-    const gaps = stream.fallbacks.filter(
-      (fallback) =>
-        showsInPlace(fallback) && !(fallback.kind === 'item' && items.has(fallback.detail)),
-    )
-    expect(gaps, gaps.map(({ line, detail }) => `${String(line)}: ${detail}`).join('\n')).toEqual(
-      [],
-    )
+    const gaps = contentGaps(stream, script.gen)
+    expect(gaps, listed(gaps).join('\n')).toEqual([])
   })
 
   it('takes mechanic fallbacks only for the silent effects named above', () => {
@@ -126,5 +144,41 @@ describe.each(replays)('the instruction stream of $id', ({ id, script, stream, t
       parties: { near: party('near'), far: party('far') },
       instructions,
     })
+  })
+})
+
+/** A Gen 1 battle of Alice's Dugtrio and Bob's Cloyster, then `lines`. */
+const gen1StreamOf = (...lines: string[]) =>
+  buildGen3Stream(
+    buildBattleScript(
+      [
+        '|gen|1',
+        '|player|p1|Alice|1|',
+        '|player|p2|Bob|2|',
+        '|teamsize|p1|6',
+        '|teamsize|p2|6',
+        '|start',
+        '|switch|p1a: Dugtrio|Dugtrio|100/100',
+        '|switch|p2a: Cloyster|Cloyster|100/100',
+        ...lines,
+        '',
+      ].join('\n'),
+    ),
+  )
+
+describe('the content-gap test', () => {
+  it('lets a partial trap that keeps a Gen 1 Pokémon from moving pass through the named list', () => {
+    const stream = gen1StreamOf('|turn|1', '|cant|p1a: Dugtrio|partiallytrapped')
+
+    expect(stream.fallbacks.map(({ kind }) => kind)).toContain('phrase')
+    expect(listed(contentGaps(stream, 1))).toEqual([])
+  })
+
+  it('fails a phrase fallback the named list leaves out', () => {
+    const stream = gen1StreamOf('|turn|1', '|-miss|p1a: Dugtrio')
+
+    expect(listed(contentGaps(stream, 1))).toEqual([
+      '9: no game message for a miss without a target',
+    ])
   })
 })

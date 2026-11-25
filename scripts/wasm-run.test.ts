@@ -1,103 +1,23 @@
-import { readFileSync } from 'node:fs'
-
 import { describe, expect, it } from 'vitest'
 
 import { checkShots, SCREEN } from './rom-shot-probes.ts'
-import { PROGRESS_HEADER_PATH, readProgressLayout } from './rom-shot-run.ts'
 import type { ProgressLayout } from './rom-shot-run.ts'
 import type { Scene } from './rom-shot-scenes.ts'
-import { GBA_ROM_BASE, loadSlotLayout } from './rom-slot.ts'
-import { MIXER_RATE } from '../src/web/wasm/protocol.ts'
 import { frameLines } from './wasm-hashes.ts'
+import {
+  AUDIO_SAMPLES,
+  fakeModule,
+  KEYS_UP,
+  LAYOUT,
+  playing,
+  SLOT_LAYOUT,
+} from './wasm-run-fake.ts'
 import { playCommand, playModule, runPlace, STALL_FRAMES } from './wasm-run.ts'
-import type { GameModule, ModuleHooks } from './wasm-run.ts'
 
 // The class of a WebAssembly trap, by its name.
 class RuntimeError extends Error {
   override name = 'RuntimeError'
 }
-
-const LAYOUT = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
-const SLOT_LAYOUT = loadSlotLayout()
-const SLOT = GBA_ROM_BASE + 0x1000
-const PROGRESS = GBA_ROM_BASE + 0x22000
-const PIXELS = GBA_ROM_BASE + 0x24000
-const PIXEL_COUNT = 240 * 160
-// One frame of the fake's sound: two left and right pairs at half volume.
-const AUDIO = GBA_ROM_BASE + 0x38000
-const AUDIO_SAMPLES = [0.5, -0.5, -0.5, 0.5]
-
-interface Progress {
-  done: number
-  total: number
-  error: number
-  finished: boolean
-  playing: boolean
-}
-
-/** What the fake game shows on a frame: its progress and one colour over the whole screen. */
-type Script = (frame: number) => { progress: Progress; colour: number }
-
-interface Fake {
-  factory: (hooks: ModuleHooks) => Promise<GameModule>
-  /** The slot's bytes as AgbMain found them. */
-  slotAtStart: () => Uint8Array | undefined
-}
-
-// The slot as the C initializer leaves it in the module's data: magic, version, sizes, no stream.
-function emptySlot(memory: Uint8Array): void {
-  const view = new DataView(memory.buffer, SLOT)
-  memory.set(new TextEncoder().encode(SLOT_LAYOUT.magic), SLOT)
-  view.setUint16(SLOT_LAYOUT.offsets.version, SLOT_LAYOUT.version, true)
-  view.setUint16(SLOT_LAYOUT.offsets.headerSize, SLOT_LAYOUT.headerSize, true)
-  view.setUint32(SLOT_LAYOUT.offsets.slotSize, SLOT_LAYOUT.size, true)
-}
-
-function writeProgress(memory: Uint8Array, layout: ProgressLayout, progress: Progress): void {
-  const view = new DataView(memory.buffer, PROGRESS)
-  view.setUint16(layout.offsets.done, progress.done, true)
-  view.setUint16(layout.offsets.total, progress.total, true)
-  view.setUint8(layout.offsets.error, progress.error)
-  view.setUint8(layout.offsets.finished, progress.finished ? 1 : 0)
-  view.setUint8(layout.offsets.playing, progress.playing ? 1 : 0)
-}
-
-// A module object with the exports the harness uses. AgbMain plays the script for at most
-// `limit` frames and then returns, which the real game never does.
-function fakeModule(script: Script, layout = LAYOUT, limit = 20000): Fake {
-  // Untouched pages of a large buffer cost no memory.
-  const memory = new Uint8Array(GBA_ROM_BASE + 0x40000)
-  const words = new Uint16Array(memory.buffer)
-  emptySlot(memory)
-  new Float32Array(memory.buffer, AUDIO, AUDIO_SAMPLES.length).set(AUDIO_SAMPLES)
-  let slotAtStart: Uint8Array | undefined
-  const factory = (hooks: ModuleHooks) =>
-    Promise.resolve<GameModule>({
-      HEAPU8: memory,
-      HEAPU16: words,
-      _IrvWasm_Slot: () => SLOT,
-      _IrvWasm_Progress: () => PROGRESS,
-      _AgbMain: () => {
-        slotAtStart = memory.slice(SLOT, SLOT + SLOT_LAYOUT.size)
-        for (let frame = 1; frame <= limit; frame++) {
-          const { progress, colour } = script(frame)
-          writeProgress(memory, layout, progress)
-          words.fill(colour, PIXELS >> 1, (PIXELS >> 1) + PIXEL_COUNT)
-          hooks.irvAudio(AUDIO, AUDIO_SAMPLES.length, MIXER_RATE)
-          hooks.irvFrame(PIXELS)
-        }
-      },
-    })
-  return { factory, slotAtStart: () => slotAtStart }
-}
-
-const playing = (done: number, total = 34): Progress => ({
-  done,
-  total,
-  error: 0,
-  finished: false,
-  playing: true,
-})
 
 const scene = (name: string, done: number, frames: number): Scene => ({
   name,
@@ -210,6 +130,22 @@ describe('playing a stream in the module', () => {
     expect(frameLines(run.hashes, 9)).toEqual(frameLines(run.hashes, 1))
     expect(frameLines(run.hashes, 10)).not.toEqual(frameLines(run.hashes, 9))
     expect(frameLines(run.hashes, 30)).toEqual(frameLines(run.hashes, 10))
+  })
+
+  it('holds B from frame N on, by writing KEYINPUT before each frame, for a run that asks (#68)', async () => {
+    const end = { ...playing(34), finished: true }
+    const script = (frame: number) => ({ progress: frame < 6 ? playing(1) : end, colour: 0 })
+    const heldB = KEYS_UP & ~0x0002
+    const fromThree = fakeModule(script)
+    const request = { stream: undefined, scenes: [], layout: LAYOUT }
+    await playModule(fromThree.factory, { ...request, holdBFrom: 3 })
+    expect(fromThree.keys).toEqual([KEYS_UP, KEYS_UP, heldB, heldB, heldB, heldB])
+    const fromFirst = fakeModule(script)
+    await playModule(fromFirst.factory, { ...request, holdBFrom: 1 })
+    expect(fromFirst.keys).toEqual(Array.from({ length: 6 }, () => heldB))
+    const none = fakeModule(script)
+    await playModule(none.factory, request)
+    expect(none.keys).toEqual(Array.from({ length: 6 }, () => KEYS_UP))
   })
 
   it('fails when AgbMain returns, which the game never does', async () => {
