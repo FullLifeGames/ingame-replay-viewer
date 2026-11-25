@@ -10,13 +10,15 @@
 // before its heal (`BattleScript_ItemHealHP_RemoveItem`). A berry eaten for confusion alone plays
 // its animation with no pop-up (`BattleScript_BerryCureConfusionRet`); one that cures a status
 // too names itself again as the confusion ends (`BattleScript_BerryCureStatusAndConfusionRet`).
-// An item the expansion lacks is text alone (plan §4) and shows no pop-up.
+// An item the expansion lacks is text alone (plan §4) and shows no pop-up. A berry that acts as it
+// is eaten (`[consumed]`, Custap Berry) says its line after the pop-up and the animation of its
+// `[eat]` (`BattleScript_CustapBerryActivation`).
 import { Dex, toID } from '@pkmn/dex'
 
 import type { ScriptEvent } from '../../script/events'
 import type { PokemonRef } from '../../script/types'
 import { itemOf } from '../tables/lookup'
-import { isSteal, itemRemoved, itemShown } from '../text/phrases-items'
+import { actedFaster, isSteal, itemRemoved, itemShown } from '../text/phrases-items'
 import { type Context, type EventOf, sameMon } from './context'
 
 /** The expansion's number of the item, or undefined for an item it lacks. */
@@ -84,6 +86,19 @@ export function shownBefore(who: PokemonRef, name: string, ctx: Context): boolea
   return before !== undefined && toID(before) === toID(name) && popUpOf(name) !== undefined
 }
 
+/**
+ * Says the line of a berry that acts as it is eaten, right after `who` ate it, and says whether it
+ * did. The `[eat]` before it showed the pop-up and played the animation.
+ */
+export function berryConsumed(event: EventOf<'effectActivate'>, ctx: Context): boolean {
+  const { who, effect, line } = event
+  if (!event.consumed || who === undefined || effect.kind !== 'item') return false
+  const eaten = eatenBefore(who, ctx)
+  if (eaten === undefined || toID(eaten) !== toID(effect.name)) return false
+  ctx.print(line, actedFaster(ctx.mon(who), eaten))
+  return true
+}
+
 /** Whether `event` ends the confusion of `who`. */
 export const endsConfusion = (event: ScriptEvent | undefined, who: PokemonRef) =>
   event?.kind === 'effectEnd' && sameMon(event.who, who) && toID(event.effect.name) === 'confusion'
@@ -131,8 +146,18 @@ function usedForNext(event: EventOf<'itemEnd'>, ctx: Context): boolean {
   return resets || healsBy(next, event.who, event.item) || Boolean(Dex.items.get(event.item).boosts)
 }
 
+/**
+ * The Pokémon whose move took the item: `[of]`, or else the last mover on the other side, since
+ * Gen 4 logs Knock Off's end with no `[of]` (`-enditem|<target>|<item>|[from] move: Knock Off`).
+ */
+function takerOf({ who, cause, source }: EventOf<'itemEnd'>, ctx: Context): PokemonRef | undefined {
+  if (source !== undefined || cause?.kind !== 'move') return source
+  return ctx.mover?.side === who.side ? undefined : ctx.mover
+}
+
 export function itemEnd(event: EventOf<'itemEnd'>, ctx: Context): void {
-  const { who, cause, source, line } = event
+  const { who, cause, line } = event
+  const source = takerOf(event, ctx)
   const number = heldItem(ctx, line, event.item)
   if (event.eaten || usedForNext(event, ctx)) {
     // A berry eaten for confusion alone shows none (`BattleScript_BerryCureConfusionRet`).

@@ -16,6 +16,15 @@ export const ITEM_TEMPLATES = {
   knockedOff: tagged('STRINGID_PKMNKNOCKEDOFF', (user: Mon, target: Mon, item: string) => {
     return `${nameAtStart(user)} knocked off ${nameInside(target)}'s ${item}!`
   }),
+  airBalloon: tagged('STRINGID_AIRBALLOONFLOAT', (who: Mon) => {
+    return `${nameAtStart(who)} floats in the air with its Air Balloon!`
+  }),
+  airBalloonPopped: tagged('STRINGID_AIRBALLOONPOP', (who: Mon) => {
+    return `${nameAtStart(who)}'s Air Balloon popped!`
+  }),
+  actsFaster: tagged('STRINGID_CANACTFASTERTHANKSTO', (who: Mon, item: string) => {
+    return `${nameAtStart(who)} can act faster than normal, thanks to its ${item}!`
+  }),
   whiteHerb: tagged('STRINGID_PKMNSITEMRESTOREDSTATUS', (who: Mon, item: string) => {
     return `${nameAtStart(who)} returned its stats to normal using its ${item}!`
   }),
@@ -25,6 +34,13 @@ export const ITEM_TEMPLATES = {
 }
 
 const STEALS = new Set(['thief', 'covet'])
+
+/**
+ * The Air Balloon says its lines with no pop-up: as its holder comes in, and as a hit pops it
+ * (`BattleScript_AirBalloonMsgInRet`, `BattleScript_AirBalloonMsgPop`). The log gives both with
+ * no cause.
+ */
+const AIR_BALLOON = 'airballoon'
 
 /** Thief and Covet take the item of the Pokémon of `[of]`. */
 export const isSteal = (cause: Effect | undefined) =>
@@ -43,6 +59,9 @@ export function itemShown(
     return { text: ITEM_TEMPLATES.stole.render(who, source, name) }
   }
   if (id === 'trick') return { text: ITEM_TEMPLATES.obtained.render(who, name) }
+  if (cause === undefined && toID(item) === AIR_BALLOON) {
+    return { text: ITEM_TEMPLATES.airBalloon.render(who) }
+  }
   const by = cause === undefined ? '' : ` by ${cause.name}`
   return ownPhrase(`${ownerAtStart(who)} ${name} was revealed!`, `an item shown${by}`)
 }
@@ -58,8 +77,16 @@ export function itemRemoved(
   if (cause && toID(cause.name) === 'knockoff' && source !== undefined) {
     return { text: ITEM_TEMPLATES.knockedOff.render(source, who, name) }
   }
+  if (cause === undefined && toID(item) === AIR_BALLOON) {
+    return { text: ITEM_TEMPLATES.airBalloonPopped.render(who) }
+  }
   return ownPhrase(`${ownerAtStart(who)} ${name} was used up!`, `${item} used up`)
 }
+
+/** The berry `who` ate let it move first in its priority (Custap Berry). */
+export const actedFaster = (who: Mon, item: string): Phrase => ({
+  text: ITEM_TEMPLATES.actsFaster.render(who, itemName(item)),
+})
 
 /**
  * Lowered stages back to 0: by the item `who` used up just before (White Herb), or else in a line

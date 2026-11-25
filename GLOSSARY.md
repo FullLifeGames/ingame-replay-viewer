@@ -166,6 +166,10 @@ _Avoid_: demo, sample
 The lines above the game on the viewer: the two players' names by side and the turn the game has reached.
 _Avoid_: HUD, scoreboard
 
+**Team list**:
+Both teams as Team Preview names them, listed under the game on the viewer. Each side sits under the panel's words for it, the far side first. A Pokémon shows its species, its gender sign and its level when below 100. A replay without Team Preview has no team list.
+_Avoid_: roster, team sheet
+
 **Pause**:
 The viewer's Pause and Play button. It holds the running replay at its frame and suspends its sound until Play.
 _Avoid_: stop, freeze
@@ -205,7 +209,7 @@ A replay whose format's generation is no newer than the target game's, so every 
 _Avoid_: native replay
 
 **Dropped line**:
-A battle log line deliberately not shown in the game, such as chat or timer messages. Every line is either shown or a dropped line, never silently skipped. Each dropped line carries its reason; the reason `state` marks a line whose state a later line shows, such as the recharge turn that the next turn's "must recharge" line tells. The reason `preview` marks the Team Preview lines, since the intro's Poké Balls show each team, and `format` marks a line that a format writes for itself.
+A battle log line deliberately not shown in the game, such as chat or timer messages. Every line is either shown or a dropped line, never silently skipped. Each dropped line carries its reason; the reason `state` marks a line whose state a later line shows, such as the recharge turn that the next turn's "must recharge" line tells, or a one-turn state the game never shows, such as Roost's turn without the Flying type. The reason `preview` marks the Team Preview lines, since the intro's Poké Balls show each team and the viewer's team list names both teams, and `format` marks a line that a format writes for itself.
 _Avoid_: ignored line, skipped event
 
 **Kind census**:
@@ -213,7 +217,7 @@ The check that walks every kind of battle log line the protocol library knows an
 _Avoid_: coverage list
 
 **Named list**:
-The kinds of battle log line the battle script has no rule for, in three groups, each with its reason: kinds a replay's log never holds, kinds of formats the viewer refuses, and kinds with no rule yet. Since #65 the last group holds none. A dropped line of a kind on the list carries that kind's reason, and the page's list "Not shown in the game" prints it.
+The kinds of battle log line the battle script has no rule for, in four groups, each with its reason: kinds a replay's log never holds, kinds of formats the viewer refuses, kinds that only Gen 4 and later log, which no rule shows yet, and kinds with no rule yet. Since #65 the last group holds none. Of the four, a test replay may hold only lines of the last group. A dropped line of a kind on the list carries that kind's reason, and the page's list "Not shown in the game" prints it.
 _Avoid_: named gap list, allow list
 
 **Content gap**:

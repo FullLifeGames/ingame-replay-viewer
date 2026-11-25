@@ -12,6 +12,7 @@ describe('damage from a cause (P1)', () => {
     ['Sandstorm', 'Dugtrio is buffeted by the sandstorm!'],
     ['Hail', 'Dugtrio is buffeted by the hail!'],
     ['Spikes', 'Dugtrio was hurt by the spikes!'],
+    ['Stealth Rock', 'Pointed stones dug into Dugtrio!'],
     ['psn', 'Dugtrio was hurt by its poisoning!'],
     ['brn', 'Dugtrio was hurt by its burn!'],
     ['Recoil|[of] p2a: Tyranitar', 'Dugtrio was damaged by the recoil!'],

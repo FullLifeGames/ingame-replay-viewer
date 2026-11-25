@@ -1,0 +1,438 @@
+{"length":6733,"crc32":"41e5927e","trainers":{"near":{"name":"tizio potente ao","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Monai","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"},{"species":385,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Jirachi"},{"species":639,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Terrakion"},{"species":286,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Breloom"},{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":1102,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Landorus"}],"far":[{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"},{"species":534,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Conkeldurr"},{"species":1102,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Landorus"},{"species":121,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Starmie"},{"species":385,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Jirachi"},{"species":380,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Latias"}]}}
+{"line":40,"op":"intro"}
+{"line":40,"op":"print","text":"You are challenged by Monai!"}
+{"line":42,"op":"print","text":"Monai sent out Landorus!"}
+{"line":42,"op":"sendOut","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":41,"op":"print","text":"Go! Breloom!"}
+{"line":41,"op":"sendOut","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":43,"op":"ability","side":"far","ability":22,"show":true}
+{"line":44,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"one"}
+{"line":44,"op":"print","text":"Breloom's Attack fell!"}
+{"line":43,"op":"ability","side":"far","ability":22,"show":false}
+{"line":45,"op":"turn","number":1}
+{"line":48,"op":"print","text":"The opposing Landorus used Hidden Power!"}
+{"line":48,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":50,"op":"hit","side":"near","effectiveness":"super"}
+{"line":50,"op":"hp","side":"near","hp":50}
+{"line":50,"op":"print","text":"It's super effective!"}
+{"line":51,"op":"print","text":"Breloom used Stun Spore!"}
+{"line":51,"op":"move","user":"near","target":"far","move":78,"animTurn":0}
+{"line":52,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":52,"op":"print","text":"The opposing Landorus is paralyzed, so it may be unable to move!"}
+{"line":52,"op":"status","side":"far","slot":2,"status":"par"}
+{"line":54,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":54,"op":"print","text":"Breloom was badly poisoned!"}
+{"line":54,"op":"status","side":"near","slot":3,"status":"tox"}
+{"line":56,"op":"turn","number":2}
+{"line":59,"op":"print","text":"Breloom used Substitute!"}
+{"line":59,"op":"move","user":"near","target":"near","move":164,"animTurn":0}
+{"line":60,"op":"volatile","side":"near","volatile":"substitute","on":true}
+{"line":61,"op":"hp","side":"near","hp":25}
+{"line":60,"op":"print","text":"Breloom put in a substitute!"}
+{"line":62,"op":"print","text":"The opposing Landorus couldn't move because it's paralyzed!"}
+{"line":62,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":64,"op":"ability","side":"near","ability":90,"show":true}
+{"line":64,"op":"hp","side":"near","hp":38}
+{"line":64,"op":"print","text":"Breloom had its HP restored."}
+{"line":64,"op":"ability","side":"near","ability":90,"show":false}
+{"line":66,"op":"turn","number":3}
+{"line":69,"op":"print","text":"Breloom used Seed Bomb!"}
+{"line":69,"op":"move","user":"near","target":"far","move":402,"animTurn":0}
+{"line":70,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":70,"op":"hp","side":"far","hp":69}
+{"line":71,"op":"print","text":"The opposing Landorus couldn't move because it's paralyzed!"}
+{"line":71,"op":"anim","side":"far","anim":"statusPrz"}
+{"line":73,"op":"itemPopUp","side":"far","item":472}
+{"line":73,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":73,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":73,"op":"hp","side":"far","hp":75}
+{"line":74,"op":"ability","side":"near","ability":90,"show":true}
+{"line":74,"op":"hp","side":"near","hp":50}
+{"line":74,"op":"print","text":"Breloom had its HP restored."}
+{"line":74,"op":"ability","side":"near","ability":90,"show":false}
+{"line":76,"op":"turn","number":4}
+{"line":79,"op":"print","text":"Breloom used Seed Bomb!"}
+{"line":79,"op":"move","user":"near","target":"far","move":402,"animTurn":0}
+{"line":80,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":80,"op":"hp","side":"far","hp":44}
+{"line":81,"op":"print","text":"The opposing Landorus used U-turn!"}
+{"line":81,"op":"move","user":"far","target":"near","move":369,"animTurn":0}
+{"line":82,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":82,"op":"print","text":"The substitute took damage for Breloom!"}
+{"line":82,"op":"anim","side":"near","anim":"substituteFade"}
+{"line":82,"op":"print","text":"Breloom's substitute faded!"}
+{"line":82,"op":"volatile","side":"near","volatile":"substitute","on":false}
+{"line":85,"op":"withdraw","side":"far"}
+{"line":85,"op":"print","text":"Monai sent out Conkeldurr!"}
+{"line":85,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":87,"op":"ability","side":"near","ability":90,"show":true}
+{"line":87,"op":"hp","side":"near","hp":63}
+{"line":87,"op":"print","text":"Breloom had its HP restored."}
+{"line":87,"op":"ability","side":"near","ability":90,"show":false}
+{"line":89,"op":"turn","number":5}
+{"line":92,"op":"anim","side":"near","anim":"focusPunchSetup"}
+{"line":92,"op":"print","text":"Breloom is tightening its focus!"}
+{"line":93,"op":"print","text":"The opposing Conkeldurr used Bulk Up!"}
+{"line":93,"op":"move","user":"far","target":"far","move":339,"animTurn":0}
+{"line":94,"op":"stat","side":"far","stat":"atk","stages":1,"arrows":"several"}
+{"line":94,"op":"print","text":"The opposing Conkeldurr's Attack rose!"}
+{"line":95,"op":"stat","side":"far","stat":"def","stages":1,"arrows":"none"}
+{"line":95,"op":"print","text":"The opposing Conkeldurr's Defense rose!"}
+{"line":96,"op":"print","text":"Breloom used Focus Punch!"}
+{"line":96,"op":"move","user":"near","target":"far","move":264,"animTurn":0}
+{"line":97,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":97,"op":"hp","side":"far","hp":65}
+{"line":99,"op":"itemPopUp","side":"far","item":472}
+{"line":99,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":99,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":99,"op":"hp","side":"far","hp":71}
+{"line":100,"op":"ability","side":"near","ability":90,"show":true}
+{"line":100,"op":"hp","side":"near","hp":75}
+{"line":100,"op":"print","text":"Breloom had its HP restored."}
+{"line":100,"op":"ability","side":"near","ability":90,"show":false}
+{"line":102,"op":"turn","number":6}
+{"line":105,"op":"print","text":"Breloom, come back!"}
+{"line":105,"op":"withdraw","side":"near"}
+{"line":105,"op":"print","text":"Go! Landorus!"}
+{"line":105,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
+{"line":106,"op":"ability","side":"near","ability":22,"show":true}
+{"line":107,"op":"stat","side":"far","stat":"atk","stages":-1,"arrows":"one"}
+{"line":107,"op":"print","text":"The opposing Conkeldurr's Attack fell!"}
+{"line":106,"op":"ability","side":"near","ability":22,"show":false}
+{"line":108,"op":"print","text":"The opposing Conkeldurr used Bulk Up!"}
+{"line":108,"op":"move","user":"far","target":"far","move":339,"animTurn":0}
+{"line":109,"op":"stat","side":"far","stat":"atk","stages":1,"arrows":"several"}
+{"line":109,"op":"print","text":"The opposing Conkeldurr's Attack rose!"}
+{"line":110,"op":"stat","side":"far","stat":"def","stages":1,"arrows":"none"}
+{"line":110,"op":"print","text":"The opposing Conkeldurr's Defense rose!"}
+{"line":112,"op":"itemPopUp","side":"far","item":472}
+{"line":112,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":112,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":112,"op":"hp","side":"far","hp":77}
+{"line":114,"op":"turn","number":7}
+{"line":117,"op":"print","text":"Landorus used Knock Off!"}
+{"line":117,"op":"move","user":"near","target":"far","move":282,"animTurn":0}
+{"line":119,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":119,"op":"hp","side":"far","hp":76}
+{"line":119,"op":"print","text":"It's not very effective…"}
+{"line":120,"op":"print","text":"Landorus knocked off the opposing Conkeldurr's Leftovers!"}
+{"line":120,"op":"item","side":"far","slot":1,"item":0}
+{"line":121,"op":"print","text":"The opposing Conkeldurr used Drain Punch!"}
+{"line":121,"op":"move","user":"far","target":"near","move":409,"animTurn":0}
+{"line":123,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":123,"op":"hp","side":"near","hp":74}
+{"line":123,"op":"print","text":"It's not very effective…"}
+{"line":124,"op":"hp","side":"far","hp":88}
+{"line":124,"op":"print","text":"Landorus had its energy drained!"}
+{"line":126,"op":"itemPopUp","side":"near","item":472}
+{"line":126,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":126,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":126,"op":"hp","side":"near","hp":80}
+{"line":128,"op":"turn","number":8}
+{"line":131,"op":"print","text":"Landorus used Earthquake!"}
+{"line":131,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
+{"line":132,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":132,"op":"hp","side":"far","hp":67}
+{"line":133,"op":"print","text":"The opposing Conkeldurr used Drain Punch!"}
+{"line":133,"op":"move","user":"far","target":"near","move":409,"animTurn":0}
+{"line":135,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":135,"op":"hp","side":"near","hp":54}
+{"line":135,"op":"print","text":"It's not very effective…"}
+{"line":136,"op":"hp","side":"far","hp":79}
+{"line":136,"op":"print","text":"Landorus had its energy drained!"}
+{"line":138,"op":"itemPopUp","side":"near","item":472}
+{"line":138,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":138,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":138,"op":"hp","side":"near","hp":60}
+{"line":140,"op":"turn","number":9}
+{"line":144,"op":"print","text":"Landorus used U-turn!"}
+{"line":144,"op":"move","user":"near","target":"far","move":369,"animTurn":0}
+{"line":146,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":146,"op":"hp","side":"far","hp":74}
+{"line":146,"op":"print","text":"It's not very effective…"}
+{"line":149,"op":"withdraw","side":"near"}
+{"line":149,"op":"print","text":"Go! Starmie!"}
+{"line":149,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":150,"op":"print","text":"The opposing Conkeldurr used Payback!"}
+{"line":150,"op":"move","user":"far","target":"near","move":371,"animTurn":0}
+{"line":152,"op":"hit","side":"near","effectiveness":"super"}
+{"line":152,"op":"hp","side":"near","hp":47}
+{"line":152,"op":"print","text":"It's super effective!"}
+{"line":154,"op":"itemPopUp","side":"near","item":472}
+{"line":154,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":154,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":154,"op":"hp","side":"near","hp":53}
+{"line":156,"op":"turn","number":10}
+{"line":167,"op":"print","text":"Starmie used Scald!"}
+{"line":167,"op":"move","user":"near","target":"far","move":503,"animTurn":0}
+{"line":169,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":169,"op":"hp","side":"far","hp":29}
+{"line":169,"op":"print","text":"A critical hit!"}
+{"line":170,"op":"print","text":"The opposing Conkeldurr used Payback!"}
+{"line":170,"op":"move","user":"far","target":"near","move":371,"animTurn":0}
+{"line":172,"op":"hit","side":"near","effectiveness":"super"}
+{"line":172,"op":"hp","side":"near","hp":0}
+{"line":172,"op":"print","text":"It's super effective!"}
+{"line":173,"op":"faint","side":"near"}
+{"line":173,"op":"print","text":"Starmie fainted!"}
+{"line":179,"op":"print","text":"Go! Tyranitar!"}
+{"line":179,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":180,"op":"ability","side":"near","ability":45,"show":true}
+{"line":180,"op":"weather","weather":"sand"}
+{"line":180,"op":"print","text":"A sandstorm kicked up!"}
+{"line":180,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":180,"op":"ability","side":"near","ability":45,"show":false}
+{"line":181,"op":"turn","number":11}
+{"line":184,"op":"print","text":"Tyranitar used Superpower!"}
+{"line":184,"op":"move","user":"near","target":"far","move":276,"animTurn":0}
+{"line":185,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":185,"op":"hp","side":"far","hp":0}
+{"line":186,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"several"}
+{"line":186,"op":"print","text":"Tyranitar's Attack fell!"}
+{"line":187,"op":"stat","side":"near","stat":"def","stages":-1,"arrows":"none"}
+{"line":187,"op":"print","text":"Tyranitar's Defense fell!"}
+{"line":188,"op":"faint","side":"far"}
+{"line":188,"op":"print","text":"The opposing Conkeldurr fainted!"}
+{"line":190,"op":"print","text":"The sandstorm is raging."}
+{"line":190,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":194,"op":"print","text":"Monai sent out Landorus!"}
+{"line":194,"op":"switchIn","side":"far","slot":2,"hp":44,"status":"par"}
+{"line":195,"op":"ability","side":"far","ability":22,"show":true}
+{"line":196,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"one"}
+{"line":196,"op":"print","text":"Tyranitar's Attack fell!"}
+{"line":195,"op":"ability","side":"far","ability":22,"show":false}
+{"line":197,"op":"turn","number":12}
+{"line":200,"op":"print","text":"Tyranitar, come back!"}
+{"line":200,"op":"withdraw","side":"near"}
+{"line":200,"op":"print","text":"Go! Breloom!"}
+{"line":200,"op":"switchIn","side":"near","slot":3,"hp":75,"status":"tox"}
+{"line":201,"op":"print","text":"The opposing Landorus used Stealth Rock!"}
+{"line":201,"op":"move","user":"far","target":"near","move":446,"animTurn":0}
+{"line":202,"op":"print","text":"Pointed stones float in the air on your side!"}
+{"line":204,"op":"print","text":"The sandstorm is raging."}
+{"line":204,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":205,"op":"print","text":"Breloom is buffeted by the sandstorm!"}
+{"line":205,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":205,"op":"hp","side":"near","hp":69}
+{"line":206,"op":"itemPopUp","side":"far","item":472}
+{"line":206,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":206,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":206,"op":"hp","side":"far","hp":50}
+{"line":207,"op":"ability","side":"near","ability":90,"show":true}
+{"line":207,"op":"hp","side":"near","hp":82}
+{"line":207,"op":"print","text":"Breloom had its HP restored."}
+{"line":207,"op":"ability","side":"near","ability":90,"show":false}
+{"line":209,"op":"turn","number":13}
+{"line":212,"op":"print","text":"Breloom used Seed Bomb!"}
+{"line":212,"op":"move","user":"near","target":"far","move":402,"animTurn":0}
+{"line":214,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":214,"op":"hp","side":"far","hp":0}
+{"line":214,"op":"print","text":"A critical hit!"}
+{"line":215,"op":"faint","side":"far"}
+{"line":215,"op":"print","text":"The opposing Landorus fainted!"}
+{"line":217,"op":"print","text":"The sandstorm is raging."}
+{"line":217,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":218,"op":"print","text":"Breloom is buffeted by the sandstorm!"}
+{"line":218,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":218,"op":"hp","side":"near","hp":75}
+{"line":219,"op":"ability","side":"near","ability":90,"show":true}
+{"line":219,"op":"hp","side":"near","hp":88}
+{"line":219,"op":"print","text":"Breloom had its HP restored."}
+{"line":219,"op":"ability","side":"near","ability":90,"show":false}
+{"line":231,"op":"print","text":"Monai sent out Jirachi!"}
+{"line":231,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":232,"op":"turn","number":14}
+{"line":236,"op":"print","text":"The opposing Jirachi used Iron Head!"}
+{"line":236,"op":"move","user":"far","target":"near","move":442,"animTurn":0}
+{"line":237,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":237,"op":"hp","side":"near","hp":46}
+{"line":238,"op":"print","text":"Breloom used Stun Spore!"}
+{"line":239,"op":"print","text":"The opposing Jirachi avoided the attack!"}
+{"line":241,"op":"print","text":"The sandstorm is raging."}
+{"line":241,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":242,"op":"print","text":"Breloom is buffeted by the sandstorm!"}
+{"line":242,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":242,"op":"hp","side":"near","hp":40}
+{"line":243,"op":"ability","side":"near","ability":90,"show":true}
+{"line":243,"op":"hp","side":"near","hp":53}
+{"line":243,"op":"print","text":"Breloom had its HP restored."}
+{"line":243,"op":"ability","side":"near","ability":90,"show":false}
+{"line":245,"op":"turn","number":15}
+{"line":249,"op":"print","text":"Breloom, come back!"}
+{"line":249,"op":"withdraw","side":"near"}
+{"line":249,"op":"print","text":"Go! Landorus!"}
+{"line":249,"op":"switchIn","side":"near","slot":5,"hp":60,"status":"none"}
+{"line":250,"op":"hp","side":"near","hp":48}
+{"line":250,"op":"print","text":"Pointed stones dug into Landorus!"}
+{"line":251,"op":"ability","side":"near","ability":22,"show":true}
+{"line":252,"op":"stat","side":"far","stat":"atk","stages":-1,"arrows":"one"}
+{"line":252,"op":"print","text":"The opposing Jirachi's Attack fell!"}
+{"line":251,"op":"ability","side":"near","ability":22,"show":false}
+{"line":253,"op":"print","text":"The opposing Jirachi used Ice Punch!"}
+{"line":253,"op":"move","user":"far","target":"near","move":8,"animTurn":0}
+{"line":255,"op":"hit","side":"near","effectiveness":"super"}
+{"line":255,"op":"hp","side":"near","hp":0}
+{"line":255,"op":"print","text":"It's super effective!"}
+{"line":256,"op":"faint","side":"near"}
+{"line":256,"op":"print","text":"Landorus fainted!"}
+{"line":258,"op":"print","text":"The sandstorm is raging."}
+{"line":258,"op":"anim","side":"far","anim":"sandstormContinues"}
+{"line":262,"op":"print","text":"Go! Jirachi!"}
+{"line":262,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":263,"op":"hp","side":"near","hp":94}
+{"line":263,"op":"print","text":"Pointed stones dug into Jirachi!"}
+{"line":264,"op":"turn","number":16}
+{"line":269,"op":"print","text":"The opposing Jirachi used Fire Punch!"}
+{"line":269,"op":"move","user":"far","target":"near","move":7,"animTurn":0}
+{"line":271,"op":"hit","side":"near","effectiveness":"super"}
+{"line":271,"op":"hp","side":"near","hp":65}
+{"line":271,"op":"print","text":"It's super effective!"}
+{"line":272,"op":"print","text":"Jirachi used Fire Punch!"}
+{"line":272,"op":"move","user":"near","target":"far","move":7,"animTurn":0}
+{"line":274,"op":"hit","side":"far","effectiveness":"super"}
+{"line":274,"op":"hp","side":"far","hp":65}
+{"line":274,"op":"print","text":"It's super effective!"}
+{"line":276,"op":"print","text":"The sandstorm is raging."}
+{"line":276,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":278,"op":"turn","number":17}
+{"line":281,"op":"print","text":"Monai withdrew Jirachi!"}
+{"line":281,"op":"withdraw","side":"far"}
+{"line":281,"op":"print","text":"Monai sent out Tyranitar!"}
+{"line":281,"op":"switchIn","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":282,"op":"print","text":"Jirachi used Fire Punch!"}
+{"line":282,"op":"move","user":"near","target":"far","move":7,"animTurn":0}
+{"line":284,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":284,"op":"hp","side":"far","hp":94}
+{"line":284,"op":"print","text":"It's not very effective…"}
+{"line":286,"op":"print","text":"The sandstorm is raging."}
+{"line":286,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":288,"op":"turn","number":18}
+{"line":292,"op":"print","text":"Jirachi used Iron Head!"}
+{"line":292,"op":"move","user":"near","target":"far","move":442,"animTurn":0}
+{"line":294,"op":"hit","side":"far","effectiveness":"super"}
+{"line":294,"op":"hp","side":"far","hp":53}
+{"line":294,"op":"print","text":"It's super effective!"}
+{"line":295,"op":"print","text":"The opposing Tyranitar flinched and couldn't move!"}
+{"line":297,"op":"print","text":"The sandstorm is raging."}
+{"line":297,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":299,"op":"turn","number":19}
+{"line":303,"op":"print","text":"Jirachi used Iron Head!"}
+{"line":303,"op":"move","user":"near","target":"far","move":442,"animTurn":0}
+{"line":305,"op":"hit","side":"far","effectiveness":"super"}
+{"line":305,"op":"hp","side":"far","hp":10}
+{"line":305,"op":"print","text":"It's super effective!"}
+{"line":306,"op":"print","text":"The opposing Tyranitar flinched and couldn't move!"}
+{"line":308,"op":"print","text":"The sandstorm is raging."}
+{"line":308,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":310,"op":"turn","number":20}
+{"line":311,"op":"itemPopUp","side":"far","item":576}
+{"line":311,"op":"anim","side":"far","anim":"heldItemBerry"}
+{"line":311,"op":"item","side":"far","slot":0,"item":0}
+{"line":312,"op":"print","text":"The opposing Tyranitar can act faster than normal, thanks to its Custap Berry!"}
+{"line":315,"op":"print","text":"The opposing Tyranitar used Pursuit!"}
+{"line":315,"op":"move","user":"far","target":"near","move":228,"animTurn":0}
+{"line":316,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":316,"op":"hp","side":"near","hp":49}
+{"line":317,"op":"itemPopUp","side":"near","item":523}
+{"line":317,"op":"anim","side":"near","anim":"heldItemBerry"}
+{"line":317,"op":"item","side":"near","slot":1,"item":0}
+{"line":318,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":318,"op":"hp","side":"near","hp":74}
+{"line":319,"op":"print","text":"Jirachi used Stealth Rock!"}
+{"line":319,"op":"move","user":"near","target":"far","move":446,"animTurn":0}
+{"line":320,"op":"print","text":"Pointed stones float in the air on the opposing side!"}
+{"line":322,"op":"print","text":"The sandstorm is raging."}
+{"line":322,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":324,"op":"turn","number":21}
+{"line":328,"op":"print","text":"Jirachi used Iron Head!"}
+{"line":328,"op":"move","user":"near","target":"far","move":442,"animTurn":0}
+{"line":330,"op":"hit","side":"far","effectiveness":"super"}
+{"line":330,"op":"hp","side":"far","hp":0}
+{"line":330,"op":"print","text":"It's super effective!"}
+{"line":331,"op":"faint","side":"far"}
+{"line":331,"op":"print","text":"The opposing Tyranitar fainted!"}
+{"line":333,"op":"print","text":"The sandstorm is raging."}
+{"line":333,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":337,"op":"print","text":"Monai sent out Jirachi!"}
+{"line":337,"op":"switchIn","side":"far","slot":4,"hp":65,"status":"none"}
+{"line":338,"op":"hp","side":"far","hp":59}
+{"line":338,"op":"print","text":"Pointed stones dug into the opposing Jirachi!"}
+{"line":339,"op":"turn","number":22}
+{"line":343,"op":"print","text":"Jirachi, come back!"}
+{"line":343,"op":"withdraw","side":"near"}
+{"line":343,"op":"print","text":"Go! Breloom!"}
+{"line":343,"op":"switchIn","side":"near","slot":3,"hp":53,"status":"tox"}
+{"line":344,"op":"hp","side":"near","hp":46}
+{"line":344,"op":"print","text":"Pointed stones dug into Breloom!"}
+{"line":345,"op":"print","text":"The opposing Jirachi used Fire Punch!"}
+{"line":345,"op":"move","user":"far","target":"near","move":7,"animTurn":0}
+{"line":347,"op":"hit","side":"near","effectiveness":"super"}
+{"line":347,"op":"hp","side":"near","hp":0}
+{"line":347,"op":"print","text":"It's super effective!"}
+{"line":348,"op":"faint","side":"near"}
+{"line":348,"op":"print","text":"Breloom fainted!"}
+{"line":350,"op":"print","text":"The sandstorm is raging."}
+{"line":350,"op":"anim","side":"far","anim":"sandstormContinues"}
+{"line":354,"op":"print","text":"Go! Terrakion!"}
+{"line":354,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":355,"op":"hp","side":"near","hp":94}
+{"line":355,"op":"print","text":"Pointed stones dug into Terrakion!"}
+{"line":356,"op":"turn","number":23}
+{"line":359,"op":"print","text":"Monai withdrew Jirachi!"}
+{"line":359,"op":"withdraw","side":"far"}
+{"line":359,"op":"print","text":"Monai sent out Starmie!"}
+{"line":359,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":360,"op":"hp","side":"far","hp":88}
+{"line":360,"op":"print","text":"Pointed stones dug into the opposing Starmie!"}
+{"line":361,"op":"item","side":"far","slot":3,"item":497}
+{"line":361,"op":"print","text":"The opposing Starmie floats in the air with its Air Balloon!"}
+{"line":362,"op":"print","text":"Terrakion used Close Combat!"}
+{"line":362,"op":"move","user":"near","target":"far","move":370,"animTurn":0}
+{"line":364,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":364,"op":"hp","side":"far","hp":41}
+{"line":364,"op":"print","text":"It's not very effective…"}
+{"line":365,"op":"stat","side":"near","stat":"def","stages":-1,"arrows":"several"}
+{"line":365,"op":"print","text":"Terrakion's Defense fell!"}
+{"line":366,"op":"stat","side":"near","stat":"spd","stages":-1,"arrows":"none"}
+{"line":366,"op":"print","text":"Terrakion's Sp. Def fell!"}
+{"line":367,"op":"print","text":"The opposing Starmie's Air Balloon popped!"}
+{"line":367,"op":"item","side":"far","slot":3,"item":0}
+{"line":369,"op":"print","text":"The sandstorm is raging."}
+{"line":369,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":370,"op":"print","text":"The opposing Starmie is buffeted by the sandstorm!"}
+{"line":370,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":370,"op":"hp","side":"far","hp":35}
+{"line":372,"op":"turn","number":24}
+{"line":375,"op":"print","text":"Terrakion used Close Combat!"}
+{"line":375,"op":"move","user":"near","target":"far","move":370,"animTurn":0}
+{"line":377,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":377,"op":"hp","side":"far","hp":0}
+{"line":377,"op":"print","text":"It's not very effective…"}
+{"line":378,"op":"stat","side":"near","stat":"def","stages":-1,"arrows":"several"}
+{"line":378,"op":"print","text":"Terrakion's Defense fell!"}
+{"line":379,"op":"stat","side":"near","stat":"spd","stages":-1,"arrows":"none"}
+{"line":379,"op":"print","text":"Terrakion's Sp. Def fell!"}
+{"line":380,"op":"faint","side":"far"}
+{"line":380,"op":"print","text":"The opposing Starmie fainted!"}
+{"line":382,"op":"print","text":"The sandstorm is raging."}
+{"line":382,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":386,"op":"print","text":"Monai sent out Jirachi!"}
+{"line":386,"op":"switchIn","side":"far","slot":4,"hp":59,"status":"none"}
+{"line":387,"op":"hp","side":"far","hp":52}
+{"line":387,"op":"print","text":"Pointed stones dug into the opposing Jirachi!"}
+{"line":388,"op":"turn","number":25}
+{"line":391,"op":"print","text":"Terrakion used Close Combat!"}
+{"line":391,"op":"move","user":"near","target":"far","move":370,"animTurn":0}
+{"line":392,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":392,"op":"hp","side":"far","hp":0}
+{"line":393,"op":"stat","side":"near","stat":"def","stages":-1,"arrows":"several"}
+{"line":393,"op":"print","text":"Terrakion's Defense fell!"}
+{"line":394,"op":"stat","side":"near","stat":"spd","stages":-1,"arrows":"none"}
+{"line":394,"op":"print","text":"Terrakion's Sp. Def fell!"}
+{"line":395,"op":"faint","side":"far"}
+{"line":395,"op":"print","text":"The opposing Jirachi fainted!"}
+{"line":397,"op":"print","text":"The sandstorm is raging."}
+{"line":397,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":401,"op":"print","text":"Monai forfeited."}
+{"line":403,"op":"print","text":"tizio potente ao won the battle!"}
+{"line":403,"op":"end","outcome":"nearWon"}

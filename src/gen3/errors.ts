@@ -10,7 +10,7 @@ export class GenerationRefusal extends Gen3Error {
   readonly gen: number
 
   constructor(gen: number, newest: number) {
-    super(`the stream plays Gen ${String(newest)} battles, this one is Gen ${String(gen)}`)
+    super(`the stream plays Gen 1 to ${String(newest)} battles, this one is Gen ${String(gen)}`)
     this.gen = gen
   }
 }

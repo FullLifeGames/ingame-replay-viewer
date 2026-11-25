@@ -215,49 +215,6 @@ describe('the effect rules of a Pokémon', () => {
   })
 })
 
-describe('the item rules', () => {
-  it('lets Thief take the item silently, then shows it with its cause and source', () => {
-    const script = REPLAY_994086
-    const skySands = refIn(script, 'far', 'Sky Sands')
-    const skarmory = refIn(script, 'near', 'Skarmory')
-    const thief = { name: 'Thief', kind: 'move' }
-
-    expect(eventsFrom(script, 347).slice(0, 2)).toEqual([
-      {
-        kind: 'itemEnd',
-        line: 347,
-        who: skySands,
-        item: 'Choice Band',
-        cause: thief,
-        source: skarmory,
-        silent: true,
-      },
-      {
-        kind: 'item',
-        line: 348,
-        who: skarmory,
-        item: 'Choice Band',
-        cause: thief,
-        source: skySands,
-      },
-    ])
-  })
-
-  it('eats a Lum Berry', () => {
-    const script = REPLAY_994128
-
-    expect(eventsAt(script, 66)).toEqual([
-      {
-        kind: 'itemEnd',
-        line: 66,
-        who: refIn(script, 'near', 'Kingdra'),
-        item: 'Lum Berry',
-        eaten: true,
-      },
-    ])
-  })
-})
-
 describe('Psych Up and the effects that last until the next move', () => {
   it("copies the target's stat stages to the user", () => {
     const script = scriptOf('|-copyboost|p1a: Dugtrio|p2a: Tyranitar|[from] move: Psych Up')

@@ -59,8 +59,18 @@ export const FIELD_TEMPLATES = {
   mist: tagged('gText_PkmnShroudedInMist', (who: Mon) => {
     return `${nameAtStart(who)} surrounds itself with a protective mist!`
   }),
+  stealthRock: tagged('STRINGID_POINTEDSTONESFLOAT', (team: string) => {
+    return `Pointed stones float in the air on ${team} side!`
+  }),
   spikesGone: tagged('STRINGID_PKMNBLEWAWAYSPIKES', (who: Mon) => {
     return `${nameAtStart(who)} blew away Spikes!`
+  }),
+  // Gen 4's line for Rapid Spin, kept in the pinned file "Not in gen 5+", as Spikes' above.
+  stealthRockGone: tagged('STRINGID_PKMNBLEWAWAYSTEALTHROCK', (who: Mon) => {
+    return `${nameAtStart(who)} blew away Stealth Rock!`
+  }),
+  stealthRockCleared: tagged('STRINGID_STEALTHROCKDISAPPEAREDFROMTEAM', (team: string) => {
+    return `The pointed stones disappeared from ${team} side!`
   }),
   reflectGone: tagged(
     'STRINGID_REFLECTWOREOFF',
@@ -117,6 +127,7 @@ export function weatherText(weather: WeatherName, phase: Phase): Phrase {
 
 const SIDE_STARTS: Readonly<Record<string, (side: Side) => string>> = {
   spikes: (side) => T.spikes.render(teamInside(side)),
+  stealthrock: (side) => T.stealthRock.render(teamInside(side)),
   reflect: (side) => T.reflect.render(teamInside(side)),
   lightscreen: (side) => T.lightScreen.render(teamInside(side)),
   safeguard: (side) => T.safeguard.render(teamAtStart(side)),
@@ -149,16 +160,23 @@ export function sideStarted(side: Side, condition: Effect, user?: Mon): Phrase {
 }
 
 const SIDE_ENDS: Readonly<Record<string, (side: Side) => string>> = {
+  stealthrock: (side) => T.stealthRockCleared.render(teamInside(side)),
   reflect: (side) => T.reflectGone.render(teamAtStart(side)),
   lightscreen: (side) => T.lightScreenGone.render(teamAtStart(side)),
   safeguard: (side) => T.safeguardGone.render(teamAtStart(side)),
 }
 
-/** A condition gone from a side; `source` blew Spikes away with Rapid Spin. */
+/** The hazards whose end names the Pokémon that blew them away, by the condition's id. */
+const SIDE_ENDS_BY_SOURCE: Readonly<Record<string, (source: Mon) => string>> = {
+  spikes: T.spikesGone.render,
+  stealthrock: T.stealthRockGone.render,
+}
+
+/** A condition gone from a side; `source` blew a hazard away, as with Rapid Spin. */
 export function sideEnded(side: Side, condition: Effect, source: Mon | undefined): Phrase {
   const id = toID(condition.name)
-  if (id === 'spikes' && source !== undefined) return { text: T.spikesGone.render(source) }
-  const text = SIDE_ENDS[id]?.(side)
+  const bySource = SIDE_ENDS_BY_SOURCE[id]
+  const text = source && bySource ? bySource(source) : SIDE_ENDS[id]?.(side)
   if (text !== undefined) return { text }
   const own = T.woreOff.render(teamAtStart(side), held(condition.name))
   return ownPhrase(own, `${condition.name} ending on a side`)

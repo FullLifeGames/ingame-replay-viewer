@@ -7,10 +7,10 @@ import type { Protocol } from '@pkmn/protocol'
 
 /**
  * Why a kind is on the named list: a server never writes it into a battle room's log, only
- * formats the build or the backend refuses log it, or a Gen 1 to 3 singles battle can log it
- * and no rule shows it yet.
+ * formats the build refuses log it, only Gen 4 and later log it and no rule shows it yet, or a
+ * Gen 1 to 3 singles battle can log it and no rule shows it yet.
  */
-type NamedGroup = 'not in a replay log' | 'refused format' | 'no rule yet'
+type NamedGroup = 'not in a replay log' | 'refused format' | 'newer generation' | 'no rule yet'
 
 interface NamedKind {
   readonly group: NamedGroup
@@ -22,10 +22,10 @@ const OUTSIDE: NamedKind = {
   reason: "a server sends it to one client, outside a battle room's log",
 }
 
-/** A kind that only Gen 4 and later log; the backend refuses those battles. */
+/** A kind that only Gen 4 and later log; no rule shows it yet (#86). */
 const newer = (what: string): NamedKind => ({
-  group: 'refused format',
-  reason: `${what}: only Gen 4 and later log it, and the backend refuses those battles`,
+  group: 'newer generation',
+  reason: `${what}: only Gen 4 and later log it, and no rule shows it yet`,
 })
 
 /** A kind that only doubles and triples log; the build refuses those battles. */
@@ -82,7 +82,7 @@ export const NAMED_KINDS: Readonly<Partial<Record<Protocol.ArgName, NamedKind>>>
   '|tournament|autostart|': OUTSIDE,
   '|tournament|autodq|': OUTSIDE,
 
-  // Refused formats.
+  // Newer generations.
   '|detailschange|': newer('a permanent forme change'),
   '|replace|': newer('the end of a disguise as another team member'),
   '|-swapboost|': newer('stat stages swapped between two Pokémon'),
@@ -100,6 +100,8 @@ export const NAMED_KINDS: Readonly<Partial<Record<Protocol.ArgName, NamedKind>>>
   '|-zbroken|': newer('a Z-Move breaking through protection'),
   '|-candynamax|': newer('Dynamax becoming available'),
   '|-terastallize|': newer('Terastallization'),
+
+  // Refused formats.
   '|swap|': notSingles('a Pokémon moving to another position'),
   '|-center|': notSingles('the last Pokémon of a triple battle moving to the centre'),
   '|-combine|': notSingles('two moves combined'),

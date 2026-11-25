@@ -67,7 +67,13 @@ describe('dropReasonOf', () => {
     expect(dropReasonOf(lineOf('|player|p2|xXEricXx|red|'), true)).toBe('room')
   })
 
+  it("drops Roost's turn as state: the client keeps the volatile and the game says nothing", () => {
+    expect(dropReasonOf(lineOf('|-singleturn|p1a: Skarmory|move: Roost'), true)).toBe('state')
+  })
+
   it.each([
+    '|-singleturn|p1a: Dugtrio|Protect',
+    '|-singleturn|p1a: Dugtrio|move: Endure',
     '|player|p1|A Welcome Guest|#uwliiiskyminflyers|',
     '|start',
     '|switch|p1a: Dugtrio|Dugtrio, M|100/100',

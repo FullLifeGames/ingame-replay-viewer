@@ -1,6 +1,8 @@
 // The page's own words: the status line after each step, the viewer's progress line under
-// "Details", the panel above the game, and the texts of the "Not shown in the game" list. A failure's line comes from visitor.ts, and the words of
-// the step that failed (replay-choice.ts, session.ts) become its detail.
+// "Details", the panel above the game with the side headings it shares with the team list, and
+// the texts of the "Not shown in the game" list. A failure's line comes from visitor.ts, and the
+// words of the step that failed (replay-choice.ts, session.ts) become its detail.
+import type { Side } from '../script/types'
 import { plainText } from './markup'
 import type { ReplaySummary } from './replay-choice'
 import type { DumpSummary, StartSummary } from './session'
@@ -112,6 +114,11 @@ export function rowText({ line, what, text, detail, standIn }: NotShownRow): str
   return `Line ${String(line)}, ${shown}${logLine}${detail === undefined ? '' : `; ${plainText(detail)}`}`
 }
 
+const SIDE_WORDS: Readonly<Record<Side, string>> = { far: 'Far side', near: 'Near side' }
+
+/** A side's heading: the panel's line (#58) and the team list's heading (#87) read the same. */
+export const sideLine = (side: Side, name: string): string => `${SIDE_WORDS[side]}: ${name}`
+
 /** The panel's lines (#58): far side first, as the game shows it at the top, then the turn. */
 export interface PanelText {
   readonly far: string
@@ -142,8 +149,8 @@ export function panelText(
 ): PanelText {
   if (picked === undefined) return { far: '', near: '', turn: '' }
   return {
-    far: `Far side: ${picked.players.far}`,
-    near: `Near side: ${picked.players.near}`,
+    far: sideLine('far', picked.players.far),
+    near: sideLine('near', picked.players.near),
     turn: turnText(picked, running),
   }
 }

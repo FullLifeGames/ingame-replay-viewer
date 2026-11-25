@@ -1,0 +1,287 @@
+{"length":4850,"crc32":"dcdd26c2","trainers":{"near":{"name":"beanstockg","trainerPic":3,"teamSize":6,"revealed":6},"far":{"name":"Model Magneton","trainerPic":53,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":115,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Kangaskhan"},{"species":227,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Skarmory"},{"species":462,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Magnezone"},{"species":1064,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Rotom"},{"species":260,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Swampert"},{"species":142,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Aerodactyl"}],"far":[{"species":380,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Latias"},{"species":376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Metagross"},{"species":330,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Flygon"},{"species":462,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Magnezone"},{"species":94,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gengar"},{"species":248,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tyranitar"}]}}
+{"line":24,"op":"intro"}
+{"line":24,"op":"print","text":"You are challenged by Model Magneton!"}
+{"line":26,"op":"print","text":"Model Magneton sent out Latias!"}
+{"line":26,"op":"sendOut","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":25,"op":"print","text":"Go! Kangaskhan!"}
+{"line":25,"op":"sendOut","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":27,"op":"turn","number":1}
+{"line":32,"op":"print","text":"Kangaskhan used Fake Out!"}
+{"line":32,"op":"move","user":"near","target":"far","move":252,"animTurn":0}
+{"line":34,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":34,"op":"hp","side":"far","hp":44}
+{"line":34,"op":"print","text":"A critical hit!"}
+{"line":35,"op":"print","text":"The opposing Latias flinched and couldn't move!"}
+{"line":38,"op":"turn","number":2}
+{"line":41,"op":"print","text":"Kangaskhan used Sucker Punch!"}
+{"line":41,"op":"move","user":"near","target":"far","move":389,"animTurn":0}
+{"line":43,"op":"hit","side":"far","effectiveness":"super"}
+{"line":43,"op":"hp","side":"far","hp":0}
+{"line":43,"op":"print","text":"It's super effective!"}
+{"line":44,"op":"faint","side":"far"}
+{"line":44,"op":"print","text":"The opposing Latias fainted!"}
+{"line":49,"op":"print","text":"Model Magneton sent out Metagross!"}
+{"line":49,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":50,"op":"turn","number":3}
+{"line":53,"op":"print","text":"Kangaskhan used Earthquake!"}
+{"line":53,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
+{"line":55,"op":"hit","side":"far","effectiveness":"super"}
+{"line":55,"op":"hp","side":"far","hp":57}
+{"line":55,"op":"print","text":"It's super effective!"}
+{"line":56,"op":"print","text":"The opposing Metagross used Stealth Rock!"}
+{"line":56,"op":"move","user":"far","target":"near","move":446,"animTurn":0}
+{"line":57,"op":"print","text":"Pointed stones float in the air on your side!"}
+{"line":59,"op":"itemPopUp","side":"far","item":472}
+{"line":59,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":59,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":59,"op":"hp","side":"far","hp":63}
+{"line":61,"op":"turn","number":4}
+{"line":64,"op":"print","text":"Kangaskhan used Earthquake!"}
+{"line":64,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
+{"line":66,"op":"hit","side":"far","effectiveness":"super"}
+{"line":66,"op":"hp","side":"far","hp":20}
+{"line":66,"op":"print","text":"It's super effective!"}
+{"line":67,"op":"print","text":"The opposing Metagross used Explosion!"}
+{"line":67,"op":"move","user":"far","target":"near","move":153,"animTurn":0}
+{"line":68,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":68,"op":"hp","side":"near","hp":0}
+{"line":69,"op":"faint","side":"far"}
+{"line":69,"op":"print","text":"The opposing Metagross fainted!"}
+{"line":70,"op":"faint","side":"near"}
+{"line":70,"op":"print","text":"Kangaskhan fainted!"}
+{"line":75,"op":"print","text":"Go! Skarmory!"}
+{"line":75,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":76,"op":"hp","side":"near","hp":88}
+{"line":76,"op":"print","text":"Pointed stones dug into Skarmory!"}
+{"line":77,"op":"print","text":"Model Magneton sent out Flygon!"}
+{"line":77,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":78,"op":"turn","number":5}
+{"line":81,"op":"print","text":"The opposing Flygon used U-turn!"}
+{"line":81,"op":"move","user":"far","target":"near","move":369,"animTurn":0}
+{"line":84,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":84,"op":"hp","side":"near","hp":81}
+{"line":84,"op":"print","text":"A critical hit!"}
+{"line":84,"op":"print","text":"It's not very effective…"}
+{"line":87,"op":"withdraw","side":"far"}
+{"line":87,"op":"print","text":"Model Magneton sent out Magnezone!"}
+{"line":87,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":88,"op":"print","text":"Skarmory used Stealth Rock!"}
+{"line":88,"op":"move","user":"near","target":"far","move":446,"animTurn":0}
+{"line":89,"op":"print","text":"Pointed stones float in the air on the opposing side!"}
+{"line":91,"op":"itemPopUp","side":"near","item":472}
+{"line":91,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":91,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":91,"op":"hp","side":"near","hp":87}
+{"line":93,"op":"turn","number":6}
+{"line":96,"op":"print","text":"The opposing Magnezone used Thunderbolt!"}
+{"line":96,"op":"move","user":"far","target":"near","move":85,"animTurn":0}
+{"line":98,"op":"hit","side":"near","effectiveness":"super"}
+{"line":98,"op":"hp","side":"near","hp":0}
+{"line":98,"op":"print","text":"It's super effective!"}
+{"line":99,"op":"faint","side":"near"}
+{"line":99,"op":"print","text":"Skarmory fainted!"}
+{"line":104,"op":"print","text":"Go! Magnezone!"}
+{"line":104,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":105,"op":"hp","side":"near","hp":94}
+{"line":105,"op":"print","text":"Pointed stones dug into Magnezone!"}
+{"line":106,"op":"turn","number":7}
+{"line":109,"op":"print","text":"Magnezone used Hidden Power!"}
+{"line":109,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
+{"line":111,"op":"hit","side":"far","effectiveness":"super"}
+{"line":111,"op":"hp","side":"far","hp":32}
+{"line":111,"op":"print","text":"It's super effective!"}
+{"line":112,"op":"print","text":"The opposing Magnezone used Thunder Wave!"}
+{"line":112,"op":"move","user":"far","target":"near","move":86,"animTurn":0}
+{"line":113,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":113,"op":"print","text":"Magnezone is paralyzed, so it may be unable to move!"}
+{"line":113,"op":"status","side":"near","slot":2,"status":"par"}
+{"line":115,"op":"itemPopUp","side":"far","item":472}
+{"line":115,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":115,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":115,"op":"hp","side":"far","hp":38}
+{"line":117,"op":"turn","number":8}
+{"line":120,"op":"print","text":"The opposing Magnezone used Hidden Power!"}
+{"line":120,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":122,"op":"hit","side":"near","effectiveness":"super"}
+{"line":122,"op":"hp","side":"near","hp":28}
+{"line":122,"op":"print","text":"It's super effective!"}
+{"line":123,"op":"print","text":"Magnezone used Hidden Power!"}
+{"line":123,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
+{"line":125,"op":"hit","side":"far","effectiveness":"super"}
+{"line":125,"op":"hp","side":"far","hp":0}
+{"line":125,"op":"print","text":"It's super effective!"}
+{"line":126,"op":"faint","side":"far"}
+{"line":126,"op":"print","text":"The opposing Magnezone fainted!"}
+{"line":131,"op":"print","text":"Model Magneton sent out Gengar!"}
+{"line":131,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":132,"op":"hp","side":"far","hp":88}
+{"line":132,"op":"print","text":"Pointed stones dug into the opposing Gengar!"}
+{"line":133,"op":"turn","number":9}
+{"line":136,"op":"print","text":"The opposing Gengar used Substitute!"}
+{"line":136,"op":"move","user":"far","target":"far","move":164,"animTurn":0}
+{"line":137,"op":"volatile","side":"far","volatile":"substitute","on":true}
+{"line":138,"op":"hp","side":"far","hp":63}
+{"line":137,"op":"print","text":"The opposing Gengar put in a substitute!"}
+{"line":139,"op":"print","text":"Magnezone used Hidden Power!"}
+{"line":139,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
+{"line":140,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":140,"op":"print","text":"The substitute took damage for the opposing Gengar!"}
+{"line":140,"op":"anim","side":"far","anim":"substituteFade"}
+{"line":140,"op":"print","text":"The opposing Gengar's substitute faded!"}
+{"line":140,"op":"volatile","side":"far","volatile":"substitute","on":false}
+{"line":143,"op":"turn","number":10}
+{"line":146,"op":"print","text":"The opposing Gengar used Focus Blast!"}
+{"line":147,"op":"print","text":"Magnezone avoided the attack!"}
+{"line":148,"op":"print","text":"Magnezone couldn't move because it's paralyzed!"}
+{"line":148,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":151,"op":"turn","number":11}
+{"line":154,"op":"print","text":"The opposing Gengar used Substitute!"}
+{"line":154,"op":"move","user":"far","target":"far","move":164,"animTurn":0}
+{"line":155,"op":"volatile","side":"far","volatile":"substitute","on":true}
+{"line":156,"op":"hp","side":"far","hp":38}
+{"line":155,"op":"print","text":"The opposing Gengar put in a substitute!"}
+{"line":157,"op":"print","text":"Magnezone used Hidden Power!"}
+{"line":157,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
+{"line":158,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":158,"op":"print","text":"The substitute took damage for the opposing Gengar!"}
+{"line":158,"op":"anim","side":"far","anim":"substituteFade"}
+{"line":158,"op":"print","text":"The opposing Gengar's substitute faded!"}
+{"line":158,"op":"volatile","side":"far","volatile":"substitute","on":false}
+{"line":161,"op":"turn","number":12}
+{"line":164,"op":"print","text":"The opposing Gengar used Focus Blast!"}
+{"line":164,"op":"move","user":"far","target":"near","move":411,"animTurn":0}
+{"line":166,"op":"hit","side":"near","effectiveness":"super"}
+{"line":166,"op":"hp","side":"near","hp":0}
+{"line":166,"op":"print","text":"It's super effective!"}
+{"line":167,"op":"faint","side":"near"}
+{"line":167,"op":"print","text":"Magnezone fainted!"}
+{"line":168,"op":"hp","side":"far","hp":28}
+{"line":168,"op":"print","text":"The opposing Gengar was hurt by the Life Orb!"}
+{"line":173,"op":"print","text":"Go! Rotom!"}
+{"line":173,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":174,"op":"hp","side":"near","hp":88}
+{"line":174,"op":"print","text":"Pointed stones dug into Rotom!"}
+{"line":175,"op":"turn","number":13}
+{"line":178,"op":"print","text":"Rotom used Shadow Ball!"}
+{"line":178,"op":"move","user":"near","target":"far","move":247,"animTurn":0}
+{"line":180,"op":"hit","side":"far","effectiveness":"super"}
+{"line":180,"op":"hp","side":"far","hp":0}
+{"line":180,"op":"print","text":"It's super effective!"}
+{"line":181,"op":"faint","side":"far"}
+{"line":181,"op":"print","text":"The opposing Gengar fainted!"}
+{"line":186,"op":"print","text":"Model Magneton sent out Tyranitar!"}
+{"line":186,"op":"switchIn","side":"far","slot":5,"hp":100,"status":"none"}
+{"line":187,"op":"hp","side":"far","hp":88}
+{"line":187,"op":"print","text":"Pointed stones dug into the opposing Tyranitar!"}
+{"line":188,"op":"ability","side":"far","ability":45,"show":true}
+{"line":188,"op":"weather","weather":"sand"}
+{"line":188,"op":"print","text":"A sandstorm kicked up!"}
+{"line":188,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":188,"op":"ability","side":"far","ability":45,"show":false}
+{"line":189,"op":"turn","number":14}
+{"line":192,"op":"print","text":"Rotom, come back!"}
+{"line":192,"op":"withdraw","side":"near"}
+{"line":192,"op":"print","text":"Go! Swampert!"}
+{"line":192,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":193,"op":"hp","side":"near","hp":94}
+{"line":193,"op":"print","text":"Pointed stones dug into Swampert!"}
+{"line":194,"op":"print","text":"The opposing Tyranitar used Dragon Dance!"}
+{"line":194,"op":"move","user":"far","target":"far","move":349,"animTurn":0}
+{"line":195,"op":"stat","side":"far","stat":"atk","stages":1,"arrows":"several"}
+{"line":195,"op":"print","text":"The opposing Tyranitar's Attack rose!"}
+{"line":196,"op":"stat","side":"far","stat":"spe","stages":1,"arrows":"none"}
+{"line":196,"op":"print","text":"The opposing Tyranitar's Speed rose!"}
+{"line":198,"op":"print","text":"The sandstorm is raging."}
+{"line":198,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":200,"op":"turn","number":15}
+{"line":203,"op":"print","text":"The opposing Tyranitar used Crunch!"}
+{"line":203,"op":"move","user":"far","target":"near","move":242,"animTurn":0}
+{"line":204,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":204,"op":"hp","side":"near","hp":27}
+{"line":205,"op":"stat","side":"near","stat":"def","stages":-1,"arrows":"one"}
+{"line":205,"op":"print","text":"Swampert's Defense fell!"}
+{"line":206,"op":"print","text":"Swampert used Earthquake!"}
+{"line":206,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
+{"line":208,"op":"hit","side":"far","effectiveness":"super"}
+{"line":208,"op":"hp","side":"far","hp":1}
+{"line":208,"op":"print","text":"It's super effective!"}
+{"line":210,"op":"print","text":"The sandstorm is raging."}
+{"line":210,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":212,"op":"turn","number":16}
+{"line":215,"op":"print","text":"Swampert used Protect!"}
+{"line":215,"op":"move","user":"near","target":"near","move":182,"animTurn":0}
+{"line":216,"op":"print","text":"Swampert protected itself!"}
+{"line":217,"op":"print","text":"The opposing Tyranitar used Crunch!"}
+{"line":218,"op":"print","text":"Swampert protected itself!"}
+{"line":220,"op":"print","text":"The sandstorm is raging."}
+{"line":220,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":222,"op":"turn","number":17}
+{"line":225,"op":"print","text":"Swampert, come back!"}
+{"line":225,"op":"withdraw","side":"near"}
+{"line":225,"op":"print","text":"Go! Aerodactyl!"}
+{"line":225,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
+{"line":226,"op":"hp","side":"near","hp":76}
+{"line":226,"op":"print","text":"Pointed stones dug into Aerodactyl!"}
+{"line":227,"op":"print","text":"The opposing Tyranitar used Crunch!"}
+{"line":227,"op":"move","user":"far","target":"near","move":242,"animTurn":0}
+{"line":228,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":228,"op":"hp","side":"near","hp":0}
+{"line":229,"op":"faint","side":"near"}
+{"line":229,"op":"print","text":"Aerodactyl fainted!"}
+{"line":231,"op":"print","text":"The sandstorm is raging."}
+{"line":231,"op":"anim","side":"far","anim":"sandstormContinues"}
+{"line":235,"op":"print","text":"Go! Rotom!"}
+{"line":235,"op":"switchIn","side":"near","slot":3,"hp":88,"status":"none"}
+{"line":236,"op":"hp","side":"near","hp":76}
+{"line":236,"op":"print","text":"Pointed stones dug into Rotom!"}
+{"line":237,"op":"turn","number":18}
+{"line":240,"op":"print","text":"Rotom used Shadow Ball!"}
+{"line":240,"op":"move","user":"near","target":"far","move":247,"animTurn":0}
+{"line":242,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":242,"op":"hp","side":"far","hp":0}
+{"line":242,"op":"print","text":"It's not very effective…"}
+{"line":243,"op":"faint","side":"far"}
+{"line":243,"op":"print","text":"The opposing Tyranitar fainted!"}
+{"line":245,"op":"print","text":"The sandstorm is raging."}
+{"line":245,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":246,"op":"print","text":"Rotom is buffeted by the sandstorm!"}
+{"line":246,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":246,"op":"hp","side":"near","hp":69}
+{"line":250,"op":"print","text":"Model Magneton sent out Flygon!"}
+{"line":250,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":251,"op":"hp","side":"far","hp":95}
+{"line":251,"op":"print","text":"Pointed stones dug into the opposing Flygon!"}
+{"line":252,"op":"turn","number":19}
+{"line":255,"op":"print","text":"The opposing Flygon used Outrage!"}
+{"line":255,"op":"move","user":"far","target":"near","move":200,"animTurn":0}
+{"line":256,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":256,"op":"hp","side":"near","hp":5}
+{"line":257,"op":"print","text":"Rotom used Shadow Ball!"}
+{"line":257,"op":"move","user":"near","target":"far","move":247,"animTurn":0}
+{"line":258,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":258,"op":"hp","side":"far","hp":44}
+{"line":260,"op":"print","text":"The sandstorm is raging."}
+{"line":260,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":261,"op":"print","text":"Rotom is buffeted by the sandstorm!"}
+{"line":261,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":261,"op":"hp","side":"near","hp":0}
+{"line":262,"op":"faint","side":"near"}
+{"line":262,"op":"print","text":"Rotom fainted!"}
+{"line":266,"op":"print","text":"Go! Swampert!"}
+{"line":266,"op":"switchIn","side":"near","slot":4,"hp":27,"status":"none"}
+{"line":267,"op":"hp","side":"near","hp":20}
+{"line":267,"op":"print","text":"Pointed stones dug into Swampert!"}
+{"line":268,"op":"itemPopUp","side":"near","item":569}
+{"line":268,"op":"anim","side":"near","anim":"heldItemBerry"}
+{"line":268,"op":"item","side":"near","slot":4,"item":0}
+{"line":269,"op":"stat","side":"near","stat":"spe","stages":1,"arrows":"one"}
+{"line":269,"op":"print","text":"The Salac Berry boosted Swampert's Speed!"}
+{"line":270,"op":"turn","number":20}
+{"line":273,"op":"print","text":"The opposing Flygon used Outrage!"}
+{"line":273,"op":"move","user":"far","target":"near","move":200,"animTurn":0}
+{"line":274,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":274,"op":"hp","side":"near","hp":0}
+{"line":275,"op":"faint","side":"near"}
+{"line":275,"op":"print","text":"Swampert fainted!"}
+{"line":277,"op":"print","text":"Model Magneton won the battle!"}
+{"line":277,"op":"end","outcome":"farWon"}
