@@ -65,9 +65,25 @@ export function spaceToggles(press: KeyPress, run: PausedRun | undefined): boole
   return press.key === ' ' && plain && !ownsSpace(press.target)
 }
 
-/** A run as the toggle sees it: the pause's run, with the id of the replay it plays. */
+/** A run as the toggle sees it: the pause's run, the id of its replay and why it has no sound. */
 export interface ToggledRun extends PausedRun {
   readonly id: string
+  readonly silence: string | undefined
+}
+
+/** The runs whose last Play the browser refused to resume, so their line says so. */
+const refused = new WeakSet<ToggledRun>()
+
+/**
+ * The status line after a Play: the refusal's line, or the running line once a Play resumes the
+ * sound after a refusal. The run's own reason for no sound stays in it. Undefined otherwise.
+ */
+function playLine(run: ToggledRun, silence: string | undefined): string | undefined {
+  if (silence !== undefined) {
+    refused.add(run)
+    return runningLine(run, { silence })
+  }
+  return refused.delete(run) ? runningLine(run, run) : undefined
 }
 
 /**
@@ -75,8 +91,9 @@ export interface ToggledRun extends PausedRun {
  * on: the sound resumes first, inside the caller's click, then the clock counts on. Writes the
  * grant at once, so the worker stops or goes on before the next animation frame. Nothing happens
  * before the first run or once the run reached END. Resolves with the status line for a Play whose
- * resume the browser refused (#69): the game plays on without sound, and the line says why. A
- * refused suspend gives no line, since the clock holds the game anyway (S5-16).
+ * resume the browser refused (#69): the game plays on without sound, and the line says why. The
+ * next Play whose resume succeeds resolves with the running line again. A refused suspend gives no
+ * line, since the clock holds the game anyway (S5-16).
  */
 export function togglePause(
   run: ToggledRun | undefined,
@@ -95,9 +112,7 @@ export function togglePause(
   const resumed = audio.resumeNow()
   run.clock.play(now)
   grant(run.control, run.clock.allowed(now, frame))
-  return resumed.then((silence) =>
-    silence === undefined ? undefined : runningLine(run, { silence }),
-  )
+  return resumed.then((silence) => playLine(run, silence))
 }
 
 /**
