@@ -12,6 +12,7 @@ import {
   pickedFrom,
   type PickView,
   type Playing,
+  playingOf,
   showPick,
   type Then,
 } from './pick-lines'
@@ -144,14 +145,12 @@ type ReplayChooser = Pick<ReplayChoice, 'pickTestReplay' | 'loadReplay'> & {
   readonly playing?: Playing
 }
 
-const NO_GAME: Playing = () => undefined
-
 /**
  * Offers the test replays and picks the first, so the list shows at once; a later pick or Load
  * shows its list and asks for Start.
  */
 export function wireReplays(chooser: ReplayChooser, view: StatusView): void {
-  const playing = chooser.playing ?? NO_GAME
+  const playing = playingOf(chooser)
   const pick = (id: string, then?: Then): void => {
     const replay = TEST_REPLAYS.find((test) => test.id === id)
     if (replay !== undefined) void showPick(view, chooser.pickTestReplay(replay), playing, then)
@@ -179,6 +178,6 @@ export function wireReplayFile(
     const file = view.replayFile.files?.[0]
     if (file === undefined) return
     view.replayFile.value = ''
-    void showPick(view, chooser.loadFile(file), chooser.playing ?? NO_GAME, loadedFrom(view))
+    void showPick(view, chooser.loadFile(file), playingOf(chooser), loadedFrom(view))
   })
 }

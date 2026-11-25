@@ -21,6 +21,11 @@ export interface PickView {
 /** The id of the replay the game plays while one plays; a page that tells none leaves it out. */
 export type Playing = () => string | undefined
 
+const NO_GAME: Playing = () => undefined
+
+/** The game a page's flow names after a failed pick: its `playing`, or none if it tells none. */
+export const playingOf = (flow: { readonly playing?: Playing }): Playing => flow.playing ?? NO_GAME
+
 export type Then = (summary: ReplaySummary) => void
 
 /**
