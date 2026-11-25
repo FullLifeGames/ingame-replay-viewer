@@ -10,6 +10,13 @@ import type { Moment } from '../src/gen5/moment.ts'
 
 export type SceneName = 'known' | 'unknown'
 
+/** The text banks of pokebw2 that the run reads its lines from: the move lines and the
+ * standard lines. */
+export const TEXT_BANKS = {
+  move: 'res/text/system/0016.txt',
+  standard: 'res/text/system/0019.txt',
+}
+
 const NEAR_CLIENT = 0
 const FAR_CLIENT = 1
 

@@ -19,7 +19,8 @@ import type { Gen5Global, MarkRecord, RunPlan, RunReport } from '../src/gen5/hoo
 import { MAIN_RAM_SIZE, MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import type { RamRef } from '../src/gen5/ram-check.ts'
 import { momentSteps } from './gen5-moment-plan.ts'
-import { type SceneName, sceneBlocks, textId, textLine } from './gen5-moment-scene.ts'
+import { listedReader } from './gen5-bw2-source.ts'
+import { type SceneName, sceneBlocks, TEXT_BANKS, textId, textLine } from './gen5-moment-scene.ts'
 import { log, sampleLine, waitForStart } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve, watchRequests } from './gen5-shot.ts'
@@ -60,8 +61,8 @@ function symbol(numbers: Bw2Numbers, name: string): number {
   return found.address
 }
 
-const bank = (number: string) =>
-  readFileSync(join(GEN5_PATHS.pokebw2, `res/text/system/${number}.txt`), 'utf8')
+const readPokebw2 = listedReader(GEN5_PATHS.pokebw2)
+const bank = (name: keyof typeof TEXT_BANKS) => readPokebw2(TEXT_BANKS[name])
 
 /** Main RAM once, and from it the adapter, the one server and both front Pokémon. */
 async function readBattle(page: Page, numbers: Bw2Numbers): Promise<Battle> {
@@ -169,15 +170,15 @@ async function play(page: Page, numbers: Bw2Numbers, scene: SceneName, deadline:
   logReport(await runPlan(page, first, `s6-${scene}`, deadline))
   const battle = await readBattle(page, numbers)
   log(`adapter ${hex(battle.adapter)}, server ${hex(battle.server)}`)
-  const std = textId(bank('0019'), 'Bank0019_Text_ItsSuperEffective')
+  const std = textId(bank('standard'), 'Bank0019_Text_ItsSuperEffective')
   const blocks = sceneBlocks(scene, battle, std)
   for (const { name, moment } of blocks) {
     const variant = moment.attacker.monId === battle.near.monId ? 0 : 2
     log(
-      `${name}: ${JSON.stringify(moment)}; bank 16 line ${String(moment.move * 3 + variant)}: ${textLine(bank('0016'), moment.move * 3 + variant)}`,
+      `${name}: ${JSON.stringify(moment)}; bank 16 line ${String(moment.move * 3 + variant)}: ${textLine(bank('move'), moment.move * 3 + variant)}`,
     )
   }
-  log(`standard line ${String(std)}: ${textLine(bank('0019'), std)}`)
+  log(`standard line ${String(std)}: ${textLine(bank('standard'), std)}`)
   const steps = momentSteps({
     adapterNumbers: adapterNumbers(numbers),
     table: numbers,

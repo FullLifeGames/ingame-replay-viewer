@@ -1,11 +1,11 @@
 // Generates build/gen5/bw2.json, the Gen 5 spike's numbers of Black 2 (USA) (#72, D4), from
-// pokebw2 (https://github.com/fuddlesworth/pokebw2, GPL-3.0) at a pinned commit: the addresses S6
-// needs, the adapter and server command enums, each argument format's puts, the message rules and
-// the adapter's layout. The checkout lives in .cache/gen5/pokebw2/ and the output in build/gen5/;
-// nothing of pokebw2 is committed. Usage: node scripts/gen5-bw2.ts (clones on the first run).
-import { execFileSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+// pokebw2 at its pin (gen5-bw2-source.ts): the addresses S6 needs, the adapter and server command
+// enums, each argument format's puts, the message rules and the adapter's layout. The checkout
+// lives in .cache/gen5/pokebw2/ and the output in build/gen5/; nothing of pokebw2 is committed.
+// Usage: node scripts/gen5-bw2.ts [--checkout <dir>] (fetches on the first run).
+import { mkdirSync, writeFileSync } from 'node:fs'
+import { dirname } from 'node:path'
+import { parseArgs } from 'node:util'
 
 import type {
   ArgFormat,
@@ -25,13 +25,9 @@ import {
 } from './gen5-bw2-c.ts'
 import { battleNumbers } from './gen5-bw2-battle.ts'
 import { parseArgFormats, parseMessageRules } from './gen5-bw2-put.ts'
+import { checkout, listedReader, POKEBW2, type Pokebw2Read } from './gen5-bw2-source.ts'
 import { structLayout } from './gen5-bw2-struct.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
-
-const POKEBW2 = {
-  repository: 'https://github.com/fuddlesworth/pokebw2.git',
-  commit: '345b790e6000869b481b79838bb5727309f832fb',
-}
 
 /** The symbols the spike reads or names: the adapter list, the server's and the client's loops,
  * and the client's handlers of the commands S6 sends. All live in overlay 167. */
@@ -160,30 +156,30 @@ export function checkCommandFormats(
   return { ...entries }
 }
 
-/** Clones the pinned commit on the first run; throws when the checkout stands elsewhere. */
-function checkout(): string {
-  const dir = GEN5_PATHS.pokebw2
-  const git = (...args: string[]) => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8' })
-  if (!existsSync(join(dir, '.git'))) {
-    mkdirSync(dir, { recursive: true })
-    git('init', '-q')
-    git('remote', 'add', 'origin', POKEBW2.repository)
-    git('fetch', '-q', '--depth', '1', 'origin', POKEBW2.commit)
-    git('checkout', '-q', '--detach', 'FETCH_HEAD')
-  }
-  const head = git('rev-parse', 'HEAD').trim()
-  if (head !== POKEBW2.commit) {
-    throw new Error(`pokebw2 stands at ${head}, not the pinned ${POKEBW2.commit}`)
-  }
-  return dir
+/** The files the generator parses, by the role each plays. */
+const SOURCES = {
+  symbols: 'config/b2_us/arm9/overlays/ov167/symbols.txt',
+  adapterC: 'src/battle/btl_adapter.c',
+  queueC: 'src/battle/btl_server_cmd.c',
+  serverC: 'src/battle/btl_server.c',
+  adapterH: 'include/battle/btl_adapter.h',
+  queueH: 'include/battle/btl_server_cmd.h',
+  serverH: 'include/battle/btl_server.h',
+  mainH: 'include/battle/btl_main.h',
+  pokeparamH: 'include/battle/btl_pokeparam.h',
 }
 
-function generate(dir: string): Bw2Numbers {
-  const read = (path: string) => readFileSync(join(dir, path), 'utf8')
-  const adapterC = read('src/battle/btl_adapter.c')
-  const queueH = read('include/battle/btl_server_cmd.h')
-  const queueC = read('src/battle/btl_server_cmd.c')
-  const ov167 = parseSymbols(read('config/b2_us/arm9/overlays/ov167/symbols.txt'), 'ov167')
+type Sources = Record<keyof typeof SOURCES, string>
+
+/** Every file the generator parses, read through `read` before any parsing. */
+export function readSources(read: Pokebw2Read): Sources {
+  const entries = Object.entries(SOURCES).map(([role, path]) => [role, read(path)])
+  return Object.fromEntries(entries) as Sources
+}
+
+function parse(sources: Sources): Bw2Numbers {
+  const { adapterC, queueC, queueH } = sources
+  const ov167 = parseSymbols(sources.symbols, 'ov167')
   const serverCommands = enumAround(queueH, 'SC_MOVE_MSG')
   const messages = parseMessageRules(queueC, defineValue(queueH, 'SC_MSG_ARG_END'))
   const codes = enumAround(queueC, 'SC_ARGS_NONE')
@@ -194,7 +190,7 @@ function generate(dir: string): Bw2Numbers {
   return {
     pokebw2: { ...POKEBW2 },
     symbols: pickSymbols(ov167, SYMBOL_NAMES),
-    adapterCommands: enumAround(read('include/battle/btl_adapter.h'), 'BTL_ACMD_SERVER_CMD'),
+    adapterCommands: enumAround(sources.adapterH, 'BTL_ACMD_SERVER_CMD'),
     adapterStates: enumAround(adapterC, 'BTL_ADAPTER_STATE_SEND'),
     serverCommands,
     argFormats,
@@ -202,12 +198,7 @@ function generate(dir: string): Bw2Numbers {
     messages,
     queueSize: defineValue(queueH, 'BTL_SERVER_CMD_QUE_SIZE'),
     adapter,
-    battle: battleNumbers({
-      serverC: read('src/battle/btl_server.c'),
-      serverH: read('include/battle/btl_server.h'),
-      mainH: read('include/battle/btl_main.h'),
-      pokeparamH: read('include/battle/btl_pokeparam.h'),
-    }),
+    battle: battleNumbers(sources),
   }
 }
 
@@ -252,7 +243,10 @@ function report(numbers: Bw2Numbers): void {
 }
 
 function main(): void {
-  const numbers = generate(checkout())
+  const { values } = parseArgs({
+    options: { checkout: { type: 'string', default: GEN5_PATHS.pokebw2 } },
+  })
+  const numbers = parse(readSources(listedReader(checkout(values.checkout))))
   mkdirSync(dirname(GEN5_PATHS.bw2Json), { recursive: true })
   writeFileSync(GEN5_PATHS.bw2Json, `${JSON.stringify(numbers, null, 2)}\n`)
   report(numbers)
