@@ -131,8 +131,18 @@ function usedForNext(event: EventOf<'itemEnd'>, ctx: Context): boolean {
   return resets || healsBy(next, event.who, event.item) || Boolean(Dex.items.get(event.item).boosts)
 }
 
+/**
+ * The Pokémon whose move took the item: `[of]`, or else the last mover on the other side, since
+ * Gen 4 logs Knock Off's end with no `[of]` (`-enditem|<target>|<item>|[from] move: Knock Off`).
+ */
+function takerOf({ who, cause, source }: EventOf<'itemEnd'>, ctx: Context): PokemonRef | undefined {
+  if (source !== undefined || cause?.kind !== 'move') return source
+  return ctx.mover?.side === who.side ? undefined : ctx.mover
+}
+
 export function itemEnd(event: EventOf<'itemEnd'>, ctx: Context): void {
-  const { who, cause, source, line } = event
+  const { who, cause, line } = event
+  const source = takerOf(event, ctx)
   const number = heldItem(ctx, line, event.item)
   if (event.eaten || usedForNext(event, ctx)) {
     // A berry eaten for confusion alone shows none (`BattleScript_BerryCureConfusionRet`).
