@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { battleEntry, TO_TITLE } from './battle-entry'
 import type { RoutePlaces } from './bw2-numbers'
 import { type MacroStep, routeSlice } from './macro'
 import { newGameRoute, PLAYER_X, PLAYER_Z } from './route'
@@ -28,6 +29,14 @@ describe('newGameRoute', () => {
     const [until, last] = newGameRoute(PLACES, checks).slice(-2)
     expect(until).toMatchObject({ kind: 'until', name: 'battle', checks, holdFor: 60 })
     expect(last).toEqual({ kind: 'mark', name: 'battle' })
+  })
+
+  it('starts with the shared opening and ends with the shared battle entry', () => {
+    const checks = [{ name: 'mode', address: 0x02100000, width: 4 as const, oneOf: [0] }]
+    const steps = newGameRoute(PLACES, checks)
+    const entry = battleEntry(checks, { start: 9000, battle: 3000 })
+    expect(routeSlice(steps, undefined, 'title')).toEqual(TO_TITLE)
+    expect(steps.slice(-entry.length)).toEqual(entry)
   })
 
   it('presses Start once on the way to the title, after the opening', () => {

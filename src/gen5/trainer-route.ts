@@ -8,9 +8,9 @@
 // does no harm. Frame counts are our readings of
 // earlier runs' frames, and every position is our reading of RAM in a run.
 import type { RoutePlaces } from './bw2-numbers.ts'
-import { type Button, type MacroStep, routeSlice } from './macro.ts'
+import { type Button, mark, type MacroStep, press, PRESS_FRAMES, routeSlice } from './macro.ts'
 import type { RamCheck, RamRef } from './ram-check.ts'
-import { mark, PLAYER_X, PLAYER_Z, press, PRESS_FRAMES } from './route.ts'
+import { PLAYER_X, PLAYER_Z } from './route.ts'
 import {
   fastText,
   OPTIONS_SLOT_WITH_POKEDEX,

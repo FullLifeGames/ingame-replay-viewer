@@ -55,6 +55,17 @@ export type MacroStep =
   /** Writes into main RAM: takes one frame, before which the page applies the writes. */
   | { kind: 'write'; name: string; writes: readonly MemoryWrite[] }
 
+/** Frames a scripted press holds its buttons: the game reads its pad once per frame. */
+export const PRESS_FRAMES = 4
+
+export const wait = (frames: number): MacroStep => ({ kind: 'wait', frames })
+export const press = (button: Button, frames = PRESS_FRAMES): MacroStep => ({
+  kind: 'press',
+  buttons: [button],
+  frames,
+})
+export const mark = (name: string): MacroStep => ({ kind: 'mark', name })
+
 /** The buttons to hold through one frame, the marks reached before it, and where the macro is. */
 export interface FrameInput {
   buttons: readonly Button[]

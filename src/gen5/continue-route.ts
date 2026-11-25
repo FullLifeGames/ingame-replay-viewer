@@ -3,8 +3,8 @@
 // the wipe into the field where the game was saved. A save made with the C-Gear off brings no
 // question at CONTINUE. The walk to the trainer and the battle's entry come with 78-4; until then
 // a probe walks east from the field and marks what it meets.
-import type { MacroStep } from './macro.ts'
-import { mark, press, PRESS_FRAMES, TO_TITLE, wait } from './route.ts'
+import { TO_TITLE } from './battle-entry.ts'
+import { mark, type MacroStep, press, PRESS_FRAMES, wait } from './macro.ts'
 
 /** Frames from A on the title to a standing start menu: the new game's route marks its start menu
  * after the same wait (explore-00). */

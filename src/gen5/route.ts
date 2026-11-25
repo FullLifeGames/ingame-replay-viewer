@@ -2,20 +2,10 @@
 // macro that src/web/gen5/frame-hook.ts plays one emulated frame at a time. Each mark is a
 // milestone where a run saves a state and a frame, so the next attempt starts there
 // (scripts/gen5-route.ts). Frame counts were read off frames of earlier runs, never off a clock.
+import { battleEntry, TO_TITLE } from './battle-entry.ts'
 import type { RoutePlaces } from './bw2-numbers.ts'
-import type { Button, MacroStep } from './macro.ts'
+import { type Button, mark, type MacroStep, press, PRESS_FRAMES, wait } from './macro.ts'
 import type { RamCheck, RamRef } from './ram-check.ts'
-
-/** Frames a scripted press holds its buttons: the game reads its pad once per frame. */
-export const PRESS_FRAMES = 4
-
-export const wait = (frames: number): MacroStep => ({ kind: 'wait', frames })
-export const press = (button: Button, frames = PRESS_FRAMES): MacroStep => ({
-  kind: 'press',
-  buttons: [button],
-  frames,
-})
-export const mark = (name: string): MacroStep => ({ kind: 'mark', name })
 
 /** Presses A once every `every` frames for `frames` frames: text boxes, one after the other. */
 const mashA = (frames: number, every: number): MacroStep => ({
@@ -23,9 +13,6 @@ const mashA = (frames: number, every: number): MacroStep => ({
   frames,
   mash: { buttons: ['A'], every, hold: PRESS_FRAMES },
 })
-
-/** The opening runs until Start skips it, at the frame S1 used (just after the logo). */
-export const TO_TITLE: MacroStep[] = [wait(1900), press('Start'), wait(600), mark('title')]
 
 /** A press and a short gap, so the next press is a new one: a cursor moves once per press. */
 const TAP_GAP = 8
@@ -222,8 +209,7 @@ const STARTER: MacroStep[] = [
  * asks for a battle. Their talk needs A too (B mashed for 9000 frames left it standing). After
  * it Bianca only repeats her call for a battle; the battle starts from its own trigger
  * (`places.battleTrigger`), so the route holds Down with A again until IRV stands on its row.
- * Then A until the battle has its adapter, then no input until the action menu stands
- * (src/gen5/battle-check.ts) for 60 frames: an A there would pick Fight. */
+ * Then the battle's entry that every route shares (src/gen5/battle-entry.ts). */
 const battle = (places: RoutePlaces, checks: readonly RamCheck[]): MacroStep[] => [
   {
     kind: 'until',
@@ -243,17 +229,7 @@ const battle = (places: RoutePlaces, checks: readonly RamCheck[]): MacroStep[] =
     mash: { buttons: ['A'], every: 20, hold: PRESS_FRAMES, held: ['Down'] },
   },
   mark('battle-trigger'),
-  {
-    kind: 'until',
-    name: 'battle-start',
-    checks: checks.filter((check) => check.mainRamPointer === true),
-    holdFor: 1,
-    limit: 9000,
-    mash: { buttons: ['A'], every: 20, hold: PRESS_FRAMES },
-  },
-  mark('battle-start'),
-  { kind: 'until', name: 'battle', checks, holdFor: 60, limit: 3000 },
-  mark('battle'),
+  ...battleEntry(checks, { start: 9000, battle: 3000 }),
 ]
 
 /** The route from boot to the places of the map's events (scripts/gen5-bw2-field.ts);

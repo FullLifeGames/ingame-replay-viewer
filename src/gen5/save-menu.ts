@@ -4,8 +4,8 @@
 // menu lists other buttons for each kind of menu (before the first Pokémon, before the Pokédex,
 // with both), so the button's place is the caller's. A mark follows every press and every 30
 // frames, so a run's frames show each moment and the write's end can be read off them.
-import type { Button, MacroStep } from './macro.ts'
-import { mark, press, PRESS_FRAMES, tap, wait } from './route.ts'
+import { type Button, mark, type MacroStep, press, PRESS_FRAMES, wait } from './macro.ts'
+import { tap } from './route.ts'
 
 /** A button of the field menu's grid: its row from the top, its column from the left. The cursor
  * starts on the top left button when X opens the menu. */
