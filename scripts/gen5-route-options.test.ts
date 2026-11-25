@@ -44,15 +44,30 @@ describe('readRouteOptions', () => {
     expect(readRouteOptions(['--query', 'save=x'], NOW).query).toBe('?save=x')
   })
 
+  it('reads the trainer route from a state of the rival battle', () => {
+    const args = ['--route', 'trainer', '--state', 's5-battle', '--label', 's78t1']
+    const options = readRouteOptions([...args, '--uncapped', '--minutes', '19'], NOW)
+    expect(options).toMatchObject({
+      route: 'trainer',
+      state: 's5-battle',
+      label: 's78t1',
+      uncapped: true,
+      deadlineMs: NOW + 19 * 60_000,
+    })
+  })
+
   it('refuses a route it does not know', () => {
-    expect(() => readRouteOptions(['--route', 'trainer'], NOW)).toThrow(
-      '--route takes new-game, save-here or continue, not "trainer".',
+    expect(() => readRouteOptions(['--route', 'gym'], NOW)).toThrow(
+      '--route takes new-game, save-here, continue or trainer, not "gym".',
     )
   })
 
-  it('refuses the save route without a state to start from', () => {
+  it('refuses the save route and the trainer route without a state to start from', () => {
     expect(() => readRouteOptions(['--route', 'save-here'], NOW)).toThrow(
       'The save route needs --state: it saves where a state stands.',
+    )
+    expect(() => readRouteOptions(['--route', 'trainer'], NOW)).toThrow(
+      'The trainer route needs --state: it plays on from a state of the rival battle or later.',
     )
   })
 

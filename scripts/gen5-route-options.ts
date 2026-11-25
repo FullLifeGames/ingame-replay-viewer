@@ -1,15 +1,15 @@
 // The command line of scripts/gen5-route.ts (#72, #78): which route a run plays, the state it
 // starts from, the save it queues or takes, and the page's address. Usage: --route
-// new-game|save-here|continue, --from <mark> and --to <mark> (the new game's marks; --from starts
-// from the state s5-<mark>), --state <file base> (any state under build/gen5/states/), --save
-// <file> (queued through the hook before the pick), --take-save <name> (written to
-// build/gen5/saves/<name>.sav once it stands still), --query <text>, --label, --uncapped,
-// --minutes.
+// new-game|save-here|continue|trainer, --from <mark> and --to <mark> (the new game's marks;
+// --from starts from the state s5-<mark>), --state <file base> (any state under
+// build/gen5/states/), --save <file> (queued through the hook before the pick), --take-save
+// <name> (written to build/gen5/saves/<name>.sav once it stands still), --query <text>,
+// --label, --uncapped, --minutes.
 import { parseArgs } from 'node:util'
 
 import { isSaveName } from '../src/gen5/save-file.ts'
 
-const ROUTES = ['new-game', 'save-here', 'continue'] as const
+const ROUTES = ['new-game', 'save-here', 'continue', 'trainer'] as const
 
 export type RouteName = (typeof ROUTES)[number]
 
@@ -32,10 +32,17 @@ export interface RouteOptions {
 
 const isRoute = (name: string): name is RouteName => (ROUTES as readonly string[]).includes(name)
 
+/** The routes that start from a state alone, each with the sentence that says why. */
+const STATE_ROUTES: Partial<Record<RouteName, string>> = {
+  'save-here': 'The save route needs --state: it saves where a state stands.',
+  trainer:
+    'The trainer route needs --state: it plays on from a state of the rival battle or later.',
+}
+
 /** Where the route and the state disagree, or undefined. */
 function routeProblem(options: RouteOptions): string | undefined {
-  if (options.route === 'save-here' && options.state === undefined)
-    return 'The save route needs --state: it saves where a state stands.'
+  const needsState = STATE_ROUTES[options.route]
+  if (needsState !== undefined && options.state === undefined) return needsState
   if (options.route !== 'new-game' && (options.from ?? options.to) !== undefined)
     return '--from and --to cut the new-game route only.'
   if (options.from !== undefined && options.state !== undefined)
@@ -71,7 +78,9 @@ export function readRouteOptions(args: string[], now: number): RouteOptions {
     },
   })
   if (!isRoute(values.route))
-    throw new Error(`--route takes new-game, save-here or continue, not "${values.route}".`)
+    throw new Error(
+      `--route takes new-game, save-here, continue or trainer, not "${values.route}".`,
+    )
   const minutes = Number(values.minutes)
   const query = values.query.replace(/^\?/, '')
   const options: RouteOptions = {

@@ -90,6 +90,13 @@ describe('failingCheck', () => {
       'far: its pointer does not lead into main RAM',
     )
   })
+
+  it('fails a value it was told to leave behind, and holds once the value moved on', () => {
+    expect(failingCheck([{ ...adapter('cmd', 2, 2), noneOf: [0x2b, 7] }], read)).toBe(
+      'cmd read 0x2b, one of 0x2b 0x7',
+    )
+    expect(failingCheck([{ ...adapter('cmd', 2, 2), noneOf: [7] }], read)).toBe(undefined)
+  })
 })
 
 // Scene: the log shows the adapter's fields as the battle starts, one line per frame that changed

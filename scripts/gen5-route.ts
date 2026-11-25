@@ -1,8 +1,9 @@
 // The route runs of the Gen 5 spike (#72, #78): plays a route on the spike page in headless
 // Chromium, from boot or from a state under build/gen5/states/: the new game of src/gen5/route.ts
-// up to a mark or its end, the save from the field menu (src/gen5/save-menu.ts), or the continue
-// from a save (src/gen5/continue-route.ts). At each mark the page saves a state and the core's
-// frame; scripts/gen5-route-run.ts writes them to build/gen5/states/ and build/gen5/frames/
+// up to a mark or its end, the save from the field menu (src/gen5/save-menu.ts), the continue
+// from a save (src/gen5/continue-route.ts), or the story on from the rival battle
+// (src/gen5/trainer-route.ts). At each mark the page saves a state and the core's frame;
+// scripts/gen5-route-run.ts writes them to build/gen5/states/ and build/gen5/frames/
 // (gitignored, ADR 0002; never served or committed) and logs the emulated frame, the wall time and
 // a hash of main RAM. Requests stay on the machine and carry no body (scripts/gen5-requests.ts).
 // Usage: GEN5_DUMP=<path> node scripts/gen5-route.ts with the options of
@@ -19,6 +20,7 @@ import type { Gen5Global, RunPlan } from '../src/gen5/hook.ts'
 import { routeSlice } from '../src/gen5/macro.ts'
 import { newGameRoute, PLAYER_X, PLAYER_Z } from '../src/gen5/route.ts'
 import { SAVE_SLOT_BEFORE_POKEMON, saveGame } from '../src/gen5/save-menu.ts'
+import { trainerRoute } from '../src/gen5/trainer-route.ts'
 import { log, logSave, sampleLine, waitForStart } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { readRouteOptions, type RouteOptions, stateBase } from './gen5-route-options.ts'
@@ -30,24 +32,35 @@ type BattleRefs = ReturnType<typeof battleRefs>
 
 type Route = Pick<RunPlan, 'steps' | 'stateMarks'>
 
-/** The steps of the chosen route; the save route keeps one state, at its mark `saved`. */
-function routeOf(options: RouteOptions, refs: BattleRefs, places: RoutePlaces): Route {
+/** The steps of the chosen route; the save route keeps one state, at its mark `saved`, and the
+ * trainer route plays on after `from`, the mark of the state it starts from. */
+function routeOf(
+  options: RouteOptions,
+  refs: BattleRefs,
+  places: RoutePlaces,
+  from?: string,
+): Route {
   if (options.route === 'save-here')
     return { steps: saveGame(SAVE_SLOT_BEFORE_POKEMON), stateMarks: ['saved'] }
   if (options.route === 'continue') return { steps: continueRoute() }
+  if (options.route === 'trainer') return trainerRoute(places, from)
   return { steps: routeSlice(newGameRoute(places, refs.checks), options.from, options.to) }
 }
 
 function readPlan(options: RouteOptions, refs: BattleRefs, places: RoutePlaces): RunPlan {
   const { watch } = refs
-  const route = { ...routeOf(options, refs, places), watch, markRefs: [PLAYER_X, PLAYER_Z] }
+  const markRefs = [PLAYER_X, PLAYER_Z]
   const base = stateBase(options)
-  if (base === undefined) return { ...route, startFrame: 0 }
+  if (base === undefined)
+    return { ...routeOf(options, refs, places), watch, markRefs, startFrame: 0 }
   const path = join(GEN5_PATHS.states, base)
   const meta = JSON.parse(readFileSync(`${path}.json`, 'utf8')) as StateMeta
   const state = readFileSync(`${path}.state`).toString('base64')
-  log(`from state ${base}: frame ${String(meta.frame)}, main RAM ${String(meta.ramSha)}`)
-  return { ...route, state, stateSha: meta.ramSha, startFrame: meta.frame }
+  log(
+    `from state ${base}: mark ${meta.mark}, frame ${String(meta.frame)}, main RAM ${String(meta.ramSha)}`,
+  )
+  const route = routeOf(options, refs, places, meta.mark)
+  return { ...route, watch, markRefs, state, stateSha: meta.ramSha, startFrame: meta.frame }
 }
 
 /** Queues the run, and the save of the build machine if the command names one, before the pick. */
