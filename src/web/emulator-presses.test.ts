@@ -45,7 +45,7 @@ describe('the emulator page', () => {
     expect(shown).toEqual([
       'Starting the emulator.',
       {
-        line: 'Running Gen 3 OU: A Welcome Guest vs xXEricXx (994052).',
+        line: 'Started Gen 3 OU: A Welcome Guest vs xXEricXx (994052).',
         detail: startLine({
           label: 'Gen 3 OU: A Welcome Guest vs xXEricXx (994052)',
           streamBytes: STREAM_994052.length,

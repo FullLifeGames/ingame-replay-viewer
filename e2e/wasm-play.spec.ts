@@ -248,7 +248,7 @@ test('mGBA on the emulator page plays 994052 at fast-forward (B7 measurement)', 
   await expect(page.locator('#status-detail')).toHaveText(`The patched ROM's SHA1 is ${romSha1}.`)
   await expect(page.getByLabel('Example replay')).toHaveValue(FIRST)
   await page.getByRole('button', { name: 'Start', exact: true }).click()
-  await expect(line).toHaveText(`Running ${labelOf(FIRST)}.`, { timeout: 60_000 })
+  await expect(line).toHaveText(`Started ${labelOf(FIRST)}.`, { timeout: 60_000 })
   await page.evaluate(() => {
     const probe = globalThis as Probe
     probe.irvFrames = 0

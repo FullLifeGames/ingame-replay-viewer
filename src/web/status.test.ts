@@ -43,9 +43,10 @@ describe('the status lines', () => {
   })
 
   // The running ROM holds the stream, so the patched ROM's SHA1 (the dump line's) is not its own.
-  it('names the replay, with its stream in bytes under "Details" and no SHA1', () => {
+  // mGBA gives the page no memory read, so the line holds before END and after it (#90).
+  it('says it started the replay, with its stream in bytes under "Details" and no SHA1', () => {
     expect(startLine({ label: LABEL, streamBytes: 8346 })).toEqual({
-      line: `Running ${LABEL}.`,
+      line: `Started ${LABEL}.`,
       detail: '8346 bytes of instruction stream.',
     })
   })

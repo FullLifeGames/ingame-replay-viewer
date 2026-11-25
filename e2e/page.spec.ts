@@ -158,7 +158,7 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
   await expect(page.locator('#status-detail')).toHaveText(`The patched ROM's SHA1 is ${romSha1}.`)
   await expect(page.getByLabel('Example replay')).toHaveValue(FIRST)
   await page.getByRole('button', { name: 'Start', exact: true }).click()
-  await expect(status).toHaveText(`Running ${FIRST_LABEL}.`, { timeout: 60_000 })
+  await expect(status).toHaveText(`Started ${FIRST_LABEL}.`, { timeout: 60_000 })
   await expect(page.locator('#status-detail')).toHaveText(
     `${String(streamBytes)} bytes of instruction stream.`,
   )
@@ -185,7 +185,7 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
     await page.getByLabel('Example replay').selectOption(SECOND)
     await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${SECOND}: `))
     await page.getByRole('button', { name: 'Start', exact: true }).click()
-    await expect(status).toHaveText(`Running ${SECOND_LABEL}.`, { timeout: 60_000 })
+    await expect(status).toHaveText(`Started ${SECOND_LABEL}.`, { timeout: 60_000 })
     await expect.poll(async () => differ(before, await frame(page)), { timeout: 30_000 }).toBe(true)
     await expect
       .poll(async () => (await frame(page)).colours, { timeout: 30_000 })
@@ -224,7 +224,7 @@ test('a Load that fails while a game plays says that the game keeps its replay, 
     timeout: 90_000,
   })
   await page.getByRole('button', { name: 'Start', exact: true }).click()
-  await expect(status).toHaveText(`Running ${FIRST_LABEL}.`, { timeout: 60_000 })
+  await expect(status).toHaveText(`Started ${FIRST_LABEL}.`, { timeout: 60_000 })
   await expect.poll(async () => (await frame(page)).colours, { timeout: 30_000 }).toBeGreaterThan(1)
 
   await loadReplay(page, MISSING)

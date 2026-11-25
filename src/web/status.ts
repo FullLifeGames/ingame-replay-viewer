@@ -32,11 +32,15 @@ export const dumpLine = ({ romSha1 }: DumpSummary): StatusLine => ({
 
 const streamText = (bytes: number): string => `${String(bytes)} bytes of instruction stream`
 
+/**
+ * Once the emulator page started a replay. mGBA gives the page no memory read, so it cannot tell
+ * END: the line holds over the game and over the black screen after its outro (#90).
+ */
 export const startLine = ({
   label,
   streamBytes,
 }: Pick<StartSummary, 'label' | 'streamBytes'>): StatusLine => ({
-  line: `Running ${label}.`,
+  line: `Started ${label}.`,
   detail: `${streamText(streamBytes)}.`,
 })
 
