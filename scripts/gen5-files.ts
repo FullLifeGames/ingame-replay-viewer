@@ -1,7 +1,8 @@
 // What both Gen 5 spike servers (#72) answer with: the cross-origin isolation headers, the file
 // types, and the rule that maps a request path to a file inside one folder and never outside it.
-// Saves (#78) answer from the saves folder alone, by a name src/gen5/save-file.ts allows, and the
-// fetched site (#79) only the files scripts/gen5-manifest.ts lists as served.
+// Saves (#78) answer from the saves folder alone, by a name src/gen5/save-file.ts allows, the
+// fetched site (#79) only the files scripts/gen5-manifest.ts lists as served, and /source/ only
+// the archives it names (scripts/gen5-sources.ts places them).
 // scripts/gen5-serve.ts (Vite, for the shot script) and scripts/gen5-built.ts (the built page,
 // for the user's own check) import it.
 import { createReadStream, statSync } from 'node:fs'
@@ -9,7 +10,7 @@ import type { ServerResponse } from 'node:http'
 import { extname, isAbsolute, join, normalize } from 'node:path'
 
 import { isSaveName, SAVES_PREFIX } from '../src/gen5/save-file.ts'
-import { isServedSitePath } from './gen5-manifest.ts'
+import { isServedSitePath, isSourceArchive } from './gen5-manifest.ts'
 
 /** Where the fetched EmulatorJS site answers on both servers. */
 export const SITE_PREFIX = '/emulatorjs/'
@@ -28,6 +29,7 @@ const TYPES: Record<string, string> = {
   '.html': 'text/html',
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
+  '.gz': 'application/gzip',
 }
 
 /** The request path without its query, decoded; undefined for a malformed escape or a NUL. */
@@ -77,19 +79,35 @@ export function savesFileFor(url: string, saves: string): string | undefined {
   return join(saves, file)
 }
 
-/** The built page's file for a request: SITE_PREFIX from the fetched site, SAVES_PREFIX from
- * `saves`, the rest from `page`. */
-export function fileFor(
-  url: string,
-  page: string,
-  site: string,
-  saves: string,
-): string | undefined {
+/** Where the source archives answer on both servers (scripts/gen5-sources.ts). */
+export const SOURCE_PREFIX = '/source/'
+
+/** The archive in `sources` for `/source/<archive>` with a name the manifest gives one of its
+ * sources; undefined for any other path. */
+export function sourceFileFor(url: string, sources: string): string | undefined {
+  const path = decodedPath(url)
+  if (path?.startsWith(SOURCE_PREFIX) !== true) return undefined
+  const name = path.slice(SOURCE_PREFIX.length)
+  return isSourceArchive(name) ? join(sources, name) : undefined
+}
+
+/** The folders the built server answers from. */
+export interface ServedFolders {
+  built: string
+  site: string
+  saves: string
+  sources: string
+}
+
+/** The built page's file for a request: SITE_PREFIX from the fetched site, SAVES_PREFIX from the
+ * saves, SOURCE_PREFIX from the source archives, the rest from the built page. */
+export function fileFor(url: string, folders: ServedFolders): string | undefined {
   const path = decodedPath(url)
   if (path === undefined) return undefined
-  if (path.startsWith(SITE_PREFIX)) return siteFileFor(url, site)
-  if (path.startsWith(SAVES_PREFIX)) return savesFileFor(url, saves)
-  return inFolder(page, path.replace(/^\/+/, ''))
+  if (path.startsWith(SITE_PREFIX)) return siteFileFor(url, folders.site)
+  if (path.startsWith(SAVES_PREFIX)) return savesFileFor(url, folders.saves)
+  if (path.startsWith(SOURCE_PREFIX)) return sourceFileFor(url, folders.sources)
+  return inFolder(folders.built, path.replace(/^\/+/, ''))
 }
 
 /** Sends `file` when it exists, uncached and isolated; a 404 that names the path otherwise. */

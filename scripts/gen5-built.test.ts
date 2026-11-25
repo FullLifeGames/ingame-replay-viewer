@@ -7,6 +7,7 @@ import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { BUILT_PORT, builtServerOptions, startBuiltServer } from './gen5-built'
+import { archiveName, COMPONENTS } from './gen5-manifest'
 import { GEN5_PATHS } from './gen5-paths'
 
 describe('builtServerOptions', () => {
@@ -54,11 +55,19 @@ describe('startBuiltServer', () => {
     built: join(root, 'page'),
     site: join(root, 'site'),
     saves: join(root, 'saves'),
+    sources: join(root, 'sources'),
   }
+  const archive = archiveName(COMPONENTS.melonds.source)
   let server: Server | undefined
 
   beforeAll(async () => {
-    for (const file of ['page/index.html', 'site/data/loader.js', 'site/data/version.json']) {
+    for (const file of [
+      'page/index.html',
+      'site/data/loader.js',
+      'site/data/version.json',
+      `sources/${archive}`,
+      'sources/other.tar.gz',
+    ]) {
       mkdirSync(join(root, file, '..'), { recursive: true })
       writeFileSync(join(root, file), 'x')
     }
@@ -70,12 +79,13 @@ describe('startBuiltServer', () => {
     rmSync(root, { recursive: true, force: true })
   })
 
-  const status = async (path: string): Promise<number> => {
+  const answer = async (path: string): Promise<Response> => {
     const address = server?.address() as AddressInfo
     const response = await fetch(`http://127.0.0.1:${String(address.port)}${path}`)
     await response.arrayBuffer()
-    return response.status
+    return response
   }
+  const status = async (path: string): Promise<number> => (await answer(path)).status
 
   it('answers a file the manifest serves and the page itself', async () => {
     expect(await status('/emulatorjs/data/loader.js')).toBe(200)
@@ -84,5 +94,12 @@ describe('startBuiltServer', () => {
 
   it('answers 404 for a file of the site the manifest does not list', async () => {
     expect(await status('/emulatorjs/data/version.json')).toBe(404)
+  })
+
+  it('answers an archive the manifest names as gzip, and 404 for another name', async () => {
+    const response = await answer(`/source/${archive}`)
+    expect(response.status).toBe(200)
+    expect(response.headers.get('content-type')).toBe('application/gzip')
+    expect(await status('/source/other.tar.gz')).toBe(404)
   })
 })

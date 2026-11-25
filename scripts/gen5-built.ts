@@ -3,7 +3,7 @@
 // that, so the page forgot the dump. This builds src/web/gen5/ into build/gen5/page/ and serves
 // it with Node's own server: no websocket, no dev client, every answer cross-origin isolated and
 // uncached, /emulatorjs/* from the fetched packages as far as scripts/gen5-manifest.ts serves
-// them. It binds to 127.0.0.1 unless --host.
+// them, /source/* the archives it names. It binds to 127.0.0.1 unless --host.
 // Usage: node scripts/gen5-serve.ts --built [--host] [--port N]
 import { createServer, type Server } from 'node:http'
 import { join } from 'node:path'
@@ -11,7 +11,7 @@ import { parseArgs } from 'node:util'
 
 import { build } from 'vite'
 
-import { fileFor, ISOLATION, sendFile } from './gen5-files.ts'
+import { fileFor, ISOLATION, sendFile, type ServedFolders } from './gen5-files.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
 /** The built page's port; the dev server for the shot script keeps 5183. */
@@ -50,13 +50,10 @@ export async function buildGen5Page(): Promise<void> {
   })
 }
 
-/** The folders the built server answers from. */
-export type BuiltFolders = Pick<typeof GEN5_PATHS, 'built' | 'site' | 'saves'>
-
 /** Serves the built page from `folders`; resolves once it listens. */
 export function startBuiltServer(
   options: BuiltServerOptions,
-  folders: BuiltFolders = GEN5_PATHS,
+  folders: ServedFolders = GEN5_PATHS,
 ): Promise<Server> {
   const server = createServer((req, res) => {
     const url = req.url ?? '/'
@@ -65,7 +62,7 @@ export function startBuiltServer(
       res.end()
       return
     }
-    sendFile(res, fileFor(url, folders.built, folders.site, folders.saves), url)
+    sendFile(res, fileFor(url, folders), url)
   })
   return new Promise((resolve, reject) => {
     server.once('error', reject)
