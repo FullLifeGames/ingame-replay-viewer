@@ -26,7 +26,7 @@ Each failure shows two parts. The status line holds the visitor line from `visit
 
 Under a line that asks for a report sits the report link. It opens the repository's issue form "Replay problem" (`.github/ISSUE_TEMPLATE/replay-problem.yml`) in a new tab, with the replay and the line filled in; `report-link.ts` builds the address. GitHub reads issue forms from the default branch, so until the form reaches `master` the link opens GitHub's new-issue page with no form filled in.
 
-The viewer opens with a short intro: what it does, the dump it needs, that your dump and your replay files stay in the tab, and the formats it plays (`PLAYED_FORMATS` in `visitor.ts`). It links the emulator page, the licence page (`public/licences.html`, which Vite copies into the build as it stands) and the source code. The select of test replays reads "Example replay" on both pages.
+The viewer opens with a short intro: what it does, the dump it needs, that your dump and your replay files stay in the tab, and the formats it plays (`PLAYED_FORMATS` in `visitor.ts`). It links the emulator page, the licence page (`public/licences.html`, which Vite copies into the build as it stands) and the source code. The select of test replays reads "Example replay" on both pages. It labels each replay by its format, its players and its number, such as "Gen 3 OU: A Welcome Guest vs xXEricXx (994052)", and loads a replay only when you pick it. The labels come from `example-replays.json`, which `node scripts/web-examples.ts` writes from the replays' own JSON in `test/fixtures/replays/`; a spec fails until the list is written again after a replay joins or changes.
 
 ## The viewer
 

@@ -102,8 +102,11 @@ export function findReplayView(page: string) {
     testReplay,
     replayForm: element(page, 'replay-form', HTMLFormElement),
     replayInput: element(page, 'replay-input', HTMLInputElement),
-    offer: (ids: readonly string[], first: string): void => {
-      testReplay.replaceChildren(...ids.map((id) => new Option(id, id, false, id === first)))
+    /** Offers each test replay under its label; an option's value stays the replay's id. */
+    offer: (examples: readonly { id: string; label: string }[], first: string): void => {
+      testReplay.replaceChildren(
+        ...examples.map(({ id, label }) => new Option(label, id, false, id === first)),
+      )
     },
     showReplay: (summary: ReplaySummary): void => {
       element(page, 'replay-summary', HTMLParagraphElement).textContent = replayLine(summary)
@@ -156,10 +159,7 @@ export function wireReplays(chooser: ReplayChooser, view: StatusView): void {
     event.preventDefault()
     void showPick(view, chooser.loadReplay(view.replayInput.value), playing, loadedFrom(view))
   })
-  view.offer(
-    TEST_REPLAYS.map((test) => test.id),
-    FIRST_REPLAY,
-  )
+  view.offer(TEST_REPLAYS, FIRST_REPLAY)
   pick(FIRST_REPLAY)
 }
 
