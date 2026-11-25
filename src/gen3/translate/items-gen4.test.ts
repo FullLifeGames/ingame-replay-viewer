@@ -1,5 +1,6 @@
 // Items whose lines Gen 4 logs brought: Custap Berry's `[consumed]` after the berry is eaten
-// (`BattleScript_CustapBerryActivation`) and Quick Claw's activation.
+// (`BattleScript_CustapBerryActivation`), Quick Claw's activation, and the Air Balloon's two
+// lines (`BattleScript_AirBalloonMsgInRet`, `BattleScript_AirBalloonMsgPop`).
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
@@ -44,5 +45,23 @@ describe('Quick Claw (D8)', () => {
     expect(fallbacksFrom(result, NEXT)).toMatchObject([
       { kind: 'phrase', detail: 'no game message for Quick Claw acting' },
     ])
+  })
+})
+
+describe('the Air Balloon', () => {
+  it('says it floats and says the pop, with no pop-up and no fallback', () => {
+    const result = streamOfLog(
+      '|-item|p2a: Tyranitar|Air Balloon',
+      '|-damage|p2a: Tyranitar|80/100',
+      '|-enditem|p2a: Tyranitar|Air Balloon',
+    )
+    const scene = sceneFrom(result, NEXT)
+    expect(scene.filter((step) => typeof step === 'string')).toEqual([
+      'The opposing Tyranitar floats in the air with its Air Balloon!',
+      "The opposing Tyranitar's Air Balloon popped!",
+    ])
+    expect(scene).toContainEqual({ op: 'item', side: 'far', slot: 0, item: 0 })
+    expect(scene.filter((step) => typeof step !== 'string' && step.op === 'itemPopUp')).toEqual([])
+    expect(fallbacksFrom(result, NEXT)).toEqual([])
   })
 })
