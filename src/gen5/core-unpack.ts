@@ -30,6 +30,16 @@ export interface UnpackReport {
   ms: number
 }
 
+/** The name under which the page's worker keeps its last report on its global scope
+ * (src/web/gen5/extract7z.ts), for the scripts to read (scripts/gen5-page.ts). */
+export const UNPACK_REPORT = 'gen5Unpack'
+
+/** The worker's global scope as far as the report goes: one type for the worker and the scripts,
+ * as src/gen5/hook.ts is for window.gen5. */
+export interface UnpackGlobal {
+  [UNPACK_REPORT]?: UnpackReport
+}
+
 /** The archive's bytes from the message EmulatorJS posts: a Uint8Array, or a bare buffer. */
 function bytesOf(data: unknown): Uint8Array {
   if (ArrayBuffer.isView(data)) return new Uint8Array(data.buffer, data.byteOffset, data.byteLength)

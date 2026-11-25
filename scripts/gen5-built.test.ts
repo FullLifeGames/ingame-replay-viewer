@@ -17,7 +17,7 @@ import {
 import { writeLicencesPage } from './gen5-licences-read'
 import { archiveName, COMPONENTS, SITE_FILES } from './gen5-manifest'
 import { GEN5_PATHS } from './gen5-paths'
-import { DONE, FILE } from '../src/gen5/core-unpack'
+import { DONE, FILE, UNPACK_REPORT, type UnpackGlobal } from '../src/gen5/core-unpack'
 import { UNPACKER_PATH, UNPACKER_SCRIPT } from '../src/gen5/unpacker'
 import { fromBase64 } from '../src/gen5/lzma.fixtures'
 import { ARCHIVES } from '../src/gen5/seven-zip.fixtures'
@@ -174,17 +174,21 @@ interface Posted {
   transfer: readonly ArrayBuffer[]
 }
 
+type Scope = { onmessage?: (event: { data: unknown }) => void } & UnpackGlobal &
+  Record<string, unknown>
+
 /** Runs `script` as EmulatorJS runs its unpacker: a classic script (a module's import or export
- * fails to compile here) whose global scope is `self`, then one message with the archive. */
-function runClassic(script: string, archive: Uint8Array): Posted[] {
+ * fails to compile here) whose global scope is `self`, then one message with the archive. Gives
+ * the posts and the scope the script left behind. */
+function runClassic(script: string, archive: Uint8Array): { posted: Posted[]; scope: Scope } {
   const posted: Posted[] = []
-  const scope: { onmessage?: (event: { data: unknown }) => void } & Record<string, unknown> = {
+  const scope: Scope = {
     postMessage: (message: Posted['message'], options: { transfer: ArrayBuffer[] }) =>
       posted.push({ message, transfer: options.transfer }),
   }
   new Script(script).runInNewContext({ self: scope, performance, TextDecoder })
   scope.onmessage?.({ data: archive })
-  return posted
+  return { posted, scope }
 }
 
 // Scene: EmulatorJS fetches the unpacker as text and starts it from a Blob URL as a classic
@@ -198,7 +202,7 @@ describe('the unpacker script', () => {
 
   it('is one classic script that unpacks an archive in EmulatorJS shapes', () => {
     expect(script).not.toMatch(/^\s*(import|export)\b/m)
-    const posted = runClassic(script, fromBase64(ARCHIVES.encodedHeader))
+    const { posted } = runClassic(script, fromBase64(ARCHIVES.encodedHeader))
     expect(posted.map(({ message }) => [message.t, message.file])).toEqual([
       [4, undefined],
       [FILE, 'alpha.txt'],
@@ -207,6 +211,17 @@ describe('the unpacker script', () => {
       [DONE, undefined],
     ])
     expect(posted[1]?.transfer).toEqual([posted[1]?.message.data?.buffer])
+  })
+
+  // Scene: scripts/gen5-page.ts reads the unpack report from the worker under the name that
+  // src/gen5/core-unpack.ts gives it (review W3).
+  it('leaves its report on its global scope under the name the scripts read', () => {
+    const { scope } = runClassic(script, fromBase64(ARCHIVES.encodedHeader))
+    expect(scope[UNPACK_REPORT]).toEqual({
+      files: 2,
+      bytes: 5500,
+      ms: expect.any(Number) as number,
+    })
   })
 
   it('is what the build writes beside the page', async () => {

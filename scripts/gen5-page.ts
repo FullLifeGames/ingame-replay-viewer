@@ -5,7 +5,7 @@ import { join } from 'node:path'
 
 import type { Page } from '@playwright/test'
 
-import type { UnpackReport } from '../src/gen5/core-unpack.ts'
+import { UNPACK_REPORT, type UnpackGlobal, type UnpackReport } from '../src/gen5/core-unpack.ts'
 import { type Gen5Global, RETRO_START } from '../src/gen5/hook.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { loadAverage, sampleMemory } from './gen5-proc.ts'
@@ -74,7 +74,10 @@ export async function waitForStart(page: Page): Promise<void> {
 export async function logUnpack(page: Page): Promise<void> {
   for (const worker of page.workers()) {
     const report = await worker
-      .evaluate(() => (globalThis as { gen5Unpack?: UnpackReport }).gen5Unpack)
+      .evaluate<UnpackReport | undefined, typeof UNPACK_REPORT>(
+        (key) => (globalThis as UnpackGlobal)[key],
+        UNPACK_REPORT,
+      )
       .catch(() => undefined)
     if (report === undefined) continue
     log(
