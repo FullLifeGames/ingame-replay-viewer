@@ -37,9 +37,16 @@ export class AudioOpener {
     )
   }
 
-  /** Resumes the open context at once and returns its promise; nothing before the first open. */
-  resumeNow(): Promise<void> {
-    return this.opened?.resume() ?? Promise.resolve()
+  /**
+   * Resumes the open context at once; nothing before the first open. Resolves with why the sound
+   * stays off when the browser refuses the resume (#69), and with undefined otherwise.
+   */
+  resumeNow(): Promise<string | undefined> {
+    if (this.opened === undefined) return Promise.resolve(undefined)
+    return this.opened.resume().then(
+      () => undefined,
+      (error: unknown) => `the audio did not resume: ${messageOf(error)}`,
+    )
   }
 
   /** Suspends the open context; the ring keeps its samples for the next resume. */
@@ -48,7 +55,7 @@ export class AudioOpener {
   }
 
   private started(context: AudioContext): Promise<Sound> {
-    return this.resumeNow().then(
+    return context.resume().then(
       () => context,
       (error: unknown) => `the audio did not start: ${messageOf(error)}`,
     )

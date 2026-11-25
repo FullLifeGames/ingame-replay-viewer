@@ -73,6 +73,30 @@ describe('diffScenes', () => {
     ])
   })
 
+  it('compares the final frame of a refused run, which writes no scene frame', () => {
+    const refusedOurs = join(root, 'refused-ours')
+    const refusedTheirs = join(root, 'refused-theirs')
+    mkdirSync(refusedOurs)
+    mkdirSync(refusedTheirs)
+    const changed = blank()
+    changed.rgb[3 * (2 * 4 + 1)] = 8
+    writeFileSync(join(refusedOurs, 'final.ppm'), ppm(changed))
+    writeFileSync(join(refusedOurs, 'op-frames.txt'), 'op-frames 1 module version-4\n')
+    writeFileSync(join(refusedTheirs, 'final.ppm'), ppm(blank()))
+    expect(diffScenes(refusedOurs, refusedTheirs)).toEqual([
+      { scene: 'final', diff: { pixels: 1, box: { x0: 1, y0: 2, x1: 1, y1: 2 } } },
+    ])
+  })
+
+  it('names a refused run whose final frame mGBA lacks', () => {
+    const refusedOurs = join(root, 'refused-alone')
+    mkdirSync(refusedOurs)
+    writeFileSync(join(refusedOurs, 'final.ppm'), ppm(blank()))
+    expect(() => diffScenes(refusedOurs, join(root, 'theirs'))).toThrow(
+      /no mGBA frame .*final\.ppm/,
+    )
+  })
+
   it('names a scene that mGBA has no frame for', () => {
     writeFileSync(join(ours, 'win.ppm'), ppm(blank()))
     expect(() => diffScenes(ours, theirs)).toThrow(/no mGBA frame .*win\.ppm/)

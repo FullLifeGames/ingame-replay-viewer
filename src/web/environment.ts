@@ -28,10 +28,7 @@ export function environmentProblem(
   runner = 'the emulator',
 ): EnvironmentProblem | undefined {
   if (!environment.isSecureContext) {
-    const detail =
-      `This page is not a secure context, so ${runner} cannot run. Open it on devbox at ` +
-      'http://localhost:5177, or over the HTTPS address that tailscale serve gives it ' +
-      '(see src/web/README.md).'
+    const detail = `This page is not a secure context, so ${runner} cannot run. The page needs HTTPS.`
     return { kind: 'insecure', detail }
   }
   if (!environment.crossOriginIsolated) {

@@ -23,6 +23,7 @@ const REAL_VALUES: Readonly<Record<string, string>> = {
   largest: '5',
   address: 'https://viewer.example.org/replays/',
   words: 'Pick your US Emerald dump first, then press Start.',
+  replay: 'smogtours-gen3ou-994052',
 }
 
 /** U+FFFD, the character that stands for one that cannot be written. */

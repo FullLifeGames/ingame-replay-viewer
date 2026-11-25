@@ -18,6 +18,7 @@ import {
 import type { TestReplay } from './replays'
 import { checkBaseRom, patchBaseRom, readSlotDescription } from './rom'
 import { ROM_FILES } from './rom-files'
+import type { PlayingGame } from './visitor'
 
 /** What the page hands the session: its GETs, the emulator's loader and the crash line's sink. */
 export interface SessionDeps {
@@ -55,6 +56,12 @@ export interface Session {
   loadReplay(input: string): Promise<ReplaySummary | undefined>
   start(): Promise<StartSummary>
   restart(): void
+  /**
+   * The game the emulator runs, which a failed pick names (#69): the last Start's replay, until the
+   * core crashed or a Start took the game down. The page cannot tell END in mGBA, so a game past
+   * END still counts, and the game says so.
+   */
+  readonly playing: () => PlayingGame | undefined
 }
 
 /** `make`'s promise, made at the first call and made again after it failed. */
@@ -90,9 +97,13 @@ export function createSession(deps: SessionDeps): Session {
   const dumps = newest<Dump>(false)
   const replays = createReplayChoice(deps.fetchJson)
   let loaded: Emulator | undefined
+  let playing: string | undefined
   const emulator = once(async () => {
     const ready = await step('Could not start the emulator', deps.loadEmulator)
-    ready.onCrash(deps.onCrash)
+    ready.onCrash((line) => {
+      playing = undefined
+      deps.onCrash(line)
+    })
     loaded = ready
     return ready
   })
@@ -112,10 +123,13 @@ export function createSession(deps: SessionDeps): Session {
       writeReplaySlot(dump.rom, dump.description, chosen.bytes),
     )
     const running = await emulator()
+    // The emulator quits the game it runs before it loads the ROM, which it may refuse.
+    playing = undefined
     await step('Could not start the emulator', () => {
       running.run(rom)
     })
     const { id, streamBytes } = chosen.summary
+    playing = id
     return { id, streamBytes }
   }
 
@@ -127,6 +141,7 @@ export function createSession(deps: SessionDeps): Session {
     pickTestReplay: replays.pickTestReplay,
     loadReplay: replays.loadReplay,
     start,
+    playing: () => (playing === undefined ? undefined : { replay: playing, tellsEnd: false }),
     restart: () => {
       try {
         if (loaded === undefined) throw new EmulatorError(NOT_STARTED_LINE)

@@ -7,7 +7,7 @@ function setUp() {
   return { runs: new Runs<string>((run) => stopped.push(run)), stopped }
 }
 
-describe("the spike page's runs", () => {
+describe("the viewer's runs", () => {
   it('stops the current run when another replaces it, so one at most is live', () => {
     const { runs, stopped } = setUp()
     runs.replace('first')

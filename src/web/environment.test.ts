@@ -3,16 +3,16 @@ import { describe, expect, it } from 'vitest'
 import { environmentProblem, startsModuleWorkers } from './environment'
 
 describe('environmentProblem', () => {
-  // Opened as http://100.x.y.z:5177 over Tailscale: not a secure context, so no SharedArrayBuffer.
-  // The user reads this line on their own phone or PC, where localhost is not devbox.
-  it('names devbox, its localhost address and the tailnet HTTPS route on an insecure page', () => {
+  // Opened over plain HTTP from another device: not a secure context, so no SharedArrayBuffer. A
+  // visitor reads this line under "Details": it names what the page needs, and no machine,
+  // address or tool of the developers.
+  it('names HTTPS and no machine, address or tool on an insecure page', () => {
     const problem = environmentProblem({ isSecureContext: false, crossOriginIsolated: false })
     expect(problem?.kind).toBe('insecure')
-    const line = problem?.detail
-    expect(line).toContain('secure context')
-    expect(line).toContain('on devbox at http://localhost:5177')
-    expect(line).toContain('tailscale serve')
-    expect(line).toContain('src/web/README.md')
+    expect(problem?.detail).toBe(
+      'This page is not a secure context, so the emulator cannot run. The page needs HTTPS.',
+    )
+    expect(problem?.detail).not.toMatch(/devbox|localhost|tailscale|README|npm run|:\/\//i)
   })
 
   it('names the COOP and COEP headers on a secure page that is not cross-origin isolated', () => {
@@ -24,7 +24,7 @@ describe('environmentProblem', () => {
     expect(line).toContain('Cross-Origin-Embedder-Policy: require-corp')
   })
 
-  // The WebAssembly spike page runs no emulator; its lines name the game instead.
+  // The viewer runs no emulator; its lines name the game instead.
   it('names what the page runs', () => {
     for (const isSecureContext of [false, true]) {
       const environment = { isSecureContext, crossOriginIsolated: false }

@@ -3,6 +3,9 @@
 // of a frame or a pair of frames; checkShots answers a scene's question from its named frames.
 import type { Side } from '../src/script/types.ts'
 
+import { placedVerdict } from './rom-shot-placed.ts'
+import type { PlacedCheck } from './rom-shot-placed.ts'
+
 export interface Frame {
   width: number
   height: number
@@ -103,6 +106,7 @@ export type Check =
       background?: number
     }
   | { probe: 'balls'; shot: string; cells: readonly Region[]; colour: number; balls: number }
+  | PlacedCheck
 
 export interface Verdict {
   pass: boolean
@@ -265,6 +269,8 @@ function verdictOf(check: Check, frame: (name: string) => Frame): Verdict {
       return textVerdict(frame(check.shot), check)
     case 'balls':
       return ballsVerdict(frame(check.shot), check)
+    case 'placed':
+      return placedVerdict(frame(check.before), frame(check.after), check)
   }
 }
 

@@ -1,4 +1,4 @@
-// The compile census of the WebAssembly spike (#35, plan B1): every C file of the tree once through
+// The compile census of the WebAssembly build (#35, plan B1): every C file of the tree once through
 // emcc, each with its result, its first error and its class, so B3 knows which fix each failure
 // needs (per-file flag, shadow header, exclusion with a replacement, overlay patch).
 

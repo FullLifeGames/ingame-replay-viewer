@@ -32,7 +32,13 @@
 // end, as a player who holds B; no other key is ever down. Frames count from 1, so n 1 holds B
 // from the first frame the core runs.
 //
-// Output on stdout, one JSON object per line: {"shot":...} for each shot, then {"status":...}.
+// The op log (#71): on the first frame the interpreter plays with `done` at an op's index, the op
+// started, and the tool prints {"op":<index>,"frame":<frame>}; `done` at the op count is END's
+// finish. scripts/op-frames.ts holds the same rule for the WebAssembly build (OpClock) and writes
+// both engines' logs.
+//
+// Output on stdout, one JSON object per line: {"shot":...} for each shot, {"op":...} for each op
+// start, then {"status":...}.
 // Exit code 0 when the run reached a status, 2 on a usage or emulator error.
 
 #include <mgba/core/blip_buf.h>
@@ -94,6 +100,7 @@ struct Run
     int shotCount;
     unsigned long stateEvery;
     unsigned long holdBFrom;
+    unsigned nextOp;
     bool fixedClock;
     time_t clock;
 };
@@ -241,6 +248,15 @@ static bool TakeShots(struct Run *run, struct Progress progress, unsigned long f
     return true;
 }
 
+// Prints each op that starts on this frame: every index from the next one up to `done`.
+static void LogOps(struct Run *run, struct Progress progress, unsigned long frame)
+{
+    if (!progress.playing)
+        return;
+    for (; run->nextOp <= progress.done; run->nextOp++)
+        printf("{\"op\":%u,\"frame\":%lu}\n", run->nextOp, frame);
+}
+
 static bool ShotsDue(const struct Run *run)
 {
     int i;
@@ -294,6 +310,7 @@ static const char *Play(struct Run *run, unsigned long *frame, struct Progress *
         if (!DumpState(run, *frame))
             return NULL;
         *progress = ReadProgress(run);
+        LogOps(run, *progress, *frame);
         if (!TakeShots(run, *progress, *frame))
             return NULL;
         if (progress->error != 0 && errorFrame == 0)

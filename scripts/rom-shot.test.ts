@@ -94,6 +94,18 @@ describe('the scenes a run must have', () => {
   })
 })
 
+describe('the ops of a plan (#71)', () => {
+  it("are the stream's ops by name, for the op frame log; the empty slot has none", async () => {
+    const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
+    const [handMade, empty, version] = await planStreams(['hand-made'], layout)
+    expect(empty).toMatchObject({ ops: [] })
+    expect(handMade?.ops).toContain('move')
+    expect(handMade?.ops[0]).toBe('intro')
+    expect(handMade?.ops.at(-1)).toBe('end')
+    expect(version?.ops).toEqual(handMade?.ops)
+  }, 60_000)
+})
+
 describe.skipIf(!existsSync(buildPaths().tree))('the send-out plans (#66, pinned tree)', () => {
   it('are one plan per battle, each to its end, before the two refusals', async () => {
     const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))

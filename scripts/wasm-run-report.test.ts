@@ -27,6 +27,7 @@ const plan = (name: string, stream: number[], holdBFrom?: number): ShotPlan => (
   scenes: [],
   missing: [],
   expect: 'finished',
+  ops: [],
   ...(holdBFrom === undefined ? {} : { holdBFrom }),
 })
 

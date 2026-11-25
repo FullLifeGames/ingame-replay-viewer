@@ -6,8 +6,8 @@
 // the same stream with B held from the first frame, which must show every scene (#30, #68). Two
 // refusal runs follow: the built ROM's empty slot (refused as EMPTY) and the hand-made stream with
 // an unknown version (refused as VERSION).
-// Frames, the ROMs and report.json go to build/rom/shots/. Needs a ROM from npm run rom:build and
-// libmgba-dev.
+// Frames, each stream's op frame log (op-frames.ts), the ROMs and report.json go to
+// build/rom/shots/. Needs a ROM from npm run rom:build and libmgba-dev.
 import { createHash } from 'node:crypto'
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -15,8 +15,10 @@ import { parseArgs } from 'node:util'
 
 import { runnerImport } from 'vite'
 
+import type { Stream } from '../src/gen3/stream/instructions.ts'
 import type { SlotDescription } from '../src/patch/slot.ts'
 import { writeReplaySlot } from '../src/patch/slot.ts'
+import { opFrameLog, writeOpFrames } from './op-frames.ts'
 import { nmOutput } from './rom-build.ts'
 import { runCliAsync } from './rom-cli.ts'
 import { OUTPUT_NAMES } from './rom-outputs.ts'
@@ -98,6 +100,8 @@ export interface StreamPlan {
   /** The scenes the stream lacks. */
   missing: string[]
   expect: Expected
+  /** The stream's ops by name, in order, for the op frame log (#71). */
+  ops: string[]
 }
 
 /** A stream plan as the shot tool and the module's runner play it. */
@@ -176,6 +180,7 @@ export async function planStreams(
 ): Promise<StreamPlan[]> {
   const shot = await loadShotStream()
   const plays = names.flatMap((named) => namedStreams(shot, named))
+  const opsOf = (stream: Stream) => stream.instructions.map(({ op }) => op)
   const played = plays.map(([name, bytes]): StreamPlan => {
     const stream = shot.decodeStream(bytes)
     return {
@@ -184,18 +189,20 @@ export async function planStreams(
       scenes: scenesOf(stream),
       missing: missingScenes(stream),
       expect: 'finished',
+      ops: opsOf(stream),
     }
   })
-  const refused = refusalScenes(layout.refusedColour)
+  const refused = { scenes: refusalScenes(layout.refusedColour), missing: [] }
+  const handMade = shot.handMadeBytes()
   return [
     ...played,
-    { name: 'empty-slot', stream: undefined, scenes: refused, missing: [], expect: 'EMPTY' },
+    { name: 'empty-slot', stream: undefined, ...refused, expect: 'EMPTY', ops: [] },
     {
       name: `version-${String(shot.UNKNOWN_VERSION)}`,
-      stream: shot.withVersion(shot.handMadeBytes(), shot.UNKNOWN_VERSION),
-      scenes: refused,
-      missing: [],
+      stream: shot.withVersion(handMade, shot.UNKNOWN_VERSION),
+      ...refused,
       expect: 'VERSION',
+      ops: opsOf(shot.decodeStream(handMade)),
     },
   ]
 }
@@ -247,6 +254,7 @@ function playRun(context: Context, plan: RunPlan): RunReport {
     ...(plan.holdBFrom === undefined ? {} : { holdBFrom: plan.holdBFrom }),
   })
   const seconds = Math.round((performance.now() - start) / 100) / 10
+  writeOpFrames(frameDir, opFrameLog({ engine: 'mgba', stream: plan.name }, output.ops, plan.ops))
   return reportRun({ plan, output, frames: readFrames(frameDir), errors: context.errors, seconds })
 }
 

@@ -5,8 +5,9 @@
 // module cannot be interrupted from Node, so each stream runs in its own process under timeout:
 // `--play <dir>` writes the stream into the module's slot, calls AgbMain and answers as the shot
 // tool (rom/gen3/shot/replay_shot.c) does, with the frames of its shots as PPM in <dir> and one
-// JSON line per shot and the status on stdout, and END or the trap in <dir>/outcome.json. Frames
-// and report.json go to build/wasm/run/.
+// JSON line per shot, per op start and for the status on stdout, and END or the trap in
+// <dir>/outcome.json. Frames, each stream's op frame log (op-frames.ts) and report.json go to
+// build/wasm/run/.
 // `--baseline` and `--against-baseline` add the A/B of wasm-hashes.ts (#43). `--sanitize shift`
 // plays the module of `wasm:build -- --sanitize shift` (#44) and writes under build/wasm/sanitize.
 // `--all` plays every test replay after the named streams. A stream that fails ends only itself;
@@ -21,7 +22,7 @@ import { AudioMeter } from '../src/web/wasm/audio.ts'
 import { FRAME_HEIGHT, FRAME_WIDTH, widenFrame } from '../src/web/wasm/frame.ts'
 import type { GameModule, ModuleHooks } from '../src/web/wasm/game.ts'
 import { readProgress } from '../src/web/wasm/progress.ts'
-import type { Progress } from '../src/web/wasm/progress.ts'
+import { opFrameLog, writeOpFrames } from './op-frames.ts'
 import { runCliAsync } from './rom-cli.ts'
 import { emptyInside, REPO_DIR } from './rom-paths.ts'
 import type { Frame } from './rom-shot-probes.ts'
@@ -67,20 +68,17 @@ import {
 } from './wasm-run-report.ts'
 import type { StreamReport } from './wasm-run-report.ts'
 import { SoundLog } from './wasm-run-sound.ts'
+import { Watch } from './wasm-run-watch.ts'
 
 // The module's shape lives in src/web/wasm, which the page's worker shares.
+export { STALL_FRAMES } from './wasm-run-watch.ts'
 export type { GameModule, ModuleHooks } from '../src/web/wasm/game.ts'
 
 type ModuleFactory = (hooks: ModuleHooks) => Promise<GameModule>
 
-// The rules of the shot tool's run (replay_shot.c): a stall is this many frames on one op, and a
-// refused run ends this many frames after the error, with the refusal screen up.
-export const STALL_FRAMES = 3600
-const ERROR_FRAMES = 30
 // A run of 994052 takes about 41000 frames; the module plays a few hundred per second.
 const RUN_SECONDS = 900
 
-type Shot = Scene['shots'][number]
 type Status = ToolOutput['status']
 
 /** The module's 240x160 BGR555 frame as the shot tool's frames show it, each channel widened. */
@@ -118,58 +116,6 @@ function holdB(game: GameModule, next: number, from: number | undefined): void {
 // number as a longjmp (B3b, R24).
 class Stop extends Error {
   override name = 'Stop'
-}
-
-/** The shot tool's loop (Play and TakeShots in replay_shot.c), one frame at a time. */
-class Watch {
-  frame = 0
-  finishedAt: number | undefined
-  readonly lines: ToolOutput['shots'] = []
-  readonly frames = new Map<string, Frame>()
-  private readonly due = new Map<string, number>()
-  private lastDone = 0
-  private lastChange = 0
-  private errorFrame = 0
-
-  private readonly shots: readonly Shot[]
-
-  constructor(shots: readonly Shot[]) {
-    this.shots = shots
-  }
-
-  /** Takes the shots due on this frame; returns the status when the run ends on it. */
-  step(progress: Progress, frame: () => Frame): Status['status'] | undefined {
-    this.frame++
-    this.takeShots(progress, frame)
-    this.noteFirsts(progress)
-    if (this.errorFrame !== 0 && this.frame - this.errorFrame >= ERROR_FRAMES) return 'error'
-    if (progress.finished && !this.shotsDue()) return 'finished'
-    if (progress.done !== this.lastDone) {
-      this.lastDone = progress.done
-      this.lastChange = this.frame
-    }
-    return this.frame - this.lastChange >= STALL_FRAMES ? 'stall' : undefined
-  }
-
-  private noteFirsts(progress: Progress): void {
-    if (progress.finished && this.finishedAt === undefined) this.finishedAt = this.frame
-    if (progress.error !== 0 && this.errorFrame === 0) this.errorFrame = this.frame
-  }
-
-  private takeShots(progress: Progress, frame: () => Frame): void {
-    for (const shot of this.shots) {
-      if (!this.due.has(shot.name) && progress.playing && progress.done === shot.done) {
-        this.due.set(shot.name, this.frame + shot.frames)
-      }
-      if (this.due.get(shot.name) !== this.frame || this.frames.has(shot.name)) continue
-      this.frames.set(shot.name, frame())
-      this.lines.push({ shot: shot.name, frame: this.frame, done: progress.done })
-    }
-  }
-
-  private shotsDue(): boolean {
-    return this.shots.some((shot) => this.due.has(shot.name) && !this.frames.has(shot.name))
-  }
 }
 
 export interface PlayRequest {
@@ -237,7 +183,7 @@ export async function playModule(
     game._AgbMain()
   } catch (error) {
     if (!(error instanceof Stop) || status === undefined) throw new ModuleTrap(watch.frame, error)
-    const output = { shots: watch.lines, status }
+    const output = { shots: watch.lines, ops: watch.ops.starts, status }
     const { frames, finishedAt } = watch
     return { output, frames, finishedAt, audio, sound, hashes: hashes.done() }
   }
@@ -296,7 +242,7 @@ async function playDir(dir: string): Promise<void> {
     `${basename(dir)}: sound ${String(samples)} samples, ${perFrame.toFixed(1)} per frame, rms ${rms.toFixed(4)}`,
   )
   sayMusic(basename(dir), run.sound, run.output.status.frame, say)
-  const lines = [...run.output.shots, run.output.status]
+  const lines = [...run.output.shots, ...run.output.ops, run.output.status]
   process.stdout.write(lines.map((line) => `${JSON.stringify(line)}\n`).join(''))
 }
 
@@ -329,6 +275,7 @@ function runStream(plan: ShotPlan, { runDir, module, errors, baseline }: StreamR
     throw new Error(`${plan.name}: the run failed (exit ${String(result.status)})`)
   const end = readEnd(dir)
   const output = readToolOutput(result.stdout)
+  writeOpFrames(dir, opFrameLog({ engine: 'module', stream: plan.name }, output.ops, plan.ops))
   const report = reportRun({ plan, output, frames: readFrames(dir), errors, seconds })
   const settled = settleBaseline(baseline, plan.name, join(dir, RUN_HASHES))
   if (settled.equal !== undefined) say(settled.equal)

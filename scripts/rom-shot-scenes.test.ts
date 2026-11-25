@@ -269,11 +269,16 @@ describe('the scene points of a decoded instruction list (S6)', () => {
     const compared = { probe: 'differs', before: 'win', after: 'outro' }
     const near = { x: 48, y: 48, width: 64, height: 64 }
     expect(outro('farWon')?.shots).toEqual([{ name: 'outro', done: 2, frames: 150 }])
+    const far = { x: 176, y: 8, width: 64, height: 64 }
     expect(outro('farWon', [{ op: 'intro' }])?.check).toEqual({
-      ...compared,
-      region: { x: 176, y: 8, width: 64, height: 64 },
-      kept: SCREEN.message,
+      probe: 'placed',
+      before: 'intro',
+      after: 'outro',
+      from: { ...far, x: 144 },
+      to: far,
+      reach: 16,
     })
+    expect(outro('farWon')?.check).toEqual({ ...compared, region: far, kept: SCREEN.message })
     expect(outro('nearWon', [{ op: 'intro' }])?.check).toEqual({
       probe: 'same',
       before: 'intro',
