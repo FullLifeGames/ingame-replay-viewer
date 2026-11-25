@@ -29,10 +29,10 @@ const OP_FRAMES_FILE = 'op-frames.txt'
 const FINISHED = 'finished'
 
 /**
- * Frames by which a start, counted from op 0, may part before the compare names the op. On
- * hand-made and 993907 the gap steps by 1 frame at 20 ops and by 3 at two moves, and by 13 to 40
- * frames at near send-outs, whose back animation follows the mon's nature (#71). Three keeps the
- * small steps out and names the first large one.
+ * Frames by which a start, counted from op 0, may part before the compare names the op. Over the
+ * hand-made battle and the eleven test replays a move steps the gap by 3 frames at most and a stat
+ * change or an animation by 1, while a send-out or a switch-in steps it by up to 44 (#71). Three
+ * keeps the small steps out and names the first large one.
  */
 export const DEFAULT_THRESHOLD = 3
 
