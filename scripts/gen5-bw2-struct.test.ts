@@ -108,3 +108,61 @@ describe('structLayout', () => {
     expect(firstMember(SOURCE, 'Lamp')).toBe('u32 glow')
   })
 })
+
+// Invented structs in the shape of the direct entry's (#97): a 64-bit member after a word, which
+// the game's compiler (MWCC) puts at a multiple of 4 and not of 8, inside a nested struct; a
+// scalar typedef; a const pointer; an unnamed bit-field; an array sized by a define and one of two
+// dimensions; and a 64-bit member at the end.
+const ENTRY_SOURCE = `
+#define SEAT_COUNT 3
+typedef u16 TrackId;
+
+typedef struct {
+    u32 face;
+    u64 seed;
+} Dice;
+
+struct Coach {
+    TrackId track;
+    Dice dice;
+    const Wagon *next;
+    u16 lamp : 3;
+    u16 : 5;
+    u16 horn : 2;
+    u8 seats[SEAT_COUNT];
+    u8 rows[2][3];
+    s64 drift;
+};
+`
+
+// Scene: the page writes the battle setup's members at the offsets the game's code reads, and the
+// setup holds the battle's random state of three 64-bit words.
+describe("structLayout on the direct entry's shapes", () => {
+  it('puts a 64-bit member at a multiple of 4, inside a nested struct and at the end', () => {
+    expect(structLayout(ENTRY_SOURCE, 'Dice')).toEqual({
+      size: 12,
+      align: 4,
+      fields: { face: { offset: 0, size: 4 }, seed: { offset: 4, size: 8 } },
+    })
+    const coach = structLayout(ENTRY_SOURCE, 'Coach')
+    expect(coach.fields).toEqual({
+      track: { offset: 0, size: 2 },
+      dice: { offset: 4, size: 12 },
+      'dice.face': { offset: 4, size: 4 },
+      'dice.seed': { offset: 8, size: 8 },
+      next: { offset: 16, size: 4 },
+      lamp: { offset: 20, size: 2, bit: 0, bits: 3 },
+      horn: { offset: 20, size: 2, bit: 8, bits: 2 },
+      seats: { offset: 22, size: 3 },
+      rows: { offset: 25, size: 6 },
+      drift: { offset: 32, size: 8 },
+    })
+    expect(coach.size).toBe(40)
+    expect(coach.align).toBe(4)
+  })
+
+  it('throws on an array sized by a name that no define gives', () => {
+    const odd = ENTRY_SOURCE.replace('#define SEAT_COUNT 3', '')
+    expect(() => structLayout(odd, 'Coach')).toThrow(/SEAT_COUNT/)
+  })
+})
