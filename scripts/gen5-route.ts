@@ -18,7 +18,7 @@ import { battleRefs } from '../src/gen5/battle-check.ts'
 import type { Bw2Numbers, RoutePlaces } from '../src/gen5/bw2-numbers.ts'
 import { continueRoute, MENU_LIMIT } from '../src/gen5/continue-route.ts'
 import type { Gen5Global, RunPlan, RunReport } from '../src/gen5/hook.ts'
-import { type MacroStep, routeSlice } from '../src/gen5/macro.ts'
+import { routeSlice } from '../src/gen5/macro.ts'
 import { newGameRoute, PLAYER_X, PLAYER_Z } from '../src/gen5/route.ts'
 import { SAVE_SLOT_BEFORE_POKEMON, saveGame } from '../src/gen5/save-menu.ts'
 import { FIELD_X, FIELD_Z, trainerRoute } from '../src/gen5/trainer-route.ts'
@@ -78,21 +78,18 @@ async function queue(page: Page, plan: RunPlan, save: string | undefined): Promi
 }
 
 /** The continue route's count from the mark `title` (#78): to the first frame the battle checks
- * held, which is the mark `battle` less the frames they went on holding, and to the mark itself,
- * each against MENU_LIMIT. */
-function logMenuCount(report: RunReport, steps: readonly MacroStep[]): void {
+ * held, the mark `action`, and to the mark `battle`, each against MENU_LIMIT. */
+function logMenuCount(report: RunReport): void {
   const frameOf = (name: string) => report.marks.find((record) => record.name === name)?.frame
-  const [title, battle] = [frameOf('title'), frameOf('battle')]
-  const standing = steps.find((step) => step.kind === 'until' && step.name === 'battle')
-  if (title === undefined || battle === undefined || standing?.kind !== 'until') {
-    log('menu count: the run has no marks title and battle')
+  const [title, action, battle] = [frameOf('title'), frameOf('action'), frameOf('battle')]
+  if (title === undefined || action === undefined || battle === undefined) {
+    log('menu count: the run has no marks title, action and battle')
     return
   }
   const against = (frames: number) =>
     `${String(frames)} (${frames <= MENU_LIMIT ? 'within' : 'OVER'} the limit of ${String(MENU_LIMIT)})`
-  const held = battle - (standing.holdFor - 1) - title
   log(
-    `menu count from title: to the first frame the battle checks hold ${against(held)}, to the mark battle ${against(battle - title)}`,
+    `menu count from title: to the first frame the battle checks hold ${against(action - title)}, to the mark battle ${against(battle - title)}`,
   )
 }
 
@@ -109,7 +106,7 @@ async function play(page: Page, dump: string, plan: RunPlan, options: RouteOptio
   }
   const report = await follow(page, options)
   await logEnd(page, options, plan.watch)
-  if (options.route === 'continue') logMenuCount(report, plan.steps)
+  if (options.route === 'continue') logMenuCount(report)
   log(`${sampleLine()}; status: ${report.status}`)
   let taken = true
   if (options.takeSave !== undefined) {

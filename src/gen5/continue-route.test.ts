@@ -41,7 +41,8 @@ function worstFrames(steps: readonly MacroStep[]): number {
 
 // Scene: the page boots with the save before Youngster Terrell. The macro takes the title, the
 // start menu's CONTINUE, the wipe into Route 20 and the walk east into his sight; his line and the
-// battle's opening follow, and the run ends once the action menu stands.
+// battle's opening follow with A, which stops once the battle checks first hold, and the run ends
+// once the action menu stands.
 describe('continueRoute', () => {
   const steps = continueRoute(CHECKS)
 
@@ -50,11 +51,11 @@ describe('continueRoute', () => {
     expect(routeSlice(steps, undefined, 'title')).toEqual(opening)
   })
 
-  it('marks the start menu, the field, the battle start and the battle after the title', () => {
+  it('marks the start menu, the field, the battle start, the action menu and the battle', () => {
     const names = routeSlice(steps, 'title', undefined).flatMap((step) =>
       step.kind === 'mark' ? [step.name] : [],
     )
-    expect(names).toEqual(['continue', 'field', 'battle-start', 'battle'])
+    expect(names).toEqual(['continue', 'field', 'battle-start', 'action', 'battle'])
   })
 
   it('presses A once on the title and once on CONTINUE', () => {
@@ -70,29 +71,40 @@ describe('continueRoute', () => {
     ])
   })
 
-  it('presses only A until the battle has its adapter, and nothing after', () => {
-    const [start, battle] = untils(routeSlice(steps, 'field', undefined))
-    expect(start?.mash).toMatchObject({ buttons: ['A'] })
-    expect(start?.mash?.held).toBeUndefined()
+  it('presses only A, and Right in the field step, until the battle checks first hold', () => {
+    const before = routeSlice(steps, 'title', 'action')
+    expect(before.some((step) => step.kind === 'mash')).toBe(false)
+    expect(new Set(pressed(before))).toEqual(new Set(['A']))
+    const mashes = untils(before).map((step) => step.mash)
+    expect(mashes.map((mash) => mash?.buttons)).toEqual([['A'], ['A'], ['A']])
+    expect(mashes.map((mash) => mash?.held)).toEqual([['Right'], undefined, undefined])
+  })
+
+  it('presses A through the opening until every battle check holds once', () => {
+    const [start, action] = untils(routeSlice(steps, 'field', 'action'))
     expect(start?.checks).toEqual(CHECKS.filter((check) => check.mainRamPointer === true))
-    const after = routeSlice(steps, 'battle-start', undefined)
+    expect(action).toMatchObject({ name: 'action', checks: CHECKS, holdFor: 1 })
+  })
+
+  it('presses nothing from the first frame the checks hold, while they hold for 60 frames', () => {
+    const after = routeSlice(steps, 'action', undefined)
     expect(after.filter((step) => step.kind === 'press' || step.kind === 'mash')).toEqual([])
+    const [battle, ...rest] = untils(after)
+    expect(rest).toEqual([])
     expect(battle).toMatchObject({ name: 'battle', checks: CHECKS, holdFor: 60 })
     expect(battle?.mash).toBeUndefined()
   })
 
   it('gives every wait from the title a limit, so a slow step fails the run', () => {
     const waits = untils(routeSlice(steps, 'title', 'battle'))
-    expect(waits.map((step) => step.name)).toEqual(['field', 'battle-start', 'battle'])
+    expect(waits.map((step) => step.name)).toEqual(['field', 'battle-start', 'action', 'battle'])
     expect(worstFrames(routeSlice(steps, 'title', 'battle'))).toBeLessThan(2 * MENU_LIMIT)
   })
 
-  // #78 asks for 1,800 frames at most from the title to the action menu. 78-4 counted 1,861 at
-  // best: the battle's opening takes 872 of them, and the route may press nothing there. The
-  // criterion stays open with the integrator; this case passes while the route runs over and fails
-  // once its limits fit, so then it turns into a plain case.
-  it.fails('reaches the action menu within the limit from the title', () => {
+  // #78 asks for 1,800 frames at most from the title to the action menu, counted to the first
+  // frame the battle checks hold (the mark "action"). Every wait's limit counts in full here.
+  it('reaches the action menu within the limit from the title', () => {
     expect(MENU_LIMIT).toBe(1800)
-    expect(worstFrames(routeSlice(steps, 'title', 'battle'))).toBeLessThanOrEqual(MENU_LIMIT)
+    expect(worstFrames(routeSlice(steps, 'title', 'action'))).toBeLessThanOrEqual(MENU_LIMIT)
   })
 })

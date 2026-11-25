@@ -60,3 +60,42 @@ describe('battleEntry', () => {
     expect(steps[0]).not.toHaveProperty('markEvery')
   })
 })
+
+// Scene: the short route may press A through the battle's opening as well, so its messages pass
+// sooner. A stops on the first frame every check holds, before the action menu can take a press.
+describe('battleEntry through the opening', () => {
+  const limits = { start: 900, battle: 300 }
+  const steps = battleEntry([MODE, POINTER], limits, { every: 4, throughOpening: true })
+  const mash = { buttons: ['A'], every: 4, hold: 2 }
+
+  it('presses A until the adapter, then marks battle-start as without the option', () => {
+    expect(steps.slice(0, 2)).toEqual([
+      { kind: 'until', name: 'battle-start', checks: [POINTER], holdFor: 1, limit: 900, mash },
+      { kind: 'mark', name: 'battle-start' },
+    ])
+  })
+
+  it('presses A on the same beat until every check holds once, then marks action', () => {
+    expect(steps.slice(2, 4)).toEqual([
+      { kind: 'until', name: 'action', checks: [MODE, POINTER], holdFor: 1, limit: 300, mash },
+      { kind: 'mark', name: 'action' },
+    ])
+  })
+
+  it('presses nothing while every check holds for 60 frames, then marks battle', () => {
+    const [hold, end, ...rest] = steps.slice(4)
+    expect(hold).toMatchObject({ kind: 'until', name: 'battle', checks: [MODE, POINTER] })
+    expect(hold).toMatchObject({ holdFor: 60 })
+    expect(hold).not.toHaveProperty('mash')
+    expect(hold?.kind === 'until' && hold.limit).toBeGreaterThanOrEqual(60)
+    expect(hold?.kind === 'until' && hold.limit).toBeLessThanOrEqual(70)
+    expect(end).toEqual({ kind: 'mark', name: 'battle' })
+    expect(rest).toEqual([])
+  })
+
+  it('keeps the steps of today without the option', () => {
+    expect(battleEntry([MODE, POINTER], limits, { every: 4, throughOpening: false })).toEqual(
+      battleEntry([MODE, POINTER], limits, { every: 4 }),
+    )
+  })
+})
