@@ -1,7 +1,8 @@
-// The emulator page in Chromium (plan S5b §5). Tests 1 to 3 need no dump; test 4 reads the user's
-// US Emerald by the build's own rule and skips without it or without the built patch, and fails
-// on a build that lacks part of the patch series. It shows that the emulator runs the replay's
-// ROM; that the replay plays to its end, and that Restart starts it over, is the tester's.
+// The emulator page in Chromium (plan S5b §5). Tests 1 to 3 need no dump; tests 4 and 5 read the
+// user's US Emerald by the build's own rule and skip without it or without the built patch, and
+// fail on a build that lacks part of the patch series. Test 4 shows that the emulator runs the
+// replay's ROM; that the replay plays to its end, and that Restart starts it over, is the
+// tester's. Test 5 loads an ID that Showdown answers with 404 while the game plays (#69).
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -16,10 +17,12 @@ import { readSeries } from '../scripts/rom-upstream.ts'
 import { differ, frame } from './frames.ts'
 import { notShownCount } from './page-text.ts'
 import { guardRequests } from './requests.ts'
+import { loadReplay, showdownUrl } from './showdown.ts'
 
 const EMULATOR = '/emulator.html'
 const FIRST = 'smogtours-gen3ou-994052'
 const SECOND = 'smogtours-gen3ou-994086'
+const MISSING = 'smogtours-gen3ou-1'
 const BASE_SHA1 = loadBuildConfig().baseRom.sha1
 // Words for the developer, which a visitor line never holds (#59).
 const DEVELOPER_WORDS = /npm run|localhost|devbox|tailscale|README/
@@ -37,6 +40,19 @@ function buildProblems(): string[] {
     info,
     readSeries(readFileSync(join(ROM_DIR, 'patches', 'series'), 'utf8')),
   )
+}
+
+/**
+ * Skips without the dump or the built patch, naming what is missing, and fails on a build that
+ * does not boot into the replay.
+ */
+function needBuild(): void {
+  const missing = [
+    existsSync(DUMP) ? undefined : `no US Emerald dump at ${DUMP}; set IRV_BASE_ROM to it`,
+    existsSync(PATCH) ? undefined : `no ${PATCH}; run npm run rom:build`,
+  ].filter((problem) => problem !== undefined)
+  test.skip(missing.length > 0, missing.join(' and '))
+  expect(buildProblems(), 'build/rom/ holds a build that does not boot into the replay').toEqual([])
 }
 
 /** The stream's length that src/gen3's snapshot of 994052 holds (its spec keeps it true). */
@@ -118,13 +134,8 @@ test('a file that is not US Emerald is refused before the patch is fetched', asy
 })
 
 test('994052 starts in the emulator, and a second Start runs 994086', async ({ page, baseURL }) => {
-  const missing = [
-    existsSync(DUMP) ? undefined : `no US Emerald dump at ${DUMP}; set IRV_BASE_ROM to it`,
-    existsSync(PATCH) ? undefined : `no ${PATCH}; run npm run rom:build`,
-  ].filter((problem) => problem !== undefined)
-  test.skip(missing.length > 0, missing.join(' and '))
   test.setTimeout(240_000)
-  expect(buildProblems(), 'build/rom/ holds a build that does not boot into the replay').toEqual([])
+  needBuild()
 
   const { romSha1 } = JSON.parse(readFileSync(SLOT, 'utf8')) as { romSha1: string }
   const streamBytes = snapshotLength()
@@ -182,4 +193,53 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
   expect(await page.evaluate('indexedDB.databases().then((found) => found.length)')).toBe(0)
   expect(errors).toEqual([])
   expect(notSameOriginGets).toEqual([])
+})
+
+test('a Load that fails while a game plays says that the game plays on, and the next pick clears it', async ({
+  page,
+  baseURL,
+}) => {
+  test.setTimeout(240_000)
+  needBuild()
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  const requests = await guardRequests(page, baseURL)
+  // Registered after the guard, so it answers first.
+  await page.route(showdownUrl(MISSING), (route) =>
+    route.fulfill({
+      status: 404,
+      contentType: 'text/plain',
+      headers: { 'access-control-allow-origin': '*' },
+      body: 'Not found',
+    }),
+  )
+  await page.goto(EMULATOR)
+  const status = page.getByRole('status')
+  const detail = page.locator('#status-detail')
+  const details = page.locator('#details')
+  await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles(DUMP)
+  await expect(status).toHaveText(/^Your dump is US Emerald, and the page patched it/, {
+    timeout: 90_000,
+  })
+  await page.getByRole('button', { name: 'Start', exact: true }).click()
+  await expect(status).toHaveText(`Running ${FIRST}.`, { timeout: 60_000 })
+  await expect.poll(async () => (await frame(page)).colours, { timeout: 30_000 }).toBeGreaterThan(1)
+
+  await loadReplay(page, MISSING)
+  await expect(status).toHaveText(
+    `Showdown has no replay with this ID. The game plays on with ${FIRST}.`,
+  )
+  await expect(detail).not.toHaveText('')
+  await expect(details).toBeVisible()
+  // The game does play on: its frames go on changing.
+  const failed = await frame(page)
+  await expect.poll(async () => differ(failed, await frame(page)), { timeout: 30_000 }).toBe(true)
+
+  await page.getByLabel('Example replay').selectOption(SECOND)
+  await expect(status).toHaveText(`Picked ${SECOND}. Press Start to play it.`)
+  await expect(detail).toHaveText('')
+  await expect(details).toBeHidden()
+  await expect(page.locator('#report')).toBeHidden()
+  expect(errors).toEqual([])
+  expect(requests).toEqual([`GET ${showdownUrl(MISSING)}`])
 })
