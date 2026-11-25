@@ -3,11 +3,12 @@
 
 /**
  * Why a battle log line is a dropped line. `state` marks a line whose state the client keeps and
- * a later line shows (`-mustrecharge`: the next turn's `cant`). `preview` marks a Team Preview
- * line: the intro's balls show each team, and the page lists both teams. `format` marks a line a
- * format writes for its own client (`|custom|`). `unknown` and `unsupported` mark lines the
- * battle script cannot show yet; no test replay may contain them, except an `unsupported` line of
- * a kind the named list keeps as "no rule yet" (`census.ts`).
+ * a later line shows (`-mustrecharge`: the next turn's `cant`), or a one-turn state the game never
+ * shows (Roost's turn without the Flying type). `preview` marks a Team Preview line: the intro's
+ * balls show each team, and the page lists both teams. `format` marks a line a format writes for
+ * its own client (`|custom|`). `unknown` and `unsupported` mark lines the battle script cannot
+ * show yet; no test replay may contain them, except an `unsupported` line of a kind the named list
+ * keeps as "no rule yet" (`census.ts`).
  */
 export type DropReason =
   | 'spacer'

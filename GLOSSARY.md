@@ -209,7 +209,7 @@ A replay whose format's generation is no newer than the target game's, so every 
 _Avoid_: native replay
 
 **Dropped line**:
-A battle log line deliberately not shown in the game, such as chat or timer messages. Every line is either shown or a dropped line, never silently skipped. Each dropped line carries its reason; the reason `state` marks a line whose state a later line shows, such as the recharge turn that the next turn's "must recharge" line tells. The reason `preview` marks the Team Preview lines, since the intro's Poké Balls show each team and the viewer's team list names both teams, and `format` marks a line that a format writes for itself.
+A battle log line deliberately not shown in the game, such as chat or timer messages. Every line is either shown or a dropped line, never silently skipped. Each dropped line carries its reason; the reason `state` marks a line whose state a later line shows, such as the recharge turn that the next turn's "must recharge" line tells, or a one-turn state the game never shows, such as Roost's turn without the Flying type. The reason `preview` marks the Team Preview lines, since the intro's Poké Balls show each team and the viewer's team list names both teams, and `format` marks a line that a format writes for itself.
 _Avoid_: ignored line, skipped event
 
 **Kind census**:
