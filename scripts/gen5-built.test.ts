@@ -1,8 +1,12 @@
-import { readFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import type { Server } from 'node:http'
+import type { AddressInfo } from 'node:net'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
-import { describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import { BUILT_PORT, builtServerOptions } from './gen5-built'
+import { BUILT_PORT, builtServerOptions, startBuiltServer } from './gen5-built'
 import { GEN5_PATHS } from './gen5-paths'
 
 describe('builtServerOptions', () => {
@@ -40,5 +44,45 @@ describe('the spike page', () => {
     for (const id of ['uncapped', 'core-switch', 'vsync-switch', 'copy', 'figures', 'phone-note']) {
       expect(html).toContain(`id="${id}"`)
     }
+  })
+})
+
+// Scene: the server answers 404 outside the manifest (scripts/gen5-manifest.ts).
+describe('startBuiltServer', () => {
+  const root = mkdtempSync(join(tmpdir(), 'gen5-built-'))
+  const folders = {
+    built: join(root, 'page'),
+    site: join(root, 'site'),
+    saves: join(root, 'saves'),
+  }
+  let server: Server | undefined
+
+  beforeAll(async () => {
+    for (const file of ['page/index.html', 'site/data/loader.js', 'site/data/version.json']) {
+      mkdirSync(join(root, file, '..'), { recursive: true })
+      writeFileSync(join(root, file), 'x')
+    }
+    server = await startBuiltServer({ host: false, port: 0 }, folders)
+  })
+
+  afterAll(() => {
+    server?.close()
+    rmSync(root, { recursive: true, force: true })
+  })
+
+  const status = async (path: string): Promise<number> => {
+    const address = server?.address() as AddressInfo
+    const response = await fetch(`http://127.0.0.1:${String(address.port)}${path}`)
+    await response.arrayBuffer()
+    return response.status
+  }
+
+  it('answers a file the manifest serves and the page itself', async () => {
+    expect(await status('/emulatorjs/data/loader.js')).toBe(200)
+    expect(await status('/')).toBe(200)
+  })
+
+  it('answers 404 for a file of the site the manifest does not list', async () => {
+    expect(await status('/emulatorjs/data/version.json')).toBe(404)
   })
 })

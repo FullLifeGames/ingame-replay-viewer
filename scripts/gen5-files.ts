@@ -1,6 +1,7 @@
 // What both Gen 5 spike servers (#72) answer with: the cross-origin isolation headers, the file
 // types, and the rule that maps a request path to a file inside one folder and never outside it.
-// Saves (#78) answer from the saves folder alone, by a name src/gen5/save-file.ts allows.
+// Saves (#78) answer from the saves folder alone, by a name src/gen5/save-file.ts allows, and the
+// fetched site (#79) only the files scripts/gen5-manifest.ts lists as served.
 // scripts/gen5-serve.ts (Vite, for the shot script) and scripts/gen5-built.ts (the built page,
 // for the user's own check) import it.
 import { createReadStream, statSync } from 'node:fs'
@@ -8,6 +9,7 @@ import type { ServerResponse } from 'node:http'
 import { extname, isAbsolute, join, normalize } from 'node:path'
 
 import { isSaveName, SAVES_PREFIX } from '../src/gen5/save-file.ts'
+import { isServedSitePath } from './gen5-manifest.ts'
 
 /** Where the fetched EmulatorJS site answers on both servers. */
 export const SITE_PREFIX = '/emulatorjs/'
@@ -38,18 +40,32 @@ function decodedPath(url: string): string | undefined {
   }
 }
 
-/** `inside` as a file in `root`, or undefined when it would climb out; '' is index.html. */
-function inFolder(root: string, inside: string): string | undefined {
-  const relative = normalize(inside === '' ? 'index.html' : inside)
-  if (relative.startsWith('..') || isAbsolute(relative)) return undefined
-  return join(root, relative)
+/** `inside` normalized, or undefined when it would climb out of its folder. */
+function normalizedInside(inside: string): string | undefined {
+  const relative = normalize(inside)
+  return relative.startsWith('..') || isAbsolute(relative) ? undefined : relative
 }
 
-/** The fetched site's file for a path under SITE_PREFIX; undefined for any other path. */
-export function siteFileFor(url: string, site: string): string | undefined {
+/** `inside` as a file in `root`, or undefined when it would climb out; '' is index.html. */
+function inFolder(root: string, inside: string): string | undefined {
+  const relative = normalizedInside(inside === '' ? 'index.html' : inside)
+  return relative === undefined ? undefined : join(root, relative)
+}
+
+/** The path inside the site for a request path under SITE_PREFIX, normalized; undefined for any
+ * other path and one that climbs out. */
+export function sitePathOf(url: string): string | undefined {
   const path = decodedPath(url)
   if (path?.startsWith(SITE_PREFIX) !== true) return undefined
-  return inFolder(site, path.slice(SITE_PREFIX.length))
+  const inside = path.slice(SITE_PREFIX.length)
+  return inside === '' ? '' : normalizedInside(inside)
+}
+
+/** The fetched site's file for a path the manifest serves (scripts/gen5-manifest.ts); undefined
+ * for any other path. */
+export function siteFileFor(url: string, site: string): string | undefined {
+  const inside = sitePathOf(url)
+  return inside !== undefined && isServedSitePath(inside) ? join(site, inside) : undefined
 }
 
 /** The save file in `saves` for `/saves/<name>.sav`; undefined for any other path. */

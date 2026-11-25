@@ -2,11 +2,14 @@
 // machine is aborted; one whose method is not GET or HEAD, or that carries a body, is a fault, so
 // neither the dump nor a state nor a save leaves the tab. On the built page a websocket or Vite's
 // dev client is a fault too. Each fault fails the run, and the run's log ends with one line on its
-// requests. At the end the run lists the origin's IndexedDB databases: none may hold the save
-// folder. scripts/gen5-shot.ts, scripts/gen5-route.ts and scripts/gen5-moment.ts use it.
+// requests. A request for a file of the EmulatorJS site that scripts/gen5-manifest.ts does not
+// list is a fault as well (#79). At the end the run lists the origin's IndexedDB databases: none
+// may hold the save folder. scripts/gen5-shot.ts, scripts/gen5-route.ts and scripts/gen5-moment.ts use it.
 import type { Page } from '@playwright/test'
 
 import { SAVE_FOLDER } from '../src/gen5/save-file.ts'
+import { SITE_PREFIX, sitePathOf } from './gen5-files.ts'
+import { isListed } from './gen5-manifest.ts'
 import { log } from './gen5-page.ts'
 
 /** Local: the page's own origin, or a blob: or data: URL the page made itself. */
@@ -21,13 +24,26 @@ export interface SeenRequest {
   bodyBytes: number | undefined
 }
 
+/** True for a request to the origin's EmulatorJS site that scripts/gen5-manifest.ts does not
+ * list, served or absent. */
+function outsideManifest(url: string, origin: string): boolean {
+  if (!url.startsWith(`${origin}${SITE_PREFIX}`)) return false
+  const inside = sitePathOf(url.slice(origin.length))
+  return inside === undefined || !isListed(inside)
+}
+
 /** Why a request fails the run, or undefined when it may be made. */
-export function requestFault(request: SeenRequest, built: boolean): string | undefined {
+export function requestFault(
+  request: SeenRequest,
+  built: boolean,
+  origin: string,
+): string | undefined {
   const { method, url, bodyBytes } = request
   if (method !== 'GET' && method !== 'HEAD') return `${method} ${url}: not GET or HEAD`
   if (bodyBytes !== undefined)
     return `${method} ${url}: carries a body of ${String(bodyBytes)} bytes`
   if (built && url.includes('/@vite/')) return `${method} ${url}: the dev client on the built page`
+  if (outsideManifest(url, origin)) return `${method} ${url}: outside the manifest`
   return undefined
 }
 
@@ -36,9 +52,11 @@ export class RequestLog {
   private count = 0
   private readonly faults: string[] = []
   private readonly built: boolean
+  private readonly origin: string
 
-  constructor(built: boolean) {
+  constructor(built: boolean, origin: string) {
     this.built = built
+    this.origin = origin
   }
 
   get failed(): boolean {
@@ -48,7 +66,7 @@ export class RequestLog {
   /** Counts a request; returns its fault, if it is one. */
   seen(request: SeenRequest): string | undefined {
     this.count += 1
-    const fault = requestFault(request, this.built)
+    const fault = requestFault(request, this.built, this.origin)
     if (fault !== undefined) this.faults.push(fault)
     return fault
   }
@@ -68,14 +86,15 @@ export class RequestLog {
       const faults = `${String(this.faults.length)} fault${this.faults.length === 1 ? '' : 's'}`
       return `${seen}, ${faults}: ${this.faults.join('; ')}`
     }
-    return `${seen}, all local, none with a body${this.built ? ', no websocket, no dev client' : ''}`
+    const manifest = 'every EmulatorJS file in the manifest'
+    return `${seen}, all local, none with a body, ${manifest}${this.built ? ', no websocket, no dev client' : ''}`
   }
 }
 
 /** Logs every request, websocket, console line and page error; aborts a request that leaves the
  * machine. The returned log holds the faults. */
 export function watchRequests(page: Page, origin: string, built: boolean): RequestLog {
-  const requests = new RequestLog(built)
+  const requests = new RequestLog(built, origin)
   page.on('request', (request) => {
     const body = request.postDataBuffer()
     const fault = requests.seen({

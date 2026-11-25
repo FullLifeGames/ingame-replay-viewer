@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { fileFor, savesFileFor } from './gen5-files'
+import { fileFor, savesFileFor, siteFileFor, sitePathOf } from './gen5-files'
 
 describe('fileFor', () => {
   const page = '/repo/build/gen5/page'
@@ -36,6 +36,43 @@ describe('fileFor', () => {
   it('refuses a malformed escape and a NUL byte', () => {
     expect(fileFor('/%E0%A4%A', page, site, saves)).toBeUndefined()
     expect(fileFor('/index.html%00.js', page, site, saves)).toBeUndefined()
+  })
+})
+
+// Scene: a path the manifest does not list (scripts/gen5-manifest.ts).
+describe('siteFileFor', () => {
+  const site = '/repo/.cache/gen5/emulatorjs/site'
+
+  it('maps a path the manifest serves, with or without a query', () => {
+    expect(siteFileFor('/emulatorjs/data/loader.js', site)).toBe(`${site}/data/loader.js`)
+    expect(siteFileFor('/emulatorjs/data/cores/melonds-wasm.data?v=1', site)).toBe(
+      `${site}/data/cores/melonds-wasm.data`,
+    )
+  })
+
+  it('refuses a file of the site that the manifest does not list, and one it lists as absent', () => {
+    for (const inside of [
+      'data/version.json',
+      'index.html',
+      'package.json',
+      'data/compression/extractzip.js',
+      'data/emulator.min.js',
+      '',
+    ])
+      expect(siteFileFor(`/emulatorjs/${inside}`, site), inside).toBeUndefined()
+  })
+})
+
+describe('sitePathOf', () => {
+  it('gives the normalized path inside the site', () => {
+    expect(sitePathOf('/emulatorjs/data//src/./emulator.js?x')).toBe('data/src/emulator.js')
+    expect(sitePathOf('/emulatorjs/')).toBe('')
+  })
+
+  it('gives nothing for a path outside the site or one that climbs out', () => {
+    expect(sitePathOf('/saves/route-20.sav')).toBeUndefined()
+    expect(sitePathOf('/emulatorjs/../index.html')).toBeUndefined()
+    expect(sitePathOf('/emulatorjs/%E0%A4%A')).toBeUndefined()
   })
 })
 
