@@ -2,7 +2,9 @@
 // from the site scripts/gen5-fetch.ts unpacks, with its components, and each component's version,
 // licence and corresponding source. Both servers answer only the paths it lists as served
 // (scripts/gen5-files.ts), and a run's request log fails on a path it does not list
-// (scripts/gen5-requests.ts). The page's own files are described as rules in OWN_FILES.
+// (scripts/gen5-requests.ts). The page's own files are described as rules in OWN_FILES. Each
+// component's notice files stand in scripts/gen5-notices.ts.
+import { type Notice, NOTICES } from './gen5-notices.ts'
 
 /** A licence by its SPDX id as the component states it, or the reason nobody can name one. */
 export type Licence = 'GPL-3.0' | 'MIT' | { unnamed: string }
@@ -27,6 +29,8 @@ export interface Component {
   /** The pinned npm package (scripts/gen5-fetch.ts) that brings the component's files. */
   from: string
   source: Source
+  /** The files in `source` that hold its notices and those of the parts compiled into it. */
+  notices: readonly Notice[]
 }
 
 /** `logged`: a run asked for it; `other core`: a core build for another browser; `locale`: the
@@ -67,6 +71,7 @@ export const COMPONENTS: Readonly<Record<ComponentId, Component>> = {
     licence: 'GPL-3.0',
     from: EMULATORJS_PACKAGE,
     source: EMULATORJS_SOURCE,
+    notices: NOTICES.emulatorjs,
   },
   // The core's wasm holds the library version "0.9.3 18a057d": melonDS's libretro.cpp builds it
   // from MELONDS_VERSION and the git hash its Makefile reads. 18a057d resolves in this repository.
@@ -81,6 +86,7 @@ export const COMPONENTS: Readonly<Record<ComponentId, Component>> = {
       commit: '18a057d372783b42d7e297b8731f3c3d673cdcab',
       tar: '4368395f6ce9ec1e199a5bdef4591a86b8cfe70f101bc9d0421a56ea15d3e928',
     },
+    notices: NOTICES.melonds,
   },
   // The wasm's data starts with "6dd4353", RetroArch's GIT_VERSION (version_git.c); it resolves in
   // this repository, on the branch next that EmulatorJS's build script clones.
@@ -95,6 +101,7 @@ export const COMPONENTS: Readonly<Record<ComponentId, Component>> = {
       commit: '6dd4353937ef48b6ec0bfbdbb15d1c5992d86927',
       tar: '05515361238893f7983dffb1be87881cb774868c9adf99169a17616ce74b13d7',
     },
+    notices: NOTICES.retroarch,
   },
   // Each core archive's build.json names the build scripts' version 2.0.2; this commit was main's
   // head from 2025-06-02 to 2025-07-06, around the build of 2025-06-14 (an inference). build.sh
@@ -110,6 +117,7 @@ export const COMPONENTS: Readonly<Record<ComponentId, Component>> = {
       commit: 'b24e5b535034dc7c3428d76f236d4793881969b6',
       tar: '4010b0545376a6573facab7e10fddd1ec627f1e8091e042c1aaba673140c442f',
     },
+    notices: NOTICES.build,
   },
   // EmulatorJS's update.js copies node_modules/nipplejs/dist/nipplejs.js; the served file equals
   // nipplejs 0.10.2's plus one newline. LICENSE at the tag v0.10.2 is MIT.
@@ -124,6 +132,7 @@ export const COMPONENTS: Readonly<Record<ComponentId, Component>> = {
       commit: '9fca6e72bb99318d69092075015140179f4e32bf',
       tar: '8b7b070943ed50c5dfaab5539e8789a46e78f41c27adbec361e01d08ef398d6f',
     },
+    notices: NOTICES.nipplejs,
   },
   // update.js copies socket.io/client-dist/socket.io.min.js; its header names MIT. The commit is
   // the tag socket.io@4.8.1 of the monorepo.
@@ -138,6 +147,7 @@ export const COMPONENTS: Readonly<Record<ComponentId, Component>> = {
       commit: '91e1c8b3584054db6072046404a24e79a17c1367',
       tar: '81780e2ad998b36375cbe33f6420e700f0f830b9f921bf98b090648cf1f9a932',
     },
+    notices: NOTICES.socketio,
   },
   // An old Emscripten build of a small 7z unpacker, unchanged in EmulatorJS since 2021. Nobody
   // names its licence (U1, for the user); the source is the place EmulatorJS keeps it.
@@ -147,6 +157,7 @@ export const COMPONENTS: Readonly<Record<ComponentId, Component>> = {
     licence: { unnamed: 'no licence in the file, its folder or EmulatorJS since 2021' },
     from: EMULATORJS_PACKAGE,
     source: EMULATORJS_SOURCE,
+    notices: NOTICES.extract7z,
   },
 }
 
@@ -209,6 +220,9 @@ const LOCALES = ['af-FR', 'ar-AR', 'ben-BEN', 'de-GER', 'el-GR', 'es-ES', 'fa-AF
   .map((code) => served(`data/localization/${code}.json`, ['emulatorjs'], 'locale'))
 
 export const SITE_FILES: readonly SiteFile[] = [...LOGGED, ...OTHER_CORES, ...LOCALES]
+
+/** The viewer's repository: the page's own source, under the MIT licence of its LICENSE. */
+export const VIEWER_REPOSITORY = 'https://github.com/FullLifeGames/ingame-replay-viewer'
 
 export const OWN_FILES: readonly OwnFiles[] = [
   {

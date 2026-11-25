@@ -1,9 +1,11 @@
 // The corresponding source of each component the Gen 5 page sends (#79, D4, D5). For each source
 // the manifest names (scripts/gen5-manifest.ts), git fetches the pinned commit at depth 1 into a
 // bare repository under .cache/gen5/sources/git/, checking every object against its name; the
-// script checks that the fetch brought the pinned commit, streams `git archive`'s tar of it through
-// a SHA-256 and gzip into a part file, and gives the part its archive name only when the tar's
-// hash is the pin. --print prints each tar's hash and places nothing. Nothing here is committed.
+// script checks that the fetch brought the pinned commit and keeps a ref under refs/pins/ on it
+// (the licences page reads its notices from that commit), streams `git archive`'s tar of it
+// through a SHA-256 and gzip into a part file, and gives the part its archive name only when the
+// tar's hash is the pin. --print prints each tar's hash and places nothing. Nothing here is
+// committed.
 // Usage: node scripts/gen5-sources.ts [--print]
 import { execFileSync, spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
@@ -31,6 +33,25 @@ export function fetchSteps(dir: string, source: Source, fresh: boolean): string[
     source.commit,
   ]
   return fresh ? [['init', '-q', '--bare', dir], fetch] : [fetch]
+}
+
+/** The ref that keeps `source`'s pinned commit in its bare repository, so git's housekeeping
+ * never prunes it; the licences page reads its notices from that commit. */
+export function pinRef(source: Source): string {
+  return `refs/pins/${source.name}`
+}
+
+/** Runs the steps for `source` in the bare repository `dir` through `git` (`fresh` makes the
+ * repository first): the fetch, the check that FETCH_HEAD is the pin, then the pin's ref. */
+export function fetchInto(
+  dir: string,
+  source: Source,
+  fresh: boolean,
+  git: (args: string[]) => string,
+): void {
+  for (const step of fetchSteps(dir, source, fresh)) git(step)
+  verifyFetchHead(git(['-C', dir, 'rev-parse', 'FETCH_HEAD']).trim(), source)
+  git(['-C', dir, 'update-ref', pinRef(source), source.commit])
 }
 
 /** Throws, naming the source, unless the fetched commit `head` is the pinned one. */
@@ -127,8 +148,7 @@ function fetchSource(source: Source): string {
   const dir = join(GEN5_PATHS.sources, 'git', `${source.name}.git`)
   const fresh = !existsSync(join(dir, 'HEAD'))
   const started = performance.now()
-  for (const step of fetchSteps(dir, source, fresh)) git(...step)
-  verifyFetchHead(git('-C', dir, 'rev-parse', 'FETCH_HEAD').trim(), source)
+  fetchInto(dir, source, fresh, (args) => git(...args))
   const how = fresh ? 'into a new bare repository' : 'again'
   say(`${source.name} ${source.commit} fetched ${how} in ${seconds(started)} s`)
   return dir

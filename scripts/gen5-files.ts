@@ -110,14 +110,21 @@ export function fileFor(url: string, folders: ServedFolders): string | undefined
   return inFolder(folders.built, path.replace(/^\/+/, ''))
 }
 
-/** Sends `file` when it exists, uncached and isolated; a 404 that names the path otherwise. */
+/** Sends `file` when it exists, uncached and isolated, with its size; a 404 that names the path
+ * otherwise. */
 export function sendFile(res: ServerResponse, file: string | undefined, path: string): void {
-  if (file === undefined || statSync(file, { throwIfNoEntry: false })?.isFile() !== true) {
+  const stat = file === undefined ? undefined : statSync(file, { throwIfNoEntry: false })
+  if (file === undefined || stat?.isFile() !== true) {
     res.writeHead(404, { ...ISOLATION, 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' })
     res.end(`gen5: no ${path}`)
     return
   }
   const type = TYPES[extname(file)] ?? 'application/octet-stream'
-  res.writeHead(200, { ...ISOLATION, 'Content-Type': type, 'Cache-Control': 'no-store' })
+  res.writeHead(200, {
+    ...ISOLATION,
+    'Content-Type': type,
+    'Content-Length': String(stat.size),
+    'Cache-Control': 'no-store',
+  })
   createReadStream(file).pipe(res)
 }

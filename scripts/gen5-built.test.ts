@@ -7,7 +7,8 @@ import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { BUILT_PORT, builtServerOptions, startBuiltServer } from './gen5-built'
-import { archiveName, COMPONENTS } from './gen5-manifest'
+import { writeLicencesPage } from './gen5-licences-read'
+import { archiveName, COMPONENTS, SITE_FILES } from './gen5-manifest'
 import { GEN5_PATHS } from './gen5-paths'
 
 describe('builtServerOptions', () => {
@@ -89,6 +90,16 @@ describe('startBuiltServer', () => {
       mkdirSync(join(root, file, '..'), { recursive: true })
       writeFileSync(join(root, file), 'x')
     }
+    writeLicencesPage(folders.built, {
+      build: { commit: '1'.repeat(40), date: '2026-11-25', dirty: false },
+      components: COMPONENTS,
+      files: SITE_FILES,
+      archives: [],
+      notices: [],
+      unfound: [],
+      gpl: 'invented',
+      viewerLicence: 'invented',
+    })
     server = await startBuiltServer({ host: false, port: 0 }, folders)
   })
 
@@ -108,6 +119,20 @@ describe('startBuiltServer', () => {
   it('answers a file the manifest serves and the page itself', async () => {
     expect(await status('/emulatorjs/data/loader.js')).toBe(200)
     expect(await status('/')).toBe(200)
+  })
+
+  it('answers the licences page the build writes as HTML', async () => {
+    const response = await answer('/licences.html')
+    expect(response.status).toBe(200)
+    expect(response.headers.get('content-type')).toBe('text/html')
+  })
+
+  it('names the size of an archive, so a HEAD answers it', async () => {
+    const address = server?.address() as AddressInfo
+    const url = `http://127.0.0.1:${String(address.port)}/source/${archive}`
+    const response = await fetch(url, { method: 'HEAD' })
+    expect(response.status).toBe(200)
+    expect(response.headers.get('content-length')).toBe('1')
   })
 
   it('answers 404 for a file of the site the manifest does not list', async () => {

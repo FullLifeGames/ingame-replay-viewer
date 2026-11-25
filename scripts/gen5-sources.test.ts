@@ -9,7 +9,14 @@ import { afterAll, describe, expect, it } from 'vitest'
 
 import { archiveName, type Source, SOURCES } from './gen5-manifest'
 import { pinFaults } from './gen5-manifest-check'
-import { fetchSteps, placeArchive, verifyFetchHead, verifyTarHash } from './gen5-sources'
+import {
+  fetchInto,
+  fetchSteps,
+  pinRef,
+  placeArchive,
+  verifyFetchHead,
+  verifyTarHash,
+} from './gen5-sources'
 
 const PIN: Source = {
   name: 'tool',
@@ -51,6 +58,38 @@ describe('fetchSteps', () => {
 
   it('fetches again into the bare repository of an earlier run', () => {
     expect(fetchSteps(dir, PIN, false)).toEqual([fetch])
+  })
+})
+
+// Scene: git's housekeeping must not prune the pinned commit, which only FETCH_HEAD names.
+describe('fetchInto', () => {
+  const dir = '/invented/sources/git/tool.git'
+  const run = (head: string) => {
+    const calls: string[][] = []
+    const git = (args: string[]) => {
+      calls.push(args)
+      return args.includes('rev-parse') ? `${head}\n` : ''
+    }
+    return { calls, git }
+  }
+
+  it('fetches, checks FETCH_HEAD against the pin, then keeps a ref under refs/pins/ on it', () => {
+    const { calls, git } = run(PIN.commit)
+    fetchInto(dir, PIN, true, git)
+    expect(pinRef(PIN)).toBe('refs/pins/tool')
+    expect(calls).toEqual([
+      ...fetchSteps(dir, PIN, true),
+      ['-C', dir, 'rev-parse', 'FETCH_HEAD'],
+      ['-C', dir, 'update-ref', 'refs/pins/tool', PIN.commit],
+    ])
+  })
+
+  it('sets no ref when the fetch brought another commit', () => {
+    const { calls, git } = run('c'.repeat(40))
+    expect(() => {
+      fetchInto(dir, PIN, false, git)
+    }).toThrow(`tool: fetched ${'c'.repeat(40)}, not the pinned ${PIN.commit}`)
+    expect(calls.some((args) => args.includes('update-ref'))).toBe(false)
   })
 })
 

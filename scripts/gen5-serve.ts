@@ -1,10 +1,10 @@
 // The Gen 5 spike page's servers (#72). By default Vite's dev server on src/web/gen5/, for the
 // shot script, with /emulatorjs/* served from the fetched packages in .cache/gen5/emulatorjs/site/
 // (scripts/gen5-fetch.ts), /saves/* from src/web/gen5/saves/ alone and /source/* from the source
-// archives in .cache/gen5/sources/ (scripts/gen5-sources.ts). With --built it builds the page and
-// serves the build instead, for the user's own check (scripts/gen5-built.ts). Every answer is
-// cross-origin isolated, which the core's thread build needs. Both bind to 127.0.0.1 unless the
-// command line says --host.
+// archives in .cache/gen5/sources/ (scripts/gen5-sources.ts), and /licences.html made from them
+// (scripts/gen5-licences-read.ts). With --built it builds the page and serves the build instead,
+// for the user's own check (scripts/gen5-built.ts). Every answer is cross-origin isolated, which
+// the core's thread build needs. Both bind to 127.0.0.1 unless the command line says --host.
 // Usage: node scripts/gen5-serve.ts [--host] | --built [--host] [--port N]
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { join } from 'node:path'
@@ -22,10 +22,15 @@ import {
   SOURCE_PREFIX,
   sourceFileFor,
 } from './gen5-files.ts'
+import { licencesHtml } from './gen5-licences.ts'
+import { readLicencesInput } from './gen5-licences-read.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
 /** Lane a's port (plan section 0); Vite moves to the next free one above it if it is taken. */
 const PORT = 5183
+
+/** Where both servers answer the licences page (D13). */
+const LICENCES_PATH = '/licences.html'
 
 /** Vite's own deny list, plus what /@fs/ must never reach: outputs, fetched files, dumps, saves.
  * Vite checks it for files under the root too, so the saves' own middleware answers first. */
@@ -54,13 +59,34 @@ function mount(prefix: string, fileOf: (url: string) => string | undefined): Mid
   }
 }
 
-/** The three mounts answer before Vite's own middlewares. */
+/** Answers /licences.html with `page`, the licences page the build writes (#79), made afresh on
+ * each request; a 500 that says why when it cannot be made. Passes the rest. */
+export function licencesMount(page: () => string): Middleware {
+  return (req, res, next) => {
+    if ((req.url ?? '').split('?')[0] !== LICENCES_PATH) {
+      next()
+      return
+    }
+    const head = { ...ISOLATION, 'Cache-Control': 'no-store' }
+    try {
+      const html = page()
+      res.writeHead(200, { ...head, 'Content-Type': 'text/html' })
+      res.end(html)
+    } catch (error) {
+      res.writeHead(500, { ...head, 'Content-Type': 'text/plain' })
+      res.end(`gen5: ${error instanceof Error ? error.message : String(error)}`)
+    }
+  }
+}
+
+/** The four mounts answer before Vite's own middlewares. */
 const emulatorjsMount: Plugin = {
   name: 'gen5-emulatorjs',
   configureServer(server) {
     server.middlewares.use(mount(SITE_PREFIX, (url) => siteFileFor(url, GEN5_PATHS.site)))
     server.middlewares.use(mount(SAVES_PREFIX, (url) => savesFileFor(url, GEN5_PATHS.saves)))
     server.middlewares.use(mount(SOURCE_PREFIX, (url) => sourceFileFor(url, GEN5_PATHS.sources)))
+    server.middlewares.use(licencesMount(() => licencesHtml(readLicencesInput(GEN5_PATHS.sources))))
   },
 }
 

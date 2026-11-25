@@ -26,6 +26,7 @@ const TOOL: Component = {
   licence: 'MIT',
   from: '@example/tool@1.0.0',
   source: SOURCE,
+  notices: [{ part: 'Tool', path: 'LICENSE', kind: 'licence' }],
 }
 
 function draft(tool: Partial<Component>, paths: readonly [string, string[]][]): ManifestDraft {
