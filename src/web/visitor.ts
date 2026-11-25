@@ -28,7 +28,7 @@ import { BuildMismatchError, DumpRefusal } from './rom'
 import { MemoryRefusal, RunFailure, type RunFailureKind } from './wasm/failures'
 
 /** The formats the viewer plays; the viewer's intro names them too. */
-export const PLAYED_FORMATS = 'Gen 1 to 3 singles'
+export const PLAYED_FORMATS = 'Gen 1 to 4 singles'
 
 const REPORT = 'Report it with the link below.'
 const RELOAD = 'Reload the page. If it fails again, report it with the link below.'

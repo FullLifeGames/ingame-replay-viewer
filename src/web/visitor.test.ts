@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import replay994052 from '../../test/fixtures/replays/smogtours-gen3ou-994052.json'
-import { buildGen3Stream } from '../gen3/backend'
+import { buildGen3Stream, NEWEST_GEN } from '../gen3/backend'
 import { Gen3Error, GenerationRefusal } from '../gen3/errors'
 import { SlotError } from '../patch/slot'
 import { buildBattleScript } from '../script/build'
@@ -54,13 +54,17 @@ const HTML_PAGE = '<!DOCTYPE html>\n<html><body>Not here</body></html>'
 const GEN9 = readReplay({ ...replay994052, log: replay994052.log.replace('|gen|3\n', '|gen|9\n') })
 
 describe('visitorLine for the replay', () => {
+  it('names every generation the backend plays (#86)', () => {
+    expect(PLAYED_FORMATS).toBe(`Gen 1 to ${String(NEWEST_GEN)} singles`)
+  })
+
   it('gives a log that starts with |gen|9 the generation line, from the typed refusal', () => {
     const refusal = caught(() => buildGen3Stream(buildBattleScript('|gen|9\n')))
     expect(refusal).toBeInstanceOf(GenerationRefusal)
     const link: ReplayPlace = { source: 'link', replay: 'gen9ou-1' }
     expect(visitorLine(failed(STREAM, refusal, link))).toEqual({
       line: `This replay is a Gen 9 battle. The viewer plays ${PLAYED_FORMATS} for now.`,
-      detail: `${STREAM}: the stream plays Gen 3 battles, this one is Gen 9`,
+      detail: `${STREAM}: the stream plays Gen 1 to ${String(NEWEST_GEN)} battles, this one is Gen 9`,
       report: false,
       replay: 'gen9ou-1',
     })
