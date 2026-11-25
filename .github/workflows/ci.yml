@@ -27,6 +27,9 @@ jobs:
           cache: npm
       - id: deps
         run: npm ci
+      - name: Fetch EmulatorJS's pinned packages for the manifest's spec
+        run: node scripts/gen5-fetch.ts
+        timeout-minutes: 2
       - name: Fetch pokebw2 at its pin and generate its numbers
         run: node scripts/gen5-bw2.ts --quiet
         timeout-minutes: 3
