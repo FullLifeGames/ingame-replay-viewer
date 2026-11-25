@@ -6,7 +6,8 @@ import { isFileLoadingAllowed, resolveConfig } from 'vite'
 
 import { archiveName, SOURCES } from './gen5-manifest'
 import { GEN5_PATHS } from './gen5-paths'
-import { gen5ServerConfig, licencesMount } from './gen5-serve'
+import { gen5ServerConfig, licencesMount, unpackerMount } from './gen5-serve'
+import { UNPACKER_PATH } from '../src/gen5/core-unpack'
 
 /** Runs `url` through the mount with an invented page; gives the answer, or 'next'. */
 function answer(url: string, page: () => string) {
@@ -52,6 +53,62 @@ describe('licencesMount', () => {
 
   it('passes every other path on', () => {
     expect(answer('/index.html', () => '')).toMatchObject({ next: true, status: 0 })
+  })
+})
+
+/** Runs `url` through the unpacker's mount with an invented script; gives the answer once it
+ * ends, or 'next'. */
+function answerScript(url: string, script: () => Promise<string>) {
+  return new Promise<{ status: number; type: string; body: string; next: boolean }>((resolve) => {
+    const got = { status: 0, type: '', body: '', next: false }
+    const res = {
+      writeHead(status: number, headers: Record<string, string>) {
+        got.status = status
+        got.type = headers['Content-Type'] ?? ''
+      },
+      end(body: string) {
+        got.body = body
+        resolve(got)
+      },
+    }
+    unpackerMount(script)(
+      { url } as unknown as IncomingMessage,
+      res as unknown as ServerResponse,
+      () => {
+        got.next = true
+        resolve(got)
+      },
+    )
+  })
+}
+
+// Scene: the dev server answers the page's unpacker as the build writes it, one classic script.
+describe('unpackerMount', () => {
+  it("answers the unpacker's path with the bundled script as JavaScript", async () => {
+    expect(await answerScript(`${UNPACKER_PATH}?v=1`, () => Promise.resolve('(()=>{})()'))).toEqual(
+      {
+        status: 200,
+        type: 'text/javascript',
+        body: '(()=>{})()',
+        next: false,
+      },
+    )
+  })
+
+  it('answers 500 with the reason when the script cannot be bundled', async () => {
+    const failing = () => Promise.reject(new Error('extract7z.ts: no such file'))
+    expect(await answerScript(UNPACKER_PATH, failing)).toMatchObject({
+      status: 500,
+      body: 'gen5: extract7z.ts: no such file',
+    })
+  })
+
+  it('passes every other path on', async () => {
+    const script = () => Promise.resolve('')
+    expect(await answerScript('/emulatorjs/data/compression/extract7z.js', script)).toMatchObject({
+      next: true,
+      status: 0,
+    })
   })
 })
 

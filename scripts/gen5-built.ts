@@ -6,12 +6,14 @@
 // them, /source/* the archives it names, and /licences.html, which the build writes from the
 // pinned sources (#79). It binds to 127.0.0.1 unless --host.
 // Usage: node scripts/gen5-serve.ts --built [--host] [--port N]
+import { writeFileSync } from 'node:fs'
 import { createServer, type Server } from 'node:http'
 import { join } from 'node:path'
 import { parseArgs } from 'node:util'
 
 import { build } from 'vite'
 
+import { UNPACKER_ENTRY, UNPACKER_SCRIPT } from '../src/gen5/core-unpack.ts'
 import { fileFor, ISOLATION, sendFile, type ServedFolders } from './gen5-files.ts'
 import { readLicencesInput, writeLicencesPage } from './gen5-licences-read.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
@@ -41,9 +43,45 @@ export function builtServerOptions(argv: readonly string[]): BuiltServerOptions 
   return { host: values.host, port }
 }
 
+/** The page's unpacker worker (src/web/gen5/extract7z.ts) bundled into one classic script, an
+ * IIFE with no import or export: EmulatorJS starts it from a Blob URL, where a module could not
+ * load its imports. The dev server answers it from here, the build writes it beside the page. */
+export async function bundleUnpacker(): Promise<string> {
+  const result = await build({
+    configFile: false,
+    root: GEN5_PATHS.page,
+    cacheDir: join(GEN5_PATHS.runs, '..', 'vite-cache'),
+    logLevel: 'warn',
+    publicDir: false,
+    build: {
+      write: false,
+      emptyOutDir: false,
+      lib: {
+        entry: join(GEN5_PATHS.page, UNPACKER_ENTRY),
+        formats: ['iife'],
+        name: 'gen5Unpacker',
+        fileName: () => UNPACKER_SCRIPT,
+      },
+    },
+  })
+  const outputs = Array.isArray(result) ? result : 'output' in result ? [result] : []
+  const chunks = outputs.flatMap((each) => each.output).filter((file) => file.type === 'chunk')
+  if (chunks.length !== 1 || chunks[0] === undefined) {
+    throw new Error(
+      `gen5-built: the unpacker bundled into ${String(chunks.length)} scripts, not one`,
+    )
+  }
+  return chunks[0].code
+}
+
+/** Writes the unpacker's script into `dir` as UNPACKER_SCRIPT. */
+export async function writeUnpackerScript(dir: string): Promise<void> {
+  writeFileSync(join(dir, UNPACKER_SCRIPT), await bundleUnpacker())
+}
+
 /** Builds the page into GEN5_PATHS.built with Vite's build and none of the repository's config,
- * then writes the licences page beside it from the pinned sources (scripts/gen5-licences-read.ts);
- * without them it stops. */
+ * writes the unpacker's script beside it, then the licences page from the pinned sources
+ * (scripts/gen5-licences-read.ts); without them it stops. */
 export async function buildGen5Page(): Promise<void> {
   const licences = readLicencesInput(GEN5_PATHS.sources)
   await build({
@@ -53,6 +91,7 @@ export async function buildGen5Page(): Promise<void> {
     logLevel: 'warn',
     build: { outDir: GEN5_PATHS.built, emptyOutDir: true },
   })
+  await writeUnpackerScript(GEN5_PATHS.built)
   writeLicencesPage(GEN5_PATHS.built, licences)
 }
 

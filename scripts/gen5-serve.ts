@@ -1,8 +1,9 @@
 // The Gen 5 spike page's servers (#72). By default Vite's dev server on src/web/gen5/, for the
 // shot script, with /emulatorjs/* served from the fetched packages in .cache/gen5/emulatorjs/site/
 // (scripts/gen5-fetch.ts), /saves/* from src/web/gen5/saves/ alone and /source/* from the source
-// archives in .cache/gen5/sources/ (scripts/gen5-sources.ts), and /licences.html made from them
-// (scripts/gen5-licences-read.ts). With --built it builds the page and serves the build instead,
+// archives in .cache/gen5/sources/ (scripts/gen5-sources.ts), /licences.html made from them
+// (scripts/gen5-licences-read.ts), and the page's unpacker bundled into one classic script
+// (scripts/gen5-built.ts, #79). With --built it builds the page and serves the build instead,
 // for the user's own check (scripts/gen5-built.ts). Every answer is cross-origin isolated, which
 // the core's thread build needs. Both bind to 127.0.0.1 unless the command line says --host.
 // Usage: node scripts/gen5-serve.ts [--host] | --built [--host] [--port N]
@@ -11,7 +12,14 @@ import { join } from 'node:path'
 
 import { createServer, type InlineConfig, type Plugin, type ViteDevServer } from 'vite'
 
-import { BUILT_PORT, buildGen5Page, builtServerOptions, startBuiltServer } from './gen5-built.ts'
+import {
+  BUILT_PORT,
+  buildGen5Page,
+  builtServerOptions,
+  bundleUnpacker,
+  startBuiltServer,
+} from './gen5-built.ts'
+import { UNPACKER_PATH } from '../src/gen5/core-unpack.ts'
 import { SAVES_PREFIX } from '../src/gen5/save-file.ts'
 import {
   ISOLATION,
@@ -59,27 +67,45 @@ function mount(prefix: string, fileOf: (url: string) => string | undefined): Mid
   }
 }
 
-/** Answers /licences.html with `page`, the licences page the build writes (#79), made afresh on
- * each request; a 500 that says why when it cannot be made. Passes the rest. */
-export function licencesMount(page: () => string): Middleware {
+/** Answers `path` with the text `make` gives, made afresh on each request, as `type`; a 500
+ * that says why when it cannot be made. Passes the rest. A text made at once is sent at once. */
+function madeMount(path: string, type: string, make: () => string | Promise<string>): Middleware {
   return (req, res, next) => {
-    if ((req.url ?? '').split('?')[0] !== LICENCES_PATH) {
+    if ((req.url ?? '').split('?')[0] !== path) {
       next()
       return
     }
     const head = { ...ISOLATION, 'Cache-Control': 'no-store' }
-    try {
-      const html = page()
-      res.writeHead(200, { ...head, 'Content-Type': 'text/html' })
-      res.end(html)
-    } catch (error) {
+    const fail = (error: unknown) => {
       res.writeHead(500, { ...head, 'Content-Type': 'text/plain' })
       res.end(`gen5: ${error instanceof Error ? error.message : String(error)}`)
     }
+    const send = (text: string) => {
+      res.writeHead(200, { ...head, 'Content-Type': type })
+      res.end(text)
+    }
+    let made: string | Promise<string>
+    try {
+      made = make()
+    } catch (error) {
+      fail(error)
+      return
+    }
+    if (typeof made === 'string') send(made)
+    else void made.then(send, fail)
   }
 }
 
-/** The four mounts answer before Vite's own middlewares. */
+/** Answers /licences.html with `page`, the licences page the build writes (#79). */
+export const licencesMount = (page: () => string): Middleware =>
+  madeMount(LICENCES_PATH, 'text/html', page)
+
+/** Answers the page's unpacker (src/gen5/core-unpack.ts) with `script`, the one classic script
+ * the build writes beside the page (scripts/gen5-built.ts). */
+export const unpackerMount = (script: () => Promise<string>): Middleware =>
+  madeMount(UNPACKER_PATH, 'text/javascript', script)
+
+/** The five mounts answer before Vite's own middlewares. */
 const emulatorjsMount: Plugin = {
   name: 'gen5-emulatorjs',
   configureServer(server) {
@@ -87,6 +113,7 @@ const emulatorjsMount: Plugin = {
     server.middlewares.use(mount(SAVES_PREFIX, (url) => savesFileFor(url, GEN5_PATHS.saves)))
     server.middlewares.use(mount(SOURCE_PREFIX, (url) => sourceFileFor(url, GEN5_PATHS.sources)))
     server.middlewares.use(licencesMount(() => licencesHtml(readLicencesInput(GEN5_PATHS.sources))))
+    server.middlewares.use(unpackerMount(bundleUnpacker))
   },
 }
 
