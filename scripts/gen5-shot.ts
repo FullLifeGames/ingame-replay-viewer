@@ -3,11 +3,12 @@
 // count per second, Chromium's memory and every request the page made. A request that leaves the
 // machine is aborted and fails the run. Frames land in build/gen5/frames/ (gitignored, ADR 0002).
 // Usage: GEN5_DUMP=<path> node scripts/gen5-shot.ts [--scene boot|speed|pacing] [--seconds 90]
-// [--start-at-frame <n>] [--threads] [--built] [--label s1] [--page-shot <name>]. The scenes
-// "speed" and "pacing" run scripts/gen5-speed.ts. --built serves the built page
+// [--start-at-frame <n>] [--threads] [--built] [--label s1] [--page-shot <name>] [--save <file>].
+// The scenes "speed" and "pacing" run scripts/gen5-speed.ts. --built serves the built page
 // (scripts/gen5-built.ts) instead of Vite's dev server, and a websocket or a Vite client request
-// fails the run. --page-shot saves the page at a phone's 360 px width before the pick.
-import { mkdirSync } from 'node:fs'
+// fails the run. --page-shot saves the page at a phone's 360 px width before the pick. --save
+// <file> loads that save when the game starts (a save of the build machine, never served).
+import { mkdirSync, readFileSync } from 'node:fs'
 import type { AddressInfo } from 'node:net'
 import { parseArgs } from 'node:util'
 
@@ -15,7 +16,15 @@ import { chromium, type Page } from '@playwright/test'
 
 import type { Gen5Global } from '../src/gen5/hook.ts'
 import { paceBetween, paceLine, type PaceSample, paceWindows } from '../src/gen5/pace.ts'
-import { framesOf, log, pressStart, sampleLine, saveFrame, waitForStart } from './gen5-page.ts'
+import {
+  framesOf,
+  log,
+  logSave,
+  pressStart,
+  sampleLine,
+  saveFrame,
+  waitForStart,
+} from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { loadAverage, sampleMemory } from './gen5-proc.ts'
 import { BUILT_PORT, buildGen5Page, startBuiltServer } from './gen5-built.ts'
@@ -53,6 +62,8 @@ interface ShotOptions {
   label: string
   /** The name of a 360 px wide page screenshot before the pick, if any. */
   pageShot: string | undefined
+  /** A save file of the build machine that the page loads when the game starts (#78). */
+  save: string | undefined
 }
 
 /** A phone's width in CSS pixels, for the page screenshot before the pick. */
@@ -206,13 +217,22 @@ async function copyFigures(page: Page): Promise<void> {
 async function drive(page: Page, dump: string, options: ShotOptions): Promise<void> {
   await logCalibration(page)
   if (options.pageShot !== undefined) await pageShot(page, options.pageShot)
+  if (options.save !== undefined) {
+    const base64 = readFileSync(options.save).toString('base64')
+    await page.evaluate((bytes) => {
+      ;(globalThis as unknown as Gen5Global).gen5.queueSave(bytes)
+    }, base64)
+    log(`queued a save of ${String(Buffer.from(base64, 'base64').length)} bytes`)
+  }
   log(`before the dump; ${sampleLine()}`)
   await page.setInputFiles('#dump', dump)
   await waitForStart(page)
+  await logSave(page, 'at the start')
   log(
     `core options: ${await page.evaluate(() => (globalThis as unknown as Gen5Global).gen5.coreOptions())}`,
   )
   await playScene(page, options)
+  await logSave(page, 'at the end')
   await copyFigures(page)
   log(
     `${sampleLine()}; status: ${await page.evaluate(() => (globalThis as unknown as Gen5Global).gen5.status())}`,
@@ -256,6 +276,7 @@ async function main(): Promise<void> {
       built: { type: 'boolean', default: false },
       label: { type: 'string', default: 's1' },
       'page-shot': { type: 'string' },
+      save: { type: 'string' },
     },
   })
   const dump = process.env.GEN5_DUMP
@@ -272,6 +293,7 @@ async function main(): Promise<void> {
     built: values.built,
     label: values.label,
     pageShot: values['page-shot'],
+    save: values.save,
   })
 }
 

@@ -76,3 +76,17 @@ export async function pressStart(page: Page, frame: number): Promise<void> {
   )
   log(`pressed Start at frame ${String(frame)}`)
 }
+
+/** Logs the game's save as the core holds it (#78): the path the core reports, the save folder's
+ * file system, and the file's size and SHA-256 once the core wrote one. */
+export async function logSave(page: Page, when: string): Promise<void> {
+  const save = await page.evaluate(() => (globalThis as unknown as Gen5Global).gen5.takeSave())
+  if (save === undefined) {
+    log(`save ${when}: the game is not running`)
+    return
+  }
+  const file = save.file
+    ? `${String(save.file.bytes)} bytes, SHA-256 ${save.file.sha256}`
+    : 'no file yet'
+  log(`save ${when}: path ${save.path}, folder on ${save.mount}, ${file}`)
+}
