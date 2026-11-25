@@ -13,7 +13,7 @@ import { parseArgs } from 'node:util'
 
 import { build } from 'vite'
 
-import { UNPACKER_ENTRY, UNPACKER_SCRIPT } from '../src/gen5/core-unpack.ts'
+import { UNPACKER_ENTRY, UNPACKER_SCRIPT } from '../src/gen5/unpacker.ts'
 import { fileFor, ISOLATION, sendFile, type ServedFolders } from './gen5-files.ts'
 import { readLicencesInput, writeLicencesPage } from './gen5-licences-read.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'

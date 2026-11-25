@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { UNPACKER_PATH } from '../src/gen5/core-unpack'
+import { UNPACKER_PATH } from '../src/gen5/unpacker'
 import { isLocalRequest, RequestLog, requestFault, storageCheck } from './gen5-requests'
 
 const origin = 'http://gen5.localhost:5183'

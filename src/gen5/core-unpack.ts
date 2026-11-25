@@ -3,19 +3,9 @@
 // window.EJS_paths names for extract7z.js, starts it as a classic worker, posts it the core's 7z
 // archive and waits for three kinds of message: progress (t 4), a file (t 2) and done (t 1). It
 // resolves on done alone, so every way out posts done. This module holds the worker's logic on
-// unpack7z (src/gen5/seven-zip.ts), and the script's name and path, which the page, the build,
-// the manifest and both servers read; the worker's own shell is src/web/gen5/extract7z.ts.
+// unpack7z (src/gen5/seven-zip.ts); src/gen5/unpacker.ts names the script, and the worker's own
+// shell is src/web/gen5/extract7z.ts.
 import { type SevenZipEntry, unpack7z } from './seven-zip.ts'
-
-/** EmulatorJS's name for its 7z unpacker, by which window.EJS_paths maps it, and the name of the
- * page's own worker script that stands in for it. */
-export const UNPACKER_SCRIPT = 'extract7z.js'
-
-/** Where both servers answer the worker script: the page's root. */
-export const UNPACKER_PATH = `/${UNPACKER_SCRIPT}`
-
-/** The worker's source in the page's folder, which scripts/gen5-built.ts bundles. */
-export const UNPACKER_ENTRY = 'extract7z.ts'
 
 /** The message kinds of compression.js. */
 export const PROGRESS = 4
@@ -38,12 +28,6 @@ export interface UnpackReport {
   files: number
   bytes: number
   ms: number
-}
-
-/** What the page sets as window.EJS_paths: EmulatorJS's 7z unpacker resolves to the page's own
- * worker, every other file of EmulatorJS stays where its data path puts it. */
-export function emulatorPaths(): Record<string, string> {
-  return { [UNPACKER_SCRIPT]: UNPACKER_PATH }
 }
 
 /** The archive's bytes from the message EmulatorJS posts: a Uint8Array, or a bare buffer. */

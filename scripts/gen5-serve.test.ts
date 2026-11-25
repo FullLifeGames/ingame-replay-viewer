@@ -7,7 +7,7 @@ import { isFileLoadingAllowed, resolveConfig } from 'vite'
 import { archiveName, SOURCES } from './gen5-manifest'
 import { GEN5_PATHS } from './gen5-paths'
 import { gen5ServerConfig, licencesMount, unpackerMount } from './gen5-serve'
-import { UNPACKER_PATH } from '../src/gen5/core-unpack'
+import { UNPACKER_PATH } from '../src/gen5/unpacker'
 
 /** Runs `url` through the mount with an invented page; gives the answer, or 'next'. */
 function answer(url: string, page: () => string) {

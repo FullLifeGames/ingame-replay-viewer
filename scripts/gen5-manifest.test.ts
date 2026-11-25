@@ -13,7 +13,7 @@ import {
   SOURCES,
 } from './gen5-manifest'
 import { checkManifest, type ManifestDraft } from './gen5-manifest-check'
-import { UNPACKER_PATH } from '../src/gen5/core-unpack'
+import { UNPACKER_PATH } from '../src/gen5/unpacker'
 
 const SOURCE = {
   name: 'tool',

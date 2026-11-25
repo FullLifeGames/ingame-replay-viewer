@@ -5,7 +5,7 @@
 // (scripts/gen5-requests.ts). The page's own files are described as rules in OWN_FILES. Each
 // component's notice files stand in scripts/gen5-notices.ts, its source's pin in
 // scripts/gen5-pins.ts.
-import { UNPACKER_PATH } from '../src/gen5/core-unpack.ts'
+import { UNPACKER_PATH } from '../src/gen5/unpacker.ts'
 import { type Notice, NOTICES } from './gen5-notices.ts'
 import {
   BUILD_SOURCE,
@@ -203,7 +203,7 @@ export const OWN_FILES: readonly OwnFiles[] = [
     source: 'this repository at the commit the page was built from',
   },
   // EmulatorJS's compression.js asks for data/compression/extract7z.js, whose licence nobody names
-  // (U1); the page's window.EJS_paths sends it to this worker instead (src/gen5/core-unpack.ts).
+  // (U1); the page's window.EJS_paths sends it to this worker instead (src/gen5/unpacker.ts).
   {
     id: 'unpacker',
     files: `${UNPACKER_PATH}, the viewer's worker that unpacks the emulator's core in place of EmulatorJS's data/compression/extract7z.js`,

@@ -10,7 +10,7 @@ import {
   type Source,
   VIEWER_REPOSITORY,
 } from './gen5-manifest'
-import { UNPACKER_PATH } from '../src/gen5/core-unpack'
+import { UNPACKER_PATH } from '../src/gen5/unpacker'
 
 // Invented inputs: two sources, three components, invented texts.
 const CORE: Source = {

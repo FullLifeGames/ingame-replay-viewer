@@ -17,7 +17,8 @@ import {
 import { writeLicencesPage } from './gen5-licences-read'
 import { archiveName, COMPONENTS, SITE_FILES } from './gen5-manifest'
 import { GEN5_PATHS } from './gen5-paths'
-import { DONE, FILE, UNPACKER_PATH, UNPACKER_SCRIPT } from '../src/gen5/core-unpack'
+import { DONE, FILE } from '../src/gen5/core-unpack'
+import { UNPACKER_PATH, UNPACKER_SCRIPT } from '../src/gen5/unpacker'
 import { fromBase64 } from '../src/gen5/lzma.fixtures'
 import { ARCHIVES } from '../src/gen5/seven-zip.fixtures'
 

@@ -19,7 +19,7 @@ import {
   bundleUnpacker,
   startBuiltServer,
 } from './gen5-built.ts'
-import { UNPACKER_PATH } from '../src/gen5/core-unpack.ts'
+import { UNPACKER_PATH } from '../src/gen5/unpacker.ts'
 import { SAVES_PREFIX } from '../src/gen5/save-file.ts'
 import {
   ISOLATION,

@@ -39,7 +39,7 @@ The licences page holds, in this order:
 - `scripts/gen5-sources.ts` fetches each source's commit into a bare repository under `.cache/gen5/sources/git/`. It keeps a ref under `refs/pins/` on that commit, writes the archive with `git archive` and checks the tar's SHA-256 against the pin before it places the file.
 - `scripts/gen5-licences-read.ts` reads each notice and the GPL's text from the bare repositories with `git show <commit>:<path>`, and every file of such a folder in one `git cat-file --batch`. `scripts/gen5-notice-groups.ts` groups those files by their opening comment. `scripts/gen5-licences.ts` turns them into the page and escapes every string it got from a file.
 - `scripts/gen5-built.ts` writes `licences.html` beside the built page. The dev server (`scripts/gen5-serve.ts`) makes it on each request. Both answer `/source/<archive>` for the manifest's archives alone.
-- `src/gen5/core-unpack.ts` names the page's unpacker and its path, which the page, the build, the manifest and both servers read (see "The core's unpacker").
+- `src/gen5/unpacker.ts` names the page's unpacker and its path, which the page, the build, the manifest and both servers read (see "The core's unpacker").
 - `scripts/gen5-licences-shot.ts` checks it all in a browser: the notice above the file input at 360 px, the licences page, and a `HEAD` to every source link.
 
 Run `node scripts/gen5-sources.ts` once before you build. Without the archives the build stops and says so.
@@ -85,7 +85,7 @@ The page sets `window.EJS_paths` so that EmulatorJS fetches `/extract7z.js` inst
 The code:
 
 - `src/gen5/range-decoder.ts` and `src/gen5/lzma.ts` decode LZMA, `src/gen5/lzma2.ts` LZMA2's chunks, and `src/gen5/seven-zip.ts` with its header and reader modules the 7z container. It reads LZMA2 and LZMA, the two methods the cores use, checks every CRC the archive carries and refuses any other method by name.
-- `src/gen5/core-unpack.ts` holds the worker's logic, the script's name and its path.
+- `src/gen5/core-unpack.ts` holds the worker's logic, and `src/gen5/unpacker.ts` the script's name and its path.
 - `src/web/gen5/extract7z.ts` is the worker's shell. EmulatorJS starts it from a Blob URL, where a module could not load its imports, so `scripts/gen5-built.ts` bundles it into one classic script, for the build and for the dev server.
 
 We wrote the decoder from these texts:
