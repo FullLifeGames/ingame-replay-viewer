@@ -90,7 +90,7 @@ describe('readRouteOptions', () => {
 
   it('refuses a save name the servers would not answer', () => {
     expect(() => readRouteOptions(['--take-save', '../town'], NOW)).toThrow(
-      '--take-save takes lower-case letters, digits and inner hyphens, not "../town".',
+      '--take-save takes lower-case letters and digits, with single hyphens between them, not "../town".',
     )
   })
 

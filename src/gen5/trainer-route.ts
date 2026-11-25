@@ -8,9 +8,17 @@
 // does no harm. Frame counts are our readings of
 // earlier runs' frames, and every position is our reading of RAM in a run.
 import type { RoutePlaces } from './bw2-numbers.ts'
-import { type Button, mark, type MacroStep, press, PRESS_FRAMES, routeSlice } from './macro.ts'
+import {
+  type Button,
+  mark,
+  type MacroStep,
+  press,
+  PRESS_FRAMES,
+  routeSlice,
+  TEXT_EVERY,
+} from './macro.ts'
 import type { RamCheck, RamRef } from './ram-check.ts'
-import { PLAYER_X, PLAYER_Z } from './route.ts'
+import { LOOKOUT_ROW, PLAYER_X, PLAYER_Z } from './route.ts'
 import {
   fastText,
   OPTIONS_SLOT_WITH_POKEDEX,
@@ -28,9 +36,6 @@ export const FIELD_Z: RamRef = { name: 'field z', address: 0x0223b452, width: 2 
 
 /** Frames between two marks of a scene. */
 const BEAT = 150
-
-/** Frames from one press that closes text to the next. */
-const TEXT_EVERY = 20
 
 /** `count` beats of BEAT frames with `button` every TEXT_EVERY frames, and `held` on every frame,
  * each followed by a mark `<prefix>-NN`. */
@@ -102,7 +107,7 @@ const CITY: MacroStep[] = [...beats('shoes', 24, 'B'), mark('city-free')]
  * free below the gate's north door at gate-08. The position refs read 0 in the gate. */
 const GATE: MacroStep[] = [
   ...walkTo('gate-column', 'Right', { ...PLAYER_X, oneOf: [54] }),
-  ...walkTo('gate-road', 'Up', { ...PLAYER_Z, atMost: 721 }),
+  ...walkTo('gate-road', 'Up', { ...PLAYER_Z, atMost: LOOKOUT_ROW }),
   ...beats('gate', 8, 'B', ['Up']),
 ]
 

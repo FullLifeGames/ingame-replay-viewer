@@ -8,7 +8,7 @@ import { parseArgs } from 'node:util'
 import { continueRoute } from '../src/gen5/continue-route.ts'
 import type { RunPlan } from '../src/gen5/hook.ts'
 import type { RamCheck, RamRef } from '../src/gen5/ram-check.ts'
-import { isSaveName } from '../src/gen5/save-file.ts'
+import { isSaveName, SAVE_NAME_RULE } from '../src/gen5/save-file.ts'
 import type { SceneName } from './gen5-moment-scene.ts'
 
 /** The spike's state at the rival battle's action menu (#72). */
@@ -36,8 +36,7 @@ const isScene = (name: string): name is SceneName => name === 'known' || name ==
 
 function startOf(save: string | undefined): MomentStart {
   if (save === undefined) return { from: 'state', state: SPIKE_STATE }
-  if (!isSaveName(save))
-    throw new Error(`--save takes lower-case letters, digits and inner hyphens, not "${save}".`)
+  if (!isSaveName(save)) throw new Error(`--save takes ${SAVE_NAME_RULE}, not "${save}".`)
   return { from: 'boot', save, query: `?save=${save}` }
 }
 

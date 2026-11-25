@@ -58,6 +58,9 @@ export type MacroStep =
 /** Frames a scripted press holds its buttons: the game reads its pad once per frame. */
 export const PRESS_FRAMES = 4
 
+/** Frames from one press that closes text to the next, where a route presses on through talk. */
+export const TEXT_EVERY = 20
+
 export const wait = (frames: number): MacroStep => ({ kind: 'wait', frames })
 export const press = (button: Button, frames = PRESS_FRAMES): MacroStep => ({
   kind: 'press',

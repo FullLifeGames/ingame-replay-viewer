@@ -1,6 +1,6 @@
 # The Gen 5 save before a trainer
 
-`src/web/gen5/saves/route-20.sav` is a battery save of Black 2 (USA), played from New Game on the build machine for the Gen 5 page (#78). The page loads it into melonDS before the game starts, so Continue puts the player two tiles from a trainer, and a short macro walks into his battle. ADR 0002 lets the file ship: a save holds player data alone. It is the one kind of game file the tracked tree may hold.
+`src/web/gen5/saves/route-20.sav` is a battery save of Black 2 (USA), played from New Game on the build machine for the Gen 5 page (#78). The page loads it into melonDS before the game starts, so Continue puts the player two tiles west of the column a trainer looks up, and a short macro walks into his battle. ADR 0002 lets the file ship: a save holds player data alone. It is the one kind of game file the tracked tree may hold.
 
 ## The trainer
 
@@ -24,7 +24,7 @@ On Route 20, on the dirt road from Floccesy Town, two tiles west of the column T
 
 ## The steps by hand
 
-These steps follow the scenes that the build machine's macro played (below). Nobody has played them by hand yet. Anyone with their own dump can try them on the Gen 5 page:
+These steps follow the scenes that the build machine's macro played (below). Nobody has played them by hand yet. Anyone with their own dump can try them on the Gen 5 page, but the page has no button yet that hands the save out. It keeps the save in memory, hides the emulator's own save buttons, and a reload loses the play.
 
 1. New Game. Through Professor Juniper's talk, answer that you are a boy, name the player IRV and keep the rival's name Hugh.
 2. In Aspertia City follow the story to the lookout: Hugh's talk, then Bianca's. Say yes to her Pokédex request, take Tepig and give it no nickname.
@@ -35,9 +35,11 @@ These steps follow the scenes that the build machine's macro played (below). Nob
 7. Walk east along that road into Route 20 and stop two tiles west of Terrell's column, facing east.
 8. In the field menu set the text speed to fast in Options, then Save.
 
+After step 8 the one way out is the page's hook in the browser's console: `await window.gen5.takeSave()` returns the save's path, the file system its folder sits on, and the file in base64 with its SHA-256 and its size in bytes. Decode the base64 into the file.
+
 ## How the build machine made it
 
-The spike's route (`src/gen5/route.ts`) played from New Game to the rival battle's action menu in pieces, each run starting from a state that an earlier run saved. From there `src/gen5/trainer-route.ts` played the battle and every step above to the save, and `scripts/gen5-route.ts --route trainer --take-save route-20` read the file out of the core once the game had written it. The play from the rival battle's menu to the save took 28,387 frames, and the game had saved 61,957 frames after New Game.
+The spike's route (`src/gen5/route.ts`) played from New Game to the rival battle's action menu in pieces, each run starting from a state that an earlier run saved. From there runs of earlier versions of `src/gen5/trainer-route.ts` played the battle and every step above to the save, again in pieces, each from a state the run before saved. Several scenes changed after the runs that played them, and nobody has played the file as committed from start to end. `scripts/gen5-route.ts --route trainer --take-save route-20` read the file out of the core once the game had written it. The play from the rival battle's menu to the save took 28,387 frames, and the game had saved 61,957 frames after New Game.
 
 The stretch before the rival battle rests on states made under earlier versions of the spike's route (`docs/gen5-spike.md`, "Into a battle"). A remake from boot plays other frames, so it gives another file with another hash.
 

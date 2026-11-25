@@ -49,7 +49,7 @@ describe('readMomentOptions', () => {
       '--scene takes known or unknown, not "other".',
     )
     expect(() => readMomentOptions(['--save', '../route-20'], NOW)).toThrow(
-      '--save takes lower-case letters, digits and inner hyphens, not "../route-20".',
+      '--save takes lower-case letters and digits, with single hyphens between them, not "../route-20".',
     )
     expect(() => readMomentOptions(['--minutes', '0'], NOW)).toThrow(
       '--minutes takes a positive number, not "0".',

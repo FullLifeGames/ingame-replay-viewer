@@ -7,7 +7,7 @@
 // --label, --uncapped, --minutes.
 import { parseArgs } from 'node:util'
 
-import { isSaveName } from '../src/gen5/save-file.ts'
+import { isSaveName, SAVE_NAME_RULE } from '../src/gen5/save-file.ts'
 
 const ROUTES = ['new-game', 'save-here', 'continue', 'trainer'] as const
 
@@ -55,9 +55,7 @@ function check(options: RouteOptions, minutes: number, minutesText: string): voi
   const problem = routeProblem(options)
   if (problem !== undefined) throw new Error(problem)
   if (options.takeSave !== undefined && !isSaveName(options.takeSave))
-    throw new Error(
-      `--take-save takes lower-case letters, digits and inner hyphens, not "${options.takeSave}".`,
-    )
+    throw new Error(`--take-save takes ${SAVE_NAME_RULE}, not "${options.takeSave}".`)
   if (!(minutes > 0)) throw new Error(`--minutes takes a positive number, not "${minutesText}".`)
 }
 

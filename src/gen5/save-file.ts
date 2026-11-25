@@ -31,9 +31,13 @@ export const SAVE_PATH = savePath(CONTENT_NAME, SAVE_EXTENSION)
 /** Where both servers answer the saves we made; only names that pass `isSaveName`. */
 export const SAVES_PREFIX = '/saves/'
 
-/** Lower-case letters, digits and inner hyphens: no dot, no slash, nothing that climbs. */
+/** What `isSaveName` takes, in the words of the scripts' refusals. */
+export const SAVE_NAME_RULE = 'lower-case letters and digits, with single hyphens between them'
+
+/** Lower-case letters and digits, with single hyphens between them: no dot, no slash, no hyphen
+ * at an end or two in a row, nothing that climbs. */
 export function isSaveName(name: string): boolean {
-  return /^[a-z0-9][a-z0-9-]*$/.test(name)
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name)
 }
 
 export const saveUrl = (name: string) => `${SAVES_PREFIX}${name}.${SAVE_EXTENSION}`

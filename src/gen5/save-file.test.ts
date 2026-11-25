@@ -4,6 +4,7 @@ import {
   CONTENT_NAME,
   isSaveName,
   SAVE_FOLDER,
+  SAVE_NAME_RULE,
   SAVE_PATH,
   saveName,
   savePath,
@@ -36,6 +37,15 @@ describe('the save the address names', () => {
     expect(saveName('?save=Route')).toBeUndefined()
     expect(isSaveName('-x')).toBe(false)
     expect(isSaveName('route-20')).toBe(true)
+  })
+
+  it('takes single hyphens between letters and digits, and no hyphen at an end or doubled', () => {
+    expect(isSaveName('a')).toBe(true)
+    expect(isSaveName('a-b-c')).toBe(true)
+    expect(isSaveName('route-20')).toBe(true)
+    expect(isSaveName('a-')).toBe(false)
+    expect(isSaveName('a--b')).toBe(false)
+    expect(SAVE_NAME_RULE).toBe('lower-case letters and digits, with single hyphens between them')
   })
 
   it('says so when the address names a save that is no save name', () => {

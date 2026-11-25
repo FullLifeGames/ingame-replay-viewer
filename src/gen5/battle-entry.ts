@@ -9,14 +9,11 @@
 // buttons, so neither form presses a button in the frame they first hold or after it. The adapter
 // marks the action chosen only once the whole action is picked (btl_client.c), so the hold cannot
 // see an A that opened the move list; the run's frames show the action menu untouched.
-import { mark, type MacroStep, press, PRESS_FRAMES, wait } from './macro.ts'
+import { mark, type MacroStep, press, PRESS_FRAMES, TEXT_EVERY, wait } from './macro.ts'
 import type { RamCheck } from './ram-check.ts'
 
 /** The opening runs until Start skips it, at the frame S1 used (just after the logo). */
 export const TO_TITLE: MacroStep[] = [wait(1900), press('Start'), wait(600), mark('title')]
-
-/** Frames from one press of A to the next while the battle comes. */
-const TEXT_EVERY = 20
 
 /** Frames in a row the battle checks hold before the route calls the action menu standing. */
 const STANDING_FRAMES = 60
