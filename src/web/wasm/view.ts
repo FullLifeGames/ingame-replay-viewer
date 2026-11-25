@@ -1,7 +1,9 @@
 // The viewer's DOM: the elements of index.html and what main.ts shows in them.
-// The replay controls and the list come from replay-view.ts, as on the emulator page.
+// The replay controls and the list come from replay-view.ts, as on the emulator page; the panel
+// and the team list are the viewer's own.
 import type { ReplayPlace, ReplaySummary } from '../replay-choice'
 import {
+  fill,
   findReplayView,
   fitDetails,
   element as pageElement,
@@ -11,6 +13,7 @@ import {
   showVisitorLine,
 } from '../replay-view'
 import type { PanelText } from '../status'
+import { TEAM_SIDES, teamLists } from '../teams'
 import type { VisitorLine } from '../visitor'
 import type { PauseButton } from './pause'
 import { SPEEDS, type Speed } from './protocol'
@@ -59,14 +62,39 @@ function findPause() {
   }
 }
 
-/** The shared replay view, which also keeps the summary it showed last, for the panel. */
+/**
+ * The team list under the game (#87): each side's heading and Pokémon, written as text, never as
+ * markup, since the names come from other people's replays. A replay without Team Preview hides it.
+ */
+function findTeams(): (summary: ReplaySummary) => void {
+  const section = element('teams', HTMLElement)
+  const columns = TEAM_SIDES.map((side) => ({
+    heading: element(`teams-${side}`, HTMLParagraphElement),
+    members: element(`teams-${side}-members`, HTMLOListElement),
+  }))
+  return (summary) => {
+    const lists = teamLists(summary)
+    section.hidden = lists === undefined
+    columns.forEach(({ heading, members }, at) => {
+      heading.textContent = lists?.[at]?.heading ?? ''
+      fill(members, lists?.[at]?.members ?? [])
+    })
+  }
+}
+
+/**
+ * The shared replay view with the team list, which also keeps the summary it showed last, for
+ * the panel.
+ */
 function findShownReplayView() {
   const replayView = findReplayView(PAGE)
+  const showTeams = findTeams()
   let shown: ReplaySummary | undefined
   return {
     ...replayView,
     showReplay: (summary: ReplaySummary): void => {
       replayView.showReplay(summary)
+      showTeams(summary)
       shown = summary
     },
     /** The replay the list shows: the newest pick that did not fail. */

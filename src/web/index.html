@@ -24,9 +24,29 @@
       #test-replay {
         max-width: 100%;
       }
-      #panel p {
+      #panel p,
+      #teams p {
         margin: 0.25em 0;
         overflow-wrap: anywhere;
+      }
+      /* The team list (#87): two columns, far side first, that fit a 390 px phone. */
+      #teams {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 1em;
+        width: min(720px, 100%);
+        overflow-wrap: anywhere;
+      }
+      #teams[hidden] {
+        display: none;
+      }
+      #teams h2 {
+        grid-column: 1 / -1;
+        margin: 0.5em 0 0;
+      }
+      #teams ol {
+        margin: 0;
+        padding-left: 1.5em;
       }
       fieldset {
         display: inline;
@@ -106,6 +126,17 @@
         <p id="panel-turn"></p>
       </div>
       <canvas id="screen" width="240" height="160"></canvas>
+      <section id="teams" hidden>
+        <h2>Teams</h2>
+        <div>
+          <p id="teams-far"></p>
+          <ol id="teams-far-members"></ol>
+        </div>
+        <div>
+          <p id="teams-near"></p>
+          <ol id="teams-near-members"></ol>
+        </div>
+      </section>
       <p id="replay-summary"></p>
       <h2 id="not-shown">Not shown in the game (0)</h2>
       <ul id="not-shown-counts"></ul>
