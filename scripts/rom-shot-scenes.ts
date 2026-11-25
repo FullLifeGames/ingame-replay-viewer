@@ -216,8 +216,8 @@ function winScene(input: Input): Scene | undefined {
 // Measured on the 994052 and hand-made frames of step 7: 0 pixels differ. Far, the intro draws the
 // trainer centred on (176, 40) (OpponentHandleDrawTrainerPic,
 // U/src/battle_controller_opponent.c:374-413), 32 pixels left of the slide's end, and the field
-// behind the trainer's clear pixels differs between the two places (524 pixels on 2717564545 and
-// 993907). So the placed probe (rom-shot-placed.ts) looks for the intro's trainer in the region:
+// behind the trainer's clear pixels differs between the two places (524 pixels on six of the seven
+// test replays that the far side wins, 514 on 994128, in both engines). So the placed probe (rom-shot-placed.ts) looks for the intro's trainer in the region:
 // the best match must lie at the slide's end and nowhere within 16 pixels of it, which a trainer
 // a frame short of its end (2 pixels right) fails, as do an empty field, a fading frame and a
 // black one. Without an intro either side checks only that the winner's mon went back or its

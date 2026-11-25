@@ -22,7 +22,9 @@ export interface PlacedCheck {
 
 // At its place a sprite's count is at most this share of the count a pixel off on either side.
 // Measured on 993907's far trainer in both engines: 524 pixels at the place, 1190 and 1191 a pixel
-// off (a share of 0.44); on hand-made's empty far field 1331 against 1330 and 1330.
+// off (a share of 0.44); on hand-made's empty far field 1331 against 1330 and 1330. Both engines
+// pass it on the seven test replays that the far side wins: 524 pixels at the place and 1190 a
+// pixel off on six of them, 514 and 1146 on 994128 (0.45).
 const SHARP_SHARE = 0.75
 
 // The pixel as 0xRRGGBB.
