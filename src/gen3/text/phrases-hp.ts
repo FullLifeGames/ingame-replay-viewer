@@ -25,6 +25,9 @@ export const HP_TEMPLATES = {
   spikes: tagged('STRINGID_PKMNHURTBYSPIKES', (who: Mon) => {
     return `${nameAtStart(who)} was hurt by the spikes!`
   }),
+  stealthRock: tagged('STRINGID_STEALTHROCKDMG', (who: Mon) => {
+    return `Pointed stones dug into ${nameInside(who)}!`
+  }),
   poison: tagged('STRINGID_PKMNHURTBYPOISON', (who: Mon) => {
     return `${nameAtStart(who)} was hurt by its poisoning!`
   }),
@@ -79,6 +82,7 @@ const HURT_BY: Readonly<Record<string, (who: Mon) => string>> = {
   sandstorm: HP_TEMPLATES.sandstorm.render,
   hail: HP_TEMPLATES.hail.render,
   spikes: HP_TEMPLATES.spikes.render,
+  stealthrock: HP_TEMPLATES.stealthRock.render,
   psn: HP_TEMPLATES.poison.render,
   tox: HP_TEMPLATES.poison.render,
   brn: HP_TEMPLATES.burn.render,
