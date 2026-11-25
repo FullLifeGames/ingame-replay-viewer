@@ -41,6 +41,24 @@ describe('the spike page', () => {
     expect(input).not.toMatch(/accept/i)
   })
 
+  // Scene: the notice stands before the file input (#79, GPL-3.0 section 5(d)).
+  it('shows the GPL notice before the file input and links the licences page', () => {
+    const notice = /<section id="licence-notice">(.*?)<\/section>/s.exec(html)
+    expect(notice).not.toBeNull()
+    expect(notice?.index).toBeLessThan(html.indexOf('<input id="dump"'))
+    const text = (notice?.[1] ?? '').replace(/\s+/g, ' ')
+    for (const words of [
+      'GNU General Public License, version 3',
+      `EmulatorJS ${COMPONENTS.emulatorjs.version}`,
+      'melonDS',
+      'RetroArch',
+      'no warranty',
+      '<a href="licences.html">',
+    ]) {
+      expect(text).toContain(words)
+    }
+  })
+
   it('shows the speed cap, the core switch, the copy button and the phone note', () => {
     for (const id of ['uncapped', 'core-switch', 'vsync-switch', 'copy', 'figures', 'phone-note']) {
       expect(html).toContain(`id="${id}"`)

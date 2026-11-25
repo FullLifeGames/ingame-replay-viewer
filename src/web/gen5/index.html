@@ -20,6 +20,11 @@
         font-family: ui-monospace, monospace;
         font-size: 0.85rem;
       }
+      #licence-notice {
+        font-size: 0.9rem;
+        border-left: 3px solid #888;
+        padding-left: 0.75rem;
+      }
       #game {
         width: min(512px, 100%);
         aspect-ratio: 2 / 3;
@@ -28,6 +33,16 @@
   </head>
   <body>
     <h1>Gen 5 spike</h1>
+    <section id="licence-notice">
+      <p>
+        This page runs EmulatorJS 4.2.3 with its melonDS core and RetroArch, copyright their
+        authors, together with this viewer's own code. The page as a whole is licensed to you under
+        the GNU General Public License, version 3 (GPL-3.0). You may copy, change and share it under
+        that licence. It comes with no warranty.
+        <a href="licences.html">Licences and source code</a> holds the licence text, every copyright
+        notice and the source of each file this page sends.
+      </p>
+    </section>
     <p>
       <label for="dump">Pick your Black 2 (USA) dump. It stays in this browser.</label>
       <input id="dump" type="file" />
