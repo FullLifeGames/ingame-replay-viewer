@@ -23,6 +23,7 @@ const PIN: Source = {
   repository: 'https://github.com/example/tool',
   commit: 'a'.repeat(40),
   tar: 'b'.repeat(64),
+  basis: 'the tag v1.0.0',
 }
 
 const sha256 = (bytes: Uint8Array | string) => createHash('sha256').update(bytes).digest('hex')
@@ -34,11 +35,12 @@ describe('pinFaults', () => {
 
   it('names each fault of a pin with its source', () => {
     const bad = { name: 'Tool/x', repository: 'https://example.com/tool.git', commit: 'abc1234' }
-    expect(pinFaults({ ...bad, tar: 'b'.repeat(63) })).toEqual([
+    expect(pinFaults({ ...bad, tar: 'b'.repeat(63), basis: ' ' })).toEqual([
       'Tool/x: the name is not lower-case letters, digits, dots and dashes',
       'Tool/x: the repository is no https://github.com/<owner>/<repo>',
       'Tool/x: the commit is no full 40-hex id',
       "Tool/x: the tar's SHA-256 is no 64-hex digest",
+      'Tool/x: the basis of its commit is empty',
     ])
   })
 

@@ -21,6 +21,16 @@ const placed =
       existsSync(join(GEN5_PATHS.sources, 'git', `${source.name}.git`, 'HEAD')),
   )
 
+/** The .c and .h files git lists under libretro-common/ at RetroArch's pin. */
+function libretroCommonFiles(): string[] {
+  const commit = SOURCES.find((source) => source.name === 'retroarch')?.commit ?? ''
+  const dir = join(GEN5_PATHS.sources, 'git', 'retroarch.git')
+  const args = ['-C', dir, 'ls-tree', '-r', '--name-only', commit, '--', 'libretro-common/']
+  return execFileSync('git', args, { encoding: 'utf8' })
+    .split('\n')
+    .filter((path) => /\.[ch]$/.test(path))
+}
+
 describe.skipIf(!placed)(
   'the licences page from the pins (skips unless scripts/gen5-sources.ts placed every source)',
   () => {
@@ -36,6 +46,25 @@ describe.skipIf(!placed)(
       }
     })
 
+    // Scene: the licence id follows the notice's own words (review W6).
+    it('names a GPL component "or later" exactly where one of its notices says so', () => {
+      const words = (text: string) => text.replace(/\s+/g, ' ')
+      for (const [id, part] of Object.entries(COMPONENTS)) {
+        if (typeof part.licence !== 'string' || !part.licence.startsWith('GPL')) continue
+        const later = (input?.notices ?? []).some(
+          (notice) =>
+            notice.component === id &&
+            words(notice.text).includes(
+              'version 3 of the License, or (at your option) any later version',
+            ),
+        )
+        expect({ id, licence: part.licence }).toEqual({
+          id,
+          licence: later ? 'GPL-3.0-or-later' : 'GPL-3.0-only',
+        })
+      }
+    })
+
     it("takes the GPL's full text from melonDS's LICENSE", () => {
       expect(input?.gpl.trimStart().startsWith('GNU GENERAL PUBLIC LICENSE')).toBe(true)
       expect(input?.gpl).toContain('END OF TERMS AND CONDITIONS')
@@ -44,21 +73,10 @@ describe.skipIf(!placed)(
     // Scene: libretro-common's files carry other notices beside the MIT one (review W1).
     it("groups every .c and .h file of libretro-common at RetroArch's pin by its notice", () => {
       const tree = input?.trees.find((read) => read.part === 'libretro-common')
-      const retroarch = COMPONENTS.retroarch.source
-      const dir = join(GEN5_PATHS.sources, 'git', `${retroarch.name}.git`)
-      const listed = execFileSync(
-        'git',
-        ['-C', dir, 'ls-tree', '-r', '--name-only', retroarch.commit, '--', 'libretro-common/'],
-        { encoding: 'utf8' },
-      )
-        .split('\n')
-        .filter((path) => /\.[ch]$/.test(path))
-      const grouped = [
-        ...(tree?.groups.flatMap((group) => group.paths) ?? []),
-        ...(tree?.bare ?? []),
-      ]
-      expect(grouped.sort()).toEqual(listed.sort())
-      const groupOf = (path: string) => tree?.groups.find((group) => group.paths.includes(path))
+      const groups = tree?.groups ?? []
+      const grouped = [...groups.flatMap((group) => group.paths), ...(tree?.bare ?? [])]
+      expect(grouped.sort()).toEqual(libretroCommonFiles().sort())
+      const groupOf = (path: string) => groups.find((group) => group.paths.includes(path))
       expect(groupOf('libretro-common/encodings/encoding_base64.c')?.text).toContain(
         'Copyright (C) 2013 William Sherif',
       )

@@ -19,6 +19,7 @@ const SOURCE = {
   repository: 'https://github.com/example/tool',
   commit: 'a'.repeat(40),
   tar: 'b'.repeat(64),
+  basis: 'the tag v1.0.0',
 }
 const TOOL: Component = {
   name: 'Tool',
@@ -27,6 +28,13 @@ const TOOL: Component = {
   from: '@example/tool@1.0.0',
   source: SOURCE,
   notices: [{ part: 'Tool', path: 'LICENSE', kind: 'licence' }],
+}
+
+/** The source of that name in SOURCES; throws when there is none. */
+function pin(name: string) {
+  const found = SOURCES.find((source) => source.name === name)
+  if (found === undefined) throw new Error(`no source ${name}`)
+  return found
 }
 
 function draft(tool: Partial<Component>, paths: readonly [string, string[]][]): ManifestDraft {
@@ -178,9 +186,44 @@ describe('the manifest', () => {
     }
   })
 
-  it("describes the page's own files and the saves by rule, under this repository's licence", () => {
-    expect(OWN_FILES.map((own) => own.licence)).toEqual(['MIT', 'MIT'])
+  // Scene: the save is the game's bytes from our play (review U-e), not code under MIT alone.
+  it("describes the page's own files and the saves by rule, the save's licence in words", () => {
+    expect(OWN_FILES.map((own) => own.licence)).toEqual([
+      'MIT',
+      {
+        words:
+          "The game wrote this save during our play from New Game on the build machine, as docs/gen5-save.md records. We offer it under the repository's MIT licence as far as it is ours.",
+      },
+    ])
     expect(OWN_FILES.map((own) => own.files).join(' ')).toContain('/saves/<name>.sav')
+  })
+
+  // Scene: each GPL notice at the pins says "or (at your option) any later version" (review W6).
+  it('names each GPL component by the id its notice states, and no plain GPL-3.0', () => {
+    const ids = Object.fromEntries(
+      Object.entries(COMPONENTS).map(([id, part]) => [id, part.licence]),
+    )
+    expect(ids).toMatchObject({
+      emulatorjs: 'GPL-3.0-or-later',
+      melonds: 'GPL-3.0-or-later',
+      retroarch: 'GPL-3.0-or-later',
+      build: 'GPL-3.0-or-later',
+      nipplejs: 'MIT',
+      socketio: 'MIT',
+    })
+    expect(Object.values(ids)).not.toContain('GPL-3.0')
+  })
+
+  // Scene: extract7z.js has no source to offer (review W3).
+  it('offers no source, with the reason, for a component without a named licence, and one for every other', () => {
+    for (const [id, part] of Object.entries(COMPONENTS)) {
+      const named = typeof part.licence === 'string'
+      const offered = !('none' in part.source)
+      expect({ id, offered }).toEqual({ id, offered: named })
+    }
+    expect(COMPONENTS.extract7z.source).toEqual({
+      none: "EmulatorJS's repository holds this same compiled file, not its source code, and nobody names where that lives.",
+    })
   })
 })
 
@@ -197,22 +240,39 @@ describe('the sources', () => {
     ])
     expect(new Set(SOURCES.map((source) => source.repository)).size).toBe(SOURCES.length)
     for (const part of Object.values(COMPONENTS)) {
-      const named = SOURCES.filter((source) => source.name === part.source.name)
-      expect(named, part.name).toEqual([part.source])
+      if ('none' in part.source) continue
+      const { source } = part
+      expect(
+        SOURCES.filter((each) => each.name === source.name),
+        part.name,
+      ).toEqual([source])
     }
   })
 
+  // Scene: the build scripts' commit is an inference from dates (review W4).
+  it('gives each source the basis of its commit in words', () => {
+    expect(Object.fromEntries(SOURCES.map((source) => [source.name, source.basis]))).toEqual({
+      emulatorjs: "the registry's gitHead of both pinned packages",
+      melonds: "the commit named in the core's own bytes",
+      retroarch: "the commit named in the core's own bytes",
+      'emulatorjs-build':
+        "inferred from dates: the head of the scripts' main branch around the core's build day",
+      nipplejs: 'the tag v0.10.2, the version the served file equals',
+      'socket.io': "the tag socket.io@4.8.1, the version the served file's header names",
+    })
+  })
+
   it("names EmulatorJS at the registry's gitHead of both pinned packages", () => {
-    const commit = COMPONENTS.emulatorjs.source.commit
+    const commit = pin('emulatorjs').commit
     expect(PACKAGES.map((pkg) => pkg.gitHead)).toEqual([commit, commit])
   })
 
   it('names each archive by its source and commit, and knows no other name', () => {
-    expect(archiveName(COMPONENTS.melonds.source)).toBe(
+    expect(archiveName(pin('melonds'))).toBe(
       'melonds-18a057d372783b42d7e297b8731f3c3d673cdcab.tar.gz',
     )
     expect(SOURCES.map(archiveName).filter((name) => !isSourceArchive(name))).toEqual([])
-    const listed = archiveName(COMPONENTS.melonds.source)
+    const listed = archiveName(pin('melonds'))
     for (const name of ['melonds.tar.gz', `${listed}.part`, '', 'git/melonds.git', `./${listed}`])
       expect(isSourceArchive(name), name).toBe(false)
   })

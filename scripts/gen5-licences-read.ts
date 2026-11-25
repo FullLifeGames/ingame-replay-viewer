@@ -21,6 +21,7 @@ import {
   type ComponentId,
   COMPONENTS,
   SITE_FILES,
+  sourceOf,
   SOURCES,
 } from './gen5-manifest.ts'
 import { groupNotices, type ReadTree, type TreeFile } from './gen5-notice-groups.ts'
@@ -48,11 +49,12 @@ export function readNotices(
   return (Object.keys(components) as ComponentId[]).flatMap((id) => {
     const part = components[id]
     return part.notices.map((notice) => {
+      const source = sourceOf(part)
       let text: string
       try {
-        text = read(part.source, notice.path)
+        text = read(source, notice.path)
       } catch (error) {
-        const at = `${notice.path} at ${part.source.commit}`
+        const at = `${notice.path} at ${source.commit}`
         throw new Error(`${part.name}: cannot read ${at}`, { cause: error })
       }
       return { ...notice, component: id, text: noticeText(part, notice, text) }
@@ -69,18 +71,19 @@ export function readNoticeTrees(
 ): ReadTree[] {
   return trees.map((tree) => {
     const part = components[tree.component]
+    const source = sourceOf(part)
     let files: readonly TreeFile[]
     try {
-      files = readTree(part.source, tree.folder)
+      files = readTree(source, tree.folder)
     } catch (error) {
-      const at = `${tree.folder} at ${part.source.commit}`
+      const at = `${tree.folder} at ${source.commit}`
       throw new Error(`${part.name}: cannot read ${at}`, { cause: error })
     }
     const kept = files.filter(
       ({ path }) =>
         path.startsWith(tree.folder) && tree.extensions.some((ending) => path.endsWith(ending)),
     )
-    return { ...tree, commit: part.source.commit, ...groupNotices(kept) }
+    return { ...tree, commit: source.commit, ...groupNotices(kept) }
   })
 }
 
@@ -116,7 +119,7 @@ export function readLicencesInput(sources: string): LicencesInput {
     notices: readNotices(COMPONENTS, read),
     trees,
     unfound: UNFOUND,
-    gpl: read(COMPONENTS[GPL_TEXT.component].source, GPL_TEXT.path),
+    gpl: read(sourceOf(COMPONENTS[GPL_TEXT.component]), GPL_TEXT.path),
     viewerLicence: readFileSync(join(GEN5_PATHS.repo, 'LICENSE'), 'utf8'),
   }
 }

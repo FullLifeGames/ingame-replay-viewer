@@ -2,7 +2,7 @@
 // every component names its licence and its source by commit, every file names a known
 // component, no path stands twice, and each source's pin is well formed. They take a loose shape,
 // so a spec can hand them a draft that lacks a field.
-import type { Component, Source } from './gen5-manifest.ts'
+import { type Component, isOffered, type Source } from './gen5-manifest.ts'
 
 export interface ManifestDraft {
   components: Readonly<Record<string, Partial<Component>>>
@@ -11,13 +11,19 @@ export interface ManifestDraft {
 
 const FULL_COMMIT = /^[0-9a-f]{40}$/
 
+/** True when `part` names its source by a full commit, or gives the reason it offers none. */
+function namesSource(part: Partial<Component>): boolean {
+  const { source } = part
+  if (source === undefined) return false
+  return isOffered(source) ? FULL_COMMIT.test(source.commit) : source.none.trim() !== ''
+}
+
 /** The faults of one component, as the file `path` meets them. */
 function componentFaults(path: string, id: string, part: Partial<Component> | undefined): string[] {
   if (part === undefined) return [`${path}: names the unknown component ${id}`]
   const faults: string[] = []
   if (part.licence === undefined) faults.push(`${path}: the component ${id} names no licence`)
-  if (part.source === undefined || !FULL_COMMIT.test(part.source.commit))
-    faults.push(`${path}: the component ${id} names no source`)
+  if (!namesSource(part)) faults.push(`${path}: the component ${id} names no source`)
   return faults
 }
 
@@ -49,6 +55,7 @@ const PIN_RULES: readonly [keyof Source, RegExp, string][] = [
   ],
   ['commit', FULL_COMMIT, 'the commit is no full 40-hex id'],
   ['tar', /^[0-9a-f]{64}$/, "the tar's SHA-256 is no 64-hex digest"],
+  ['basis', /\S/, 'the basis of its commit is empty'],
 ]
 
 /** The faults of one source's pin (scripts/gen5-sources.ts), each naming the source. */

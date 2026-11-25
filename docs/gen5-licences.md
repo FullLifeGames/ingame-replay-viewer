@@ -15,6 +15,10 @@ So the page owes each visitor:
 - the build's date and commit, and what the build combined (section 5(a));
 - the source of every file it sends, at the exact version sent, on the same host (section 6(d)).
 
+The licence ids follow the notices at the pins. Every GPL notice there, in melonDS, RetroArch, EmulatorJS and its build scripts, says "either version 3 of the License, or (at your option) any later version", so the manifest names each `GPL-3.0-or-later`. The page as a whole goes out under version 3.
+
+The save the page serves is not code. The game wrote its bytes during our play from New Game on the build machine (`docs/gen5-save.md`), and the page offers it under the repository's MIT licence as far as it is ours.
+
 ## What the page shows
 
 The notice stands in `src/web/gen5/index.html` as `#licence-notice`, above the file input. It links `licences.html`.
@@ -23,8 +27,8 @@ The licences page holds, in this order:
 
 1. what the page runs and how it is licensed;
 2. the build's date and commit, with a link to the repository at that commit, and a sentence when the build machine had changes the commit lacks;
-3. a table of every file the page sends, with its component, version, licence and source;
-4. one line per source archive: its commit, its size, the SHA-256 of its tar, a link to the archive and one to the upstream repository at that commit;
+3. a table of every file the page sends, with its component, version, licence and source, or the reason no source is offered;
+4. one line per source archive: its commit and how we know that commit, its size, the SHA-256 of its tar, a link to the archive and one to the upstream repository at that commit;
 5. the copyright notices, each quoted whole from its file at the pin;
 6. the licence texts: the GPL, the MIT texts and the licences of the parts the core compiles in.
 
@@ -43,14 +47,18 @@ Nothing fetched is committed: not the archives, not the bare repositories, not t
 
 ## The commits behind the core
 
-The core's package names no commit of melonDS or RetroArch. The core's own bytes do: its wasm holds melonDS's version string `0.9.3 18a057d` and RetroArch's git hash `6dd4353`. Both resolve in EmulatorJS's forks. The build scripts are EmulatorJS/build at the commit that was the head of its main branch on the build's date. The manifest records each commit and why.
+The core's package names no commit of melonDS or RetroArch. The core's own bytes do: its wasm holds melonDS's version string `0.9.3 18a057d` and RetroArch's git hash `6dd4353`. Both resolve in EmulatorJS's forks.
+
+The build scripts' commit is an inference from dates. Each core's `build.json` names the scripts' version 2.0.2, and `b24e5b5` was the head of EmulatorJS/build's main branch around the core's build day. Nothing in the core's bytes names that commit.
+
+`scripts/gen5-pins.ts` records each commit with its basis in a few words, and the licences page prints that basis beside the archive: the registry's `gitHead` for EmulatorJS, the commit named in the core's own bytes for melonDS and RetroArch, the inference from dates for the build scripts, and the tag of the version the served file equals or names for nipplejs and Socket.IO.
 
 ## Parts with no notice in the pinned sources
 
 Two parts the core holds carry no notice in any pinned source. The licences page names both and says so.
 
-- Emscripten's runtime. EmulatorJS's build scripts install emsdk 3.1.74. No pinned tree holds Emscripten.
-- zlib. RetroArch's web build links Emscripten's own zlib port. RetroArch's copy in `deps/libz` is not compiled in.
+- Emscripten's runtime. The build scripts' `build_env.sh` names emsdk 3.1.74 for a local build; their CI takes the version from a setting the pin does not hold. The core's wasm names its compiler as `21.0.0git (https:/github.com/llvm/llvm-project 23e3cbb2e82b62586266116c8ab77ce68e412cf8)`. Which Emscripten release that was is not established. No pinned tree holds Emscripten.
+- zlib. RetroArch's web build links Emscripten's own zlib port (`-s USE_ZLIB=1`); RetroArch's copy in `deps/libz` is not compiled in. The core's wasm holds zlib's messages and the string `1.3.1`, but no copyright line of zlib.
 
 ## libretro-common's notices
 
@@ -69,4 +77,4 @@ The public Gen 5 page's own issue takes these, next to #62.
 
 ## Open: `extract7z.js`
 
-EmulatorJS ships `data/compression/extract7z.js` with no licence. The file came from another website in 2021 and has not changed since. Nobody names its author or its source. The page needs it to unpack the core. Until the user rules on it (U1), the manifest marks its licence as unnamed, and its row on the licences page says so.
+EmulatorJS ships `data/compression/extract7z.js` with no licence. The file came from another website in 2021 and has not changed since. Nobody names its author or its source. The page needs it to unpack the core. Until the user rules on it (U1), the manifest marks its licence as unnamed and offers no source for it: EmulatorJS's repository holds the same compiled file, not its source code. Its row on the licences page says both.

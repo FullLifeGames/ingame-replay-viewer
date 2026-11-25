@@ -7,7 +7,7 @@ import { afterAll, describe, expect, it } from 'vitest'
 
 import type { Reader, TreeReader } from './gen5-licences-git'
 import { readLicencesInput, readNotices, readNoticeTrees } from './gen5-licences-read'
-import { type ComponentId, COMPONENTS } from './gen5-manifest'
+import { type ComponentId, COMPONENTS, sourceOf } from './gen5-manifest'
 import type { NoticeTree } from './gen5-notices'
 import { GEN5_PATHS } from './gen5-paths'
 
@@ -88,7 +88,7 @@ describe('readNoticeTrees', () => {
     const [read] = readNoticeTrees(COMPONENTS, [tree], files)
     expect(read).toEqual({
       ...tree,
-      commit: COMPONENTS.retroarch.source.commit,
+      commit: sourceOf(COMPONENTS.retroarch).commit,
       groups: [
         { text: '/* MIT, at 6dd4353 */', paths: ['lib/one.c'] },
         { text: '/* zlib */', paths: ['lib/two.h'] },

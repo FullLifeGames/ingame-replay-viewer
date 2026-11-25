@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import { fileFor, savesFileFor, siteFileFor, sitePathOf, sourceFileFor } from './gen5-files'
-import { archiveName, COMPONENTS } from './gen5-manifest'
+import { archiveName, COMPONENTS, sourceOf } from './gen5-manifest'
 
-const ARCHIVE = archiveName(COMPONENTS.melonds.source)
+const ARCHIVE = archiveName(sourceOf(COMPONENTS.melonds))
 
 describe('fileFor', () => {
   const page = '/repo/build/gen5/page'

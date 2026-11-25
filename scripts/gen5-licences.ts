@@ -6,10 +6,13 @@ import {
   archiveName,
   type Component,
   type ComponentId,
+  isOffered,
   type Licence,
+  type LicenceInWords,
   OWN_FILES,
   type SiteFile,
   type Source,
+  sourceOf,
   VIEWER_REPOSITORY,
 } from './gen5-manifest.ts'
 import { escapeHtml, link, pre, short } from './gen5-html.ts'
@@ -52,16 +55,20 @@ export interface LicencesInput {
 
 const treeOf = (repository: string, commit: string) => `${repository}/tree/${commit}`
 
-/** Until U1 is ruled, the words of plan section 6, point 7, for a licence nobody names. */
-function licenceWords(licence: Licence): string {
-  return typeof licence === 'string'
-    ? licence
+/** A licence's id or words; until U1 is ruled, the words of plan section 6, point 7, for a
+ * licence nobody names. */
+function licenceWords(licence: Licence | LicenceInWords): string {
+  if (typeof licence === 'string') return licence
+  return 'words' in licence
+    ? licence.words
     : 'Licence not named. EmulatorJS ships this file without one.'
 }
 
 /** The name the page gives `source`: that of the first component it is the source of. */
 function sourceName(input: LicencesInput, source: Source): string {
-  const owner = Object.values(input.components).find((part) => part.source.name === source.name)
+  const owner = Object.values(input.components).find(
+    (part) => isOffered(part.source) && part.source.name === source.name,
+  )
   return owner?.name ?? source.name
 }
 
@@ -81,22 +88,30 @@ const COLUMNS = ['Path', 'Component', 'Version', 'Licence', 'Source']
 const cellsOf = (cells: readonly string[]) =>
   cells.map((cell, at) => `<td data-label="${COLUMNS[at] ?? ''}">${cell}</td>`).join('')
 
+/** A link to each offered source of `parts` once, and for a part with none the reason. */
+function sourceCell(input: LicencesInput, parts: readonly Component[]): string {
+  const offered = parts.map((part) => part.source).filter(isOffered)
+  const links = [...new Map(offered.map((source) => [source.name, source])).values()].map(
+    (source) =>
+      link(
+        `/source/${archiveName(source)}`,
+        `${sourceName(input, source)} ${short(source.commit)}`,
+      ),
+  )
+  const reasons = parts.flatMap(({ source }) =>
+    isOffered(source) ? [] : [escapeHtml(`No source offered. ${source.none}`)],
+  )
+  return [...links, ...reasons].join('<br>')
+}
+
 function fileRow(input: LicencesInput, file: SiteFile): string {
   const parts = file.components.map((id) => input.components[id])
-  const sources = [...new Map(parts.map((part) => [part.source.name, part.source])).values()]
   const cells = [
     `<code>${escapeHtml(`/emulatorjs/${file.path}`)}</code>`,
     parts.map((part) => escapeHtml(part.name)).join('<br>'),
     parts.map((part) => escapeHtml(part.version)).join('<br>'),
     parts.map((part) => escapeHtml(licenceWords(part.licence))).join('<br>'),
-    sources
-      .map((source) =>
-        link(
-          `/source/${archiveName(source)}`,
-          `${sourceName(input, source)} ${short(source.commit)}`,
-        ),
-      )
-      .join('<br>'),
+    sourceCell(input, parts),
   ]
   const path = escapeHtml(`/emulatorjs/${file.path}`)
   return `<tr data-path="${path}">${cellsOf(cells)}</tr>`
@@ -128,7 +143,7 @@ function sourcesList(input: LicencesInput): string {
   const lines = input.archives.map(({ source, bytes }) => {
     const archive = archiveName(source)
     const size = bytes.toLocaleString('en-US')
-    return `<li>${escapeHtml(sourceName(input, source))} at commit ${escapeHtml(source.commit)}: ${link(`/source/${archive}`, archive)} (${size} bytes). SHA-256 of the unpacked tar: <code>${escapeHtml(source.tar)}</code>. ${link(treeOf(source.repository, source.commit), 'The repository at that commit')}.</li>`
+    return `<li>${escapeHtml(sourceName(input, source))} at commit ${escapeHtml(source.commit)} (${escapeHtml(source.basis)}): ${link(`/source/${archive}`, archive)} (${size} bytes). SHA-256 of the unpacked tar: <code>${escapeHtml(source.tar)}</code>. ${link(treeOf(source.repository, source.commit), 'The repository at that commit')}.</li>`
   })
   const { commit } = input.build
   lines.push(
@@ -146,7 +161,7 @@ function whereFrom(input: LicencesInput, notice: ReadNotice): string {
     notice.lines === undefined
       ? ''
       : `, lines ${String(notice.lines[0])} to ${String(notice.lines[1])}`
-  const commit = short(input.components[notice.component].source.commit)
+  const commit = short(sourceOf(input.components[notice.component]).commit)
   return `<p class="from">${escapeHtml(notice.path)}${lines}, at commit ${commit}</p>`
 }
 
@@ -191,7 +206,7 @@ function licenceTexts(input: LicencesInput): string {
   const ids = Object.keys(input.components) as ComponentId[]
   const mit = ids.filter((id) => input.components[id].licence === 'MIT')
   const rest = ids.filter((id) => !mit.includes(id))
-  const gplFrom = short(input.components.melonds.source.commit)
+  const gplFrom = short(sourceOf(input.components.melonds).commit)
   return `<h2 id="licence-texts">Licence texts</h2>
 <h3>GNU General Public License, version 3</h3>
 <p class="from">LICENSE of melonDS, at commit ${gplFrom}</p>

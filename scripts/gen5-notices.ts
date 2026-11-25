@@ -97,11 +97,11 @@ export const UNFOUND: readonly Unfound[] = [
   {
     component: 'retroarch',
     part: "Emscripten's runtime",
-    says: "EmulatorJS's build scripts install emsdk 3.1.74 (build_env.sh). No pinned source holds Emscripten's notice.",
+    says: "EmulatorJS's build scripts: their build_env.sh names emsdk 3.1.74 for a local build, and their CI takes the version from a setting the pin does not hold. The core's wasm names its compiler as 21.0.0git (https:/github.com/llvm/llvm-project 23e3cbb2e82b62586266116c8ab77ce68e412cf8). Which Emscripten release that was is not established. No pinned source holds Emscripten's notice.",
   },
   {
     component: 'retroarch',
     part: 'zlib',
-    says: "Makefile.emulatorjs links zlib from Emscripten's ports (-s USE_ZLIB=1). No pinned source holds that copy's notice.",
+    says: "Makefile.emulatorjs links zlib from Emscripten's ports (-s USE_ZLIB=1). The core's wasm holds zlib's messages, such as \"incorrect header check\", and the string 1.3.1, but no copyright line of zlib. No pinned source holds that copy's notice.",
   },
 ]

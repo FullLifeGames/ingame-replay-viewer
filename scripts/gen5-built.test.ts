@@ -8,7 +8,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { BUILT_PORT, builtServerOptions, startBuiltServer } from './gen5-built'
 import { writeLicencesPage } from './gen5-licences-read'
-import { archiveName, COMPONENTS, SITE_FILES } from './gen5-manifest'
+import { archiveName, COMPONENTS, SITE_FILES, sourceOf } from './gen5-manifest'
 import { GEN5_PATHS } from './gen5-paths'
 
 describe('builtServerOptions', () => {
@@ -76,7 +76,7 @@ describe('startBuiltServer', () => {
     saves: join(root, 'saves'),
     sources: join(root, 'sources'),
   }
-  const archive = archiveName(COMPONENTS.melonds.source)
+  const archive = archiveName(sourceOf(COMPONENTS.melonds))
   let server: Server | undefined
 
   beforeAll(async () => {

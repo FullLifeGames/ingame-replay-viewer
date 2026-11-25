@@ -16,14 +16,20 @@ const CORE: Source = {
   repository: 'https://github.com/example/core',
   commit: 'c'.repeat(40),
   tar: 'd'.repeat(64),
+  basis: 'the commit named in the core bytes',
 }
 const PAD: Source = {
   name: 'pad',
   repository: 'https://github.com/example/pad',
   commit: 'e'.repeat(40),
   tar: 'f'.repeat(64),
+  basis: 'inferred from dates',
 }
-const part = (name: string, source: Source, licence: Component['licence']): Component => ({
+const part = (
+  name: string,
+  source: Component['source'],
+  licence: Component['licence'],
+): Component => ({
   name,
   version: '1.2.3',
   licence,
@@ -33,10 +39,10 @@ const part = (name: string, source: Source, licence: Component['licence']): Comp
 })
 const COMPONENTS_INVENTED = {
   ...COMPONENTS,
-  emulatorjs: part('Shell', CORE, 'GPL-3.0'),
-  melonds: part('Core', CORE, 'GPL-3.0'),
+  emulatorjs: part('Shell', CORE, 'GPL-3.0-or-later'),
+  melonds: part('Core', CORE, 'GPL-3.0-or-later'),
   nipplejs: part('Pad', PAD, 'MIT'),
-  extract7z: part('Unpacker', CORE, { unnamed: 'nobody names it' }),
+  extract7z: part('Unpacker', { none: 'Nobody names its source.' }, { unnamed: 'nobody names it' }),
 }
 const FILES: readonly SiteFile[] = [
   { path: 'data/shell.js', components: ['emulatorjs'], presence: 'served', why: 'logged' },
@@ -113,6 +119,25 @@ describe('licencesHtml', () => {
   it('reads the row of a file with an unnamed licence as the plan writes it', () => {
     const row = /<tr data-path="\/emulatorjs\/data\/unpack.js">.*?<\/tr>/s.exec(html)?.[0] ?? ''
     expect(textOf(row)).toContain('Licence not named. EmulatorJS ships this file without one.')
+  })
+
+  // Scene: extract7z.js has no source to offer (review W3).
+  it('offers no source link for a file without a named licence, and one for every other', () => {
+    const rows = html.match(/<tr data-path="[^"]*">.*?<\/tr>/gs) ?? []
+    expect(rows).toHaveLength(4)
+    for (const row of rows) {
+      const unnamed = row.includes('data/unpack.js')
+      expect({ row, link: row.includes('href="/source/') }).toEqual({ row, link: !unnamed })
+    }
+    const unpacker = rows.find((row) => row.includes('data/unpack.js')) ?? ''
+    expect(textOf(unpacker)).toContain('No source offered. Nobody names its source.')
+  })
+
+  // Scene: the build scripts' commit is an inference, and the page says so (review W4).
+  it("names each archive's basis beside its commit", () => {
+    const section = textOf(html.slice(html.indexOf('<h2 id="sources">')))
+    expect(section).toContain(`at commit ${CORE.commit} (the commit named in the core bytes):`)
+    expect(section).toContain(`at commit ${PAD.commit} (inferred from dates):`)
   })
 
   it('links each archive once with its commit, size and tar hash, and its repository there', () => {
