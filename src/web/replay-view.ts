@@ -15,7 +15,7 @@ import {
   showPick,
   type Then,
 } from './pick-lines'
-import { countText, notShownHeading, replayLine, rowText } from './status'
+import { countText, notShownHeading, replayLine, rowText, type StatusLine } from './status'
 import { detailShown, type VisitorLine, visitorLine } from './visitor'
 
 /** The element `#id` of `page`, which must be a `type`. */
@@ -66,9 +66,13 @@ function writeLine(page: string, parts: LineParts, shown: VisitorLine): void {
   report.hidden = !shown.report
 }
 
-/** A line of the page's own, such as a step that went well: no detail and no report link. */
-export function showLine(page: string, line: string): void {
-  writeLine(page, STATUS_PARTS, { line, detail: '', report: false })
+/**
+ * A line of the page's own, such as a step that went well, with the words its "Details" holds, if
+ * any (status.ts), and no report link.
+ */
+export function showLine(page: string, shown: string | StatusLine): void {
+  const { line, detail } = typeof shown === 'string' ? { line: shown, detail: '' } : shown
+  writeLine(page, STATUS_PARTS, { line, detail, report: false })
 }
 
 /** A visitor line (visitor.ts) on the status line, with its detail and report link. */

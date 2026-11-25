@@ -241,7 +241,10 @@ test('mGBA on the emulator page plays 994052 at fast-forward (B7 measurement)', 
   await page.goto('/emulator.html')
   const line = page.getByRole('status')
   await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles(DUMP)
-  await expect(line).toHaveText(new RegExp(romSha1), { timeout: 90_000 })
+  await expect(line).toHaveText(/^Your dump is US Emerald, and the page patched it\./, {
+    timeout: 90_000,
+  })
+  await expect(page.locator('#status-detail')).toHaveText(`The patched ROM's SHA1 is ${romSha1}.`)
   await expect(page.getByLabel('Example replay')).toHaveValue(FIRST)
   await page.getByRole('button', { name: 'Start', exact: true }).click()
   await expect(line).toHaveText(new RegExp(`^Running ${FIRST}`), { timeout: 60_000 })

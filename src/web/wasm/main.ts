@@ -55,8 +55,15 @@ import { findWasmView, type WasmView } from './view'
  */
 type ListedPick = Picked & { readonly summary?: ReplaySummary; readonly place?: ReplayPlace }
 
-/** A run with the id of the replay it plays, for the status line at END, and its summary. */
-type NamedRun = Run & { readonly id: string; readonly summary: ReplaySummary | undefined }
+/**
+ * A run with the id of the replay it plays, for the status line at END, its summary, and its
+ * stream's length for the progress line.
+ */
+type NamedRun = Run & {
+  readonly id: string
+  readonly summary: ReplaySummary | undefined
+  readonly streamBytes: number
+}
 
 /** The animation-frame loop: grants the run its frames, draws the newest and shows the progress. */
 function drawLoop(view: WasmView, runs: Runs<NamedRun>, changeSpeed: (speed: Speed) => void): void {
@@ -130,7 +137,11 @@ function createViewer(view: WasmView) {
 
   const begin = (module: Built, chosen: ListedPick, sound: Sound): Run => {
     const { id, summary, place } = chosen
-    const run = Object.assign(startRun(module, chosen, view.speed(), sound), { id, summary })
+    const run = Object.assign(startRun(module, chosen, view.speed(), sound), {
+      id,
+      summary,
+      streamBytes: chosen.stream.length,
+    })
     watchRun(run, (failure) => {
       if (runs.current === run) view.failure(failure, place)
     })

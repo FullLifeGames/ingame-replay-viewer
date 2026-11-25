@@ -12,11 +12,27 @@ export const READY_LINE = 'Pick your US Emerald dump, then press Start.'
 export const CHECKING_LINE = 'Checking your dump and patching it. This takes a few seconds.'
 export const STARTING_LINE = 'Starting the emulator.'
 
-export const dumpLine = ({ romSha1 }: DumpSummary): string =>
-  `Your dump is US Emerald, and the page patched it (ROM SHA1 ${romSha1}). Press Start.`
+/**
+ * A line of the page's own and the words "Details" holds under it. The status line says what
+ * plays and what to press; a developer's numbers, such as a SHA1 or a byte count, wait under
+ * "Details" (#69).
+ */
+export interface StatusLine {
+  readonly line: string
+  readonly detail: string
+}
 
-export const startLine = ({ id, streamBytes }: StartSummary): string =>
-  `Running ${id}: ${String(streamBytes)} bytes of instruction stream.`
+export const dumpLine = ({ romSha1 }: DumpSummary): StatusLine => ({
+  line: 'Your dump is US Emerald, and the page patched it. Press Start.',
+  detail: `The patched ROM's SHA1 is ${romSha1}.`,
+})
+
+const streamText = (bytes: number): string => `${String(bytes)} bytes of instruction stream`
+
+export const startLine = ({ id, streamBytes }: StartSummary): StatusLine => ({
+  line: `Running ${id}.`,
+  detail: `${streamText(streamBytes)}.`,
+})
 
 /** The viewer's lines while it builds the game from the dump, and once it did. */
 export const BUILDING_LINE = 'Checking your dump and building the game. This takes a few seconds.'
@@ -37,14 +53,10 @@ export const silenceText = (silence: string | undefined, verb: 'plays' | 'played
 export const endedLine = (id: string, silence?: string): string =>
   `Played ${id} to the end of the battle.${silenceText(silence, 'played')}`
 
-/** The stream a run plays, by the id of its replay (run.ts's Picked). */
-interface PlayedStream {
-  readonly id: string
-  readonly stream: Uint8Array
-}
-
 /** What the viewer's lines read of a run (run.ts's Run): its time to END and its sound. */
 interface LineRun {
+  /** The length of the instruction stream it plays. */
+  readonly streamBytes: number
   readonly finishedMs: number | undefined
   /** The audio worklet's node; undefined for a run without sound. */
   readonly output: unknown
@@ -52,18 +64,25 @@ interface LineRun {
   readonly silence: string | undefined
 }
 
-/** The run's progress, with the sound's skips and dry spells while it has sound (#47). */
+/**
+ * The run's progress under "Details", with the stream's bytes (#69) and the sound's skips and dry
+ * spells while it has sound (#47).
+ */
 export const progressLine = (status: RunStatus, run: LineRun): string => {
   const finished =
     run.finishedMs === undefined
       ? ''
       : ` Finished at frame ${String(status.finishedAt)} after ${(run.finishedMs / 1000).toFixed(1)} s.`
   const sound = run.output === undefined ? '' : ` ${soundLine(run.ring)}`
-  return `Frame ${String(status.frame)}, instruction ${String(status.done)} of ${String(status.total)}, turn ${String(status.turn)}.${finished}${sound}`
+  const instruction = `instruction ${String(status.done)} of ${String(status.total)} (${streamText(run.streamBytes)})`
+  return `Frame ${String(status.frame)}, ${instruction}, turn ${String(status.turn)}.${finished}${sound}`
 }
 
-export const runningLine = (picked: PlayedStream, run: LineRun): string =>
-  `Running ${picked.id}: ${String(picked.stream.length)} bytes of instruction stream.${silenceText(run.silence, 'plays')}`
+/** Once a run starts: the replay it plays, and why it plays without sound. */
+export const runningLine = (
+  picked: { readonly id: string },
+  run: Pick<LineRun, 'silence'>,
+): string => `Running ${picked.id}.${silenceText(run.silence, 'plays')}`
 
 const PRESS_START = 'Press Start to play it.'
 

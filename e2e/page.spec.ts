@@ -135,12 +135,20 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
   await page.goto(EMULATOR)
   const status = page.getByRole('status')
   await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles(DUMP)
-  await expect(status).toHaveText(new RegExp(romSha1), { timeout: 90_000 })
+  // #69: the SHA1 and the byte count wait under "Details", off the status line.
+  await expect(status).toHaveText(
+    'Your dump is US Emerald, and the page patched it. Press Start.',
+    {
+      timeout: 90_000,
+    },
+  )
+  await expect(page.locator('#status-detail')).toHaveText(`The patched ROM's SHA1 is ${romSha1}.`)
   await expect(page.getByLabel('Example replay')).toHaveValue(FIRST)
   await page.getByRole('button', { name: 'Start', exact: true }).click()
-  await expect(status).toHaveText(new RegExp(`Running ${FIRST}.*${String(streamBytes)} bytes`), {
-    timeout: 60_000,
-  })
+  await expect(status).toHaveText(`Running ${FIRST}.`, { timeout: 60_000 })
+  await expect(page.locator('#status-detail')).toHaveText(
+    `${String(streamBytes)} bytes of instruction stream.`,
+  )
   expect(await notShownCount(page)).toBeGreaterThan(0)
   // 240×160 scaled three times; mGBA sets the canvas's own size, the page's CSS its shown size.
   expect(await page.locator('canvas').boundingBox()).toMatchObject({ width: 720, height: 480 })
@@ -164,7 +172,7 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
     await page.getByLabel('Example replay').selectOption(SECOND)
     await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${SECOND}: `))
     await page.getByRole('button', { name: 'Start', exact: true }).click()
-    await expect(status).toHaveText(new RegExp(`^Running ${SECOND}: `), { timeout: 60_000 })
+    await expect(status).toHaveText(new RegExp(`^Running ${SECOND}\\.`), { timeout: 60_000 })
     await expect.poll(async () => differ(before, await frame(page)), { timeout: 30_000 }).toBe(true)
     await expect
       .poll(async () => (await frame(page)).colours, { timeout: 30_000 })

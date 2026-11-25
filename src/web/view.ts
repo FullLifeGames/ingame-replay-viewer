@@ -8,6 +8,7 @@ import {
   showOnly,
   showVisitorLine,
 } from './replay-view'
+import type { StatusLine } from './status'
 import type { VisitorLine } from './visitor'
 
 const PAGE = 'emulator.html'
@@ -24,7 +25,7 @@ export function findView() {
     showOnly: (shown: VisitorLine): void => {
       showOnly(PAGE, shown)
     },
-    status: (line: string): void => {
+    status: (line: string | StatusLine): void => {
       showLine(PAGE, line)
     },
     visitorLine: (shown: VisitorLine): void => {
