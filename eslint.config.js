@@ -6,9 +6,16 @@ import prettier from 'eslint-config-prettier'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
-// Import zone (AGENTS.md): the battle script, the Gen 3 game backend and the BPS codec are plain
-// TypeScript. They use no DOM or browser API, import nothing from the pages and no emulator.
-const PURE_MODULES = ['src/script/**/*.ts', 'src/gen3/**/*.ts', 'src/patch/**/*.ts']
+// Import zone (AGENTS.md): the battle script, the Gen 3 game backend, the Gen 5 modules and the
+// BPS codec are plain TypeScript. They use no DOM or browser API, import nothing from the pages and
+// no emulator.
+const PURE_MODULES = [
+  'src/script/**/*.ts',
+  'src/gen3/**/*.ts',
+  'src/gen5/**/*.ts',
+  'src/patch/**/*.ts',
+]
+const PURE_FOLDERS = 'src/script/, src/gen3/, src/gen5/ and src/patch/'
 
 // Environment-neutral helpers that browsers list among their globals and Node has as well.
 const NEUTRAL_GLOBALS = new Set([
@@ -19,17 +26,16 @@ const NEUTRAL_GLOBALS = new Set([
   'structuredClone',
 ])
 const BROWSER_GLOBALS = Object.keys(globals.browser).filter((name) => !NEUTRAL_GLOBALS.has(name))
-const NO_BROWSER_MESSAGE =
-  'src/script/, src/gen3/ and src/patch/ use no DOM or browser API; take data from the caller.'
+const NO_BROWSER_MESSAGE = `${PURE_FOLDERS} use no DOM or browser API; take data from the caller.`
 
 const PURE_IMPORT_PATTERNS = [
   {
     group: ['**/web', '**/web/**'],
-    message: 'src/script/, src/gen3/ and src/patch/ import nothing from the pages in src/web/.',
+    message: `${PURE_FOLDERS} import nothing from the pages in src/web/.`,
   },
   {
-    group: ['@thenick775/*'],
-    message: 'src/script/, src/gen3/ and src/patch/ import no emulator.',
+    group: ['@thenick775/*', '@emulatorjs/*'],
+    message: `${PURE_FOLDERS} import no emulator.`,
   },
 ]
 
@@ -60,7 +66,7 @@ const scriptZone = {
         patterns: [
           ...PURE_IMPORT_PATTERNS,
           {
-            group: ['**/gen3', '**/gen3/**'],
+            group: ['**/gen3', '**/gen3/**', '**/gen5', '**/gen5/**'],
             message: 'src/script/ is game-neutral and imports nothing from a game backend.',
           },
         ],
@@ -69,21 +75,33 @@ const scriptZone = {
   },
 }
 
-// The BPS codec runs in the build and on the page (#8), so it imports nothing from Node either.
-// This block repeats the pure patterns for the same reason as the one above.
-const NO_NODE_MESSAGE = 'src/patch/ runs on the page as well; it imports nothing from Node.'
-const patchZone = {
-  files: ['src/patch/**/*.ts'],
-  rules: {
-    'no-restricted-imports': [
-      'error',
-      {
-        paths: builtinModules.map((name) => ({ name, message: NO_NODE_MESSAGE })),
-        patterns: [...PURE_IMPORT_PATTERNS, { group: ['node:*'], message: NO_NODE_MESSAGE }],
-      },
-    ],
-  },
+// A pure folder that also runs on the page imports nothing from Node either. The block repeats the
+// pure patterns for the same reason as the one above.
+function noNodeZone(folder, message) {
+  return {
+    files: [`${folder}**/*.ts`],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: builtinModules.map((name) => ({ name, message })),
+          patterns: [...PURE_IMPORT_PATTERNS, { group: ['node:*'], message }],
+        },
+      ],
+    },
+  }
 }
+
+// The BPS codec runs in the build and on the page (#8); the Gen 5 modules run in the scripts and
+// on the page (#75).
+const patchZone = noNodeZone(
+  'src/patch/',
+  'src/patch/ runs on the page as well; it imports nothing from Node.',
+)
+const gen5Zone = noNodeZone(
+  'src/gen5/',
+  'src/gen5/ runs on the page as well; it imports nothing from Node.',
+)
 
 // Ceilings (AGENTS.md): fixed for every TypeScript file from the first commit.
 const ceilings = {
@@ -143,6 +161,7 @@ export default defineConfig([
   pureZone,
   scriptZone,
   patchZone,
+  gen5Zone,
   ceilings,
   specs,
   prettier,

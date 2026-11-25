@@ -66,8 +66,9 @@ Order after milestone 2 (user, 22.11.2026): milestone 3 starts first, and Gen 5 
 5. **Viewer v2.** Jump to a turn, flip sides, exact HP for random formats (re-running the battle from the published seed and inputs), backgrounds per format, music, rating display.
 6. **Gen 5.** Black 2/White 2 driven from outside: first Gen 1–5 formats, then newer ones.
    - Starts with a time-boxed spike in wave 5 (#72; user, 24.11.2026), on Black 2 (USA) from the user's dump.
+   - Trainer's hint line (#76, user, 24.11.2026): once a Gen 5 backend holds the server, it never writes the adapter's action-selection command, so the client starts no action selection during a replay and shows none of the trainer's hint lines (`CheckTrainerHintMsg` in pokebw2's `src/battle/btl_client.c`).
    - Open: the emulator (EmulatorJS's melonDS, desmume-wasm, DS Anywhere) and speed on phones.
-   - Open: building the savestate in the user's browser from a save file.
+   - Way into a battle (#78; user, 24.11.2026): a save file before a trainer, and a short macro into the battle. The long route from New Game stays a development tool. A save we made from New Game, before Youngster Terrell on Route 20, ships in `src/web/gen5/saves/` (`docs/gen5-save.md`). The page loads it into the core before the game starts, and the macro reaches the battle's action menu 1,642 frames after the title.
    - Open: borrowed slots for newer content, and permission from Smogon for its Gen 5-style sprites.
 7. **Live play.** Pick moves in the game's own menus and play on Showdown.
    - Open: memory access in the GBA emulator, the transport, and the choice screens.

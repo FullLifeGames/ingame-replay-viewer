@@ -4,14 +4,19 @@
 // of the converter's data assembly (the module and wasm:convert carry the game's data), and the
 // build folders stay ignored. The contents come from the index, which is what a commit takes, not
 // from the files on disk.
+//
+// One exception to the name rule: a save directly in src/web/gen5/saves/. ADR 0002 ends with "A
+// save file holds only player data and may be shipped", and #78 ships the saves we made from New
+// Game there. A save anywhere else stays refused, and so does every other forbidden name.
 import { execFileSync } from 'node:child_process'
 import { mkdtempSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { dirname, join } from 'node:path'
+import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { afterAll, describe, expect, it } from 'vitest'
 
+import { GEN5_PATHS } from './gen5-paths.ts'
 import { CONVERTED_BY } from './wasm-data-asm.ts'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -24,6 +29,12 @@ const git = (...args: string[]) => execFileSync('git', args, { cwd: root, encodi
 const tracked = git('ls-files', '-z').split('\0').filter(Boolean)
 
 const FORBIDDEN_NAME = /\.(?:gba|agb|bps|ips|ups|sav|srm|elf|nds|ss\w*|state|ppm|wasm)$/i
+
+// The saves folder from the root, as git lists it: a save directly in it is ours.
+const SAVES = relative(GEN5_PATHS.repo, GEN5_PATHS.saves)
+const isOurSave = (path: string) => dirname(path) === SAVES && path.endsWith('.sav')
+
+const isForbiddenName = (path: string) => FORBIDDEN_NAME.test(path) && !isOurSave(path)
 
 // The GBA header: the fixed value 0x96 at 0xB2 and the complement over 0xA0 to 0xBC at 0xBD. The
 // check needs none of the Nintendo logo bytes, so this spec holds nothing taken from a ROM.
@@ -162,17 +173,32 @@ describe('the name rule', () => {
     'shots/WIN.PPM',
     'build/wasm/irv-emerald.wasm',
   ])('refuses %s', (path) => {
-    expect(FORBIDDEN_NAME.test(path)).toBe(true)
+    expect(isForbiddenName(path)).toBe(true)
   })
 
   it.each(['notes.md', 'ppm.ts', 'rom-shot-probes.ts', 'wasm-run.ts'])('takes %s', (path) => {
-    expect(FORBIDDEN_NAME.test(path)).toBe(false)
+    expect(isForbiddenName(path)).toBe(false)
+  })
+
+  it('takes a save of ours in the saves folder', () => {
+    expect(isForbiddenName('src/web/gen5/saves/route-20.sav')).toBe(false)
+  })
+
+  it.each([
+    'save.sav',
+    'src/web/gen5/route-20.sav',
+    'src/web/gen5/saves/deep/x.sav',
+    'build/gen5/saves/town.sav',
+    'src/web/gen5/saves/x.state',
+    'src/web/gen5/saves/x.srm',
+  ])('refuses %s outside the exception', (path) => {
+    expect(isForbiddenName(path)).toBe(true)
   })
 })
 
 describe('the tracked tree', () => {
   it('holds no ROM, savestate, ELF, patch or frame by name', () => {
-    expect(tracked.filter((path) => FORBIDDEN_NAME.test(path))).toEqual([])
+    expect(tracked.filter((path) => isForbiddenName(path))).toEqual([])
   })
 
   it('holds no file that starts with a GBA header, a patch, frame or wasm magic, or data assembly', () => {
@@ -190,6 +216,10 @@ describe('the tracked tree', () => {
     'build/rom/check.log',
     'build/wasm/irv-emerald.wasm',
     'build/wasm/irv-emerald-wasm.bps',
+    'build/gen5/saves/town.sav',
+    'save.sav',
+    'src/web/gen5/route-20.sav',
+    'src/web/gen5/saves/deep/x.sav',
     'build/wasm/asm/data/battle_scripts_1.s',
     'build/wasm/asm/data/battle_scripts_1.o',
     '.cache/wasm/platform/src/platform/bios.c',
