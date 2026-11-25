@@ -1,7 +1,8 @@
 // Generates build/gen5/bw2.json, the Gen 5 spike's numbers of Black 2 (USA) (#72, D4), from
 // pokebw2 at its pin (gen5-bw2-source.ts): the addresses S6 needs, the adapter and server command
-// enums, each argument format's puts, the message rules and the adapter's layout. The checkout
-// lives in .cache/gen5/pokebw2/ and the output in build/gen5/; nothing of pokebw2 is committed.
+// enums, each argument format's puts, the message rules, the adapter's layout and the route's
+// places in the map's events. The checkout lives in .cache/gen5/pokebw2/ and the output in
+// build/gen5/; nothing of pokebw2 is committed.
 // Usage: node scripts/gen5-bw2.ts [--checkout <dir>] [--quiet] (fetches on the first run). With
 // --quiet the report gives the pin, counts and checks and no number of pokebw2, as CI's public log
 // needs.
@@ -18,6 +19,7 @@ import {
   pickSymbols,
 } from './gen5-bw2-c.ts'
 import { battleNumbers } from './gen5-bw2-battle.ts'
+import { ROUTE_MAP, routePlaces } from './gen5-bw2-field.ts'
 import { parseArgFormats, parseMessageRules } from './gen5-bw2-put.ts'
 import { fullLines, quietLines, report } from './gen5-bw2-report.ts'
 import { checkout, listedReader, POKEBW2, type Pokebw2Read } from './gen5-bw2-source.ts'
@@ -143,6 +145,8 @@ const SOURCES = {
   serverH: 'include/battle/btl_server.h',
   mainH: 'include/battle/btl_main.h',
   pokeparamH: 'include/battle/btl_pokeparam.h',
+  mapEvents: ROUTE_MAP.events,
+  mapScript: ROUTE_MAP.script,
 }
 
 type Sources = Record<keyof typeof SOURCES, string>
@@ -175,6 +179,7 @@ function parse(sources: Sources): Bw2Numbers {
     queueSize: defineValue(queueH, 'BTL_SERVER_CMD_QUE_SIZE'),
     adapter,
     battle: battleNumbers(sources),
+    route: routePlaces(sources.mapEvents, sources.mapScript),
   }
 }
 

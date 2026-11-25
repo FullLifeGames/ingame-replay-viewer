@@ -54,6 +54,12 @@ describe('quietLines', () => {
       waitSelectSeq: 29,
       single: { clientCount: 2, posClientIds: [0, 1] },
     },
+    route: {
+      hughTrigger: { x: 1, z: 31, width: 2 },
+      battleTrigger: { x: 1, z: 33, width: 2 },
+      outlookTrigger: { x: 1, z: 37, width: 2 },
+      bianca: { x: 2, z: 29 },
+    },
   }
 
   it('gives the pin, the counts and the checks, and no address, offset or value', () => {

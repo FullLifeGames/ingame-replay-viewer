@@ -98,6 +98,33 @@ export interface BattleNumbers {
   single: SingleBattle
 }
 
+/** A trigger of the map's events: the player steps on row `z` from column `x` on, across `width`
+ * columns. */
+export interface TriggerPlace {
+  x: number
+  z: number
+  width: number
+}
+
+/** The tile an NPC of the map's events stands on. */
+interface ActorPlace {
+  x: number
+  z: number
+}
+
+/** The places on the route of src/gen5/route.ts, each from the event whose script shows its key's
+ * line first (scripts/gen5-bw2-field.ts). `z` is the row that the player's position reads. */
+export interface RoutePlaces {
+  /** Hugh comes back to the player once he has his starter. */
+  hughTrigger: TriggerPlace
+  /** The first battle with Hugh starts. */
+  battleTrigger: TriggerPlace
+  /** Hugh sends the player up to the outlook. */
+  outlookTrigger: TriggerPlace
+  /** Bianca, who hands out the starters at the outlook. */
+  bianca: ActorPlace
+}
+
 /** The whole of build/gen5/bw2.json. */
 export interface Bw2Numbers extends ServerCmdTable {
   pokebw2: { repository: string; commit: string }
@@ -107,4 +134,5 @@ export interface Bw2Numbers extends ServerCmdTable {
   queueSize: number
   adapter: StructLayout
   battle: BattleNumbers
+  route: RoutePlaces
 }

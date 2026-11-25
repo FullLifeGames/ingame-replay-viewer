@@ -13,8 +13,10 @@ import { singleBattlePos } from '../src/gen5/battle-mons.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import { momentCommands } from '../src/gen5/moment.ts'
+import { newGameRoute } from '../src/gen5/route.ts'
 import { packCommands } from '../src/gen5/server-cmd.ts'
 import { checkAdapterLayout, SYMBOL_NAMES } from './gen5-bw2.ts'
+import { placeMatches, reaches, ROUTE_MAP, scriptLabel } from './gen5-bw2-field.ts'
 import { MOMENT_COMMANDS, namesOutsideMainRam, zeroArguments } from './gen5-bw2-report.ts'
 import { listedReader, POKEBW2 } from './gen5-bw2-source.ts'
 import {
@@ -132,5 +134,43 @@ describe.skipIf(!existsSync(FILE))('the Gen 5 code on the generated numbers', ()
     expect(labels.filter((label) => !has(moves, label))).toEqual([])
     const standard = 'Bank0019_Text_ItsSuperEffective'
     expect(has(read(TEXT_BANKS.standard), standard), standard).toBe(true)
+  })
+
+  it("find each of the route's places in exactly one event of the map", () => {
+    const read = listedReader(GEN5_PATHS.pokebw2)
+    const matches = placeMatches(read(ROUTE_MAP.events), read(ROUTE_MAP.script))
+    const notOne = Object.entries(matches).filter(([, events]) => events.length !== 1)
+    expect(notOne.map(([place]) => place)).toEqual([])
+  })
+
+  it("start a trainer battle from the battle trigger's script", () => {
+    const read = listedReader(GEN5_PATHS.pokebw2)
+    const script = read(ROUTE_MAP.script)
+    const { triggers } = JSON.parse(read(ROUTE_MAP.events)) as {
+      triggers: { script: number; grid: { x: number; z: number; width: number } }[]
+    }
+    const { x, z, width } = real().route.battleTrigger
+    const there = triggers.filter(
+      ({ grid }) => grid.x === x && grid.z === z && grid.width === width,
+    )
+    const battles = there.filter((event) =>
+      reaches(script, scriptLabel(event), 'CallTrainerBattle'),
+    )
+    expect(there.length === 1 && battles.length === 1, 'one trigger there, starting a battle').toBe(
+      true,
+    )
+  })
+
+  it('put the three triggers in one strip of columns', () => {
+    const { hughTrigger, battleTrigger, outlookTrigger } = real().route
+    const strip = (place: typeof hughTrigger) =>
+      place.x === hughTrigger.x && place.width === hughTrigger.width
+    expect(strip(battleTrigger) && strip(outlookTrigger), 'one strip').toBe(true)
+  })
+
+  it('build the route from boot to the battle', () => {
+    const numbers = real()
+    const built = passes(() => newGameRoute(numbers.route, battleRefs(numbers).checks))
+    expect(built, 'newGameRoute').toBe(true)
   })
 })
