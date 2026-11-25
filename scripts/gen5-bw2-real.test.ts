@@ -13,13 +13,8 @@ import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import { momentCommands } from '../src/gen5/moment.ts'
 import { packCommands } from '../src/gen5/server-cmd.ts'
-import {
-  checkAdapterLayout,
-  MOMENT_COMMANDS,
-  namesOutsideMainRam,
-  SYMBOL_NAMES,
-  zeroArguments,
-} from './gen5-bw2.ts'
+import { checkAdapterLayout, SYMBOL_NAMES } from './gen5-bw2.ts'
+import { MOMENT_COMMANDS, namesOutsideMainRam, zeroArguments } from './gen5-bw2-report.ts'
 import { POKEBW2 } from './gen5-bw2-source.ts'
 import { type SceneName, sceneBlocks } from './gen5-moment-scene.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
