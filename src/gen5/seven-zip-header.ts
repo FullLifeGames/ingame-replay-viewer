@@ -23,7 +23,7 @@ const NUM_UNPACK_STREAM = 0x0d
 /** The bytes the folders of one streams info may unpack to, together. The page's largest core,
  * the thread build, unpacks to 6,070,528 bytes in two folders; 64 MiB leaves room for a larger
  * core and still keeps a header of a few bytes from making the worker allocate gigabytes. */
-export const UNPACKED_LIMIT = 64 * 2 ** 20
+const UNPACKED_LIMIT = 64 * 2 ** 20
 
 /** Each counted item takes a byte at least: a coder its flags, a folder its count of coders, a
  * packed stream its size. A packed stream without a size names no folder's data, so this reader
