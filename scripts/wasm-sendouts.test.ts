@@ -8,13 +8,9 @@ import { encodeStream } from '../src/gen3/stream/encode.ts'
 import speciesTable from '../src/gen3/tables/species.json'
 import trainerPics from '../src/gen3/tables/trainer-pics.json'
 import { readerTree } from './rom-paths.ts'
-import {
-  readSendOutAnimations,
-  SEND_OUTS,
-  sendOutCoverage,
-  sendOutStreams,
-} from './wasm-sendouts.ts'
+import { readSendOutAnimations, sendOutCoverage, sendOutStreams } from './wasm-sendouts.ts'
 import type { SendOutStream } from './wasm-sendouts.ts'
+import { SEND_OUTS } from './wasm-sendouts-name.ts'
 
 const ANIMATION_C = `static void (*const sMonAnimFunctions[])(struct Sprite *sprite) =
 {
