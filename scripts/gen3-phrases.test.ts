@@ -1,6 +1,6 @@
-// P2 (devbox): every tagged phrase template renders the string of the pinned `battle_message.c`
-// it names, with the placeholders filled for the same scene (plan §5, D2). The file is read in
-// place and nothing of it is written anywhere.
+// P2 (pinned tree): every tagged phrase template renders the string of the pinned
+// `battle_message.c` it names, with the placeholders filled for the same scene (plan §5, D2). The
+// file is read in place and nothing of it is written anywhere.
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -98,7 +98,7 @@ describe('the phrase samples', () => {
 const file = join(readerTree(), 'src', 'battle_message.c')
 
 describe.skipIf(!existsSync(file))(
-  'the tagged phrases against the pinned strings (P2, devbox)',
+  'the tagged phrases against the pinned strings (P2, pinned tree)',
   () => {
     let messages: ReadonlyMap<string, string> | undefined
     const pinnedOf = (id: string) => {

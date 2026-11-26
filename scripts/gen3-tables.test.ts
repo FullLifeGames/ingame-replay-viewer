@@ -192,13 +192,13 @@ describe('jsonText', () => {
   })
 })
 
-// Devbox only: CI has no 600 MB checkout, so the committed tables stand in for it there. It reads
-// the pinned tree, which takes about 2 s alone and missed vitest's 5 s default under load.
+// The build machine only: CI has no 600 MB checkout, so the committed tables stand in for it there.
+// It reads the pinned tree, which takes about 2 s alone and missed vitest's 5 s default under load.
 // The limit is twice its worst loaded time or more (#92: 3.9 s under a second heavy run).
 const TREE_READ_LIMIT = 30_000
 const tree = readerTree()
 describe.skipIf(!existsSync(tree))(
-  'the committed tables (T7, devbox)',
+  'the committed tables (T7, pinned tree)',
   { timeout: TREE_READ_LIMIT },
   () => {
     it('equal the tables generated from the pinned tree', () => {

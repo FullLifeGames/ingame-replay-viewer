@@ -4,7 +4,7 @@ Milestone 1b asked one question: can the pinned pokeemerald-expansion, with our 
 
 ## Verdict
 
-The spike works. The WebAssembly build of the pinned expansion with our C files plays the hand-made stream at 1x and 994052 at fast from boot to END in Chromium on devbox, with sound. In the Node harness its frames pass the same 13 scenes as mGBA's, and in Chromium it reaches END at the same frames as in Node. In Chromium it runs about as fast as mGBA's page at fast-forward, and compressed it downloads 0.8 MB less.
+The spike works. The WebAssembly build of the pinned expansion with our C files plays the hand-made stream at 1x and 994052 at fast from boot to END in Chromium on the build machine, with sound. In the Node harness its frames pass the same 13 scenes as mGBA's, and in Chromium it reaches END at the same frames as in Node. In Chromium it runs about as fast as mGBA's page at fast-forward, and compressed it downloads 0.8 MB less.
 
 Two things stood between it and a public build in wave 3: a platform layer we may ship, which #43 built in wave 4, and the module patch's assets, which the wave 3 gate accepted under ADR 0002 as amended.
 
@@ -88,7 +88,7 @@ On the host's clock and stream format 1, mGBA varied between sessions on the sam
 
 ## Speed
 
-Wall-clock numbers on devbox are rough: its six cores are slow and shared, and another session ran beside some of these runs.
+Wall-clock numbers on the build machine are rough: its six cores are slow and shared, and another session ran beside some of these runs.
 
 | Host     | Engine                                                  | 994052 to its stop                                                                                                               | Frames per second                                |
 | -------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
@@ -97,7 +97,7 @@ Wall-clock numbers on devbox are rough: its six cores are slow and shared, and a
 | Chromium | WebAssembly page at fast                                | 116.0 s on the dev server and 120.1 s on the preview in B7, 113.8 s in B6; 155.0 s in fix step 11 under the other session's load | 330 to 348 averaged over the run; 256 under load |
 | Chromium | mGBA page at fast-forward                               | 10 s windows at multipliers 16 to 256 (two runs)                                                                                 | 243 to 314; 60.0 and 60.2 at 1x                  |
 
-Stage 2's module, with the division helpers, their rewrite and #68's changes, plays about 1.5 % slower than stage 1's. Played interleaved in Node, 994052 took 107.2 s and 109.5 s on stage 2's module and 105.0 s and 108.3 s on stage 1's, which has no rewrite, with every frame equal. Single runs on the build machine's shared cores spread wider than that. At 1x the module needs about a sixth of one core on devbox. Native mGBA runs about 2.6 times faster than the module in Node (B7's interleaved runs). In Chromium the gap closes: mGBA's own WebAssembly build tops out at about 314 frames per second, with the multiplier at 64 or 256, and the module plays 994052 at 330 to 348 on average (256 in fix step 11, under another session's load). The numbers measure different stretches. Each of mGBA's windows covers the 10 s of the battle it fell on, while the module's numbers average the whole run, so call the two engines even in the browser.
+Stage 2's module, with the division helpers, their rewrite and #68's changes, plays about 1.5 % slower than stage 1's. Played interleaved in Node, 994052 took 107.2 s and 109.5 s on stage 2's module and 105.0 s and 108.3 s on stage 1's, which has no rewrite, with every frame equal. Single runs on the build machine's shared cores spread wider than that. At 1x the module needs about a sixth of one core on the build machine. Native mGBA runs about 2.6 times faster than the module in Node (B7's interleaved runs). In Chromium the gap closes: mGBA's own WebAssembly build tops out at about 314 frames per second, with the multiplier at 64 or 256, and the module plays 994052 at 330 to 348 on average (256 in fix step 11, under another session's load). The numbers measure different stretches. Each of mGBA's windows covers the 10 s of the battle it fell on, while the module's numbers average the whole run, so call the two engines even in the browser.
 
 The mGBA probe (`e2e/wasm-play.spec.ts`, its second test) plays 994052 on the emulator page and sets mGBA's fast-forward multiplier to 1, 4, 16 and 64 in a first run and 1, 16, 64 and 256 in a second, counting frames for 10 s at each through mGBA's end-of-frame callback. The page keeps mGBA's module to itself, so the probe wraps the package's default export as the browser loads it; the page's code stays as it is.
 
@@ -251,7 +251,7 @@ The gate accepted both drafts on 22.11.2026 (answers 2a and 4a): the amendment n
 
 ## Rests
 
-- The audio drift: in headless Chromium the worklet reads 2.5 to 3 % slower than the worker writes, and a fifth slower on a loaded devbox. The latency cap holds the fill at 0.2 s, and each skip back to 0.1 s cuts the sound once; at a 3 % gap that is a cut every few seconds. A resampler that follows the fill would play it without cuts. Since wave 4 the worklet waits for a reserve of 33 ms before it plays and after each dry spell, and the page counts each dry spell once.
+- The audio drift: in headless Chromium the worklet reads 2.5 to 3 % slower than the worker writes, and a fifth slower on a loaded build machine. The latency cap holds the fill at 0.2 s, and each skip back to 0.1 s cuts the sound once; at a 3 % gap that is a cut every few seconds. A resampler that follows the fill would play it without cuts. Since wave 4 the worklet waits for a reserve of 33 ms before it plays and after each dry spell, and the page counts each dry spell once.
 - `include/script.h` has three inline checks that test a pointer for ROM mirror 1 (specials, `gotonative`, `callnative`). Under the module they read every pointer as unmarked, so an effect analysis stops early. That is the field path, not the battle's.
 - Phones: 256 MB of fixed linear memory, a module worker, `SharedArrayBuffer` and an audio worklet. Not tried on a phone.
 - Input: the page sends no keys. Live play (roadmap 7) needs the page to write them to `REG_KEYINPUT` as `wasm:run` does.

@@ -1,6 +1,6 @@
 // npm run rom:build [-- --clean] and npm run rom:clean [-- --all] (plan §6). A thin CLI over the
 // tested modules: preflight, the pinned tree with our changes, make, then the outputs in build/rom/.
-// A heavy check on devbox: run it alone and in the background (AGENTS.md).
+// A heavy check on the build machine: run it alone and in the background (AGENTS.md).
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'

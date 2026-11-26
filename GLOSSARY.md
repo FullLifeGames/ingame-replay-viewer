@@ -137,7 +137,7 @@ The BPS patch from the base ROM to the WebAssembly module (`irv-emerald-wasm.bps
 _Avoid_: wasm patch, module download
 
 **Sanitized module**:
-A WebAssembly module built with one of clang's runtime checks, so that a replay run reports every place in the game's C that breaks the check (#44: shifts). It stays on devbox beside the module the page loads and has no module patch.
+A WebAssembly module built with one of clang's runtime checks, so that a replay run reports every place in the game's C that breaks the check (#44: shifts). It stays on the build machine beside the module the page loads and has no module patch.
 _Avoid_: debug build, test module
 
 **Overlay patch**:
