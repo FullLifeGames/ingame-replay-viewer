@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { ENTRY } from '../src/gen5/direct-entry.fixtures.ts'
-import { PKM, TERMINATOR } from '../src/gen5/pkm.fixtures.ts'
+import { PKM, TEAM_PKM, TERMINATOR } from '../src/gen5/pkm.fixtures.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
 const FILE = GEN5_PATHS.bw2Json
@@ -19,6 +19,7 @@ const FILE = GEN5_PATHS.bw2Json
  * the numbers of the same names. */
 const COMPARED = [
   { module: 'pkm.fixtures.ts', name: 'PKM', value: PKM, path: ['pkm'] },
+  { module: 'pkm.fixtures.ts', name: 'TEAM_PKM', value: TEAM_PKM, path: ['pkm'] },
   {
     module: 'pkm.fixtures.ts',
     name: 'TERMINATOR',
