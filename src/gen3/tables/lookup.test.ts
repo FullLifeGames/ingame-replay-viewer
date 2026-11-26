@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { Gen3Error } from '../errors'
+import abilities from './abilities.json'
 import { genericMove } from './generic'
 import { abilityOf, constantOf, itemOf, moveOf, readTable, speciesOf } from './lookup'
 
@@ -36,6 +37,33 @@ describe('lookups by @pkmn name', () => {
   it('play every Hidden Power type as Hidden Power', () => {
     expect(moveOf('Hidden Power Fire')).toEqual({ number: 237, name: 'Hidden Power' })
     expect(moveOf('Hidden Power')).toEqual({ number: 237, name: 'Hidden Power' })
+  })
+})
+
+// The expansion keeps As One and Embody Aspect as one constant per form, each with the one display
+// name, where @pkmn names the form in parentheses and the log may write "As One" bare (D10).
+describe('abilities that share a display name (#88)', () => {
+  it.each([
+    'As One',
+    'As One (Glastrier)',
+    'As One (Spectrier)',
+    'Embody Aspect (Teal)',
+    'Embody Aspect (Hearthflame)',
+    'Embody Aspect (Wellspring)',
+    'Embody Aspect (Cornerstone)',
+  ])('find %s by its display name, with no fallback', (name) => {
+    expect(abilityOf(name).fallback).toBeUndefined()
+  })
+
+  it('pick the form the parentheses name, else the lower number', () => {
+    const [hearthflame] = abilities.ABILITY_EMBODY_ASPECT_HEARTHFLAME_MASK
+    const [iceRider] = abilities.ABILITY_AS_ONE_ICE_RIDER
+    expect(abilityOf('Embody Aspect (Hearthflame)')).toEqual({
+      number: hearthflame,
+      name: 'Embody Aspect',
+    })
+    expect(abilityOf('As One (Spectrier)')).toEqual({ number: iceRider, name: 'As One' })
+    expect(abilityOf('As One')).toEqual({ number: iceRider, name: 'As One' })
   })
 })
 
