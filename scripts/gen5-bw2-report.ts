@@ -1,6 +1,6 @@
 // The report of the pokebw2 generator (gen5-bw2.ts): the full one with every number it read, for a
 // run on the build machine, and the quiet one for CI's public log, with no number of pokebw2.
-import type { Bw2Numbers, Bw2Symbol, EntryNumbers } from '../src/gen5/bw2-numbers.ts'
+import type { Bw2Numbers, Bw2Symbol, EntryNumbers, PkmNumbers } from '../src/gen5/bw2-numbers.ts'
 import { inMainRam } from '../src/gen5/main-ram.ts'
 import { packCommands, type ServerCommand } from '../src/gen5/server-cmd.ts'
 
@@ -75,6 +75,10 @@ function entryChecks(entry: EntryNumbers): string[] {
   ]
 }
 
+/** A Pokémon's format by name: the generator has read and checked the rest or thrown. */
+const pkmCheck = (pkm: PkmNumbers) =>
+  `pkm layouts ${Object.keys(pkm.layouts).join(', ')}; block table, cipher and shiny bound read`
+
 /** The report for a public log: the pin, the count of the symbols it looked up by our own names,
  * and the two checks, and no number of pokebw2: no address, offset, value or size. Each of
  * pokebw2's lists runs from 0, so a list's size would give away its last entry's number. */
@@ -86,6 +90,24 @@ export function quietLines(numbers: Bw2Numbers): string[] {
     outside.length === 0 ? 'all symbols in main RAM' : `outside main RAM: ${outside.join(', ')}`,
     LAYOUT_CHECKED,
     ...entryChecks(numbers.entry),
+    pkmCheck(numbers.pkm),
+  ]
+}
+
+/** Every number of a Pokémon's format, for a run on the build machine. */
+function pkmLines(pkm: PkmNumbers): string[] {
+  const { species, moves, items, abilities, natures } = pkm
+  const lists = Object.entries({ species, moves, items, abilities, natures })
+  return [
+    ...Object.entries(pkm.layouts).map(
+      ([name, layout]) =>
+        `pkm layout ${name} size ${hex(layout.size)}, align ${String(layout.align)}`,
+    ),
+    `pkm block columns ${JSON.stringify(pkm.blockColumns)}`,
+    `pkm block table ${JSON.stringify(pkm.blockOffsets)}`,
+    `pkm selector ${JSON.stringify(pkm.selector)}, cipher ${JSON.stringify(pkm.cipher)}`,
+    `pkm shiny below ${String(pkm.shinyBelow)}, constants ${JSON.stringify(pkm.constants)}`,
+    `pkm lists ${lists.map(([name, list]) => `${name} ${count(list)}`).join(', ')}`,
   ]
 }
 
@@ -133,6 +155,7 @@ export function fullLines(numbers: Bw2Numbers): string[] {
     ...momentSamples(numbers),
     ...entryLines(numbers.entry),
     ...entryChecks(numbers.entry),
+    ...pkmLines(numbers.pkm),
   ]
 }
 

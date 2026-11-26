@@ -73,6 +73,23 @@ describe('quietLines', () => {
       battleOverlay: { start: 0x02190000, end: 0x02190600 },
       bootOverlays: { ovA: { start: 0x02180000, end: 0x02190000 } },
     },
+    pkm: {
+      layouts: { PartyPkm: LAYOUT, PkmBlockA: LAYOUT, PkmBlockB: LAYOUT },
+      blockColumns: { PkmBlockA: 1, PkmBlockB: 0 },
+      blockOffsets: [
+        [0, 0x18],
+        [0x18, 0],
+      ],
+      selector: { mask: 0x30, shift: 4 },
+      cipher: { multiplier: 0x2f1, increment: 0x55, shift: 12 },
+      shinyBelow: 5,
+      constants: { PARTY_SIZE: 3 },
+      species: { SPECIES_NONE: 0, SPECIES_BUDLING: 1 },
+      moves: { MOVE_POKE: 2 },
+      items: { ITEM_ACORN: 3 },
+      abilities: { ABILITY_STURDY_ROOTS: 4 },
+      natures: { NATURE_CALM: 5 },
+    },
   }
 
   it('gives the pin, the count of symbols and the checks, and no address, offset or value', () => {
@@ -85,6 +102,7 @@ describe('quietLines', () => {
       'entry symbols all in main RAM',
       'battle overlay in main RAM, apart from the boot overlays',
       'entry layouts Kite, Lamp',
+      'pkm layouts PartyPkm, PkmBlockA, PkmBlockB; block table, cipher and shiny bound read',
     ])
   })
 
@@ -117,6 +135,7 @@ describe('quietLines', () => {
       serverCommands: names('CMD', 5, 0),
       argFormats: names('ARGS', 6, { code: 0, argCount: 0, puts: [] }),
       commandFormats: names('CMD', 7, 'ARGS_0'),
+      pkm: { ...numbers.pkm, species: names('SPECIES', 8, 0), moves: names('MOVE', 9, 0) },
     }
     const [pin, ...rest] = quietLines(sized)
     expect(pin).toBe('pokebw2 c0ffee')

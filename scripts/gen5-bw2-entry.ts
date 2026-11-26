@@ -17,7 +17,7 @@ import {
   linkSpan,
   overlayName,
 } from './gen5-bw2-span.ts'
-import { structLayout } from './gen5-bw2-struct.ts'
+import { checkedLayout } from './gen5-bw2-struct.ts'
 import { listConstants } from './gen5-bw2-trainer.ts'
 
 const ARM9 = 'config/b2_us/arm9'
@@ -53,6 +53,8 @@ export const ENTRY_SOURCES = {
   trainerClasses: 'generated/trainer_classes.txt',
   printsysC: 'src/system/printsys.c',
   setupC: 'src/system/btl_setup.c',
+  battleH: 'include/constants/battle.h',
+  soundList: 'generated/sound.txt',
 }
 
 /** The link files of the overlays GameInit loads, by overlay name; the generator checks
@@ -128,6 +130,8 @@ const BUFFER_MAKERS = ['TrainerBattleSetup_Create']
 
 /** The trainer class of the opponent (D12): the class of the shipped save's trainer. */
 const TRAINER_CLASS = 'TRAINER_CLASS_YOUNGSTER'
+/** The music a regular trainer class battles to, which the park writes (plan E-6, decision 8). */
+const TRAINER_TRACK = 'SEQ_BGM_VS_TRAINER'
 
 /** The address a call through a register takes: a Thumb function's with bit 0 set, an ARM
  * function's as it is. Throws on anything else, and on an address out of step with its set. */
@@ -197,6 +201,9 @@ function entryConstants(input: EntryInput): Record<string, number> {
       'CONFIG_TEXT_SPEED_FAST',
     ),
     CHAR_EOM: defineValue(input.printsysC, 'CHAR_EOM'),
+    BTL_STYLE_SINGLE: defineValue(input.battleH, 'BTL_STYLE_SINGLE'),
+    BTL_STYLE_DOUBLE: defineValue(input.battleH, 'BTL_STYLE_DOUBLE'),
+    [TRAINER_TRACK]: named(listConstants(input.soundList), TRAINER_TRACK),
   }
 }
 
@@ -210,14 +217,12 @@ function bufferSize(source: string, name: string): number {
 }
 
 function entryLayouts(input: EntryInput): Record<string, StructLayout> {
-  const layouts: Record<string, StructLayout> = {}
-  for (const [name, { from, members }] of Object.entries(LAYOUTS)) {
-    const layout = structLayout(from.map((role) => input[role]).join('\n'), name)
-    const missing = members.filter((member) => layout.fields[member] === undefined)
-    if (missing.length > 0) throw new Error(`${name} lacks ${missing.join(', ')}`)
-    layouts[name] = layout
-  }
-  return layouts
+  return Object.fromEntries(
+    Object.entries(LAYOUTS).map(([name, { from, members }]) => [
+      name,
+      checkedLayout(from.map((role) => input[role]).join('\n'), name, members),
+    ]),
+  )
 }
 
 /** Everything the direct entry needs, checked: the battle overlay meets no boot overlay, and

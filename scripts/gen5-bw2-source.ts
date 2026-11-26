@@ -56,6 +56,18 @@ export const POKEBW2_FILES: readonly string[] = [
   'generated/trainer_classes.txt',
   'src/system/printsys.c',
   'src/system/btl_setup.c',
+  'include/constants/battle.h',
+  'generated/sound.txt',
+  // A Pokémon's data format (#97): the cipher and the block table, the constants and the lists.
+  'src/system/poke_tool.c',
+  'include/constants/pokemon.h',
+  'include/constants/language.h',
+  'include/constants/version.h',
+  'generated/species.txt',
+  'generated/moves.txt',
+  'generated/items.txt',
+  'generated/abilities.txt',
+  'generated/natures.txt',
 ]
 
 /** Reads one file of pokebw2 by its path inside the checkout. */

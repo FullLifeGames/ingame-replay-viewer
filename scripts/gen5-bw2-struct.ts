@@ -143,6 +143,18 @@ export function structLayout(source: string, name: string, upTo?: string): Struc
   return layoutOf(stripComments(source), name, upTo)
 }
 
+/** The layout of the struct `name`; throws naming the struct and each of `members` it lacks. */
+export function checkedLayout(
+  source: string,
+  name: string,
+  members: readonly string[],
+): StructLayout {
+  const layout = structLayout(source, name)
+  const missing = members.filter((member) => layout.fields[member] === undefined)
+  if (missing.length > 0) throw new Error(`${name} lacks ${missing.join(', ')}`)
+  return layout
+}
+
 /** The first member of the struct `name` as written, such as `BattleMonCore core`. */
 export function firstMember(source: string, name: string): string {
   const [first] = membersOf(stripComments(source), name)

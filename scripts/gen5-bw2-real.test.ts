@@ -262,6 +262,9 @@ describe.skipIf(!existsSync(FILE))('the Gen 5 code on the generated numbers', ()
       'TRAINER_CLASS_YOUNGSTER',
       'CONFIG_TEXT_SPEED_FAST',
       'CHAR_EOM',
+      'BTL_STYLE_SINGLE',
+      'BTL_STYLE_DOUBLE',
+      'SEQ_BGM_VS_TRAINER',
     ]
     expect(Object.keys(constants).sort()).toEqual([...names].sort())
     const signs = names.filter((name) => (constants[name] ?? 0) < 0 !== (name === 'OVERLAY_NONE'))
@@ -277,5 +280,15 @@ describe.skipIf(!existsSync(FILE))('the Gen 5 code on the generated numbers', ()
     expect((bufferSizes.TrainerBattleSetup_Create ?? 0) > 1, 'room for a name').toBe(true)
     const pkm = layouts.PartyPkm?.size ?? 0
     expect(pkm > 0 && size('PokeParty', 'pkms') % pkm === 0, 'whole Pokémon').toBe(true)
+  })
+
+  it("fit each block in its chunk and give the block table a row for each selector's value", () => {
+    const { layouts, blockOffsets, selector } = real().pkm
+    const chunk = layouts.PkmBufferChunk?.size ?? 0
+    const blocks = ['PkmBlockA', 'PkmBlockB', 'PkmBlockC', 'PkmBlockD']
+    const long = blocks.filter((name) => !((layouts[name]?.size ?? Infinity) <= chunk))
+    expect(long, 'blocks past the chunk').toEqual([])
+    const rows = (selector.mask >>> selector.shift) + 1
+    expect(chunk > 0 && blockOffsets.length >= rows, 'a row for each value').toBe(true)
   })
 })

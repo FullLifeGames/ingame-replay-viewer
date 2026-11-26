@@ -76,6 +76,8 @@ struct Config { u16 textSpeed : 4; u16 : 12; };`,
   battleProcH: '#define OVERLAY_BATTLE_MAIN OVERLAY_ID(101)',
   trainerClasses: 'TRAINER_CLASS_HIKER = 0\nTRAINER_CLASS_YOUNGSTER\n',
   printsysC: '#define CHAR_NEWLINE 0xe000\n#define CHAR_EOM 0xfffe',
+  battleH: '#define BTL_STYLE_SINGLE 4\n#define BTL_STYLE_DOUBLE 9',
+  soundList: 'SEQ_SILENCE\nSEQ_BGM_VS_WILD = 100\nSEQ_BGM_VS_TRAINER\n',
   setupC: `static void Kite_Init(Kite *kite) { kite->name = GFL_StrBufCreate(3, heapId); }
 BtlSetupTrainer *TrainerBattleSetup_Create(HeapID heapId) {
     BtlSetupTrainer *trainer = GFL_HeapAllocate(heapId, sizeof(BtlSetupTrainer), TRUE, "x.c", 9);
@@ -104,6 +106,9 @@ describe('entryNumbers', () => {
       TRAINER_CLASS_YOUNGSTER: 1,
       CONFIG_TEXT_SPEED_FAST: 3,
       CHAR_EOM: 0xfffe,
+      BTL_STYLE_SINGLE: 4,
+      BTL_STYLE_DOUBLE: 9,
+      SEQ_BGM_VS_TRAINER: 101,
     })
   })
 
