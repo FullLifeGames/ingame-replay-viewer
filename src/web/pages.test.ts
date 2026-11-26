@@ -175,6 +175,12 @@ describe('the words for visitors', () => {
       )
     })
 
+    // #90 D6: a row wraps anywhere but inside its log line's first field, as "|-fieldstart".
+    it(`keeps the first field of a "Not shown" row on one line on ${name}`, () => {
+      expect(page(name)).toMatch(/#not-shown-rows li\s*\{\s*overflow-wrap: anywhere;\s*\}/)
+      expect(page(name)).toMatch(/#not-shown-rows \.log-kind\s*\{\s*white-space: nowrap;\s*\}/)
+    })
+
     it(`gives the environment line its own "Details" and report link on ${name}`, () => {
       const block = /<div id="environment" hidden>([\s\S]*?)<\/div>/.exec(page(name))?.[1]
       expect(block).toContain('<p id="environment-line"></p>')

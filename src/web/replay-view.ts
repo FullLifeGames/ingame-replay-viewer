@@ -7,6 +7,7 @@
 import type { ReplayChoice, ReplayPlace, ReplaySummary } from './replay-choice'
 import { FIRST_REPLAY, TEST_REPLAYS } from './replays'
 import { reportLink } from './report-link'
+import type { NotShownRow } from './stream'
 import {
   loadedFrom,
   pickedFrom,
@@ -21,7 +22,7 @@ import {
   notShownHeading,
   replayDetail,
   replaySummaryLine,
-  rowText,
+  rowParts,
   type StatusLine,
 } from './status'
 import { detailShown, type VisitorLine, visitorLine } from './visitor'
@@ -107,6 +108,25 @@ export function fill(list: HTMLElement, texts: readonly string[]): void {
   )
 }
 
+/**
+ * Fills the "Not shown" list with one item per row, its log line's first field in a span that the
+ * page keeps on one line (#90). The parts come from other people's replays: text, never markup.
+ */
+function fillRows(list: HTMLElement, rows: readonly NotShownRow[]): void {
+  list.replaceChildren(
+    ...rows.map((row) => {
+      const { head, kind, rest } = rowParts(row)
+      const item = document.createElement('li')
+      const span = Object.assign(document.createElement('span'), {
+        className: 'log-kind',
+        textContent: kind,
+      })
+      item.append(head, ...(kind === '' ? [] : [span]), rest)
+      return item
+    }),
+  )
+}
+
 /** The replay controls of `page`, and the call that shows a replay's summary and list. */
 export function findReplayView(page: string) {
   const testReplay = element(page, 'test-replay', HTMLSelectElement)
@@ -131,7 +151,7 @@ export function findReplayView(page: string) {
         summary.rows.length,
       )
       fill(element(page, 'not-shown-counts', HTMLUListElement), summary.counts.map(countText))
-      fill(element(page, 'not-shown-rows', HTMLOListElement), summary.rows.map(rowText))
+      fillRows(element(page, 'not-shown-rows', HTMLOListElement), summary.rows)
     },
     /** Notes where the select stands for the replay the page now holds (#32). */
     keepPick: (): void => {

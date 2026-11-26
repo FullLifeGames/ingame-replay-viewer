@@ -123,14 +123,39 @@ export const notShownHeading = (rows: number): string => `Not shown in the game 
 
 export const countText = ({ what, count }: NotShownCount): string => `${what} (${String(count)})`
 
+/** A "Not shown" row in three parts; the page keeps `kind` on one line (#90). */
+export interface RowParts {
+  readonly head: string
+  /** The log line's first field, such as "|-fieldstart", or '' for a line without one. */
+  readonly kind: string
+  readonly rest: string
+}
+
+/** The longest first field a row keeps on one line: the protocol's longest has 20 characters. */
+const LONGEST_KIND = 24
+
 /**
- * One row of the list: its 1-based line, what happened, the log line and any detail, the last two
- * without Showdown's markup (#31).
+ * One row of the list in parts: its 1-based line and what happened, then the log line's first
+ * field, then the rest of the log line and any detail, the log line and the detail without
+ * Showdown's markup (#31). A first field longer than any of the protocol stays in the rest.
  */
-export function rowText({ line, what, text, detail, standIn }: NotShownRow): string {
+export function rowParts({ line, what, text, detail, standIn }: NotShownRow): RowParts {
   const shown = standIn ? `${what}, a stand-in shows` : what
-  const logLine = text === '' ? '' : `: ${plainText(text)}`
-  return `Line ${String(line)}, ${shown}${logLine}${detail === undefined ? '' : `; ${plainText(detail)}`}`
+  const logLine = plainText(text)
+  const field = /^\|[^|]*/.exec(logLine)?.[0] ?? ''
+  const kind = field.length <= LONGEST_KIND ? field : ''
+  const tail = detail === undefined ? '' : `; ${plainText(detail)}`
+  return {
+    head: `Line ${String(line)}, ${shown}${text === '' ? '' : ': '}`,
+    kind,
+    rest: `${logLine.slice(kind.length)}${tail}`,
+  }
+}
+
+/** One row of the list as one text: its parts joined. */
+export function rowText(row: NotShownRow): string {
+  const { head, kind, rest } = rowParts(row)
+  return `${head}${kind}${rest}`
 }
 
 const SIDE_WORDS: Readonly<Record<Side, string>> = { far: 'Far side', near: 'Near side' }
