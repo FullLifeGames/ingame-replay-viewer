@@ -1,7 +1,9 @@
 // The notices of the Gen 5 page's components (#79, D6, D7, D16): for each component of
 // scripts/gen5-manifest.ts, the files in its source at the pinned commit that hold its copyright
 // notices and licence texts, and those of the parts its build compiles in (RetroArch's
-// Makefile.emulatorjs and Makefile.common, melonDS's Makefile.common, at the pins). Nothing here
+// Makefile.emulatorjs and Makefile.common, melonDS's Makefile.common, at the pins). Emscripten's
+// parts follow Makefile.emulatorjs's link: its JS runtime, musl, libc++, libc++abi, compiler-rt
+// and dlmalloc (no flag picks another allocator), and zlib through its port. Nothing here
 // quotes a notice: scripts/gen5-licences-read.ts reads each one from the pinned commit, and the
 // licences page shows it whole. The GPL's text comes from melonDS's LICENSE, never from the tree.
 import type { ComponentId } from './gen5-manifest.ts'
@@ -74,9 +76,18 @@ export const NOTICES: Readonly<Record<ComponentId, readonly Notice[]>> = {
     licence('ibxm', 'deps/ibxm/licence.txt'),
   ],
   build: GPL_APPENDIX("EmulatorJS's build scripts"),
+  emscripten: [
+    licence('Emscripten', 'LICENSE'),
+    licence('musl', 'system/lib/libc/musl/COPYRIGHT'),
+    licence('libc++', 'system/lib/libcxx/LICENSE.TXT'),
+    licence('libc++abi', 'system/lib/libcxxabi/LICENSE.TXT'),
+    licence('compiler-rt', 'system/lib/compiler-rt/LICENSE.TXT'),
+    notice('dlmalloc', 'system/lib/dlmalloc.c', [52, 55]),
+  ],
+  // zlib.h states the version's year; zlib's LICENSE at the tag still says 1995-2022.
+  zlib: [notice('zlib', 'zlib.h', [1, 23])],
   nipplejs: [licence('nipplejs', 'LICENSE')],
   socketio: SOCKET_IO_PACKAGES.map((name) => licence(name, `packages/${name}/LICENSE`)),
-  extract7z: [],
 }
 
 /** libretro-common's files each carry a notice of their own; RetroArch compiles many of them. */
@@ -92,16 +103,6 @@ export const NOTICE_TREES: readonly NoticeTree[] = [
 /** The GPL's full text: melonDS's LICENSE at its pin, the text the core's license.txt holds. */
 export const GPL_TEXT = { component: 'melonds', path: 'LICENSE' } as const
 
-/** Parts the core holds whose notice none of the pinned sources carries. */
-export const UNFOUND: readonly Unfound[] = [
-  {
-    component: 'retroarch',
-    part: "Emscripten's runtime",
-    says: "EmulatorJS's build scripts: their build_env.sh names emsdk 3.1.74 for a local build, and their CI takes the version from a setting the pin does not hold. The core's wasm names its compiler as 21.0.0git (https:/github.com/llvm/llvm-project 23e3cbb2e82b62586266116c8ab77ce68e412cf8). Which Emscripten release that was is not established. No pinned source holds Emscripten's notice.",
-  },
-  {
-    component: 'retroarch',
-    part: 'zlib',
-    says: "Makefile.emulatorjs links zlib from Emscripten's ports (-s USE_ZLIB=1). The core's wasm holds zlib's messages, such as \"incorrect header check\", and the string 1.3.1, but no copyright line of zlib. No pinned source holds that copy's notice.",
-  },
-]
+/** Parts the core holds whose notice none of the pinned sources carries. Empty since 79-5, when
+ * Emscripten and zlib became components with sources of their own; a pin bump may fill it. */
+export const UNFOUND: readonly Unfound[] = []

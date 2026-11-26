@@ -52,7 +52,7 @@ describe('quietLines', () => {
       party: LAYOUT,
       monCore: LAYOUT,
       waitSelectSeq: 29,
-      single: { clientCount: 3, posClientIds: [2, 0, 1] },
+      single: { clientCount: 3, posClientIds: [2, 0, 1], clients: { player: 2, opponent: 1 } },
     },
     route: {
       hughTrigger: { x: 1, z: 31, width: 2 },
@@ -61,6 +61,36 @@ describe('quietLines', () => {
       bianca: { x: 2, z: 29 },
     },
     saveTrainer: { x: 3, z: 41 },
+    entry: {
+      functions: {
+        Spin_Main: { call: 0x02004001, thumb: true },
+        Spin_Arm: { call: 0x02004100, thumb: false },
+      },
+      data: { sTable: symbol('sTable', 0x02100000) },
+      constants: { HEAPID_SPIN: 43 },
+      layouts: { Kite: LAYOUT, Lamp: LAYOUT },
+      bufferSizes: { Kite_Create: 9 },
+      setupIndices: { player: 3, opponent: 2 },
+      battleOverlay: { start: 0x02190000, end: 0x02190600 },
+      bootOverlays: { ovA: { start: 0x02180000, end: 0x02190000 } },
+    },
+    pkm: {
+      layouts: { PartyPkm: LAYOUT, PkmBlockA: LAYOUT, PkmBlockB: LAYOUT },
+      blockColumns: { PkmBlockA: 1, PkmBlockB: 0 },
+      blockOffsets: [
+        [0, 0x18],
+        [0x18, 0],
+      ],
+      selector: { mask: 0x30, shift: 4 },
+      cipher: { multiplier: 0x2f1, increment: 0x55, shift: 12 },
+      shinyBelow: 5,
+      constants: { PARTY_SIZE: 3 },
+      species: { SPECIES_NONE: 0, SPECIES_BUDLING: 1 },
+      moves: { MOVE_POKE: 2 },
+      items: { ITEM_ACORN: 3 },
+      abilities: { ABILITY_STURDY_ROOTS: 4 },
+      natures: { NATURE_CALM: 5 },
+    },
   }
 
   it('gives the pin, the count of symbols and the checks, and no address, offset or value', () => {
@@ -69,7 +99,26 @@ describe('quietLines', () => {
       'symbols 2',
       'outside main RAM: itcm',
       'adapter layout checked: members present, offsets rising, inside the struct, bit-fields shared',
+      'entry functions in ARM: Spin_Arm',
+      'entry symbols all in main RAM',
+      'battle overlay in main RAM, apart from the boot overlays',
+      'entry layouts Kite, Lamp',
+      'pkm layouts PartyPkm, PkmBlockA, PkmBlockB; block table, cipher and shiny bound read',
     ])
+  })
+
+  // Scene: the direct entry's numbers (#97) reach the public log as names and checks alone.
+  it("names the entry's ARM functions and its symbols outside main RAM, and no number", () => {
+    const entry = {
+      ...numbers.entry,
+      functions: { Spin_Main: { call: 0x02004001, thumb: true } },
+      data: { itcm: symbol('itcm', 0x01ff8123) },
+      battleOverlay: { start: 0x023ffc00, end: 0x02400400 },
+    }
+    const lines = quietLines({ ...numbers, entry })
+    expect(lines).toContain('entry functions all Thumb')
+    expect(lines).toContain('entry symbols outside main RAM: itcm')
+    expect(lines).toContain('battle overlay outside main RAM, apart from the boot overlays')
   })
 
   // Scene: each of pokebw2's lists runs from 0, so its size would give away its last entry's
@@ -87,6 +136,7 @@ describe('quietLines', () => {
       serverCommands: names('CMD', 5, 0),
       argFormats: names('ARGS', 6, { code: 0, argCount: 0, puts: [] }),
       commandFormats: names('CMD', 7, 'ARGS_0'),
+      pkm: { ...numbers.pkm, species: names('SPECIES', 8, 0), moves: names('MOVE', 9, 0) },
     }
     const [pin, ...rest] = quietLines(sized)
     expect(pin).toBe('pokebw2 c0ffee')

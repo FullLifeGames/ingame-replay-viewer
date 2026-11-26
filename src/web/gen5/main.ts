@@ -3,18 +3,22 @@
 // stays in the browser as a Blob URL; EmulatorJS's databases are off, so it never lands in
 // IndexedDB. The address picks the core build and vsync (src/gen5/pacing.ts); vsync is off unless
 // it says `?vsync=1`. The game's clock is fixed and runs with the emulated frames, and a macro can
-// play from boot or from a state (frame-hook.ts). With `?save=<name>` the page fetches that save
-// from its own server and loads it before the game starts; the save folder lives in memory alone,
-// never in IndexedDB (save-load.ts). `window.gen5` is the hook that the scripts read.
+// play from boot or from a state (frame-hook.ts). EmulatorJS unpacks the core in the page's own
+// worker, which window.EJS_paths names for its 7z unpacker (src/gen5/unpacker.ts, #79). With
+// `?save=<name>` the page fetches that save from its own server and loads it before the game
+// starts; the save folder lives in memory alone, never in IndexedDB (save-load.ts). `window.gen5`
+// is the hook that the scripts read.
 import { figuresLine } from '../../gen5/figures.ts'
 import type { Calibration, Gen5Hook, SaveReport } from '../../gen5/hook.ts'
 import type { MainRamFacts } from '../../gen5/main-ram.ts'
 import { checkBlack2, HEADER_SIZE } from '../../gen5/nds-header.ts'
 import { emulatorOptions, pageSettings } from '../../gen5/pacing.ts'
 import { CONTENT_NAME, saveName, saveQueryProblem } from '../../gen5/save-file.ts'
+import { emulatorPaths } from '../../gen5/unpacker.ts'
 import { wireControls } from './controls.ts'
 import { fromBase64, sha256, toBase64 } from './codec.ts'
-import { fixClock, frameHook, wrapRuntime } from './frame-hook.ts'
+import { fixClock, wrapRuntime } from './core-runtime.ts'
+import { frameHook } from './frame-hook.ts'
 import { ramHook, readFacts } from './ram-hook.ts'
 import {
   fetchSave,
@@ -148,6 +152,7 @@ function startEmulator(file: File): void {
   window.EJS_player = '#game'
   window.EJS_core = 'melonds'
   window.EJS_pathtodata = DATA_PATH
+  window.EJS_paths = emulatorPaths()
   window.EJS_gameUrl = URL.createObjectURL(file)
   window.EJS_gameName = CONTENT_NAME
   window.EJS_startOnLoaded = true

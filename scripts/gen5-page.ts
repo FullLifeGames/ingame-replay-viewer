@@ -5,6 +5,7 @@ import { join } from 'node:path'
 
 import type { Page } from '@playwright/test'
 
+import { UNPACK_REPORT, type UnpackGlobal, type UnpackReport } from '../src/gen5/core-unpack.ts'
 import { type Gen5Global, RETRO_START } from '../src/gen5/hook.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { loadAverage, sampleMemory } from './gen5-proc.ts'
@@ -65,6 +66,26 @@ export async function waitForStart(page: Page): Promise<void> {
     { timeout: START_TIMEOUT_MS, polling: 1000 },
   )
   log(`started after ${((Date.now() - begin) / 1000).toFixed(1)} s; ${sampleLine()}`)
+  await logUnpack(page)
+}
+
+/** Logs the report the page's unpacker keeps on its worker's global scope (src/web/gen5/
+ * extract7z.ts): the files, their bytes and the ms the core took to unpack. */
+export async function logUnpack(page: Page): Promise<void> {
+  for (const worker of page.workers()) {
+    const report = await worker
+      .evaluate<UnpackReport | undefined, typeof UNPACK_REPORT>(
+        (key) => (globalThis as UnpackGlobal)[key],
+        UNPACK_REPORT,
+      )
+      .catch(() => undefined)
+    if (report === undefined) continue
+    log(
+      `unpacked the core in the page's worker: ${String(report.files)} files, ${String(report.bytes)} bytes, ${report.ms.toFixed(0)} ms`,
+    )
+    return
+  }
+  log("unpacked the core: no worker holds the page's unpack report")
 }
 
 export async function pressStart(page: Page, frame: number): Promise<void> {

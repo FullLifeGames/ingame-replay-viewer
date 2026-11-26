@@ -29,7 +29,7 @@ function adapterField(numbers: Bw2Numbers, name: string): RamRef {
   const ref: RamRef = {
     name,
     address: symbolAddress(numbers, 'sAdapters'),
-    offset: field.offset,
+    hops: [field.offset],
     width: field.size,
   }
   if (field.bits === undefined) return ref

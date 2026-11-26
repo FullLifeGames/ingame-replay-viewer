@@ -16,6 +16,7 @@ import {
 describe('parseSymbols', () => {
   const list = [
     'Spin_Main kind:function(thumb,size=0x4a) addr:0x0219a010',
+    'Spin_Arm kind:function(arm,size=0x20) addr:0x0219a040',
     'sTable kind:data(any) addr:0x021c0000',
     'sSlots kind:bss addr:0x021c8000',
     'data_ov001_021c8004 kind:bss addr:0x021c8004 ambiguous',
@@ -23,13 +24,28 @@ describe('parseSymbols', () => {
     '',
   ].join('\n')
 
-  it('reads name, kind, address and a function size', () => {
+  it("reads name, kind, address, a function's size and a code symbol's instruction set", () => {
     expect(parseSymbols(list, 'ov001')).toEqual([
-      { name: 'Spin_Main', kind: 'function', address: 0x0219a010, size: 0x4a, module: 'ov001' },
+      {
+        name: 'Spin_Main',
+        kind: 'function',
+        address: 0x0219a010,
+        size: 0x4a,
+        mode: 'thumb',
+        module: 'ov001',
+      },
+      {
+        name: 'Spin_Arm',
+        kind: 'function',
+        address: 0x0219a040,
+        size: 0x20,
+        mode: 'arm',
+        module: 'ov001',
+      },
       { name: 'sTable', kind: 'data', address: 0x021c0000, module: 'ov001' },
       { name: 'sSlots', kind: 'bss', address: 0x021c8000, module: 'ov001' },
       { name: 'data_ov001_021c8004', kind: 'bss', address: 0x021c8004, module: 'ov001' },
-      { name: '.L_0219a020', kind: 'label', address: 0x0219a020, module: 'ov001' },
+      { name: '.L_0219a020', kind: 'label', address: 0x0219a020, mode: 'thumb', module: 'ov001' },
     ])
   })
 

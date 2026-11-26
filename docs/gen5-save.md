@@ -2,6 +2,15 @@
 
 `src/web/gen5/saves/route-20.sav` is a battery save of Black 2 (USA), played from New Game on the build machine for the Gen 5 page (#78). The page loads it into melonDS before the game starts, so Continue puts the player two tiles west of the column a trainer looks up, and a short macro walks into his battle. ADR 0002 lets the file ship: a save holds player data alone. It is the one kind of game file the tracked tree may hold.
 
+## What it serves since the direct start
+
+The direct entry (#97) needs no save: the page boots with none, and the routine's park writes both parties. The save still serves two things:
+
+- `scripts/gen5-pkm-real.test.ts` proves the Pokémon format on it: it opens the save's Tepig, seals it back byte for byte and reads its fields by name (`docs/gen5-spike.md`, "A Pokémon as data").
+- The walk: `node scripts/gen5-moment.ts --entry walk --save route-20` plays Continue and the steps into Terrell's battle, as #78 did. It stays until the walk's removal.
+
+`--save route-20` without `--entry walk` loads the save and then starts the battle through the routine, which writes its own team into the battle's setup in place of the save's party.
+
 ## The trainer
 
 Youngster Terrell on Route 20. He fits the three rules of #78, read in pokebw2 by file and symbol:

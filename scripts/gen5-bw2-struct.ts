@@ -3,12 +3,15 @@
 // procedure call standard's (AAPCS, "Data types and alignment"): a scalar or pointer sits at a
 // multiple of its size; a struct takes its largest member's alignment and pads its size to it; a
 // bitfield takes the next free bits of a container of its declared type, lowest bits first on a
-// little-endian target, and starts a new container when it would cross one. A typedef of a
-// function pointer is a pointer. Members of any other shape (unions, anonymous structs, arrays
-// sized by a name, unknown types) throw, unless the layout stops before them: a member's offset
-// depends only on the members before it.
+// little-endian target, and starts a new container when it would cross one, and an unnamed one
+// only takes its bits. One rule is the game's compiler's own (MWCC, #97): a 64-bit scalar sits at
+// a multiple of 4, not of 8, as pokebw2's TimeSigSave and FestMissionConfig show by their padding
+// names and size comment. A typedef of a function pointer is a pointer, a typedef of a scalar is
+// that scalar, `const` changes nothing, and an array's length may be a define of the source.
+// Members of any other shape (unions, anonymous structs, unknown types) throw, unless the layout
+// stops before them: a member's offset depends only on the members before it.
 import type { FieldLayout, StructLayout } from '../src/gen5/bw2-numbers.ts'
-import { closingBrace, literal, stripComments } from './gen5-bw2-c.ts'
+import { closingBrace, defineValue, literal, stripComments } from './gen5-bw2-c.ts'
 
 /** Sizes of the scalar types the battle structs use (pokebw2 include/types.h, ARM9). */
 const SCALARS: Readonly<Record<string, number>> = {
@@ -20,8 +23,12 @@ const SCALARS: Readonly<Record<string, number>> = {
   s32: 4,
   int: 4,
   BOOL: 4,
+  u64: 8,
+  s64: 8,
 }
 const POINTER = 4
+/** No scalar sits at a multiple of more than a word on the game's compiler. */
+const WORD = 4
 
 interface Cursor {
   bit: number
@@ -29,7 +36,8 @@ interface Cursor {
   fields: Record<string, FieldLayout>
 }
 
-const MEMBER = /^(\w+)\s*(\*+)?\s*(\w+)\s*(?:\[([^\]]+)\])?\s*(?::\s*(\d+))?$/
+const MEMBER = /^(?:const\s+)?(\w+)\s*(\*+)?\s*(\w+)\s*((?:\[[^\]]+\]\s*)*)(?::\s*(\d+))?$/
+const UNNAMED_BITS = /^(\w+)\s*:\s*(\d+)$/
 
 /** The body of `struct name { ... }` or `typedef struct [tag] { ... } name;`. */
 function structBody(code: string, name: string): string {
@@ -47,6 +55,7 @@ function structBody(code: string, name: string): string {
   throw new Error(`no struct ${name} in the source`)
 }
 
+/** Places a bitfield; an unnamed one (`name` '') takes its bits and gets no field. */
 function placeBits(cursor: Cursor, name: string, type: string, bits: number): void {
   const size = SCALARS[type]
   if (size === undefined) throw new Error(`the bitfield ${name} has the type ${type}, no scalar`)
@@ -54,7 +63,7 @@ function placeBits(cursor: Cursor, name: string, type: string, bits: number): vo
   let start = Math.floor(cursor.bit / width) * width
   if (cursor.bit + bits > start + width) start += width
   cursor.bit = Math.max(cursor.bit, start)
-  cursor.fields[name] = { offset: start / 8, size, bit: cursor.bit - start, bits }
+  if (name !== '') cursor.fields[name] = { offset: start / 8, size, bit: cursor.bit - start, bits }
   cursor.bit += bits
   cursor.align = Math.max(cursor.align, size)
 }
@@ -73,22 +82,37 @@ function placeWhole(cursor: Cursor, name: string, unit: StructLayout, count: num
 const isFunctionPointer = (code: string, type: string) =>
   new RegExp(`\\btypedef\\b[^;{}]*\\(\\s*\\*\\s*${type}\\s*\\)\\s*\\(`).test(code)
 
+/** The scalar that `typedef <scalar> type;` names, or undefined. */
+const scalarTypedef = (code: string, type: string) =>
+  new RegExp(`\\btypedef\\s+(\\w+)\\s+${type}\\s*;`).exec(code)?.[1]
+
 function unitOf(code: string, type: string, pointer: boolean): StructLayout {
   if (pointer || isFunctionPointer(code, type)) return { size: POINTER, align: POINTER, fields: {} }
-  const scalar = SCALARS[type]
-  return scalar === undefined ? layoutOf(code, type) : { size: scalar, align: scalar, fields: {} }
+  const scalar = SCALARS[type] ?? SCALARS[scalarTypedef(code, type) ?? '']
+  if (scalar === undefined) return layoutOf(code, type)
+  return { size: scalar, align: Math.min(scalar, WORD), fields: {} }
 }
 
-/** Places one member; returns its name. */
+/** The element count of `[a][b]...`, each a literal or a define of the source. */
+function lengthOf(code: string, dimensions: string): number {
+  const counts = [...dimensions.matchAll(/\[([^\]]+)\]/g)].map(([, count = '']) => {
+    return literal(count) ?? defineValue(code, count.trim())
+  })
+  return counts.reduce((product, count) => product * count, 1)
+}
+
+/** Places one member; returns its name, or '' for an unnamed bitfield. */
 function placeMember(cursor: Cursor, code: string, member: string): string {
-  const match = /[{}]|\bunion\b|\bstruct\b/.test(member) ? null : MEMBER.exec(member)
-  const [, type = '', stars, name = '', count, bits] = match ?? []
-  const length = count === undefined ? 1 : literal(count)
-  if (match === null || length === undefined) {
-    throw new Error(`cannot lay out the member "${member}"`)
+  const unnamed = UNNAMED_BITS.exec(member)
+  if (unnamed !== null) {
+    placeBits(cursor, '', unnamed[1] ?? '', Number(unnamed[2]))
+    return ''
   }
+  const match = /[{}]|\bunion\b|\bstruct\b/.test(member) ? null : MEMBER.exec(member)
+  if (match === null) throw new Error(`cannot lay out the member "${member}"`)
+  const [, type = '', stars, name = '', dimensions = '', bits] = match
   if (bits !== undefined) placeBits(cursor, name, type, Number(bits))
-  else placeWhole(cursor, name, unitOf(code, type, stars !== undefined), length)
+  else placeWhole(cursor, name, unitOf(code, type, stars !== undefined), lengthOf(code, dimensions))
   return name
 }
 
@@ -117,6 +141,18 @@ function layoutOf(code: string, name: string, upTo?: string): StructLayout {
  * only the members up to and with that one (`size` then ends with it). */
 export function structLayout(source: string, name: string, upTo?: string): StructLayout {
   return layoutOf(stripComments(source), name, upTo)
+}
+
+/** The layout of the struct `name`; throws naming the struct and each of `members` it lacks. */
+export function checkedLayout(
+  source: string,
+  name: string,
+  members: readonly string[],
+): StructLayout {
+  const layout = structLayout(source, name)
+  const missing = members.filter((member) => layout.fields[member] === undefined)
+  if (missing.length > 0) throw new Error(`${name} lacks ${missing.join(', ')}`)
+  return layout
 }
 
 /** The first member of the struct `name` as written, such as `BattleMonCore core`. */

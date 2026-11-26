@@ -2,8 +2,10 @@
 // the game's heap, so their addresses change from battle to battle. The server is found by its
 // step function, and from it a chain of pointers leads to the clients' poke container
 // (pokebw2: src/battle/btl_server.c, src/battle/btl_main.c, include/battle/btl_main.h). Each link
-// is checked before it is followed. The layouts come from build/gen5/bw2.json.
-import type { BattleNumbers, SingleBattle, StructLayout } from './bw2-numbers.ts'
+// is checked before it is followed. From the container come a client's front Pokémon and, for the
+// direct start's readings (#97), its whole party as the battle copied it. The layouts come from
+// build/gen5/bw2.json.
+import type { BattleNumbers, FieldLayout, SingleBattle, StructLayout } from './bw2-numbers.ts'
 import { inMainRam } from './main-ram.ts'
 import type { ReadRam } from './ram-check.ts'
 
@@ -17,13 +19,22 @@ export interface BattleMonReading {
   level: number
 }
 
+/** A Pokémon of a client's party: the core's values and its held item and ability. */
+export interface PartyMonReading extends BattleMonReading {
+  item: number
+  ability: number
+}
+
 const hex = (value: number) => `0x${value.toString(16)}`
 
-function offsetOf(layout: StructLayout, field: string, what: string): number {
+function fieldOf(layout: StructLayout, field: string, what: string): FieldLayout {
   const found = layout.fields[field]
   if (found === undefined) throw new Error(`the layout of ${what} has no field ${field}`)
-  return found.offset
+  return found
 }
+
+const offsetOf = (layout: StructLayout, field: string, what: string) =>
+  fieldOf(layout, field, what).offset
 
 /** The DS addresses where a server's step is `proc` (a Thumb function, so the word may carry
  * bit 0) and its seq the wait for the actions. `ram` is main RAM from `base`. */
@@ -68,25 +79,23 @@ function clientCon(read: ReadRam, server: number, battle: BattleNumbers): number
   return con
 }
 
-/** The front Pokémon of `clientId`'s party in the clients' container, reached from the server. */
-export function frontMon(
-  read: ReadRam,
-  server: number,
-  battle: BattleNumbers,
-  clientId: number,
-): BattleMonReading {
+/** The BattleParty of `clientId` in the clients' container, reached from the server. */
+function partyOf(read: ReadRam, server: number, battle: BattleNumbers, clientId: number): number {
   const con = clientCon(read, server, battle)
-  const party =
-    con + offsetOf(battle.pokeCon, 'parties', 'BtlPokeCon') + clientId * battle.party.size
-  const address = read(party + offsetOf(battle.party, 'mons', 'BattleParty'), 4)
-  if (!inMainRam(address)) {
-    throw new Error(
-      `client ${String(clientId)}'s front Pokémon at ${hex(address)} lies outside main RAM`,
-    )
-  }
-  const core = (name: string, width: 1 | 2) =>
+  return con + offsetOf(battle.pokeCon, 'parties', 'BtlPokeCon') + clientId * battle.party.size
+}
+
+/** A reader of the core of the Pokémon at `address`, checked to lie in main RAM; `what` names it
+ * in the error. */
+function coreAt(read: ReadRam, address: number, battle: BattleNumbers, what: string) {
+  if (!inMainRam(address)) throw new Error(`${what} at ${hex(address)} lies outside main RAM`)
+  return (name: string, width: 1 | 2) =>
     read(address + offsetOf(battle.monCore, name, 'BattleMonCore'), width)
-  return {
+}
+
+function monAt(read: ReadRam, address: number, battle: BattleNumbers, what: string) {
+  const core = coreAt(read, address, battle, what)
+  const reading: BattleMonReading = {
     address,
     monId: core('monId', 1),
     species: core('species', 2),
@@ -94,6 +103,48 @@ export function frontMon(
     maxHp: core('maxHP', 2),
     level: core('level', 1),
   }
+  return reading
+}
+
+/** The front Pokémon of `clientId`'s party in the clients' container, reached from the server. */
+export function frontMon(
+  read: ReadRam,
+  server: number,
+  battle: BattleNumbers,
+  clientId: number,
+): BattleMonReading {
+  const party = partyOf(read, server, battle, clientId)
+  const address = read(party + offsetOf(battle.party, 'mons', 'BattleParty'), 4)
+  return monAt(read, address, battle, `client ${String(clientId)}'s front Pokémon`)
+}
+
+/** Every Pokémon of `clientId`'s party in the clients' container, in party order: its count (a
+ * byte), then each entry of its mons. */
+export function partyMons(
+  read: ReadRam,
+  server: number,
+  battle: BattleNumbers,
+  clientId: number,
+): PartyMonReading[] {
+  const party = partyOf(read, server, battle, clientId)
+  const n = read(party + offsetOf(battle.party, 'count', 'BattleParty'), 1)
+  const slots = fieldOf(battle.party, 'mons', 'BattleParty')
+  const mons = party + slots.offset
+  const client = `client ${String(clientId)}'s`
+  if (n * 4 > slots.size) {
+    throw new Error(`${client} party counts more Pokémon than its slots`)
+  }
+  return Array.from({ length: n }, (_, i) => {
+    const address = read(mons + i * 4, 4)
+    const what = `${client} Pokémon ${String(i)}`
+    const core = coreAt(read, address, battle, what)
+    const mon: PartyMonReading = {
+      ...monAt(read, address, battle, what),
+      item: core('heldItem', 2),
+      ability: core('baseAbility', 2),
+    }
+    return mon
+  })
 }
 
 /** A single battle's position of a client's Pokémon, from the battle's setup. */
