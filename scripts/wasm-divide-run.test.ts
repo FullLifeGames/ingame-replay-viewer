@@ -3,7 +3,7 @@
 // 14.2.1's values of the ROM (.waves/04 plan-div fact 1, the issue's diagnosis). The 64-bit ones
 // mirror the 32-bit ones on a zero divisor and do not return libgcc's 64-bit values, so their spec
 // proves only that the rewrite routes each 64-bit op to its helper;
-// scripts/wasm-layer-divide.test.ts holds libgcc's 64-bit values. A helper's own op stays an op:
+// scripts/wasm-divide-rows.ts holds libgcc's 64-bit values. A helper's own op stays an op:
 // rewritten, it would call itself until the stack runs out. CI has no Emscripten, so this spec
 // skips there.
 import { execFileSync } from 'node:child_process'
