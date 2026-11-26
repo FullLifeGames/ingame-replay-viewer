@@ -1,7 +1,7 @@
 // What the viewer does with a press or a failed Load while a game plays (#69), in Chromium. Each
 // test reads the user's US Emerald by the build's rule and skips without it or without the
-// module. A double click on Start during a run leaves one run, which plays the replay from its
-// beginning, and Start enabled. A Load that Showdown answers with 404 during a run says that the
+// module. A double click on Start during a run starts the run over once, as its second click
+// plays nothing (#90), and leaves Start enabled. A Load that Showdown answers with 404 during a run says that the
 // game plays on, and the next pick's line leaves nothing of that failure. No request leaves the
 // page but the routed one.
 import { expect, type Page, test } from '@playwright/test'
@@ -81,8 +81,7 @@ test('a double click on Start during a run leaves one run, from the beginning, a
       ;(globalThis as Hooked).irvPressedAt = performance.now()
     })
     await start.dblclick()
-    // The second click may land before or after the new run begins, so the count of runs started
-    // is reported, and the test pins what holds either way.
+    // The first click starts the run over; the second, with a detail of 2, plays nothing (#90).
     await expect
       .poll(async () => (await status(page))?.runs.started, { timeout: 60_000, intervals: [500] })
       .toBeGreaterThan(played.runs.started)
@@ -90,7 +89,7 @@ test('a double click on Start during a run leaves one run, from the beginning, a
     const now = await waitFor(page, (run) => run.runs.live === 1, 60_000)
     const { wallMs, sinceMark } = await sincePress(page)
     report({ step: 'double click', started: now.runs.started - played.runs.started, wallMs })
-    expect(now.runs.live).toBe(1)
+    expect(now.runs).toEqual({ started: played.runs.started + 1, live: 1 })
     // The current run began after the mark, so its game counts its frames from the beginning.
     expect(wallMs).toBeLessThanOrEqual(sinceMark)
     expect(now.frame).toBeLessThanOrEqual(GBA_FRAMES_PER_SECOND * (now.wallMs / 1000) + 60)

@@ -294,9 +294,10 @@ function wire(viewer: Viewer, view: WasmView): void {
     view.status(BUILDING_LINE)
     act(view, () => viewer.pickDump(file))
   })
-  // Start stays disabled from its click until the run begins or fails (#69).
-  view.start.addEventListener('click', () => {
-    playFrom(view, view.start, () => pressStart(view.start, viewer.play))
+  // Start stays disabled from its click until the run begins or fails (#69); a double click's
+  // second click plays nothing (#90).
+  view.start.addEventListener('click', (event) => {
+    playFrom(view, view.start, () => pressStart(view.start, viewer.play, event.detail))
   })
   view.restart.addEventListener('click', () => {
     playFrom(view, view.restart, () => viewer.restart())
