@@ -90,6 +90,10 @@ describe('park', () => {
     ])
   })
 
+  it('marks the opening every 30 frames, so the intro with the written names shows', () => {
+    expect(named(steps, 'action')).toMatchObject({ kind: 'until', markEvery: 30 })
+  })
+
   it('writes nothing after the wait for gone', () => {
     const gone = steps.findIndex((step) => step.kind === 'until' && step.name === 'gone')
     expect(steps.slice(gone).filter((step) => step.kind === 'write')).toEqual([])

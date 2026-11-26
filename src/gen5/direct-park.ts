@@ -42,8 +42,9 @@ const GONE_LIMIT = 60
  * init), and from there through the opening to the action menu: no run has measured them. */
 const LIMITS: EntryLimits = { start: 900, battle: 900 }
 
-/** A on a quick beat through the opening, with a frame every 30 frames on the way. */
-const PACE: EntryPace = { markEvery: 30, every: 4, throughOpening: true }
+/** A on a quick beat through the opening, with a frame every 30 frames on the way to the adapter
+ * and through the opening, whose intro shows the written names. */
+const PACE: EntryPace = { markEvery: 30, every: 4, throughOpening: true, openingMarkEvery: 30 }
 
 /** A chain from the block's setup word, its hops spelled out. */
 type SetupChain = PointerChain & { hops: readonly number[] }
