@@ -33,7 +33,7 @@ export function sessionPlans(
     return { plans: [firstRun(options.start, refs, trainer, input.readState)], notes: [] }
   }
   const boot = takeover(entry, input.readRoutine())
-  const parked = park(entry, boot.layout, options.names, refs.checks)
+  const parked = park(entry, boot, options.names, refs.checks)
   const plan = (steps: RunPlan['steps'], watch: RamRef[]): RunPlan => ({
     steps,
     startFrame: 0,

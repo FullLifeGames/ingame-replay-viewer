@@ -43,7 +43,13 @@ describe('sessionPlans', () => {
     expect(plans.map((plan) => lastMark(plan.steps))).toEqual(['park', 'battle'])
     expect(plans.map((plan) => plan.state)).toEqual([undefined, undefined])
     expect(plans.map((plan) => plan.stateMarks)).toEqual([[], []])
-    expect(plans[1]?.watch.map((ref) => ref.name)).toEqual(['stage', 'mode'])
+    expect(plans[1]?.watch.map((ref) => ref.name)).toEqual([
+      'stage',
+      'setup',
+      'player.party',
+      'opponent.party',
+      'mode',
+    ])
   })
 
   it('gives the cut of a name for the log', () => {

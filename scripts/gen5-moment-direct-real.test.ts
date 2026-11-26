@@ -50,9 +50,10 @@ describe.skipIf(!FILES.every((file) => existsSync(file)))(
       const [boot, battle] = plans.map((plan) => named(plan.steps))
       expect(boot?.slice(0, 2)).toEqual(['until takeover-window', 'write takeover'])
       expect(boot?.at(-1)).toBe('mark park')
-      expect(battle?.slice(0, 4)).toEqual([
+      expect(battle?.slice(0, 5)).toEqual([
         'until park-check',
         'write park',
+        'until go-region',
         'write go',
         'until gone',
       ])
@@ -72,7 +73,7 @@ describe.skipIf(!FILES.every((file) => existsSync(file)))(
       expect(touched.map((ref) => ref.name)).toEqual([])
     })
 
-    it('check every word of the code at the takeover and at the park', () => {
+    it('check every word of the code at the takeover, at the park and before the go', () => {
       const { numbers, routine } = real()
       const { steps } = takeover(numbers.entry, routine)
       const region = (name: string) => {
@@ -84,6 +85,10 @@ describe.skipIf(!FILES.every((file) => existsSync(file)))(
       const words = Math.ceil(routine.size / 4)
       expect(region('takeover-region').length >= words, 'at the takeover').toBe(true)
       expect(region('park-region').length >= words, 'at the park').toBe(true)
+      const [, battle] = sessionPlans(options, input()).plans
+      const go = battle?.steps.find((one) => one.kind === 'until' && one.name === 'go-region')
+      const before = go?.kind === 'until' ? go.checks : []
+      expect(before.filter((c) => c.name.startsWith('routine code')).length >= words).toBe(true)
     })
   },
 )

@@ -109,6 +109,16 @@ describe('takeover', () => {
     ])
   })
 
+  it('gives the checks of its region, the same at the takeover and at the park', () => {
+    const { region } = takeover(ENTRY, ROUTINE)
+    const checksOf = (name: string) => {
+      const step = steps.find((one) => one.kind === 'until' && one.name === name)
+      return step?.kind === 'until' ? step.checks : []
+    }
+    expect(checksOf('takeover-region')).toEqual(region)
+    expect(checksOf('park-region')).toEqual(region)
+  })
+
   it('checks a code tail short of a word byte by byte', () => {
     const odd = { ...ROUTINE, bytes: [...ROUTINE.bytes, 0x5a], size: 0x25 }
     const region = takeover(ENTRY, odd).steps[2]

@@ -35,10 +35,12 @@ const ROUTINE_OWNS: readonly OrderMember[] = ['stage', 'gameData', 'setup']
 
 const MANAGER_NEXT = ['nextOverlayId', 'nextFunctions', 'nextParam'] as const
 
-/** The routine's pieces, their places in the battle overlay, and the plan's steps and watch. */
+/** The routine's pieces, their places in the battle overlay, the checks that its region holds
+ * what the page wrote, and the plan's steps and watch. */
 export interface Takeover {
   steps: MacroStep[]
   layout: RoutineLayout
+  region: RamCheck[]
   watch: RamRef[]
 }
 
@@ -157,7 +159,7 @@ function regionChecks(entry: EntryNumbers, routine: RoutineBuild, layout: Routin
 }
 
 /** An until that holds or fails in the frame it starts: a check of the moment. */
-const checkNow = (name: string, checks: readonly RamCheck[]): MacroStep => ({
+export const checkNow = (name: string, checks: readonly RamCheck[]): MacroStep => ({
   kind: 'until',
   name,
   checks,
@@ -201,5 +203,5 @@ export function takeover(entry: EntryNumbers, routine: RoutineBuild): Takeover {
     mark('park'),
   ]
   const watch = [managerRef(entry, 'queued'), managerRef(entry, 'nextFunctions'), stage]
-  return { steps, layout, watch }
+  return { steps, layout, region, watch }
 }

@@ -10,6 +10,7 @@ import type { MemoryWrite } from './ram-write'
 // Every address, offset, size and constant here is invented (direct-entry.fixtures.ts).
 
 const SETUP = 0x0230003c
+const STAGE = 0x02300030
 const GO = 0x02300034
 
 /** Invented battle checks: the adapter's pointer and a mode. */
@@ -18,7 +19,7 @@ const BATTLE: RamCheck[] = [
   { name: 'mode', address: 0x02150004, width: 4, oneOf: [2] },
 ]
 
-const { layout } = takeover(ENTRY, ROUTINE)
+const boot = takeover(ENTRY, ROUTINE)
 const NAMES = { player: 'Ann', opponent: 'Bo' }
 
 const writesOf = (step: MacroStep | undefined): readonly MemoryWrite[] =>
@@ -29,13 +30,14 @@ const named = (steps: readonly MacroStep[], name: string) =>
 // Scene: the routine waits at the park; the page writes both sides, then the go, and from the
 // battle's start the page presses A through the opening to the action menu.
 describe('park', () => {
-  const { steps, notes } = park(ENTRY, layout, NAMES, BATTLE)
+  const { steps, notes } = park(ENTRY, boot, NAMES, BATTLE)
 
   it('checks the setup, writes the park, then the go, waits for gone and enters the battle', () => {
     const names = steps.map((step) => ('name' in step ? `${step.kind} ${step.name}` : step.kind))
     expect(names).toEqual([
       'until park-check',
       'write park',
+      'until go-region',
       'write go',
       'until gone',
       'mark gone',
@@ -62,6 +64,29 @@ describe('park', () => {
     ])
     expect(writesOf(named(steps, 'go'))).toEqual([
       { kind: 'bytes', field: 'go', address: GO, bytes: [1, 0, 0, 0] },
+    ])
+  })
+
+  it("checks the routine's region in the frame before the go, as at the takeover and the park", () => {
+    const at = steps.findIndex((step) => step.kind === 'until' && step.name === 'go-region')
+    expect(steps[at]).toEqual({
+      kind: 'until',
+      name: 'go-region',
+      checks: boot.region,
+      holdFor: 1,
+      limit: 0,
+    })
+    expect(steps[at + 1]).toMatchObject({ kind: 'write', name: 'go' })
+    expect(boot.region.length).toBeGreaterThan(0)
+  })
+
+  it("reads the setup and both clients' party pointers, which the copy goes through", () => {
+    const { watch } = park(ENTRY, boot, NAMES, BATTLE)
+    expect(watch).toEqual([
+      { name: 'stage', address: STAGE, width: 4 },
+      { name: 'setup', address: SETUP, width: 4 },
+      { name: 'player.party', address: SETUP, hops: [0x20], width: 4 },
+      { name: 'opponent.party', address: SETUP, hops: [0x24], width: 4 },
     ])
   })
 
@@ -123,7 +148,7 @@ describe('park', () => {
   })
 
   it('cuts names past their room and gives the cuts for the log', () => {
-    const long = park(ENTRY, layout, { player: 'Annabel', opponent: 'Bartholomew' }, BATTLE)
+    const long = park(ENTRY, boot, { player: 'Annabel', opponent: 'Bartholomew' }, BATTLE)
     expect(long.notes).toEqual([
       'opponent.name: "Bartholomew" cut to "Bartholo", the 8 characters it holds',
       'player.name: "Annabel" cut to "Annab", the 5 characters it holds',
@@ -137,7 +162,7 @@ describe('park', () => {
       fields: { textSpeed: { offset: 0, size: 2, bit: 6, bits: 4 } },
     }
     const entry = { ...ENTRY, layouts: { ...ENTRY.layouts, Config: config } }
-    expect(() => park(entry, layout, NAMES, BATTLE)).toThrow(/textSpeed/)
+    expect(() => park(entry, boot, NAMES, BATTLE)).toThrow(/textSpeed/)
   })
   it('throws on a text speed that is no bit-field, a count of no width and no name buffer size', () => {
     const layouts = (struct: string, fields: object) => ({
@@ -145,12 +170,12 @@ describe('park', () => {
       [struct]: { size: 0x260, align: 4, fields: { ...ENTRY.layouts[struct]?.fields, ...fields } },
     })
     const speed = { ...ENTRY, layouts: layouts('Config', { textSpeed: { offset: 0, size: 2 } }) }
-    expect(() => park(speed, layout, NAMES, BATTLE)).toThrow(
+    expect(() => park(speed, boot, NAMES, BATTLE)).toThrow(
       'config.textSpeed is no bit-field in one byte',
     )
     const count = { ...ENTRY, layouts: layouts('PokeParty', { count: { offset: 4, size: 3 } }) }
-    expect(() => park(count, layout, NAMES, BATTLE)).toThrow('PokeParty.count fills no byte')
+    expect(() => park(count, boot, NAMES, BATTLE)).toThrow('PokeParty.count fills no byte')
     const sizes = { ...ENTRY, bufferSizes: {} }
-    expect(() => park(sizes, layout, NAMES, BATTLE)).toThrow("no size of the trainer's name buffer")
+    expect(() => park(sizes, boot, NAMES, BATTLE)).toThrow("no size of the trainer's name buffer")
   })
 })

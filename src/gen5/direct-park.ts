@@ -6,7 +6,7 @@
 // battle's that the setup holds. Pure: the numbers come in from build/gen5/bw2.json.
 import { battleEntry, type EntryLimits, type EntryPace } from './battle-entry.ts'
 import type { EntryNumbers, FieldLayout } from './bw2-numbers.ts'
-import { stageRef } from './direct-takeover.ts'
+import { checkNow, stageRef, type Takeover } from './direct-takeover.ts'
 import { entryConstant, entryField, entryLayout } from './entry-field.ts'
 import { type StringBuffer, stringWrites } from './game-string.ts'
 import { mark, type MacroStep } from './macro.ts'
@@ -175,6 +175,21 @@ function parkWrites(entry: EntryNumbers, layout: RoutineLayout, names: ParkNames
   return { writes, notes }
 }
 
+/** The readings of the log: the setup the routine built and both clients' party pointers in it,
+ * the copy's source and destination (#97: the copy goes into the setup's own party of client 1). */
+function setupWatch(entry: EntryNumbers, layout: RoutineLayout): RamRef[] {
+  const pointer = (name: string, client: number): RamRef => ({
+    name,
+    ...behindSetup(layout, [slot(entry, 'party', client)]),
+    width: WORD,
+  })
+  return [
+    { name: 'setup', address: blockAddress(layout, 'setup'), width: WORD },
+    pointer('player.party', PLAYER),
+    pointer('opponent.party', OPPONENT),
+  ]
+}
+
 /** What must hold before the page writes: the setup built, the opponent's name buffer of the size
  * the plan cut the name to, a Pokémon in the player's party to copy and none in the opponent's. */
 function parkChecks(entry: EntryNumbers, layout: RoutineLayout): RamCheck[] {
@@ -199,20 +214,23 @@ function parkChecks(entry: EntryNumbers, layout: RoutineLayout): RamCheck[] {
   ]
 }
 
-/** Plan 2 from the park: the checks, the park's writes, the go, the wait for gone, then the
- * battle's entry through the opening. No write follows the go: the battle loads over the routine. */
+/** Plan 2 from the park: the checks, the park's writes, the routine's region checked again in the
+ * frame before the go, the go, the wait for gone, then the battle's entry through the opening. No
+ * write follows the go: the battle loads over the routine. */
 export function park(
   entry: EntryNumbers,
-  layout: RoutineLayout,
+  routine: Pick<Takeover, 'layout' | 'region'>,
   names: ParkNames,
   battleChecks: readonly RamCheck[],
 ): Park {
+  const { layout } = routine
   const { writes, notes } = parkWrites(entry, layout, names)
   const go = blockAddress(layout, 'go')
   const stage = stageRef(layout)
   const steps: MacroStep[] = [
-    { kind: 'until', name: 'park-check', checks: parkChecks(entry, layout), holdFor: 1, limit: 0 },
+    checkNow('park-check', parkChecks(entry, layout)),
     { kind: 'write', name: 'park', writes },
+    checkNow('go-region', routine.region),
     {
       kind: 'write',
       name: 'go',
@@ -228,5 +246,5 @@ export function park(
     mark('gone'),
     ...battleEntry(battleChecks, LIMITS, PACE),
   ]
-  return { steps, notes, watch: [stage] }
+  return { steps, notes, watch: [stage, ...setupWatch(entry, layout)] }
 }
