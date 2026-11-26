@@ -15,6 +15,7 @@ import type {
   CopyBoostEvent,
   SingleMoveEvent,
   SingleTurnEvent,
+  TerastallizeEvent,
   TransformEvent,
 } from './effect-events'
 import type {
@@ -340,6 +341,7 @@ export type ScriptEvent =
   | EffectActivateEvent
   | TransformEvent
   | FormChangeEvent
+  | TerastallizeEvent
   | SingleTurnEvent
   | SingleMoveEvent
   | CopyBoostEvent

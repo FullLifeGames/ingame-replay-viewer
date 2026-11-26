@@ -1,5 +1,5 @@
-// Rules for the lines about one Pokémon: switches, drags, faints, HP, status, stat stages and
-// forms.
+// Rules for the lines about one Pokémon: switches, drags, faints, HP, status, stat stages, forms
+// and Terastallization.
 
 import type { Pokemon } from '@pkmn/client'
 import type { BoostID } from '@pkmn/data'
@@ -209,6 +209,14 @@ export const POKEMON_RULES = {
   '|-clearnegativeboost|': { arity: 1, reads: ['silent'], build: negativeStatReset },
   // The third argument, when present, is empty.
   '|-formechange|': { arity: 2, reads: ['from', 'of', 'msg'], build: formChange },
+  // The type is the log's, as @pkmn/protocol reads it.
+  '|-terastallize|': {
+    arity: 2,
+    reads: [],
+    build: ({ line, args: [, ident, type], battle }) => [
+      { kind: 'terastallize', line, who: refOf(battle, ident, line), type },
+    ],
+  },
   // Haze: the line names no Pokémon; the client resets the stages of every active one.
   '|-clearallboost|': { arity: 0, reads: [], build: ({ line }) => [{ kind: 'statReset', line }] },
 } satisfies Rules

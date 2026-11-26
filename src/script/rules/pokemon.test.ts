@@ -318,3 +318,14 @@ describe('the form change rule', () => {
     ])
   })
 })
+
+describe('the Terastallization rule (#88)', () => {
+  it('reads the Pokémon and the type it terastallized into', () => {
+    const script = scriptOf('|-terastallize|p2a: Tyranitar|Fairy')
+
+    expect(script.dropped.filter((drop) => drop.line >= NEXT)).toEqual([])
+    expect(eventsAt(script, NEXT)).toEqual([
+      { kind: 'terastallize', line: NEXT, who: TYRANITAR, type: 'Fairy' },
+    ])
+  })
+})

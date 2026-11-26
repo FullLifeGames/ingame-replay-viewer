@@ -1,6 +1,8 @@
 // The battle script's events for the effects on one Pokémon, items and abilities. `events.ts`
 // holds the other events and the union of them all.
 
+import type { TypeName } from '@pkmn/data'
+
 import type { Caused, Hit } from './events'
 import type { Effect, PokemonRef } from './types'
 
@@ -55,6 +57,14 @@ export interface FormChangeEvent extends Caused {
   readonly who: PokemonRef
   readonly species: string
   readonly msg?: true
+}
+
+/** `who` terastallizes into `type`, the type the log names (#88). */
+export interface TerastallizeEvent {
+  readonly kind: 'terastallize'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly type: TypeName
 }
 
 /** An effect that lasts the turn: Protect, Endure, Focus Punch's focus. */

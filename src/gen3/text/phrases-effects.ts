@@ -86,7 +86,11 @@ export const EFFECT_TEMPLATES = {
   // `BattleScript_BattlerFormChangeWithString`, after the form change (Castform's Forecast).
   formChanged: tagged('STRINGID_PKMNTRANSFORMED', start('transformed!')),
   // Bide's second turn (`BattleScript_BideStoringEnergy`) and its third (`BattleScript_BideAttack`).
+  // `BattleScript_Terastallization` says it first too, then the change with B_BUFF1 the type.
   storingEnergy: tagged('STRINGID_PKMNSTORINGENERGY', start('is storing energy!')),
+  terastallized: tagged('STRINGID_PKMNTERASTALLIZEDINTO', (who: Mon, type: string) => {
+    return `${nameAtStart(who)} terastallized into the ${type} type!`
+  }),
   unleashedEnergy: tagged('STRINGID_PKMNUNLEASHEDENERGY', start('unleashed its energy!')),
   // `BattleScript_RageIsBuilding` says it after a hit raises the Attack of a Pokémon in a rage
   // (`rage.ts`); a `-start|<mon>|Rage` line says it as Rage starts.
@@ -273,6 +277,12 @@ export const transformed = (who: Mon, species: string) =>
 
 /** `who` took another form of its species. */
 export const formChanged = (who: Mon) => E.formChanged.render(who)
+
+/** The two lines of `who`'s Terastallization into `type`, in the order the game says them. */
+export const terastallizing = (who: Mon, type: string): readonly [string, string] => [
+  E.storingEnergy.render(who),
+  E.terastallized.render(who, type),
+]
 
 /** A move `who` kept off, such as by Protect or Safeguard. */
 export function blocked(who: Mon, effect: Effect): Phrase {
