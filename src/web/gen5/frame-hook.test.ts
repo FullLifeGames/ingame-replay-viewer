@@ -112,6 +112,30 @@ describe('frameHook', () => {
     expect(hook.calls.runReport().jumps).toBe(1)
   })
 
+  // Scene: the moment's plan starts at a frame both runs share, however long the script took to
+  // read the battle before it queued the plan.
+  it('holds a run queued for a later frame until that frame, then starts it there', () => {
+    const { hook, iterate } = setup()
+    iterate()
+    hook.calls.queueRun(plan([{ kind: 'mark', name: 'begin' }], { startAt: 5 }))
+    for (let i = 0; i < 4; i += 1) iterate()
+    expect(hook.calls.runReport()).toMatchObject({ status: 'queued', marks: [] })
+    for (let i = 0; i < 3; i += 1) iterate()
+    expect(hook.calls.runReport()).toMatchObject({ status: 'done', marks: [{ frame: 5 }] })
+  })
+
+  it('fails a run queued for a frame the core already passed, naming both frames', () => {
+    const { hook, iterate } = setup()
+    for (let i = 0; i < 7; i += 1) iterate()
+    hook.calls.queueRun(plan([{ kind: 'mark', name: 'begin' }], { startAt: 4 }))
+    iterate()
+    expect(hook.calls.runReport()).toMatchObject({
+      status: 'failed',
+      failed: 'the run was to start at frame 4, and the hook first saw frame 7',
+      marks: [],
+    })
+  })
+
   it('counts every frame the core ran between two calls as a jump', () => {
     const { hook, iterate } = setup()
     hook.calls.queueRun(plan([{ kind: 'wait', frames: 20 }]))

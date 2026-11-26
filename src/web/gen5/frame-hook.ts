@@ -116,16 +116,27 @@ class FrameDriver {
     if (run) this.step(g, run, page, starting ? 0 : skipped)
   }
 
-  /** True when a queued run starts at this frame: at once from boot; from a state at the first
-   * frame after the load, which waits until RetroArch is up. */
+  /** True when a queued run starts at this frame: at once from boot, or at its frame; from a
+   * state at the first frame after the load, which waits until RetroArch is up. */
   private ready(g: FrameGame, plan: RunPlan, page: number): boolean {
-    if (plan.state === undefined) return true
+    if (plan.state === undefined) return plan.startAt === undefined || this.due(plan.startAt, page)
     if (this.loadedAt !== undefined && page > this.loadedAt) {
       this.checkLoad(plan)
       return true
     }
     if (this.loadedAt === undefined && page >= LOAD_AFTER_FRAMES) this.load(g, plan.state, page)
     return false
+  }
+
+  /** True at the frame `startAt`; past it the queued run fails, as it can no longer start there. */
+  private due(startAt: number, page: number): boolean {
+    const frame = page + this.offset
+    if (frame > startAt) {
+      this.queued = undefined
+      this.report.status = 'failed'
+      this.report.failed = `the run was to start at frame ${String(startAt)}, and the hook first saw frame ${String(frame)}`
+    }
+    return frame === startAt
   }
 
   /** Loads a state; the run starts at the next frame the hook sees, once the load took hold. */

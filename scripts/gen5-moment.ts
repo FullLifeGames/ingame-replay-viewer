@@ -2,10 +2,11 @@
 // driven from outside. It starts the session as gen5-moment-args.ts says: from the spike's battle
 // state, or from boot with a save the page fetches from /saves/ and the continue route to the
 // trainer's action menu, or with --entry direct through our routine from boot (#97,
-// gen5-moment-direct.ts), each as one plan. Then it reads the player's adapter, the server and both Pokémon from main
-// RAM and plays the steps of gen5-moment-plan.ts: hold the server, answer the action menu and
-// write one block per moment. It writes a frame per mark under build/gen5/frames/ and the last
-// mark's state under build/gen5/states/ (gitignored, ADR 0002).
+// gen5-moment-direct.ts), each as one plan. Then it reads the player's adapter, the server and
+// both Pokémon from main RAM and plays the steps of gen5-moment-plan.ts from a fixed frame after
+// the mark battle: hold the server, answer the action menu and write one block per moment. It
+// writes a frame per mark under build/gen5/frames/ and the last mark's state under
+// build/gen5/states/ (gitignored, ADR 0002).
 // Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts [--scene known|unknown] [--save <name>]
 // [--entry walk|direct] [--player <name>] [--opponent <name>] [--minutes 15].
 import { readFileSync, writeFileSync } from 'node:fs'
@@ -25,7 +26,7 @@ import type { RoutineBuild } from '../src/gen5/routine-order.ts'
 import { type MomentOptions, readMomentOptions, type StateFile } from './gen5-moment-args.ts'
 import { sessionPlan } from './gen5-moment-direct.ts'
 import { markLines, writeLines } from './gen5-moment-log.ts'
-import { momentSteps } from './gen5-moment-plan.ts'
+import { MOMENT_GAP, momentStart, momentSteps } from './gen5-moment-plan.ts'
 import { listedReader } from './gen5-bw2-source.ts'
 import {
   moveLineLabel,
@@ -227,9 +228,16 @@ async function play(page: Page, dump: string, numbers: Bw2Numbers, options: Mome
     blocks,
   })
   for (const line of writeLines(steps)) log(line)
+  const startAt = momentStart(first.marks)
+  log(
+    startAt === undefined
+      ? 'moment: starts once queued, as the session has no mark battle'
+      : `moment: starts at frame ${String(startAt)}, ${String(MOMENT_GAP)} frames after the mark battle`,
+  )
   const second: RunPlan = {
     steps,
     startFrame: 0,
+    ...(startAt === undefined ? {} : { startAt }),
     watch: watchOf(numbers, battle),
     stateMarks: ['end'],
   }

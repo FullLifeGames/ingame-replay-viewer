@@ -4,7 +4,7 @@ import type { AdapterNumbers } from '../src/gen5/adapter'
 import type { ServerCmdTable } from '../src/gen5/bw2-numbers'
 import type { MacroStep } from '../src/gen5/macro'
 import type { Moment } from '../src/gen5/moment'
-import { momentSteps } from './gen5-moment-plan'
+import { MOMENT_GAP, momentStart, momentSteps } from './gen5-moment-plan'
 
 // Invented numbers in the shapes of bw2.json: offsets, command numbers, IDs and the address.
 /** The adapter command that starts an action selection (BTL_ACMD_SELECT_ACTION), invented. */
@@ -119,5 +119,22 @@ describe('momentSteps after the hold', () => {
     const commands = commandsAfterHold(steps)
     expect(commands).not.toContain(SELECT_ACTION)
     expect([...commands]).toEqual([ADAPTER_NUMBERS.serverCmd])
+  })
+})
+
+// Scene: two equal runs must start the moment at the same frame, while the script reads the
+// battle in wall time between the session and the moment.
+describe('momentStart', () => {
+  it('starts the moment a fixed gap after the mark battle, wide enough for the reading', () => {
+    const marks = [
+      { name: 'action', frame: 300 },
+      { name: 'battle', frame: 350 },
+    ]
+    expect(MOMENT_GAP).toBeGreaterThanOrEqual(300)
+    expect(momentStart(marks)).toBe(350 + MOMENT_GAP)
+  })
+
+  it('leaves the start open for a session with no mark battle', () => {
+    expect(momentStart([{ name: 'title', frame: 40 }])).toBeUndefined()
   })
 })
