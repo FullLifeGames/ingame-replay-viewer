@@ -20,10 +20,14 @@ BOOL BtlMain_SetupAloneSingle(u32 *state, BtlMainModule *mainModule) {
         mainModule->clientCount = 2; // two clients
         mainModule->posClientIds[0] = 1;
         mainModule->posClientIds[1] = 0;
+        mainModule->clients[0] = BattleClient_Create(mainModule, 6, 0);
+        mainModule->clients[1] = BattleClient_Create(mainModule, 0, 1);
         break;
     }
     return FALSE;
 }`,
+  // The prototype puts `isAI` before `clientId`; client 1 is the player's, client 0 the AI's.
+  clientH: 'BtlClient *BattleClient_Create(BtlMainModule *mainModule, u8 isAI, u16 clientId);',
   pokeparamH: `typedef struct { u16 hp; u32 seen; u16 species; u8 monId; Mystery more[COUNT]; } BattleMonCore;
 struct BattleMon { BattleMonCore core; s8 boost; };`,
 }
@@ -45,7 +49,17 @@ describe('battleNumbers', () => {
 
   // Scene: a single battle's positions come from its setup, not from the client IDs.
   it("reads the single battle's clients and the client at each position as its setup writes them", () => {
-    expect(battleNumbers(SOURCES).single).toEqual({ clientCount: 2, posClientIds: [1, 0] })
+    expect(battleNumbers(SOURCES).single).toEqual({
+      clientCount: 2,
+      posClientIds: [1, 0],
+      clients: { player: 1, opponent: 0 },
+    })
+  })
+
+  it("refuses a player's or an opponent's client outside the count", () => {
+    const mainC = SOURCES.mainC.replace('Create(mainModule, 6, 0)', 'Create(mainModule, 6, 2)')
+    const outside = mainC.replace('clients[0] =', 'clients[2] =')
+    expect(() => battleNumbers({ ...SOURCES, mainC: outside })).toThrow(/outside the count/)
   })
 
   it('refuses a setup without the function, without the count or without a position for a client', () => {

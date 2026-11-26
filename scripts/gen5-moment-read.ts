@@ -13,6 +13,7 @@ import {
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import type { WrittenPkm } from '../src/gen5/pkm-fields.ts'
+import { sideClient } from './gen5-moment-scene.ts'
 import { dexSpecies } from './gen5-moment-team.ts'
 import { log } from './gen5-page.ts'
 
@@ -102,8 +103,9 @@ export function readBattle(
   log(`servers waiting for the actions: ${servers.map(hex).join(' ') || 'none'}`)
   const [server] = servers
   if (servers.length !== 1 || server === undefined) throw new Error('need exactly one server')
-  const near = frontMon(read, server, numbers.battle, 0)
-  const far = frontMon(read, server, numbers.battle, 1)
+  const { single } = numbers.battle
+  const near = frontMon(read, server, numbers.battle, sideClient(single, 'near'))
+  const far = frontMon(read, server, numbers.battle, sideClient(single, 'far'))
   for (const [side, mon] of [
     ['near', near],
     ['far', far],
@@ -112,11 +114,11 @@ export function readBattle(
       `${side}: ${speciesName(mon.species)} (${String(mon.species)}) L${String(mon.level)} mon ID ${String(mon.monId)}, HP ${String(mon.hp)}/${String(mon.maxHp)} at ${hex(mon.address)}`,
     )
   }
-  for (const [side, client, team] of [
-    ['near', 0, written?.player],
-    ['far', 1, written?.opponent],
+  for (const [side, team] of [
+    ['near', written?.player],
+    ['far', written?.opponent],
   ] as const) {
-    const party = partyMons(read, server, numbers.battle, client)
+    const party = partyMons(read, server, numbers.battle, sideClient(single, side))
     logParty(side, party)
     log(partyLine(side, party, team))
   }

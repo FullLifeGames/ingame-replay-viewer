@@ -17,7 +17,8 @@ import { momentCommands } from '../src/gen5/moment.ts'
 import { newGameRoute } from '../src/gen5/route.ts'
 import { packCommands } from '../src/gen5/server-cmd.ts'
 import { trainerRoute } from '../src/gen5/trainer-route.ts'
-import { checkAdapterLayout, SYMBOL_NAMES } from './gen5-bw2.ts'
+import { checkAdapterLayout, readSources, SYMBOL_NAMES } from './gen5-bw2.ts'
+import { checkPlayerClient, setupIndices, singleClients } from './gen5-bw2-clients.ts'
 import { BOOT_LINKS, ENTRY_FUNCTIONS } from './gen5-bw2-entry.ts'
 import { checkApart } from './gen5-bw2-span.ts'
 import { placeMatches, reaches, ROUTE_MAP, scriptLabel } from './gen5-bw2-field.ts'
@@ -118,6 +119,35 @@ describe.skipIf(!existsSync(FILE))('the Gen 5 code on the generated numbers', ()
     expect(once.length === clients.length, 'each client at exactly one position').toBe(true)
     const positions = clients.map((client) => singleBattlePos(single, client))
     expect(new Set(positions).size === clients.length, 'the positions differ').toBe(true)
+  })
+
+  it("hold the player's and the opponent's client to the single battle's setup, apart", () => {
+    const { clients, clientCount } = real().battle.single
+    const sources = readSources(listedReader(GEN5_PATHS.pokebw2))
+    const atPin = singleClients(sources.mainC, sources.clientH)
+    const same = atPin.player === clients.player && atPin.opponent === clients.opponent
+    expect(same, "each side's client is the one BtlMain_SetupAloneSingle creates for it").toBe(true)
+    expect(clients.player !== clients.opponent, 'the two clients differ').toBe(true)
+    const inside = [clients.player, clients.opponent].every((id) => id >= 0 && id < clientCount)
+    expect(inside, 'both clients inside the count').toBe(true)
+    const named = passes(() => {
+      checkPlayerClient(clients, sources.setupC)
+    })
+    expect(named, "the setup's playerClientId is the player's client").toBe(true)
+  })
+
+  it("hold each side's setup index to the trainer battle's setup, apart and inside the arrays", () => {
+    const { entry } = real()
+    const atPin = setupIndices(readSources(listedReader(GEN5_PATHS.pokebw2)).setupC)
+    const { player, opponent } = entry.setupIndices
+    const same = atPin.player === player && atPin.opponent === opponent
+    expect(same, "each side's index is the one BtlSetup_SetTrainer1v1Single fills").toBe(true)
+    expect(player !== opponent, 'the two indices differ').toBe(true)
+    const arrays = ['party', 'playerInfo', 'trainers'].filter((member) => {
+      const field = entry.layouts.BtlSetup?.fields[member]
+      return field === undefined || Math.max(player, opponent) * 4 + 4 > field.size
+    })
+    expect(arrays, "the arrays that hold no element at a side's index").toEqual([])
   })
 
   it("hand each scene's moments to the adapter, which takes each block", () => {

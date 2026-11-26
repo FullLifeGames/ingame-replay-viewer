@@ -87,6 +87,8 @@ export const ENTRY: EntryNumbers = {
     PartyPkm: layout(0x60, {}),
   },
   bufferSizes: { TrainerBattleSetup_Create: 9 },
+  // The two sides' elements of the setup's per-client arrays, the player's after the opponent's.
+  setupIndices: { player: 1, opponent: 0 },
   battleOverlay: { start: 0x02300000, end: 0x02340000 },
   bootOverlays: { ov004: { start: 0x02280000, end: 0x02300000 } },
 }

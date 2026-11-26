@@ -1,8 +1,9 @@
 // The numbers of the direct battle start (#97) from pokebw2 at its pin: the functions the routine
 // calls with the address each takes, the data the page compares and hands over, the constants by
-// name, the layouts the page and the routine write through, and the battle overlay's span, where
-// the routine lives until the battle loads there. Part of build/gen5/bw2.json; nothing of pokebw2
-// is committed, and the errors name roles and show no number.
+// name, the layouts the page and the routine write through, each side's index in the setup
+// (gen5-bw2-clients.ts), and the battle overlay's span, where the routine lives until the battle
+// loads there. Part of build/gen5/bw2.json; nothing of pokebw2 is committed, and the errors name
+// roles and show no number.
 import type {
   Bw2Symbol,
   EntryFunction,
@@ -10,6 +11,7 @@ import type {
   StructLayout,
 } from '../src/gen5/bw2-numbers.ts'
 import { defineValue, enumAround, parseSymbols, pickSymbols } from './gen5-bw2-c.ts'
+import { setupIndices } from './gen5-bw2-clients.ts'
 import {
   checkApart,
   checkBootOverlays,
@@ -243,6 +245,7 @@ export function entryNumbers(input: EntryInput): EntryNumbers {
     bufferSizes: Object.fromEntries(
       BUFFER_MAKERS.map((name) => [name, bufferSize(input.setupC, name)]),
     ),
+    setupIndices: setupIndices(input.setupC),
     battleOverlay,
     bootOverlays,
   }

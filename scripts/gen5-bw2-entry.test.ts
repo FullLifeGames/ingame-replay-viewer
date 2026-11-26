@@ -84,6 +84,16 @@ BtlSetupTrainer *TrainerBattleSetup_Create(HeapID heapId) {
 
     trainer->name = GFL_StrBufCreate(12, heapId);
     return trainer;
+}
+static void BtlSetup_LoadTrainer(BtlSetup *setup, u32 client, PokeParty **party, HeapID heapId);
+static void BtlSetup_LoadPlayerParty(BtlSetup *setup, HeapID heapId) {
+    setup->party[3] = PokeParty_Create(heapId);
+}
+static void BtlSetup_LoadGameData(BtlSetup *setup, GameData *gameData) {
+    setup->playerInfo[3] = GetGameDataPlayerInfo(gameData);
+}
+void BtlSetup_SetTrainer1v1Single(BtlSetup *setup, u32 trainerId, HeapID heapId) {
+    BtlSetup_LoadTrainer(setup, 2, &setup->party[2], heapId);
 }`,
 }
 
@@ -116,6 +126,11 @@ describe('entryNumbers', () => {
     expect(entryNumbers(INPUT).bufferSizes).toEqual({ TrainerBattleSetup_Create: 12 })
     const setupC = INPUT.setupC.replace('GFL_StrBufCreate(12', 'GFL_StrBufCreate(size')
     expect(() => entryNumbers({ ...INPUT, setupC })).toThrow(/TrainerBattleSetup_Create/)
+  })
+
+  // Scene: the park writes the player's party and name and the trainer's at their own elements.
+  it("gives each side's element of the setup's per-client arrays", () => {
+    expect(entryNumbers(INPUT).setupIndices).toEqual({ player: 3, opponent: 2 })
   })
 
   it('lays out the structs the page writes, nested and 64-bit members as the compiler does', () => {

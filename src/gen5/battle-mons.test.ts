@@ -54,7 +54,7 @@ const BATTLE: BattleNumbers = {
     },
   },
   waitSelectSeq: 7,
-  single: { clientCount: 3, posClientIds: [2, 0, 1] },
+  single: { clientCount: 3, posClientIds: [2, 0, 1], clients: { player: 2, opponent: 0 } },
 }
 const BASE = 0x02000000
 const PROC = 0x021357a0
@@ -190,7 +190,7 @@ describe('partyMons', () => {
 // are invented: in the three clients' one, client 0 stands at position 1, client 1 at 2 and
 // client 2 at 0; the other holds two clients in swapped order.
 describe('singleBattlePos', () => {
-  const swapped = { clientCount: 2, posClientIds: [1, 0] }
+  const swapped = { clientCount: 2, posClientIds: [1, 0], clients: { player: 1, opponent: 0 } }
 
   it("puts each client's Pokémon at the position its setup gives it", () => {
     expect([0, 1, 2].map((client) => singleBattlePos(BATTLE.single, client))).toEqual([1, 2, 0])
@@ -201,6 +201,6 @@ describe('singleBattlePos', () => {
     expect(() => singleBattlePos(swapped, 2)).toThrow(/client 2/)
     expect(() => singleBattlePos(swapped, -1)).toThrow(/client -1/)
     expect(() => singleBattlePos(swapped, 0.5)).toThrow(/client 0.5/)
-    expect(() => singleBattlePos({ clientCount: 2, posClientIds: [1, 1] }, 0)).toThrow(/client 0/)
+    expect(() => singleBattlePos({ ...swapped, posClientIds: [1, 1] }, 0)).toThrow(/client 0/)
   })
 })

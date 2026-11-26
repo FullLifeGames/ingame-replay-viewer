@@ -16,7 +16,7 @@ import type { RamCheck, RamRef } from './ram-check.ts'
 import { littleEndian, type MemoryWrite } from './ram-write.ts'
 import { blockAddress, type RoutineLayout } from './routine-layout.ts'
 import { ROUTINE_STAGES } from './routine-order.ts'
-import { behindSetup, OPPONENT, PLAYER, type SetupChain, slot, width, WORD } from './setup-chain.ts'
+import { behindSetup, type SetupChain, type SetupSide, slot, width, WORD } from './setup-chain.ts'
 
 /** The names the page writes for the two sides. */
 export interface ParkNames {
@@ -66,14 +66,15 @@ function bitsWrite(field: string, chain: SetupChain, at: FieldLayout, value: num
   return { kind: 'bits', field, address: chain.address, hops, mask, value: value * 2 ** shift }
 }
 
-/** A member of the opponent's name, the StrBuf behind trainers[1]. */
+/** A member of the opponent's name, the StrBuf behind the opponent's element of trainers. */
 function opponentStrBuf(entry: EntryNumbers, layout: RoutineLayout, member: string): SetupChain {
-  const trainer = slot(entry, 'trainers', OPPONENT)
+  const trainer = slot(entry, 'trainers', 'opponent')
   const name = entryField(entry, 'BtlSetupTrainer', 'name').offset
   return behindSetup(layout, [trainer, name, entryField(entry, 'StrBuf', member).offset])
 }
 
-/** The opponent's name in the StrBuf of trainers[1], which the battle's intro prints. */
+/** The opponent's name in the StrBuf of the opponent's element of trainers, which the battle's
+ * intro prints. */
 function opponentName(entry: EntryNumbers, layout: RoutineLayout): StringBuffer {
   const strbuf = (member: string) => opponentStrBuf(entry, layout, member)
   const room = entry.bufferSizes.TrainerBattleSetup_Create
@@ -88,11 +89,11 @@ function opponentName(entry: EntryNumbers, layout: RoutineLayout): StringBuffer 
   }
 }
 
-/** The player's name in the PlayerInfo of the player's client, a plain array of characters. */
+/** The player's name in the PlayerInfo of the player's element of playerInfo, a plain array of characters. */
 function playerName(entry: EntryNumbers, layout: RoutineLayout): StringBuffer {
   const name = entryField(entry, 'PlayerInfo', 'name')
   const charWidth = entryField(entry, 'StrBuf', 'chars').size
-  const hops = [slot(entry, 'playerInfo', PLAYER), name.offset]
+  const hops = [slot(entry, 'playerInfo', 'player'), name.offset]
   return {
     field: 'player.name',
     chars: behindSetup(layout, hops),
@@ -122,7 +123,7 @@ function parkWrites(entry: EntryNumbers, layout: RoutineLayout, sides: ParkSides
   const opponent = stringWrites(names.opponent, opponentName(entry, layout), terminator)
   const player = stringWrites(names.player, playerName(entry, layout), terminator)
   const trainerClass = entryField(entry, 'BtlSetupTrainer', 'trainerClass')
-  const classHops = [slot(entry, 'trainers', OPPONENT), trainerClass.offset]
+  const classHops = [slot(entry, 'trainers', 'opponent'), trainerClass.offset]
   const speed = entryField(entry, 'Config', 'textSpeed')
   const config = behindSetup(layout, [entryField(entry, 'BtlSetup', 'config').offset, speed.offset])
   const writes: MemoryWrite[] = [
@@ -153,18 +154,18 @@ function parkWrites(entry: EntryNumbers, layout: RoutineLayout, sides: ParkSides
   return { writes, notes }
 }
 
-/** The readings of the log: the setup the routine built and both clients' party pointers in it,
+/** The readings of the log: the setup the routine built and both sides' party pointers in it,
  * which the park writes the parties behind (#97: the setup's own parties, not the game's). */
 function setupWatch(entry: EntryNumbers, layout: RoutineLayout): RamRef[] {
-  const pointer = (name: string, client: number): RamRef => ({
+  const pointer = (name: string, side: SetupSide): RamRef => ({
     name,
-    ...behindSetup(layout, [slot(entry, 'party', client)]),
+    ...behindSetup(layout, [slot(entry, 'party', side)]),
     width: WORD,
   })
   return [
     { name: 'setup', address: blockAddress(layout, 'setup'), width: WORD },
-    pointer('player.party', PLAYER),
-    pointer('opponent.party', OPPONENT),
+    pointer('player.party', 'player'),
+    pointer('opponent.party', 'opponent'),
   ]
 }
 

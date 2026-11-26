@@ -1,15 +1,14 @@
 // Chains into the battle's setup for the direct battle start (#97): the routine keeps the setup it
 // built in its block's `setup` word, and every write and check of the park starts there. The
-// setup's pointer arrays hold one element per client: the player's side and the opponent's. Pure:
-// the numbers come in from build/gen5/bw2.json.
-import type { EntryNumbers, FieldLayout } from './bw2-numbers.ts'
+// setup's pointer arrays hold one element per side, the player's and the opponent's, each at the
+// side's setup index (#93). Pure: the numbers come in from build/gen5/bw2.json.
+import type { EntryNumbers, FieldLayout, Sides } from './bw2-numbers.ts'
 import { entryField } from './entry-field.ts'
 import type { PointerChain } from './ram-chain.ts'
 import { blockAddress, type RoutineLayout } from './routine-layout.ts'
 
-/** The setup's clients: the player's side and the opponent's. */
-export const PLAYER = 0
-export const OPPONENT = 1
+/** A side of the setup: the player's or the opponent's. */
+export type SetupSide = keyof Sides
 
 /** Bytes a pointer takes. */
 export const WORD = 4
@@ -22,9 +21,9 @@ export function behindSetup(layout: RoutineLayout, hops: readonly number[]): Set
   return { address: blockAddress(layout, 'setup'), hops }
 }
 
-/** The offset of element `client` of the setup's pointer array `member`. */
-export const slot = (entry: EntryNumbers, member: string, client: number) =>
-  entryField(entry, 'BtlSetup', member).offset + client * WORD
+/** The offset of `side`'s element of the setup's pointer array `member`. */
+export const slot = (entry: EntryNumbers, member: string, side: SetupSide) =>
+  entryField(entry, 'BtlSetup', member).offset + entry.setupIndices[side] * WORD
 
 /** The width a check reads `field` with; throws when it is no byte, halfword or word. */
 export const width = (field: FieldLayout, name: string): 1 | 2 | 4 => {

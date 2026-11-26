@@ -73,12 +73,20 @@ export interface ServerCmdTable {
   messages: MessageRules
 }
 
+/** A number of the player's side and one of the opponent's. */
+export interface Sides {
+  player: number
+  opponent: number
+}
+
 /** A single battle's clients and the client at each battle position, as its setup assigns them
  * (BtlMain_SetupAloneSingle). */
 export interface SingleBattle {
   clientCount: number
   /** The client ID at each position, by position. */
   posClientIds: number[]
+  /** The player's client and the opponent's: the setup creates the opponent's as the AI. */
+  clients: Sides
 }
 
 /** The battle's structs that lead from the server to the Pokémon, some laid out only up to the
@@ -155,6 +163,9 @@ export interface EntryNumbers {
   /** The size of the string buffer each named function creates (GFL_StrBufCreate's first
    * argument), in characters with the terminator: the room the page may write a name into. */
   bufferSizes: Record<string, number>
+  /** Each side's element of the setup's per-client arrays (party, playerInfo, trainers), as the
+   * trainer battle's setup fills them. */
+  setupIndices: Sides
   /** The battle overlay's span in RAM, where the routine lives until the battle loads there. */
   battleOverlay: Span
   /** The spans of the overlays GameInit loads at boot, by overlay name; the battle overlay's

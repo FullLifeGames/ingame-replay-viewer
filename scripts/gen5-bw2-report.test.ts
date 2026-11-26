@@ -52,7 +52,7 @@ describe('quietLines', () => {
       party: LAYOUT,
       monCore: LAYOUT,
       waitSelectSeq: 29,
-      single: { clientCount: 3, posClientIds: [2, 0, 1] },
+      single: { clientCount: 3, posClientIds: [2, 0, 1], clients: { player: 2, opponent: 1 } },
     },
     route: {
       hughTrigger: { x: 1, z: 31, width: 2 },
@@ -70,6 +70,7 @@ describe('quietLines', () => {
       constants: { HEAPID_SPIN: 43 },
       layouts: { Kite: LAYOUT, Lamp: LAYOUT },
       bufferSizes: { Kite_Create: 9 },
+      setupIndices: { player: 3, opponent: 2 },
       battleOverlay: { start: 0x02190000, end: 0x02190600 },
       bootOverlays: { ovA: { start: 0x02180000, end: 0x02190000 } },
     },

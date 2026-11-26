@@ -1,5 +1,5 @@
 // Both sides' parties for the direct battle start (#97, plan E-6, decision 4): the park writes each
-// side's sealed Pokémon (pkm-cipher.ts) behind that client's party pointer in the battle's setup,
+// side's sealed Pokémon (pkm-cipher.ts) behind that side's party pointer in the battle's setup,
 // one after another at the party's `pkms`, then the party's `count` and its slot byte, as
 // PokeParty_AddPkm leaves a party. The setup's parties are its own copies (BtlSetup_LoadPlayerParty
 // copies the game's party whole), so the game's party stays as the save or New Game left it. Pure:
@@ -9,7 +9,7 @@ import { entryField, entryLayout } from './entry-field.ts'
 import type { RamCheck } from './ram-check.ts'
 import { littleEndian, type MemoryWrite } from './ram-write.ts'
 import type { RoutineLayout } from './routine-layout.ts'
-import { behindSetup, OPPONENT, PLAYER, slot, width } from './setup-chain.ts'
+import { behindSetup, slot, width } from './setup-chain.ts'
 
 /** Each side's sealed Pokémon, in party order, each one PartyPkm long. */
 export interface PartySides {
@@ -18,14 +18,12 @@ export interface PartySides {
 }
 
 type Side = keyof PartySides
-
-const CLIENTS: Record<Side, number> = { player: PLAYER, opponent: OPPONENT }
 const SIDES: readonly Side[] = ['player', 'opponent']
 
 /** A member of a side's party, through the setup's party pointer. */
 function partyRef(entry: EntryNumbers, layout: RoutineLayout, side: Side, member: string) {
   const offset = entryField(entry, 'PokeParty', member).offset
-  return behindSetup(layout, [slot(entry, 'party', CLIENTS[side]), offset])
+  return behindSetup(layout, [slot(entry, 'party', side), offset])
 }
 
 /** The Pokémon a party holds at most: the PartyPkms its `pkms` has room for. */

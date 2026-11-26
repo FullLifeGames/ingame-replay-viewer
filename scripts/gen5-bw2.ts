@@ -1,9 +1,10 @@
 // Generates build/gen5/bw2.json, the Gen 5 spike's numbers of Black 2 (USA) (#72, D4), from
 // pokebw2 at its pin (gen5-bw2-source.ts): the addresses S6 needs, the adapter and server command
 // enums, each argument format's puts, the message rules, the adapter's layout, the route's places
-// in the map's events, the tile of the shipped save's trainer, the direct entry's numbers and a
-// Pokémon's data format (#97). The checkout lives in .cache/gen5/pokebw2/ and the output in
-// build/gen5/; nothing of pokebw2 is committed.
+// in the map's events, the tile of the shipped save's trainer, the player's client and the
+// opponent's with each side's setup index (#93), the direct entry's numbers and a Pokémon's data
+// format (#97). The checkout lives in .cache/gen5/pokebw2/ and the output in build/gen5/; nothing
+// of pokebw2 is committed.
 // Usage: node scripts/gen5-bw2.ts [--checkout <dir>] [--quiet] (fetches on the first run). With
 // --quiet the report gives the pin, counts and checks and no number of pokebw2, as CI's public log
 // needs.
@@ -20,6 +21,7 @@ import {
   pickSymbols,
 } from './gen5-bw2-c.ts'
 import { battleNumbers } from './gen5-bw2-battle.ts'
+import { checkPlayerClient } from './gen5-bw2-clients.ts'
 import { BATTLE_OVERLAY, BOOT_LINKS, ENTRY_SOURCES, entryNumbers } from './gen5-bw2-entry.ts'
 import { ROUTE_MAP, routePlaces } from './gen5-bw2-field.ts'
 import { PKM_SOURCES, pkmNumbers } from './gen5-bw2-pkm.ts'
@@ -148,6 +150,7 @@ const SOURCES = {
   queueH: 'include/battle/btl_server_cmd.h',
   serverH: 'include/battle/btl_server.h',
   mainH: 'include/battle/btl_main.h',
+  clientH: 'include/battle/btl_client.h',
   pokeparamH: 'include/battle/btl_pokeparam.h',
   mapEvents: ROUTE_MAP.events,
   mapScript: ROUTE_MAP.script,
@@ -179,6 +182,8 @@ function parse(sources: Sources): Bw2Numbers {
   const table = parseFormatTable(queueC, 'sCmdFormats')
   const adapter = structLayout(adapterC, 'BtlAdapter')
   checkAdapterLayout(adapter)
+  const battle = battleNumbers(sources)
+  checkPlayerClient(battle.single.clients, sources.setupC)
   return {
     pokebw2: { ...POKEBW2 },
     symbols: pickSymbols(ov167, SYMBOL_NAMES),
@@ -190,7 +195,7 @@ function parse(sources: Sources): Bw2Numbers {
     messages,
     queueSize: defineValue(queueH, 'BTL_SERVER_CMD_QUE_SIZE'),
     adapter,
-    battle: battleNumbers(sources),
+    battle,
     route: routePlaces(sources.mapEvents, sources.mapScript),
     saveTrainer: saveTrainer({
       events: sources.trainerEvents,
