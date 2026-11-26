@@ -52,6 +52,23 @@ describe('the move rules', () => {
     ])
   })
 
+  // Showdown's Ivy Cudgel, `onPrepareHit`: `this.attrLastMove('[anim] Ivy Cudgel ' + move.type)`.
+  it('keeps the look a move line names beside the move', () => {
+    const script = scriptOf('|move|p1a: Dugtrio|Ivy Cudgel|p2a: Tyranitar|[anim] Ivy Cudgel Water')
+
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+    expect(eventsAt(script, NEXT)).toEqual([
+      {
+        kind: 'move',
+        line: NEXT,
+        user: DUGTRIO,
+        move: 'Ivy Cudgel',
+        target: TYRANITAR,
+        anim: 'Ivy Cudgel Water',
+      },
+    ])
+  })
+
   it("makes Protect's activation a block event", () => {
     const script = REPLAY_994086
 

@@ -10,7 +10,10 @@ import type { Found } from './lookup'
 import meta from './meta.json'
 import { gens, itemGaps, names } from './testing'
 
-const GENS = [1, 2, 3] as const
+const GENS = [1, 2, 3, 4, 5, 9] as const
+
+/** The species the expansion lacks, by generation: Rockruff-Dusk shows Rockruff (D11). */
+const SPECIES_GAPS: Readonly<Partial<Record<number, readonly string[]>>> = { 9: ['Rockruff-Dusk'] }
 
 const misses = (list: string[], lookup: (name: string) => Found) =>
   list.filter((name) => lookup(name).fallback !== undefined)
@@ -22,10 +25,10 @@ describe('meta.json (T4)', () => {
   })
 })
 
-describe('Gen 1 to 3 per @pkmn/data (T5)', () => {
+describe('the played generations per @pkmn/data (T5)', () => {
   it.each(GENS)('maps every species, move and ability of Gen %i', (gen) => {
     const data = gens.get(gen)
-    expect(misses(names(data.species), speciesOf)).toEqual([])
+    expect(misses(names(data.species), speciesOf)).toEqual(SPECIES_GAPS[gen] ?? [])
     expect(misses(names(data.moves), moveOf)).toEqual([])
     expect(misses(names(data.abilities), abilityOf)).toEqual([])
   })

@@ -16,17 +16,19 @@ import type { PokemonRef } from '../../script/types'
 import { mechanicGap } from '../fallbacks'
 import type { Anim, Volatile } from '../stream/instructions'
 import {
-  blocked,
   copiedStats,
   effectActivated,
   effectEnded,
   effectStarted,
-  singleMove as untilNextMove,
-  singleTurn as lastsTheTurn,
   transformed,
 } from '../text/phrases-effects'
 import { withdrawn } from '../text/phrases-field'
 import { itemEndedConfusion } from '../text/phrases-status'
+import {
+  blocked,
+  singleMove as untilNextMove,
+  singleTurn as lastsTheTurn,
+} from '../text/phrases-turn'
 import { type Context, type EventOf, type PrintText, sameMon } from './context'
 import { HIT_TURN, isFutureMove } from './anim-turn'
 import { hit, hitLines } from './hits'
@@ -75,7 +77,8 @@ export function effectStart(event: EventOf<'effectStart'>, ctx: Context): void {
 function startLine(event: EventOf<'effectStart'>, ctx: Context): void {
   const { who, effect, line } = event
   const source = event.source && ctx.mon(event.source)
-  ctx.print(line, effectStarted(ctx.mon(who), effect, source, event.detail))
+  const { cause, detail } = event
+  ctx.print(line, effectStarted(ctx.mon(who), effect, { source, cause, detail }))
   if (toID(effect.name) === PERISH_ZERO) drain(who, line, ctx)
 }
 
@@ -138,7 +141,7 @@ function substituteBreaks(event: EventOf<'effectEnd'>, ctx: Context): void {
 
 /**
  * A substitute that takes a hit (`[damage]`) plays the hit first; a berry eaten as it acts says its
- * own line; any other effect is a line.
+ * own line; any other effect is a line, which can name the Pokémon of `[of]` (Attract, Lock-On).
  */
 export function effectActivate(event: EventOf<'effectActivate'>, ctx: Context): void {
   const { who, effect, line } = event
@@ -152,7 +155,8 @@ export function effectActivate(event: EventOf<'effectActivate'>, ctx: Context): 
     return
   }
   if (event.damage && who !== undefined) hit(line, ctx.activeSide(who), event.effectiveness, ctx)
-  ctx.print(line, effectActivated(who && ctx.mon(who), effect))
+  const source = event.source && ctx.mon(event.source)
+  ctx.print(line, effectActivated(who && ctx.mon(who), effect, source))
   hitLines(event, ctx)
 }
 

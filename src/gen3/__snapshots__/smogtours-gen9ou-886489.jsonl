@@ -1,0 +1,646 @@
+{"length":10245,"crc32":"ea4cb046","trainers":{"near":{"name":"Setsu","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"badcluelesswashed","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":1056,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Deoxys"},{"species":1100,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tornadus"},{"species":1417,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ogerpon"},{"species":472,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gliscor"},{"species":485,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Heatran"},{"species":980,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Weezing"}],"far":[{"species":472,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gliscor"},{"species":1396,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Ting-Lu"},{"species":1393,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Gholdengo"},{"species":1380,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Slither Wing"},{"species":1406,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Walking Wake"},{"species":1434,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Pecharunt"}]}}
+{"line":39,"op":"intro"}
+{"line":39,"op":"print","text":"You are challenged by badcluelesswashed!"}
+{"line":41,"op":"print","text":"badcluelesswashed sent out Ting-Lu!"}
+{"line":41,"op":"sendOut","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":40,"op":"print","text":"Go! Gliscor!"}
+{"line":40,"op":"sendOut","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":42,"op":"ability","side":"far","ability":284,"show":true}
+{"line":42,"op":"ability","side":"far","ability":284,"show":false}
+{"line":43,"op":"turn","number":1}
+{"line":46,"op":"print","text":"Gliscor, come back!"}
+{"line":46,"op":"withdraw","side":"near"}
+{"line":46,"op":"print","text":"Go! Ogerpon!"}
+{"line":46,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":47,"op":"print","text":"The opposing Ting-Lu used Stealth Rock!"}
+{"line":47,"op":"move","user":"far","target":"near","move":446,"animTurn":0}
+{"line":48,"op":"print","text":"Pointed stones float in the air on your side!"}
+{"line":51,"op":"turn","number":2}
+{"line":54,"op":"print","text":"badcluelesswashed withdrew Ting-Lu!"}
+{"line":54,"op":"withdraw","side":"far"}
+{"line":54,"op":"print","text":"badcluelesswashed sent out Pecharunt!"}
+{"line":54,"op":"switchIn","side":"far","slot":5,"hp":100,"status":"none"}
+{"line":55,"op":"print","text":"Ogerpon used Ivy Cudgel!"}
+{"line":55,"op":"move","user":"near","target":"far","move":832,"animTurn":0}
+{"line":56,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":56,"op":"hp","side":"far","hp":72}
+{"line":59,"op":"turn","number":3}
+{"line":62,"op":"print","text":"Ogerpon used Ivy Cudgel!"}
+{"line":62,"op":"move","user":"near","target":"far","move":832,"animTurn":0}
+{"line":64,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":64,"op":"hp","side":"far","hp":33}
+{"line":64,"op":"print","text":"A critical hit!"}
+{"line":65,"op":"print","text":"The opposing Pecharunt used Recover!"}
+{"line":65,"op":"move","user":"far","target":"far","move":105,"animTurn":0}
+{"line":66,"op":"hp","side":"far","hp":83}
+{"line":66,"op":"print","text":"The opposing Pecharunt's HP was restored."}
+{"line":69,"op":"turn","number":4}
+{"line":72,"op":"print","text":"Ogerpon, come back!"}
+{"line":72,"op":"withdraw","side":"near"}
+{"line":72,"op":"print","text":"Go! Heatran!"}
+{"line":72,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":73,"op":"hp","side":"near","hp":88}
+{"line":73,"op":"print","text":"Pointed stones dug into Heatran!"}
+{"line":74,"op":"print","text":"The opposing Pecharunt used Parting Shot!"}
+{"line":74,"op":"move","user":"far","target":"near","move":575,"animTurn":0}
+{"line":75,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"several"}
+{"line":75,"op":"print","text":"Heatran's Attack fell!"}
+{"line":76,"op":"stat","side":"near","stat":"spa","stages":-1,"arrows":"none"}
+{"line":76,"op":"print","text":"Heatran's Sp. Atk fell!"}
+{"line":79,"op":"withdraw","side":"far"}
+{"line":79,"op":"print","text":"badcluelesswashed sent out Walking Wake!"}
+{"line":79,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":81,"op":"itemPopUp","side":"near","item":472}
+{"line":81,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":81,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":81,"op":"hp","side":"near","hp":94}
+{"line":83,"op":"turn","number":5}
+{"line":87,"op":"print","text":"Heatran, come back!"}
+{"line":87,"op":"withdraw","side":"near"}
+{"line":87,"op":"print","text":"Go! Ogerpon!"}
+{"line":87,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":88,"op":"hp","side":"near","hp":88}
+{"line":88,"op":"print","text":"Pointed stones dug into Ogerpon!"}
+{"line":89,"op":"print","text":"The opposing Walking Wake used Knock Off!"}
+{"line":89,"op":"move","user":"far","target":"near","move":282,"animTurn":0}
+{"line":90,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":90,"op":"hp","side":"near","hp":73}
+{"line":93,"op":"turn","number":6}
+{"line":98,"op":"print","text":"Ogerpon, come back!"}
+{"line":98,"op":"withdraw","side":"near"}
+{"line":98,"op":"print","text":"Go! Heatran!"}
+{"line":98,"op":"switchIn","side":"near","slot":4,"hp":94,"status":"none"}
+{"line":99,"op":"hp","side":"near","hp":82}
+{"line":99,"op":"print","text":"Pointed stones dug into Heatran!"}
+{"line":100,"op":"print","text":"The opposing Walking Wake used Draco Meteor!"}
+{"line":100,"op":"move","user":"far","target":"near","move":434,"animTurn":0}
+{"line":102,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":102,"op":"hp","side":"near","hp":57}
+{"line":102,"op":"print","text":"It's not very effective…"}
+{"line":103,"op":"stat","side":"far","stat":"spa","stages":-2,"arrows":"one"}
+{"line":103,"op":"print","text":"The opposing Walking Wake's Sp. Atk harshly fell!"}
+{"line":105,"op":"itemPopUp","side":"near","item":472}
+{"line":105,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":105,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":105,"op":"hp","side":"near","hp":63}
+{"line":107,"op":"turn","number":7}
+{"line":111,"op":"print","text":"Heatran, come back!"}
+{"line":111,"op":"withdraw","side":"near"}
+{"line":111,"op":"print","text":"Go! Ogerpon!"}
+{"line":111,"op":"switchIn","side":"near","slot":2,"hp":73,"status":"none"}
+{"line":112,"op":"hp","side":"near","hp":60}
+{"line":112,"op":"print","text":"Pointed stones dug into Ogerpon!"}
+{"line":113,"op":"print","text":"The opposing Walking Wake used Knock Off!"}
+{"line":113,"op":"move","user":"far","target":"near","move":282,"animTurn":0}
+{"line":114,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":114,"op":"hp","side":"near","hp":45}
+{"line":117,"op":"turn","number":8}
+{"line":122,"op":"print","text":"badcluelesswashed withdrew Walking Wake!"}
+{"line":122,"op":"withdraw","side":"far"}
+{"line":122,"op":"print","text":"badcluelesswashed sent out Pecharunt!"}
+{"line":122,"op":"switchIn","side":"far","slot":5,"hp":83,"status":"none"}
+{"line":123,"op":"print","text":"Ogerpon used Synthesis!"}
+{"line":123,"op":"move","user":"near","target":"near","move":235,"animTurn":0}
+{"line":124,"op":"hp","side":"near","hp":95}
+{"line":124,"op":"print","text":"Ogerpon's HP was restored."}
+{"line":127,"op":"turn","number":9}
+{"line":131,"op":"print","text":"Ogerpon, come back!"}
+{"line":131,"op":"withdraw","side":"near"}
+{"line":131,"op":"print","text":"Go! Gliscor!"}
+{"line":131,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":132,"op":"hp","side":"near","hp":88}
+{"line":132,"op":"print","text":"Pointed stones dug into Gliscor!"}
+{"line":133,"op":"print","text":"The opposing Pecharunt used Parting Shot!"}
+{"line":133,"op":"move","user":"far","target":"near","move":575,"animTurn":0}
+{"line":134,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"several"}
+{"line":134,"op":"print","text":"Gliscor's Attack fell!"}
+{"line":135,"op":"stat","side":"near","stat":"spa","stages":-1,"arrows":"none"}
+{"line":135,"op":"print","text":"Gliscor's Sp. Atk fell!"}
+{"line":138,"op":"withdraw","side":"far"}
+{"line":138,"op":"print","text":"badcluelesswashed sent out Walking Wake!"}
+{"line":138,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":140,"op":"anim","side":"near","anim":"statusPsn"}
+{"line":140,"op":"print","text":"Gliscor was badly poisoned!"}
+{"line":140,"op":"status","side":"near","slot":3,"status":"tox"}
+{"line":142,"op":"turn","number":10}
+{"line":145,"op":"print","text":"Gliscor used Protect!"}
+{"line":145,"op":"move","user":"near","target":"near","move":182,"animTurn":0}
+{"line":146,"op":"print","text":"Gliscor protected itself!"}
+{"line":147,"op":"print","text":"The opposing Walking Wake used Surf!"}
+{"line":148,"op":"print","text":"Gliscor protected itself!"}
+{"line":150,"op":"ability","side":"near","ability":90,"show":true}
+{"line":150,"op":"hp","side":"near","hp":100}
+{"line":150,"op":"print","text":"Gliscor had its HP restored."}
+{"line":150,"op":"ability","side":"near","ability":90,"show":false}
+{"line":152,"op":"turn","number":11}
+{"line":156,"op":"print","text":"badcluelesswashed withdrew Walking Wake!"}
+{"line":156,"op":"withdraw","side":"far"}
+{"line":156,"op":"print","text":"badcluelesswashed sent out Pecharunt!"}
+{"line":156,"op":"switchIn","side":"far","slot":5,"hp":83,"status":"none"}
+{"line":157,"op":"print","text":"Gliscor, come back!"}
+{"line":157,"op":"withdraw","side":"near"}
+{"line":157,"op":"print","text":"Go! Ogerpon!"}
+{"line":157,"op":"switchIn","side":"near","slot":2,"hp":95,"status":"none"}
+{"line":158,"op":"hp","side":"near","hp":83}
+{"line":158,"op":"print","text":"Pointed stones dug into Ogerpon!"}
+{"line":161,"op":"turn","number":12}
+{"line":164,"op":"print","text":"Ogerpon, come back!"}
+{"line":164,"op":"withdraw","side":"near"}
+{"line":164,"op":"print","text":"Go! Weezing!"}
+{"line":164,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
+{"line":165,"op":"ability","side":"near","ability":256,"show":true}
+{"line":165,"op":"print","text":"Neutralizing gas filled the area!"}
+{"line":165,"op":"ability","side":"near","ability":256,"show":false}
+{"line":166,"op":"print","text":"The opposing Pecharunt used Parting Shot!"}
+{"line":166,"op":"move","user":"far","target":"near","move":575,"animTurn":0}
+{"line":167,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"several"}
+{"line":167,"op":"print","text":"Weezing's Attack fell!"}
+{"line":168,"op":"stat","side":"near","stat":"spa","stages":-1,"arrows":"none"}
+{"line":168,"op":"print","text":"Weezing's Sp. Atk fell!"}
+{"line":171,"op":"withdraw","side":"far"}
+{"line":171,"op":"print","text":"badcluelesswashed sent out Gholdengo!"}
+{"line":171,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":174,"op":"turn","number":13}
+{"line":177,"op":"print","text":"The effects of the neutralizing gas wore off!"}
+{"line":178,"op":"print","text":"Weezing, come back!"}
+{"line":178,"op":"withdraw","side":"near"}
+{"line":178,"op":"print","text":"Go! Heatran!"}
+{"line":178,"op":"switchIn","side":"near","slot":4,"hp":63,"status":"none"}
+{"line":179,"op":"hp","side":"near","hp":51}
+{"line":179,"op":"print","text":"Pointed stones dug into Heatran!"}
+{"line":180,"op":"print","text":"The opposing Gholdengo used Shadow Ball!"}
+{"line":180,"op":"move","user":"far","target":"near","move":247,"animTurn":0}
+{"line":181,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":181,"op":"hp","side":"near","hp":17}
+{"line":183,"op":"itemPopUp","side":"near","item":472}
+{"line":183,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":183,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":183,"op":"hp","side":"near","hp":23}
+{"line":185,"op":"turn","number":14}
+{"line":188,"op":"print","text":"The opposing Gholdengo used Shadow Ball!"}
+{"line":188,"op":"move","user":"far","target":"near","move":247,"animTurn":0}
+{"line":189,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":189,"op":"hp","side":"near","hp":0}
+{"line":190,"op":"faint","side":"near"}
+{"line":190,"op":"print","text":"Heatran fainted!"}
+{"line":195,"op":"print","text":"Go! Weezing!"}
+{"line":195,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
+{"line":196,"op":"ability","side":"near","ability":256,"show":true}
+{"line":196,"op":"print","text":"Neutralizing gas filled the area!"}
+{"line":196,"op":"ability","side":"near","ability":256,"show":false}
+{"line":197,"op":"turn","number":15}
+{"line":200,"op":"print","text":"The opposing Gholdengo used Shadow Ball!"}
+{"line":200,"op":"move","user":"far","target":"near","move":247,"animTurn":0}
+{"line":201,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":201,"op":"hp","side":"near","hp":45}
+{"line":202,"op":"stat","side":"near","stat":"spd","stages":-1,"arrows":"one"}
+{"line":202,"op":"print","text":"Weezing's Sp. Def fell!"}
+{"line":203,"op":"print","text":"Weezing used Defog!"}
+{"line":203,"op":"move","user":"near","target":"far","move":432,"animTurn":0}
+{"line":204,"op":"stat","side":"far","stat":"evasion","stages":-1,"arrows":"one"}
+{"line":204,"op":"print","text":"The opposing Gholdengo's evasiveness fell!"}
+{"line":205,"op":"print","text":"Weezing blew away Stealth Rock!"}
+{"line":208,"op":"turn","number":16}
+{"line":211,"op":"print","text":"The opposing Gholdengo used Shadow Ball!"}
+{"line":211,"op":"move","user":"far","target":"near","move":247,"animTurn":0}
+{"line":212,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":212,"op":"hp","side":"near","hp":0}
+{"line":213,"op":"faint","side":"near"}
+{"line":213,"op":"print","text":"Weezing fainted!"}
+{"line":214,"op":"print","text":"The effects of the neutralizing gas wore off!"}
+{"line":219,"op":"print","text":"Go! Ogerpon!"}
+{"line":219,"op":"switchIn","side":"near","slot":2,"hp":83,"status":"none"}
+{"line":220,"op":"turn","number":17}
+{"line":223,"op":"print","text":"badcluelesswashed withdrew Gholdengo!"}
+{"line":223,"op":"withdraw","side":"far"}
+{"line":223,"op":"print","text":"badcluelesswashed sent out Slither Wing!"}
+{"line":223,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":224,"op":"print","text":"Ogerpon used Ivy Cudgel!"}
+{"line":224,"op":"move","user":"near","target":"far","move":832,"animTurn":0}
+{"line":225,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":225,"op":"hp","side":"far","hp":53}
+{"line":228,"op":"turn","number":18}
+{"line":231,"op":"print","text":"Ogerpon, come back!"}
+{"line":231,"op":"withdraw","side":"near"}
+{"line":231,"op":"print","text":"Go! Tornadus!"}
+{"line":231,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":232,"op":"print","text":"The opposing Slither Wing used First Impression!"}
+{"line":232,"op":"move","user":"far","target":"near","move":623,"animTurn":0}
+{"line":234,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":234,"op":"hp","side":"near","hp":74}
+{"line":234,"op":"print","text":"It's not very effective…"}
+{"line":237,"op":"turn","number":19}
+{"line":241,"op":"print","text":"badcluelesswashed withdrew Slither Wing!"}
+{"line":241,"op":"withdraw","side":"far"}
+{"line":241,"op":"print","text":"badcluelesswashed sent out Ting-Lu!"}
+{"line":241,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":242,"op":"ability","side":"far","ability":284,"show":true}
+{"line":242,"op":"ability","side":"far","ability":284,"show":false}
+{"line":243,"op":"print","text":"Tornadus used Bleakwind Storm!"}
+{"line":243,"op":"move","user":"near","target":"far","move":774,"animTurn":0}
+{"line":244,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":244,"op":"hp","side":"far","hp":74}
+{"line":245,"op":"hp","side":"near","hp":65}
+{"line":245,"op":"print","text":"Tornadus was hurt by the Life Orb!"}
+{"line":247,"op":"itemPopUp","side":"far","item":472}
+{"line":247,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":247,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":247,"op":"hp","side":"far","hp":80}
+{"line":249,"op":"turn","number":20}
+{"line":252,"op":"print","text":"Tornadus used Grass Knot!"}
+{"line":252,"op":"move","user":"near","target":"far","move":447,"animTurn":0}
+{"line":254,"op":"hit","side":"far","effectiveness":"super"}
+{"line":254,"op":"hp","side":"far","hp":38}
+{"line":254,"op":"print","text":"It's super effective!"}
+{"line":255,"op":"hp","side":"near","hp":55}
+{"line":255,"op":"print","text":"Tornadus was hurt by the Life Orb!"}
+{"line":256,"op":"print","text":"The opposing Ting-Lu used Stealth Rock!"}
+{"line":256,"op":"move","user":"far","target":"near","move":446,"animTurn":0}
+{"line":257,"op":"print","text":"Pointed stones float in the air on your side!"}
+{"line":259,"op":"itemPopUp","side":"far","item":472}
+{"line":259,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":259,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":259,"op":"hp","side":"far","hp":45}
+{"line":261,"op":"turn","number":21}
+{"line":264,"op":"print","text":"Tornadus used Grass Knot!"}
+{"line":264,"op":"move","user":"near","target":"far","move":447,"animTurn":0}
+{"line":266,"op":"hit","side":"far","effectiveness":"super"}
+{"line":266,"op":"hp","side":"far","hp":7}
+{"line":266,"op":"print","text":"It's super effective!"}
+{"line":267,"op":"hp","side":"near","hp":45}
+{"line":267,"op":"print","text":"Tornadus was hurt by the Life Orb!"}
+{"line":268,"op":"print","text":"The opposing Ting-Lu used Spikes!"}
+{"line":268,"op":"move","user":"far","target":"near","move":191,"animTurn":0}
+{"line":269,"op":"print","text":"Spikes were scattered on the ground all around your side!"}
+{"line":271,"op":"itemPopUp","side":"far","item":472}
+{"line":271,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":271,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":271,"op":"hp","side":"far","hp":13}
+{"line":273,"op":"turn","number":22}
+{"line":276,"op":"print","text":"Tornadus used Grass Knot!"}
+{"line":276,"op":"move","user":"near","target":"far","move":447,"animTurn":0}
+{"line":278,"op":"hit","side":"far","effectiveness":"super"}
+{"line":278,"op":"hp","side":"far","hp":0}
+{"line":278,"op":"print","text":"It's super effective!"}
+{"line":279,"op":"faint","side":"far"}
+{"line":279,"op":"print","text":"The opposing Ting-Lu fainted!"}
+{"line":280,"op":"hp","side":"near","hp":36}
+{"line":280,"op":"print","text":"Tornadus was hurt by the Life Orb!"}
+{"line":285,"op":"print","text":"badcluelesswashed sent out Gholdengo!"}
+{"line":285,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":286,"op":"turn","number":23}
+{"line":289,"op":"print","text":"The opposing Gholdengo used Shadow Ball!"}
+{"line":289,"op":"move","user":"far","target":"near","move":247,"animTurn":0}
+{"line":290,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":290,"op":"hp","side":"near","hp":0}
+{"line":291,"op":"faint","side":"near"}
+{"line":291,"op":"print","text":"Tornadus fainted!"}
+{"line":296,"op":"print","text":"Go! Ogerpon!"}
+{"line":296,"op":"switchIn","side":"near","slot":2,"hp":83,"status":"none"}
+{"line":297,"op":"hp","side":"near","hp":71}
+{"line":297,"op":"print","text":"Pointed stones dug into Ogerpon!"}
+{"line":298,"op":"hp","side":"near","hp":58}
+{"line":298,"op":"print","text":"Ogerpon was hurt by the spikes!"}
+{"line":299,"op":"turn","number":24}
+{"line":303,"op":"print","text":"badcluelesswashed withdrew Gholdengo!"}
+{"line":303,"op":"withdraw","side":"far"}
+{"line":303,"op":"print","text":"badcluelesswashed sent out Pecharunt!"}
+{"line":303,"op":"switchIn","side":"far","slot":5,"hp":83,"status":"none"}
+{"line":304,"op":"print","text":"Ogerpon used Ivy Cudgel!"}
+{"line":304,"op":"move","user":"near","target":"far","move":832,"animTurn":0}
+{"line":305,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":305,"op":"hp","side":"far","hp":54}
+{"line":308,"op":"turn","number":25}
+{"line":312,"op":"print","text":"Ogerpon, come back!"}
+{"line":312,"op":"withdraw","side":"near"}
+{"line":312,"op":"print","text":"Go! Gliscor!"}
+{"line":312,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"tox"}
+{"line":313,"op":"hp","side":"near","hp":88}
+{"line":313,"op":"print","text":"Pointed stones dug into Gliscor!"}
+{"line":314,"op":"print","text":"The opposing Pecharunt used Foul Play!"}
+{"line":314,"op":"move","user":"far","target":"near","move":492,"animTurn":0}
+{"line":315,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":315,"op":"hp","side":"near","hp":72}
+{"line":317,"op":"ability","side":"near","ability":90,"show":true}
+{"line":317,"op":"hp","side":"near","hp":84}
+{"line":317,"op":"print","text":"Gliscor had its HP restored."}
+{"line":317,"op":"ability","side":"near","ability":90,"show":false}
+{"line":319,"op":"turn","number":26}
+{"line":322,"op":"print","text":"Gliscor used Swords Dance!"}
+{"line":322,"op":"move","user":"near","target":"near","move":14,"animTurn":0}
+{"line":323,"op":"stat","side":"near","stat":"atk","stages":2,"arrows":"one"}
+{"line":323,"op":"print","text":"Gliscor's Attack rose sharply!"}
+{"line":324,"op":"print","text":"The opposing Pecharunt used Parting Shot!"}
+{"line":324,"op":"move","user":"far","target":"near","move":575,"animTurn":0}
+{"line":325,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"several"}
+{"line":325,"op":"print","text":"Gliscor's Attack fell!"}
+{"line":326,"op":"stat","side":"near","stat":"spa","stages":-1,"arrows":"none"}
+{"line":326,"op":"print","text":"Gliscor's Sp. Atk fell!"}
+{"line":329,"op":"withdraw","side":"far"}
+{"line":329,"op":"print","text":"badcluelesswashed sent out Gholdengo!"}
+{"line":329,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":331,"op":"ability","side":"near","ability":90,"show":true}
+{"line":331,"op":"hp","side":"near","hp":97}
+{"line":331,"op":"print","text":"Gliscor had its HP restored."}
+{"line":331,"op":"ability","side":"near","ability":90,"show":false}
+{"line":333,"op":"turn","number":27}
+{"line":336,"op":"print","text":"Gliscor used Protect!"}
+{"line":336,"op":"move","user":"near","target":"near","move":182,"animTurn":0}
+{"line":337,"op":"print","text":"Gliscor protected itself!"}
+{"line":338,"op":"print","text":"The opposing Gholdengo used Trick!"}
+{"line":339,"op":"print","text":"Gliscor protected itself!"}
+{"line":341,"op":"ability","side":"near","ability":90,"show":true}
+{"line":341,"op":"hp","side":"near","hp":100}
+{"line":341,"op":"print","text":"Gliscor had its HP restored."}
+{"line":341,"op":"ability","side":"near","ability":90,"show":false}
+{"line":343,"op":"turn","number":28}
+{"line":346,"op":"print","text":"Gliscor, come back!"}
+{"line":346,"op":"withdraw","side":"near"}
+{"line":346,"op":"print","text":"Go! Ogerpon!"}
+{"line":346,"op":"switchIn","side":"near","slot":2,"hp":58,"status":"none"}
+{"line":347,"op":"hp","side":"near","hp":46}
+{"line":347,"op":"print","text":"Pointed stones dug into Ogerpon!"}
+{"line":348,"op":"hp","side":"near","hp":34}
+{"line":348,"op":"print","text":"Ogerpon was hurt by the spikes!"}
+{"line":349,"op":"print","text":"The opposing Gholdengo used Trick!"}
+{"line":350,"op":"print","text":"But it failed!"}
+{"line":353,"op":"turn","number":29}
+{"line":356,"op":"print","text":"badcluelesswashed withdrew Gholdengo!"}
+{"line":356,"op":"withdraw","side":"far"}
+{"line":356,"op":"print","text":"badcluelesswashed sent out Pecharunt!"}
+{"line":356,"op":"switchIn","side":"far","slot":5,"hp":54,"status":"none"}
+{"line":357,"op":"print","text":"Ogerpon used Ivy Cudgel!"}
+{"line":357,"op":"move","user":"near","target":"far","move":832,"animTurn":0}
+{"line":358,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":358,"op":"hp","side":"far","hp":24}
+{"line":361,"op":"turn","number":30}
+{"line":364,"op":"print","text":"Ogerpon used Ivy Cudgel!"}
+{"line":364,"op":"move","user":"near","target":"far","move":832,"animTurn":0}
+{"line":365,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":365,"op":"hp","side":"far","hp":0}
+{"line":366,"op":"faint","side":"far"}
+{"line":366,"op":"print","text":"The opposing Pecharunt fainted!"}
+{"line":371,"op":"print","text":"badcluelesswashed sent out Slither Wing!"}
+{"line":371,"op":"switchIn","side":"far","slot":3,"hp":53,"status":"none"}
+{"line":372,"op":"turn","number":31}
+{"line":375,"op":"print","text":"Ogerpon, come back!"}
+{"line":375,"op":"withdraw","side":"near"}
+{"line":375,"op":"print","text":"Go! Gliscor!"}
+{"line":375,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"tox"}
+{"line":376,"op":"hp","side":"near","hp":88}
+{"line":376,"op":"print","text":"Pointed stones dug into Gliscor!"}
+{"line":377,"op":"print","text":"The opposing Slither Wing used First Impression!"}
+{"line":377,"op":"move","user":"far","target":"near","move":623,"animTurn":0}
+{"line":379,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":379,"op":"hp","side":"near","hp":70}
+{"line":379,"op":"print","text":"It's not very effective…"}
+{"line":381,"op":"ability","side":"near","ability":90,"show":true}
+{"line":381,"op":"hp","side":"near","hp":83}
+{"line":381,"op":"print","text":"Gliscor had its HP restored."}
+{"line":381,"op":"ability","side":"near","ability":90,"show":false}
+{"line":383,"op":"turn","number":32}
+{"line":386,"op":"print","text":"Gliscor used Swords Dance!"}
+{"line":386,"op":"move","user":"near","target":"near","move":14,"animTurn":0}
+{"line":387,"op":"stat","side":"near","stat":"atk","stages":2,"arrows":"one"}
+{"line":387,"op":"print","text":"Gliscor's Attack rose sharply!"}
+{"line":388,"op":"print","text":"The opposing Slither Wing used U-turn!"}
+{"line":388,"op":"move","user":"far","target":"near","move":369,"animTurn":0}
+{"line":390,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":390,"op":"hp","side":"near","hp":70}
+{"line":390,"op":"print","text":"It's not very effective…"}
+{"line":394,"op":"withdraw","side":"far"}
+{"line":394,"op":"print","text":"badcluelesswashed sent out Gholdengo!"}
+{"line":394,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":396,"op":"ability","side":"near","ability":90,"show":true}
+{"line":396,"op":"hp","side":"near","hp":82}
+{"line":396,"op":"print","text":"Gliscor had its HP restored."}
+{"line":396,"op":"ability","side":"near","ability":90,"show":false}
+{"line":398,"op":"turn","number":33}
+{"line":401,"op":"print","text":"Gliscor used Protect!"}
+{"line":401,"op":"move","user":"near","target":"near","move":182,"animTurn":0}
+{"line":402,"op":"print","text":"Gliscor protected itself!"}
+{"line":403,"op":"print","text":"The opposing Gholdengo used Trick!"}
+{"line":404,"op":"print","text":"Gliscor protected itself!"}
+{"line":406,"op":"ability","side":"near","ability":90,"show":true}
+{"line":406,"op":"hp","side":"near","hp":95}
+{"line":406,"op":"print","text":"Gliscor had its HP restored."}
+{"line":406,"op":"ability","side":"near","ability":90,"show":false}
+{"line":408,"op":"turn","number":34}
+{"line":411,"op":"print","text":"Gliscor, come back!"}
+{"line":411,"op":"withdraw","side":"near"}
+{"line":411,"op":"print","text":"Go! Deoxys!"}
+{"line":411,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":412,"op":"hp","side":"near","hp":88}
+{"line":412,"op":"print","text":"Pointed stones dug into Deoxys!"}
+{"line":413,"op":"hp","side":"near","hp":76}
+{"line":413,"op":"print","text":"Deoxys was hurt by the spikes!"}
+{"line":414,"op":"ability","side":"near","ability":46,"show":true}
+{"line":414,"op":"print","text":"Deoxys is exerting its pressure!"}
+{"line":414,"op":"ability","side":"near","ability":46,"show":false}
+{"line":415,"op":"print","text":"The opposing Gholdengo used Trick!"}
+{"line":415,"op":"move","user":"far","target":"near","move":271,"animTurn":0}
+{"line":416,"op":"print","text":"The opposing Gholdengo switched items with its target!"}
+{"line":417,"op":"item","side":"near","slot":0,"item":444}
+{"line":417,"op":"print","text":"Deoxys obtained Choice Scarf."}
+{"line":418,"op":"item","side":"far","slot":2,"item":472}
+{"line":418,"op":"print","text":"The opposing Gholdengo obtained Leftovers."}
+{"line":421,"op":"turn","number":35}
+{"line":425,"op":"print","text":"badcluelesswashed withdrew Gholdengo!"}
+{"line":425,"op":"withdraw","side":"far"}
+{"line":425,"op":"print","text":"badcluelesswashed sent out Walking Wake!"}
+{"line":425,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":426,"op":"print","text":"Deoxys used Psycho Boost!"}
+{"line":426,"op":"move","user":"near","target":"far","move":354,"animTurn":0}
+{"line":427,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":427,"op":"hp","side":"far","hp":27}
+{"line":428,"op":"stat","side":"near","stat":"spa","stages":-2,"arrows":"one"}
+{"line":428,"op":"print","text":"Deoxys's Sp. Atk harshly fell!"}
+{"line":431,"op":"turn","number":36}
+{"line":435,"op":"print","text":"badcluelesswashed withdrew Walking Wake!"}
+{"line":435,"op":"withdraw","side":"far"}
+{"line":435,"op":"print","text":"badcluelesswashed sent out Slither Wing!"}
+{"line":435,"op":"switchIn","side":"far","slot":3,"hp":53,"status":"none"}
+{"line":436,"op":"print","text":"Deoxys used Psycho Boost!"}
+{"line":436,"op":"move","user":"near","target":"far","move":354,"animTurn":0}
+{"line":438,"op":"hit","side":"far","effectiveness":"super"}
+{"line":438,"op":"hp","side":"far","hp":1}
+{"line":438,"op":"print","text":"It's super effective!"}
+{"line":439,"op":"stat","side":"near","stat":"spa","stages":-2,"arrows":"one"}
+{"line":439,"op":"print","text":"Deoxys's Sp. Atk harshly fell!"}
+{"line":442,"op":"turn","number":37}
+{"line":445,"op":"print","text":"Deoxys used Psycho Boost!"}
+{"line":445,"op":"move","user":"near","target":"far","move":354,"animTurn":0}
+{"line":447,"op":"hit","side":"far","effectiveness":"super"}
+{"line":447,"op":"hp","side":"far","hp":0}
+{"line":447,"op":"print","text":"It's super effective!"}
+{"line":448,"op":"stat","side":"near","stat":"spa","stages":-2,"arrows":"one"}
+{"line":448,"op":"print","text":"Deoxys's Sp. Atk harshly fell!"}
+{"line":449,"op":"faint","side":"far"}
+{"line":449,"op":"print","text":"The opposing Slither Wing fainted!"}
+{"line":455,"op":"print","text":"badcluelesswashed sent out Gliscor!"}
+{"line":455,"op":"switchIn","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":456,"op":"turn","number":38}
+{"line":460,"op":"print","text":"Deoxys, come back!"}
+{"line":460,"op":"withdraw","side":"near"}
+{"line":460,"op":"print","text":"Go! Ogerpon!"}
+{"line":460,"op":"switchIn","side":"near","slot":2,"hp":34,"status":"none"}
+{"line":461,"op":"hp","side":"near","hp":21}
+{"line":461,"op":"print","text":"Pointed stones dug into Ogerpon!"}
+{"line":462,"op":"hp","side":"near","hp":9}
+{"line":462,"op":"print","text":"Ogerpon was hurt by the spikes!"}
+{"line":463,"op":"print","text":"The opposing Gliscor used Swords Dance!"}
+{"line":463,"op":"move","user":"far","target":"far","move":14,"animTurn":0}
+{"line":464,"op":"stat","side":"far","stat":"atk","stages":2,"arrows":"one"}
+{"line":464,"op":"print","text":"The opposing Gliscor's Attack rose sharply!"}
+{"line":466,"op":"anim","side":"far","anim":"statusPsn"}
+{"line":466,"op":"print","text":"The opposing Gliscor was badly poisoned!"}
+{"line":466,"op":"status","side":"far","slot":0,"status":"tox"}
+{"line":468,"op":"turn","number":39}
+{"line":471,"op":"flushTextBox"}
+{"line":471,"op":"print","text":"The opposing Gliscor is storing energy!"}
+{"line":471,"op":"print","text":"The opposing Gliscor terastallized into the Normal type!"}
+{"line":472,"op":"print","text":"Ogerpon used Ivy Cudgel!"}
+{"line":472,"op":"move","user":"near","target":"far","move":832,"animTurn":0}
+{"line":473,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":473,"op":"hp","side":"far","hp":51}
+{"line":474,"op":"print","text":"The opposing Gliscor used Facade!"}
+{"line":474,"op":"move","user":"far","target":"near","move":263,"animTurn":0}
+{"line":475,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":475,"op":"hp","side":"near","hp":0}
+{"line":476,"op":"faint","side":"near"}
+{"line":476,"op":"print","text":"Ogerpon fainted!"}
+{"line":478,"op":"ability","side":"far","ability":90,"show":true}
+{"line":478,"op":"hp","side":"far","hp":64}
+{"line":478,"op":"print","text":"The opposing Gliscor had its HP restored."}
+{"line":478,"op":"ability","side":"far","ability":90,"show":false}
+{"line":482,"op":"print","text":"Go! Deoxys!"}
+{"line":482,"op":"switchIn","side":"near","slot":0,"hp":76,"status":"none"}
+{"line":483,"op":"hp","side":"near","hp":63}
+{"line":483,"op":"print","text":"Pointed stones dug into Deoxys!"}
+{"line":484,"op":"hp","side":"near","hp":51}
+{"line":484,"op":"print","text":"Deoxys was hurt by the spikes!"}
+{"line":485,"op":"ability","side":"near","ability":46,"show":true}
+{"line":485,"op":"print","text":"Deoxys is exerting its pressure!"}
+{"line":485,"op":"ability","side":"near","ability":46,"show":false}
+{"line":486,"op":"turn","number":40}
+{"line":490,"op":"print","text":"The opposing Gliscor used Protect!"}
+{"line":490,"op":"move","user":"far","target":"far","move":182,"animTurn":0}
+{"line":491,"op":"print","text":"The opposing Gliscor protected itself!"}
+{"line":492,"op":"print","text":"Deoxys used Focus Blast!"}
+{"line":493,"op":"print","text":"The opposing Gliscor protected itself!"}
+{"line":495,"op":"ability","side":"far","ability":90,"show":true}
+{"line":495,"op":"hp","side":"far","hp":76}
+{"line":495,"op":"print","text":"The opposing Gliscor had its HP restored."}
+{"line":495,"op":"ability","side":"far","ability":90,"show":false}
+{"line":497,"op":"turn","number":41}
+{"line":500,"op":"print","text":"Deoxys used Focus Blast!"}
+{"line":500,"op":"move","user":"near","target":"far","move":411,"animTurn":0}
+{"line":502,"op":"hit","side":"far","effectiveness":"super"}
+{"line":502,"op":"hp","side":"far","hp":11}
+{"line":502,"op":"print","text":"It's super effective!"}
+{"line":503,"op":"print","text":"The opposing Gliscor used Facade!"}
+{"line":503,"op":"move","user":"far","target":"near","move":263,"animTurn":0}
+{"line":504,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":504,"op":"hp","side":"near","hp":0}
+{"line":505,"op":"faint","side":"near"}
+{"line":505,"op":"print","text":"Deoxys fainted!"}
+{"line":507,"op":"ability","side":"far","ability":90,"show":true}
+{"line":507,"op":"hp","side":"far","hp":23}
+{"line":507,"op":"print","text":"The opposing Gliscor had its HP restored."}
+{"line":507,"op":"ability","side":"far","ability":90,"show":false}
+{"line":511,"op":"print","text":"Go! Gliscor!"}
+{"line":511,"op":"switchIn","side":"near","slot":3,"hp":95,"status":"tox"}
+{"line":512,"op":"hp","side":"near","hp":82}
+{"line":512,"op":"print","text":"Pointed stones dug into Gliscor!"}
+{"line":513,"op":"turn","number":42}
+{"line":522,"op":"print","text":"Gliscor used Earthquake!"}
+{"line":522,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
+{"line":523,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":523,"op":"hp","side":"far","hp":0}
+{"line":524,"op":"faint","side":"far"}
+{"line":524,"op":"print","text":"The opposing Gliscor fainted!"}
+{"line":526,"op":"ability","side":"near","ability":90,"show":true}
+{"line":526,"op":"hp","side":"near","hp":95}
+{"line":526,"op":"print","text":"Gliscor had its HP restored."}
+{"line":526,"op":"ability","side":"near","ability":90,"show":false}
+{"line":530,"op":"print","text":"badcluelesswashed sent out Gholdengo!"}
+{"line":530,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":531,"op":"turn","number":43}
+{"line":535,"op":"print","text":"Gliscor used Swords Dance!"}
+{"line":535,"op":"move","user":"near","target":"near","move":14,"animTurn":0}
+{"line":536,"op":"stat","side":"near","stat":"atk","stages":2,"arrows":"one"}
+{"line":536,"op":"print","text":"Gliscor's Attack rose sharply!"}
+{"line":537,"op":"print","text":"The opposing Gholdengo used Make It Rain!"}
+{"line":537,"op":"move","user":"far","target":"near","move":802,"animTurn":0}
+{"line":538,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":538,"op":"hp","side":"near","hp":17}
+{"line":539,"op":"stat","side":"far","stat":"spa","stages":-1,"arrows":"one"}
+{"line":539,"op":"print","text":"The opposing Gholdengo's Sp. Atk fell!"}
+{"line":541,"op":"ability","side":"near","ability":90,"show":true}
+{"line":541,"op":"hp","side":"near","hp":29}
+{"line":541,"op":"print","text":"Gliscor had its HP restored."}
+{"line":541,"op":"ability","side":"near","ability":90,"show":false}
+{"line":543,"op":"turn","number":44}
+{"line":546,"op":"print","text":"Gliscor used Protect!"}
+{"line":546,"op":"move","user":"near","target":"near","move":182,"animTurn":0}
+{"line":547,"op":"print","text":"Gliscor protected itself!"}
+{"line":548,"op":"print","text":"The opposing Gholdengo used Make It Rain!"}
+{"line":549,"op":"print","text":"Gliscor protected itself!"}
+{"line":551,"op":"ability","side":"near","ability":90,"show":true}
+{"line":551,"op":"hp","side":"near","hp":42}
+{"line":551,"op":"print","text":"Gliscor had its HP restored."}
+{"line":551,"op":"ability","side":"near","ability":90,"show":false}
+{"line":553,"op":"turn","number":45}
+{"line":557,"op":"print","text":"Gliscor used Earthquake!"}
+{"line":557,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
+{"line":559,"op":"hit","side":"far","effectiveness":"super"}
+{"line":559,"op":"hp","side":"far","hp":0}
+{"line":559,"op":"print","text":"It's super effective!"}
+{"line":560,"op":"faint","side":"far"}
+{"line":560,"op":"print","text":"The opposing Gholdengo fainted!"}
+{"line":562,"op":"ability","side":"near","ability":90,"show":true}
+{"line":562,"op":"hp","side":"near","hp":54}
+{"line":562,"op":"print","text":"Gliscor had its HP restored."}
+{"line":562,"op":"ability","side":"near","ability":90,"show":false}
+{"line":566,"op":"print","text":"badcluelesswashed sent out Walking Wake!"}
+{"line":566,"op":"switchIn","side":"far","slot":4,"hp":27,"status":"none"}
+{"line":567,"op":"turn","number":46}
+{"line":570,"op":"print","text":"Gliscor used Protect!"}
+{"line":570,"op":"move","user":"near","target":"near","move":182,"animTurn":0}
+{"line":571,"op":"print","text":"Gliscor protected itself!"}
+{"line":572,"op":"print","text":"The opposing Walking Wake used Draco Meteor!"}
+{"line":573,"op":"print","text":"Gliscor protected itself!"}
+{"line":575,"op":"ability","side":"near","ability":90,"show":true}
+{"line":575,"op":"hp","side":"near","hp":67}
+{"line":575,"op":"print","text":"Gliscor had its HP restored."}
+{"line":575,"op":"ability","side":"near","ability":90,"show":false}
+{"line":577,"op":"turn","number":47}
+{"line":581,"op":"flushTextBox"}
+{"line":581,"op":"print","text":"Gliscor is storing energy!"}
+{"line":581,"op":"print","text":"Gliscor terastallized into the Fairy type!"}
+{"line":582,"op":"print","text":"The opposing Walking Wake used Draco Meteor!"}
+{"line":583,"op":"print","text":"It doesn't affect Gliscor…"}
+{"line":584,"op":"print","text":"Gliscor used Earthquake!"}
+{"line":584,"op":"move","user":"near","target":"far","move":89,"animTurn":0}
+{"line":585,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":585,"op":"hp","side":"far","hp":0}
+{"line":586,"op":"faint","side":"far"}
+{"line":586,"op":"print","text":"The opposing Walking Wake fainted!"}
+{"line":589,"op":"print","text":"Setsu won the battle!"}
+{"line":589,"op":"end","outcome":"nearWon"}
+{"line":55,"fallback":"move","detail":"the game has no look for Ivy Cudgel Water; it plays Ivy Cudgel"}
+{"line":62,"fallback":"move","detail":"the game has no look for Ivy Cudgel Water; it plays Ivy Cudgel"}
+{"line":121,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}
+{"line":155,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}
+{"line":224,"fallback":"move","detail":"the game has no look for Ivy Cudgel Water; it plays Ivy Cudgel"}
+{"line":240,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}
+{"line":304,"fallback":"move","detail":"the game has no look for Ivy Cudgel Water; it plays Ivy Cudgel"}
+{"line":357,"fallback":"move","detail":"the game has no look for Ivy Cudgel Water; it plays Ivy Cudgel"}
+{"line":364,"fallback":"move","detail":"the game has no look for Ivy Cudgel Water; it plays Ivy Cudgel"}
+{"line":393,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}
+{"line":434,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}
+{"line":450,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}
+{"line":471,"fallback":"mechanic","detail":"no state in the stream for Terastallization starting"}
+{"line":472,"fallback":"move","detail":"the game has no look for Ivy Cudgel Water; it plays Ivy Cudgel"}
+{"line":581,"fallback":"mechanic","detail":"no state in the stream for Terastallization starting"}
+{"line":587,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}

@@ -5,7 +5,7 @@ import { toID } from '@pkmn/dex'
 
 import type { Effect, Side } from '../../script/types'
 import { type Fitted, fitCharset } from './charset'
-import { held, type Mon, nameAtStart, teamAtStart, teamInside } from './names'
+import { held, type Mon, moveName, nameAtStart, teamAtStart, teamInside } from './names'
 import { ownPhrase, type Phrase, tagged } from './template'
 
 type Phase = 'start' | 'upkeep' | 'end'
@@ -30,14 +30,17 @@ export const FIELD_TEMPLATES = {
   sandStart: tagged('STRINGID_SANDSTORMBREWED', () => 'A sandstorm kicked up!'),
   sunStart: tagged('STRINGID_SUNLIGHTGOTBRIGHT', () => 'The sunlight turned harsh!'),
   hailStart: tagged('STRINGID_STARTEDHAIL', () => 'It started to hail!'),
+  snowStart: tagged('STRINGID_STARTEDSNOW', () => 'It started to snow!'),
   rainUpkeep: tagged('STRINGID_RAINCONTINUES', () => 'Rain continues to fall.'),
   sandUpkeep: tagged('STRINGID_SANDSTORMRAGES', () => 'The sandstorm is raging.'),
   sunUpkeep: tagged('STRINGID_SUNLIGHTSTRONG', () => 'The sunlight is strong.'),
   hailUpkeep: tagged('STRINGID_HAILCONTINUES', () => 'The hail is crashing down.'),
+  snowUpkeep: tagged('STRINGID_SNOWCONTINUES', () => 'Snow continues to fall.'),
   rainEnd: tagged('STRINGID_RAINSTOPPED', () => 'The rain stopped.'),
   sandEnd: tagged('STRINGID_SANDSTORMSUBSIDED', () => 'The sandstorm subsided.'),
   sunEnd: tagged('STRINGID_SUNLIGHTFADED', () => 'The sunlight faded.'),
   hailEnd: tagged('STRINGID_HAILSTOPPED', () => 'The hail stopped.'),
+  snowEnd: tagged('STRINGID_SNOWSTOPPED', () => 'The snow stopped.'),
   electricWeakened: tagged(
     'STRINGID_ELECTRICITYWEAKENED',
     () => "Electricity's power was weakened!",
@@ -51,6 +54,9 @@ export const FIELD_TEMPLATES = {
   }),
   lightScreen: tagged('STRINGID_PKMNRAISEDSPDEF', (team: string) => {
     return `Light Screen made ${team} side stronger against special moves!`
+  }),
+  auroraVeil: tagged('STRINGID_PKMNAURORAVEIL', (team: string) => {
+    return `Aurora Veil made ${team} side stronger against physical and special moves!`
   }),
   safeguard: tagged('STRINGID_PKMNCOVEREDBYVEIL', (Team: string) => {
     return `${Team} side became cloaked in a mystical veil!`
@@ -82,6 +88,7 @@ export const FIELD_TEMPLATES = {
   safeguardGone: tagged('STRINGID_PKMNSAFEGUARDEXPIRED', (Team: string) => {
     return `${Team} side is no longer protected by the mystical veil!`
   }),
+  // `BattleScript_SideStatusWoreOff`, as a side's timer ends a screen; B_BUFF1 is the move.
   woreOff: tagged('STRINGID_PKMNSXWOREOFF', (Team: string, condition: string) => {
     return `${Team} side's ${condition} wore off!`
   }),
@@ -107,20 +114,22 @@ export function withdrawn(mon: Mon, trainer: string): string {
 
 export const draggedOut = (who: Mon) => T.dragged.render(who)
 
-type Gen3Weather = Extract<WeatherName, 'Rain' | 'Sand' | 'Sun' | 'Hail'>
+/** The weathers the expansion has words for: Gen 3's four and snow. */
+type SaidWeather = Extract<WeatherName, 'Rain' | 'Sand' | 'Sun' | 'Hail' | 'Snow'>
 
-const WEATHER: Readonly<Record<Gen3Weather, Readonly<Record<Phase, () => string>>>> = {
+const WEATHER: Readonly<Record<SaidWeather, Readonly<Record<Phase, () => string>>>> = {
   Rain: { start: T.rainStart.render, upkeep: T.rainUpkeep.render, end: T.rainEnd.render },
   Sand: { start: T.sandStart.render, upkeep: T.sandUpkeep.render, end: T.sandEnd.render },
   Sun: { start: T.sunStart.render, upkeep: T.sunUpkeep.render, end: T.sunEnd.render },
   Hail: { start: T.hailStart.render, upkeep: T.hailUpkeep.render, end: T.hailEnd.render },
+  Snow: { start: T.snowStart.render, upkeep: T.snowUpkeep.render, end: T.snowEnd.render },
 }
 
-const isGen3Weather = (weather: WeatherName): weather is Gen3Weather => weather in WEATHER
+const isSaidWeather = (weather: WeatherName): weather is SaidWeather => weather in WEATHER
 
 /** The weather's start (by a move or an ability alike), its turn's end and its end. */
 export function weatherText(weather: WeatherName, phase: Phase): Phrase {
-  if (isGen3Weather(weather)) return { text: WEATHER[weather][phase]() }
+  if (isSaidWeather(weather)) return { text: WEATHER[weather][phase]() }
   const own = `The weather changed to ${held(weather)}!`
   return ownPhrase(own, `${weather} at its ${phase}`)
 }
@@ -130,6 +139,7 @@ const SIDE_STARTS: Readonly<Record<string, (side: Side) => string>> = {
   stealthrock: (side) => T.stealthRock.render(teamInside(side)),
   reflect: (side) => T.reflect.render(teamInside(side)),
   lightscreen: (side) => T.lightScreen.render(teamInside(side)),
+  auroraveil: (side) => T.auroraVeil.render(teamInside(side)),
   safeguard: (side) => T.safeguard.render(teamAtStart(side)),
 }
 
@@ -159,10 +169,11 @@ export function sideStarted(side: Side, condition: Effect, user?: Mon): Phrase {
   return ownPhrase(own, `${condition.name} starting on a side`)
 }
 
-const SIDE_ENDS: Readonly<Record<string, (side: Side) => string>> = {
+const SIDE_ENDS: Readonly<Record<string, (side: Side, condition: Effect) => string>> = {
   stealthrock: (side) => T.stealthRockCleared.render(teamInside(side)),
   reflect: (side) => T.reflectGone.render(teamAtStart(side)),
   lightscreen: (side) => T.lightScreenGone.render(teamAtStart(side)),
+  auroraveil: (side, veil) => T.woreOff.render(teamAtStart(side), moveName(veil.name)),
   safeguard: (side) => T.safeguardGone.render(teamAtStart(side)),
 }
 
@@ -176,7 +187,7 @@ const SIDE_ENDS_BY_SOURCE: Readonly<Record<string, (source: Mon) => string>> = {
 export function sideEnded(side: Side, condition: Effect, source: Mon | undefined): Phrase {
   const id = toID(condition.name)
   const bySource = SIDE_ENDS_BY_SOURCE[id]
-  const text = source && bySource ? bySource(source) : SIDE_ENDS[id]?.(side)
+  const text = source && bySource ? bySource(source) : SIDE_ENDS[id]?.(side, condition)
   if (text !== undefined) return { text }
   const own = T.woreOff.render(teamAtStart(side), held(condition.name))
   return ownPhrase(own, `${condition.name} ending on a side`)

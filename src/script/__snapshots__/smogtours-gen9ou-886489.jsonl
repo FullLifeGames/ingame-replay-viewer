@@ -1,0 +1,581 @@
+{"gen":9,"format":"[Gen 9] OU","teams":{"near":[{"species":"Deoxys-Speed","name":"Deoxys","level":100,"shiny":false},{"species":"Tornadus-Therian","name":"Tornadus","gender":"M","level":100,"shiny":false},{"species":"Ogerpon-Wellspring","name":"Ogerpon","gender":"F","level":100,"shiny":false},{"species":"Gliscor","name":"Gliscor","gender":"F","level":100,"shiny":false},{"species":"Heatran","name":"Heatran","gender":"F","level":100,"shiny":false},{"species":"Weezing-Galar","name":"Weezing","gender":"F","level":100,"shiny":false}],"far":[{"species":"Gliscor","name":"Gliscor","gender":"F","level":100,"shiny":false},{"species":"Ting-Lu","name":"Ting-Lu","level":100,"shiny":false},{"species":"Gholdengo","name":"Gholdengo","level":100,"shiny":false},{"species":"Slither Wing","name":"Slither Wing","level":100,"shiny":false},{"species":"Walking Wake","name":"Walking Wake","level":100,"shiny":false},{"species":"Pecharunt","name":"Pecharunt","level":100,"shiny":false}]},"preview":{"near":[{"species":"Deoxys-Speed","level":100},{"species":"Tornadus-Therian","gender":"M","level":100},{"species":"Ogerpon-Wellspring","gender":"F","level":100},{"species":"Gliscor","gender":"F","level":100},{"species":"Heatran","gender":"F","level":100},{"species":"Weezing-Galar","gender":"F","level":100}],"far":[{"species":"Gliscor","gender":"F","level":100},{"species":"Ting-Lu","level":100},{"species":"Gholdengo","level":100},{"species":"Slither Wing","level":100},{"species":"Walking Wake","level":100},{"species":"Pecharunt","level":100}]}}
+{"line":0,"text":"|inactive|Battle timer is ON: inactive players will automatically lose when time's up.","reason":"timer"}
+{"line":1,"text":"|t:|1762696925","reason":"timestamp"}
+{"line":2,"text":"|gametype|singles","reason":"metadata"}
+{"kind":"player","line":3,"side":"near","name":"Setsu","avatar":"gloria-league"}
+{"kind":"player","line":4,"side":"far","name":"badcluelesswashed","avatar":"unknownf"}
+{"line":5,"text":"|gen|9","reason":"metadata"}
+{"line":6,"text":"|tier|[Gen 9] OU","reason":"metadata"}
+{"line":7,"text":"|rule|HP Percentage Mod: HP is shown in percentages","reason":"rule"}
+{"line":8,"text":"|rule|Endless Battle Clause: Forcing endless battles is banned","reason":"rule"}
+{"line":9,"text":"|rule|Species Clause: Limit one of each Pokémon","reason":"rule"}
+{"line":10,"text":"|rule|OHKO Clause: OHKO moves are banned","reason":"rule"}
+{"line":11,"text":"|rule|Evasion Items Clause: Evasion items are banned","reason":"rule"}
+{"line":12,"text":"|rule|Evasion Moves Clause: Evasion moves are banned","reason":"rule"}
+{"line":13,"text":"|rule|Evasion Abilities Clause: Evasion abilities are banned","reason":"rule"}
+{"line":14,"text":"|rule|Sleep Moves Clause: Sleep-inducing moves are banned","reason":"rule"}
+{"line":15,"text":"|clearpoke","reason":"preview"}
+{"line":16,"text":"|poke|p1|Deoxys-Speed|","reason":"preview"}
+{"line":17,"text":"|poke|p1|Tornadus-Therian, M|","reason":"preview"}
+{"line":18,"text":"|poke|p1|Ogerpon-Wellspring, F|","reason":"preview"}
+{"line":19,"text":"|poke|p1|Gliscor, F|","reason":"preview"}
+{"line":20,"text":"|poke|p1|Heatran, F|","reason":"preview"}
+{"line":21,"text":"|poke|p1|Weezing-Galar, F|","reason":"preview"}
+{"line":22,"text":"|poke|p2|Gliscor, F|","reason":"preview"}
+{"line":23,"text":"|poke|p2|Ting-Lu|","reason":"preview"}
+{"line":24,"text":"|poke|p2|Gholdengo|","reason":"preview"}
+{"line":25,"text":"|poke|p2|Slither Wing|","reason":"preview"}
+{"line":26,"text":"|poke|p2|Walking Wake|","reason":"preview"}
+{"line":27,"text":"|poke|p2|Pecharunt|","reason":"preview"}
+{"line":28,"text":"|teampreview","reason":"preview"}
+{"line":29,"text":"|c|☆Setsu|hf","reason":"chat"}
+{"line":30,"text":"|inactive|Setsu has 270 seconds left.","reason":"timer"}
+{"line":31,"text":"|inactive|badcluelesswashed has 270 seconds left.","reason":"timer"}
+{"line":32,"text":"|inactive|Setsu has 240 seconds left.","reason":"timer"}
+{"line":33,"text":"|inactive|badcluelesswashed has 240 seconds left.","reason":"timer"}
+{"line":34,"text":"|inactive|Setsu has 210 seconds left.","reason":"timer"}
+{"line":35,"text":"|","reason":"spacer"}
+{"line":36,"text":"|t:|1762697042","reason":"timestamp"}
+{"kind":"teamSize","line":37,"side":"near","size":6}
+{"kind":"teamSize","line":38,"side":"far","size":6}
+{"kind":"battleStart","line":39}
+{"kind":"switchIn","line":40,"who":{"side":"near","index":3},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"switchIn","line":41,"who":{"side":"far","index":1},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"ability","line":42,"who":{"side":"far","index":1},"ability":"Vessel of Ruin"}
+{"kind":"turn","line":43,"number":1}
+{"line":44,"text":"|","reason":"spacer"}
+{"line":45,"text":"|t:|1762697055","reason":"timestamp"}
+{"kind":"switchIn","line":46,"who":{"side":"near","index":2},"replaces":{"side":"near","index":3},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":47,"user":{"side":"far","index":1},"move":"Stealth Rock","target":{"side":"near","index":2}}
+{"kind":"sideStart","line":48,"side":"near","condition":{"name":"Stealth Rock","kind":"move"}}
+{"line":49,"text":"|","reason":"spacer"}
+{"line":50,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":51,"number":2}
+{"line":52,"text":"|","reason":"spacer"}
+{"line":53,"text":"|t:|1762697066","reason":"timestamp"}
+{"kind":"switchIn","line":54,"who":{"side":"far","index":5},"replaces":{"side":"far","index":1},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":55,"user":{"side":"near","index":2},"move":"Ivy Cudgel","target":{"side":"far","index":5},"anim":"Ivy Cudgel Water"}
+{"kind":"damage","line":56,"who":{"side":"far","index":5},"hp":{"hp":72,"max":100}}
+{"line":57,"text":"|","reason":"spacer"}
+{"line":58,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":59,"number":3}
+{"line":60,"text":"|","reason":"spacer"}
+{"line":61,"text":"|t:|1762697077","reason":"timestamp"}
+{"kind":"move","line":62,"user":{"side":"near","index":2},"move":"Ivy Cudgel","target":{"side":"far","index":5},"anim":"Ivy Cudgel Water"}
+{"kind":"damage","line":64,"who":{"side":"far","index":5},"hp":{"hp":33,"max":100},"crit":true,"folded":[63]}
+{"kind":"move","line":65,"user":{"side":"far","index":5},"move":"Recover","target":{"side":"far","index":5}}
+{"kind":"heal","line":66,"who":{"side":"far","index":5},"hp":{"hp":83,"max":100}}
+{"line":67,"text":"|","reason":"spacer"}
+{"line":68,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":69,"number":4}
+{"line":70,"text":"|","reason":"spacer"}
+{"line":71,"text":"|t:|1762697092","reason":"timestamp"}
+{"kind":"switchIn","line":72,"who":{"side":"near","index":4},"replaces":{"side":"near","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":73,"who":{"side":"near","index":4},"hp":{"hp":88,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":74,"user":{"side":"far","index":5},"move":"Parting Shot","target":{"side":"near","index":4}}
+{"kind":"statChange","line":75,"who":{"side":"near","index":4},"stat":"atk","stages":-1}
+{"kind":"statChange","line":76,"who":{"side":"near","index":4},"stat":"spa","stages":-1}
+{"line":77,"text":"|","reason":"spacer"}
+{"line":78,"text":"|t:|1762697098","reason":"timestamp"}
+{"kind":"switchIn","line":79,"who":{"side":"far","index":4},"replaces":{"side":"far","index":5},"dragged":false,"cause":{"name":"Parting Shot"},"hp":{"hp":100,"max":100}}
+{"line":80,"text":"|","reason":"spacer"}
+{"kind":"heal","line":81,"who":{"side":"near","index":4},"hp":{"hp":94,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":82,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":83,"number":5}
+{"line":84,"text":"|inactive|Setsu has 240 seconds left.","reason":"timer"}
+{"line":85,"text":"|","reason":"spacer"}
+{"line":86,"text":"|t:|1762697132","reason":"timestamp"}
+{"kind":"switchIn","line":87,"who":{"side":"near","index":2},"replaces":{"side":"near","index":4},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":88,"who":{"side":"near","index":2},"hp":{"hp":88,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":89,"user":{"side":"far","index":4},"move":"Knock Off","target":{"side":"near","index":2}}
+{"kind":"damage","line":90,"who":{"side":"near","index":2},"hp":{"hp":73,"max":100}}
+{"line":91,"text":"|","reason":"spacer"}
+{"line":92,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":93,"number":6}
+{"line":94,"text":"|inactive|Setsu has 210 seconds left.","reason":"timer"}
+{"line":95,"text":"|inactive|badcluelesswashed has 270 seconds left.","reason":"timer"}
+{"line":96,"text":"|","reason":"spacer"}
+{"line":97,"text":"|t:|1762697189","reason":"timestamp"}
+{"kind":"switchIn","line":98,"who":{"side":"near","index":4},"replaces":{"side":"near","index":2},"dragged":false,"hp":{"hp":94,"max":100}}
+{"kind":"damage","line":99,"who":{"side":"near","index":4},"hp":{"hp":82,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":100,"user":{"side":"far","index":4},"move":"Draco Meteor","target":{"side":"near","index":4}}
+{"kind":"damage","line":102,"who":{"side":"near","index":4},"hp":{"hp":57,"max":100},"effectiveness":"resisted","folded":[101]}
+{"kind":"statChange","line":103,"who":{"side":"far","index":4},"stat":"spa","stages":-2}
+{"line":104,"text":"|","reason":"spacer"}
+{"kind":"heal","line":105,"who":{"side":"near","index":4},"hp":{"hp":63,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":106,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":107,"number":7}
+{"line":108,"text":"|inactive|Setsu has 180 seconds left.","reason":"timer"}
+{"line":109,"text":"|","reason":"spacer"}
+{"line":110,"text":"|t:|1762697213","reason":"timestamp"}
+{"kind":"switchIn","line":111,"who":{"side":"near","index":2},"replaces":{"side":"near","index":4},"dragged":false,"hp":{"hp":73,"max":100}}
+{"kind":"damage","line":112,"who":{"side":"near","index":2},"hp":{"hp":60,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":113,"user":{"side":"far","index":4},"move":"Knock Off","target":{"side":"near","index":2}}
+{"kind":"damage","line":114,"who":{"side":"near","index":2},"hp":{"hp":45,"max":100}}
+{"line":115,"text":"|","reason":"spacer"}
+{"line":116,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":117,"number":8}
+{"line":118,"text":"|inactive|Setsu has 180 seconds left.","reason":"timer"}
+{"line":119,"text":"|","reason":"spacer"}
+{"line":120,"text":"|t:|1762697220","reason":"timestamp"}
+{"kind":"effectEnd","line":121,"who":{"side":"far","index":4},"effect":{"name":"Protosynthesis"},"silent":true}
+{"kind":"switchIn","line":122,"who":{"side":"far","index":5},"replaces":{"side":"far","index":4},"dragged":false,"hp":{"hp":83,"max":100}}
+{"kind":"move","line":123,"user":{"side":"near","index":2},"move":"Synthesis","target":{"side":"near","index":2}}
+{"kind":"heal","line":124,"who":{"side":"near","index":2},"hp":{"hp":95,"max":100}}
+{"line":125,"text":"|","reason":"spacer"}
+{"line":126,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":127,"number":9}
+{"line":128,"text":"|inactive|badcluelesswashed has 270 seconds left.","reason":"timer"}
+{"line":129,"text":"|","reason":"spacer"}
+{"line":130,"text":"|t:|1762697229","reason":"timestamp"}
+{"kind":"switchIn","line":131,"who":{"side":"near","index":3},"replaces":{"side":"near","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":132,"who":{"side":"near","index":3},"hp":{"hp":88,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":133,"user":{"side":"far","index":5},"move":"Parting Shot","target":{"side":"near","index":3}}
+{"kind":"statChange","line":134,"who":{"side":"near","index":3},"stat":"atk","stages":-1}
+{"kind":"statChange","line":135,"who":{"side":"near","index":3},"stat":"spa","stages":-1}
+{"line":136,"text":"|","reason":"spacer"}
+{"line":137,"text":"|t:|1762697231","reason":"timestamp"}
+{"kind":"switchIn","line":138,"who":{"side":"far","index":4},"replaces":{"side":"far","index":5},"dragged":false,"cause":{"name":"Parting Shot"},"hp":{"hp":100,"max":100}}
+{"line":139,"text":"|","reason":"spacer"}
+{"kind":"status","line":140,"who":{"side":"near","index":3},"status":"tox","cause":{"name":"Toxic Orb","kind":"item"}}
+{"line":141,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":142,"number":10}
+{"line":143,"text":"|","reason":"spacer"}
+{"line":144,"text":"|t:|1762697243","reason":"timestamp"}
+{"kind":"move","line":145,"user":{"side":"near","index":3},"move":"Protect","target":{"side":"near","index":3}}
+{"kind":"singleTurn","line":146,"who":{"side":"near","index":3},"effect":{"name":"Protect"}}
+{"kind":"move","line":147,"user":{"side":"far","index":4},"move":"Surf","target":{"side":"near","index":3}}
+{"kind":"block","line":148,"who":{"side":"near","index":3},"effect":{"name":"Protect","kind":"move"}}
+{"line":149,"text":"|","reason":"spacer"}
+{"kind":"heal","line":150,"who":{"side":"near","index":3},"hp":{"hp":100,"max":100},"status":"tox","cause":{"name":"Poison Heal","kind":"ability"}}
+{"line":151,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":152,"number":11}
+{"line":153,"text":"|","reason":"spacer"}
+{"line":154,"text":"|t:|1762697263","reason":"timestamp"}
+{"kind":"effectEnd","line":155,"who":{"side":"far","index":4},"effect":{"name":"Protosynthesis"},"silent":true}
+{"kind":"switchIn","line":156,"who":{"side":"far","index":5},"replaces":{"side":"far","index":4},"dragged":false,"hp":{"hp":83,"max":100}}
+{"kind":"switchIn","line":157,"who":{"side":"near","index":2},"replaces":{"side":"near","index":3},"dragged":false,"hp":{"hp":95,"max":100}}
+{"kind":"damage","line":158,"who":{"side":"near","index":2},"hp":{"hp":83,"max":100},"cause":{"name":"Stealth Rock"}}
+{"line":159,"text":"|","reason":"spacer"}
+{"line":160,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":161,"number":12}
+{"line":162,"text":"|","reason":"spacer"}
+{"line":163,"text":"|t:|1762697274","reason":"timestamp"}
+{"kind":"switchIn","line":164,"who":{"side":"near","index":5},"replaces":{"side":"near","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"ability","line":165,"who":{"side":"near","index":5},"ability":"Neutralizing Gas"}
+{"kind":"move","line":166,"user":{"side":"far","index":5},"move":"Parting Shot","target":{"side":"near","index":5}}
+{"kind":"statChange","line":167,"who":{"side":"near","index":5},"stat":"atk","stages":-1}
+{"kind":"statChange","line":168,"who":{"side":"near","index":5},"stat":"spa","stages":-1}
+{"line":169,"text":"|","reason":"spacer"}
+{"line":170,"text":"|t:|1762697278","reason":"timestamp"}
+{"kind":"switchIn","line":171,"who":{"side":"far","index":2},"replaces":{"side":"far","index":5},"dragged":false,"cause":{"name":"Parting Shot"},"hp":{"hp":100,"max":100}}
+{"line":172,"text":"|","reason":"spacer"}
+{"line":173,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":174,"number":13}
+{"line":175,"text":"|","reason":"spacer"}
+{"line":176,"text":"|t:|1762697295","reason":"timestamp"}
+{"kind":"effectEnd","line":177,"who":{"side":"near","index":5},"effect":{"name":"Neutralizing Gas","kind":"ability"}}
+{"kind":"switchIn","line":178,"who":{"side":"near","index":4},"replaces":{"side":"near","index":5},"dragged":false,"hp":{"hp":63,"max":100}}
+{"kind":"damage","line":179,"who":{"side":"near","index":4},"hp":{"hp":51,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":180,"user":{"side":"far","index":2},"move":"Shadow Ball","target":{"side":"near","index":4}}
+{"kind":"damage","line":181,"who":{"side":"near","index":4},"hp":{"hp":17,"max":100}}
+{"line":182,"text":"|","reason":"spacer"}
+{"kind":"heal","line":183,"who":{"side":"near","index":4},"hp":{"hp":23,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":184,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":185,"number":14}
+{"line":186,"text":"|","reason":"spacer"}
+{"line":187,"text":"|t:|1762697302","reason":"timestamp"}
+{"kind":"move","line":188,"user":{"side":"far","index":2},"move":"Shadow Ball","target":{"side":"near","index":4}}
+{"kind":"damage","line":189,"who":{"side":"near","index":4},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":190,"who":{"side":"near","index":4}}
+{"line":191,"text":"|","reason":"spacer"}
+{"line":192,"text":"|upkeep","reason":"upkeep"}
+{"line":193,"text":"|","reason":"spacer"}
+{"line":194,"text":"|t:|1762697308","reason":"timestamp"}
+{"kind":"switchIn","line":195,"who":{"side":"near","index":5},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"ability","line":196,"who":{"side":"near","index":5},"ability":"Neutralizing Gas"}
+{"kind":"turn","line":197,"number":15}
+{"line":198,"text":"|","reason":"spacer"}
+{"line":199,"text":"|t:|1762697314","reason":"timestamp"}
+{"kind":"move","line":200,"user":{"side":"far","index":2},"move":"Shadow Ball","target":{"side":"near","index":5}}
+{"kind":"damage","line":201,"who":{"side":"near","index":5},"hp":{"hp":45,"max":100}}
+{"kind":"statChange","line":202,"who":{"side":"near","index":5},"stat":"spd","stages":-1}
+{"kind":"move","line":203,"user":{"side":"near","index":5},"move":"Defog","target":{"side":"far","index":2}}
+{"kind":"statChange","line":204,"who":{"side":"far","index":2},"stat":"evasion","stages":-1}
+{"kind":"sideEnd","line":205,"side":"near","condition":{"name":"Stealth Rock"},"cause":{"name":"Defog","kind":"move"},"source":{"side":"near","index":5}}
+{"line":206,"text":"|","reason":"spacer"}
+{"line":207,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":208,"number":16}
+{"line":209,"text":"|","reason":"spacer"}
+{"line":210,"text":"|t:|1762697321","reason":"timestamp"}
+{"kind":"move","line":211,"user":{"side":"far","index":2},"move":"Shadow Ball","target":{"side":"near","index":5}}
+{"kind":"damage","line":212,"who":{"side":"near","index":5},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":213,"who":{"side":"near","index":5}}
+{"kind":"effectEnd","line":214,"who":{"side":"near","index":5},"effect":{"name":"Neutralizing Gas","kind":"ability"}}
+{"line":215,"text":"|","reason":"spacer"}
+{"line":216,"text":"|upkeep","reason":"upkeep"}
+{"line":217,"text":"|","reason":"spacer"}
+{"line":218,"text":"|t:|1762697323","reason":"timestamp"}
+{"kind":"switchIn","line":219,"who":{"side":"near","index":2},"dragged":false,"hp":{"hp":83,"max":100}}
+{"kind":"turn","line":220,"number":17}
+{"line":221,"text":"|","reason":"spacer"}
+{"line":222,"text":"|t:|1762697327","reason":"timestamp"}
+{"kind":"switchIn","line":223,"who":{"side":"far","index":3},"replaces":{"side":"far","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":224,"user":{"side":"near","index":2},"move":"Ivy Cudgel","target":{"side":"far","index":3},"anim":"Ivy Cudgel Water"}
+{"kind":"damage","line":225,"who":{"side":"far","index":3},"hp":{"hp":53,"max":100}}
+{"line":226,"text":"|","reason":"spacer"}
+{"line":227,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":228,"number":18}
+{"line":229,"text":"|","reason":"spacer"}
+{"line":230,"text":"|t:|1762697332","reason":"timestamp"}
+{"kind":"switchIn","line":231,"who":{"side":"near","index":1},"replaces":{"side":"near","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":232,"user":{"side":"far","index":3},"move":"First Impression","target":{"side":"near","index":1}}
+{"kind":"damage","line":234,"who":{"side":"near","index":1},"hp":{"hp":74,"max":100},"effectiveness":"resisted","folded":[233]}
+{"line":235,"text":"|","reason":"spacer"}
+{"line":236,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":237,"number":19}
+{"line":238,"text":"|","reason":"spacer"}
+{"line":239,"text":"|t:|1762697353","reason":"timestamp"}
+{"kind":"effectEnd","line":240,"who":{"side":"far","index":3},"effect":{"name":"Protosynthesis"},"silent":true}
+{"kind":"switchIn","line":241,"who":{"side":"far","index":1},"replaces":{"side":"far","index":3},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"ability","line":242,"who":{"side":"far","index":1},"ability":"Vessel of Ruin"}
+{"kind":"move","line":243,"user":{"side":"near","index":1},"move":"Bleakwind Storm","target":{"side":"far","index":1}}
+{"kind":"damage","line":244,"who":{"side":"far","index":1},"hp":{"hp":74,"max":100}}
+{"kind":"damage","line":245,"who":{"side":"near","index":1},"hp":{"hp":65,"max":100},"cause":{"name":"Life Orb","kind":"item"}}
+{"line":246,"text":"|","reason":"spacer"}
+{"kind":"heal","line":247,"who":{"side":"far","index":1},"hp":{"hp":80,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":248,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":249,"number":20}
+{"line":250,"text":"|","reason":"spacer"}
+{"line":251,"text":"|t:|1762697361","reason":"timestamp"}
+{"kind":"move","line":252,"user":{"side":"near","index":1},"move":"Grass Knot","target":{"side":"far","index":1}}
+{"kind":"damage","line":254,"who":{"side":"far","index":1},"hp":{"hp":38,"max":100},"effectiveness":"super","folded":[253]}
+{"kind":"damage","line":255,"who":{"side":"near","index":1},"hp":{"hp":55,"max":100},"cause":{"name":"Life Orb","kind":"item"}}
+{"kind":"move","line":256,"user":{"side":"far","index":1},"move":"Stealth Rock","target":{"side":"near","index":1}}
+{"kind":"sideStart","line":257,"side":"near","condition":{"name":"Stealth Rock","kind":"move"}}
+{"line":258,"text":"|","reason":"spacer"}
+{"kind":"heal","line":259,"who":{"side":"far","index":1},"hp":{"hp":45,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":260,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":261,"number":21}
+{"line":262,"text":"|","reason":"spacer"}
+{"line":263,"text":"|t:|1762697367","reason":"timestamp"}
+{"kind":"move","line":264,"user":{"side":"near","index":1},"move":"Grass Knot","target":{"side":"far","index":1}}
+{"kind":"damage","line":266,"who":{"side":"far","index":1},"hp":{"hp":7,"max":100},"effectiveness":"super","folded":[265]}
+{"kind":"damage","line":267,"who":{"side":"near","index":1},"hp":{"hp":45,"max":100},"cause":{"name":"Life Orb","kind":"item"}}
+{"kind":"move","line":268,"user":{"side":"far","index":1},"move":"Spikes","target":{"side":"near","index":1}}
+{"kind":"sideStart","line":269,"side":"near","condition":{"name":"Spikes"}}
+{"line":270,"text":"|","reason":"spacer"}
+{"kind":"heal","line":271,"who":{"side":"far","index":1},"hp":{"hp":13,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":272,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":273,"number":22}
+{"line":274,"text":"|","reason":"spacer"}
+{"line":275,"text":"|t:|1762697373","reason":"timestamp"}
+{"kind":"move","line":276,"user":{"side":"near","index":1},"move":"Grass Knot","target":{"side":"far","index":1}}
+{"kind":"damage","line":278,"who":{"side":"far","index":1},"hp":{"hp":0,"max":100},"effectiveness":"super","folded":[277]}
+{"kind":"faint","line":279,"who":{"side":"far","index":1}}
+{"kind":"damage","line":280,"who":{"side":"near","index":1},"hp":{"hp":36,"max":100},"cause":{"name":"Life Orb","kind":"item"}}
+{"line":281,"text":"|","reason":"spacer"}
+{"line":282,"text":"|upkeep","reason":"upkeep"}
+{"line":283,"text":"|","reason":"spacer"}
+{"line":284,"text":"|t:|1762697379","reason":"timestamp"}
+{"kind":"switchIn","line":285,"who":{"side":"far","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"turn","line":286,"number":23}
+{"line":287,"text":"|","reason":"spacer"}
+{"line":288,"text":"|t:|1762697382","reason":"timestamp"}
+{"kind":"move","line":289,"user":{"side":"far","index":2},"move":"Shadow Ball","target":{"side":"near","index":1}}
+{"kind":"damage","line":290,"who":{"side":"near","index":1},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":291,"who":{"side":"near","index":1}}
+{"line":292,"text":"|","reason":"spacer"}
+{"line":293,"text":"|upkeep","reason":"upkeep"}
+{"line":294,"text":"|","reason":"spacer"}
+{"line":295,"text":"|t:|1762697386","reason":"timestamp"}
+{"kind":"switchIn","line":296,"who":{"side":"near","index":2},"dragged":false,"hp":{"hp":83,"max":100}}
+{"kind":"damage","line":297,"who":{"side":"near","index":2},"hp":{"hp":71,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"damage","line":298,"who":{"side":"near","index":2},"hp":{"hp":58,"max":100},"cause":{"name":"Spikes"}}
+{"kind":"turn","line":299,"number":24}
+{"line":300,"text":"|inactive|Setsu has 270 seconds left.","reason":"timer"}
+{"line":301,"text":"|","reason":"spacer"}
+{"line":302,"text":"|t:|1762697399","reason":"timestamp"}
+{"kind":"switchIn","line":303,"who":{"side":"far","index":5},"replaces":{"side":"far","index":2},"dragged":false,"hp":{"hp":83,"max":100}}
+{"kind":"move","line":304,"user":{"side":"near","index":2},"move":"Ivy Cudgel","target":{"side":"far","index":5},"anim":"Ivy Cudgel Water"}
+{"kind":"damage","line":305,"who":{"side":"far","index":5},"hp":{"hp":54,"max":100}}
+{"line":306,"text":"|","reason":"spacer"}
+{"line":307,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":308,"number":25}
+{"line":309,"text":"|inactive|Setsu has 270 seconds left.","reason":"timer"}
+{"line":310,"text":"|","reason":"spacer"}
+{"line":311,"text":"|t:|1762697408","reason":"timestamp"}
+{"kind":"switchIn","line":312,"who":{"side":"near","index":3},"replaces":{"side":"near","index":2},"dragged":false,"hp":{"hp":100,"max":100},"status":"tox"}
+{"kind":"damage","line":313,"who":{"side":"near","index":3},"hp":{"hp":88,"max":100},"status":"tox","cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":314,"user":{"side":"far","index":5},"move":"Foul Play","target":{"side":"near","index":3}}
+{"kind":"damage","line":315,"who":{"side":"near","index":3},"hp":{"hp":72,"max":100},"status":"tox"}
+{"line":316,"text":"|","reason":"spacer"}
+{"kind":"heal","line":317,"who":{"side":"near","index":3},"hp":{"hp":84,"max":100},"status":"tox","cause":{"name":"Poison Heal","kind":"ability"}}
+{"line":318,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":319,"number":26}
+{"line":320,"text":"|","reason":"spacer"}
+{"line":321,"text":"|t:|1762697416","reason":"timestamp"}
+{"kind":"move","line":322,"user":{"side":"near","index":3},"move":"Swords Dance","target":{"side":"near","index":3}}
+{"kind":"statChange","line":323,"who":{"side":"near","index":3},"stat":"atk","stages":2}
+{"kind":"move","line":324,"user":{"side":"far","index":5},"move":"Parting Shot","target":{"side":"near","index":3}}
+{"kind":"statChange","line":325,"who":{"side":"near","index":3},"stat":"atk","stages":-1}
+{"kind":"statChange","line":326,"who":{"side":"near","index":3},"stat":"spa","stages":-1}
+{"line":327,"text":"|","reason":"spacer"}
+{"line":328,"text":"|t:|1762697423","reason":"timestamp"}
+{"kind":"switchIn","line":329,"who":{"side":"far","index":2},"replaces":{"side":"far","index":5},"dragged":false,"cause":{"name":"Parting Shot"},"hp":{"hp":100,"max":100}}
+{"line":330,"text":"|","reason":"spacer"}
+{"kind":"heal","line":331,"who":{"side":"near","index":3},"hp":{"hp":97,"max":100},"status":"tox","cause":{"name":"Poison Heal","kind":"ability"}}
+{"line":332,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":333,"number":27}
+{"line":334,"text":"|","reason":"spacer"}
+{"line":335,"text":"|t:|1762697429","reason":"timestamp"}
+{"kind":"move","line":336,"user":{"side":"near","index":3},"move":"Protect","target":{"side":"near","index":3}}
+{"kind":"singleTurn","line":337,"who":{"side":"near","index":3},"effect":{"name":"Protect"}}
+{"kind":"move","line":338,"user":{"side":"far","index":2},"move":"Trick","target":{"side":"near","index":3}}
+{"kind":"block","line":339,"who":{"side":"near","index":3},"effect":{"name":"Protect","kind":"move"}}
+{"line":340,"text":"|","reason":"spacer"}
+{"kind":"heal","line":341,"who":{"side":"near","index":3},"hp":{"hp":100,"max":100},"status":"tox","cause":{"name":"Poison Heal","kind":"ability"}}
+{"line":342,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":343,"number":28}
+{"line":344,"text":"|","reason":"spacer"}
+{"line":345,"text":"|t:|1762697435","reason":"timestamp"}
+{"kind":"switchIn","line":346,"who":{"side":"near","index":2},"replaces":{"side":"near","index":3},"dragged":false,"hp":{"hp":58,"max":100}}
+{"kind":"damage","line":347,"who":{"side":"near","index":2},"hp":{"hp":46,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"damage","line":348,"who":{"side":"near","index":2},"hp":{"hp":34,"max":100},"cause":{"name":"Spikes"}}
+{"kind":"move","line":349,"user":{"side":"far","index":2},"move":"Trick","still":true}
+{"kind":"fail","line":350,"who":{"side":"far","index":2}}
+{"line":351,"text":"|","reason":"spacer"}
+{"line":352,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":353,"number":29}
+{"line":354,"text":"|","reason":"spacer"}
+{"line":355,"text":"|t:|1762697446","reason":"timestamp"}
+{"kind":"switchIn","line":356,"who":{"side":"far","index":5},"replaces":{"side":"far","index":2},"dragged":false,"hp":{"hp":54,"max":100}}
+{"kind":"move","line":357,"user":{"side":"near","index":2},"move":"Ivy Cudgel","target":{"side":"far","index":5},"anim":"Ivy Cudgel Water"}
+{"kind":"damage","line":358,"who":{"side":"far","index":5},"hp":{"hp":24,"max":100}}
+{"line":359,"text":"|","reason":"spacer"}
+{"line":360,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":361,"number":30}
+{"line":362,"text":"|","reason":"spacer"}
+{"line":363,"text":"|t:|1762697454","reason":"timestamp"}
+{"kind":"move","line":364,"user":{"side":"near","index":2},"move":"Ivy Cudgel","target":{"side":"far","index":5},"anim":"Ivy Cudgel Water"}
+{"kind":"damage","line":365,"who":{"side":"far","index":5},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":366,"who":{"side":"far","index":5}}
+{"line":367,"text":"|","reason":"spacer"}
+{"line":368,"text":"|upkeep","reason":"upkeep"}
+{"line":369,"text":"|","reason":"spacer"}
+{"line":370,"text":"|t:|1762697459","reason":"timestamp"}
+{"kind":"switchIn","line":371,"who":{"side":"far","index":3},"dragged":false,"hp":{"hp":53,"max":100}}
+{"kind":"turn","line":372,"number":31}
+{"line":373,"text":"|","reason":"spacer"}
+{"line":374,"text":"|t:|1762697463","reason":"timestamp"}
+{"kind":"switchIn","line":375,"who":{"side":"near","index":3},"replaces":{"side":"near","index":2},"dragged":false,"hp":{"hp":100,"max":100},"status":"tox"}
+{"kind":"damage","line":376,"who":{"side":"near","index":3},"hp":{"hp":88,"max":100},"status":"tox","cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":377,"user":{"side":"far","index":3},"move":"First Impression","target":{"side":"near","index":3}}
+{"kind":"damage","line":379,"who":{"side":"near","index":3},"hp":{"hp":70,"max":100},"status":"tox","effectiveness":"resisted","folded":[378]}
+{"line":380,"text":"|","reason":"spacer"}
+{"kind":"heal","line":381,"who":{"side":"near","index":3},"hp":{"hp":83,"max":100},"status":"tox","cause":{"name":"Poison Heal","kind":"ability"}}
+{"line":382,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":383,"number":32}
+{"line":384,"text":"|","reason":"spacer"}
+{"line":385,"text":"|t:|1762697474","reason":"timestamp"}
+{"kind":"move","line":386,"user":{"side":"near","index":3},"move":"Swords Dance","target":{"side":"near","index":3}}
+{"kind":"statChange","line":387,"who":{"side":"near","index":3},"stat":"atk","stages":2}
+{"kind":"move","line":388,"user":{"side":"far","index":3},"move":"U-turn","target":{"side":"near","index":3}}
+{"kind":"damage","line":390,"who":{"side":"near","index":3},"hp":{"hp":70,"max":100},"status":"tox","effectiveness":"resisted","folded":[389]}
+{"line":391,"text":"|","reason":"spacer"}
+{"line":392,"text":"|t:|1762697476","reason":"timestamp"}
+{"kind":"effectEnd","line":393,"who":{"side":"far","index":3},"effect":{"name":"Protosynthesis"},"silent":true}
+{"kind":"switchIn","line":394,"who":{"side":"far","index":2},"replaces":{"side":"far","index":3},"dragged":false,"cause":{"name":"U-turn"},"hp":{"hp":100,"max":100}}
+{"line":395,"text":"|","reason":"spacer"}
+{"kind":"heal","line":396,"who":{"side":"near","index":3},"hp":{"hp":82,"max":100},"status":"tox","cause":{"name":"Poison Heal","kind":"ability"}}
+{"line":397,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":398,"number":33}
+{"line":399,"text":"|","reason":"spacer"}
+{"line":400,"text":"|t:|1762697482","reason":"timestamp"}
+{"kind":"move","line":401,"user":{"side":"near","index":3},"move":"Protect","target":{"side":"near","index":3}}
+{"kind":"singleTurn","line":402,"who":{"side":"near","index":3},"effect":{"name":"Protect"}}
+{"kind":"move","line":403,"user":{"side":"far","index":2},"move":"Trick","target":{"side":"near","index":3}}
+{"kind":"block","line":404,"who":{"side":"near","index":3},"effect":{"name":"Protect","kind":"move"}}
+{"line":405,"text":"|","reason":"spacer"}
+{"kind":"heal","line":406,"who":{"side":"near","index":3},"hp":{"hp":95,"max":100},"status":"tox","cause":{"name":"Poison Heal","kind":"ability"}}
+{"line":407,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":408,"number":34}
+{"line":409,"text":"|","reason":"spacer"}
+{"line":410,"text":"|t:|1762697485","reason":"timestamp"}
+{"kind":"switchIn","line":411,"who":{"side":"near","index":0},"replaces":{"side":"near","index":3},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":412,"who":{"side":"near","index":0},"hp":{"hp":88,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"damage","line":413,"who":{"side":"near","index":0},"hp":{"hp":76,"max":100},"cause":{"name":"Spikes"}}
+{"kind":"ability","line":414,"who":{"side":"near","index":0},"ability":"Pressure"}
+{"kind":"move","line":415,"user":{"side":"far","index":2},"move":"Trick","target":{"side":"near","index":0}}
+{"kind":"effectActivate","line":416,"who":{"side":"far","index":2},"effect":{"name":"Trick","kind":"move"},"source":{"side":"near","index":0}}
+{"kind":"item","line":417,"who":{"side":"near","index":0},"item":"Choice Scarf","cause":{"name":"Trick","kind":"move"}}
+{"kind":"item","line":418,"who":{"side":"far","index":2},"item":"Leftovers","cause":{"name":"Trick","kind":"move"}}
+{"line":419,"text":"|","reason":"spacer"}
+{"line":420,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":421,"number":35}
+{"line":422,"text":"|inactive|badcluelesswashed has 270 seconds left.","reason":"timer"}
+{"line":423,"text":"|","reason":"spacer"}
+{"line":424,"text":"|t:|1762697538","reason":"timestamp"}
+{"kind":"switchIn","line":425,"who":{"side":"far","index":4},"replaces":{"side":"far","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":426,"user":{"side":"near","index":0},"move":"Psycho Boost","target":{"side":"far","index":4}}
+{"kind":"damage","line":427,"who":{"side":"far","index":4},"hp":{"hp":27,"max":100}}
+{"kind":"statChange","line":428,"who":{"side":"near","index":0},"stat":"spa","stages":-2}
+{"line":429,"text":"|","reason":"spacer"}
+{"line":430,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":431,"number":36}
+{"line":432,"text":"|","reason":"spacer"}
+{"line":433,"text":"|t:|1762697553","reason":"timestamp"}
+{"kind":"effectEnd","line":434,"who":{"side":"far","index":4},"effect":{"name":"Protosynthesis"},"silent":true}
+{"kind":"switchIn","line":435,"who":{"side":"far","index":3},"replaces":{"side":"far","index":4},"dragged":false,"hp":{"hp":53,"max":100}}
+{"kind":"move","line":436,"user":{"side":"near","index":0},"move":"Psycho Boost","target":{"side":"far","index":3}}
+{"kind":"damage","line":438,"who":{"side":"far","index":3},"hp":{"hp":1,"max":100},"effectiveness":"super","folded":[437]}
+{"kind":"statChange","line":439,"who":{"side":"near","index":0},"stat":"spa","stages":-2}
+{"line":440,"text":"|","reason":"spacer"}
+{"line":441,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":442,"number":37}
+{"line":443,"text":"|","reason":"spacer"}
+{"line":444,"text":"|t:|1762697558","reason":"timestamp"}
+{"kind":"move","line":445,"user":{"side":"near","index":0},"move":"Psycho Boost","target":{"side":"far","index":3}}
+{"kind":"damage","line":447,"who":{"side":"far","index":3},"hp":{"hp":0,"max":100},"effectiveness":"super","folded":[446]}
+{"kind":"statChange","line":448,"who":{"side":"near","index":0},"stat":"spa","stages":-2}
+{"kind":"faint","line":449,"who":{"side":"far","index":3}}
+{"kind":"effectEnd","line":450,"who":{"side":"far","index":3},"effect":{"name":"Protosynthesis"},"silent":true}
+{"line":451,"text":"|","reason":"spacer"}
+{"line":452,"text":"|upkeep","reason":"upkeep"}
+{"line":453,"text":"|","reason":"spacer"}
+{"line":454,"text":"|t:|1762697559","reason":"timestamp"}
+{"kind":"switchIn","line":455,"who":{"side":"far","index":0},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"turn","line":456,"number":38}
+{"line":457,"text":"|inactive|badcluelesswashed has 270 seconds left.","reason":"timer"}
+{"line":458,"text":"|","reason":"spacer"}
+{"line":459,"text":"|t:|1762697567","reason":"timestamp"}
+{"kind":"switchIn","line":460,"who":{"side":"near","index":2},"replaces":{"side":"near","index":0},"dragged":false,"hp":{"hp":34,"max":100}}
+{"kind":"damage","line":461,"who":{"side":"near","index":2},"hp":{"hp":21,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"damage","line":462,"who":{"side":"near","index":2},"hp":{"hp":9,"max":100},"cause":{"name":"Spikes"}}
+{"kind":"move","line":463,"user":{"side":"far","index":0},"move":"Swords Dance","target":{"side":"far","index":0}}
+{"kind":"statChange","line":464,"who":{"side":"far","index":0},"stat":"atk","stages":2}
+{"line":465,"text":"|","reason":"spacer"}
+{"kind":"status","line":466,"who":{"side":"far","index":0},"status":"tox","cause":{"name":"Toxic Orb","kind":"item"}}
+{"line":467,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":468,"number":39}
+{"line":469,"text":"|","reason":"spacer"}
+{"line":470,"text":"|t:|1762697578","reason":"timestamp"}
+{"kind":"terastallize","line":471,"who":{"side":"far","index":0},"type":"Normal"}
+{"kind":"move","line":472,"user":{"side":"near","index":2},"move":"Ivy Cudgel","target":{"side":"far","index":0},"anim":"Ivy Cudgel Water"}
+{"kind":"damage","line":473,"who":{"side":"far","index":0},"hp":{"hp":51,"max":100},"status":"tox"}
+{"kind":"move","line":474,"user":{"side":"far","index":0},"move":"Facade","target":{"side":"near","index":2}}
+{"kind":"damage","line":475,"who":{"side":"near","index":2},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":476,"who":{"side":"near","index":2}}
+{"line":477,"text":"|","reason":"spacer"}
+{"kind":"heal","line":478,"who":{"side":"far","index":0},"hp":{"hp":64,"max":100},"status":"tox","cause":{"name":"Poison Heal","kind":"ability"}}
+{"line":479,"text":"|upkeep","reason":"upkeep"}
+{"line":480,"text":"|","reason":"spacer"}
+{"line":481,"text":"|t:|1762697598","reason":"timestamp"}
+{"kind":"switchIn","line":482,"who":{"side":"near","index":0},"dragged":false,"hp":{"hp":76,"max":100}}
+{"kind":"damage","line":483,"who":{"side":"near","index":0},"hp":{"hp":63,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"damage","line":484,"who":{"side":"near","index":0},"hp":{"hp":51,"max":100},"cause":{"name":"Spikes"}}
+{"kind":"ability","line":485,"who":{"side":"near","index":0},"ability":"Pressure"}
+{"kind":"turn","line":486,"number":40}
+{"line":487,"text":"|inactive|Setsu has 270 seconds left.","reason":"timer"}
+{"line":488,"text":"|","reason":"spacer"}
+{"line":489,"text":"|t:|1762697632","reason":"timestamp"}
+{"kind":"move","line":490,"user":{"side":"far","index":0},"move":"Protect","target":{"side":"far","index":0}}
+{"kind":"singleTurn","line":491,"who":{"side":"far","index":0},"effect":{"name":"Protect"}}
+{"kind":"move","line":492,"user":{"side":"near","index":0},"move":"Focus Blast","target":{"side":"far","index":0}}
+{"kind":"block","line":493,"who":{"side":"far","index":0},"effect":{"name":"Protect","kind":"move"}}
+{"line":494,"text":"|","reason":"spacer"}
+{"kind":"heal","line":495,"who":{"side":"far","index":0},"hp":{"hp":76,"max":100},"status":"tox","cause":{"name":"Poison Heal","kind":"ability"}}
+{"line":496,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":497,"number":41}
+{"line":498,"text":"|","reason":"spacer"}
+{"line":499,"text":"|t:|1762697653","reason":"timestamp"}
+{"kind":"move","line":500,"user":{"side":"near","index":0},"move":"Focus Blast","target":{"side":"far","index":0}}
+{"kind":"damage","line":502,"who":{"side":"far","index":0},"hp":{"hp":11,"max":100},"status":"tox","effectiveness":"super","folded":[501]}
+{"kind":"move","line":503,"user":{"side":"far","index":0},"move":"Facade","target":{"side":"near","index":0}}
+{"kind":"damage","line":504,"who":{"side":"near","index":0},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":505,"who":{"side":"near","index":0}}
+{"line":506,"text":"|","reason":"spacer"}
+{"kind":"heal","line":507,"who":{"side":"far","index":0},"hp":{"hp":23,"max":100},"status":"tox","cause":{"name":"Poison Heal","kind":"ability"}}
+{"line":508,"text":"|upkeep","reason":"upkeep"}
+{"line":509,"text":"|","reason":"spacer"}
+{"line":510,"text":"|t:|1762697657","reason":"timestamp"}
+{"kind":"switchIn","line":511,"who":{"side":"near","index":3},"dragged":false,"hp":{"hp":95,"max":100},"status":"tox"}
+{"kind":"damage","line":512,"who":{"side":"near","index":3},"hp":{"hp":82,"max":100},"status":"tox","cause":{"name":"Stealth Rock"}}
+{"kind":"turn","line":513,"number":42}
+{"line":514,"text":"|inactive|Setsu has 270 seconds left.","reason":"timer"}
+{"line":515,"text":"|inactive|badcluelesswashed has 270 seconds left.","reason":"timer"}
+{"line":516,"text":"|inactive|Setsu has 240 seconds left.","reason":"timer"}
+{"line":517,"text":"|inactive|Setsu has 210 seconds left.","reason":"timer"}
+{"line":518,"text":"|inactive|Setsu has 180 seconds left.","reason":"timer"}
+{"line":519,"text":"|inactive|Setsu has 150 seconds left.","reason":"timer"}
+{"line":520,"text":"|","reason":"spacer"}
+{"line":521,"text":"|t:|1762697798","reason":"timestamp"}
+{"kind":"move","line":522,"user":{"side":"near","index":3},"move":"Earthquake","target":{"side":"far","index":0}}
+{"kind":"damage","line":523,"who":{"side":"far","index":0},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":524,"who":{"side":"far","index":0}}
+{"line":525,"text":"|","reason":"spacer"}
+{"kind":"heal","line":526,"who":{"side":"near","index":3},"hp":{"hp":95,"max":100},"status":"tox","cause":{"name":"Poison Heal","kind":"ability"}}
+{"line":527,"text":"|upkeep","reason":"upkeep"}
+{"line":528,"text":"|","reason":"spacer"}
+{"line":529,"text":"|t:|1762697806","reason":"timestamp"}
+{"kind":"switchIn","line":530,"who":{"side":"far","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"turn","line":531,"number":43}
+{"line":532,"text":"|inactive|Setsu has 150 seconds left.","reason":"timer"}
+{"line":533,"text":"|","reason":"spacer"}
+{"line":534,"text":"|t:|1762697827","reason":"timestamp"}
+{"kind":"move","line":535,"user":{"side":"near","index":3},"move":"Swords Dance","target":{"side":"near","index":3}}
+{"kind":"statChange","line":536,"who":{"side":"near","index":3},"stat":"atk","stages":2}
+{"kind":"move","line":537,"user":{"side":"far","index":2},"move":"Make It Rain","target":{"side":"near","index":3}}
+{"kind":"damage","line":538,"who":{"side":"near","index":3},"hp":{"hp":17,"max":100},"status":"tox"}
+{"kind":"statChange","line":539,"who":{"side":"far","index":2},"stat":"spa","stages":-1}
+{"line":540,"text":"|","reason":"spacer"}
+{"kind":"heal","line":541,"who":{"side":"near","index":3},"hp":{"hp":29,"max":100},"status":"tox","cause":{"name":"Poison Heal","kind":"ability"}}
+{"line":542,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":543,"number":44}
+{"line":544,"text":"|","reason":"spacer"}
+{"line":545,"text":"|t:|1762697836","reason":"timestamp"}
+{"kind":"move","line":546,"user":{"side":"near","index":3},"move":"Protect","target":{"side":"near","index":3}}
+{"kind":"singleTurn","line":547,"who":{"side":"near","index":3},"effect":{"name":"Protect"}}
+{"kind":"move","line":548,"user":{"side":"far","index":2},"move":"Make It Rain","target":{"side":"near","index":3}}
+{"kind":"block","line":549,"who":{"side":"near","index":3},"effect":{"name":"Protect","kind":"move"}}
+{"line":550,"text":"|","reason":"spacer"}
+{"kind":"heal","line":551,"who":{"side":"near","index":3},"hp":{"hp":42,"max":100},"status":"tox","cause":{"name":"Poison Heal","kind":"ability"}}
+{"line":552,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":553,"number":45}
+{"line":554,"text":"|inactive|Setsu has 150 seconds left.","reason":"timer"}
+{"line":555,"text":"|","reason":"spacer"}
+{"line":556,"text":"|t:|1762697856","reason":"timestamp"}
+{"kind":"move","line":557,"user":{"side":"near","index":3},"move":"Earthquake","target":{"side":"far","index":2}}
+{"kind":"damage","line":559,"who":{"side":"far","index":2},"hp":{"hp":0,"max":100},"effectiveness":"super","folded":[558]}
+{"kind":"faint","line":560,"who":{"side":"far","index":2}}
+{"line":561,"text":"|","reason":"spacer"}
+{"kind":"heal","line":562,"who":{"side":"near","index":3},"hp":{"hp":54,"max":100},"status":"tox","cause":{"name":"Poison Heal","kind":"ability"}}
+{"line":563,"text":"|upkeep","reason":"upkeep"}
+{"line":564,"text":"|","reason":"spacer"}
+{"line":565,"text":"|t:|1762697858","reason":"timestamp"}
+{"kind":"switchIn","line":566,"who":{"side":"far","index":4},"dragged":false,"hp":{"hp":27,"max":100}}
+{"kind":"turn","line":567,"number":46}
+{"line":568,"text":"|","reason":"spacer"}
+{"line":569,"text":"|t:|1762697862","reason":"timestamp"}
+{"kind":"move","line":570,"user":{"side":"near","index":3},"move":"Protect","target":{"side":"near","index":3}}
+{"kind":"singleTurn","line":571,"who":{"side":"near","index":3},"effect":{"name":"Protect"}}
+{"kind":"move","line":572,"user":{"side":"far","index":4},"move":"Draco Meteor","target":{"side":"near","index":3}}
+{"kind":"block","line":573,"who":{"side":"near","index":3},"effect":{"name":"Protect","kind":"move"}}
+{"line":574,"text":"|","reason":"spacer"}
+{"kind":"heal","line":575,"who":{"side":"near","index":3},"hp":{"hp":67,"max":100},"status":"tox","cause":{"name":"Poison Heal","kind":"ability"}}
+{"line":576,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":577,"number":47}
+{"line":578,"text":"|inactive|Setsu has 150 seconds left.","reason":"timer"}
+{"line":579,"text":"|","reason":"spacer"}
+{"line":580,"text":"|t:|1762697887","reason":"timestamp"}
+{"kind":"terastallize","line":581,"who":{"side":"near","index":3},"type":"Fairy"}
+{"kind":"move","line":582,"user":{"side":"far","index":4},"move":"Draco Meteor","target":{"side":"near","index":3}}
+{"kind":"immune","line":583,"who":{"side":"near","index":3}}
+{"kind":"move","line":584,"user":{"side":"near","index":3},"move":"Earthquake","target":{"side":"far","index":4}}
+{"kind":"damage","line":585,"who":{"side":"far","index":4},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":586,"who":{"side":"far","index":4}}
+{"kind":"effectEnd","line":587,"who":{"side":"far","index":4},"effect":{"name":"Protosynthesis"},"silent":true}
+{"line":588,"text":"|","reason":"spacer"}
+{"kind":"win","line":589,"side":"near","name":"Setsu"}
+{"line":590,"text":"|player|p2|","reason":"room"}
+{"line":591,"text":"|c|☆Setsu|gg","reason":"chat"}

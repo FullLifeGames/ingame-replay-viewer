@@ -113,9 +113,30 @@ function textOnly(prefix: Prefix, name: string, kind: FallbackKind, shows: strin
   return { number: 0, name, fallback: { kind, detail: `${missing(prefix, name)}; ${shows}` } }
 }
 
+/** Whether `constant` holds the words of `form` as whole parts: TEAL in `…_TEAL_MASK`. */
+const holdsForm = (constant: string, form: string) =>
+  `${constant}_`.includes(`${constantOf('ABILITY', form).slice('ABILITY'.length)}_`)
+
+/**
+ * The ability whose display name is `name` without its parentheses, for the forms the expansion
+ * keeps as constants of their own under one name: `Embody Aspect (Teal)` is
+ * `ABILITY_EMBODY_ASPECT_TEAL_MASK`, and the log's bare `As One` is one of `ABILITY_AS_ONE_*`. The
+ * words in parentheses pick the constant that holds them; where none does, the lower number.
+ */
+function sharedName(name: string): Found | undefined {
+  const [, shown = name, form] = /^(.+?) \((.+)\)$/.exec(name) ?? []
+  const rows = [...TABLES.ABILITY].filter(([, row]) => row.name === shown)
+  const formed = rows.filter(([constant]) => form !== undefined && holdsForm(constant, form))
+  const numbers = (formed.length > 0 ? formed : rows).map(([, row]) => row.number)
+  const [lowest] = numbers.toSorted((a, b) => a - b)
+  return lowest === undefined ? undefined : { number: lowest, name: shown }
+}
+
 export function abilityOf(name: string): Found {
   const known = Dex.abilities.get(name)
-  return textOnly('ABILITY', known.exists ? known.name : name, 'ability', 'text without a pop-up')
+  const real = known.exists ? known.name : name
+  const shows = 'text without a pop-up'
+  return rowOf('ABILITY', real) ?? sharedName(real) ?? textOnly('ABILITY', real, 'ability', shows)
 }
 
 export function itemOf(name: string): Found {

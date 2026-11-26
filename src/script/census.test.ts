@@ -55,8 +55,13 @@ describe('the kind census', () => {
 
   it('groups a kind that only Gen 4 and later log apart from the refused formats (#86)', () => {
     expect(NAMED_KINDS['|-fieldstart|']?.group).toBe('newer generation')
-    expect(NAMED_KINDS['|-terastallize|']?.group).toBe('newer generation')
+    expect(NAMED_KINDS['|-candynamax|']?.group).toBe('newer generation')
     expect(NAMED_KINDS['|swap|']?.group).toBe('refused format')
+  })
+
+  it('gives Terastallization a rule and takes it off the named list (#88)', () => {
+    expect(ruleFor('|-terastallize|')).toBeDefined()
+    expect(NAMED_KINDS['|-terastallize|']).toBeUndefined()
   })
 
   it('gives every named kind a reason', () => {
