@@ -21,11 +21,10 @@ import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import type { Gen5Global, MarkRecord, RunPlan, RunReport } from '../src/gen5/hook.ts'
 import { MAIN_RAM_SIZE, MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import type { RamRef } from '../src/gen5/ram-check.ts'
-import type { MacroStep } from '../src/gen5/macro.ts'
-import type { MemoryWrite } from '../src/gen5/ram-write.ts'
 import type { RoutineBuild } from '../src/gen5/routine-order.ts'
 import { type MomentOptions, readMomentOptions, type StateFile } from './gen5-moment-args.ts'
 import { sessionPlans } from './gen5-moment-direct.ts'
+import { markLines, writeLines } from './gen5-moment-log.ts'
 import { momentSteps } from './gen5-moment-plan.ts'
 import { listedReader } from './gen5-bw2-source.ts'
 import {
@@ -43,20 +42,6 @@ import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve } from './gen5-shot.ts'
 
 const POLL_MS = 1000
 const hex = (value: number) => `0x${value.toString(16)}`
-
-/** One write for the build machine's log: its field, its fixed address and what it writes. */
-function writeText(write: MemoryWrite): string {
-  if (write.kind === 'copy') return `${write.field} copy of ${String(write.length)} bytes`
-  const at = `${write.field} @${hex(write.address)}${write.hops ? ` hops ${write.hops.map(hex).join(' ')}` : ''}`
-  if (write.kind === 'bits') return `${at} bits ${hex(write.mask)}=${String(write.value)}`
-  return `${at} ${write.bytes.map((b) => b.toString(16).padStart(2, '0')).join(' ')}`
-}
-function logWrites(steps: readonly MacroStep[]): void {
-  for (const step of steps) {
-    if (step.kind === 'write')
-      for (const w of step.writes) log(`step write ${step.name}: ${writeText(w)}`)
-  }
-}
 
 /** The page's hook; spelled out in each evaluate, since those run in the page, not here. */
 const hook = (page: Page) => ({
@@ -209,7 +194,7 @@ async function startSession(page: Page, dump: string, numbers: Bw2Numbers, optio
   const from = start.from === 'boot' ? `boot with the save ${start.save}` : `state ${start.state}`
   const counts = plans.map((plan) => String(plan.steps.length)).join(' + ')
   log(`entry ${options.entry}: ${counts} steps from ${from}`)
-  for (const plan of plans) logWrites(plan.steps)
+  for (const line of plans.flatMap((plan) => writeLines(plan.steps))) log(line)
   const [first, ...rest] = plans
   if (first === undefined) throw new Error('the session has no plan')
   if (fromBoot) await hook(page).queueRun(first)
@@ -251,7 +236,7 @@ async function play(page: Page, dump: string, numbers: Bw2Numbers, options: Mome
     adapter: battle.adapter,
     blocks,
   })
-  logWrites(steps)
+  for (const line of writeLines(steps)) log(line)
   const second: RunPlan = {
     steps,
     startFrame: 0,
@@ -261,6 +246,7 @@ async function play(page: Page, dump: string, numbers: Bw2Numbers, options: Mome
   await hook(page).queueRun(second)
   const report = await follow(page, label, deadlineMs, first.marks.length)
   logReport(report)
+  for (const line of markLines(report.marks)) log(line)
   return report.status === 'done' ? 0 : 1
 }
 
