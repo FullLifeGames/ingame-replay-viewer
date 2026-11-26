@@ -13,6 +13,7 @@ import {
   pickedLine,
   progressLine,
   READY_LINE,
+  replayDetail,
   replaySummaryLine,
   restartLine,
   rowText,
@@ -42,13 +43,11 @@ describe('the status lines', () => {
     })
   })
 
-  // The running ROM holds the stream, so the patched ROM's SHA1 (the dump line's) is not its own.
-  // mGBA gives the page no memory read, so the line holds before END and after it (#90).
-  it('says it started the replay, with its stream in bytes under "Details" and no SHA1', () => {
-    expect(startLine({ label: LABEL, streamBytes: 8346 })).toEqual({
-      line: `Started ${LABEL}.`,
-      detail: '8346 bytes of instruction stream.',
-    })
+  // The running ROM holds the stream, so the patched ROM's SHA1 (the dump line's) is not its own,
+  // and the pick's counts under "Details" give its bytes. mGBA gives the page no memory read, so
+  // the line holds before END and after it (#90).
+  it('says it started the replay, with no detail of its own', () => {
+    expect(startLine(LABEL)).toBe(`Started ${LABEL}.`)
   })
 
   // A new pick or a Load changes nothing in the running game until the next Start.
@@ -57,7 +56,7 @@ describe('the status lines', () => {
   })
 
   it('writes large byte counts without separators, as the specs and the snapshot do', () => {
-    expect(startLine({ label: LABEL, streamBytes: 30914 }).detail).toContain('30914 bytes')
+    expect(replayDetail({ instructions: 1, streamBytes: 30914 })).toContain('30914 bytes')
   })
 
   // The game reaches END at the win or tie line; the outro after it belongs to no battle line.
@@ -259,7 +258,7 @@ describe('the status lines a visitor reads', () => {
     ['checking', () => CHECKING_LINE],
     ['patched', () => lineOf(dumpLine({ romSha1: ROM_SHA1 }))],
     ['starting', () => STARTING_LINE],
-    ['running on the emulator page', () => lineOf(startLine({ label: LABEL, streamBytes: 8346 }))],
+    ['running on the emulator page', () => startLine(LABEL)],
     ['building', () => BUILDING_LINE],
     ['built', () => BUILT_LINE],
     ['running in the viewer', () => lineOf(runningLine({ label: LABEL }, { silence: NO_WORKLET }))],

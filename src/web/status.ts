@@ -6,7 +6,7 @@
 import type { Side } from '../script/types'
 import { plainText } from './markup'
 import type { ReplaySummary } from './replay-choice'
-import type { DumpSummary, StartSummary } from './session'
+import type { DumpSummary } from './session'
 import type { NotShownCount, NotShownRow } from './stream'
 import { soundLine } from './wasm/audio'
 import type { Silence } from './wasm/audio-opener'
@@ -35,15 +35,10 @@ const streamText = (bytes: number): string => `${String(bytes)} bytes of instruc
 
 /**
  * Once the emulator page started a replay. mGBA gives the page no memory read, so it cannot tell
- * END: the line holds over the game and over the black screen after its outro (#90).
+ * END: the line holds over the game and over the black screen after its outro (#90). It carries
+ * no detail: the pick's counts under "Details" already give the stream's bytes (replayDetail).
  */
-export const startLine = ({
-  label,
-  streamBytes,
-}: Pick<StartSummary, 'label' | 'streamBytes'>): StatusLine => ({
-  line: `Started ${label}.`,
-  detail: `${streamText(streamBytes)}.`,
-})
+export const startLine = (label: string): string => `Started ${label}.`
 
 /** The viewer's lines while it builds the game from the dump, and once it did. */
 export const BUILDING_LINE = 'Checking your dump and building the game. This takes a few seconds.'

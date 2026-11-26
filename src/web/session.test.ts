@@ -54,7 +54,6 @@ describe('the full flow', () => {
     expect(await session.start()).toEqual({
       id: 'smogtours-gen3ou-994052',
       label: 'Gen 3 OU: A Welcome Guest vs xXEricXx (994052)',
-      streamBytes: STREAM_994052.length,
     })
     expect(runs).toHaveLength(1)
     const [run = new Uint8Array()] = runs

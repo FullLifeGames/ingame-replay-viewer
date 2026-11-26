@@ -159,8 +159,10 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
   await expect(page.getByLabel('Example replay')).toHaveValue(FIRST)
   await page.getByRole('button', { name: 'Start', exact: true }).click()
   await expect(status).toHaveText(`Started ${FIRST_LABEL}.`, { timeout: 60_000 })
-  await expect(page.locator('#status-detail')).toHaveText(
-    `${String(streamBytes)} bytes of instruction stream.`,
+  // The stream's bytes show once under "Details": in the pick's counts, not in the line's detail.
+  await expect(page.locator('#status-detail')).toHaveText('')
+  await expect(page.locator('#replay-detail')).toHaveText(
+    new RegExp(`^\\d+ instructions, ${String(streamBytes)} bytes of instruction stream\\.$`),
   )
   expect(await notShownCount(page)).toBeGreaterThan(0)
   // 240×160 scaled three times; mGBA sets the canvas's own size, the page's CSS its shown size.
@@ -176,6 +178,7 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
   await test.step('frames change after Restart', async () => {
     await page.getByRole('button', { name: 'Restart' }).click()
     await expect(status).toHaveText(`Restarted ${FIRST_LABEL} from the beginning.`)
+    await expect(page.locator('#status-detail')).toHaveText('')
     await expect.poll(async () => differ(later, await frame(page)), { timeout: 30_000 }).toBe(true)
   })
 

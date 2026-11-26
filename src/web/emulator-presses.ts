@@ -39,7 +39,7 @@ export function emulatorPresses(
           view.start.disabled = false
         })
         running = started.label
-        view.status(say.startLine(started))
+        view.status(say.startLine(started.label))
         view.restart.disabled = false
       })
     },
