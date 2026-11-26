@@ -25,7 +25,12 @@ const scene = (name: string, done: number, frames: number): Scene => ({
   check: { probe: 'text', shot: name, region: { x: 0, y: 0, width: 1, height: 1 } },
 })
 
-describe('playing a stream in the module', () => {
+// Each case plays the fake module for hundreds to thousands of frames, about 1 s alone. The first
+// took over 5.5 s in a full check while a second heavy run loaded the machine (#92); the limit is
+// twice that or more.
+const PLAY_LIMIT = 15_000
+
+describe('playing a stream in the module', { timeout: PLAY_LIMIT }, () => {
   it('writes the stream into the slot with its length at +0x10 before AgbMain runs', async () => {
     const fake = fakeModule((frame) => ({ progress: playing(frame < 5 ? 0 : 34), colour: 0 }))
     const stream = Uint8Array.from([1, 0, 0x22, 7, 9])
