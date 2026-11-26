@@ -1,6 +1,9 @@
 // An invented direct entry (#97) for the specs of its plan: every address, offset, size and
-// constant here is made up for them, none comes from pokebw2, and the layouts hold only the
-// members the plan reads.
+// constant here is made up for them. The functions, data, constants, structs and members carry
+// pokebw2's names, since the plan looks them up by name, and the layouts hold only the members the
+// plan reads, in an order of their own. scripts/gen5-fixtures-real.test.ts holds that no number
+// here equals the one that build/gen5/bw2.json generates under the same name. The routine's build
+// is ours, not pokebw2's.
 import type { Bw2Symbol, EntryNumbers, StructLayout } from './bw2-numbers.ts'
 import type { RoutineBuild } from './routine-order.ts'
 import { ORDER_MEMBERS } from './routine-order.ts'
@@ -15,7 +18,7 @@ const data = (name: string, address: number, module = 'arm9'): Bw2Symbol => ({
 const word = (offset: number) => ({ offset, size: 4 })
 const layout = (size: number, fields: StructLayout['fields']): StructLayout => ({
   size,
-  align: 4,
+  align: 8,
   fields,
 })
 
@@ -40,21 +43,21 @@ export const ENTRY: EntryNumbers = {
   constants: {
     HEAPID_USER: 7,
     OVERLAY_BATTLE_MAIN: 99,
-    OVERLAY_NONE: -1,
+    OVERLAY_NONE: -3,
     SND_CHANNEL_MASK_ALL: 0x7fff,
     TRAINER_CLASS_YOUNGSTER: 0x21,
     CONFIG_TEXT_SPEED_FAST: 3,
     CHAR_EOM: 0xfffe,
   },
   layouts: {
-    GameProcManager: layout(0x20, {
-      queued: word(0x0c),
-      nextOverlayId: word(0x14),
-      nextFunctions: word(0x18),
-      nextParam: word(0x1c),
+    GameProcManager: layout(0x2c, {
+      queued: word(0x08),
+      nextFunctions: word(0x10),
+      nextOverlayId: word(0x20),
+      nextParam: word(0x24),
     }),
     BtlSetup: layout(0x100, {
-      battleStyle: word(4),
+      battleStyle: word(0x0c),
       'fieldSituation.bgm': { offset: 0x0a, size: 2 },
       party: { offset: 0x20, size: 16 },
       playerInfo: { offset: 0x30, size: 16 },
@@ -62,21 +65,21 @@ export const ENTRY: EntryNumbers = {
       gameData: word(0x64),
       config: word(0x68),
     }),
-    BtlSetupTrainer: layout(0x30, { trainerClass: word(4), name: word(0x14) }),
-    StrBuf: layout(12, {
-      size: { offset: 0, size: 2 },
-      length: { offset: 2, size: 2 },
-      magic: word(4),
-      chars: { offset: 8, size: 2 },
+    BtlSetupTrainer: layout(0x30, { name: word(0x08), trainerClass: word(0x10) }),
+    StrBuf: layout(16, {
+      magic: word(0),
+      length: { offset: 4, size: 2 },
+      size: { offset: 6, size: 2 },
+      chars: { offset: 10, size: 2 },
     }),
     PokeParty: layout(0x260, {
-      capacity: word(0),
-      count: word(4),
-      pkms: { offset: 8, size: 0x240 },
-      slotExists: { offset: 0x248, size: 1 },
+      count: word(0),
+      capacity: word(8),
+      pkms: { offset: 0x10, size: 0x240 },
+      slotExists: { offset: 0x250, size: 1 },
     }),
-    PlayerInfo: layout(0x20, { name: { offset: 0, size: 12 }, gender: { offset: 0x1d, size: 1 } }),
-    Config: layout(4, { textSpeed: { offset: 0, size: 2, bit: 2, bits: 3 } }),
+    PlayerInfo: layout(0x24, { name: { offset: 0, size: 12 }, gender: { offset: 0x1a, size: 1 } }),
+    Config: layout(6, { textSpeed: { offset: 0, size: 2, bit: 2, bits: 3 } }),
     BtlFieldStatus: layout(0x0e, {}),
     PartyPkm: layout(0x60, {}),
   },

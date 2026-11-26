@@ -8,8 +8,8 @@ import { entryAddress, entryCall, entryConstant, entryField, entryLayout } from 
 // Scene: a plan never writes through a number the generator did not give; it names the gap.
 describe('the entry lookups', () => {
   it('give what the entry holds', () => {
-    expect(entryLayout(ENTRY, 'StrBuf').size).toBe(12)
-    expect(entryField(ENTRY, 'StrBuf', 'length')).toEqual({ offset: 2, size: 2 })
+    expect(entryLayout(ENTRY, 'StrBuf').size).toBe(16)
+    expect(entryField(ENTRY, 'StrBuf', 'length')).toEqual({ offset: 4, size: 2 })
     expect(entryConstant(ENTRY, 'HEAPID_USER')).toBe(7)
     expect(entryAddress(ENTRY, 'sGameProcManager')).toBe(0x02110000)
     expect(entryCall(ENTRY, 'GameData_Create')).toBe(0x02004201)

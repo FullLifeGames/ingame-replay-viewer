@@ -45,7 +45,7 @@ describe('takeover', () => {
       'manager.nextParam',
     ])
     expect(checks.every((check) => check.address === 0x02110000)).toBe(true)
-    expect(hops('manager.queued')).toEqual([0x0c])
+    expect(hops('manager.queued')).toEqual([0x08])
     expect(checks[0]?.noneOf).toEqual([0])
     expect(checks[1]?.oneOf).toEqual([0x02200000])
     expect(checks[2]?.oneOf).toEqual([0x02110010])
@@ -69,11 +69,11 @@ describe('takeover', () => {
     })
     expect(writes[3]).toMatchObject({
       address: 0x02110000,
-      hops: [0x14],
-      bytes: [255, 255, 255, 255],
+      hops: [0x20],
+      bytes: [0xfd, 0xff, 0xff, 0xff],
     })
-    expect(writes[4]).toMatchObject({ hops: [0x18], bytes: [0x24, 0, 0x30, 0x02] })
-    expect(writes[5]).toMatchObject({ hops: [0x1c], bytes: [0x30, 0, 0x30, 0x02] })
+    expect(writes[4]).toMatchObject({ hops: [0x10], bytes: [0x24, 0, 0x30, 0x02] })
+    expect(writes[5]).toMatchObject({ hops: [0x24], bytes: [0x30, 0, 0x30, 0x02] })
   })
 
   it("fills the block with stage, go, gameData and setup at 0 and the page's values", () => {
@@ -141,8 +141,8 @@ describe('takeover', () => {
 
   it("throws on a proc manager's next word that is no word", () => {
     const manager = ENTRY.layouts.GameProcManager
-    const fields = { ...manager?.fields, nextParam: { offset: 0x1c, size: 2 } }
-    const layouts = { ...ENTRY.layouts, GameProcManager: { size: 0x20, align: 4, fields } }
+    const fields = { ...manager?.fields, nextParam: { offset: 0x24, size: 2 } }
+    const layouts = { ...ENTRY.layouts, GameProcManager: { size: 0x2c, align: 8, fields } }
     expect(() => takeover({ ...ENTRY, layouts }, ROUTINE)).toThrow(
       "the proc manager's nextParam is no word",
     )
@@ -193,9 +193,9 @@ function play(
 describe('the takeover plan, played', () => {
   const boot = (memory: ReturnType<typeof ram>) => {
     memory.put(0x02110000, le(MANAGER))
-    memory.put(MANAGER + 0x0c, le(1))
-    memory.put(MANAGER + 0x18, le(0x02200000))
-    memory.put(MANAGER + 0x1c, le(0x02110010))
+    memory.put(MANAGER + 0x08, le(1))
+    memory.put(MANAGER + 0x10, le(0x02200000))
+    memory.put(MANAGER + 0x24, le(0x02110010))
   }
   const stageAt = BLOCK + orderOffset('stage')
 

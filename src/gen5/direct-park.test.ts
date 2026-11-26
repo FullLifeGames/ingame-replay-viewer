@@ -112,11 +112,14 @@ describe('park', () => {
     const of = (field: string) => writes.find((write) => write.field === field)
     expect(of('opponent.name')).toMatchObject({
       address: SETUP,
-      hops: [0x48, 0x14, 8],
+      hops: [0x48, 0x08, 10],
       bytes: [0x42, 0, 0x6f, 0, 0xfe, 0xff],
     })
-    expect(of('opponent.name length')).toMatchObject({ hops: [0x48, 0x14, 2], bytes: [2, 0] })
-    expect(of('opponent.trainerClass')).toMatchObject({ hops: [0x48, 4], bytes: [0x21, 0, 0, 0] })
+    expect(of('opponent.name length')).toMatchObject({ hops: [0x48, 0x08, 4], bytes: [2, 0] })
+    expect(of('opponent.trainerClass')).toMatchObject({
+      hops: [0x48, 0x10],
+      bytes: [0x21, 0, 0, 0],
+    })
     expect(of('player.name')).toMatchObject({
       hops: [0x30, 0],
       bytes: [0x41, 0, 0x6e, 0, 0x6e, 0, 0xfe, 0xff],
@@ -132,13 +135,13 @@ describe('park', () => {
     expect(of('opponent.party')).toEqual({
       kind: 'copy',
       field: 'opponent.party',
-      from: { address: SETUP, hops: [0x20, 8] },
-      to: { address: SETUP, hops: [0x24, 8] },
+      from: { address: SETUP, hops: [0x20, 0x10] },
+      to: { address: SETUP, hops: [0x24, 0x10] },
       length: 0x60,
     })
-    expect(of('opponent.party.count')).toMatchObject({ hops: [0x24, 4], bytes: [1, 0, 0, 0] })
+    expect(of('opponent.party.count')).toMatchObject({ hops: [0x24, 0], bytes: [1, 0, 0, 0] })
     expect(of('opponent.party.slotExists')).toMatchObject({
-      hops: [0x24, 0x248],
+      hops: [0x24, 0x250],
       mask: 1,
       value: 1,
     })
@@ -154,9 +157,9 @@ describe('park', () => {
       'player.party.count',
       'opponent.party.count',
     ])
-    expect(checks[1]).toMatchObject({ hops: [0x48, 0x14, 0], width: 2, oneOf: [9] })
-    expect(checks[2]).toMatchObject({ hops: [0x20, 4], noneOf: [0] })
-    expect(checks[3]).toMatchObject({ hops: [0x24, 4], oneOf: [0] })
+    expect(checks[1]).toMatchObject({ hops: [0x48, 0x08, 6], width: 2, oneOf: [9] })
+    expect(checks[2]).toMatchObject({ hops: [0x20, 0], noneOf: [0] })
+    expect(checks[3]).toMatchObject({ hops: [0x24, 0], oneOf: [0] })
   })
 
   it('cuts names past their room and gives the cuts for the log', () => {
@@ -169,8 +172,8 @@ describe('park', () => {
 
   it('throws on a text speed whose bits leave their byte', () => {
     const config = {
-      size: 4,
-      align: 4,
+      size: 6,
+      align: 8,
       fields: { textSpeed: { offset: 0, size: 2, bit: 6, bits: 4 } },
     }
     const entry = { ...ENTRY, layouts: { ...ENTRY.layouts, Config: config } }
@@ -179,13 +182,13 @@ describe('park', () => {
   it('throws on a text speed that is no bit-field, a count of no width and no name buffer size', () => {
     const layouts = (struct: string, fields: object) => ({
       ...ENTRY.layouts,
-      [struct]: { size: 0x260, align: 4, fields: { ...ENTRY.layouts[struct]?.fields, ...fields } },
+      [struct]: { size: 0x260, align: 8, fields: { ...ENTRY.layouts[struct]?.fields, ...fields } },
     })
     const speed = { ...ENTRY, layouts: layouts('Config', { textSpeed: { offset: 0, size: 2 } }) }
     expect(() => park(speed, boot, NAMES, BATTLE)).toThrow(
       'config.textSpeed is no bit-field in one byte',
     )
-    const count = { ...ENTRY, layouts: layouts('PokeParty', { count: { offset: 4, size: 3 } }) }
+    const count = { ...ENTRY, layouts: layouts('PokeParty', { count: { offset: 0, size: 3 } }) }
     expect(() => park(count, boot, NAMES, BATTLE)).toThrow('PokeParty.count fills no byte')
     const sizes = { ...ENTRY, bufferSizes: {} }
     expect(() => park(sizes, boot, NAMES, BATTLE)).toThrow("no size of the trainer's name buffer")
