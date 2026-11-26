@@ -16,17 +16,19 @@ import type { PokemonRef } from '../../script/types'
 import { mechanicGap } from '../fallbacks'
 import type { Anim, Volatile } from '../stream/instructions'
 import {
-  blocked,
   copiedStats,
   effectActivated,
   effectEnded,
   effectStarted,
-  singleMove as untilNextMove,
-  singleTurn as lastsTheTurn,
   transformed,
 } from '../text/phrases-effects'
 import { withdrawn } from '../text/phrases-field'
 import { itemEndedConfusion } from '../text/phrases-status'
+import {
+  blocked,
+  singleMove as untilNextMove,
+  singleTurn as lastsTheTurn,
+} from '../text/phrases-turn'
 import { type Context, type EventOf, type PrintText, sameMon } from './context'
 import { HIT_TURN, isFutureMove } from './anim-turn'
 import { hit, hitLines } from './hits'

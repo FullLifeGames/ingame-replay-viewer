@@ -10,6 +10,7 @@ import { FIELD_TEMPLATES } from '../src/gen3/text/phrases-field.ts'
 import { HP_TEMPLATES } from '../src/gen3/text/phrases-hp.ts'
 import { ITEM_TEMPLATES } from '../src/gen3/text/phrases-items.ts'
 import { CANT_TEMPLATES, STATUS_TEMPLATES } from '../src/gen3/text/phrases-status.ts'
+import { TURN_TEMPLATES } from '../src/gen3/text/phrases-turn.ts'
 import { MOVE_TEMPLATES, STAT_TEMPLATES } from '../src/gen3/text/phrases.ts'
 import { NAME_TEMPLATES } from '../src/gen3/text/names.ts'
 
@@ -49,6 +50,7 @@ export const TEMPLATE_GROUPS: Readonly<Record<string, Readonly<Record<string, An
   cant: CANT_TEMPLATES,
   field: FIELD_TEMPLATES,
   effects: EFFECT_TEMPLATES,
+  turns: TURN_TEMPLATES,
   items: ITEM_TEMPLATES,
   charge: CHARGE_TEMPLATES,
 }
@@ -126,6 +128,7 @@ export const SAMPLES: Readonly<Record<string, Sample>> = {
   'effects.disabled': withValue('B_BUFF1', nb('Body Slam'), FAR),
   'effects.transformed': withValue('B_BUFF1', 'Tyranitar', FAR),
   'effects.terastallized': withValue('B_BUFF1', 'Fairy', FAR),
+  'effects.changedType': withValue('B_BUFF1', 'Ice', FAR),
   'effects.tookAttack': withValue('B_BUFF1', nb('Future Sight'), FAR),
   'effects.copiedStats': { args: [FAR, NEAR], fill: { B_EFF_NAME_WITH_PREFIX2: 'Dugtrio' } },
   'effects.squeezed': { args: [FAR, NEAR], fill: { B_SCR_NAME_WITH_PREFIX2: 'Dugtrio' } },
