@@ -118,55 +118,74 @@ describe('weather', () => {
   })
 })
 
-// The expansion says snow in its own words (`STRINGID_STARTEDSNOW`, `STRINGID_SNOWCONTINUES`,
-// `STRINGID_SNOWSTOPPED`), but the stream holds no snow: its start clears the weather the stream
-// holds (D12), and its start and each turn list the look the stream lacks.
-describe('snow (#88)', () => {
+// The expansion's own snow (`B_WEATHER_SNOW`), with its own words (`STRINGID_STARTEDSNOW`,
+// `STRINGID_SNOWCONTINUES`, `STRINGID_SNOWSTOPPED`) and its animation of each turn
+// (`B_ANIM_SNOW_CONTINUES`): the stream holds it since version 4 (#89).
+describe('snow (#89)', () => {
   const snowWarning = '|-weather|Snowscape|[from] ability: Snow Warning|[of] p2a: Tyranitar'
   const gapsOf = (...lines: string[]) =>
     streamOfLog(...lines)
       .fallbacks.filter(({ line }) => line >= NEXT)
       .map(({ kind, detail }) => ({ kind, detail }))
 
-  it('clears the weather, then says the snow Snow Warning starts inside its pop-up', () => {
+  it('sets the snow Snow Warning starts, says it and plays it inside the pop-up', () => {
     expect(sceneOf(snowWarning).map(plain)).toEqual([
       popUp('Snow Warning', true),
-      { op: 'weather', weather: 'none' },
+      { op: 'weather', weather: 'snow' },
       'It started to snow!',
+      { op: 'anim', side: 'near', anim: 'snowContinues' },
       popUp('Snow Warning', false),
     ])
-    expect(gapsOf(snowWarning)).toEqual([mechanicGap('Snow', 'starting')])
+    expect(gapsOf(snowWarning)).toEqual([])
   })
 
-  it('says the snow of each turn and lists its look', () => {
+  it('sets the snow Snowscape starts, then says it, as the move carries its look', () => {
+    const lines = ['|move|p1a: Dugtrio|Snowscape|p1a: Dugtrio', '|-weather|Snowscape']
+    expect(sceneOf(...lines).map(plain)).toEqual([
+      'Dugtrio used Snowscape!',
+      { op: 'move', user: 'near', target: 'near', move: moveOf('Snowscape').number, animTurn: 0 },
+      { op: 'weather', weather: 'snow' },
+      'It started to snow!',
+    ])
+    expect(gapsOf(...lines)).toEqual([])
+  })
+
+  it('says the snow of each turn, then plays it', () => {
     const lines = [snowWarning, '|-weather|Snowscape|[upkeep]']
     expect(
       sceneOf(...lines)
-        .slice(4)
+        .slice(5)
         .map(plain),
-    ).toEqual(['Snow continues to fall.'])
-    expect(gapsOf(...lines)).toEqual([
-      mechanicGap('Snow', 'starting'),
-      mechanicGap('Snow', 'continuing'),
-    ])
+    ).toEqual(['Snow continues to fall.', { op: 'anim', side: 'near', anim: 'snowContinues' }])
+    expect(gapsOf(...lines)).toEqual([])
   })
 
-  it('says the snow stopped and lists nothing for it', () => {
+  it('clears the snow as it ends, then says so', () => {
     const lines = [snowWarning, '|-weather|none']
     expect(
       sceneOf(...lines)
-        .slice(4)
+        .slice(5)
         .map(plain),
-    ).toEqual(['The snow stopped.'])
-    expect(gapsOf(...lines)).toEqual([mechanicGap('Snow', 'starting')])
+    ).toEqual([{ op: 'weather', weather: 'none' }, 'The snow stopped.'])
+    expect(gapsOf(...lines)).toEqual([])
   })
+})
 
-  it('clears the rain that the snow replaces', () => {
-    expect(sceneOf('|-weather|RainDance', snowWarning).slice(2).map(plain)).toEqual([
-      popUp('Snow Warning', true),
+// A weather the stream lacks (Gen 6's and 7's Strong Winds, Harsh Sunshine and Heavy Rain) clears
+// the stream's weather as it starts, so the game forgets the rain it replaced (D12), and its
+// start lists the look the stream lacks.
+describe('a weather the stream lacks', () => {
+  const strongWinds = '|-weather|DeltaStream|[from] ability: Delta Stream|[of] p2a: Tyranitar'
+
+  it('clears the rain that it replaces and lists its look', () => {
+    const scene = sceneOf('|-weather|RainDance', strongWinds)
+    expect(scene.slice(2).map(plain).slice(0, 2)).toEqual([
+      { op: 'ability', side: 'far', ability: abilityOf('Delta Stream').number, show: true },
       { op: 'weather', weather: 'none' },
-      'It started to snow!',
-      popUp('Snow Warning', false),
+    ])
+    const gaps = streamOfLog('|-weather|RainDance', strongWinds).fallbacks
+    expect(gaps.filter(({ kind }) => kind === 'mechanic').map(({ detail }) => detail)).toEqual([
+      mechanicGap('Strong Winds', 'starting').detail,
     ])
   })
 })

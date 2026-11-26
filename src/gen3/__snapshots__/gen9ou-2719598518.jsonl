@@ -1,4 +1,4 @@
-{"length":7590,"crc32":"0c0c2d85","trainers":{"near":{"name":"hat_fm","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Snurke","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":889,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zamazenta"},{"species":491,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Darkrai"},{"species":594,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Alomomola"},{"species":815,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Cinderace"},{"species":962,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ninetales"},{"species":1294,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skeledirge"}],"far":[{"species":1376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Great Tusk"},{"species":1393,"maxHp":100,"level":100,"gender":"none","shiny":true,"nickname":"Luka Magic"},{"species":1412,"maxHp":100,"level":100,"gender":"none","shiny":true,"nickname":"Sinistcha"},{"species":730,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Primarina"},{"species":1371,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Clodsire"},{"species":663,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Talonflame"}]}}
+{"length":7613,"crc32":"21aa633d","trainers":{"near":{"name":"hat_fm","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Snurke","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":889,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zamazenta"},{"species":491,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Darkrai"},{"species":594,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Alomomola"},{"species":815,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Cinderace"},{"species":962,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ninetales"},{"species":1294,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skeledirge"}],"far":[{"species":1376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Great Tusk"},{"species":1393,"maxHp":100,"level":100,"gender":"none","shiny":true,"nickname":"Luka Magic"},{"species":1412,"maxHp":100,"level":100,"gender":"none","shiny":true,"nickname":"Sinistcha"},{"species":730,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Primarina"},{"species":1371,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Clodsire"},{"species":663,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Talonflame"}]}}
 {"line":39,"op":"intro"}
 {"line":39,"op":"print","text":"You are challenged by Snurke!"}
 {"line":41,"op":"print","text":"Snurke sent out Talonflame!"}
@@ -25,14 +25,16 @@
 {"line":59,"op":"print","text":"Go! Ninetales!"}
 {"line":59,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
 {"line":60,"op":"ability","side":"near","ability":117,"show":true}
-{"line":60,"op":"weather","weather":"none"}
+{"line":60,"op":"weather","weather":"snow"}
 {"line":60,"op":"print","text":"It started to snow!"}
+{"line":60,"op":"anim","side":"near","anim":"snowContinues"}
 {"line":60,"op":"ability","side":"near","ability":117,"show":false}
 {"line":61,"op":"print","text":"The opposing Primarina used Moonblast!"}
 {"line":61,"op":"move","user":"far","target":"near","move":585,"animTurn":0}
 {"line":62,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":62,"op":"hp","side":"near","hp":26}
 {"line":64,"op":"print","text":"Snow continues to fall."}
+{"line":64,"op":"anim","side":"near","anim":"snowContinues"}
 {"line":66,"op":"turn","number":3}
 {"line":69,"op":"print","text":"Ninetales used Aurora Veil!"}
 {"line":69,"op":"move","user":"near","target":"near","move":657,"animTurn":0}
@@ -44,6 +46,7 @@
 {"line":73,"op":"faint","side":"near"}
 {"line":73,"op":"print","text":"Ninetales fainted!"}
 {"line":75,"op":"print","text":"Snow continues to fall."}
+{"line":75,"op":"anim","side":"far","anim":"snowContinues"}
 {"line":79,"op":"print","text":"Go! Darkrai!"}
 {"line":79,"op":"switchIn","side":"near","slot":1,"hp":44,"status":"none"}
 {"line":80,"op":"turn","number":4}
@@ -59,6 +62,7 @@
 {"line":87,"op":"item","side":"near","slot":1,"item":472}
 {"line":87,"op":"print","text":"Darkrai obtained Leftovers."}
 {"line":89,"op":"print","text":"Snow continues to fall."}
+{"line":89,"op":"anim","side":"near","anim":"snowContinues"}
 {"line":90,"op":"itemPopUp","side":"near","item":472}
 {"line":90,"op":"anim","side":"near","anim":"heldItemEffect"}
 {"line":90,"op":"anim","side":"near","anim":"simpleHeal"}
@@ -74,6 +78,7 @@
 {"line":99,"op":"hit","side":"near","effectiveness":"normal"}
 {"line":99,"op":"hp","side":"near","hp":37}
 {"line":101,"op":"print","text":"Snow continues to fall."}
+{"line":101,"op":"anim","side":"near","anim":"snowContinues"}
 {"line":102,"op":"itemPopUp","side":"near","item":472}
 {"line":102,"op":"anim","side":"near","anim":"heldItemEffect"}
 {"line":102,"op":"anim","side":"near","anim":"simpleHeal"}
@@ -88,6 +93,7 @@
 {"line":110,"op":"hit","side":"far","effectiveness":"resisted"}
 {"line":110,"op":"hp","side":"far","hp":83}
 {"line":110,"op":"print","text":"It's not very effective…"}
+{"line":112,"op":"weather","weather":"none"}
 {"line":112,"op":"print","text":"The snow stopped."}
 {"line":113,"op":"itemPopUp","side":"near","item":472}
 {"line":113,"op":"anim","side":"near","anim":"heldItemEffect"}
@@ -503,10 +509,5 @@
 {"line":463,"op":"print","text":"Cinderace fainted!"}
 {"line":465,"op":"print","text":"Snurke won the battle!"}
 {"line":465,"op":"end","outcome":"farWon"}
-{"line":60,"fallback":"mechanic","detail":"no state in the stream for Snow starting"}
-{"line":64,"fallback":"mechanic","detail":"no state in the stream for Snow continuing"}
-{"line":75,"fallback":"mechanic","detail":"no state in the stream for Snow continuing"}
-{"line":89,"fallback":"mechanic","detail":"no state in the stream for Snow continuing"}
-{"line":101,"fallback":"mechanic","detail":"no state in the stream for Snow continuing"}
 {"line":118,"fallback":"mechanic","detail":"no state in the stream for Terastallization starting"}
 {"line":255,"fallback":"mechanic","detail":"no state in the stream for Terastallization starting"}

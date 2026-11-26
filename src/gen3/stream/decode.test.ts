@@ -57,6 +57,15 @@ describe('decodeStream', () => {
     }
   })
 
+  it('reads back the snow and its animation of each turn, which version 3 lacked', () => {
+    const snow = streamOf([
+      { op: 'weather', weather: 'snow' },
+      { op: 'anim', side: 'far', anim: 'snowContinues' },
+      END,
+    ])
+    expect(decodeStream(encodeStream(snow))).toEqual(snow)
+  })
+
   it('refuses a MOVE of size 4, as version 2 wrote it, and reads its animation turn', () => {
     const tables = encodeStream(streamWithLeads([END]))
     const end = tables.length - encodeInstruction(END).length

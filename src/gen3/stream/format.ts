@@ -147,7 +147,7 @@ export const STATUS = {
   tox: 6,
 } as const satisfies Record<StatusName | 'none', number>
 
-export const WEATHER = { none: 0, rain: 1, sun: 2, sand: 3, hail: 4 } as const
+export const WEATHER = { none: 0, rain: 1, sun: 2, sand: 3, hail: 4, snow: 5 } as const
 
 /** The order of the expansion's `enum Stat`, which starts with STAT_HP = 0. */
 export const STAT = {
@@ -186,12 +186,13 @@ export const ANIM = {
   statusPrz: 15,
   statusFrz: 16,
   simpleHeal: 17,
+  snowContinues: 18,
 } as const
 
 /**
  * The masks of the order rules, as bits by OP and ANIM number: the ops whose side operands name a
  * side with a battler out (WITHDRAW, MOVE, HIT, HP, FAINT, STAT, ANIM, VOLATILE, ABILITY,
- * ITEM_POP_UP, TRAP_TURN, FORM_CHANGE, SHOW_MON), and the four weather anims that need none.
+ * ITEM_POP_UP, TRAP_TURN, FORM_CHANGE, SHOW_MON), and the five weather anims that need none.
  * order.test.ts holds each mask equal to the OR of those names.
  */
-export const ORDER = { onFieldOps: 0x6db7a0, freeAnims: 0xf0 } as const
+export const ORDER = { onFieldOps: 0x6db7a0, freeAnims: 0x400f0 } as const

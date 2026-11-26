@@ -12,8 +12,9 @@
 //   playanimation_var BS_BATTLER_0, sB_ANIM_ARG1
 //
 // `sB_ANIM_ARG1` is the weather's own animation, the one its upkeep plays (`src/battle_util.c`).
-// A weather the stream lacks (snow, #88) clears the stream's weather as it starts, so the game
-// forgets the rain it replaced (D12); its start and its turns list the look the stream lacks.
+// A weather the stream lacks (Gen 6's and 7's Strong Winds, Harsh Sunshine and Heavy Rain) clears
+// the stream's weather as it starts, so the game forgets the rain it replaced (D12); its start and
+// its turns list the look the stream lacks. Snow is the stream's own since version 4 (#89).
 // Side and field conditions are a line each; the stream holds no state for them, since the game
 // shows none.
 import type { WeatherName } from '@pkmn/client'
@@ -34,6 +35,7 @@ const WEATHERS: Partial<Readonly<Record<WeatherName, Shown>>> = {
   Sun: { weather: 'sun', anim: 'sunContinues' },
   Sand: { weather: 'sand', anim: 'sandstormContinues' },
   Hail: { weather: 'hail', anim: 'hailContinues' },
+  Snow: { weather: 'snow', anim: 'snowContinues' },
 }
 
 /** The look of a weather the stream lacks, listed at its start and on each of its turns. */

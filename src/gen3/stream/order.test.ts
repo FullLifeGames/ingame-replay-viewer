@@ -249,8 +249,14 @@ describe('ORDER', () => {
     expect(ORDER.onFieldOps).toBe(bits(ops.map((op) => OP[op])))
   })
 
-  it('frees the four weather anims', () => {
-    const anims = ['rainContinues', 'sunContinues', 'sandstormContinues', 'hailContinues'] as const
+  it('frees the five weather anims', () => {
+    const anims = [
+      'rainContinues',
+      'sunContinues',
+      'sandstormContinues',
+      'hailContinues',
+      'snowContinues',
+    ] as const
     expect(ORDER.freeAnims).toBe(bits(anims.map((name) => ANIM[name])))
   })
 

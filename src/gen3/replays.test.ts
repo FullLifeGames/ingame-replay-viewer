@@ -39,16 +39,14 @@ const charsetRead = (text: string) => decodeText(encodeText(text))
  * The mechanic fallbacks the test replays may take, each a look or a state the stream lacks:
  * Perish Song's first count, whose later counts print; Bide's first turn, which the expansion
  * shows as the move alone; Protosynthesis's end, which the expansion has no message for; and the
- * looks of a Terastallization and of snow, whose lines print (#88). A new one fails until it is
- * named here, and one that no test replay takes fails unless NAMED_AHEAD holds it.
+ * look of a Terastallization, whose lines print (#88). A new one fails until it is named here, and
+ * one that no test replay takes fails unless NAMED_AHEAD holds it.
  */
 const NAMED_MECHANICS: ReadonlySet<string> = new Set([
   mechanicGap('perish3', 'starting').detail,
   mechanicGap('Bide', 'starting').detail,
   mechanicGap('Protosynthesis', 'ending').detail,
   mechanicGap('Terastallization', 'starting').detail,
-  mechanicGap('Snow', 'starting').detail,
-  mechanicGap('Snow', 'continuing').detail,
 ])
 
 /**

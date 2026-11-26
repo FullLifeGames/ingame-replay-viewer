@@ -147,6 +147,7 @@
 #define REPLAY_WEATHER_SUN  2
 #define REPLAY_WEATHER_SAND 3
 #define REPLAY_WEATHER_HAIL 4
+#define REPLAY_WEATHER_SNOW 5
 
 // The order of enum Stat.
 #define REPLAY_STAT_ATK      1
@@ -187,13 +188,14 @@
 #define REPLAY_ANIM_STATUS_PRZ          15
 #define REPLAY_ANIM_STATUS_FRZ          16
 #define REPLAY_ANIM_SIMPLE_HEAL         17
+#define REPLAY_ANIM_SNOW_CONTINUES      18
 
 // The masks of the order rules, a bit per REPLAY_OP_* and REPLAY_ANIM_* number:
 // WITHDRAW, MOVE, HIT, HP, FAINT, STAT, ANIM, VOLATILE, ABILITY, ITEM_POP_UP, TRAP_TURN,
-// FORM_CHANGE and SHOW_MON, whose side operands name a side with a battler out, and the four
+// FORM_CHANGE and SHOW_MON, whose side operands name a side with a battler out, and the five
 // weather animations, which need none. replay_stream_check.c asserts each against the names.
 #define REPLAY_ORDER_ON_FIELD_OPS 0x6DB7A0
-#define REPLAY_ORDER_FREE_ANIMS   0xF0
+#define REPLAY_ORDER_FREE_ANIMS   0x400F0
 
 struct ReplayStreamHeader
 {

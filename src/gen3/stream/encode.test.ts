@@ -191,6 +191,12 @@ describe('encodeInstruction', () => {
     expect(encodeInstruction(heal)).toEqual([0x0d, 2, 1, 17])
   })
 
+  it('encodes the snow of version 4: WEATHER SNOW and ANIM SNOW_CONTINUES', () => {
+    expect(encodeInstruction({ op: 'weather', weather: 'snow' })).toEqual([0x0e, 1, 5])
+    const snow: Instruction = { op: 'anim', side: 'near', anim: 'snowContinues' }
+    expect(encodeInstruction(snow)).toEqual([0x0d, 2, 0, 18])
+  })
+
   it('encodes FORM_CHANGE as the side and a two-byte species, as ITEM_POP_UP orders them', () => {
     const change: Instruction = { op: 'formChange', side: 'far', species: 0x041b }
     expect(encodeInstruction(change)).toEqual([0x15, 3, 1, 0x1b, 0x04])
