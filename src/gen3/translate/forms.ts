@@ -6,14 +6,15 @@
 // the species of the team table again. A change by another cause plays the same scene and names
 // the fallback.
 //
-// A Terastallization (#88) plays `BattleScript_Terastallization`'s text: flushtextbox, "X is
-// storing energy!", then "X terastallized into the T type!". The stream holds no look for its
-// two animations, so the line names a mechanic fallback.
+// A Terastallization (#88, #89) plays `BattleScript_Terastallization`: flushtextbox, "X is
+// storing energy!", TERA with the game's number of the type, which plays the two animations and
+// leaves the tint and the type's mark, then "X terastallized into the T type!". A type the game
+// lacks keeps both lines and names a mechanic fallback.
 import { toID } from '@pkmn/dex'
 
 import type { Effect } from '../../script/types'
-import { mechanicGap } from '../fallbacks'
-import { speciesOf } from '../tables/lookup'
+import { teraTypeGap } from '../fallbacks'
+import { speciesOf, typeOf } from '../tables/lookup'
 import { formChanged, terastallizing } from '../text/phrases-effects'
 import type { Context, EventOf } from './context'
 
@@ -43,7 +44,11 @@ export function formChange(event: EventOf<'formChange'>, ctx: Context): void {
 
 export function terastallize(event: EventOf<'terastallize'>, ctx: Context): void {
   const { who, line, type } = event
-  ctx.note(line, mechanicGap('Terastallization', 'starting'))
+  const [storing, into] = terastallizing(ctx.mon(who), type)
+  const teraType = typeOf(type)
   ctx.emit(line, { op: 'flushTextBox' })
-  for (const text of terastallizing(ctx.mon(who), type)) ctx.print(line, text)
+  ctx.print(line, storing)
+  if (teraType === undefined) ctx.note(line, teraTypeGap(type))
+  else ctx.emit(line, { op: 'tera', side: ctx.activeSide(who), teraType })
+  ctx.print(line, into)
 }

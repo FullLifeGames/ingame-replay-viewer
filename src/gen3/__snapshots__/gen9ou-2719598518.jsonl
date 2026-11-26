@@ -1,4 +1,4 @@
-{"length":7613,"crc32":"21aa633d","trainers":{"near":{"name":"hat_fm","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Snurke","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":889,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zamazenta"},{"species":491,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Darkrai"},{"species":594,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Alomomola"},{"species":815,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Cinderace"},{"species":962,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ninetales"},{"species":1294,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skeledirge"}],"far":[{"species":1376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Great Tusk"},{"species":1393,"maxHp":100,"level":100,"gender":"none","shiny":true,"nickname":"Luka Magic"},{"species":1412,"maxHp":100,"level":100,"gender":"none","shiny":true,"nickname":"Sinistcha"},{"species":730,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Primarina"},{"species":1371,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Clodsire"},{"species":663,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Talonflame"}]}}
+{"length":7621,"crc32":"f323b12c","trainers":{"near":{"name":"hat_fm","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Snurke","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":889,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zamazenta"},{"species":491,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Darkrai"},{"species":594,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Alomomola"},{"species":815,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Cinderace"},{"species":962,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ninetales"},{"species":1294,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skeledirge"}],"far":[{"species":1376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Great Tusk"},{"species":1393,"maxHp":100,"level":100,"gender":"none","shiny":true,"nickname":"Luka Magic"},{"species":1412,"maxHp":100,"level":100,"gender":"none","shiny":true,"nickname":"Sinistcha"},{"species":730,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Primarina"},{"species":1371,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Clodsire"},{"species":663,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Talonflame"}]}}
 {"line":39,"op":"intro"}
 {"line":39,"op":"print","text":"You are challenged by Snurke!"}
 {"line":41,"op":"print","text":"Snurke sent out Talonflame!"}
@@ -102,6 +102,7 @@
 {"line":115,"op":"turn","number":7}
 {"line":118,"op":"flushTextBox"}
 {"line":118,"op":"print","text":"Darkrai is storing energy!"}
+{"line":118,"op":"tera","side":"near","teraType":4}
 {"line":118,"op":"print","text":"Darkrai terastallized into the Poison type!"}
 {"line":119,"op":"print","text":"Darkrai used Sludge Bomb!"}
 {"line":119,"op":"move","user":"near","target":"far","move":188,"animTurn":0}
@@ -254,6 +255,7 @@
 {"line":252,"op":"turn","number":18}
 {"line":255,"op":"flushTextBox"}
 {"line":255,"op":"print","text":"The opposing Sinistcha is storing energy!"}
+{"line":255,"op":"tera","side":"far","teraType":19}
 {"line":255,"op":"print","text":"The opposing Sinistcha terastallized into the Fairy type!"}
 {"line":256,"op":"print","text":"Cinderace used Pyro Ball!"}
 {"line":256,"op":"move","user":"near","target":"far","move":708,"animTurn":0}
@@ -509,5 +511,3 @@
 {"line":463,"op":"print","text":"Cinderace fainted!"}
 {"line":465,"op":"print","text":"Snurke won the battle!"}
 {"line":465,"op":"end","outcome":"farWon"}
-{"line":118,"fallback":"mechanic","detail":"no state in the stream for Terastallization starting"}
-{"line":255,"fallback":"mechanic","detail":"no state in the stream for Terastallization starting"}

@@ -1,4 +1,4 @@
-{"length":10245,"crc32":"05bda421","trainers":{"near":{"name":"Setsu","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"badcluelesswashed","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":1056,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Deoxys"},{"species":1100,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tornadus"},{"species":1417,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ogerpon"},{"species":472,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gliscor"},{"species":485,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Heatran"},{"species":980,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Weezing"}],"far":[{"species":472,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gliscor"},{"species":1396,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Ting-Lu"},{"species":1393,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Gholdengo"},{"species":1380,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Slither Wing"},{"species":1406,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Walking Wake"},{"species":1434,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Pecharunt"}]}}
+{"length":10253,"crc32":"21a93d47","trainers":{"near":{"name":"Setsu","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"badcluelesswashed","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":1056,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Deoxys"},{"species":1100,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tornadus"},{"species":1417,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ogerpon"},{"species":472,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gliscor"},{"species":485,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Heatran"},{"species":980,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Weezing"}],"far":[{"species":472,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gliscor"},{"species":1396,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Ting-Lu"},{"species":1393,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Gholdengo"},{"species":1380,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Slither Wing"},{"species":1406,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Walking Wake"},{"species":1434,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Pecharunt"}]}}
 {"line":39,"op":"intro"}
 {"line":39,"op":"print","text":"You are challenged by badcluelesswashed!"}
 {"line":41,"op":"print","text":"badcluelesswashed sent out Ting-Lu!"}
@@ -498,6 +498,7 @@
 {"line":468,"op":"turn","number":39}
 {"line":471,"op":"flushTextBox"}
 {"line":471,"op":"print","text":"The opposing Gliscor is storing energy!"}
+{"line":471,"op":"tera","side":"far","teraType":1}
 {"line":471,"op":"print","text":"The opposing Gliscor terastallized into the Normal type!"}
 {"line":472,"op":"print","text":"Ogerpon used Ivy Cudgel!"}
 {"line":472,"op":"move","user":"near","target":"far","move":832,"animTurn":0}
@@ -617,6 +618,7 @@
 {"line":577,"op":"turn","number":47}
 {"line":581,"op":"flushTextBox"}
 {"line":581,"op":"print","text":"Gliscor is storing energy!"}
+{"line":581,"op":"tera","side":"near","teraType":19}
 {"line":581,"op":"print","text":"Gliscor terastallized into the Fairy type!"}
 {"line":582,"op":"print","text":"The opposing Walking Wake used Draco Meteor!"}
 {"line":583,"op":"print","text":"It doesn't affect Gliscor…"}
@@ -640,7 +642,5 @@
 {"line":393,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}
 {"line":434,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}
 {"line":450,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}
-{"line":471,"fallback":"mechanic","detail":"no state in the stream for Terastallization starting"}
 {"line":472,"fallback":"move","detail":"the game has no look for Ivy Cudgel Water; it plays Ivy Cudgel"}
-{"line":581,"fallback":"mechanic","detail":"no state in the stream for Terastallization starting"}
 {"line":587,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}

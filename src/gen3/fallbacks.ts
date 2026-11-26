@@ -6,7 +6,7 @@ import type { Phrase } from './text/template'
 
 /**
  * A mechanic the stream holds no state for. On a silent line nothing shows in its place; on a line
- * that prints, the text shows and the look the stream lacks does not (a Terastallization, #88).
+ * that prints, the text shows and the look the stream lacks does not (a Tera type the game lacks).
  */
 interface MechanicFallback {
   readonly kind: 'mechanic'
@@ -23,6 +23,11 @@ export type Noted =
 /** `effect` at `phase` ("starting", "ending"), which the stream cannot hold. */
 export function mechanicGap(effect: string, phase: string): MechanicFallback {
   return { kind: 'mechanic', detail: `no state in the stream for ${effect} ${phase}` }
+}
+
+/** A Terastallization into `type`, which the game has no `TYPE_*` for: the lines show alone. */
+export function teraTypeGap(type: string): MechanicFallback {
+  return { kind: 'mechanic', detail: `the game has no Tera type ${type}` }
 }
 
 /**

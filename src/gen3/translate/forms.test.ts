@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
-import { mechanicGap } from '../fallbacks'
+import { teraTypeGap } from '../fallbacks'
 import { speciesOf } from '../tables/lookup'
 import { plain, popUp, streamOfLog } from '../testing'
 
@@ -105,28 +105,38 @@ describe('a form change by anything but Forecast', () => {
   })
 })
 
-describe('a Terastallization (#88)', () => {
+describe('a Terastallization (#88, #89)', () => {
   // `BattleScript_Terastallization`: flushtextbox, STRINGID_PKMNSTORINGENERGY, the charge and the
-  // activate animations, then STRINGID_PKMNTERASTALLIZEDINTO. The stream holds no look for it.
-  const TERA_GAP = { line: NEXT, ...mechanicGap('Terastallization', 'starting') }
-
-  it('empties the text box and says both lines of the far Pokémon, with the look named', () => {
+  // activate animations, then STRINGID_PKMNTERASTALLIZEDINTO. TERA plays both animations.
+  it('empties the text box, says the far Pokémon stores energy, Terastallizes it, then says so', () => {
     const line = '|-terastallize|p2a: Tyranitar|Fairy'
     expect(sceneFrom(NEXT, line)).toEqual([
       { op: 'flushTextBox' },
       'The opposing Tyranitar is storing energy!',
+      { op: 'tera', side: 'far', teraType: 19 },
       'The opposing Tyranitar terastallized into the Fairy type!',
     ])
-    expect(fallbacksOf(line)).toEqual([TERA_GAP])
+    expect(fallbacksOf(line)).toEqual([])
   })
 
-  it('names our own Pokémon without "The opposing"', () => {
-    const line = '|-terastallize|p1a: Dugtrio|Normal'
+  it('names our own Pokémon without "The opposing" and takes the type by its name', () => {
+    const line = '|-terastallize|p1a: Dugtrio|Stellar'
     expect(sceneFrom(NEXT, line)).toEqual([
       { op: 'flushTextBox' },
       'Dugtrio is storing energy!',
-      'Dugtrio terastallized into the Normal type!',
+      { op: 'tera', side: 'near', teraType: 20 },
+      'Dugtrio terastallized into the Stellar type!',
     ])
-    expect(fallbacksOf(line)).toEqual([TERA_GAP])
+    expect(fallbacksOf(line)).toEqual([])
+  })
+
+  it('says both lines of a Tera type the game lacks and names it, with no TERA', () => {
+    const line = '|-terastallize|p2a: Tyranitar|???'
+    expect(sceneFrom(NEXT, line)).toEqual([
+      { op: 'flushTextBox' },
+      'The opposing Tyranitar is storing energy!',
+      'The opposing Tyranitar terastallized into the ??? type!',
+    ])
+    expect(fallbacksOf(line)).toEqual([{ line: NEXT, ...teraTypeGap('???') }])
   })
 })
