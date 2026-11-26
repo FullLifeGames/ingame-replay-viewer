@@ -183,16 +183,25 @@ describe('sendOutStreams', () => {
   })
 })
 
-const tree = sendOutTree()
-describe.skipIf(!existsSync(tree))('the send-out streams of the pinned tree', () => {
-  const read = (path: string) => readFileSync(join(tree, path), 'utf8')
+// The case reads the tree's species tables and builds every send-out stream: 0.5 s alone, and up
+// to 2,953 ms in a full check while a second heavy run loaded the machine (#92). The limit is more
+// than twice that.
+const TREE_STREAMS_LIMIT = 10_000
 
-  it('reach every animation the species tables hold', () => {
-    const anims = readSendOutAnimations(read)
-    const streams = sendOutStreams(anims, speciesTable, PICS)
-    const coverage = sendOutCoverage(streams, anims, speciesTable)
-    expect(coverage.missed).toEqual([])
-    expect(anims.functions.length).toBeGreaterThan(150)
-    for (const { stream } of streams) expect(decodeStream(encodeStream(stream))).toEqual(stream)
-  })
-})
+const tree = sendOutTree()
+describe.skipIf(!existsSync(tree))(
+  'the send-out streams of the pinned tree',
+  { timeout: TREE_STREAMS_LIMIT },
+  () => {
+    const read = (path: string) => readFileSync(join(tree, path), 'utf8')
+
+    it('reach every animation the species tables hold', () => {
+      const anims = readSendOutAnimations(read)
+      const streams = sendOutStreams(anims, speciesTable, PICS)
+      const coverage = sendOutCoverage(streams, anims, speciesTable)
+      expect(coverage.missed).toEqual([])
+      expect(anims.functions.length).toBeGreaterThan(150)
+      for (const { stream } of streams) expect(decodeStream(encodeStream(stream))).toEqual(stream)
+    })
+  },
+)
