@@ -2,7 +2,7 @@
 // driven from outside. It starts the session as gen5-moment-args.ts says: from the spike's battle
 // state, or from boot with a save the page fetches from /saves/ and the continue route to the
 // trainer's action menu, or with --entry direct through our routine from boot (#97,
-// gen5-moment-direct.ts). Then it reads the player's adapter, the server and both Pokémon from main
+// gen5-moment-direct.ts), each as one plan. Then it reads the player's adapter, the server and both Pokémon from main
 // RAM and plays the steps of gen5-moment-plan.ts: hold the server, answer the action menu and
 // write one block per moment. It writes a frame per mark under build/gen5/frames/ and the last
 // mark's state under build/gen5/states/ (gitignored, ADR 0002).
@@ -23,7 +23,7 @@ import { MAIN_RAM_SIZE, MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import type { RamRef } from '../src/gen5/ram-check.ts'
 import type { RoutineBuild } from '../src/gen5/routine-order.ts'
 import { type MomentOptions, readMomentOptions, type StateFile } from './gen5-moment-args.ts'
-import { sessionPlans } from './gen5-moment-direct.ts'
+import { sessionPlan } from './gen5-moment-direct.ts'
 import { markLines, writeLines } from './gen5-moment-log.ts'
 import { momentSteps } from './gen5-moment-plan.ts'
 import { listedReader } from './gen5-bw2-source.ts'
@@ -177,12 +177,12 @@ function readStateFile(base: string): StateFile {
   return { state, frame: meta.frame, ramSha: meta.ramSha }
 }
 
-/** Picks the dump and plays the session's plans in turn to where the moment starts. A run from
- * boot is queued before the pick, so it counts from the first frame; a run from a state once the
- * game is up. Each later plan follows once the one before is done. */
+/** Picks the dump and plays the session's plan to where the moment starts. A run from boot is
+ * queued before the pick, so it counts from the first frame; a run from a state once the game is
+ * up. */
 async function startSession(page: Page, dump: string, numbers: Bw2Numbers, options: MomentOptions) {
   const { start, label, deadlineMs } = options
-  const { plans, notes } = sessionPlans(options, {
+  const { plan, notes } = sessionPlan(options, {
     refs: battleRefs(numbers),
     trainer: numbers.saveTrainer,
     entry: numbers.entry,
@@ -192,24 +192,14 @@ async function startSession(page: Page, dump: string, numbers: Bw2Numbers, optio
   for (const note of notes) log(`name cut: ${note}`)
   const fromBoot = start.from === 'boot'
   const from = start.from === 'boot' ? `boot with the save ${start.save}` : `state ${start.state}`
-  const counts = plans.map((plan) => String(plan.steps.length)).join(' + ')
-  log(`entry ${options.entry}: ${counts} steps from ${from}`)
-  for (const line of plans.flatMap((plan) => writeLines(plan.steps))) log(line)
-  const [first, ...rest] = plans
-  if (first === undefined) throw new Error('the session has no plan')
-  if (fromBoot) await hook(page).queueRun(first)
+  log(`entry ${options.entry}: ${String(plan.steps.length)} steps from ${from}`)
+  for (const line of writeLines(plan.steps)) log(line)
+  if (fromBoot) await hook(page).queueRun(plan)
   await page.setInputFiles('#dump', dump)
   await waitForStart(page)
   await logSave(page, 'at the start')
-  if (!fromBoot) await hook(page).queueRun(first)
-  let report = await follow(page, label, deadlineMs)
-  for (const plan of rest) {
-    if (report.status !== 'done') break
-    logReport(report)
-    await hook(page).queueRun(plan)
-    report = await follow(page, label, deadlineMs, report.marks.length)
-  }
-  return report
+  if (!fromBoot) await hook(page).queueRun(plan)
+  return follow(page, label, deadlineMs)
 }
 
 async function play(page: Page, dump: string, numbers: Bw2Numbers, options: MomentOptions) {

@@ -1,4 +1,4 @@
-// The direct entry's two plans (#97) on the build machine's real files: build/gen5/bw2.json,
+// The direct entry's one plan (#97) on the build machine's real files: build/gen5/bw2.json,
 // which scripts/gen5-bw2.ts generates from pokebw2 at its pin, and build/gen5/routine.json, which
 // scripts/gen5-routine.ts builds with the ARM compiler. CI has no ARM compiler (D7), so there the
 // spec skips; scripts/gen5-bw2-real.test.ts holds the guard on the generated file. As there, every
@@ -14,7 +14,7 @@ import type { MacroStep } from '../src/gen5/macro.ts'
 import type { RoutineBuild } from '../src/gen5/routine-order.ts'
 import { ROUTINE_PIECES } from '../src/gen5/routine-layout.ts'
 import { readMomentOptions } from './gen5-moment-args.ts'
-import { sessionPlans } from './gen5-moment-direct.ts'
+import { sessionPlan } from './gen5-moment-direct.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
 const FILES = [GEN5_PATHS.bw2Json, GEN5_PATHS.routineJson]
@@ -45,19 +45,20 @@ describe.skipIf(!FILES.every((file) => existsSync(file)))(
       },
     })
 
-    it('build both plans: the takeover right after its window, park, then go before gone', () => {
-      const { plans, notes } = sessionPlans(options, input())
-      const [boot, battle] = plans.map((plan) => named(plan.steps))
-      expect(boot?.slice(0, 2)).toEqual(['until takeover-window', 'write takeover'])
-      expect(boot?.at(-1)).toBe('mark park')
-      expect(battle?.slice(0, 5)).toEqual([
+    it('build one plan: the takeover right after its window, park, then go before gone', () => {
+      const { plan, notes } = sessionPlan(options, input())
+      const steps = named(plan.steps)
+      expect(steps.slice(0, 2)).toEqual(['until takeover-window', 'write takeover'])
+      const park = steps.indexOf('mark park')
+      expect(steps.slice(park, park + 6)).toEqual([
+        'mark park',
         'until park-check',
         'write park',
         'until go-region',
         'write go',
         'until gone',
       ])
-      expect(battle?.at(-1)).toBe('mark battle')
+      expect(steps.at(-1)).toBe('mark battle')
       expect(notes, 'the default names fit').toEqual([])
     })
 
@@ -85,8 +86,8 @@ describe.skipIf(!FILES.every((file) => existsSync(file)))(
       const words = Math.ceil(routine.size / 4)
       expect(region('takeover-region').length >= words, 'at the takeover').toBe(true)
       expect(region('park-region').length >= words, 'at the park').toBe(true)
-      const [, battle] = sessionPlans(options, input()).plans
-      const go = battle?.steps.find((one) => one.kind === 'until' && one.name === 'go-region')
+      const { plan } = sessionPlan(options, input())
+      const go = plan.steps.find((one) => one.kind === 'until' && one.name === 'go-region')
       const before = go?.kind === 'until' ? go.checks : []
       expect(before.filter((c) => c.name.startsWith('routine code')).length >= words).toBe(true)
     })

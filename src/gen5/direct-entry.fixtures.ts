@@ -1,6 +1,6 @@
-// An invented direct entry (#97) for the specs of the two plans: every address, offset, size and
+// An invented direct entry (#97) for the specs of its plan: every address, offset, size and
 // constant here is made up for them, none comes from pokebw2, and the layouts hold only the
-// members the plans read.
+// members the plan reads.
 import type { Bw2Symbol, EntryNumbers, StructLayout } from './bw2-numbers.ts'
 import type { RoutineBuild } from './routine-order.ts'
 import { ORDER_MEMBERS } from './routine-order.ts'

@@ -1,4 +1,4 @@
-// Plan 1 of the direct battle start (#97, D1, D8): from power-on to the park. The boot proc queues
+// Part 1 of the direct battle start (#97, D1): from power-on to the park. The boot proc queues
 // its boot screens in one update and the proc manager switches to them in the next. In the frame
 // boundary between, the page writes the routine (rom/gen5/routine.c) into the battle overlay's
 // span and swaps the queued table and param for the routine's, so the manager starts our proc in
@@ -178,7 +178,7 @@ const waitFor = (name: string, checks: readonly RamCheck[], limit: number): Macr
   limit,
 })
 
-/** Plan 1 from power-on: the takeover in the window, then the routine at its park. A stage that
+/** Part 1 from power-on: the takeover in the window, then the routine at its park. A stage that
  * failed ends the run by its name; a region that changed ends it at its check. */
 export function takeover(entry: EntryNumbers, routine: RoutineBuild): Takeover {
   if (routine.order.join() !== ORDER_MEMBERS.join()) {

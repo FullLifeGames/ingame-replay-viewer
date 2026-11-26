@@ -1,4 +1,4 @@
-// Plan 2 of the direct battle start (#97, D8 to D13): the routine waits at the park with the
+// Part 2 of the direct battle start (#97, D9 to D13): the routine waits at the park with the
 // battle's setup built (direct-takeover.ts). The page writes both sides through the setup's
 // pointers, then the go, last; the routine hands over to the battle proc, and from the battle's
 // start the page presses A through the opening to the action menu (battle-entry.ts). For the first
@@ -216,7 +216,7 @@ function parkChecks(entry: EntryNumbers, layout: RoutineLayout): RamCheck[] {
   ]
 }
 
-/** Plan 2 from the park: the checks, the park's writes, the routine's region checked again in the
+/** Part 2 from the park: the checks, the park's writes, the routine's region checked again in the
  * frame before the go, the go, the wait for gone, then the battle's entry through the opening. No
  * write follows the go: the battle loads over the routine. */
 export function park(
