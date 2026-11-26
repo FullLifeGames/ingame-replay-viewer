@@ -65,6 +65,16 @@ describe('the parts of a "Not shown" row', () => {
     expect(rowParts(row)).toEqual({ head: 'Line 7, dropped: unknown: ', kind: '', rest: text })
   })
 
+  // A wider field breaks out of a 390 px phone (#90): 24 fullwidth letters take about 370 px.
+  it("keeps a first field one longer than the protocol's longest in the rest", () => {
+    const longest = Math.max(
+      ...Object.keys(Protocol.ARGS).map((args) => (args.split('|')[1] ?? '').length + 1),
+    )
+    const text = `|${'\uff37'.repeat(longest)}|x`
+    const row = { line: 7, what: 'dropped: unknown', text, standIn: false }
+    expect(rowParts(row)).toEqual({ head: 'Line 7, dropped: unknown: ', kind: '', rest: text })
+  })
+
   it('keeps every first field of the protocol whole', () => {
     const fields = new Set(Object.keys(Protocol.ARGS).map((args) => `|${args.split('|')[1] ?? ''}`))
     for (const field of fields) {

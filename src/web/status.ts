@@ -131,8 +131,12 @@ export interface RowParts {
   readonly rest: string
 }
 
-/** The longest first field a row keeps on one line: the protocol's longest has 20 characters. */
-const LONGEST_KIND = 24
+/**
+ * The longest first field a row keeps on one line, as long as the protocol's longest. A longer
+ * one, which only someone else's replay holds, wraps with the rest: 24 wide glyphs pass a 390 px
+ * phone's width (#90).
+ */
+const LONGEST_KIND = 20
 
 /**
  * One row of the list in parts: its 1-based line and what happened, then the log line's first
