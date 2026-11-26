@@ -4,7 +4,7 @@ Milestone 6 plays replays inside Black 2 and White 2 on a DS emulator, driven fr
 
 ## Verdict
 
-The spike reached its goal. Black 2 boots from the dump in EmulatorJS's melonDS core in headless Chromium on the build machine, with no BIOS or firmware file. An input macro took the game from New Game into its first battle, Tepig against the rival's Oshawott, in pieces that S5 played from states saved under earlier versions of the macro. The final macro has not reached the battle from boot: in S9 its walk stalled before the lookout, at frame 23,270 (see "Into a battle"). In the battle the page holds the game's battle server, writes blocks of the game's own server commands into the player's battle adapter, and the game plays them: "Tepig used Tackle!", the move's animation, Oshawott's HP bar falling to the value the page gave, and "It's super effective!" (S6). The game decided nothing. One Tackle took Oshawott from 20 HP to 1, and in a second run Tepig used Flamethrower and Oshawott Hydro Pump, moves neither of them knows.
+The spike reached its goal. Black 2 boots from the dump in EmulatorJS's melonDS core in headless Chromium on the build machine, with no BIOS or firmware file. An input macro took the game from New Game into its first battle, Tepig against the rival's Oshawott, in pieces that S5 played from states saved under earlier versions of the macro. The final macro has not reached the battle from boot: in S9 its walk stalled before the lookout, at frame 23,270. Since #97 the page starts a trainer battle from power-on through a routine of its own instead, and reaches the action menu at frame 977 with no save (see "Into a battle"). In the battle the page holds the game's battle server, writes blocks of the game's own server commands into the player's battle adapter, and the game plays them: "Tepig used Tackle!", the move's animation, Oshawott's HP bar falling to the value the page gave, and "It's super effective!" (S6). The game decided nothing. One Tackle took Oshawott from 20 HP to 1, and in a second run Tepig used Flamethrower and Oshawott Hydro Pump, moves neither of them knows.
 
 The proof covers one battle and one kind of moment: a move's line, its animation, an HP change and one standard line. Faints, switches, status, weather, the hit flash and the set messages stay untried. On the build machine the emulator runs far below real time, and no PC or phone figures have come back yet. A public page also waits on the licence call in "Licences" below.
 
@@ -109,43 +109,80 @@ Since #79 the page sends its own unpacker, `/extract7z.js` (16,262 bytes as buil
 
 ## Into a battle (question 2)
 
-The routes the plan weighed (plan 1.4):
+Since #97 the page starts a trainer battle from power-on: no title, no menu, no save and no walk. This is the direct entry. The game runs unmodified, and a routine of ours (`rom/gen5/`) lives in the emulator's memory alone, as ADR 0007 allows for its fallback. `src/gen5/direct-entry.ts` plays the direct entry as one plan of 22 steps, and `scripts/gen5-moment.ts` runs it by default; `--entry walk` plays the older way (below).
 
-- (a) An input macro from New Game to the first battle. It needs the dump and nothing else.
-- (b) A save file placed before a trainer, plus a short macro. ADR 0002 allows shipping a save file.
-- (c) Memory writes after boot that start a battle. Without code of ours this needs a field hook; with injected code it is ADR 0007's fallback.
-- (d) A Battle Video from the save, started from the game's menu: route (b) with extra steps.
+### The direct entry
 
-S5 built route (a) and reached the battle with it in pieces; from boot, the final macro stalls on the way (below). The macro (`src/gen5/route.ts`) names the player "IRV", takes the rival's default name, walks out of the house and through Aspertia City to the lookout, picks Tepig, skips the nickname and follows Hugh into the battle. Most walks go by the player's position in RAM, so a step waits for a tile instead of counting frames. The route ends when the battle checks hold for 60 frames: the player's adapter exists, `sCommMode` reads 0 (a local battle) and the client waits for an action. "What will Tepig do?" and the action menu are then on screen.
+- **The takeover** (`src/gen5/direct-takeover.ts`). In the game's first frames the boot proc queues the boot screens in the proc manager behind `sGameProcManager`: `queued` is set, and `nextFunctions` and `nextParam` hold `BOOT_SCREENS_PROC_FUNCTIONS` and `sBootScreensParam`. In that frame, the one window before the manager switches, the page writes our routine, a proc table of its three functions and the order block into the battle overlay's span, which nothing uses before the battle loads. The generator checks the span apart from the two overlays the game's init loads. Then the page points `nextOverlayId`, `nextFunctions` and `nextParam` at our table and block. On the next update the manager runs our routine in the boot screens' place.
+- **The park.** The routine's init calls `GameData_Create`, `BtlSetup_Create`, `ResetBtlFieldStatus` and `BtlSetup_SetTrainer1v1Single` with no trainer of the game's own list. It leaves the game data and the setup in the order block and sets its stage to parked. Its main then waits frame after frame for the go.
+- **The park writes** (`src/gen5/direct-park.ts`, `src/gen5/direct-party.ts`), in the frame the routine reads parked, each through pointers from the setup's word in the block: the opponent's name and class (`TRAINER_CLASS_YOUNGSTER`), the player's name, fast text (`CONFIG_TEXT_SPEED_FAST`), the battle style (`BTL_STYLE_SINGLE` or `BTL_STYLE_DOUBLE`), the trainer battle's track (`SEQ_BGM_VS_TRAINER` into `fieldSituation.bgm`), and both parties of sealed Pokémon with their counts and slot bits. The page reads the style, the track and the counts back, then writes the go. A name longer than its field is cut, and the log says so.
+- **The go.** The routine's main calls `GFL_BGSysEnableEngines`, which switches both displays on: on a normal boot the boot screens make that call, and the battle never does. It starts the setup's track with `GFL_SndBGMPlay` and replaces itself by the battle's proc through `GCTX_ProcMgrReplaceProc`. The game then starts its own trainer battle, loads the battle overlay over our routine and plays the opening to the action menu.
+- **The checks.** The page compares every word of the code, the table and the block words it owns at the takeover, at the park and right before the go. A routine that finds no game data or no setup names that stage, and the run fails there.
 
-| Mark                       | Frame  |
-| -------------------------- | ------ |
-| Title screen               | 2,504  |
-| Name entry                 | 5,620  |
-| Outside the house          | 17,218 |
-| Beside Hugh at the lookout | 31,796 |
-| The battle's opening fade  | 32,544 |
-| The battle, action menu    | 33,570 |
+### The runs
 
-33,570 frames are 9 min 21 s of game time at the DS's rate. Uncapped on the build machine, at the 23 frames per second of S5's run from boot, they take about 24 minutes, longer than the 20 minutes one run may take there. So S5 grew and played the route in pieces, each starting from the state of an earlier mark (38 route runs, `gen5-route-1.log` to `gen5-route-38.log`). The macro changed between the pieces, so most states of that chain come from earlier versions of it. The table gives that chain's frames.
+The runs went through `scripts/gen5-moment.ts` on the build machine, uncapped, each in one to three minutes of wall time. Frames from power-on, at the DS's pace of 59.8261 frames per second:
 
-Determinism: two runs from boot under the final macro reached all 179 marks up to frame 22,670 on the same frames with the same SHA-256 of main RAM (`gen5-route-36.log`, `gen5-route-37.log`; each stopped at its 17-minute deadline). Two runs from the earlier chain's state at Hugh's trigger (frame 29,486) agreed in every mark's frame, RAM hash and frame image to the end (`gen5-route-35.log`, `gen5-route-38.log`).
+| Run                                 | Takeover | Park | Battle start | Action menu    | Its buttons   |
+| ----------------------------------- | -------- | ---- | ------------ | -------------- | ------------- |
+| With the save (`E-5-r3`, `E-5-r4`)  | 216      | 245  | 284          | 936 (15.6 s)   | 995 (16.6 s)  |
+| No save (`E-6-r2`, `E-6-r4`)        | 239      | 267  | 325          | 977 (16.3 s)   | 1036 (17.3 s) |
+| A double, no save (`E-6-r3`)        | 239      | 267  | 325          | 1012           | 1071          |
+| The walk from the save (#78, below) |          |      |              | 4,146 (69.3 s) |               |
 
-The final macro from boot to the battle: S9 ran it from the boot runs' last state, at frame 22,670, toward the battle (`gen5-route-39.log`). The load check held, the hook saw every frame, and every request stayed local. The first walk, north to the lookout's row, did not move the player in 600 frames: IRV stood at (55, 750) beside a man at the trees on the town's east edge, and the run failed at frame 23,270. The boot runs had left the earlier chain at Hugh's greeting. At town-06 (frame 18,342), the mark before the talk, both chains show the same image; from hugh-01 (18,642) on, every mark's image differs. At hugh-03 (19,242) the earlier chain had finished the talk, while the boot runs' A presses had opened it a second time ("You're really lucky to get a Pokémon!"), and the walks after it, which count frames, took IRV elsewhere. So the route reaches the battle only from the earlier chain's states, and the stretch from frame 18,342 to 29,486, the starter pick included, rests on states made under earlier code. The route needs a fix at Hugh's talk before it reaches the battle from boot in one chain.
+What the runs showed:
 
-The core lets the page fix what the route depends on:
+- The page caught the one-frame window in every run, and the hook saw every frame.
+- The intro reads "You are challenged by Youngster Showdown!" with the Youngster's sprite and the opponent's six balls, then "Youngster Showdown sent out Snivy!". With no save the player is the boy, the game's default, with six balls of his own.
+- At the action menu the battle's own party copies hold the six Pokémon of each side as written: species, level, HP, item and ability read back for all twelve. Both leads are drawn with their boxes, "What will Shellshock do?" stands on the top screen, and the lower screen shows FIGHT, BAG, RUN and POKEMON.
+- The moment played with the server held: Shellshock's Tackle took Snivy from 120 HP to 1 with "It's super effective!", and the foe's Tackle took Shellshock from 130 to 7.
+- Two equal runs agree at every mark on the frame, the SHA-256 of main RAM and the frame's picture: 94 marks with the save, 112 without.
+- A double sends out two Pokémon a side and shows four boxes at frame 1012, and the first position's action menu at 1071. Its run ends there, since the moment is a single's.
+- The battle's background is the plain default scene: the field status is reset, so no route's ground shows. Sound went unchecked, since the runs are headless.
+
+The frames stay on the build machine (ADR 0002), as do the logs.
+
+### A Pokémon as data
+
+The park writes each Pokémon as the bytes Black 2 keeps in a party, and the tree holds no number of that format.
+
+- **The format, read by name at run time.** `scripts/gen5-bw2-pkm.ts` reads the layouts of `PartyPkm`, `PokeParty`, `PkmBufferChunk` and `PkmBlockA` to `PkmBlockD` (`include/pml/poke_party.h`), each block's column from the enum `PKM_DATA_BLOCK_A` to `PKM_DATA_BLOCK_D`, and from `src/system/poke_tool.c` the block order table `blockShufLUT`, the personality bits that `PML_PkmGetParamBlockCore` picks its row by, the key step of `PML_CryptoNextKey` and the bound of `PML_UtilPIDIsRare`. Constants such as `PARTY_SIZE`, the `GENDER_*` values, `LANGUAGE_ENGLISH` and `VERSION_BLACK2` come by their defines, and the species, moves, items, abilities and natures as whole lists by constant name from `generated/`. Each reader throws by name when the source loses the shape it expects. All of it lands under the key `pkm` of `build/gen5/bw2.json`.
+- **The encoder.** `src/gen5/pkm-fields.ts` writes a Pokémon's fields into its plain bytes and reads them back (`plainPkm`, `readPkm`); the personality follows from the gender, the shininess, the original trainer's ID and a salt per slot (`pidFor`). `src/gen5/pkm-cipher.ts` seals the plain bytes: the checksum of the content, the blocks placed by the personality, the content ciphered under the checksum and the party part under the personality (`sealPkm`). `openPkm` gives the plain bytes back.
+- **The team.** `scripts/gen5-moment-team.ts` names twelve Pokémon, six a side, by pokebw2's constant names, at level 50; their PP and stats come from @pkmn/data by the game's numbers.
+- **The proof.** `scripts/gen5-pkm-real.test.ts` finds the party in the tracked save, opens its Tepig with a right checksum and seals it back byte for byte. It reads the species, the first move, the ball, the language, the origin, the name and the original trainer by name, and a write and read of every field changes none. Its assertions compare names and booleans.
+- **No number in the tree.** The fixtures under pokebw2's names hold invented numbers in an order of their own, and `scripts/gen5-fixtures-real.test.ts` holds that (see "pokebw2's numbers in CI").
+
+The direct entry's other numbers come the same way, by `scripts/gen5-bw2-entry.ts` under the key `entry`: the eight functions of `ENTRY_FUNCTIONS` from the ARM9's `symbols.txt`, each with the Thumb bit added; five data symbols, the ones named above among them; the constants by their defines and lists; the layouts of `GameProcManager`, `BtlSetup`, `BtlSetupTrainer`, `StrBuf`, `PokeParty`, `PartyPkm`, `PlayerInfo`, `Config` and `BtlFieldStatus`; the battle overlay's span from `ov167`'s `delinks.txt`; the room of the trainer's name from the buffer that `TrainerBattleSetup_Create` creates; and the strings' terminator `CHAR_EOM` from `src/system/printsys.c`.
+
+### What the direct entry leaves open
+
+- The visitor's page does not start it yet: `scripts/gen5-moment.ts` drives it from outside.
+- A replay's names do not reach it yet: the team names pokebw2's constants, and a map from Showdown's names to the game's numbers is still to come. Every Pokémon is form 0.
+- With an experience of 0 the near box draws its EXP bar empty.
+- The opening's samples, one every 30 frames, show the throw and no frame of the "Go!" line.
+- A nickname and the opponent's original-trainer names are cut to their fields' room, and the log says so in its `team:` lines.
+- A double's moment, and the music, which no run listened to.
+- A state kept in the browser: it would save a few seconds at most, since the park comes by frame 267, so it stays a rest.
+
+### The walk, as history
+
+Before #97 the page walked into a battle. The spike's route from New Game (`src/gen5/route.ts`) names the player IRV, picks Tepig and follows Hugh into the rival battle: 33,570 frames, 9 min 21 s at the DS's pace and about 24 minutes uncapped on the build machine, so S5 played it in pieces from the states of earlier marks, partly under earlier versions of the macro. Two runs from boot agreed on 179 marks up to frame 22,670 (`gen5-route-36.log`, `gen5-route-37.log`). From boot the final macro stalled at frame 23,270: a second talk with Hugh sent the counted walks after it elsewhere (S9, `gen5-route-39.log`).
+
+#78 replaced that route with a save of our own before Youngster Terrell on Route 20 (`docs/gen5-save.md`): the page loads it, takes Continue and walks two tiles into his sight (`src/gen5/continue-route.ts`), 4,146 frames, 69.3 s at the DS's pace, to the action menu. The walk stays until its removal, a small fix of its own; the save also serves the real spec of a Pokémon's format.
+
+What the page fixes for every way in:
 
 - The clock: no core option, but melonDS reads the real-time clock through Emscripten's `Date.now`. The page sets it to noon on 1 January 2000 plus the emulated frames over 59.8261 (`src/gen5/clock.ts`), so the battle's clock showed 12:09.
 - The firmware: the core boots on its defaults (name, birthday, language), and two runs agreed with them.
 - Input: the page presses buttons through EmulatorJS's `simulateInput` before each emulated frame, frame-exact; no run skipped a frame.
 
-What a visitor brings: the dump, and with route (a) nothing else. The page would build the state in the visitor's browser from the dump and the macro, keep it there (IndexedDB) for the next visit, and start each battle from it. ADR 0002 holds: a state counts as ROM-derived, so no state leaves the visitor's browser and no server hosts one. On a device that runs the DS's pace the first visit costs the 9 min 21 s of the route, less with the speed cap off. Route (b) would shorten that with a shipped save file; the spike did not try it.
+What a visitor brings: the dump and nothing else. The direct entry needs no save and no state. ADR 0002 holds: a state counts as ROM-derived, so no state leaves the visitor's browser and no server hosts one.
 
 ## The way in (question 3)
 
-The page writes blocks of the game's own server commands into memory where the battle client reads them, at addresses that pokebw2 gives. It injects no code and changes no file of the game (ADR 0007).
+The page writes blocks of the game's own server commands into memory where the battle client reads them, at addresses that pokebw2 gives. The moment injects no code and changes no file of the game (ADR 0007); only the battle's start runs a routine of ours ("Into a battle").
 
-pokebw2 (fuddlesworth/pokebw2, pinned at `345b790e6000869b481b79838bb5727309f832fb`) rebuilds Black 2 and White 2 byte for byte, so its symbols are the retail addresses. `scripts/gen5-bw2.ts` reads a checkout of that commit and writes `build/gen5/bw2.json`: 26 symbols of overlay 167, both command enums, every command's argument format, the message rules, the queue size and the layouts of the structs the page touches, worked out from the C structs. The code reads every address, offset, command number and message number of pokebw2's at run time, from that file or, for a line's number, from the text bank by its label; the specs use invented numbers, and the generator stops on a layout that breaks its rules for the adapter (S8). This document names each value by its symbol; `node scripts/gen5-bw2.ts` prints the values for anyone with a checkout. A few rules of the game have no number in the file, and the code writes them out, each with its source in pokebw2 named in a comment: `sCommMode` 0 for a local battle and `returned` 0 and 1 (`btl_adapter.c`). The symbols the moment depends on:
+pokebw2 (fuddlesworth/pokebw2, pinned at `345b790e6000869b481b79838bb5727309f832fb`) rebuilds Black 2 and White 2 byte for byte, so its symbols are the retail addresses. `scripts/gen5-bw2.ts` reads a checkout of that commit and writes `build/gen5/bw2.json`: 26 symbols of overlay 167, both command enums, every command's argument format, the message rules, the queue size and the layouts of the structs the page touches, worked out from the C structs. Since #78 it also holds the tile of the save's trainer, found by his name, and since #97 the direct entry's numbers (key `entry`) and a Pokémon's format (key `pkm`), both in "Into a battle". The code reads every address, offset, command number and message number of pokebw2's at run time, from that file or, for a line's number, from the text bank by its label; the specs use invented numbers, and the generator stops on a layout that breaks its rules for the adapter (S8). This document names each value by its symbol; `node scripts/gen5-bw2.ts` prints the values for anyone with a checkout. A few rules of the game have no number in the file, and the code writes them out, each with its source in pokebw2 named in a comment: `sCommMode` 0 for a local battle and `returned` 0 and 1 (`btl_adapter.c`). The symbols the moment depends on:
 
 | Symbol                          | What it is                                                                                                                    |
 | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
@@ -168,7 +205,7 @@ The first block of the known run: Tepig (battle mon 0) uses Tackle (33) on Oshaw
 
 What S6 showed, in two runs from the battle's state: the client took two blocks one after the other with no button press between, and Black 2 played each with its line, its animation and its bar. A block took 271 to 486 frames, 4.5 to 8.1 s at the DS's rate, by the move's animation. The moves need the battle scene's animation setting as the game has it now; both runs animated. Writing an adapter command `SELECT_ACTION` afterwards brought the action menu back. Before the menu, the client played Hugh's own line "I won't forget the pain you just put my partner through!": the client shows a trainer's hint line once by the opponent's HP when the player selects an action (`CheckTrainerHintMsg`). A replay needs no menu, so a backend would not send `SELECT_ACTION`.
 
-Injected code stays the fallback (ADR 0007), for what memory writes cannot reach. Nothing in the spike needed it.
+Injected code is ADR 0007's fallback, for what memory writes cannot reach. The spike needed none; the direct start (#97) is its first use, and the moment still goes in by memory writes alone.
 
 ## Battle text (question 4)
 
@@ -184,7 +221,7 @@ So a backend picks a line by its label in the pinned sources, as Gen 3's backend
 
 The spike checked every frame with headless Chromium on the page itself: `scripts/gen5-shot.ts` and its scenes run the server and Playwright's Chromium in one process and save the core's own screenshot (a PNG from `gameManager.screenshot()`, no WebGL readback) next to a log of frames, requests and memory. S5's route and S6's moment ran this way, and the integrator looked at the frames.
 
-SkyEmu's headless control server would have served as the check tool that mGBA is for Gen 3, but its v5 builds abort before the server binds (skylersaleh/SkyEmu#576). Untried, each needing an install, a build or a fix upstream: SkyEmu's windowed mode under `xvfb-run` with its control server turned on, SkyEmu built from source without asserts, a fixed SkyEmu release, desmume-cli 0.9.13 (no scripting) and melonDS 1.1 under `xvfb-run` (no scripting, a GDB stub only). The spike recommends headless Chromium with the core's screenshot. Its cost: a check starts from a state of the battle, since the route takes about 24 minutes here; states stay on the build machine.
+SkyEmu's headless control server would have served as the check tool that mGBA is for Gen 3, but its v5 builds abort before the server binds (skylersaleh/SkyEmu#576). Untried, each needing an install, a build or a fix upstream: SkyEmu's windowed mode under `xvfb-run` with its control server turned on, SkyEmu built from source without asserts, a fixed SkyEmu release, desmume-cli 0.9.13 (no scripting) and melonDS 1.1 under `xvfb-run` (no scripting, a GDB stub only). The spike recommends headless Chromium with the core's screenshot. Its cost: a check started from a state of the battle, since the route took about 24 minutes here; states stay on the build machine. Since #97 a check starts from power-on instead, and a run through the moment takes two to three minutes on the build machine.
 
 ## The dumps
 
@@ -230,16 +267,31 @@ The spike recommends route one, EmulatorJS's melonDS, with the Gen 5 page served
 
 ## pokebw2's numbers in CI
 
-The user's answer to question 7 (24.11.2026, #77): commit none of pokebw2's numbers. CI fetches pokebw2 at its pin before the check, at depth 1, with no blob fetched before the checkout and a sparse tree of exactly the files in `POKEBW2_FILES` (`scripts/gen5-bw2-source.ts`). `node scripts/gen5-bw2.ts --quiet` then generates `build/gen5/bw2.json`. Its report gives the pin, the fetch time, the count of symbols it looked up and its two checks. The log is public, so the report prints no address, offset, value or size. `scripts/gen5-bw2-real.test.ts` runs the Gen 5 code on the real numbers and asserts names and truth values only. On a machine without the file the spec skips; under CI its guard fails.
+The user's answer to question 7 (24.11.2026, #77): commit none of pokebw2's numbers. CI fetches pokebw2 at its pin before the check, at depth 1, with no blob fetched before the checkout and a sparse tree of exactly the files in `POKEBW2_FILES` (`scripts/gen5-bw2-source.ts`). `node scripts/gen5-bw2.ts --quiet` then generates `build/gen5/bw2.json`. Its report gives the pin, the fetch time, the count of symbols it looked up and its checks, each as a line of names. The log is public, so the report prints no address, offset, value or size.
 
-When the fetch fails, the generator step fails with git's message. The check still runs, so lint and types report as usual, and the guard turns the job red. Nothing falls back to invented numbers. A committed table goes to a gate on either trigger: CI cannot fetch the pin on two runs at least a day apart, or the fetch and the generator add more than 30 s to the check job, the median of five runs against the five before.
+The direct start grew the list from the battle's files to 52: the boot and the proc manager, the battle's setup, the strings, the party, the player's info and the config, the boot overlays' and the battle overlay's link files, the Pokémon's format and the generated lists of species, moves, items, abilities, natures, trainer classes and tracks. A spec holds the list equal to the files the generator reads. The step still took 1 s in CI with all 52, and a fresh sparse fetch on the build machine took 2.8 s, 3.3 s with the generator: far under the 30 s that would send a committed table to a gate.
+
+Three specs run on the real numbers there, and each asserts names and truth values only:
+
+- `scripts/gen5-bw2-real.test.ts` runs the Gen 5 code on the generated file: the battle's symbols and layouts, and the direct entry's functions, span, layouts and constants as relations.
+- `scripts/gen5-pkm-real.test.ts` proves the Pokémon format on the tracked save ("A Pokémon as data").
+- `scripts/gen5-fixtures-real.test.ts` is the fixtures' guard. A fixture that keeps pokebw2's member names in pokebw2's order with natural widths ends up with the real small offsets, sizes and bit places, though no number in it was copied; two of ours once did. So every fixture under pokebw2's names holds invented numbers in an order of its own, and the guard walks each fixture beside the generated file by the same path. It fails when a field's offset, size and bits all match, or when a struct's size or alignment, a constant, a list entry, a table cell, a cipher number, an address or a bound matches, and it lists the paths alone. It also fails on a fixture module in `src/gen5/` that it neither compares nor lists as holding no number of pokebw2.
+
+On a machine without the file these specs skip; under CI each one's guard fails. `scripts/gen5-moment-direct-real.test.ts` and the routine's build spec skip in CI as well: CI has no ARM compiler, so it builds no routine.
+
+When the fetch fails, the generator step fails with git's message. The check still runs, so lint and types report as usual, and the guards turn the job red. Nothing falls back to invented numbers. A committed table goes to a gate on either trigger: CI cannot fetch the pin on two runs at least a day apart, or the fetch and the generator add more than 30 s to the check job, the median of five runs against the five before.
 
 ## What a Gen 5 backend needs next
 
 - A writer of server commands per turn of a battle script, from the moment's shape: `SC_DAMAGE` for the hit flash, faints, switches, status, weather and the set lines of bank 18, each with its handler's arguments read from pokebw2.
 - The HP rule from the battle log's percentages to the game's HP. Gen 3's rule lives in `src/gen3/translate/scale.ts` and would move to one shared module first.
-- A start for each battle: the route's state, built in the visitor's browser once the route reaches the battle from boot, or a save file (route (b)), and the server held through the adapter's state from the first action selection.
-- The teams: the spike played the rival's battle with the game's own Pokémon. How a replay's teams reach the battle (the parties before the battle starts, or the client's copies and the view's sprites after) is untried; S6 generated the layouts of `BattleParty` and `BattleMonCore` for it.
+- The teams of a replay: a map from Showdown's names to the game's numbers for species, moves, items, abilities and natures, generated from the pinned lists by name and checked by a spec, as AGENTS.md asks. The direct entry already writes up to six a side, and its team names pokebw2's constants by hand for now.
+- Forms: every Pokémon goes in as form 0.
+- The EXP bar: a replay carries no experience, so the bar draws empty; the backend decides whether to fill it or leave it.
+- A double's moment: the direct entry reaches a double's action menu, and `src/gen5/moment.ts` plays a single's moment alone.
+- The music: the park writes the trainer battle's track, and no run has listened to it.
+- The direct entry on the visitor's page: today `scripts/gen5-moment.ts` drives it from outside.
+- The walk's removal: `--entry walk`, the continue route, the trainer route and the save before Terrell, once nothing needs them (the save still backs the format's real spec).
 - A pace for the blocks: a block took 4.5 to 8.1 s at the DS's rate, and the page waits for `returned` before the next.
 
 ## Open questions for the gate
@@ -248,7 +300,7 @@ Each is one issue proposal.
 
 1. **The GPL question for a public page (N2).** Weight: blocks a public Gen 5 page; a backend's work can start without it. Options in "Licences" above; the spike recommends EmulatorJS's melonDS under reading (a). It also settles whether EmulatorJS may join `package.json`, which the spike avoided with its own fetch (W5-11).
 2. **The clean dump (N1).** pokebw2 expects SHA1 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`; the dump the spike ran on does not match it. Weight: none for milestone 6 in DS mode; needed for DSi mode and a ROM built from pokebw2 (roadmap step 8). Dumping it needs a DSi or a 3DS.
-3. **The opening before the first battle (N4).** The route takes 9 min 21 s at the DS's pace on a visitor's first visit, about 24 min uncapped on the build machine, and from boot it first needs its fix at Hugh's talk (S9). Options: keep the route and keep its state in the visitor's browser; ship a save file before a trainer (ADR 0002 allows it); or both, the save file first. Whichever route: no state leaves the visitor's browser (ADR 0002). Weight: decides the first visit's wait.
+3. **The opening before the first battle (N4).** The route takes 9 min 21 s at the DS's pace on a visitor's first visit, about 24 min uncapped on the build machine, and from boot it first needs its fix at Hugh's talk (S9). Options: keep the route and keep its state in the visitor's browser; ship a save file before a trainer (ADR 0002 allows it); or both, the save file first. Whichever route: no state leaves the visitor's browser (ADR 0002). Weight: decides the first visit's wait. Answered: #78 shipped the save before a trainer, and #97 then started the battle from power-on with no save.
 4. **Speed on a PC and a phone (N3).** The user has the link; the figures are open. Weight: decides whether a browser route exists for visitors at all, and whether the phone keeps the 2 GB tab.
 5. **The trainer's hint line.** The client shows a trainer's line once by the opponent's HP before an action menu. A backend that sends no action selection never meets it; a backend that does must expect it. Weight: small; one ruling and one spec.
 6. **The lint zone and coverage threshold for `src/gen5/`.** `eslint.config.js` and `vitest.config.ts` do not name it yet, so only review keeps it free of DOM and Node imports (W5-15). Weight: small; two lines in shared files when the backend starts.
@@ -261,6 +313,12 @@ Each is one issue proposal.
 - The route from boot stalls at frame 23,270, before the lookout: a second talk with Hugh, on screen at frame 19,242, sends the walks after it elsewhere (S9, `gen5-route-39.log`). The battle state that S6 started from belongs to the chain built under earlier versions of the macro.
 - The route walks by two heap addresses for the player's position (0x0223E4DA and 0x0223E4DE), found by comparing states and not from pokebw2's symbols. They held in every run.
 - The FreeBIOS fallback of EmulatorJS's melonDS is read from its source; its log line never reached the browser.
+- The direct entry's EXP bar: with an experience of 0 the near box draws its bar empty (#97).
+- The direct entry's opening is sampled every 30 frames, which shows the throw and no frame of the "Go!" line. A denser sample would move the marks that the equal runs compare.
+- A nickname and the opponent's original-trainer names are cut to their fields' room: "Shellshocker" shows as "Shellshock", and "Showdown" as an original trainer as "Showdow". The log says so in its `team:` lines.
+- The direct entry's battle shows the plain default background, since the routine resets the field status.
+- A state in the visitor's browser saves a few seconds at most on the direct entry, since the park comes by frame 267.
+- Specs that build a layout inline, outside a `*.fixtures.ts` module, stand outside the fixtures' guard.
 - SkyEmu: which of the two RAM bases is live, its own "Emulation FPS" counter, its uncapped speed, and the white screen after five minutes on the title (likely the opening's loop) stay open.
 - The watch in S6 logs only while a macro step waits, so the client's answer shows as the end frame of that step.
-- `docs/plan.md`'s roadmap step 6 still lists the emulator and the save-file route as open; the gate's answers will settle both.
+- `docs/plan.md`'s roadmap step 6 still lists the emulator and speed on phones as open.
