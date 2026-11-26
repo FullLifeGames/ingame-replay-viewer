@@ -1,23 +1,24 @@
-// The glue's division helpers (#66, #92) as WebAssembly runs them: the emsdk's clang compiles
-// irv_wasm_divide.c to wasm32 with no libc, and each helper runs on the rows the native spec runs
-// (wasm-divide-rows.ts). The native harness cannot show that clang's WebAssembly code of a helper
-// never reaches a trapping op; this spec runs that code. It skips without the emsdk (CI has none).
+// The glue's division helpers (#66, #92) as WebAssembly runs them. A clang compiles irv_wasm_divide.c
+// for wasm32 with no libc (the emsdk's, else one on PATH: wasm-clang.ts), and each helper runs on
+// libgcc's rows that the native spec runs (wasm-divide-rows.ts). The native harness cannot show
+// that WebAssembly code of a helper never reaches a trapping op; this spec runs the code that clang
+// makes of the helpers' C at -O2. The module's own build compiles the same C with emcc and the flags
+// of wasm.json, so its code is close to this, not the same. Under CI a missing clang fails the
+// guard below; elsewhere the cases skip.
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import { REPO_DIR } from './rom-paths.ts'
-import { wasmPaths } from './wasm-compile.ts'
+import { findWasmClang } from './wasm-clang.ts'
 import { WASM_DIR } from './wasm-config.ts'
 import { DIVIDE_OPS, helperName } from './wasm-divide.ts'
 import { bits, DIVIDE_CASES } from './wasm-divide-rows.ts'
 import type { DivideCase } from './wasm-divide-rows.ts'
 
-// emcc sits in upstream/emscripten, its clang in upstream/bin.
-const CLANG = join(dirname(dirname(wasmPaths(REPO_DIR).emcc)), 'bin', 'clang')
+const CLANG = findWasmClang()
 const SOURCE = join(WASM_DIR, 'src', 'irv_wasm_divide.c')
 
 type Helper = (n: number | bigint, d: number | bigint) => number | bigint
@@ -34,11 +35,11 @@ afterAll(() => {
 })
 
 /** The helpers' module: no libc and no entry, the eight helpers exported by name. */
-function compileHelpers(): Record<string, Helper> {
+function compileHelpers(clang: string): Record<string, Helper> {
   const out = join(scratch, 'divide.wasm')
   const exports = DIVIDE_OPS.map((op) => `-Wl,--export=${helperName(op)}`)
   const flags = ['--target=wasm32', '-nostdlib', '-ffreestanding', '-O2', '-Wl,--no-entry']
-  const result = spawnSync(CLANG, [...flags, ...exports, SOURCE, '-o', out], { encoding: 'utf8' })
+  const result = spawnSync(clang, [...flags, ...exports, SOURCE, '-o', out], { encoding: 'utf8' })
   if (result.status !== 0) throw new Error(`the helpers do not compile:\n${result.stderr}`)
   const module = new WebAssembly.Module(readFileSync(out))
   return new WebAssembly.Instance(module).exports
@@ -54,12 +55,19 @@ function call(helpers: Record<string, Helper>, { op, n, d }: DivideCase): bigint
   return BigInt.asUintN(32, BigInt(result))
 }
 
-describe.skipIf(!existsSync(CLANG))(
-  'the division helpers compiled to WebAssembly return what libgcc 14.2.1 returns (emsdk)',
+// Scene: CI must never pass with the helpers' WebAssembly cases skipped.
+it.runIf(Boolean(process.env.CI))('finds a clang for wasm32 under CI', () => {
+  expect('missing' in CLANG ? CLANG.missing : '').toBe('')
+})
+
+const FROM = 'from' in CLANG ? CLANG.from : 'no clang'
+
+describe.skipIf('missing' in CLANG)(
+  `the division helpers compiled to WebAssembly return what libgcc 14.2.1 returns (${FROM})`,
   () => {
     let helpers: Record<string, Helper> = {}
     beforeAll(() => {
-      helpers = compileHelpers()
+      if ('path' in CLANG) helpers = compileHelpers(CLANG.path)
     }, 60_000)
 
     it.each(DIVIDE_CASES.map((one, i) => [helperName(one.op), one.n, one.d, i] as const))(
