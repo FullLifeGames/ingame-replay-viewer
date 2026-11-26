@@ -13,11 +13,13 @@ export const ORDER_MEMBERS = [
   'gameData',
   'setup',
   // Call addresses with the Thumb bit: GameData_Create, BtlSetup_Create, ResetBtlFieldStatus,
-  // BtlSetup_SetTrainer1v1Single, GFL_SndBGMPlay and GCTX_ProcMgrReplaceProc
+  // BtlSetup_SetTrainer1v1Single, GFL_BGSysEnableEngines, GFL_SndBGMPlay and
+  // GCTX_ProcMgrReplaceProc
   'gameDataCreate',
   'setupCreate',
   'resetFieldStatus',
   'setTrainer1v1Single',
+  'enableEngines',
   'bgmPlay',
   'replaceProc',
   // HEAPID_USER, OVERLAY_BATTLE_MAIN, BATTLE_PROC_FUNCTIONS and SND_CHANNEL_MASK_ALL

@@ -35,6 +35,14 @@ describe('rom/gen5/routine.c', () => {
     }).toThrow(/cheer/)
   })
 
+  it("switches both displays on at the go, before the music and the battle's proc", () => {
+    const main = SOURCE.slice(SOURCE.indexOf('BOOL RoutineProc_Main('))
+    const at = (call: string) => main.indexOf(`order->${call})(`)
+    expect(at('enableEngines')).toBeGreaterThan(main.indexOf('order->go == FALSE'))
+    expect(at('enableEngines')).toBeLessThan(at('bgmPlay'))
+    expect(at('bgmPlay')).toBeLessThan(at('replaceProc'))
+  })
+
   it('gives each stage the value the TypeScript side reads', () => {
     const stages = Object.fromEntries(
       Object.entries(cDefines(SOURCE, 'STAGE_')).map(([name, value]) => [camel(name), value]),

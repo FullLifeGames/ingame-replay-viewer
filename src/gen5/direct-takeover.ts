@@ -80,6 +80,7 @@ function blockBytes(entry: EntryNumbers, layout: RoutineLayout): number[] {
     setupCreate: entryCall(entry, 'BtlSetup_Create'),
     resetFieldStatus: entryCall(entry, 'ResetBtlFieldStatus'),
     setTrainer1v1Single: entryCall(entry, 'BtlSetup_SetTrainer1v1Single'),
+    enableEngines: entryCall(entry, 'GFL_BGSysEnableEngines'),
     bgmPlay: entryCall(entry, 'GFL_SndBGMPlay'),
     replaceProc: entryCall(entry, 'GCTX_ProcMgrReplaceProc'),
     heapId: entryConstant(entry, 'HEAPID_USER'),

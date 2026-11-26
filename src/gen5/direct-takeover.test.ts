@@ -13,7 +13,7 @@ const MANAGER = 0x02140000
 const CODE = 0x02300000
 const TABLE = 0x02300024
 const BLOCK = 0x02300030
-const STATUS = 0x02300070
+const STATUS = 0x02300074
 
 const { steps, layout } = takeover(ENTRY, ROUTINE)
 
@@ -84,14 +84,15 @@ describe('takeover', () => {
       const at = orderOffset(member)
       return (bytes[at] ?? 0) + (bytes[at + 1] ?? 0) * 0x100 + (bytes[at + 2] ?? 0) * 0x10000
     }
-    expect(bytes).toHaveLength(64)
+    expect(bytes).toHaveLength(68)
     expect(['stage', 'go', 'gameData', 'setup'].map((m) => word(m as 'go'))).toEqual([0, 0, 0, 0])
     expect(word('gameDataCreate')).toBe(0x004201)
+    expect(word('enableEngines')).toBe(0x004701)
     expect(word('heapId')).toBe(7)
     expect(word('battleOverlayId')).toBe(99)
     expect(word('battleProcFunctions')).toBe(0x300800)
     expect(word('bgmOffset')).toBe(0x0a)
-    expect(word('fieldStatus')).toBe(0x300070)
+    expect(word('fieldStatus')).toBe(0x300074)
   })
 
   it('marks takeover and park, each after a check of the routine, and ends at park', () => {

@@ -34,6 +34,15 @@ describe('orderBytes', () => {
   })
 })
 
+// Scene: the takeover replaces the boot screens, the one proc before the battle that switches both
+// displays on, so the routine makes that call of the game's own before the music and the battle.
+describe('ORDER_MEMBERS', () => {
+  it('holds the call that switches both displays on, among the calls, before the music', () => {
+    expect(ORDER_MEMBERS).toHaveLength(17)
+    expect(ORDER_MEMBERS.indexOf('enableEngines')).toBe(ORDER_MEMBERS.indexOf('bgmPlay') - 1)
+  })
+})
+
 describe('orderOffset', () => {
   it('counts four bytes a member, from the first', () => {
     expect(orderOffset(ORDER_MEMBERS[0])).toBe(0)

@@ -1,7 +1,7 @@
 // The direct entry's routine (README.md): a proc of our own that the page writes into the game's
 // memory and queues in place of the boot screens. Its init builds a trainer battle with the game's
 // own functions, its main waits until the page has written the battle's names and parties, then
-// starts the music and replaces itself by the battle's proc.
+// switches both displays on, starts the music and replaces itself by the battle's proc.
 //
 // The file holds no address, offset, size or constant of the game. Every one of them reaches the
 // routine at run time through the order block, which the proc manager hands to each function as
@@ -45,6 +45,7 @@ typedef struct OrderBlock {
     u32 setupCreate;
     u32 resetFieldStatus;
     u32 setTrainer1v1Single;
+    u32 enableEngines;
     u32 bgmPlay;
     u32 replaceProc;
     // The heap for the game data, the setup and the trainer (HEAPID_USER)
@@ -63,6 +64,7 @@ typedef struct OrderBlock {
 typedef void *(*CreateFunc)(HeapID heapId);
 typedef void (*ResetFieldStatusFunc)(void *status);
 typedef void (*SetTrainerFunc)(void *setup, void *gameData, void *status, u32 trainerId, HeapID heapId);
+typedef void (*EnableEnginesFunc)(void);
 typedef void (*BgmPlayFunc)(u32 bgm, u32 channelMask);
 typedef void (*ReplaceProcFunc)(s32 overlayId, const void *functions, void *param);
 
@@ -98,7 +100,9 @@ BOOL RoutineProc_Init(void *proc, u32 *state, void *param, void *work) {
 
 // Waits frame after frame for the page's go, then hands over to the battle as the Battle
 // Competition does: the setup's music first, then the battle's proc in place of this one.
-// A failed stage never reaches the go, so the routine waits for good.
+// Before both it switches the two displays on. On a normal boot the boot screens do that, and
+// the battle never does; the routine runs in their place, so without the call the lower screen
+// stays off. A failed stage never reaches the go, so the routine waits for good.
 BOOL RoutineProc_Main(void *proc, u32 *state, void *param, void *work) {
     OrderBlock *order = param;
     u32 bgm;
@@ -109,6 +113,7 @@ BOOL RoutineProc_Main(void *proc, u32 *state, void *param, void *work) {
     if (order->stage != STAGE_PARKED || order->go == FALSE) {
         return FALSE;
     }
+    ((EnableEnginesFunc)order->enableEngines)();
     bgm = *(volatile u16 *)(order->setup + order->bgmOffset);
     ((BgmPlayFunc)order->bgmPlay)(bgm, order->channelMask);
     ((ReplaceProcFunc)order->replaceProc)((s32)order->battleOverlayId, (const void *)order->battleProcFunctions,

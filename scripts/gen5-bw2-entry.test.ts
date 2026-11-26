@@ -90,6 +90,7 @@ describe('entryNumbers', () => {
   it('gives each function its call address, each data symbol, and the constants by name', () => {
     const entry = entryNumbers(INPUT)
     expect(Object.keys(entry.functions)).toEqual(ENTRY_FUNCTIONS)
+    expect(ENTRY_FUNCTIONS).toContain('GFL_BGSysEnableEngines')
     expect(entry.functions[ENTRY_FUNCTIONS[0] ?? '']).toEqual({ call: 0x02004001, thumb: true })
     expect(entry.data.sGameProcManager?.address).toBe(0x02100000)
     expect(entry.data.sBootScreensParam?.address).toBe(0x02100010)

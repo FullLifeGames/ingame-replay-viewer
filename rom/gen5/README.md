@@ -3,7 +3,7 @@
 `routine.c` is a small routine of our own for Black 2's direct battle start (#97). The page writes it into the game's memory while the game runs and queues it as one of the game's procs, in place of the boot screens. It has three functions, which the game's proc manager calls through a table:
 
 - init builds the game data, the battle setup and a one-on-one trainer battle with no trainer of the game's own list, then sets its stage to parked;
-- main waits frame after frame until the page sets the go word, then starts the setup's music and replaces itself by the battle's proc;
+- main waits frame after frame until the page sets the go word, then switches both displays on, starts the setup's music and replaces itself by the battle's proc. On a normal boot the boot screens switch the displays on, and the battle never does; the routine runs in their place, so it makes that call of the game's own;
 - exit frees nothing, since the battle keeps the game data and the setup.
 
 The file holds no address, offset, size or constant of the game, and it includes no header of pokebw2. Every one of those values reaches the routine at run time through the order block, which the page fills from `build/gen5/bw2.json` and hands to each function as the proc's param. The block's members are words alone. `src/gen5/routine-order.ts` lists the same members in the same order, and a spec holds the two lists equal and fails on any number in the C file at or above a small bound.

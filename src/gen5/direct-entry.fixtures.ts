@@ -28,6 +28,7 @@ export const ENTRY: EntryNumbers = {
     ResetBtlFieldStatus: call(0x02004400),
     BtlSetup_SetTrainer1v1Single: call(0x02004500),
     GFL_SndBGMPlay: call(0x02004600),
+    GFL_BGSysEnableEngines: call(0x02004700),
   },
   data: {
     sGameProcManager: data('sGameProcManager', 0x02110000),

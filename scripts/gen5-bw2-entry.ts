@@ -72,7 +72,8 @@ export type EntryInput = Record<keyof typeof ENTRY_SOURCES, string> & {
 
 /** The functions the routine calls: the queue and the replace of the proc manager, the game
  * data's and the battle setup's constructors, the field status's reset, the setup of a one-on-one
- * trainer battle, and the music. All live in the ARM9's static module. */
+ * trainer battle, the music, and the switch that turns both displays on, which the boot screens
+ * call on a normal boot and the battle never does. All live in the ARM9's static module. */
 export const ENTRY_FUNCTIONS = [
   'GCTX_ProcMgrQueueProc',
   'GCTX_ProcMgrReplaceProc',
@@ -81,6 +82,7 @@ export const ENTRY_FUNCTIONS = [
   'ResetBtlFieldStatus',
   'BtlSetup_SetTrainer1v1Single',
   'GFL_SndBGMPlay',
+  'GFL_BGSysEnableEngines',
 ]
 
 /** The proc manager's pointer, the boot proc's table, and the param and table the boot proc
