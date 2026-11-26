@@ -32,6 +32,8 @@ import {
 } from './wasm-hook.ts'
 
 const FIRST = 'smogtours-gen3ou-994052'
+/** The viewer's line at 994052's END, which names the replay by its label (#90). */
+const FIRST_ENDED = `Played ${labelOf(FIRST)} to the end of the battle.`
 const ROM_PATCH = join(buildPaths().outDir, OUTPUT_NAMES.patch)
 /** mGBA's fast-forward multipliers the probe runs 994052 at, one window each. */
 const MULTIPLIERS = [1, 16, 64, 256]
@@ -191,6 +193,7 @@ test('the viewer plays hand-made and 994052 at 1x and 2x, switches the speed whi
     report({ stream: FIRST, speed: 'fast', toEnd: end.finishedAt, seconds, fps })
     expect(end.done).toBe(end.total)
     expect(end.audio.writtenToEnd).toBe(0)
+    await expect(page.getByRole('status')).toHaveText(FIRST_ENDED)
     // After END the page leaves fast for 1x, so the game plays on without a core at full load.
     await expect(page.getByLabel('1x')).toBeChecked()
     expect((await status(page))?.speed).toBe('1x')
