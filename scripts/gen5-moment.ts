@@ -14,12 +14,10 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { Dex } from '@pkmn/dex'
 import { chromium, type Page } from '@playwright/test'
 
 import { adapterNumbers } from '../src/gen5/adapter.ts'
 import { battleRefs } from '../src/gen5/battle-check.ts'
-import { type BattleMonReading, findServers, frontMon } from '../src/gen5/battle-mons.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import type { Gen5Global, MarkRecord, RunPlan, RunReport } from '../src/gen5/hook.ts'
 import { MAIN_RAM_SIZE, MAIN_RAM_START } from '../src/gen5/main-ram.ts'
@@ -33,6 +31,7 @@ import {
   type StateFile,
 } from './gen5-moment-args.ts'
 import { sessionPlan } from './gen5-moment-direct.ts'
+import { type Battle, readBattle } from './gen5-moment-read.ts'
 import { teamParties } from './gen5-moment-team.ts'
 import { markLines, writeLines } from './gen5-moment-log.ts'
 import { MOMENT_GAP, momentStart, momentSteps } from './gen5-moment-plan.ts'
@@ -40,6 +39,7 @@ import { listedReader } from './gen5-bw2-source.ts'
 import {
   moveLineLabel,
   sceneBlocks,
+  type SceneName,
   sceneMove,
   TEXT_BANKS,
   textId,
@@ -81,50 +81,8 @@ interface Session {
   team: Team | undefined
 }
 
-interface Battle {
-  adapter: number
-  server: number
-  near: BattleMonReading
-  far: BattleMonReading
-}
-
-function symbol(numbers: Bw2Numbers, name: string): number {
-  const found = numbers.symbols[name]
-  if (!found) throw new Error(`bw2.json names no ${name}`)
-  return found.address
-}
-
 const readPokebw2 = listedReader(GEN5_PATHS.pokebw2)
 const bank = (name: keyof typeof TEXT_BANKS) => readPokebw2(TEXT_BANKS[name])
-
-/** Main RAM once, and from it the adapter, the one server and both front Pokémon. */
-async function readBattle(page: Page, numbers: Bw2Numbers): Promise<Battle> {
-  const base64 = await hook(page).readBytes(MAIN_RAM_START, MAIN_RAM_SIZE)
-  const ram = Buffer.from(base64, 'base64')
-  const read = (address: number, width: 1 | 2 | 4) =>
-    ram.readUIntLE(address - MAIN_RAM_START, width)
-  const adapter = read(symbol(numbers, 'sAdapters'), 4)
-  const proc = symbol(numbers, 'BattleServer_ProcSelectAction')
-  const servers = findServers(new Uint8Array(ram), MAIN_RAM_START, proc, numbers.battle)
-  log(`servers waiting for the actions: ${servers.map(hex).join(' ') || 'none'}`)
-  const [server] = servers
-  if (servers.length !== 1 || server === undefined) throw new Error('need exactly one server')
-  const near = frontMon(read, server, numbers.battle, 0)
-  const far = frontMon(read, server, numbers.battle, 1)
-  for (const [side, mon] of [
-    ['near', near],
-    ['far', far],
-  ] as const) {
-    const name =
-      Dex.forGen(5)
-        .species.all()
-        .find((s) => s.num === mon.species)?.name ?? '?'
-    log(
-      `${side}: ${name} (${String(mon.species)}) L${String(mon.level)} mon ID ${String(mon.monId)}, HP ${String(mon.hp)}/${String(mon.maxHp)} at ${hex(mon.address)}`,
-    )
-  }
-  return { adapter, server, near, far }
-}
 
 function watchOf(numbers: Bw2Numbers, battle: Battle): RamRef[] {
   const field = (
@@ -229,19 +187,8 @@ function sessionTeam(numbers: Bw2Numbers, options: MomentOptions): Team | undefi
   return team
 }
 
-async function play(page: Page, dump: string, numbers: Bw2Numbers, options: MomentOptions) {
-  const { scene, label, deadlineMs } = options
-  const team = sessionTeam(numbers, options)
-  const first = await startSession(page, dump, numbers, { options, team })
-  logReport(first)
-  if (first.status !== 'done') return 1
-  await hook(page).uncapped()
-  const battle = await readBattle(page, numbers)
-  log(`adapter ${hex(battle.adapter)}, server ${hex(battle.server)}`)
-  if (options.battle === 'double') {
-    log("double: the moment is a single's; the run ends at the action menu")
-    return 0
-  }
+/** The scene's blocks for the battle read, each logged with the move line it shows. */
+function sceneMoments(scene: SceneName, battle: Battle, numbers: Bw2Numbers) {
   const std = textId(bank('standard'), 'Bank0019_Text_ItsSuperEffective')
   const blocks = sceneBlocks(scene, battle, numbers.battle.single, std)
   for (const { name, moment } of blocks) {
@@ -252,6 +199,25 @@ async function play(page: Page, dump: string, numbers: Bw2Numbers, options: Mome
     )
   }
   log(`standard line ${String(std)}: ${textLine(bank('standard'), std)}`)
+  return blocks
+}
+
+async function play(page: Page, dump: string, numbers: Bw2Numbers, options: MomentOptions) {
+  const { scene, label, deadlineMs } = options
+  const team = sessionTeam(numbers, options)
+  const first = await startSession(page, dump, numbers, { options, team })
+  logReport(first)
+  if (first.status !== 'done') return 1
+  await hook(page).uncapped()
+  const base64 = await hook(page).readBytes(MAIN_RAM_START, MAIN_RAM_SIZE)
+  const ram = new Uint8Array(Buffer.from(base64, 'base64'))
+  const battle = readBattle(ram, numbers, team?.written)
+  log(`adapter ${hex(battle.adapter)}, server ${hex(battle.server)}`)
+  if (options.battle === 'double') {
+    log("double: the moment is a single's; the run ends at the action menu")
+    return 0
+  }
+  const blocks = sceneMoments(scene, battle, numbers)
   const steps = momentSteps({
     adapterNumbers: adapterNumbers(numbers),
     table: numbers,
