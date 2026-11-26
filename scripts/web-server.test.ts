@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { isFileLoadingAllowed, resolveConfig } from 'vite'
-import type { Plugin, PreviewServer, ViteDevServer } from 'vite'
+import type { Plugin, PreviewServer, ResolvedConfig, ViteDevServer } from 'vite'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { ROM_FILES } from '../src/web/rom-files.ts'
@@ -87,6 +87,16 @@ beforeAll(async () => {
   fullBase = await start(full)
   emptyBase = await start(empty)
 })
+
+// vite.config.ts as the dev server resolves it, once for the file: each resolve bundles the
+// config, and a case that did so ran past 5 s while a second heavy run loaded the machine (#92).
+// A hook gets no duration in the report, so its limit stays wide.
+const RESOLVE_LIMIT = 30_000
+let viteConfig: ResolvedConfig
+
+beforeAll(async () => {
+  viteConfig = await resolveConfig({ logLevel: 'silent' }, 'serve')
+}, RESOLVE_LIMIT)
 
 afterAll(async () => {
   await Promise.all(servers.map((server) => new Promise((done) => server.close(done))))
@@ -267,9 +277,8 @@ describe('the file guard for /@fs/', () => {
   })
 
   // The @pkmn packages ship their code in build/; only the repository's own build/ is ROM-derived.
-  it("denies the repository's build and pinned tree, and lets node_modules' build/ through", async () => {
-    const config = await resolveConfig({ logLevel: 'silent' }, 'serve')
-    const allowed = (path: string) => isFileLoadingAllowed(config, join(REPO_DIR, path))
+  it("denies the repository's build and pinned tree, and lets node_modules' build/ through", () => {
+    const allowed = (path: string) => isFileLoadingAllowed(viteConfig, join(REPO_DIR, path))
     expect(allowed('build/rom/irv-emerald.bps')).toBe(false)
     expect(allowed('build/rom/replay-slot.json')).toBe(false)
     expect(allowed('.cache/rom/expansion/graphics/pokemon/zapdos/front.png')).toBe(false)
@@ -284,19 +293,17 @@ describe('the file guard for /@fs/', () => {
     )
   })
 
-  it('is what vite.config.ts hands to the dev server, with the plugin', async () => {
-    const config = await resolveConfig({ logLevel: 'silent' }, 'serve')
-    expect(config.server.fs.deny).toEqual(FS_DENY)
-    expect(config.server.allowedHosts).toEqual(['.ts.net'])
-    expect(config.plugins.map((plugin) => plugin.name)).toContain('irv-rom-server')
+  it('is what vite.config.ts hands to the dev server, with the plugin', () => {
+    expect(viteConfig.server.fs.deny).toEqual(FS_DENY)
+    expect(viteConfig.server.allowedHosts).toEqual(['.ts.net'])
+    expect(viteConfig.plugins.map((plugin) => plugin.name)).toContain('irv-rom-server')
   })
 })
 
 describe('the emulator package in the dev server', () => {
   // mgba.js finds its pthread worker and its wasm beside itself (new URL(..., import.meta.url)),
   // which a pre-bundled copy in node_modules/.vite would break.
-  it('stays out of the dependency optimizer', async () => {
-    const config = await resolveConfig({ logLevel: 'silent' }, 'serve')
-    expect(config.optimizeDeps.exclude).toContain('@thenick775/mgba-wasm')
+  it('stays out of the dependency optimizer', () => {
+    expect(viteConfig.optimizeDeps.exclude).toContain('@thenick775/mgba-wasm')
   })
 })

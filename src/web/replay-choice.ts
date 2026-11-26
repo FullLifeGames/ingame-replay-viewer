@@ -6,6 +6,7 @@
 import type { Replay } from '../script/replay'
 import { readSavedFile, type SavedKind } from '../script/saved-replay'
 import type { Preview, Side } from '../script/types'
+import { replayLabel } from './label'
 import { messageOf } from './message'
 import { replayJsonUrl } from './replay-input'
 import type { TestReplay } from './replays'
@@ -49,6 +50,8 @@ export const PICK_REPLAY = 'Pick a replay first, then press Start.'
 
 export interface ReplaySummary {
   readonly id: string
+  /** The replay label the status lines name it by, as the example select does (#90). */
+  readonly label: string
   readonly streamBytes: number
   readonly instructions: number
   /** What the game does not show, by line. */
@@ -119,6 +122,7 @@ function chosenOf({ replay, stream, players, preview }: ReplayStream, place: Rep
   const rows = notShown(replay, stream)
   const summary: ReplaySummary = {
     id: replay.id,
+    label: replayLabel(replay.id, replay),
     streamBytes: stream.bytes.length,
     instructions: stream.instructions.length,
     rows,

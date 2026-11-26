@@ -10,13 +10,16 @@
 // A team holds six mons, and a battle sends out no species its team lacks, so the streams are
 // several battles: each sends out six far species, one after the other by WITHDRAW and SWITCH_IN,
 // and up to six near ones the same way; a battle past the near species sends out the first one.
-// Each send-out follows its line, as in the game, and the intro's line comes first, so both ball
-// displays are up before the first one. No stream format changes. For each animation the species
-// with the lowest number plays it.
+// Each send-out follows its line, as in the game, worded by the phrase module, and the intro's line
+// comes first, so both ball displays are up before the first one. No stream format changes. For
+// each animation the species with the lowest number plays it. The phrase module imports without
+// file extensions, so scripts/rom-shot-stream.ts loads this file through Vite's module runner.
 import type { Instruction, Party, Stream, StreamMon } from '../src/gen3/stream/instructions.ts'
+import { sentOut } from '../src/gen3/text/phrases-field.ts'
 import type { Side } from '../src/script/types.ts'
 import { parseEntryFields } from './gen3-parse.ts'
 import { speciesFiles } from './gen3-tables.ts'
+import { SEND_OUTS } from './wasm-sendouts-name.ts'
 
 type ReadTree = (path: string) => string
 
@@ -27,9 +30,6 @@ function numberOf(species: SpeciesTable, constant: string): number {
   const number = species[constant]?.[0]
   return typeof number === 'number' ? number : 0
 }
-
-/** The name of the streams for rom:shots and wasm:run; each battle adds its number. */
-export const SEND_OUTS = 'send-outs'
 
 const ANIMATION_C = 'src/pokemon_animation.c'
 const CONFIG = 'include/config/pokemon.h'
@@ -135,14 +135,13 @@ function streamMon(constant: string, species: SpeciesTable): StreamMon {
 
 const TRAINER_NAMES: Readonly<Record<Side, string>> = { near: 'Near', far: 'Far' }
 
-function sentOutLine(side: Side, mon: StreamMon): string {
-  return side === 'near' ? `Go! ${mon.nickname}!` : `Far sent out ${mon.nickname}!`
-}
-
 function sideSendOuts(side: Side, party: readonly StreamMon[]): Instruction[][] {
   return party.map((mon, slot) => {
     const entering = { side, slot, hp: mon.maxHp, status: 'none' } as const
-    const line: Instruction = { op: 'print', text: sentOutLine(side, mon) }
+    const line: Instruction = {
+      op: 'print',
+      text: sentOut({ side, name: mon.nickname }, TRAINER_NAMES.far),
+    }
     if (slot === 0) return [line, { op: 'sendOut', ...entering }]
     return [{ op: 'withdraw', side }, line, { op: 'switchIn', ...entering }]
   })

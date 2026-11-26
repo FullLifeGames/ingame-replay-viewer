@@ -15,13 +15,15 @@ import { buildPaths, REPO_DIR } from '../scripts/rom-paths.ts'
 import { readPreflightInput } from '../scripts/rom-preflight.ts'
 import { readSeries } from '../scripts/rom-upstream.ts'
 import { differ, frame } from './frames.ts'
-import { notShownCount } from './page-text.ts'
+import { COUNTS, labelOf, notShownCount } from './page-text.ts'
 import { guardRequests } from './requests.ts'
 import { loadReplay, showdownUrl } from './showdown.ts'
 
 const EMULATOR = '/emulator.html'
 const FIRST = 'smogtours-gen3ou-994052'
 const SECOND = 'smogtours-gen3ou-994086'
+const FIRST_LABEL = labelOf(FIRST)
+const SECOND_LABEL = labelOf(SECOND)
 const MISSING = 'smogtours-gen3ou-1'
 const BASE_SHA1 = loadBuildConfig().baseRom.sha1
 // Words for the developer, which a visitor line never holds (#59).
@@ -156,9 +158,11 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
   await expect(page.locator('#status-detail')).toHaveText(`The patched ROM's SHA1 is ${romSha1}.`)
   await expect(page.getByLabel('Example replay')).toHaveValue(FIRST)
   await page.getByRole('button', { name: 'Start', exact: true }).click()
-  await expect(status).toHaveText(`Running ${FIRST}.`, { timeout: 60_000 })
-  await expect(page.locator('#status-detail')).toHaveText(
-    `${String(streamBytes)} bytes of instruction stream.`,
+  await expect(status).toHaveText(`Started ${FIRST_LABEL}.`, { timeout: 60_000 })
+  // The stream's bytes show once under "Details": in the pick's counts, not in the line's detail.
+  await expect(page.locator('#status-detail')).toHaveText('')
+  await expect(page.locator('#replay-detail')).toHaveText(
+    new RegExp(`^\\d+ instructions, ${String(streamBytes)} bytes of instruction stream\\.$`),
   )
   expect(await notShownCount(page)).toBeGreaterThan(0)
   // 240×160 scaled three times; mGBA sets the canvas's own size, the page's CSS its shown size.
@@ -173,7 +177,8 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
 
   await test.step('frames change after Restart', async () => {
     await page.getByRole('button', { name: 'Restart' }).click()
-    await expect(status).toHaveText(new RegExp(`Restarted ${FIRST}`))
+    await expect(status).toHaveText(`Restarted ${FIRST_LABEL} from the beginning.`)
+    await expect(page.locator('#status-detail')).toHaveText('')
     await expect.poll(async () => differ(later, await frame(page)), { timeout: 30_000 }).toBe(true)
   })
 
@@ -181,9 +186,9 @@ test('994052 starts in the emulator, and a second Start runs 994086', async ({ p
   await test.step('a second Start runs another test replay', async () => {
     const before = await frame(page)
     await page.getByLabel('Example replay').selectOption(SECOND)
-    await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${SECOND}: `))
+    await expect(page.locator('#replay-summary')).toHaveText(SECOND_LABEL)
     await page.getByRole('button', { name: 'Start', exact: true }).click()
-    await expect(status).toHaveText(new RegExp(`^Running ${SECOND}\\.`), { timeout: 60_000 })
+    await expect(status).toHaveText(`Started ${SECOND_LABEL}.`, { timeout: 60_000 })
     await expect.poll(async () => differ(before, await frame(page)), { timeout: 30_000 }).toBe(true)
     await expect
       .poll(async () => (await frame(page)).colours, { timeout: 30_000 })
@@ -222,11 +227,13 @@ test('a Load that fails while a game plays says that the game keeps its replay, 
     timeout: 90_000,
   })
   await page.getByRole('button', { name: 'Start', exact: true }).click()
-  await expect(status).toHaveText(`Running ${FIRST}.`, { timeout: 60_000 })
+  await expect(status).toHaveText(`Started ${FIRST_LABEL}.`, { timeout: 60_000 })
   await expect.poll(async () => (await frame(page)).colours, { timeout: 30_000 }).toBeGreaterThan(1)
 
   await loadReplay(page, MISSING)
-  await expect(status).toHaveText(`Showdown has no replay with this ID. The game keeps ${FIRST}.`)
+  await expect(status).toHaveText(
+    `Showdown has no replay with this ID. The game keeps ${FIRST_LABEL}.`,
+  )
   await expect(detail).not.toHaveText('')
   await expect(details).toBeVisible()
   // The game goes on: its frames go on changing.
@@ -234,9 +241,11 @@ test('a Load that fails while a game plays says that the game keeps its replay, 
   await expect.poll(async () => differ(failed, await frame(page)), { timeout: 30_000 }).toBe(true)
 
   await page.getByLabel('Example replay').selectOption(SECOND)
-  await expect(status).toHaveText(`Picked ${SECOND}. Press Start to play it.`)
+  await expect(status).toHaveText(`Picked ${SECOND_LABEL}. Press Start to play it.`)
   await expect(detail).toHaveText('')
-  await expect(details).toBeHidden()
+  // "Details" holds the new pick's counts alone (#90).
+  await expect(page.locator('#details p:not(:empty)')).toHaveCount(1)
+  await expect(page.locator('#replay-detail')).toHaveText(COUNTS)
   await expect(page.locator('#report')).toBeHidden()
   expect(errors).toEqual([])
   expect(requests).toEqual([`GET ${showdownUrl(MISSING)}`])

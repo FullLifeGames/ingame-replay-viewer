@@ -111,6 +111,9 @@ describe('the steps of the link', () => {
       },
       sizes: () => (order.push('sizes'), 'Sizes: irv-emerald.wasm 9 B.'),
       patch: () => (order.push('patch'), 'Patch: wrote it.'),
+      discard: () => {
+        order.push('discard')
+      },
     }
     return { steps, order }
   }
@@ -136,5 +139,15 @@ describe('the steps of the link', () => {
       'Sizes: irv-emerald.wasm 9 B.',
       'Patch: none for a sanitized module.',
     ])
+  })
+
+  it('remove the plain link when its rewrite fails, so no later step takes it for a finished one', async () => {
+    const { steps, order } = recorded()
+    const failing = {
+      ...steps,
+      divide: () => (order.push('divide'), Promise.reject(new Error('wasm-dis failed'))),
+    }
+    await expect(linkSteps(failing)).rejects.toThrow('wasm-dis failed')
+    expect(order).toEqual(['link', 'divide', 'discard'])
   })
 })

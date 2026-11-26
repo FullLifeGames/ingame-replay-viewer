@@ -1,7 +1,7 @@
 // npm run rom:check [-- <filter>] (#7): the expansion's own make check, with our tests from
 // rom/gen3/test in the tree. The tree is prepared as for rom:build; make builds the TESTING objects
 // in build/emerald-test of the tree and runs the test ELF in mgba-rom-test. A heavy check on
-// devbox: run it alone and in the background (AGENTS.md).
+// the build machine: run it alone and in the background (AGENTS.md).
 import { mkdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { parseArgs } from 'node:util'

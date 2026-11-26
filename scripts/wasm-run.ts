@@ -246,14 +246,18 @@ async function playDir(dir: string): Promise<void> {
   process.stdout.write(lines.map((line) => `${JSON.stringify(line)}\n`).join(''))
 }
 
-interface StreamRun {
+export interface StreamRun {
   runDir: string
   module: string
   errors: readonly string[]
   baseline: { mode: RunArgs['mode']; out: string }
 }
 
-function runStream(plan: ShotPlan, { runDir, module, errors, baseline }: StreamRun): StreamReport {
+/** Plays one stream in its own process under timeout and reports it; a trap is thrown. */
+export function runStream(
+  plan: ShotPlan,
+  { runDir, module, errors, baseline }: StreamRun,
+): StreamReport {
   const dir = join(runDir, plan.name)
   mkdirSync(dir, { recursive: true })
   const { scenes, holdBFrom } = plan

@@ -1,8 +1,8 @@
 import { defineConfig, devices } from '@playwright/test'
 
-// The page's e2e (plan S5b §5): devbox only, never in CI. The game's frames are ROM-derived, so
-// no screenshot, video or trace is written; the specs compare frames in memory. Port 5178 is the
-// lane's e2e port (plan D12); 5173, 5174, 5176, 5177 and 8090 belong to others.
+// The page's e2e (plan S5b §5): the build machine only, never in CI. The game's frames are
+// ROM-derived, so no screenshot, video or trace is written; the specs compare frames in memory.
+// Port 5178 is the lane's e2e port (plan D12); 5173, 5174, 5176, 5177 and 8090 belong to others.
 const PORT = 5178
 const BASE_URL = `http://localhost:${String(PORT)}`
 

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { readReplay } from '../script/replay'
-import { exampleLabel, FIRST_REPLAY, TEST_REPLAYS } from './replays'
+import { replayLabel } from './label'
+import { FIRST_REPLAY, TEST_REPLAYS } from './replays'
 
 describe('TEST_REPLAYS', () => {
   it('lists the fifteen test replays, 994052 first', () => {
@@ -58,19 +59,7 @@ describe('the labels of the example replays', () => {
   it("takes the format and the players from each replay's own JSON", async () => {
     for (const { id, label, load } of TEST_REPLAYS) {
       const { format, players } = readReplay(await load())
-      expect(label).toBe(exampleLabel(id, { format, players }))
+      expect(label).toBe(replayLabel(id, { format, players }))
     }
-  })
-
-  it('keeps a format of another shape as it is written, and an id with no number whole', () => {
-    expect(
-      exampleLabel('gen9vgc2024regg-12', { format: '[Gen 9] VGC 2024 Reg G', players: ['A', 'B'] }),
-    ).toBe('Gen 9 VGC 2024 Reg G: A vs B (12)')
-    expect(exampleLabel('gen3ou-3', { format: 'Gen 3 OU', players: ['A', 'B'] })).toBe(
-      'Gen 3 OU: A vs B (3)',
-    )
-    expect(exampleLabel('hand-made', { format: '[Gen 3]', players: ['A', 'B'] })).toBe(
-      'Gen 3: A vs B (hand-made)',
-    )
   })
 })

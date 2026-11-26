@@ -222,8 +222,10 @@ function winScene(input: Input): Scene | undefined {
 // a frame short of its end (2 pixels right) fails, as do an empty field, a fading frame and a
 // black one. Without an intro either side checks only that the winner's mon went back or its
 // trainer came in: the region differs from the win frame, and the win line stays in the text box
-// until the fade, so a frame with the box changed is fading or black. A tie or an unknown end has
-// no winner: the outro holds the last line in the text box as the win frame shows it.
+// until the fade, so a frame with the box changed is fading or black. A tie has no winner: the
+// outro holds the tie line in the text box as the win frame shows it. An unknown end, a log cut
+// short, empties the box as its outro starts (Replay_StartOutro, #91): the box shows its empty
+// colour alone, which a line, a fading frame and a black one fail.
 const OUTRO_FRAMES = 150
 const TRAINER_REGIONS: Readonly<Record<Side, Region>> = {
   near: { x: 48, y: 48, width: 64, height: 64 },
@@ -244,6 +246,9 @@ function trainerCheck(winner: Side): Check {
 function outroCheck(input: Input, outcome: Outcome): Check {
   const winner = WINNERS[outcome]
   const after = 'outro'
+  if (outcome === 'unknown') {
+    return { probe: 'blank', shot: after, region: SCREEN.message, colour: SCREEN.messageBackground }
+  }
   if (winner === undefined) return { probe: 'same', before: 'win', after, region: SCREEN.message }
   if (introScene(input) !== undefined) return trainerCheck(winner)
   const region = TRAINER_REGIONS[winner]

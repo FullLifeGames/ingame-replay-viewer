@@ -27,12 +27,15 @@ function heldRun(log: string[], name: string, paused: boolean): HeldRun {
   }
 }
 
-/** A fake opener that logs its calls; the sound it opens is the line of a run without sound. */
+/** What the fake opener opens: why a run plays without sound. */
+const NO_SOUND = { reason: 'no sound in the spec', words: '' }
+
+/** A fake opener that logs its calls; the sound it opens is a silence. */
 function fakeAudio(log: string[]) {
   return {
     open: () => {
       log.push('open')
-      return Promise.resolve('no sound in the spec')
+      return Promise.resolve(NO_SOUND)
     },
     suspend: () => {
       log.push('suspend')
@@ -54,9 +57,7 @@ describe('the sound of a Start or Restart during a pause', () => {
   it("takes the paused run's sound off the speakers before the new run's sound opens", async () => {
     const log: string[] = []
     const { runs, ticket } = pageWith(heldRun(log, 'old', true))
-    await expect(soundForPress(runs, ticket, fakeAudio(log)).sound).resolves.toBe(
-      'no sound in the spec',
-    )
+    await expect(soundForPress(runs, ticket, fakeAudio(log)).sound).resolves.toBe(NO_SOUND)
     expect(log).toEqual(['mute old', 'open'])
   })
 

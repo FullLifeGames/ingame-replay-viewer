@@ -7,14 +7,10 @@ import { decodeStream } from '../src/gen3/stream/decode.ts'
 import { encodeStream } from '../src/gen3/stream/encode.ts'
 import speciesTable from '../src/gen3/tables/species.json'
 import trainerPics from '../src/gen3/tables/trainer-pics.json'
-import { readerTree } from './rom-paths.ts'
-import {
-  readSendOutAnimations,
-  SEND_OUTS,
-  sendOutCoverage,
-  sendOutStreams,
-} from './wasm-sendouts.ts'
+import { sendOutTree } from './rom-shot-stream.ts'
+import { readSendOutAnimations, sendOutCoverage, sendOutStreams } from './wasm-sendouts.ts'
 import type { SendOutStream } from './wasm-sendouts.ts'
+import { SEND_OUTS } from './wasm-sendouts-name.ts'
 
 const ANIMATION_C = `static void (*const sMonAnimFunctions[])(struct Sprite *sprite) =
 {
@@ -187,16 +183,25 @@ describe('sendOutStreams', () => {
   })
 })
 
-const tree = readerTree()
-describe.skipIf(!existsSync(tree))('the send-out streams of the pinned tree', () => {
-  const read = (path: string) => readFileSync(join(tree, path), 'utf8')
+// The case reads the tree's species tables and builds every send-out stream: 0.5 s alone, and up
+// to 2,953 ms in a full check while a second heavy run loaded the machine (#92). The limit is more
+// than twice that.
+const TREE_STREAMS_LIMIT = 10_000
 
-  it('reach every animation the species tables hold', () => {
-    const anims = readSendOutAnimations(read)
-    const streams = sendOutStreams(anims, speciesTable, PICS)
-    const coverage = sendOutCoverage(streams, anims, speciesTable)
-    expect(coverage.missed).toEqual([])
-    expect(anims.functions.length).toBeGreaterThan(150)
-    for (const { stream } of streams) expect(decodeStream(encodeStream(stream))).toEqual(stream)
-  })
-})
+const tree = sendOutTree()
+describe.skipIf(!existsSync(tree))(
+  'the send-out streams of the pinned tree',
+  { timeout: TREE_STREAMS_LIMIT },
+  () => {
+    const read = (path: string) => readFileSync(join(tree, path), 'utf8')
+
+    it('reach every animation the species tables hold', () => {
+      const anims = readSendOutAnimations(read)
+      const streams = sendOutStreams(anims, speciesTable, PICS)
+      const coverage = sendOutCoverage(streams, anims, speciesTable)
+      expect(coverage.missed).toEqual([])
+      expect(anims.functions.length).toBeGreaterThan(150)
+      for (const { stream } of streams) expect(decodeStream(encodeStream(stream))).toEqual(stream)
+    })
+  },
+)

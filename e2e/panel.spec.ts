@@ -11,7 +11,8 @@ import { REPO_DIR } from '../scripts/rom-paths.ts'
 import { WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'
 import { readReplay } from '../src/script/replay.ts'
 import { rawLog } from '../src/script/saved-replay-testing.ts'
-import { scrollWidth } from './page-text.ts'
+import { replayLabel } from '../src/web/label.ts'
+import { labelOf, scrollWidth, startsWith } from './page-text.ts'
 import { guardRequests } from './requests.ts'
 import { DUMP, missingForModule, report, waitFor } from './wasm-hook.ts'
 
@@ -92,7 +93,9 @@ test('the panel writes names from a file as text and wraps a long one', async ({
     mimeType: 'text/plain',
     buffer: Buffer.from(rawLog({ ...replay, log })),
   })
-  await expect(page.getByRole('status')).toHaveText('Picked long-names. Press Start to play it.')
+  // The names reach the status line in the replay label, as text (#90).
+  const label = replayLabel('long-names', { format: replay.format, players: [long, markup] })
+  await expect(page.getByRole('status')).toHaveText(`Picked ${label}. Press Start to play it.`)
   await expect(panel(page).far).toHaveText(`Far side: ${markup}`)
   await expect(panel(page).near).toHaveText(`Near side: ${long}`)
   expect(await page.locator('#injected').count()).toBe(0)
@@ -122,7 +125,7 @@ test('the panel follows the game turn by turn and asks for Start after another p
 
   await page.getByLabel('Fast').check()
   await page.getByRole('button', { name: 'Start', exact: true }).click()
-  await expect(line).toHaveText(new RegExp(`^Running ${FIRST}`))
+  await expect(line).toHaveText(startsWith(`Running ${labelOf(FIRST)}.`))
   await waitFor(page, (run) => run.turn >= 1, 120_000)
   const samples: { panel: string; hook: number | undefined }[] = []
   for (let sample = 0; sample < 5; sample += 1) {

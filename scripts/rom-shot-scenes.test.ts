@@ -263,7 +263,7 @@ describe('the scene points of a decoded instruction list (S6)', () => {
     expect(scene?.check).toEqual({ probe: 'text', shot: 'win', region: SCREEN.message })
   })
 
-  it("shoots the outro 150 frames after END and expects the winner's trainer or the last line", () => {
+  it('shoots the outro 150 frames after END and expects a trainer, the tie line or an empty box', () => {
     const outro = (outcome: 'nearWon' | 'farWon' | 'tie' | 'unknown', intro: Instruction[] = []) =>
       named([...intro, { op: 'print', text: 'Alice won!' }, { op: 'end', outcome }], 'outro')
     const compared = { probe: 'differs', before: 'win', after: 'outro' }
@@ -286,9 +286,13 @@ describe('the scene points of a decoded instruction list (S6)', () => {
       region: near,
     })
     expect(outro('nearWon')?.check).toEqual({ ...compared, region: near, kept: SCREEN.message })
-    for (const outcome of ['tie', 'unknown'] as const) {
-      expect(outro(outcome)?.check).toEqual({ ...compared, probe: 'same', region: SCREEN.message })
-    }
+    expect(outro('tie')?.check).toEqual({ ...compared, probe: 'same', region: SCREEN.message })
+    expect(outro('unknown')?.check).toEqual({
+      probe: 'blank',
+      shot: 'outro',
+      region: SCREEN.message,
+      colour: SCREEN.messageBackground,
+    })
   })
 
   it('leaves out the scenes a stream lacks', () => {

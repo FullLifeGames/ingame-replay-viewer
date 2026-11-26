@@ -26,6 +26,7 @@ import {
   progressLine,
   READY_LINE,
   runningLine,
+  type StatusLine,
 } from '../status'
 import { environmentLine, type PlayingGame } from '../visitor'
 import { AudioOpener, type Sound } from './audio-opener'
@@ -63,11 +64,11 @@ import { findWasmView, type WasmView } from './view'
 type ListedPick = Picked & { readonly summary?: ReplaySummary; readonly place?: ReplayPlace }
 
 /**
- * A run with the id of the replay it plays, for the status line at END, its summary, and its
- * stream's length for the progress line.
+ * A run with the replay label of the replay it plays, for the status lines, its summary, and its
+ * stream's length for the progress line. The hook's own stream has no summary: its id labels it.
  */
 type NamedRun = Run & {
-  readonly id: string
+  readonly label: string
   readonly summary: ReplaySummary | undefined
   readonly streamBytes: number
 }
@@ -95,7 +96,7 @@ function drawLoop(view: WasmView, runs: Runs<NamedRun>, changeSpeed: (speed: Spe
       // At END fast gives way to 1x (speedAtEnd), and the speed control shows it.
       const speed = reachEnd(run, now)
       // The draw loop looks at the current run only, so a later Start never gets this line.
-      view.status(endedLine(run.id, run.silence))
+      view.status(endedLine(run.label, run.silence))
       if (speed !== run.clock.speed) {
         changeSpeed(speed)
         view.showSpeed(speed)
@@ -116,15 +117,19 @@ function drawLoop(view: WasmView, runs: Runs<NamedRun>, changeSpeed: (speed: Spe
 const playingGame = (run: NamedRun | undefined): PlayingGame | undefined =>
   run === undefined || run.failure !== undefined || readStatus(run.control).finished
     ? undefined
-    : { replay: run.id, tellsEnd: true }
+    : { replay: run.label, tellsEnd: true }
 
 /**
  * Pauses or plays the current run. Resolves with the line for a refused resume while that run is
- * still the current one (#69).
+ * still the current one (#69) and the page shows its pick, `shown` (#90).
  */
-function toggleCurrent(runs: Runs<NamedRun>, audio: AudioOpener): Promise<string | undefined> {
+function toggleCurrent(
+  runs: Runs<NamedRun>,
+  audio: AudioOpener,
+  shown: ReplaySummary | undefined,
+): Promise<StatusLine | undefined> {
   const run = runs.current
-  return togglePause(run, audio, performance.now()).then((line) =>
+  return togglePause(run, audio, performance.now(), shown).then((line) =>
     runs.current === run ? line : undefined,
   )
 }
@@ -150,10 +155,10 @@ function beginRun(
   module: Built,
   chosen: ListedPick,
   sound: Sound,
-): Run {
+): NamedRun {
   const { id, summary, place } = chosen
   const run = Object.assign(startRun(module, chosen, view.speed(), sound), {
-    id,
+    label: summary?.label ?? id,
     summary,
     streamBytes: chosen.stream.length,
   })
@@ -182,7 +187,7 @@ function createViewer(view: WasmView) {
   }
   drawLoop(view, runs, changeSpeed)
 
-  const play = async (stream?: ListedPick): Promise<string | undefined> => {
+  const play = async (stream?: ListedPick): Promise<StatusLine | undefined> => {
     const ticket = runs.nextPlay()
     const picked = stream ?? pickedStream(choice)
     // Before the context resumes, a paused run's sound leaves the speakers (R39).
@@ -194,7 +199,8 @@ function createViewer(view: WasmView) {
       // A later Start or Restart came while this one waited; that one runs.
       if (!runs.isNewest(ticket)) return undefined
       last = chosen
-      return runningLine(chosen, beginRun({ view, runs, audio }, module, chosen, sound))
+      const run = beginRun({ view, runs, audio }, module, chosen, sound)
+      return runningLine(run, run)
     } finally {
       void press.settle()
     }
@@ -218,7 +224,7 @@ function createViewer(view: WasmView) {
     restart: () => play(last),
     changeSpeed,
     /** Pauses or plays the current run; the sound's call runs inside the caller's event. */
-    togglePause: () => toggleCurrent(runs, audio),
+    togglePause: () => toggleCurrent(runs, audio, view.shownReplay()),
     spaceToggles: (press: KeyPress) => spaceToggles(press, runs.current),
     /** The test hook of e2e/wasm-play.spec.ts: the run's status, its sound and the run counts. */
     status: () =>
@@ -229,7 +235,7 @@ function createViewer(view: WasmView) {
 type Viewer = ReturnType<typeof createViewer>
 
 /** Runs a handler's work; its line or its failure's visitor line becomes the status line. */
-function act(view: WasmView, work: () => Promise<string | undefined>): void {
+function act(view: WasmView, work: () => Promise<string | StatusLine | undefined>): void {
   work().then(
     (line) => {
       if (line !== undefined) view.status(line)
@@ -269,7 +275,7 @@ function wirePause(viewer: Viewer, view: WasmView): void {
 function playFrom(
   view: WasmView,
   button: HTMLButtonElement,
-  play: () => Promise<string | undefined>,
+  play: () => Promise<StatusLine | undefined>,
 ): void {
   const held = document.activeElement === button
   act(view, async () => {
@@ -288,9 +294,10 @@ function wire(viewer: Viewer, view: WasmView): void {
     view.status(BUILDING_LINE)
     act(view, () => viewer.pickDump(file))
   })
-  // Start stays disabled from its click until the run begins or fails (#69).
-  view.start.addEventListener('click', () => {
-    playFrom(view, view.start, () => pressStart(view.start, viewer.play))
+  // Start stays disabled from its click until the run begins or fails (#69); a double click's
+  // second click plays nothing (#90).
+  view.start.addEventListener('click', (event) => {
+    playFrom(view, view.start, () => pressStart(view.start, viewer.play, event.detail))
   })
   view.restart.addEventListener('click', () => {
     playFrom(view, view.restart, () => viewer.restart())

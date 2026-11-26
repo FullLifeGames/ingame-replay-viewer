@@ -194,13 +194,13 @@ describe('checkOrder, the encoder and the decoder', () => {
     })
   }
 
-  it("lets every test replay's stream through", () => {
-    for (const { id, log } of REPLAYS) {
-      const { bytes } = buildGen3Stream(buildBattleScript(log))
-      expect(() => {
-        checkOrder(decodeStream(bytes).instructions)
-      }, id).not.toThrow()
-    }
+  // One case per test replay: the loop over all of them ran past 5 s under a second heavy run
+  // (#92).
+  it.each(REPLAYS)("lets test replay $id's stream through", ({ log }) => {
+    const { bytes } = buildGen3Stream(buildBattleScript(log))
+    expect(() => {
+      checkOrder(decodeStream(bytes).instructions)
+    }).not.toThrow()
   })
 
   it('lets the backend write a double KO by Explosion in sand, its upkeep and both switch-ins', () => {

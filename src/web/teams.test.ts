@@ -6,6 +6,7 @@ import { teamLists } from './teams'
 
 const PLAIN: ReplaySummary = {
   id: 'gen5ou-2718717830',
+  label: 'Gen 5 OU: Alice vs Monai (2718717830)',
   streamBytes: 8346,
   instructions: 461,
   rows: [],

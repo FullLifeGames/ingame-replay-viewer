@@ -7,15 +7,19 @@
 #include "recorded_battle.h"
 #include "sound.h"
 #include "sprite.h"
+#include "string_util.h"
 #include "test/replay_test.h"
 #include "constants/battle_anim.h"
+#include "constants/characters.h"
+#include "constants/moves.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
 
-// The end of a replay (#20): the win line starts the victory music, and after END the outro
-// returns every mon still out to its ball, slides the winner's trainer in, holds the scene and
-// fades the screen and the music to black. A test sees the outro only after ReplayTest_PlayOutro.
+// The end of a replay (#20, #91): the win line starts the victory music, and after END the outro
+// empties the text box of an unknown end, shows every hidden mon still out, returns each mon still
+// out to its ball, slides the winner's trainer in, holds the scene and fades the screen and the
+// music to black. A test sees the outro only after ReplayTest_PlayOutro.
 
 // Where BtlController_HandleTrainerSlide puts each side's trainer once the slide has ended: the
 // near back pic at x 80, the far front pic at x 176 + 32.
@@ -198,6 +202,49 @@ REPLAY_TEST("A forfeit returns both mons before the slide, the loser's first")
     }
 }
 
+// A move can leave a mon hidden at the end: Fly's charge hides its user until its hit (#65). The
+// outro shows every hidden mon still out, on both sides, before the first one goes back, as
+// SHOW_MON shows it, so the ball takes back a mon the player sees. Headless tests play the charge
+// only with animations forced.
+REPLAY_TEST("The outro shows a near mon that Fly's charge hid before it returns")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        ReplayTest_PlayOutro();
+        StartBattle();
+        ReplayStream_Move(REPLAY_SIDE_NEAR, REPLAY_SIDE_FAR, MOVE_FLY);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_FLY, nearMon); }
+    THEN
+    {
+        FORCE_MOVE_ANIM(FALSE);
+        EXPECT(ReplayTest_VisibleAtReturn(REPLAY_SIDE_NEAR));
+        EXPECT(ReplayTest_VisibleAtReturn(REPLAY_SIDE_FAR));
+    }
+}
+
+// A forfeit while the loser's mon is in the air: the loser's mon shows before it goes back too.
+REPLAY_TEST("The outro shows a far mon that Fly's charge hid before it returns at a forfeit")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        ReplayTest_PlayOutro();
+        StartBattle();
+        ReplayStream_Move(REPLAY_SIDE_FAR, REPLAY_SIDE_NEAR, MOVE_FLY);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_FLY, farMon); }
+    THEN
+    {
+        FORCE_MOVE_ANIM(FALSE);
+        EXPECT(ReplayTest_VisibleAtReturn(REPLAY_SIDE_FAR));
+        EXPECT(ReplayTest_VisibleAtReturn(REPLAY_SIDE_NEAR));
+    }
+}
+
 REPLAY_TEST("The outro fades the screen and the music to black")
 {
     STREAM
@@ -331,6 +378,40 @@ REPLAY_TEST("The outro of an unknown end returns both mons, the far one first, w
         EXPECT(PlaysSong(MUS_VS_TRAINER));
         EXPECT(IsBGMPausedOrStopped());
     }
+}
+
+// The text box at the outro. A log cut short ends on a battle line that the outro no longer
+// explains, such as the weather's damage, so the outro of an unknown end empties the box, as
+// FLUSH_TEXT_BOX does. A tie keeps its tie line, as a win keeps its win line.
+static bool32 ShowsLine(const u8 *line)
+{
+    return StringCompare(gDisplayedStringBattle, line) == 0;
+}
+
+REPLAY_TEST("The outro of an unknown end clears the last battle line")
+{
+    STREAM
+    {
+        ReplayTest_PlayOutro();
+        StartBattle();
+        ReplayStream_Print(COMPOUND_STRING("Dugtrio is buffeted by the sandstorm!"));
+        ReplayStream_End(REPLAY_OUTCOME_UNKNOWN);
+    }
+    SCENE { MESSAGE("Dugtrio is buffeted by the sandstorm!"); }
+    THEN { EXPECT_EQ(gDisplayedStringBattle[0], EOS); }
+}
+
+REPLAY_TEST("The outro of a tie keeps its tie line")
+{
+    STREAM
+    {
+        ReplayTest_PlayOutro();
+        StartBattle();
+        ReplayStream_Print(COMPOUND_STRING("The battle ended in a tie!"));
+        ReplayStream_End(REPLAY_OUTCOME_TIE);
+    }
+    SCENE { MESSAGE("The battle ended in a tie!"); }
+    THEN { EXPECT(ShowsLine(COMPOUND_STRING("The battle ended in a tie!"))); }
 }
 
 REPLAY_TEST("The outro of an unknown end stops the low-HP beep")

@@ -49,6 +49,7 @@ describe('a replay choice', () => {
     const rows = notShown(replay, stream)
     expect(summary).toEqual({
       id: 'smogtours-gen3ou-994052',
+      label: 'Gen 3 OU: A Welcome Guest vs xXEricXx (994052)',
       streamBytes: STREAM_994052.length,
       instructions: stream.instructions.length,
       rows,

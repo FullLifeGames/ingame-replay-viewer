@@ -7,8 +7,8 @@ import { audioHandOver, createEmulator, NOT_STARTED_LINE } from './emulator'
 import { fakeAudioContext, fakeCore } from './emulator-testing'
 import { emulatorPresses, type PressView } from './emulator-presses'
 import { SessionError } from './replay-choice'
-import { ready, STREAM_994052, world } from './session-testing'
-import { startLine, type StatusLine } from './status'
+import { ready, world } from './session-testing'
+import type { StatusLine } from './status'
 
 /** A page whose status line and failures land in `shown`. */
 function fakeView() {
@@ -38,14 +38,29 @@ async function started() {
 }
 
 describe('the emulator page', () => {
-  it('opens the sound inside the Start click and names the replay once it runs', async () => {
+  it('opens the sound inside the Start click and names the replay by its label once it runs', async () => {
     const { askedInClick, view, shown } = await started()
     expect(askedInClick).toEqual(['resume'])
     expect(view.start.disabled).toBe(false)
     expect(shown).toEqual([
       'Starting the emulator.',
-      startLine({ id: 'smogtours-gen3ou-994052', streamBytes: STREAM_994052.length }),
+      'Started Gen 3 OU: A Welcome Guest vs xXEricXx (994052).',
     ])
+  })
+
+  // The pick's counts under "Details" hold the stream's bytes (#90), so no status line repeats
+  // them there: the page showed "6692 bytes of instruction stream." over "494 instructions, 6692
+  // bytes of instruction stream." after Start.
+  it('writes no bytes of the stream under "Details" after Start or Restart', async () => {
+    const { presses, shown } = await started()
+    presses.restart()
+    const details = shown.map((one) =>
+      typeof one === 'object' && 'detail' in one ? one.detail : '',
+    )
+    expect(details.filter((detail) => detail.includes('bytes'))).toEqual([])
+    expect(shown.at(-1)).toBe(
+      'Restarted Gen 3 OU: A Welcome Guest vs xXEricXx (994052) from the beginning.',
+    )
   })
 
   it('resumes the sound inside the Restart click, before the handler first yields', async () => {
@@ -56,7 +71,9 @@ describe('the emulator page', () => {
     presses.restart()
     expect(context.asked).toEqual(['resume'])
     expect(core.calls.at(-1)).toBe('quickReload')
-    expect(shown.at(-1)).toBe('Restarted smogtours-gen3ou-994052 from the beginning.')
+    expect(shown.at(-1)).toBe(
+      'Restarted Gen 3 OU: A Welcome Guest vs xXEricXx (994052) from the beginning.',
+    )
   })
 
   it('shows the refusal of a Restart before any Start', () => {

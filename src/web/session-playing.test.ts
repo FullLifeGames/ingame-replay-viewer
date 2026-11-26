@@ -6,7 +6,8 @@ import { playingOf, type PickView, showPick } from './pick-lines'
 import type { VisitorLine } from './visitor'
 import { OTHER_DUMP, ready, world } from './session-testing'
 
-const PLAYED = 'smogtours-gen3ou-994052'
+/** 994052's replay label: the line names the game by it (#90). */
+const PLAYED = 'Gen 3 OU: A Welcome Guest vs xXEricXx (994052)'
 
 /** A page that keeps the last visitor line the flow showed. */
 function recordingView() {

@@ -1,10 +1,10 @@
 // The stop of a run (#46, #61): a stub off the list in irv_wasm_stubs.c ends the run with the
 // stub's name, an assert that stops the program ends it there with its file, line and expression,
 // and a mixer at another rate than the page's ends it in irv_wasm_sound.c. All go through
-// irv_wasm_stop.c. This spec compiles the three glue files natively against the pinned tree, with a shadow
-// emscripten/em_js.h that turns each EM_JS import into a plain declaration. The probe defines the
-// imports in C and prints what the page would see, so it runs on devbox in seconds (CI has no
-// tree).
+// irv_wasm_stop.c. This spec compiles the three glue files natively against the pinned tree, with a
+// shadow emscripten/em_js.h that turns each EM_JS import into a plain declaration. The probe
+// defines the imports in C and prints what the page would see, so it runs on the build machine in
+// seconds (CI has no tree).
 import { spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -126,7 +126,7 @@ function runProbe(call: string): { status: number | null; lines: string[] } {
   return { status: result.status, lines: result.stdout.split('\n').filter((line) => line !== '') }
 }
 
-describe.skipIf(!existsSync(include))('the stop of a run (devbox)', () => {
+describe.skipIf(!existsSync(include))('the stop of a run (pinned tree)', () => {
   beforeAll(compileProbe)
 
   describe('at a stub', () => {

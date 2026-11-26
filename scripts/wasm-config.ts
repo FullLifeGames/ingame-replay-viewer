@@ -1,7 +1,8 @@
 // rom/gen3/wasm/wasm.json: the WebAssembly build of the expansion (#35). It pins the Emscripten
 // release, the upstream files our glue replaces, the per-file defines and compiler flags, and the
-// job cap (2: one clang per job, beside another session on devbox's 12 GB). Our platform layer
-// (rom/gen3/wasm/layer, #43) took the place of the borrowed platform files the config once pinned.
+// job cap (2: one clang per job, beside another session on the build machine's 12 GB). Our platform
+// layer (rom/gen3/wasm/layer, #43) took the place of the borrowed platform files the config once
+// pinned.
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 

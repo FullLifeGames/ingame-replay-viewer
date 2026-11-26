@@ -12,13 +12,15 @@
 #include "constants/songs.h"
 #include "constants/trainers.h"
 
-// The end of a replay (#20). The win line starts the victory music, and after END the outro runs
-// as gBattleMainFunc: every mon still out goes back into its ball, the loser's first, the winner's
-// trainer slides in, the scene holds for two seconds, and the screen and the music fade to black.
-// A tie or an unknown end has no winner: no trainer slides in, and the battle music plays on until
-// the fade. END stops the low-HP beep for every outcome. END has counted as done and finished
-// before the outro starts, so every reader of gReplayProgress sees the end on the same frame as
-// before.
+// The end of a replay (#20, #91). The win line starts the victory music, and after END the outro
+// runs as gBattleMainFunc: every mon still out goes back into its ball, the loser's first, the
+// winner's trainer slides in, the scene holds for two seconds, and the screen and the music fade to
+// black. A tie or an unknown end has no winner: no trainer slides in, and the battle music plays on
+// until the fade. END stops the low-HP beep for every outcome. An unknown end, a log cut short,
+// empties the text box, while a tie keeps its tie line as a win keeps its win line. A mon that a
+// move left hidden shows again before the first mon goes back. END has counted as done and
+// finished before the outro starts, so every reader of gReplayProgress sees the end on the same
+// frame as before.
 
 // Two seconds at 60 frames a second.
 #define OUTRO_HOLD_FRAMES 120
@@ -85,15 +87,40 @@ void Replay_StartVictoryMusic(u32 outcome)
     PlayBGM(MUS_VICTORY_TRAINER);
 }
 
+// Fly, Dig, Dive and Bounce hide their user on the charge turn, and a log can end before the hit:
+// a forfeit, or a foe's Explosion that ends the battle. Every mon still out that is hidden shows
+// again with no animation, as SHOW_MON shows it (Replay_OpShowMon), so the ball takes back a mon
+// the player sees. A visible mon gets no command, so an outro with no hidden mon plays on the same
+// frames as before.
+static void ShowHiddenMons(void)
+{
+    u32 side;
+
+    for (side = 0; side < REPLAY_STREAM_SIDE_COUNT; side++)
+    {
+        u32 battler = Replay_GetBattler(side);
+
+        if (!(sOutro.sidesOut & (1u << side)) || !gSprites[gBattlerSpriteIds[battler]].invisible)
+            continue;
+        BtlController_EmitSpriteInvisibility(battler, B_COMM_TO_CONTROLLER, FALSE);
+        MarkBattlerForControllerExec(battler);
+    }
+}
+
 // The game stops the low-HP beep at a win before the victory music (HandleEndTurn_BattleWon), and
 // at any end once it leaves the battle (FreeRestoreBattleData). The outro never leaves the battle,
-// so END stops the beep for every outcome, as a win's line did already.
+// so END stops the beep for every outcome, as a win's line did already. The last line of a log cut
+// short belongs to a battle that goes on, so the box empties as FLUSH_TEXT_BOX empties it. The
+// hidden mons show on END's frame, and the outro's first step waits for the controllers.
 void Replay_StartOutro(u32 outcome, u32 sidesOut)
 {
     BattleStopLowHpSound();
     memset(&sOutro, 0, sizeof(sOutro));
     sOutro.outcome = outcome;
     sOutro.sidesOut = sidesOut;
+    if (outcome == REPLAY_OUTCOME_UNKNOWN)
+        Replay_FlushTextBox();
+    ShowHiddenMons();
     gBattleMainFunc = Replay_Outro;
 }
 
@@ -119,8 +146,12 @@ static void Replay_Outro(void)
 // As WITHDRAW returns a mon.
 static void ReturnToBall(u32 side)
 {
-    if (sOutro.sidesOut & (1u << side))
-        Replay_ReturnMonToBall(side);
+    if (!(sOutro.sidesOut & (1u << side)))
+        return;
+#if TESTING
+    ReplayTest_AtOutroReturn(side);
+#endif
+    Replay_ReturnMonToBall(side);
 }
 
 static bool32 Outro_ReturnLoser(void)
