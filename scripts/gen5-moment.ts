@@ -1,12 +1,13 @@
 // The S6 run of the Gen 5 spike (#72) and its run from the shipped save (#78): one battle moment
 // driven from outside. It starts the session as gen5-moment-args.ts says: from the spike's battle
 // state, or from boot with a save the page fetches from /saves/ and the continue route to the
-// trainer's action menu. Then it reads the player's adapter, the server and both Pokémon from main
+// trainer's action menu, or with --entry direct through our routine from boot (#97,
+// gen5-moment-direct.ts). Then it reads the player's adapter, the server and both Pokémon from main
 // RAM and plays the steps of gen5-moment-plan.ts: hold the server, answer the action menu and
 // write one block per moment. It writes a frame per mark under build/gen5/frames/ and the last
 // mark's state under build/gen5/states/ (gitignored, ADR 0002).
 // Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts [--scene known|unknown] [--save <name>]
-// [--minutes 15].
+// [--entry walk|direct] [--player <name>] [--opponent <name>] [--minutes 15].
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -20,13 +21,11 @@ import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import type { Gen5Global, MarkRecord, RunPlan, RunReport } from '../src/gen5/hook.ts'
 import { MAIN_RAM_SIZE, MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import type { RamRef } from '../src/gen5/ram-check.ts'
+import type { MacroStep } from '../src/gen5/macro.ts'
 import type { MemoryWrite } from '../src/gen5/ram-write.ts'
-import {
-  firstRun,
-  type MomentOptions,
-  readMomentOptions,
-  type StateFile,
-} from './gen5-moment-args.ts'
+import type { RoutineBuild } from '../src/gen5/routine-order.ts'
+import { type MomentOptions, readMomentOptions, type StateFile } from './gen5-moment-args.ts'
+import { sessionPlans } from './gen5-moment-direct.ts'
 import { momentSteps } from './gen5-moment-plan.ts'
 import { listedReader } from './gen5-bw2-source.ts'
 import {
@@ -52,6 +51,13 @@ function writeText(write: MemoryWrite): string {
   if (write.kind === 'bits') return `${at} bits ${hex(write.mask)}=${String(write.value)}`
   return `${at} ${write.bytes.map((b) => b.toString(16).padStart(2, '0')).join(' ')}`
 }
+function logWrites(steps: readonly MacroStep[]): void {
+  for (const step of steps) {
+    if (step.kind === 'write')
+      for (const w of step.writes) log(`step write ${step.name}: ${writeText(w)}`)
+  }
+}
+
 /** The page's hook; spelled out in each evaluate, since those run in the page, not here. */
 const hook = (page: Page) => ({
   readBytes: (at: number, n: number) =>
@@ -186,20 +192,39 @@ function readStateFile(base: string): StateFile {
   return { state, frame: meta.frame, ramSha: meta.ramSha }
 }
 
-/** Picks the dump and plays the first run to where the moment starts. A run from boot is queued
- * before the pick, so it counts from the first frame; a run from a state once the game is up. */
+/** Picks the dump and plays the session's plans in turn to where the moment starts. A run from
+ * boot is queued before the pick, so it counts from the first frame; a run from a state once the
+ * game is up. Each later plan follows once the one before is done. */
 async function startSession(page: Page, dump: string, numbers: Bw2Numbers, options: MomentOptions) {
-  const { start } = options
-  const first = firstRun(start, battleRefs(numbers), numbers.saveTrainer, readStateFile)
+  const { start, label, deadlineMs } = options
+  const { plans, notes } = sessionPlans(options, {
+    refs: battleRefs(numbers),
+    trainer: numbers.saveTrainer,
+    entry: numbers.entry,
+    readRoutine: () => JSON.parse(readFileSync(GEN5_PATHS.routineJson, 'utf8')) as RoutineBuild,
+    readState: readStateFile,
+  })
+  for (const note of notes) log(`name cut: ${note}`)
   const fromBoot = start.from === 'boot'
   const from = start.from === 'boot' ? `boot with the save ${start.save}` : `state ${start.state}`
-  log(`first run: ${String(first.steps.length)} steps from ${from}`)
+  const counts = plans.map((plan) => String(plan.steps.length)).join(' + ')
+  log(`entry ${options.entry}: ${counts} steps from ${from}`)
+  for (const plan of plans) logWrites(plan.steps)
+  const [first, ...rest] = plans
+  if (first === undefined) throw new Error('the session has no plan')
   if (fromBoot) await hook(page).queueRun(first)
   await page.setInputFiles('#dump', dump)
   await waitForStart(page)
   await logSave(page, 'at the start')
   if (!fromBoot) await hook(page).queueRun(first)
-  return follow(page, options.label, options.deadlineMs)
+  let report = await follow(page, label, deadlineMs)
+  for (const plan of rest) {
+    if (report.status !== 'done') break
+    logReport(report)
+    await hook(page).queueRun(plan)
+    report = await follow(page, label, deadlineMs, report.marks.length)
+  }
+  return report
 }
 
 async function play(page: Page, dump: string, numbers: Bw2Numbers, options: MomentOptions) {
@@ -226,10 +251,7 @@ async function play(page: Page, dump: string, numbers: Bw2Numbers, options: Mome
     adapter: battle.adapter,
     blocks,
   })
-  for (const step of steps) {
-    if (step.kind === 'write')
-      for (const w of step.writes) log(`step write ${step.name}: ${writeText(w)}`)
-  }
+  logWrites(steps)
   const second: RunPlan = {
     steps,
     startFrame: 0,

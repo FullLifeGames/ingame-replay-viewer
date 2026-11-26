@@ -27,6 +27,8 @@ describe('readMomentOptions', () => {
     expect(readMomentOptions([], NOW)).toEqual({
       scene: 'known',
       start: { from: 'state', state: 's5-battle' },
+      entry: 'walk',
+      names: { player: 'Viewer', opponent: 'Showdown' },
       label: 's6-known',
       deadlineMs: NOW + 15 * 60_000,
     })
@@ -37,6 +39,8 @@ describe('readMomentOptions', () => {
     expect(readMomentOptions(args, NOW)).toEqual({
       scene: 'known',
       start: { from: 'boot', save: 'route-20', query: '?save=route-20' },
+      entry: 'walk',
+      names: { player: 'Viewer', opponent: 'Showdown' },
       label: 'route-20-known',
       deadlineMs: NOW + 15 * 60_000,
     })
@@ -57,6 +61,27 @@ describe('readMomentOptions', () => {
     )
     expect(() => readMomentOptions(['--minutes', '0'], NOW)).toThrow(
       '--minutes takes a positive number, not "0".',
+    )
+  })
+
+  // Scene: the direct start (#97) comes beside the walk, which stays the default until a run from
+  // boot proves the direct one (D16).
+  it('starts the battle through the routine with --entry direct, from boot with the save', () => {
+    const args = ['--entry', 'direct', '--save', 'route-20', '--player', 'Ann', '--opponent', 'Bo']
+    expect(readMomentOptions(args, NOW)).toMatchObject({
+      start: { from: 'boot', save: 'route-20' },
+      entry: 'direct',
+      names: { player: 'Ann', opponent: 'Bo' },
+      label: 'route-20-direct-known',
+    })
+  })
+
+  it('refuses an entry it does not know, and the direct one with no save', () => {
+    expect(() => readMomentOptions(['--entry', 'fly', '--save', 'route-20'], NOW)).toThrow(
+      '--entry takes walk or direct, not "fly".',
+    )
+    expect(() => readMomentOptions(['--entry', 'direct'], NOW)).toThrow(
+      "--entry direct needs --save: the first run copies the save's first Pokémon.",
     )
   })
 
