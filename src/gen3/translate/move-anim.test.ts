@@ -36,4 +36,34 @@ describe("a move line's [anim]", () => {
     ])
     expect(result.fallbacks.filter(({ line }) => line >= NEXT)).toEqual([])
   })
+
+  it('plays and lists the stand-in of a real move it names that the game lacks', () => {
+    const result = streamOfLog('|move|p1a: Dugtrio|Earthquake|p2a: Tyranitar|[anim] Paleo Wave')
+    const ops = result.instructions.filter(({ line }) => line >= NEXT)
+    expect(ops.map(({ instruction }) => plain(instruction))[1]).toEqual({
+      op: 'move',
+      user: 'near',
+      target: 'far',
+      move: moveOf('Paleo Wave').number,
+      animTurn: 0,
+    })
+    const { fallback } = moveOf('Paleo Wave')
+    expect(fallback).toBeDefined()
+    expect(result.fallbacks.filter(({ line }) => line >= NEXT)).toEqual([
+      { line: NEXT, kind: 'move', detail: fallback?.detail },
+    ])
+  })
+
+  it.each([
+    ['[miss]', '|-miss|p1a: Dugtrio|p2a: Tyranitar'],
+    ['[still]', '|-fail|p1a: Dugtrio'],
+  ])('notes no look on a move with %s, which plays no animation', (flag, after) => {
+    const result = streamOfLog(
+      `|move|p1a: Dugtrio|Ivy Cudgel|p2a: Tyranitar|${flag}|[anim] Ivy Cudgel Water`,
+      after,
+    )
+    const ops = result.instructions.filter(({ line }) => line >= NEXT)
+    expect(ops.map(({ instruction }) => instruction.op)).not.toContain('move')
+    expect(result.fallbacks.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
 })

@@ -39,6 +39,9 @@ export const ITEM_TEMPLATES = {
 
 const STEALS = new Set(['thief', 'covet'])
 
+/** Trick and Switcheroo (EFFECT_TRICK) say each item by `gItemSwapStringIds`. */
+const SWAPS = new Set(['trick', 'switcheroo'])
+
 /**
  * The Air Balloon says its lines with no pop-up: as its holder comes in, and as a hit pops it
  * (`BattleScript_AirBalloonMsgInRet`, `BattleScript_AirBalloonMsgPop`). The log gives both with
@@ -62,7 +65,7 @@ export function itemShown(
   if (isSteal(cause) && source !== undefined) {
     return { text: ITEM_TEMPLATES.stole.render(who, source, name) }
   }
-  if (id === 'trick') return { text: ITEM_TEMPLATES.obtained.render(who, name) }
+  if (id !== undefined && SWAPS.has(id)) return { text: ITEM_TEMPLATES.obtained.render(who, name) }
   if (cause === undefined && toID(item) === AIR_BALLOON) {
     return { text: ITEM_TEMPLATES.airBalloon.render(who) }
   }

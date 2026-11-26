@@ -136,6 +136,10 @@ describe('gensText', () => {
     expect(gensText([1, 2, 3, 4, 5, 9])).toBe('Gen 1 to 5 and Gen 9')
   })
 
+  it('sorts the generations before it joins their runs', () => {
+    expect(gensText([9, 1, 2])).toBe('Gen 1 to 2 and Gen 9')
+  })
+
   it('writes a lone generation by its number', () => {
     expect(gensText([3])).toBe('Gen 3')
   })

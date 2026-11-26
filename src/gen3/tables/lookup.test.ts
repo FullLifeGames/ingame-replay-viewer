@@ -67,6 +67,18 @@ describe('abilities that share a display name (#88)', () => {
   })
 })
 
+// Teal's mask has the lowest number of the four, so the other three show the narrowing by name.
+describe('Embody Aspect by its mask (#88)', () => {
+  it.each([
+    ['Embody Aspect (Teal)', 'ABILITY_EMBODY_ASPECT_TEAL_MASK'],
+    ['Embody Aspect (Wellspring)', 'ABILITY_EMBODY_ASPECT_WELLSPRING_MASK'],
+    ['Embody Aspect (Cornerstone)', 'ABILITY_EMBODY_ASPECT_CORNERSTONE_MASK'],
+  ] as const)('finds %s as %s', (name, constant) => {
+    const [number] = abilities[constant]
+    expect(abilityOf(name)).toEqual({ number, name: 'Embody Aspect' })
+  })
+})
+
 describe('fallbacks (T9)', () => {
   it('show a form without its own constant as its base species', () => {
     expect(speciesOf('Rockruff-Dusk')).toEqual({

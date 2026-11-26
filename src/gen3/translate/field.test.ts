@@ -80,6 +80,27 @@ describe('weather', () => {
     ])
   })
 
+  // Gen 3's own weather, which the stream holds: snow's path (D12) leaves it as rain's.
+  it('sets the hail a move starts, plays it each turn, and clears it as it ends', () => {
+    const lines = [
+      '|move|p1a: Dugtrio|Hail|p1a: Dugtrio',
+      '|-weather|Hail',
+      '|-weather|Hail|[upkeep]',
+      '|-weather|none',
+    ]
+    expect(sceneOf(...lines).map(plain)).toEqual([
+      'Dugtrio used Hail!',
+      { op: 'move', user: 'near', target: 'near', move: moveOf('Hail').number, animTurn: 0 },
+      { op: 'weather', weather: 'hail' },
+      'It started to hail!',
+      'The hail is crashing down.',
+      { op: 'anim', side: 'near', anim: 'hailContinues' },
+      { op: 'weather', weather: 'none' },
+      'The hail stopped.',
+    ])
+    expect(streamOfLog(...lines).fallbacks.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
+
   it('says a weather the game has no words for with a line of ours and lists it', () => {
     const result = streamOfLog('|-weather|PrimordialSea', '|-weather|PrimordialSea|[upkeep]')
     expect(result.instructions.filter(({ line }) => line >= NEXT).map(({ line }) => line)).toEqual([
