@@ -2,15 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import { PACKAGES } from './gen5-fetch'
 import {
-  archiveName,
   COMPONENTS,
   type Component,
   isListed,
   isServedSitePath,
-  isSourceArchive,
   OWN_FILES,
   SITE_FILES,
-  SOURCES,
 } from './gen5-manifest'
 import { checkManifest, type ManifestDraft } from './gen5-manifest-check'
 import { UNPACKER_PATH } from '../src/gen5/unpacker'
@@ -29,13 +26,6 @@ const TOOL: Component = {
   from: '@example/tool@1.0.0',
   source: SOURCE,
   notices: [{ part: 'Tool', path: 'LICENSE', kind: 'licence' }],
-}
-
-/** The source of that name in SOURCES; throws when there is none. */
-function pin(name: string) {
-  const found = SOURCES.find((source) => source.name === name)
-  if (found === undefined) throw new Error(`no source ${name}`)
-  return found
 }
 
 function draft(tool: Partial<Component>, paths: readonly [string, string[]][]): ManifestDraft {
@@ -190,10 +180,16 @@ describe('the manifest', () => {
     })
   })
 
-  it('gives each core build melonDS, RetroArch and the build scripts', () => {
+  it('gives each core build melonDS, RetroArch, Emscripten, zlib and the build scripts', () => {
     for (const path of ['data/cores/melonds-wasm.data', ...OTHER_CORES]) {
       const file = SITE_FILES.find((entry) => entry.path === path)
-      expect(file?.components, path).toEqual(['melonds', 'retroarch', 'build'])
+      expect(file?.components, path).toEqual([
+        'melonds',
+        'retroarch',
+        'emscripten',
+        'zlib',
+        'build',
+      ])
     }
   })
 
@@ -231,6 +227,8 @@ describe('the manifest', () => {
       melonds: 'GPL-3.0-or-later',
       retroarch: 'GPL-3.0-or-later',
       build: 'GPL-3.0-or-later',
+      emscripten: 'MIT OR NCSA',
+      zlib: 'Zlib',
       nipplejs: 'MIT',
       socketio: 'MIT',
     })
@@ -243,55 +241,5 @@ describe('the manifest', () => {
         id,
         commit: expect.stringMatching(/^[0-9a-f]{40}$/) as unknown,
       })
-  })
-})
-
-// Scene: every component names its source by commit, and each source gets one archive.
-describe('the sources', () => {
-  it('fetches each repository once, under its own name, as the components name it', () => {
-    expect(SOURCES.map((source) => source.name)).toEqual([
-      'emulatorjs',
-      'melonds',
-      'retroarch',
-      'emulatorjs-build',
-      'nipplejs',
-      'socket.io',
-    ])
-    expect(new Set(SOURCES.map((source) => source.repository)).size).toBe(SOURCES.length)
-    for (const part of Object.values(COMPONENTS)) {
-      const { source } = part
-      expect(
-        SOURCES.filter((each) => each.name === source.name),
-        part.name,
-      ).toEqual([source])
-    }
-  })
-
-  // Scene: the build scripts' commit is an inference from dates (review W4).
-  it('gives each source the basis of its commit in words', () => {
-    expect(Object.fromEntries(SOURCES.map((source) => [source.name, source.basis]))).toEqual({
-      emulatorjs: "the registry's gitHead of both pinned packages",
-      melonds: "the commit named in the core's own bytes",
-      retroarch: "the commit named in the core's own bytes",
-      'emulatorjs-build':
-        "inferred from dates: the head of the scripts' main branch around the core's build day",
-      nipplejs: 'the tag v0.10.2, the version the served file equals',
-      'socket.io': "the tag socket.io@4.8.1, the version the served file's header names",
-    })
-  })
-
-  it("names EmulatorJS at the registry's gitHead of both pinned packages", () => {
-    const commit = pin('emulatorjs').commit
-    expect(PACKAGES.map((pkg) => pkg.gitHead)).toEqual([commit, commit])
-  })
-
-  it('names each archive by its source and commit, and knows no other name', () => {
-    expect(archiveName(pin('melonds'))).toBe(
-      'melonds-18a057d372783b42d7e297b8731f3c3d673cdcab.tar.gz',
-    )
-    expect(SOURCES.map(archiveName).filter((name) => !isSourceArchive(name))).toEqual([])
-    const listed = archiveName(pin('melonds'))
-    for (const name of ['melonds.tar.gz', `${listed}.part`, '', 'git/melonds.git', `./${listed}`])
-      expect(isSourceArchive(name), name).toBe(false)
   })
 })

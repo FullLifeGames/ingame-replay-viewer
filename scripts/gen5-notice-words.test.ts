@@ -1,10 +1,11 @@
 // The words a visitor reads about what the licences page holds (#79): the notice before the file
-// input says no more than the page covers, and the parts without a notice say only what the
-// files show (review W2, U-a, U-b).
+// input says no more than the page covers and names its gaps, and the components that closed the
+// last gaps (79-5) carry the versions their pins state (review W2, U-a, U-b).
 import { readFileSync } from 'node:fs'
 
 import { describe, expect, it } from 'vitest'
 
+import { COMPONENTS } from './gen5-manifest'
 import { UNFOUND } from './gen5-notices'
 import { GEN5_PATHS } from './gen5-paths'
 
@@ -13,7 +14,7 @@ const notice = (/<section id="licence-notice">(.*?)<\/section>/s.exec(html)?.[1]
   .replace(/\s+/g, ' ')
   .trim()
 
-// Scene: the licences page lists parts it cannot cover yet, so the notice claims no "every".
+// Scene: while the licences page lists parts it cannot cover, the notice claims no "every".
 describe('the notice before the file input', () => {
   const open = UNFOUND.length > 0
 
@@ -36,22 +37,15 @@ describe('the notice before the file input', () => {
   })
 })
 
-describe('the parts without a notice in the pinned sources', () => {
-  const says = Object.fromEntries(UNFOUND.map((part) => [part.part, part.says]))
-
-  it("says of Emscripten what the build scripts and the core's bytes name, and what is open", () => {
-    const emscripten = says["Emscripten's runtime"] ?? ''
-    expect(emscripten).toContain('build_env.sh names emsdk 3.1.74 for a local build')
-    expect(emscripten).toContain(
-      '21.0.0git (https:/github.com/llvm/llvm-project 23e3cbb2e82b62586266116c8ab77ce68e412cf8)',
-    )
-    expect(emscripten).toContain('Which Emscripten release that was is not established.')
+// Scene: Emscripten and zlib have their notices from their own pinned sources (79-5).
+describe('the parts of the core', () => {
+  it('lists no part without a notice', () => {
+    expect(UNFOUND).toEqual([])
   })
 
-  it("says of zlib what the core's bytes hold, and that no notice survives in them", () => {
-    const zlib = says.zlib ?? ''
-    expect(zlib).toContain('-s USE_ZLIB=1')
-    expect(zlib).toContain('the string 1.3.1')
-    expect(zlib).toContain('no copyright line')
+  it("names Emscripten's release and zlib's version as the pins state them", () => {
+    expect(COMPONENTS.emscripten.version.startsWith('4.0.8')).toBe(true)
+    expect(COMPONENTS.emscripten.source.basis).toContain('inferred')
+    expect(COMPONENTS.zlib.version).toBe('1.3.1')
   })
 })

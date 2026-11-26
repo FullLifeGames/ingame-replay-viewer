@@ -9,15 +9,17 @@ import { UNPACKER_PATH } from '../src/gen5/unpacker.ts'
 import { type Notice, NOTICES } from './gen5-notices.ts'
 import {
   BUILD_SOURCE,
+  EMSCRIPTEN_SOURCE,
   EMULATORJS_SOURCE,
   MELONDS_SOURCE,
   NIPPLEJS_SOURCE,
   RETROARCH_SOURCE,
   SOCKET_IO_SOURCE,
+  ZLIB_SOURCE,
 } from './gen5-pins.ts'
 
 /** A licence by its SPDX id as the component's notice states it. */
-export type Licence = 'GPL-3.0-or-later' | 'GPL-3.0-only' | 'MIT'
+export type Licence = 'GPL-3.0-or-later' | 'GPL-3.0-only' | 'MIT' | 'MIT OR NCSA' | 'Zlib'
 
 /** A licence stated in words, for a rule of the page's own files that no id fits. */
 export interface LicenceInWords {
@@ -35,7 +37,8 @@ export interface Source {
   basis: string
 }
 
-export type ComponentId = 'emulatorjs' | 'melonds' | 'retroarch' | 'build' | 'nipplejs' | 'socketio'
+export type ComponentId =
+  'emulatorjs' | 'melonds' | 'retroarch' | 'build' | 'emscripten' | 'zlib' | 'nipplejs' | 'socketio'
 
 export interface Component {
   name: string
@@ -111,6 +114,25 @@ export const COMPONENTS: Readonly<Record<ComponentId, Component>> = {
     source: BUILD_SOURCE,
     notices: NOTICES.build,
   },
+  // emcc compiled and linked the core: its JS runtime is the core's glue, and its C and C++
+  // libraries are linked into the wasm. Its LICENSE offers MIT or NCSA.
+  emscripten: {
+    name: 'Emscripten',
+    version: '4.0.8 (70404ef)',
+    licence: 'MIT OR NCSA',
+    from: CORE_PACKAGE,
+    source: EMSCRIPTEN_SOURCE,
+    notices: NOTICES.emscripten,
+  },
+  // RetroArch's Makefile.emulatorjs links Emscripten's zlib port (-s USE_ZLIB=1).
+  zlib: {
+    name: 'zlib',
+    version: '1.3.1',
+    licence: 'Zlib',
+    from: CORE_PACKAGE,
+    source: ZLIB_SOURCE,
+    notices: NOTICES.zlib,
+  },
   // EmulatorJS's update.js copies node_modules/nipplejs/dist/nipplejs.js. LICENSE at the tag
   // v0.10.2 is MIT.
   nipplejs: {
@@ -132,7 +154,7 @@ export const COMPONENTS: Readonly<Record<ComponentId, Component>> = {
   },
 }
 
-const CORE: readonly ComponentId[] = ['melonds', 'retroarch', 'build']
+const CORE: readonly ComponentId[] = ['melonds', 'retroarch', 'emscripten', 'zlib', 'build']
 
 const served = (path: string, components: readonly ComponentId[], why: Why): SiteFile => ({
   path,

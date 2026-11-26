@@ -1,9 +1,9 @@
 // Our 7z unpacker (src/gen5/seven-zip.ts) on the four core builds of the site scripts/gen5-fetch.ts
 // unpacks: each gives its five files with every CRC held, license.txt is the same in all four,
 // and each wasm names the commits the manifest pins (scripts/gen5-pins.ts): melonDS's library
-// version with the short form of its commit, and RetroArch's short commit. CI fetches the two
-// pinned packages before the check, so there a missing site fails the guard; on a machine without
-// it the spec skips.
+// version with the short form of its commit, RetroArch's short commit, the LLVM commit that names
+// Emscripten's release, and zlib's version. CI fetches the two pinned packages before the check,
+// so there a missing site fails the guard; on a machine without it the spec skips.
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -12,7 +12,7 @@ import { describe, expect, it } from 'vitest'
 import { type SevenZipEntry, unpack7z } from '../src/gen5/seven-zip.ts'
 import { COMPONENTS, SITE_FILES } from './gen5-manifest.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
-import { MELONDS_SOURCE, RETROARCH_SOURCE } from './gen5-pins.ts'
+import { EMSCRIPTEN_LLVM_COMMIT, MELONDS_SOURCE, RETROARCH_SOURCE } from './gen5-pins.ts'
 
 const CORES = SITE_FILES.map((file) => file.path).filter((path) =>
   /^data\/cores\/melonds-[a-z-]+\.data$/.test(path),
@@ -80,6 +80,21 @@ describe.skipIf(!present)('the fetched cores, unpacked by our 7z reader', () => 
     expect(wasm.includes(MELONDS_VERSION), MELONDS_VERSION).toBe(true)
     expect(wasm.includes(short(RETROARCH_SOURCE.commit)), short(RETROARCH_SOURCE.commit)).toBe(true)
   })
+
+  // Scene: the Emscripten and zlib pins rest on the core's own bytes. The compiler names itself
+  // with its LLVM commit, and zlib's zlibVersion() answers its version as a C string.
+  it.each(CORES)(
+    "finds Emscripten's LLVM commit and zlib's version in the wasm of %s",
+    { timeout: 30_000 },
+    (path) => {
+      const wasm = bytesOf(path, 'melonds_libretro.wasm')
+      const llvm = /llvm-project ([0-9a-f]{40})\)/.exec(wasm.toString('latin1'))?.[1]
+      expect(llvm).toBe(EMSCRIPTEN_LLVM_COMMIT)
+      const zlib = COMPONENTS.zlib.version
+      expect(zlib).toMatch(/^\d+\.\d+\.\d+$/)
+      expect(wasm.includes(`\0${zlib}\0`), zlib).toBe(true)
+    },
+  )
 
   it('finds the same license.txt in all four', { timeout: 60_000 }, () => {
     const [first, ...rest] = CORES.map((path) => bytesOf(path, 'license.txt'))
