@@ -12,10 +12,13 @@
 //   playanimation_var BS_BATTLER_0, sB_ANIM_ARG1
 //
 // `sB_ANIM_ARG1` is the weather's own animation, the one its upkeep plays (`src/battle_util.c`).
+// A weather the stream lacks (snow, #88) clears the stream's weather as it starts, so the game
+// forgets the rain it replaced (D12); its start and its turns list the look the stream lacks.
 // Side and field conditions are a line each; the stream holds no state for them, since the game
 // shows none.
 import type { WeatherName } from '@pkmn/client'
 
+import { mechanicGap } from '../fallbacks'
 import type { Anim, Weather } from '../stream/instructions'
 import { fieldActivated, sideEnded, sideStarted, weatherText } from '../text/phrases-field'
 import type { Context, EventOf } from './context'
@@ -33,18 +36,31 @@ const WEATHERS: Partial<Readonly<Record<WeatherName, Shown>>> = {
   Hail: { weather: 'hail', anim: 'hailContinues' },
 }
 
-/** A weather the game lacks (Snow and later ones) is a line of ours alone. */
+/** The look of a weather the stream lacks, listed at its start and on each of its turns. */
+const LACKING: Readonly<Partial<Record<EventOf<'weather'>['phase'], string>>> = {
+  start: 'starting',
+  upkeep: 'continuing',
+}
+
 export function weather(event: EventOf<'weather'>, ctx: Context): void {
-  const { line, phase } = event
   const shown = WEATHERS[event.weather]
-  const text = weatherText(event.weather, phase)
-  if (phase !== 'upkeep' && shown) {
-    ctx.emit(line, { op: 'weather', weather: phase === 'start' ? shown.weather : 'none' })
-  }
-  ctx.print(line, text)
+  holdWeather(event, shown, ctx)
+  ctx.print(event.line, weatherText(event.weather, event.phase))
   if (shown && playsAfterText(event)) {
-    ctx.emit(line, { op: 'anim', side: ctx.fieldSide(), anim: shown.anim })
+    ctx.emit(event.line, { op: 'anim', side: ctx.fieldSide(), anim: shown.anim })
   }
+}
+
+/**
+ * The stream's weather: set as a weather starts and cleared as it ends. A weather the stream lacks
+ * clears it as it starts and lists its look.
+ */
+function holdWeather(event: EventOf<'weather'>, shown: Shown | undefined, ctx: Context): void {
+  const { line, phase } = event
+  if (phase === 'start') ctx.emit(line, { op: 'weather', weather: shown?.weather ?? 'none' })
+  if (phase === 'end' && shown) ctx.emit(line, { op: 'weather', weather: 'none' })
+  const lacking = LACKING[phase]
+  if (!shown && lacking !== undefined) ctx.note(line, mechanicGap(event.weather, lacking))
 }
 
 /** The upkeep and an ability's start play the weather; a move's animation carries its own. */

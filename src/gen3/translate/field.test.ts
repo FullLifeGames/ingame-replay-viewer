@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
+import { mechanicGap } from '../fallbacks'
 import { abilityOf, moveOf } from '../tables/lookup'
 import { plain, sceneOf, streamOfLog } from '../testing'
 
@@ -44,11 +45,6 @@ describe('weather', () => {
     ])
   })
 
-  it('plays no animation for a weather the game lacks, even from an ability', () => {
-    const scene = sceneOf('|-weather|Snow|[from] ability: Snow Warning|[of] p2a: Tyranitar')
-    expect(scene.map(({ op }) => op)).toEqual(['ability', 'print', 'ability'])
-  })
-
   it('says the sandstorm rages, plays it, then hurts with it (X10)', () => {
     const scene = sceneOf(
       '|-weather|Sandstorm',
@@ -84,14 +80,73 @@ describe('weather', () => {
     ])
   })
 
-  it('says a weather the game lacks with a line of ours and lists it', () => {
-    const result = streamOfLog('|-weather|Snow', '|-weather|Snow|[upkeep]')
+  it('says a weather the game has no words for with a line of ours and lists it', () => {
+    const result = streamOfLog('|-weather|PrimordialSea', '|-weather|PrimordialSea|[upkeep]')
     expect(result.instructions.filter(({ line }) => line >= NEXT).map(({ line }) => line)).toEqual([
+      NEXT,
       NEXT,
       NEXT + 1,
       NEXT + 1,
     ])
-    expect(result.fallbacks.map(({ kind }) => kind)).toEqual(['phrase', 'phrase'])
+    expect(result.fallbacks.map(({ kind }) => kind).toSorted()).toEqual([
+      'mechanic',
+      'mechanic',
+      'phrase',
+      'phrase',
+    ])
+  })
+})
+
+// The expansion says snow in its own words (`STRINGID_STARTEDSNOW`, `STRINGID_SNOWCONTINUES`,
+// `STRINGID_SNOWSTOPPED`), but the stream holds no snow: its start clears the weather the stream
+// holds (D12), and its start and each turn list the look the stream lacks.
+describe('snow (#88)', () => {
+  const snowWarning = '|-weather|Snowscape|[from] ability: Snow Warning|[of] p2a: Tyranitar'
+  const gapsOf = (...lines: string[]) =>
+    streamOfLog(...lines)
+      .fallbacks.filter(({ line }) => line >= NEXT)
+      .map(({ kind, detail }) => ({ kind, detail }))
+
+  it('clears the weather, then says the snow Snow Warning starts inside its pop-up', () => {
+    expect(sceneOf(snowWarning).map(plain)).toEqual([
+      popUp('Snow Warning', true),
+      { op: 'weather', weather: 'none' },
+      'It started to snow!',
+      popUp('Snow Warning', false),
+    ])
+    expect(gapsOf(snowWarning)).toEqual([mechanicGap('Snow', 'starting')])
+  })
+
+  it('says the snow of each turn and lists its look', () => {
+    const lines = [snowWarning, '|-weather|Snowscape|[upkeep]']
+    expect(
+      sceneOf(...lines)
+        .slice(4)
+        .map(plain),
+    ).toEqual(['Snow continues to fall.'])
+    expect(gapsOf(...lines)).toEqual([
+      mechanicGap('Snow', 'starting'),
+      mechanicGap('Snow', 'continuing'),
+    ])
+  })
+
+  it('says the snow stopped and lists nothing for it', () => {
+    const lines = [snowWarning, '|-weather|none']
+    expect(
+      sceneOf(...lines)
+        .slice(4)
+        .map(plain),
+    ).toEqual(['The snow stopped.'])
+    expect(gapsOf(...lines)).toEqual([mechanicGap('Snow', 'starting')])
+  })
+
+  it('clears the rain that the snow replaces', () => {
+    expect(sceneOf('|-weather|RainDance', snowWarning).slice(2).map(plain)).toEqual([
+      popUp('Snow Warning', true),
+      { op: 'weather', weather: 'none' },
+      'It started to snow!',
+      popUp('Snow Warning', false),
+    ])
   })
 })
 

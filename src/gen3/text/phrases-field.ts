@@ -30,14 +30,17 @@ export const FIELD_TEMPLATES = {
   sandStart: tagged('STRINGID_SANDSTORMBREWED', () => 'A sandstorm kicked up!'),
   sunStart: tagged('STRINGID_SUNLIGHTGOTBRIGHT', () => 'The sunlight turned harsh!'),
   hailStart: tagged('STRINGID_STARTEDHAIL', () => 'It started to hail!'),
+  snowStart: tagged('STRINGID_STARTEDSNOW', () => 'It started to snow!'),
   rainUpkeep: tagged('STRINGID_RAINCONTINUES', () => 'Rain continues to fall.'),
   sandUpkeep: tagged('STRINGID_SANDSTORMRAGES', () => 'The sandstorm is raging.'),
   sunUpkeep: tagged('STRINGID_SUNLIGHTSTRONG', () => 'The sunlight is strong.'),
   hailUpkeep: tagged('STRINGID_HAILCONTINUES', () => 'The hail is crashing down.'),
+  snowUpkeep: tagged('STRINGID_SNOWCONTINUES', () => 'Snow continues to fall.'),
   rainEnd: tagged('STRINGID_RAINSTOPPED', () => 'The rain stopped.'),
   sandEnd: tagged('STRINGID_SANDSTORMSUBSIDED', () => 'The sandstorm subsided.'),
   sunEnd: tagged('STRINGID_SUNLIGHTFADED', () => 'The sunlight faded.'),
   hailEnd: tagged('STRINGID_HAILSTOPPED', () => 'The hail stopped.'),
+  snowEnd: tagged('STRINGID_SNOWSTOPPED', () => 'The snow stopped.'),
   electricWeakened: tagged(
     'STRINGID_ELECTRICITYWEAKENED',
     () => "Electricity's power was weakened!",
@@ -107,20 +110,22 @@ export function withdrawn(mon: Mon, trainer: string): string {
 
 export const draggedOut = (who: Mon) => T.dragged.render(who)
 
-type Gen3Weather = Extract<WeatherName, 'Rain' | 'Sand' | 'Sun' | 'Hail'>
+/** The weathers the expansion has words for: Gen 3's four and snow. */
+type SaidWeather = Extract<WeatherName, 'Rain' | 'Sand' | 'Sun' | 'Hail' | 'Snow'>
 
-const WEATHER: Readonly<Record<Gen3Weather, Readonly<Record<Phase, () => string>>>> = {
+const WEATHER: Readonly<Record<SaidWeather, Readonly<Record<Phase, () => string>>>> = {
   Rain: { start: T.rainStart.render, upkeep: T.rainUpkeep.render, end: T.rainEnd.render },
   Sand: { start: T.sandStart.render, upkeep: T.sandUpkeep.render, end: T.sandEnd.render },
   Sun: { start: T.sunStart.render, upkeep: T.sunUpkeep.render, end: T.sunEnd.render },
   Hail: { start: T.hailStart.render, upkeep: T.hailUpkeep.render, end: T.hailEnd.render },
+  Snow: { start: T.snowStart.render, upkeep: T.snowUpkeep.render, end: T.snowEnd.render },
 }
 
-const isGen3Weather = (weather: WeatherName): weather is Gen3Weather => weather in WEATHER
+const isSaidWeather = (weather: WeatherName): weather is SaidWeather => weather in WEATHER
 
 /** The weather's start (by a move or an ability alike), its turn's end and its end. */
 export function weatherText(weather: WeatherName, phase: Phase): Phrase {
-  if (isGen3Weather(weather)) return { text: WEATHER[weather][phase]() }
+  if (isSaidWeather(weather)) return { text: WEATHER[weather][phase]() }
   const own = `The weather changed to ${held(weather)}!`
   return ownPhrase(own, `${weather} at its ${phase}`)
 }

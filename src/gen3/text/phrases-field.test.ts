@@ -69,15 +69,18 @@ describe('weather (P1)', () => {
     ['|-weather|Sandstorm\n|-weather|none', 'The sandstorm subsided.'],
     ['|-weather|SunnyDay\n|-weather|none', 'The sunlight faded.'],
     ['|-weather|Hail\n|-weather|none', 'The hail stopped.'],
+    ['|-weather|Snowscape', 'It started to snow!'],
+    ['|-weather|Snowscape\n|-weather|Snowscape|[upkeep]', 'Snow continues to fall.'],
+    ['|-weather|Snowscape\n|-weather|none', 'The snow stopped.'],
   ])('words %j', (lines, text) => {
     const { last } = sceneOf('weather', ...lines.split('\n'))
     expect(weatherText(last.weather, last.phase)).toEqual({ text })
   })
 
   it('gives a weather without a Gen 3 message our wording and a fallback', () => {
-    expect(weatherText('Snow', 'start')).toEqual({
-      text: 'The weather changed to Snow!',
-      fallback: { kind: 'phrase', detail: 'no game message for Snow at its start' },
+    expect(weatherText('Heavy Rain', 'start')).toEqual({
+      text: 'The weather changed to Heavy\u00a0Rain!',
+      fallback: { kind: 'phrase', detail: 'no game message for Heavy Rain at its start' },
     })
   })
 })
