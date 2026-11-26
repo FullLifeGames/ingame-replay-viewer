@@ -68,6 +68,16 @@ export function requiresEveryScene(name: string): boolean {
   return name === DEFAULT_REPLAY || name === HAND_MADE
 }
 
+// Neither default run holds a Terastallization: 994052 is a Gen 3 battle, and the hand-made battle
+// keeps the frames of the module's baseline (#89).
+const NOT_IN_DEFAULT_RUNS: readonly string[] = ['first-tera']
+
+/** The scenes a run lacks that fail it: for a default run, every one but those it cannot hold. */
+export function missingThatFails(name: string, missing: readonly string[]): string[] {
+  if (!requiresEveryScene(name)) return []
+  return missing.filter((scene) => !NOT_IN_DEFAULT_RUNS.includes(scene))
+}
+
 /** The ids of the test replays among the files of test/fixtures/replays/, in their order. */
 function testReplayIds(files: readonly string[]): string[] {
   return files.flatMap((name) => /-(\d+)\.json$/.exec(name)?.[1] ?? [])
@@ -279,7 +289,7 @@ export function reportRun(run: PlayedRun): RunReport {
     output,
     scenes,
     errors: run.errors,
-    missing: requiresEveryScene(plan.name) ? missing : [],
+    missing: missingThatFails(plan.name, missing),
   })
   const { name, expect } = plan
   return { name, expect, seconds: run.seconds, status: output.status, scenes, missing, problems }
