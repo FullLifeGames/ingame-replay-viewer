@@ -265,6 +265,7 @@ export function visitorLine(error: unknown, place?: ReplayPlace): VisitorLine {
 
 /** The game a failed pick names (#69): the replay it plays, and whether its page tells END. */
 export interface PlayingGame {
+  /** The replay label of the game's replay (label.ts, #90). */
   readonly replay: string
   /** False on a page that counts a game past END as playing, as the emulator page does. */
   readonly tellsEnd: boolean

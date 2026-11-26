@@ -35,5 +35,10 @@ jobs:
         timeout-minutes: 3
         env:
           GIT_TERMINAL_PROMPT: '0'
+      - name: Make clang and wasm-ld available for the WebAssembly divide spec
+        run: |
+          command -v clang || extra=clang
+          sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends lld $extra
+        timeout-minutes: 2
       - if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         run: npm run check

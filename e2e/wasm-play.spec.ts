@@ -17,6 +17,7 @@ import { OUTPUT_NAMES } from '../scripts/rom-outputs.ts'
 import { buildPaths } from '../scripts/rom-paths.ts'
 import { WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'
 import { frame } from './frames.ts'
+import { labelOf, startsWith } from './page-text.ts'
 import {
   DUMP,
   finished,
@@ -31,6 +32,8 @@ import {
 } from './wasm-hook.ts'
 
 const FIRST = 'smogtours-gen3ou-994052'
+/** The viewer's line at 994052's END, which names the replay by its label (#90). */
+const FIRST_ENDED = `Played ${labelOf(FIRST)} to the end of the battle.`
 const ROM_PATCH = join(buildPaths().outDir, OUTPUT_NAMES.patch)
 /** mGBA's fast-forward multipliers the probe runs 994052 at, one window each. */
 const MULTIPLIERS = [1, 16, 64, 256]
@@ -108,7 +111,7 @@ async function startFirst(page: Page): Promise<void> {
   await expect
     .poll(async () => (await status(page))?.runs.started, { timeout: 60_000, intervals: [500] })
     .toBe(before + 1)
-  await expect(page.getByRole('status')).toHaveText(new RegExp(`^Running ${FIRST}`))
+  await expect(page.getByRole('status')).toHaveText(startsWith(`Running ${labelOf(FIRST)}.`))
 }
 
 // #43: 994052 plays with its sound at 1x and at 2x too, a short window of each; the switch comes
@@ -190,6 +193,7 @@ test('the viewer plays hand-made and 994052 at 1x and 2x, switches the speed whi
     report({ stream: FIRST, speed: 'fast', toEnd: end.finishedAt, seconds, fps })
     expect(end.done).toBe(end.total)
     expect(end.audio.writtenToEnd).toBe(0)
+    await expect(page.getByRole('status')).toHaveText(FIRST_ENDED)
     // After END the page leaves fast for 1x, so the game plays on without a core at full load.
     await expect(page.getByLabel('1x')).toBeChecked()
     expect((await status(page))?.speed).toBe('1x')
@@ -247,7 +251,7 @@ test('mGBA on the emulator page plays 994052 at fast-forward (B7 measurement)', 
   await expect(page.locator('#status-detail')).toHaveText(`The patched ROM's SHA1 is ${romSha1}.`)
   await expect(page.getByLabel('Example replay')).toHaveValue(FIRST)
   await page.getByRole('button', { name: 'Start', exact: true }).click()
-  await expect(line).toHaveText(new RegExp(`^Running ${FIRST}`), { timeout: 60_000 })
+  await expect(line).toHaveText(`Started ${labelOf(FIRST)}.`, { timeout: 60_000 })
   await page.evaluate(() => {
     const probe = globalThis as Probe
     probe.irvFrames = 0

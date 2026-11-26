@@ -2,6 +2,7 @@
 // its own chunk; the dev server serves them from test/fixtures/replays/. The labels come from
 // example-replays.json, which scripts/web-examples.ts writes from the same files (#69).
 import examples from './example-replays.json'
+import { type LabelFields, replayLabel } from './label'
 
 const DIR = '../../test/fixtures/replays/'
 
@@ -18,30 +19,12 @@ export interface TestReplay {
   readonly load: () => Promise<unknown>
 }
 
-/** A test replay as the select "Example replay" offers it, with the label it shows. */
+/** A test replay as the select "Example replay" offers it, with its replay label (label.ts). */
 interface ExampleReplay extends TestReplay {
   readonly label: string
 }
 
-/** A test replay's own `format` and `players`, as scripts/web-examples.ts copies them. */
-interface Example {
-  readonly format: string
-  readonly players: readonly string[]
-}
-
-const EXAMPLES: Readonly<Record<string, Example | undefined>> = examples
-
-/**
- * The label the select shows for a test replay (#69): its format without the brackets around its
- * first part ("[Gen 3] OU" reads "Gen 3 OU"; a format with no such part stays as written), its
- * players in the order of `players`, and the number its id ends in (the whole id when it ends in
- * none).
- */
-export function exampleLabel(id: string, { format, players }: Example): string {
-  const shown = format.replace(/^\[([^\]]*)\]\s*/, '$1 ').trim()
-  const number = /-(\d+)$/.exec(id)?.[1] ?? id
-  return `${shown}: ${players.join(' vs ')} (${number})`
-}
+const EXAMPLES: Readonly<Record<string, LabelFields | undefined>> = examples
 
 function exampleReplay(path: string, load: () => Promise<unknown>): ExampleReplay {
   const id = path.slice(DIR.length, -'.json'.length)
@@ -49,7 +32,7 @@ function exampleReplay(path: string, load: () => Promise<unknown>): ExampleRepla
   if (example === undefined) {
     throw new Error(`example-replays.json lacks ${id}: run node scripts/web-examples.ts`)
   }
-  return { id, label: exampleLabel(id, example), load }
+  return { id, label: replayLabel(id, example), load }
 }
 
 const byId = Object.entries(files).map(([path, load]) => exampleReplay(path, load))

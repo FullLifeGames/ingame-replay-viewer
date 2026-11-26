@@ -53,7 +53,7 @@ describe('the full flow', () => {
     await session.pickTestReplay(REPLAY_994052)
     expect(await session.start()).toEqual({
       id: 'smogtours-gen3ou-994052',
-      streamBytes: STREAM_994052.length,
+      label: 'Gen 3 OU: A Welcome Guest vs xXEricXx (994052)',
     })
     expect(runs).toHaveLength(1)
     const [run = new Uint8Array()] = runs
@@ -72,6 +72,7 @@ describe('the full flow', () => {
     const rows = notShown(replay, stream)
     expect(await session.pickTestReplay(REPLAY_994052)).toEqual({
       id: 'smogtours-gen3ou-994052',
+      label: 'Gen 3 OU: A Welcome Guest vs xXEricXx (994052)',
       streamBytes: stream.bytes.length,
       instructions: stream.instructions.length,
       rows,

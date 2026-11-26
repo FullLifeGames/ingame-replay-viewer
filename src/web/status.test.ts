@@ -13,7 +13,8 @@ import {
   pickedLine,
   progressLine,
   READY_LINE,
-  replayLine,
+  replayDetail,
+  replaySummaryLine,
   restartLine,
   rowText,
   runningLine,
@@ -26,6 +27,8 @@ import { notShown, streamOfReplay } from './stream'
 
 const ROM_SHA1 = '0123456789abcdef0123456789abcdef01234567'
 const ID = 'smogtours-gen3ou-994052'
+/** 994052's replay label (label.ts), which every status line names it by (#90). */
+const LABEL = 'Gen 3 OU: A Welcome Guest vs xXEricXx (994052)'
 
 describe('the status lines', () => {
   it('asks for the dump first on a fresh page', () => {
@@ -40,41 +43,41 @@ describe('the status lines', () => {
     })
   })
 
-  // The running ROM holds the stream, so the patched ROM's SHA1 (the dump line's) is not its own.
-  it('names the replay, with its stream in bytes under "Details" and no SHA1', () => {
-    expect(startLine({ id: ID, streamBytes: 8346 })).toEqual({
-      line: `Running ${ID}.`,
-      detail: '8346 bytes of instruction stream.',
-    })
+  // The running ROM holds the stream, so the patched ROM's SHA1 (the dump line's) is not its own,
+  // and the pick's counts under "Details" give its bytes. mGBA gives the page no memory read, so
+  // the line holds before END and after it (#90).
+  it('says it started the replay, with no detail of its own', () => {
+    expect(startLine(LABEL)).toBe(`Started ${LABEL}.`)
   })
 
   // A new pick or a Load changes nothing in the running game until the next Start.
   it('asks for Start after a new replay is picked or loaded', () => {
-    expect(pickedLine(ID)).toBe(`Picked ${ID}. Press Start to play it.`)
+    expect(pickedLine(LABEL)).toBe(`Picked ${LABEL}. Press Start to play it.`)
   })
 
   it('writes large byte counts without separators, as the specs and the snapshot do', () => {
-    expect(startLine({ id: ID, streamBytes: 30914 }).detail).toContain('30914 bytes')
+    expect(replayDetail({ instructions: 1, streamBytes: 30914 })).toContain('30914 bytes')
   })
 
   // The game reaches END at the win or tie line; the outro after it belongs to no battle line.
   it('says the replay played to the end of the battle once the game reached END', () => {
-    expect(endedLine(ID)).toBe(`Played ${ID} to the end of the battle.`)
-    expect(endedLine(ID, undefined)).toBe(`Played ${ID} to the end of the battle.`)
+    expect(endedLine(LABEL).line).toBe(`Played ${LABEL} to the end of the battle.`)
+    expect(endedLine(LABEL, undefined).line).toBe(`Played ${LABEL} to the end of the battle.`)
   })
 
   // #59: the END line replaces the running line, so it keeps the reason a run had no sound.
   it('keeps at END the reason a run played without sound', () => {
-    expect(endedLine(ID, 'the audio did not start: refused for the test')).toBe(
-      `Played ${ID} to the end of the battle. It played without sound: the audio did not start: refused for the test.`,
+    expect(endedLine(LABEL, { reason: 'the audio did not start', words: 'refused' }).line).toBe(
+      `Played ${LABEL} to the end of the battle. It played without sound: the audio did not start.`,
     )
   })
 
   it('gives the running line and the END line one rule for the reason', () => {
     expect(silenceText(undefined, 'plays')).toBe('')
-    expect(silenceText('no context', 'plays')).toBe(' It plays without sound: no context.')
-    expect(endedLine(ID, 'no context')).toBe(
-      `Played ${ID} to the end of the battle.${silenceText('no context', 'played')}`,
+    const silence = { reason: 'no context', words: 'refused' }
+    expect(silenceText(silence, 'plays')).toBe(' It plays without sound: no context.')
+    expect(endedLine(LABEL, silence).line).toBe(
+      `Played ${LABEL} to the end of the battle.${silenceText(silence, 'played')}`,
     )
   })
 
@@ -89,13 +92,7 @@ describe('the status lines', () => {
   })
 
   it('says a Restart plays the replay from the start', () => {
-    expect(restartLine(ID)).toBe(`Restarted ${ID} from the beginning.`)
-  })
-
-  it('sums up the picked replay', () => {
-    expect(replayLine({ id: ID, instructions: 461, streamBytes: 8346 })).toBe(
-      `${ID}: 461 instructions, 8346 bytes of instruction stream.`,
-    )
+    expect(restartLine(LABEL)).toBe(`Restarted ${LABEL} from the beginning.`)
   })
 })
 
@@ -158,6 +155,7 @@ describe('the list of what the game does not show', () => {
 describe('the panel', () => {
   const summary = (near: string, far: string): ReplaySummary => ({
     id: ID,
+    label: LABEL,
     streamBytes: 8346,
     instructions: 461,
     rows: [],
@@ -186,7 +184,7 @@ describe('the panel', () => {
   })
 
   it('shares the words of the status line that asks for Start', () => {
-    expect(pickedLine(ID)).toBe(`Picked ${ID}. ${panelText(picked, undefined).turn}`)
+    expect(pickedLine(LABEL)).toBe(`Picked ${LABEL}. ${panelText(picked, undefined).turn}`)
   })
 
   it('stays empty while the page holds no replay', () => {
@@ -222,15 +220,15 @@ describe("the viewer's run lines", () => {
     finishedMs: undefined,
     output: undefined,
     ring,
-    silence: 'no audio worklet',
+    silence: { reason: 'the audio worklet failed', words: '' },
     streamBytes: 8346,
   }
 
   it('names the replay once a run starts, and why it plays without sound', () => {
-    const picked = { id: ID }
-    expect(runningLine(picked, { ...silent, silence: undefined })).toBe(`Running ${ID}.`)
-    expect(runningLine(picked, silent)).toBe(
-      `Running ${ID}. It plays without sound: no audio worklet.`,
+    const picked = { label: LABEL }
+    expect(runningLine(picked, { ...silent, silence: undefined }).line).toBe(`Running ${LABEL}.`)
+    expect(runningLine(picked, silent).line).toBe(
+      `Running ${LABEL}. It plays without sound: the audio worklet failed.`,
     )
   })
 
@@ -251,6 +249,7 @@ describe("the viewer's run lines", () => {
 // "Details". The words of the developers' tools stay off it as well (visitor-report.test.ts).
 describe('the status lines a visitor reads', () => {
   const DEVELOPER_WORDS = /bytes|instruction stream|SHA1|npm run|localhost|devbox|tailscale|README/i
+  const NO_WORKLET = { reason: 'the audio worklet failed', words: 'refused' }
   const lineOf = (shown: string | { readonly line: string }) =>
     typeof shown === 'string' ? shown : shown.line
 
@@ -259,13 +258,14 @@ describe('the status lines a visitor reads', () => {
     ['checking', () => CHECKING_LINE],
     ['patched', () => lineOf(dumpLine({ romSha1: ROM_SHA1 }))],
     ['starting', () => STARTING_LINE],
-    ['running on the emulator page', () => lineOf(startLine({ id: ID, streamBytes: 8346 }))],
+    ['running on the emulator page', () => startLine(LABEL)],
     ['building', () => BUILDING_LINE],
     ['built', () => BUILT_LINE],
-    ['running in the viewer', () => runningLine({ id: ID }, { silence: 'no audio worklet' })],
-    ['restarted', () => restartLine(ID)],
-    ['picked', () => pickedLine(ID)],
-    ['ended', () => endedLine(ID, 'no audio worklet')],
+    ['running in the viewer', () => lineOf(runningLine({ label: LABEL }, { silence: NO_WORKLET }))],
+    ['restarted', () => restartLine(LABEL)],
+    ['picked', () => pickedLine(LABEL)],
+    ['ended', () => lineOf(endedLine(LABEL, NO_WORKLET))],
+    ['replay summary', () => replaySummaryLine({ label: LABEL })],
   ])('holds no byte count, SHA1 or developer word: %s', (_, line) => {
     expect(line()).not.toMatch(DEVELOPER_WORDS)
   })

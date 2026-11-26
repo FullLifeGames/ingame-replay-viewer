@@ -154,6 +154,13 @@ describe('the words for visitors', () => {
       expect(details?.[0]).not.toMatch(/<details[^>]*\bopen\b/)
     })
 
+    // #90: the summary names the replay; its counts wait in the page's one "Details".
+    it(`keeps the replay's counts inside "Details" on ${name}`, () => {
+      const details = /<details id="details">([\s\S]*?)<\/details>/.exec(page(name))
+      expect(details?.[1]).toContain('<p id="replay-detail"></p>')
+      expect(page(name).match(/id="replay-detail"/g)).toHaveLength(1)
+    })
+
     // The report opens in a tab of its own, so the page keeps the dump and the run.
     it(`puts the report link under the status line on ${name}`, () => {
       expect(page(name)).toMatch(
@@ -166,6 +173,12 @@ describe('the words for visitors', () => {
       expect(page(name)).toMatch(
         /#status,\s*#status-detail,\s*#replay-summary\s*\{\s*overflow-wrap: anywhere;\s*\}/,
       )
+    })
+
+    // #90 D6: a row wraps anywhere but inside its log line's first field, as "|-fieldstart".
+    it(`keeps the first field of a "Not shown" row on one line on ${name}`, () => {
+      expect(page(name)).toMatch(/#not-shown-rows li\s*\{\s*overflow-wrap: anywhere;\s*\}/)
+      expect(page(name)).toMatch(/#not-shown-rows \.log-kind\s*\{\s*white-space: nowrap;\s*\}/)
     })
 
     it(`gives the environment line its own "Details" and report link on ${name}`, () => {

@@ -6,7 +6,8 @@ import { createReplayChoice, type ReplaySummary } from './replay-choice'
 import { TEST_REPLAYS } from './replays'
 import type { VisitorLine } from './visitor'
 
-const PLAYED = 'smogtours-gen3ou-994052'
+/** 994052's replay label: the line names the game by it (#90). */
+const PLAYED = 'Gen 3 OU: A Welcome Guest vs xXEricXx (994052)'
 /** The viewer's game: its page tells END. */
 const VIEWER_GAME = () => ({ replay: PLAYED, tellsEnd: true })
 const UNREACHABLE =
@@ -80,7 +81,7 @@ describe('the line of a failed pick', () => {
     const picked: Promise<ReplaySummary | undefined> = choice.pickTestReplay(example(next))
     await showPick(view, picked, VIEWER_GAME, pickedFrom(view))
     expect(shown()).toEqual({
-      line: `Picked ${next}. Press Start to play it.`,
+      line: 'Picked Gen 3 OU: dataexpunged vs Halbert Simpson (994086). Press Start to play it.',
       detail: '',
       report: false,
     })

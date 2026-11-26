@@ -1,7 +1,7 @@
 // npm run gen3:tables: the number and name tables in src/gen3/tables/ from the pinned expansion
 // (plan §4, ruling D3). It reads the tree that readerTree names, refuses one whose HEAD is not
 // the commit in rom/gen3/build.json, and writes JSON with constant names, numbers and display
-// names and nothing else of the expansion's files. The devbox spec regenerates and compares.
+// names and nothing else of the expansion's files. The pinned-tree spec regenerates and compares.
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'

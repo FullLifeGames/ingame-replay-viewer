@@ -1,13 +1,15 @@
 // The page's own words: the status line after each step, the viewer's progress line under
 // "Details", the panel above the game with the side headings it shares with the team list, and
 // the texts of the "Not shown in the game" list. A failure's line comes from visitor.ts, and the
-// words of the step that failed (replay-choice.ts, session.ts) become its detail.
+// words of the step that failed (replay-choice.ts, session.ts) become its detail. A line names a
+// replay by its replay label (label.ts), as the example select does (#90).
 import type { Side } from '../script/types'
 import { plainText } from './markup'
 import type { ReplaySummary } from './replay-choice'
-import type { DumpSummary, StartSummary } from './session'
+import type { DumpSummary } from './session'
 import type { NotShownCount, NotShownRow } from './stream'
 import { soundLine } from './wasm/audio'
+import type { Silence } from './wasm/audio-opener'
 import type { RunStatus } from './wasm/protocol'
 
 export const READY_LINE = 'Pick your US Emerald dump, then press Start.'
@@ -31,10 +33,12 @@ export const dumpLine = ({ romSha1 }: DumpSummary): StatusLine => ({
 
 const streamText = (bytes: number): string => `${String(bytes)} bytes of instruction stream`
 
-export const startLine = ({ id, streamBytes }: StartSummary): StatusLine => ({
-  line: `Running ${id}.`,
-  detail: `${streamText(streamBytes)}.`,
-})
+/**
+ * Once the emulator page started a replay. mGBA gives the page no memory read, so it cannot tell
+ * END: the line holds over the game and over the black screen after its outro (#90). It carries
+ * no detail: the pick's counts under "Details" already give the stream's bytes (replayDetail).
+ */
+export const startLine = (label: string): string => `Started ${label}.`
 
 /** The viewer's lines while it builds the game from the dump, and once it did. */
 export const BUILDING_LINE = 'Checking your dump and building the game. This takes a few seconds.'
@@ -42,18 +46,25 @@ export const BUILT_LINE =
   'Your dump is US Emerald, and the page built the game from it. Press Start.'
 
 /**
- * Why a run plays or played without sound, as the end of its line; empty for a run with sound.
- * The running line and the END line share it (#59).
+ * Why a run plays or played without sound, in our words, as the end of its line; empty for a run
+ * with sound. The running line and the END line share it (#59).
  */
-export const silenceText = (silence: string | undefined, verb: 'plays' | 'played'): string =>
-  silence === undefined ? '' : ` It ${verb} without sound: ${silence}.`
+export const silenceText = (silence: Silence | undefined, verb: 'plays' | 'played'): string =>
+  silence === undefined ? '' : ` It ${verb} without sound: ${silence.reason}.`
+
+/** A viewer's line with the browser's own words for a run without sound under "Details" (#90). */
+const soundStatus = (
+  line: string,
+  silence: Silence | undefined,
+  verb: 'plays' | 'played',
+): StatusLine => ({ line: `${line}${silenceText(silence, verb)}`, detail: silence?.words ?? '' })
 
 /**
  * Once the game reached END, at the win or tie line; the outro that follows belongs to no line.
  * It replaces the running line, so it keeps the reason a run had no sound.
  */
-export const endedLine = (id: string, silence?: string): string =>
-  `Played ${id} to the end of the battle.${silenceText(silence, 'played')}`
+export const endedLine = (label: string, silence?: Silence): StatusLine =>
+  soundStatus(`Played ${label} to the end of the battle.`, silence, 'played')
 
 /** What the viewer's lines read of a run (run.ts's Run): its time to END and its sound. */
 interface LineRun {
@@ -63,7 +74,7 @@ interface LineRun {
   /** The audio worklet's node; undefined for a run without sound. */
   readonly output: unknown
   readonly ring: { readonly skipped: number; readonly underruns: number }
-  readonly silence: string | undefined
+  readonly silence: Silence | undefined
 }
 
 /**
@@ -80,38 +91,70 @@ export const progressLine = (status: RunStatus, run: LineRun): string => {
   return `Frame ${String(status.frame)}, ${instruction}, turn ${String(status.turn)}.${finished}${sound}`
 }
 
-/** Once a run starts: the replay it plays, and why it plays without sound. */
+/** Once a run starts: the replay it plays, by its label, and why it plays without sound. */
 export const runningLine = (
-  picked: { readonly id: string },
+  picked: { readonly label: string },
   run: Pick<LineRun, 'silence'>,
-): string => `Running ${picked.id}.${silenceText(run.silence, 'plays')}`
+): StatusLine => soundStatus(`Running ${picked.label}.`, run.silence, 'plays')
 
 const PRESS_START = 'Press Start to play it.'
 
 /** After the user picks or loads a replay: the running game, if any, keeps its own. */
-export const pickedLine = (id: string): string => `Picked ${id}. ${PRESS_START}`
+export const pickedLine = (label: string): string => `Picked ${label}. ${PRESS_START}`
 
-export const restartLine = (id: string): string => `Restarted ${id} from the beginning.`
+export const restartLine = (label: string): string => `Restarted ${label} from the beginning.`
 
-export const replayLine = ({
-  id,
+/** The summary above "Not shown": the picked replay by its label, as the select names it (#90). */
+export const replaySummaryLine = ({ label }: Pick<ReplaySummary, 'label'>): string => label
+
+/** The picked replay's counts, a developer's numbers, under the page's "Details" (#90). */
+export const replayDetail = ({
   instructions,
   streamBytes,
-}: Pick<ReplaySummary, 'id' | 'instructions' | 'streamBytes'>): string =>
-  `${id}: ${String(instructions)} instructions, ${String(streamBytes)} bytes of instruction stream.`
+}: Pick<ReplaySummary, 'instructions' | 'streamBytes'>): string =>
+  `${String(instructions)} instructions, ${streamText(streamBytes)}.`
 
 export const notShownHeading = (rows: number): string => `Not shown in the game (${String(rows)})`
 
 export const countText = ({ what, count }: NotShownCount): string => `${what} (${String(count)})`
 
+/** A "Not shown" row in three parts; the page keeps `kind` on one line (#90). */
+export interface RowParts {
+  readonly head: string
+  /** The log line's first field, such as "|-fieldstart", or '' for a line without one. */
+  readonly kind: string
+  readonly rest: string
+}
+
 /**
- * One row of the list: its 1-based line, what happened, the log line and any detail, the last two
- * without Showdown's markup (#31).
+ * The longest first field a row keeps on one line, as long as the protocol's longest. A longer
+ * one, which only someone else's replay holds, wraps with the rest: 24 wide glyphs pass a 390 px
+ * phone's width (#90).
  */
-export function rowText({ line, what, text, detail, standIn }: NotShownRow): string {
+const LONGEST_KIND = 20
+
+/**
+ * One row of the list in parts: its 1-based line and what happened, then the log line's first
+ * field, then the rest of the log line and any detail, the log line and the detail without
+ * Showdown's markup (#31). A first field longer than any of the protocol stays in the rest.
+ */
+export function rowParts({ line, what, text, detail, standIn }: NotShownRow): RowParts {
   const shown = standIn ? `${what}, a stand-in shows` : what
-  const logLine = text === '' ? '' : `: ${plainText(text)}`
-  return `Line ${String(line)}, ${shown}${logLine}${detail === undefined ? '' : `; ${plainText(detail)}`}`
+  const logLine = plainText(text)
+  const field = /^\|[^|]*/.exec(logLine)?.[0] ?? ''
+  const kind = field.length <= LONGEST_KIND ? field : ''
+  const tail = detail === undefined ? '' : `; ${plainText(detail)}`
+  return {
+    head: `Line ${String(line)}, ${shown}${text === '' ? '' : ': '}`,
+    kind,
+    rest: `${logLine.slice(kind.length)}${tail}`,
+  }
+}
+
+/** One row of the list as one text: its parts joined. */
+export function rowText(row: NotShownRow): string {
+  const { head, kind, rest } = rowParts(row)
+  return `${head}${kind}${rest}`
 }
 
 const SIDE_WORDS: Readonly<Record<Side, string>> = { far: 'Far side', near: 'Near side' }

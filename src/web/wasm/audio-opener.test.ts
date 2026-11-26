@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { AudioOpener } from './audio-opener'
+import { AudioOpener, silenceOf } from './audio-opener'
 
 /** A fake audio context that logs its calls; `refuse` makes its resume reject with that reason. */
 function fakeContext(log: string[], refuse?: string): AudioContext {
@@ -80,19 +80,21 @@ describe('the audio opener', () => {
   it('says why the page could not open its audio, and asks the factory again', async () => {
     const log: string[] = []
     const audio = opener(log, 'no audio device')
-    await expect(audio.open()).resolves.toBe('the page could not open its audio: no audio device')
-    await expect(audio.open()).resolves.toBe('the page could not open its audio: no audio device')
+    const silence = { reason: 'the page could not open its audio', words: 'no audio device' }
+    await expect(audio.open()).resolves.toEqual(silence)
+    await expect(audio.open()).resolves.toEqual(silence)
     expect(log).toEqual(['create', 'create'])
   })
 
   it('says why the audio did not start, and resumes again on the next open()', async () => {
     const log: string[] = []
     const audio = opener(log, fakeContext(log, 'refused for the test'))
-    await expect(audio.open()).resolves.toBe('the audio did not start: refused for the test')
+    const silence = { reason: 'the audio did not start', words: 'refused for the test' }
+    await expect(audio.open()).resolves.toEqual(silence)
     log.length = 0
     const again = audio.open()
     expect(log).toEqual(['resume'])
-    await expect(again).resolves.toBe('the audio did not start: refused for the test')
+    await expect(again).resolves.toEqual(silence)
   })
 
   // #69: Play's resume that the browser refuses shows a line, and the game plays on without sound.
@@ -102,6 +104,21 @@ describe('the audio opener', () => {
     const audio = opener(log, context)
     await audio.open()
     context.resume = () => Promise.reject(new Error('refused for the test'))
-    await expect(audio.resumeNow()).resolves.toBe('the audio did not resume: refused for the test')
+    await expect(audio.resumeNow()).resolves.toEqual({
+      reason: 'the audio did not resume',
+      words: 'refused for the test',
+    })
+  })
+
+  // #90: the status line says the reason; the browser's own words wait under "Details".
+  it("keeps our reason apart from the browser's words", () => {
+    expect(silenceOf('the audio did not start', new Error('refused for the test'))).toEqual({
+      reason: 'the audio did not start',
+      words: 'refused for the test',
+    })
+    expect(silenceOf('the audio did not start', 'no device')).toEqual({
+      reason: 'the audio did not start',
+      words: 'no device',
+    })
   })
 })

@@ -24,6 +24,13 @@
       #test-replay {
         max-width: 100%;
       }
+      /* A "Not shown" row wraps anywhere but inside its log line's first field (#90). */
+      #not-shown-rows li {
+        overflow-wrap: anywhere;
+      }
+      #not-shown-rows .log-kind {
+        white-space: nowrap;
+      }
     </style>
   </head>
   <body>
@@ -64,6 +71,7 @@
       <details id="details">
         <summary>Details</summary>
         <p id="status-detail"></p>
+        <p id="replay-detail"></p>
       </details>
       <canvas id="screen" width="240" height="160"></canvas>
       <p id="replay-summary"></p>

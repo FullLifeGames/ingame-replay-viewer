@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitest/config'
 
-// The unit specs run in Node; devbox allows four workers at most (AGENTS.md).
+// The unit specs run in Node; the build machine allows four workers at most (AGENTS.md).
 export default defineConfig({
   test: {
     environment: 'node',

@@ -1,13 +1,14 @@
 // The far trainer of the outro (#71): 150 frames after END a far winner's trainer stands where its
 // slide ends, 32 pixels right of where the intro drew it. These frames are drawn here: a field
 // whose colour changes with x, so that the field behind the trainer differs between the two
-// places, and a trainer with clear pixels through which the field shows.
+// places, and a trainer with clear pixels through which the field shows. With no winner the outro
+// keeps a tie's line in the text box and empties the box of an unknown end (#91).
 import { describe, expect, it } from 'vitest'
 
 import type { Instruction } from '../src/gen3/stream/instructions.ts'
 import { streamOf } from '../src/gen3/stream/testing.ts'
 
-import { checkShots } from './rom-shot-probes.ts'
+import { checkShots, SCREEN } from './rom-shot-probes.ts'
 import type { Frame } from './rom-shot-probes.ts'
 import { scenesOf } from './rom-shot-scenes.ts'
 
@@ -52,8 +53,8 @@ const farWon: Instruction[] = [
   { op: 'end', outcome: 'farWon' },
 ]
 
-function outroCheck() {
-  const scene = scenesOf(streamOf(farWon)).find(({ name }) => name === 'outro')
+function outroCheck(instructions: readonly Instruction[] = farWon) {
+  const scene = scenesOf(streamOf(instructions)).find(({ name }) => name === 'outro')
   if (scene === undefined) throw new Error('no outro scene')
   return scene.check
 }
@@ -88,7 +89,54 @@ describe("the outro's far trainer after a far win", () => {
   })
 
   it('fails a black frame', () => {
-    const black = { width: WIDTH, height: HEIGHT, rgb: new Uint8Array(WIDTH * HEIGHT * 3) }
-    expect(checkShots(outroCheck(), framesWithOutro(black)).pass).toBe(false)
+    expect(checkShots(outroCheck(), framesWithOutro(black())).pass).toBe(false)
+  })
+})
+
+const black = () => ({ width: WIDTH, height: HEIGHT, rgb: new Uint8Array(WIDTH * HEIGHT * 3) })
+
+// The text box in its empty colour, with a line in it when `line` holds: a few glyph-like pixels.
+function withBox(frame: Frame, line: boolean, colour: number = SCREEN.messageBackground): Frame {
+  const { x, y, width, height } = SCREEN.message
+  for (let v = 0; v < height; v++) {
+    for (let u = 0; u < width; u++) {
+      const glyph = line && v > 4 && v < 12 && u < 120 && (u * 3 + v) % 4 === 0
+      setColour(frame, x + u, y + v, glyph ? 0x313131 : colour)
+    }
+  }
+  return frame
+}
+
+const endOf = (outcome: 'tie' | 'unknown'): Instruction[] => [
+  { op: 'print', text: 'Dugtrio is buffeted by the sandstorm!' },
+  { op: 'end', outcome },
+]
+
+const verdictAt = (outcome: 'tie' | 'unknown', outro: Frame) =>
+  checkShots(
+    outroCheck(endOf(outcome)),
+    new Map([
+      ['win', withBox(field(), true)],
+      ['outro', outro],
+    ]),
+  )
+
+describe('the outro with no winner', () => {
+  it('passes an unknown end whose outro shows the empty text box', () => {
+    expect(verdictAt('unknown', withBox(field(), false)).pass).toBe(true)
+  })
+
+  it('fails an unknown end whose outro keeps the last line in the box', () => {
+    expect(verdictAt('unknown', withBox(field(), true)).pass).toBe(false)
+  })
+
+  it('fails an unknown end whose outro frame is black or faded', () => {
+    expect(verdictAt('unknown', black()).pass).toBe(false)
+    expect(verdictAt('unknown', withBox(field(), false, 0x355252)).pass).toBe(false)
+  })
+
+  it('passes a tie whose outro keeps the tie line and fails an empty box', () => {
+    expect(verdictAt('tie', withBox(field(), true)).pass).toBe(true)
+    expect(verdictAt('tie', withBox(field(), false)).pass).toBe(false)
   })
 })

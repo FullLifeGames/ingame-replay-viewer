@@ -40,8 +40,8 @@ describe('the kind census', () => {
   })
 
   it('counts a kind with a rule that is also named in two places', () => {
-    const named: Named = { '|move|': { group: 'no rule yet', reason: 'a test' } }
-    expect(placesOf('|move|', named)).toEqual(['a rule', 'the named list (no rule yet)'])
+    const named: Named = { '|move|': { group: 'newer generation', reason: 'a test' } }
+    expect(placesOf('|move|', named)).toEqual(['a rule', 'the named list (newer generation)'])
   })
 
   it('counts a kind on no place as none', () => {

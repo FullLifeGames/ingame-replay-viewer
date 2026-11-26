@@ -94,7 +94,11 @@ describe('the scenes a run must have', () => {
   })
 })
 
-describe('the ops of a plan (#71)', () => {
+// planStreams builds every stream through Vite's module runner. The send-out plans took 6.1 s in a
+// full check while a second heavy run loaded the machine (#92); the limit is far above twice that.
+const PLAN_LIMIT = 60_000
+
+describe('the ops of a plan (#71)', { timeout: PLAN_LIMIT }, () => {
   it("are the stream's ops by name, for the op frame log; the empty slot has none", async () => {
     const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
     const [handMade, empty, version] = await planStreams(['hand-made'], layout)
@@ -103,20 +107,24 @@ describe('the ops of a plan (#71)', () => {
     expect(handMade?.ops[0]).toBe('intro')
     expect(handMade?.ops.at(-1)).toBe('end')
     expect(version?.ops).toEqual(handMade?.ops)
-  }, 60_000)
+  })
 })
 
-describe.skipIf(!existsSync(buildPaths().tree))('the send-out plans (#66, pinned tree)', () => {
-  it('are one plan per battle, each to its end, before the two refusals', async () => {
-    const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
-    const plans = await planStreams(['send-outs'], layout)
-    const names = plans.map((plan) => plan.name)
-    expect(names.slice(0, 2)).toEqual(['send-outs-1', 'send-outs-2'])
-    expect(names.slice(-2)).toEqual(['empty-slot', 'version-4'])
-    expect(names.length).toBeGreaterThan(12)
-    for (const plan of plans.slice(0, -2)) {
-      expect(plan.expect).toBe('finished')
-      expect(requiresEveryScene(plan.name)).toBe(false)
-    }
-  }, 60_000)
-})
+describe.skipIf(!existsSync(buildPaths().tree))(
+  'the send-out plans (#66, pinned tree)',
+  { timeout: PLAN_LIMIT },
+  () => {
+    it('are one plan per battle, each to its end, before the two refusals', async () => {
+      const layout = readProgressLayout(readFileSync(PROGRESS_HEADER_PATH, 'utf8'))
+      const plans = await planStreams(['send-outs'], layout)
+      const names = plans.map((plan) => plan.name)
+      expect(names.slice(0, 2)).toEqual(['send-outs-1', 'send-outs-2'])
+      expect(names.slice(-2)).toEqual(['empty-slot', 'version-4'])
+      expect(names.length).toBeGreaterThan(12)
+      for (const plan of plans.slice(0, -2)) {
+        expect(plan.expect).toBe('finished')
+        expect(requiresEveryScene(plan.name)).toBe(false)
+      }
+    })
+  },
+)

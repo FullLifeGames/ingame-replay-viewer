@@ -109,9 +109,14 @@ export function withVersion(bytes: Uint8Array, version: number): Uint8Array {
   return copy
 }
 
+/** The tree the ROM builds from: the send-out streams of rom:shots and their spec read it. */
+export function sendOutTree(): string {
+  return buildPaths().tree
+}
+
 /** The send-out streams (#66) of the tree the ROM builds from, each by the name of its run. */
 export function sendOutBytes(): [string, Uint8Array][] {
-  const { tree } = buildPaths()
+  const tree = sendOutTree()
   const anims = readSendOutAnimations((path) => readFileSync(join(tree, path), 'utf8'))
   const pics = { near: trainerPics.TRAINER_PIC_BRENDAN, far: trainerPics.TRAINER_PIC_MAY }
   return sendOutStreams(anims, speciesTable, pics).map(({ name, stream }) => [

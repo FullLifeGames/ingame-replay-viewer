@@ -1,5 +1,5 @@
 // A phrase template (plan §5, D2): our own wording of one scene, tagged with the symbol of the
-// pinned `src/battle_message.c` whose string it mirrors. The devbox spec
+// pinned `src/battle_message.c` whose string it mirrors. The pinned-tree spec
 // `scripts/gen3-phrases.test.ts` renders that string and holds the two equal; nothing of the file
 // lives in this repository.
 
@@ -11,7 +11,7 @@ export interface Template<A extends readonly unknown[]> {
   readonly render: (...args: A) => string
 }
 
-/** Any template, as the devbox spec walks them. */
+/** Any template, as the pinned-tree spec walks them. */
 export type AnyTemplate = Template<never>
 
 export function tagged<A extends readonly unknown[]>(

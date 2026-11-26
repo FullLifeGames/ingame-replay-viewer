@@ -38,8 +38,8 @@ export function emulatorPresses(
         const started = await session.start().finally(() => {
           view.start.disabled = false
         })
-        running = started.id
-        view.status(say.startLine(started))
+        running = started.label
+        view.status(say.startLine(started.label))
         view.restart.disabled = false
       })
     },

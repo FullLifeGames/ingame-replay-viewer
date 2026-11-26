@@ -1,6 +1,7 @@
 #include "global.h"
 #include "battle.h"
 #include "battle_controllers.h"
+#include "battle_gfx_sfx_util.h"
 #include "move.h"
 #include "pokemon.h"
 #include "replay_interpreter.h"
@@ -15,8 +16,9 @@
 // controller commands as the battle engine does for a move that hits (CancelerMoveAnimation,
 // CancelerEffectivenessSound, CancelerHitAnimation, CancelerHealthBarUpdate in
 // battle_move_resolution.c), for a mon that faints (BattleScript_FaintBattler) and for a user that
-// a move left hidden (MoveEndAttackerVisible). An op with two commands for one battler emits one
-// per step, because a battler has one bufferA.
+// a move left hidden (MoveEndAttackerVisible). HP also starts and stops the low-HP beep, as the
+// engine's datahpupdate does. An op with two commands for one battler emits one per step, because
+// a battler has one bufferA.
 
 // The sound of each REPLAY_EFFECTIVENESS_*, as CancelerEffectivenessSound picks it.
 static const u16 sEffectivenessSounds[] =
@@ -94,7 +96,10 @@ bool32 Replay_OpHit(const volatile u8 *operands, u32 step)
 
 // HP: the HP bar moves from the party's HP to the stream's, at most the mon's max HP; the
 // controller reads the old HP from the party (BtlController_HandleHealthBarUpdate). Then the party
-// and the battle mon get the new HP, as datahpupdate does after healthbarupdate.
+// and the battle mon get the new HP, as datahpupdate does after healthbarupdate. The controller
+// that sets datahpupdate's HP starts or stops the low-HP beep of a near mon on the new HP
+// (SetBattlerMonData in battle_controllers.c), and so does this op. The bar's end checks only the
+// HP from before the op, so without this call the beep would follow one HP op late.
 bool32 Replay_OpHp(const volatile u8 *operands, u32 step)
 {
     u32 battler = Replay_GetBattler(operands[0]);
@@ -109,6 +114,8 @@ bool32 Replay_OpHp(const volatile u8 *operands, u32 step)
     }
     SetMonData(mon, MON_DATA_HP, &hp);
     gBattleMons[battler].hp = hp;
+    if (IsOnPlayerSide(battler))
+        HandleLowHpMusicChange(mon, battler);
     return TRUE;
 }
 

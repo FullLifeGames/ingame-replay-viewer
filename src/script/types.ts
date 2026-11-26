@@ -7,8 +7,8 @@
  * shows (Roost's turn without the Flying type). `preview` marks a Team Preview line: the intro's
  * balls show each team, and the page lists both teams. `format` marks a line a format writes for
  * its own client (`|custom|`). `unknown` and `unsupported` mark lines the battle script cannot
- * show yet; no test replay may contain them, except an `unsupported` line of a kind the named list
- * keeps as "no rule yet" (`census.ts`).
+ * show yet; no test replay may contain them, not even an `unsupported` line whose kind the named
+ * list (`census.ts`) gives a reason in one of its three groups.
  */
 export type DropReason =
   | 'spacer'
