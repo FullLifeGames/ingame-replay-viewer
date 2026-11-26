@@ -11,14 +11,15 @@
 #include "test/replay_test.h"
 #include "constants/battle_anim.h"
 #include "constants/characters.h"
+#include "constants/moves.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
 
 // The end of a replay (#20, #91): the win line starts the victory music, and after END the outro
-// empties the text box of an unknown end, returns every mon still out to its ball, slides the
-// winner's trainer in, holds the scene and fades the screen and the music to black. A test sees
-// the outro only after ReplayTest_PlayOutro.
+// empties the text box of an unknown end, shows every hidden mon still out, returns each mon still
+// out to its ball, slides the winner's trainer in, holds the scene and fades the screen and the
+// music to black. A test sees the outro only after ReplayTest_PlayOutro.
 
 // Where BtlController_HandleTrainerSlide puts each side's trainer once the slide has ended: the
 // near back pic at x 80, the far front pic at x 176 + 32.
@@ -198,6 +199,49 @@ REPLAY_TEST("A forfeit returns both mons before the slide, the loser's first")
         EXPECT(gSprites[gHealthboxSpriteIds[nearBattler]].invisible);
         EXPECT(gSprites[gHealthboxSpriteIds[farBattler]].invisible);
         EXPECT_EQ(GetTrainerSlideSprite(REPLAY_SIDE_NEAR)->x + GetTrainerSlideSprite(REPLAY_SIDE_NEAR)->x2, NEAR_TRAINER_END_X);
+    }
+}
+
+// A move can leave a mon hidden at the end: Fly's charge hides its user until its hit (#65). The
+// outro shows every hidden mon still out, on both sides, before the first one goes back, as
+// SHOW_MON shows it, so the ball takes back a mon the player sees. Headless tests play the charge
+// only with animations forced.
+REPLAY_TEST("The outro shows a near mon that Fly's charge hid before it returns")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        ReplayTest_PlayOutro();
+        StartBattle();
+        ReplayStream_Move(REPLAY_SIDE_NEAR, REPLAY_SIDE_FAR, MOVE_FLY);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_FLY, nearMon); }
+    THEN
+    {
+        FORCE_MOVE_ANIM(FALSE);
+        EXPECT(ReplayTest_VisibleAtReturn(REPLAY_SIDE_NEAR));
+        EXPECT(ReplayTest_VisibleAtReturn(REPLAY_SIDE_FAR));
+    }
+}
+
+// A forfeit while the loser's mon is in the air: the loser's mon shows before it goes back too.
+REPLAY_TEST("The outro shows a far mon that Fly's charge hid before it returns at a forfeit")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        ReplayTest_PlayOutro();
+        StartBattle();
+        ReplayStream_Move(REPLAY_SIDE_FAR, REPLAY_SIDE_NEAR, MOVE_FLY);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_FLY, farMon); }
+    THEN
+    {
+        FORCE_MOVE_ANIM(FALSE);
+        EXPECT(ReplayTest_VisibleAtReturn(REPLAY_SIDE_FAR));
+        EXPECT(ReplayTest_VisibleAtReturn(REPLAY_SIDE_NEAR));
     }
 }
 

@@ -90,11 +90,14 @@ void ReplayTest_AtEnd(void);
 // Called when op number op (counted from 0) starts, after every wait before it.
 void ReplayTest_AtOpStart(u32 op);
 // Called once, when the outro runs its first step: on the frame after END, as END leaves no
-// controller busy and no wait.
+// controller busy and no wait, or later when END showed a hidden mon.
 void ReplayTest_AtOutroStart(void);
 // Called on each frame the interpreter runs the battle, from the takeover to END, before
 // BattleMainCB2 reads the held keys on that frame.
 void ReplayTest_AtFrame(void);
+// Called when the outro sends the mon of a side (REPLAY_SIDE_*) back into its ball, before the
+// controller command.
+void ReplayTest_AtOutroReturn(u32 side);
 #endif
 
 // Forgets the loaded replay; gReplayProgress stays readable.
