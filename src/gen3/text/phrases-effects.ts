@@ -118,6 +118,11 @@ export const EFFECT_TEMPLATES = {
   }),
   // `BattleScript_EffectTrick`, with the user as B_ATK, before the two items' lines.
   switchedItems: tagged('STRINGID_PKMNSWITCHEDITEMS', start('switched items with its target!')),
+  // `BattleScript_NeutralizingGasExits`, with no pop-up.
+  neutralizingGasOver: tagged(
+    'STRINGID_NEUTRALIZINGGASOVER',
+    () => 'The effects of the neutralizing gas wore off!',
+  ),
 }
 
 const E = EFFECT_TEMPLATES
@@ -221,6 +226,7 @@ const ENDS: Readonly<Record<string, Line>> = {
   encore: E.encoreEnded.render,
   disable: E.disableEnded.render,
   bide: E.unleashedEnergy.render,
+  neutralizinggas: E.neutralizingGasOver.render,
 }
 
 /** The end lines that name the effect's move, by the effect's id. */
