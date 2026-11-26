@@ -91,6 +91,7 @@ export const EACH_OP: readonly Instruction[] = [
   { op: 'formChange', side: 'far', species: 1051 },
   { op: 'showMon', side: 'far' },
   { op: 'tera', side: 'far', teraType: 20 },
+  { op: 'moveType', type: 1 },
   { op: 'faint', side: 'near' },
   { op: 'flushTextBox' },
   { op: 'end', outcome: 'farWon' },

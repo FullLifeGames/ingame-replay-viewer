@@ -30,6 +30,7 @@ EWRAM_DATA bool8 gReplayTestRunStream = FALSE;
 static EWRAM_DATA u16 sCheckedProgress = 0;
 static EWRAM_DATA u8 sKOAnimsAtOpStart[REPLAY_TEST_RECORDED_OPS] = {0};
 static EWRAM_DATA u8 sAnimMoveTurnsAtOpStart[REPLAY_TEST_RECORDED_OPS] = {0};
+static EWRAM_DATA u8 sMoveTypesAtOpStart[REPLAY_TEST_RECORDED_OPS] = {0};
 static EWRAM_DATA struct ReplayTestTrainerSprite sTrainerSpritesAtOpStart[REPLAY_TEST_RECORDED_OPS][REPLAY_STREAM_SIDE_COUNT] = {0};
 static EWRAM_DATA bool8 sPlayOutro = FALSE;
 static EWRAM_DATA bool8 sHoldB = FALSE;
@@ -52,6 +53,7 @@ static void ReplayTest_SetUp(void *data)
     sCheckedProgress = 0;
     memset(sKOAnimsAtOpStart, 0, sizeof(sKOAnimsAtOpStart));
     memset(sAnimMoveTurnsAtOpStart, 0, sizeof(sAnimMoveTurnsAtOpStart));
+    memset(sMoveTypesAtOpStart, 0, sizeof(sMoveTypesAtOpStart));
     memset(sTrainerSpritesAtOpStart, 0, sizeof(sTrainerSpritesAtOpStart));
     sPlayOutro = FALSE;
     sHoldB = FALSE;
@@ -124,6 +126,7 @@ void ReplayTest_AtOpStart(u32 op)
         return;
     sKOAnimsAtOpStart[op] = gBattleStruct->battlerKOAnimsRunning;
     sAnimMoveTurnsAtOpStart[op] = gAnimMoveTurn;
+    sMoveTypesAtOpStart[op] = gBattleStruct->dynamicMoveType;
     RecordTrainerSprites(sTrainerSpritesAtOpStart[op]);
 }
 
@@ -198,6 +201,12 @@ u32 ReplayTest_AnimMoveTurnAtOpStart(u32 op)
 {
     CheckRecordedOp(op);
     return sAnimMoveTurnsAtOpStart[op];
+}
+
+u32 ReplayTest_MoveTypeAtOpStart(u32 op)
+{
+    CheckRecordedOp(op);
+    return sMoveTypesAtOpStart[op];
 }
 
 const struct ReplayTestTrainerSprite *ReplayTest_TrainerSpriteAtOpStart(u32 op, u32 side)

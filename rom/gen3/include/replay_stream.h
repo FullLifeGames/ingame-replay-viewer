@@ -92,6 +92,7 @@
 #define REPLAY_OP_FORM_CHANGE    0x15 // side u8, species u16 (SPECIES_*, not SPECIES_NONE): the mon's form until it leaves the field
 #define REPLAY_OP_SHOW_MON       0x16 // side u8: shows the mon's sprite again, with no animation
 #define REPLAY_OP_TERA           0x17 // side u8, teraType u8 (TYPE_*, TYPE_NORMAL to NUMBER_OF_MON_TYPES - 1): the mon Terastallizes
+#define REPLAY_OP_MOVE_TYPE      0x18 // type u8 (TYPE_*, TYPE_NORMAL to NUMBER_OF_MON_TYPES - 1): the type the next MOVE's animation reads
 
 // The size byte of each op but PRINT.
 #define REPLAY_OP_END_SIZE            1
@@ -117,6 +118,7 @@
 #define REPLAY_OP_FORM_CHANGE_SIZE    3
 #define REPLAY_OP_SHOW_MON_SIZE       1
 #define REPLAY_OP_TERA_SIZE           2
+#define REPLAY_OP_MOVE_TYPE_SIZE      1
 
 // PRINT's size byte: one glyph and EOS at least.
 #define REPLAY_PRINT_MIN_SIZE 2

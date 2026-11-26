@@ -90,6 +90,8 @@ interface Operands {
   showMon: OnSide
   /** The side's mon Terastallizes into `teraType`, the game's `TYPE_*`, until the battle ends. */
   tera: OnSide & { readonly teraType: number }
+  /** The type, the game's `TYPE_*`, that the next MOVE's animation reads for its look. */
+  moveType: { readonly type: number }
 }
 
 export type Instruction = { [K in Op]: { readonly op: K } & Operands[K] }[Op]
@@ -219,6 +221,7 @@ export const LAYOUT: { readonly [K in FixedOp]: Fields<Operands[K]> } = {
     ['side', side],
     ['teraType', type],
   ],
+  moveType: [['type', type]],
 }
 
 /** A trainer's fields; their offsets are TRAINER_OFFSET's under the same names. */

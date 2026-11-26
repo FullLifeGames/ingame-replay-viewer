@@ -157,7 +157,7 @@ TEST("Replay: a FORM_CHANGE of another size is refused")
     EXPECT_EQ(CHECK_OP(REPLAY_OP_FORM_CHANGE, REPLAY_SIDE_FAR, SPECIES_CASTFORM_SUNNY & 0xFF), REPLAY_ERROR_SIZE);
 }
 
-// TERA's type is one of the game's: TYPE_NONE and the numbers from
+// TERA's and MOVE_TYPE's type is one of the game's: TYPE_NONE and the numbers from
 // NUMBER_OF_MON_TYPES up are none. TYPE_MYSTERY lies inside the range.
 TEST("Replay: a TERA to no type or past the game's own is refused")
 {
@@ -171,6 +171,19 @@ TEST("Replay: a TERA to no type or past the game's own is refused")
 TEST("Replay: a TERA of another size is refused")
 {
     EXPECT_EQ(CHECK_OP(REPLAY_OP_TERA, REPLAY_SIDE_NEAR), REPLAY_ERROR_SIZE);
+}
+
+TEST("Replay: a MOVE_TYPE of no type or past the game's own is refused")
+{
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_MOVE_TYPE, TYPE_NONE), REPLAY_ERROR_OPERAND);
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_MOVE_TYPE, NUMBER_OF_MON_TYPES), REPLAY_ERROR_OPERAND);
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_MOVE_TYPE, TYPE_NORMAL), REPLAY_ERROR_NONE);
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_MOVE_TYPE, TYPE_STELLAR), REPLAY_ERROR_NONE);
+}
+
+TEST("Replay: a MOVE_TYPE of another size is refused")
+{
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_MOVE_TYPE, TYPE_WATER, 0), REPLAY_ERROR_SIZE);
 }
 
 // MOVE's last operand is the turn the move animation reads (gAnimMoveTurn): any u8 passes.

@@ -94,16 +94,20 @@ describe('decodeStream', () => {
   })
 
   it('refuses an unknown op, the one after the last op of version 4', () => {
-    expect(patched([END], STREAM.tablesEnd, [0x18])).toThrow(/op 24/)
+    expect(patched([END], STREAM.tablesEnd, [0x19])).toThrow(/op 25/)
   })
 
-  it('reads back a TERA and refuses a type outside TYPE_NORMAL to the last', () => {
+  it('reads back a TERA and a MOVE_TYPE and refuses a type outside TYPE_NORMAL to the last', () => {
     const tera: Instruction = { op: 'tera', side: 'far', teraType: 19 }
-    expect(decodeStream(encodeStream(streamWithLeads([tera, END])))).toEqual(
-      streamWithLeads([tera, END]),
+    const moveType: Instruction = { op: 'moveType', type: 11 }
+    expect(decodeStream(encodeStream(streamWithLeads([tera, moveType, END])))).toEqual(
+      streamWithLeads([tera, moveType, END]),
     )
     const count = counts.NUMBER_OF_MON_TYPES
-    const types: [Instruction, number, RegExp][] = [[tera, AFTER_LEADS + 3, /tera teraType/]]
+    const types: [Instruction, number, RegExp][] = [
+      [tera, AFTER_LEADS + 3, /tera teraType/],
+      [moveType, AFTER_LEADS + 2, /moveType type/],
+    ]
     for (const [instruction, at, message] of types) {
       for (const type of [0, count]) {
         expect(patched([...LEADS, instruction, END], at, [type])).toThrow(message)

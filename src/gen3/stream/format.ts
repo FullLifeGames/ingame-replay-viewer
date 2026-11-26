@@ -10,8 +10,8 @@
 // 4. Each side operand of the ops in ORDER.onFieldOps names a side with a battler out; WITHDRAW
 //    and FAINT take it off. An ANIM of ORDER.freeAnims is free: the game plays the weather
 //    animations with no battler out, after a double KO.
-// 5. Every other op is free: PRINT, TURN, WEATHER, END, FLUSH_TEXT_BOX, and STATUS and ITEM,
-//    which name a party slot (Heal Bell reaches the whole party).
+// 5. Every other op is free: PRINT, TURN, WEATHER, END, FLUSH_TEXT_BOX, MOVE_TYPE, and STATUS
+//    and ITEM, which name a party slot (Heal Bell reaches the whole party).
 import type { BoostID, StatusName } from '@pkmn/data'
 
 import type { Side } from '../../script/types'
@@ -99,6 +99,7 @@ export const OP = {
   formChange: 0x15,
   showMon: 0x16,
   tera: 0x17,
+  moveType: 0x18,
 } as const
 
 export type Op = keyof typeof OP
@@ -128,6 +129,7 @@ export const OP_SIZE = {
   formChange: 3,
   showMon: 1,
   tera: 2,
+  moveType: 1,
 } as const satisfies Record<Exclude<Op, 'print'>, number>
 
 /** PRINT's operand: its text in the game's charset and EOS, one glyph at least. */

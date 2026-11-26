@@ -16,6 +16,7 @@
 #include "constants/battle.h"
 #include "constants/characters.h"
 #include "constants/moves.h"
+#include "constants/pokemon.h"
 #include "constants/rgb.h"
 
 // The ROM interpreter (#6). Replay_Load checks the whole stream first (replay_stream_check.c), so a
@@ -82,9 +83,10 @@ static const ReplayOpFunc sOps[] =
     [REPLAY_OP_FORM_CHANGE]    = Replay_OpFormChange,
     [REPLAY_OP_SHOW_MON]       = Replay_OpShowMon,
     [REPLAY_OP_TERA]           = Replay_OpTera,
+    [REPLAY_OP_MOVE_TYPE]      = Replay_OpMoveType,
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sOps) == REPLAY_OP_TERA + 1, ReplayOpsCoverTheFormat);
+STATIC_ASSERT(ARRAY_COUNT(sOps) == REPLAY_OP_MOVE_TYPE + 1, ReplayOpsCoverTheFormat);
 
 // The battle outcome of each REPLAY_OUTCOME_*. A tie and an unknown end are draws.
 static const u8 sOutcomes[] =
@@ -271,10 +273,12 @@ void Replay_EndOutro(void)
 }
 
 // TURN: the number of the turn that starts. No move of the last turn is still in action, as
-// HandleAction_ActionFinished clears gCurrentMove after each action.
+// HandleAction_ActionFinished clears gCurrentMove after each action, and a MOVE_TYPE that no MOVE
+// took ends with it.
 static bool32 Op_Turn(const volatile u8 *operands, u32 step)
 {
     gCurrentMove = MOVE_NONE;
+    gBattleStruct->dynamicMoveType = TYPE_NONE;
     gReplayProgress.turn = Replay_ReadU16(operands);
     return TRUE;
 }

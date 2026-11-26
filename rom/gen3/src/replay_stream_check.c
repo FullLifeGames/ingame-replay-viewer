@@ -87,9 +87,10 @@ static const struct ReplayOpFormat sOpFormats[] =
     [REPLAY_OP_FORM_CHANGE]    = { REPLAY_OP_FORM_CHANGE_SIZE,    { OPERAND_SIDE, OPERAND_SPECIES } },
     [REPLAY_OP_SHOW_MON]       = { REPLAY_OP_SHOW_MON_SIZE,       { OPERAND_SIDE } },
     [REPLAY_OP_TERA]           = { REPLAY_OP_TERA_SIZE,           { OPERAND_SIDE, OPERAND_TYPE } },
+    [REPLAY_OP_MOVE_TYPE]      = { REPLAY_OP_MOVE_TYPE_SIZE,      { OPERAND_TYPE } },
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sOpFormats) == REPLAY_OP_TERA + 1, ReplayOpFormatsCoverTheFormat);
+STATIC_ASSERT(ARRAY_COUNT(sOpFormats) == REPLAY_OP_MOVE_TYPE + 1, ReplayOpFormatsCoverTheFormat);
 
 // The values each kind allows. The stream's own enums are numbered without gaps. A type is one of
 // the game's, TYPE_MYSTERY and TYPE_STELLAR included.
