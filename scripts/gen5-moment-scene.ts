@@ -21,9 +21,6 @@ export const TEXT_BANKS = {
   standard: 'res/text/system/0019.txt',
 }
 
-const NEAR_CLIENT = 0
-const FAR_CLIENT = 1
-
 /** Per scene: the near Pokémon's move and the far HP after it, the far one's move and the near
  * HP after it. */
 const SCENES: Record<SceneName, { near: string; farHp: number; far: string; nearHp: number }> = {
@@ -38,6 +35,12 @@ function dexMove(name: string) {
 }
 
 const moveNumber = (name: string) => dexMove(name).num
+
+/** The battle client of `side`: the near side is the player's client and the far side the
+ * opponent's, as the single battle's setup creates them (build/gen5/bw2.json). */
+export function sideClient(single: SingleBattle, side: Side): number {
+  return side === 'near' ? single.clients.player : single.clients.opponent
+}
 
 /** The move that `side`'s Pokémon uses in `scene`. */
 export function sceneMove(scene: SceneName, side: Side): string {
@@ -58,12 +61,12 @@ export function sceneBlocks(
   stdMessage: number,
 ): { name: string; moment: Moment }[] {
   const plan = SCENES[scene]
-  const side = (mon: BattleMonReading, client: number) => ({
+  const side = (mon: BattleMonReading, of: Side) => ({
     monId: mon.monId,
-    pos: singleBattlePos(single, client),
+    pos: singleBattlePos(single, sideClient(single, of)),
   })
-  const near = side(mons.near, NEAR_CLIENT)
-  const far = side(mons.far, FAR_CLIENT)
+  const near = side(mons.near, 'near')
+  const far = side(mons.far, 'far')
   const hp = (mon: BattleMonReading) => ({ hp: mon.hp, maxHp: mon.maxHp })
   return [
     {

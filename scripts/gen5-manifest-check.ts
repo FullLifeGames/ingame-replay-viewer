@@ -2,7 +2,7 @@
 // every component names its licence and its source by commit, every file names a known
 // component, no path stands twice, and each source's pin is well formed. They take a loose shape,
 // so a spec can hand them a draft that lacks a field.
-import { type Component, isOffered, type Source } from './gen5-manifest.ts'
+import type { Component, Source } from './gen5-manifest.ts'
 
 export interface ManifestDraft {
   components: Readonly<Record<string, Partial<Component>>>
@@ -11,12 +11,9 @@ export interface ManifestDraft {
 
 const FULL_COMMIT = /^[0-9a-f]{40}$/
 
-/** True when `part` names its source by a full commit, or gives the reason it offers none. */
-function namesSource(part: Partial<Component>): boolean {
-  const { source } = part
-  if (source === undefined) return false
-  return isOffered(source) ? FULL_COMMIT.test(source.commit) : source.none.trim() !== ''
-}
+/** True when `part` names its source by a full commit. */
+const namesSource = (part: Partial<Component>): boolean =>
+  part.source !== undefined && FULL_COMMIT.test(part.source.commit)
 
 /** The faults of one component, as the file `path` meets them. */
 function componentFaults(path: string, id: string, part: Partial<Component> | undefined): string[] {
@@ -38,12 +35,6 @@ export function checkManifest(manifest: ManifestDraft): void {
     for (const id of components) faults.push(...componentFaults(path, id, manifest.components[id]))
   }
   if (faults.length > 0) throw new Error(`gen5-manifest: ${faults.join('; ')}`)
-}
-
-/** The files with a component whose licence nobody can name. */
-export function unnamedLicenceFiles(manifest: ManifestDraft): string[] {
-  const unnamed = (id: string): boolean => typeof manifest.components[id]?.licence === 'object'
-  return manifest.files.filter((file) => file.components.some(unnamed)).map((file) => file.path)
 }
 
 const PIN_RULES: readonly [keyof Source, RegExp, string][] = [

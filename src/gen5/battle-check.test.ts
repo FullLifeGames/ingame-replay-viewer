@@ -35,9 +35,9 @@ describe('battleRefs', () => {
     expect(checks).toEqual([
       { name: 'sCommMode', address: 0x02100000, width: 4, oneOf: [0] },
       { name: 'sAdapters[0]', address: 0x02100004, width: 4, mainRamPointer: true },
-      { name: 'returned', address: 0x02100004, offset: 0x20, width: 1, mask: 0x70, oneOf: [0] },
-      { name: 'sendCmd.cmd', address: 0x02100004, offset: 0x2a, width: 2, oneOf: [6] },
-      { name: 'sendCmd.size', address: 0x02100004, offset: 0x28, width: 2, atMost: 1200 },
+      { name: 'returned', address: 0x02100004, hops: [0x20], width: 1, mask: 0x70, oneOf: [0] },
+      { name: 'sendCmd.cmd', address: 0x02100004, hops: [0x2a], width: 2, oneOf: [6] },
+      { name: 'sendCmd.size', address: 0x02100004, hops: [0x28], width: 2, atMost: 1200 },
     ])
   })
 
@@ -59,7 +59,7 @@ describe('battleRefs', () => {
     expect(watch[4]).toEqual({
       name: 'isNet',
       address: 0x02100004,
-      offset: 0x20,
+      hops: [0x20],
       width: 1,
       mask: 0x0f,
     })

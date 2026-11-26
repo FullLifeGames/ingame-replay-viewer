@@ -32,6 +32,9 @@ export interface RunPlan {
   /** The SHA-256 of main RAM saved with the state, to check the load. */
   stateSha?: string | undefined
   startFrame: number
+  /** The emulated frame the run starts at: the hook holds it until then, and fails it when the
+   * first frame it sees is a later one. Without it the run starts at the next frame. */
+  startAt?: number
   watch: RamRef[]
   /** Values read at each mark, such as the player's position. */
   markRefs?: RamRef[]

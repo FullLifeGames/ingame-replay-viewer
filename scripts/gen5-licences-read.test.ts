@@ -13,17 +13,15 @@ import {
   readNoticeTrees,
   type RepoGit,
 } from './gen5-licences-read'
-import { type ComponentId, COMPONENTS, sourceOf } from './gen5-manifest'
+import { type ComponentId, COMPONENTS } from './gen5-manifest'
 import type { NoticeTree } from './gen5-notices'
 import { GEN5_PATHS } from './gen5-paths'
 
 // Scene: every component has its notice.
 describe('the notices of the manifest', () => {
-  it('lists a notice file for each component with a named licence, none for an unnamed one', () => {
-    for (const [id, part] of Object.entries(COMPONENTS)) {
-      const named = typeof part.licence === 'string'
-      expect({ id, some: part.notices.length > 0 }).toEqual({ id, some: named })
-    }
+  it('lists a notice file for each component', () => {
+    for (const [id, part] of Object.entries(COMPONENTS))
+      expect({ id, some: part.notices.length > 0 }).toEqual({ id, some: true })
   })
 })
 
@@ -94,7 +92,7 @@ describe('readNoticeTrees', () => {
     const [read] = readNoticeTrees(COMPONENTS, [tree], files)
     expect(read).toEqual({
       ...tree,
-      commit: sourceOf(COMPONENTS.retroarch).commit,
+      commit: COMPONENTS.retroarch.source.commit,
       groups: [
         { text: '/* MIT, at 6dd4353 */', paths: ['lib/one.c'] },
         { text: '/* zlib */', paths: ['lib/two.h'] },

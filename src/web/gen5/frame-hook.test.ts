@@ -6,9 +6,13 @@ import { MAIN_RAM_SIZE, MAIN_RAM_START, mainRamAt } from '../../gen5/main-ram'
 import { sha256, toBase64 } from './codec'
 import { type FrameGame, frameHook } from './frame-hook'
 
+// Every address and offset in this spec is invented; none comes from the game.
 const FLAG = MAIN_RAM_START + 0x100
 const OTHER = MAIN_RAM_START + 0x104
 const VALUE = MAIN_RAM_START + 0x108
+/** A fixed word that points at a heap object, as the game's proc manager pointer does. */
+const POINTER = MAIN_RAM_START + 0x200
+const OBJECT = MAIN_RAM_START + 0x1000
 
 /** A core that counts frames and lets a spec change RAM while a frame runs. */
 class FakeGame implements FrameGame {
@@ -74,6 +78,10 @@ const write = (name: string, address: number, byte: number): MacroStep => ({
   writes: [{ kind: 'bytes', field: name, address, bytes: [byte] }],
 })
 
+const setWord = (heap: Uint8Array, address: number, value: number) => {
+  new DataView(heap.buffer).setUint32(address - MAIN_RAM_START, value, true)
+}
+
 // Scene: the hook plays a macro one emulated frame at a time; a write must be in RAM before the
 // frame it belongs to runs, or the game reads the old value for a frame.
 describe('frameHook', () => {
@@ -84,7 +92,7 @@ describe('frameHook', () => {
     expect(game.seen).toEqual([0, 0, 0x5a, 0x5a])
     expect(hook.calls.runReport()).toMatchObject({
       status: 'done',
-      watch: ['2: wrote flag at 0x2000100'],
+      watch: ['2: wrote flag'],
     })
   })
 
@@ -102,6 +110,30 @@ describe('frameHook', () => {
     expect(game.heap[OTHER - MAIN_RAM_START]).toBe(0x22)
     expect(game.seen).toEqual([0x11, 0x11, 0x33])
     expect(hook.calls.runReport().jumps).toBe(1)
+  })
+
+  // Scene: the moment's plan starts at a frame both runs share, however long the script took to
+  // read the battle before it queued the plan.
+  it('holds a run queued for a later frame until that frame, then starts it there', () => {
+    const { hook, iterate } = setup()
+    iterate()
+    hook.calls.queueRun(plan([{ kind: 'mark', name: 'begin' }], { startAt: 5 }))
+    for (let i = 0; i < 4; i += 1) iterate()
+    expect(hook.calls.runReport()).toMatchObject({ status: 'queued', marks: [] })
+    for (let i = 0; i < 3; i += 1) iterate()
+    expect(hook.calls.runReport()).toMatchObject({ status: 'done', marks: [{ frame: 5 }] })
+  })
+
+  it('fails a run queued for a frame the core already passed, naming both frames', () => {
+    const { hook, iterate } = setup()
+    for (let i = 0; i < 7; i += 1) iterate()
+    hook.calls.queueRun(plan([{ kind: 'mark', name: 'begin' }], { startAt: 4 }))
+    iterate()
+    expect(hook.calls.runReport()).toMatchObject({
+      status: 'failed',
+      failed: 'the run was to start at frame 4, and the hook first saw frame 7',
+      marks: [],
+    })
   })
 
   it('counts every frame the core ran between two calls as a jump', () => {
@@ -164,5 +196,85 @@ describe('frameHook', () => {
     await vi.waitFor(() => {
       expect(hook.calls.runReport().loadCheck).toMatch(/equals the mark's hash/)
     })
+  })
+
+  // Scene: the takeover writes through the pointer at the proc manager, and the park copies a
+  // Pokémon from one party into the other, both behind pointers.
+  it('applies a write and a copy behind pointers', () => {
+    const { game, hook, iterate } = setup()
+    setWord(game.heap, POINTER, OBJECT)
+    setWord(game.heap, OBJECT + 0x10, OBJECT + 0x40)
+    setWord(game.heap, OBJECT + 0x40, 0x44332211)
+    const step: MacroStep = {
+      kind: 'write',
+      name: 'park',
+      writes: [
+        { kind: 'bytes', field: 'style', address: POINTER, hops: [0x08], bytes: [0x01] },
+        {
+          kind: 'copy',
+          field: 'lead',
+          from: { address: POINTER, hops: [0x10, 0] },
+          to: { address: POINTER, hops: [0x20] },
+          length: 4,
+        },
+      ],
+    }
+    hook.calls.queueRun(plan([step]))
+    for (let i = 0; i < 2; i += 1) iterate()
+    const at = (address: number) => game.heap[address - MAIN_RAM_START]
+    expect(at(OBJECT + 0x08)).toBe(0x01)
+    expect([0, 1, 2, 3].map((i) => at(OBJECT + 0x20 + i))).toEqual([0x11, 0x22, 0x33, 0x44])
+    expect(hook.calls.runReport()).toMatchObject({
+      status: 'done',
+      watch: ['0: wrote style', '0: wrote lead'],
+    })
+  })
+
+  // Scene: the game's heap moved an object, or the setup pointer is still null; the run must
+  // stop at that write, say which field and hop led out, and write nothing after it.
+  it('fails the run at a write whose chain leaves main RAM, and writes none of the later ones', () => {
+    const { game, hook, iterate } = setup()
+    const step: MacroStep = {
+      kind: 'write',
+      name: 'park',
+      writes: [
+        { kind: 'bytes', field: 'flag', address: FLAG, bytes: [0x5a] },
+        { kind: 'bytes', field: 'name', address: POINTER, hops: [0x10, 0x04], bytes: [1] },
+        { kind: 'bytes', field: 'other', address: OTHER, bytes: [0x22] },
+      ],
+    }
+    hook.calls.queueRun(plan([{ kind: 'wait', frames: 1 }, step, write('later', VALUE, 7)]))
+    for (let i = 0; i < 4; i += 1) iterate()
+    const report = hook.calls.runReport()
+    expect(report).toMatchObject({
+      status: 'failed',
+      step: 1,
+      failed: 'step 1 "park" could not write name: hop 0 leads out of main RAM',
+      watch: ['1: wrote flag'],
+    })
+    expect(report.marks.map((record) => record.name)).toEqual(['failed'])
+    expect(game.heap[OTHER - MAIN_RAM_START]).toBe(0)
+    expect(game.heap[VALUE - MAIN_RAM_START]).toBe(0)
+  })
+
+  // Scene: E-4 waits until the routine's stage, behind the block pointer, reads parked.
+  it('waits on a value behind pointers', () => {
+    const { game, hook, iterate } = setup()
+    game.duringFrame = (frame, heap) => {
+      if (frame === 1) setWord(heap, POINTER, OBJECT)
+      if (frame === 2) setWord(heap, OBJECT + 0x30, OBJECT + 0x80)
+      if (frame === 4) heap[OBJECT + 0x84 - MAIN_RAM_START] = 2
+    }
+    const until: MacroStep = {
+      kind: 'until',
+      name: 'parked',
+      checks: [{ name: 'stage', address: POINTER, hops: [0x30, 0x04], width: 1, oneOf: [2] }],
+      holdFor: 1,
+      limit: 20,
+    }
+    hook.calls.queueRun(plan([until, write('go', FLAG, 1)]))
+    for (let i = 0; i < 8; i += 1) iterate()
+    expect(game.seen).toEqual([0, 0, 0, 0, 0, 1, 1, 1])
+    expect(hook.calls.runReport().status).toBe('done')
   })
 })

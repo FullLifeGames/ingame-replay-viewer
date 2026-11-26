@@ -6,10 +6,11 @@ import {
   type RamCheck,
   maskedValue,
   type RamRef,
-  refAddress,
   readRef,
   type ReadRam,
 } from './ram-check'
+
+// Every address and offset in this spec is invented; none comes from the game.
 
 // A small main RAM for the spec: a pointer at 0x02100000 to 0x02180000, where a byte holds 0x11
 // (two 4-bit fields, 1 and 1) and a halfword at +2 holds 0x2b.
@@ -28,19 +29,11 @@ const read: ReadRam = (address, width) =>
 const adapter = (name: string, offset: number, width: 1 | 2 | 4): RamRef => ({
   name,
   address: 0x02100000,
-  offset,
+  hops: [offset],
   width,
 })
 
-// Scene: the route's script reads a ref through the page one word at a time, by the same rule.
-describe('refAddress and maskedValue', () => {
-  it('gives the address, or the pointer plus the offset while it stays in main RAM', () => {
-    expect(refAddress({ name: 'plain', address: 0x02100000, width: 4 }, 0)).toBe(0x02100000)
-    expect(refAddress(adapter('cmd', 2, 2), 0x02180000)).toBe(0x02180002)
-    expect(refAddress(adapter('cmd', 2, 2), 0x023ffffe)).toBe(undefined)
-    expect(refAddress(adapter('cmd', 2, 2), 0)).toBe(undefined)
-  })
-
+describe('maskedValue', () => {
   it('keeps only the masked bits, as an unsigned number', () => {
     expect(maskedValue({ ...adapter('high', 0, 4), mask: 0xf0000000 }, 0xffffffff)).toBe(0xf0000000)
     expect(maskedValue(adapter('all', 0, 2), 0x1234)).toBe(0x1234)
@@ -55,9 +48,18 @@ describe('readRef', () => {
   })
 
   it('gives undefined for a pointer outside main RAM or a null one', () => {
-    expect(readRef({ name: 'far', address: 0x02100004, offset: 0, width: 1 }, read)).toBe(undefined)
-    expect(readRef({ name: 'null', address: 0x02100008, offset: 0x10, width: 2 }, read)).toBe(
+    expect(readRef({ name: 'far', address: 0x02100004, hops: [0], width: 1 }, read)).toBe(undefined)
+    expect(readRef({ name: 'null', address: 0x02100008, hops: [0x10], width: 2 }, read)).toBe(
       undefined,
+    )
+  })
+
+  // Scene: E-4 waits on a value behind the setup pointer and one more pointer inside the setup.
+  it('reads a value behind two pointers', () => {
+    const behind: ReadRam = (address, width) =>
+      address === 0x02180004 && width === 4 ? 0x02180000 : read(address, width)
+    expect(readRef({ name: 'deep', address: 0x02100000, hops: [4, 2], width: 2 }, behind)).toBe(
+      0x2b,
     )
   })
 })
@@ -86,9 +88,11 @@ describe('failingCheck', () => {
     expect(
       failingCheck([{ name: 'far', address: 0x02100004, width: 4, mainRamPointer: true }], read),
     ).toBe('far read 0x9000000, not a pointer into main RAM')
-    expect(failingCheck([{ name: 'far', address: 0x02100004, offset: 0, width: 1 }], read)).toBe(
-      'far: its pointer does not lead into main RAM',
+    expect(failingCheck([{ name: 'far', address: 0x02100004, hops: [0], width: 1 }], read)).toBe(
+      'far: hop 0 leads out of main RAM',
     )
+    const second: RamCheck = { name: 'deep', address: 0x02100000, hops: [8, 0], width: 1 }
+    expect(failingCheck([second], read)).toBe('deep: hop 1 leads out of main RAM')
   })
 
   it('fails a value it was told to leave behind, and holds once the value moved on', () => {

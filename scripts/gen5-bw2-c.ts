@@ -54,7 +54,12 @@ function symbolOf(line: string, module: string): Bw2Symbol {
     module,
   }
   const size = /size=0x([0-9a-f]+)/i.exec(detail)?.[1]
-  return size === undefined ? symbol : { ...symbol, size: Number.parseInt(size, 16) }
+  const mode = /^(thumb|arm)\b/.exec(detail)?.[1] as Bw2Symbol['mode']
+  return {
+    ...symbol,
+    ...(size === undefined ? {} : { size: Number.parseInt(size, 16) }),
+    ...(mode === undefined ? {} : { mode }),
+  }
 }
 
 /** The lines of a ds-decomp `symbols.txt`; `module` names the list (`arm9`, `ov167`). */

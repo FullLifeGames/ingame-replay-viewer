@@ -9,6 +9,8 @@ export interface Bw2Symbol {
   address: number
   /** A function's size in bytes; data and bss lines carry none. */
   size?: number
+  /** A function's or a label's instruction set, from its line; data and bss lines carry none. */
+  mode?: 'thumb' | 'arm'
   /** The module whose symbols list names it: `arm9` or an overlay such as `ov167`. */
   module: string
 }
@@ -71,12 +73,20 @@ export interface ServerCmdTable {
   messages: MessageRules
 }
 
+/** A number of the player's side and one of the opponent's. */
+export interface Sides {
+  player: number
+  opponent: number
+}
+
 /** A single battle's clients and the client at each battle position, as its setup assigns them
  * (BtlMain_SetupAloneSingle). */
 export interface SingleBattle {
   clientCount: number
   /** The client ID at each position, by position. */
   posClientIds: number[]
+  /** The player's client and the opponent's: the setup creates the opponent's as the AI. */
+  clients: Sides
 }
 
 /** The battle's structs that lead from the server to the Pokémon, some laid out only up to the
@@ -125,6 +135,82 @@ export interface RoutePlaces {
   bianca: ActorPlace
 }
 
+/** The addresses from `start` up to and without `end`. */
+export interface Span {
+  start: number
+  end: number
+}
+
+/** A function the direct entry's routine calls through a register. */
+export interface EntryFunction {
+  /** The address to call: the symbol's, with bit 0 set for a Thumb function. */
+  call: number
+  thumb: boolean
+}
+
+/** What the direct battle start (#97) needs, all by pokebw2's own names (scripts/gen5-bw2-entry.ts). */
+export interface EntryNumbers {
+  /** The functions the routine calls, in the order of ENTRY_FUNCTIONS. */
+  functions: Record<string, EntryFunction>
+  /** The data the page compares and hands over: the proc manager, the boot proc's tables and
+   * param, the battle proc's table. */
+  data: Record<string, Bw2Symbol>
+  /** The heap, the overlays, the music's channels, the trainer class, the fast text speed, the
+   * string terminator, the single and the double battle style, and the trainer track. */
+  constants: Record<string, number>
+  /** The structs the page and the routine write through, by struct name. */
+  layouts: Record<string, StructLayout>
+  /** The size of the string buffer each named function creates (GFL_StrBufCreate's first
+   * argument), in characters with the terminator: the room the page may write a name into. */
+  bufferSizes: Record<string, number>
+  /** Each side's element of the setup's per-client arrays (party, playerInfo, trainers), as the
+   * trainer battle's setup fills them. */
+  setupIndices: Sides
+  /** The battle overlay's span in RAM, where the routine lives until the battle loads there. */
+  battleOverlay: Span
+  /** The spans of the overlays GameInit loads at boot, by overlay name; the battle overlay's
+   * span meets none of them. */
+  bootOverlays: Record<string, Span>
+}
+
+/** The selector in the function that picks a block's place: the PID's row of the block table is
+ * `(pid & mask) >>> shift`. */
+export interface BlockSelector {
+  mask: number
+  shift: number
+}
+
+/** One step of the cipher's key: `key = key * multiplier + increment` in 32 bits, and the
+ * halfword that XORs the data is `key >>> shift`. */
+export interface CipherStep {
+  multiplier: number
+  increment: number
+  shift: number
+}
+
+/** A Pokémon's data as the game stores it (#97), all by pokebw2's own names
+ * (scripts/gen5-bw2-pkm.ts). */
+export interface PkmNumbers {
+  /** PartyPkm, PokeParty, PkmBufferChunk and the four blocks PkmBlockA to PkmBlockD. */
+  layouts: Record<string, StructLayout>
+  /** Each block's column in the block table, by block struct name. */
+  blockColumns: Record<string, number>
+  /** The block table: one row per selector value, each block's byte offset in the content
+   * buffer by its column. */
+  blockOffsets: number[][]
+  selector: BlockSelector
+  cipher: CipherStep
+  /** A PID is shiny when the XOR of the halves of OT id and PID lies below this bound. */
+  shinyBelow: number
+  /** The party's size, the genders, the language and the version a Pokémon carries. */
+  constants: Record<string, number>
+  species: Record<string, number>
+  moves: Record<string, number>
+  items: Record<string, number>
+  abilities: Record<string, number>
+  natures: Record<string, number>
+}
+
 /** The whole of build/gen5/bw2.json. */
 export interface Bw2Numbers extends ServerCmdTable {
   pokebw2: { repository: string; commit: string }
@@ -139,4 +225,6 @@ export interface Bw2Numbers extends ServerCmdTable {
    * his NPC entry, found by his trainer constant (scripts/gen5-bw2-trainer.ts). He looks up along
    * his column `x`. */
   saveTrainer: ActorPlace
+  entry: EntryNumbers
+  pkm: PkmNumbers
 }

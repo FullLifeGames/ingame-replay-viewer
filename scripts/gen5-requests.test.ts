@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { UNPACKER_PATH } from '../src/gen5/unpacker'
 import { isLocalRequest, RequestLog, requestFault, storageCheck } from './gen5-requests'
 
 const origin = 'http://gen5.localhost:5183'
@@ -69,6 +70,14 @@ describe('requestFault and the manifest', () => {
     expect(fault('/emulatorjs/index.html')).toBe(
       `GET ${origin}/emulatorjs/index.html: outside the manifest`,
     )
+  })
+
+  // Scene: a run whose page still asks for EmulatorJS's unpacker fails (79-4b).
+  it("fails a request for EmulatorJS's 7z unpacker, and passes the page's own worker script", () => {
+    expect(fault('/emulatorjs/data/compression/extract7z.js')).toBe(
+      `GET ${origin}/emulatorjs/data/compression/extract7z.js: outside the manifest`,
+    )
+    expect(fault(UNPACKER_PATH)).toBeUndefined()
   })
 
   it('passes a listed path, an absent-listed one, the saves and the page’s own files', () => {

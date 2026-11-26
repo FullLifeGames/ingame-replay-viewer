@@ -1,27 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import type { ArgFormat, StructLayout } from '../src/gen5/bw2-numbers'
+import type { ArgFormat } from '../src/gen5/bw2-numbers'
+import { ADAPTER_LAYOUT as LAYOUT } from '../src/gen5/adapter.fixtures'
 import { checkAdapterLayout, checkCommandFormats } from './gen5-bw2'
 
-// An invented adapter layout: every member the spike reads, at offsets of its own.
-const LAYOUT: StructLayout = {
-  size: 0x50,
-  align: 4,
-  fields: {
-    netHandle: { offset: 0x00, size: 4 },
-    returnSize: { offset: 0x08, size: 4 },
-    returnData: { offset: 0x10, size: 4 },
-    isNet: { offset: 0x20, size: 1, bit: 0, bits: 4 },
-    returned: { offset: 0x20, size: 1, bit: 4, bits: 3 },
-    clientId: { offset: 0x21, size: 1 },
-    cmd: { offset: 0x22, size: 1 },
-    state: { offset: 0x23, size: 1 },
-    sendCmd: { offset: 0x28, size: 0x24 },
-    'sendCmd.size': { offset: 0x28, size: 2 },
-    'sendCmd.cmd': { offset: 0x2a, size: 2 },
-    'sendCmd.data': { offset: 0x2c, size: 0x20 },
-  },
-}
+// The adapter layout is invented, in src/gen5/adapter.fixtures.ts.
 const without = (name: string) =>
   Object.fromEntries(Object.entries(LAYOUT.fields).filter(([field]) => field !== name))
 

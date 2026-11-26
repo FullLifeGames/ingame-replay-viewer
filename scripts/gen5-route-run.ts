@@ -9,7 +9,8 @@ import { join, relative } from 'node:path'
 import type { Page } from '@playwright/test'
 
 import type { Gen5Global, MarkRecord, RunReport } from '../src/gen5/hook.ts'
-import { maskedValue, type RamRef, refAddress } from '../src/gen5/ram-check.ts'
+import { maskedValue, type RamRef } from '../src/gen5/ram-check.ts'
+import { type ChainEnd, chainStep } from '../src/gen5/ram-chain.ts'
 import { framesOf, log, waitForFrame } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import type { RouteOptions } from './gen5-route-options.ts'
@@ -97,12 +98,23 @@ export async function follow(page: Page, options: RouteOptions): Promise<RunRepo
   }
 }
 
+/** The address `ref` names, its pointers read through the page one word at a time by
+ * ram-chain.ts's rule. */
+async function refEnd(page: Page, ref: RamRef): Promise<ChainEnd> {
+  const pointers: number[] = []
+  for (;;) {
+    const step = chainStep(ref.name, ref, ref.width, pointers)
+    if (!('read' in step)) return step
+    pointers.push(await hook(page).word(step.read))
+  }
+}
+
 /** A watched value read once from outside, through aligned words, for the end's readings; the
- * pointer, offset and mask follow ram-check.ts's rule. */
+ * chain and the mask follow ram-check.ts's rule. */
 async function readRaw(page: Page, ref: RamRef): Promise<string> {
-  const pointer = ref.offset === undefined ? 0 : await hook(page).word(ref.address)
-  const at = refAddress(ref, pointer)
-  if (at === undefined) return 'none'
+  const end = await refEnd(page, ref)
+  if ('fault' in end) return 'none'
+  const at = end.address
   const word = await hook(page).word(at - (at % 4))
   const shifted = Math.floor(word / 2 ** ((at % 4) * 8))
   const value = ref.width === 4 ? word : shifted % 2 ** (ref.width * 8)
