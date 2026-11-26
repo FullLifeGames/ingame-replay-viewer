@@ -1,15 +1,16 @@
-// The S6 run of the Gen 5 spike (#72) and its run from the shipped save (#78): one battle moment
-// driven from outside. It starts the session as gen5-moment-args.ts says: from the spike's battle
-// state, or from boot with a save the page fetches from /saves/ and the continue route to the
-// trainer's action menu, or with --entry direct through our routine from boot, with a save or
-// none, the park writing the team of gen5-moment-team.ts (#97, gen5-moment-direct.ts), each as one
-// plan. A double's run ends after the readings at the action menu: the moment is a single's. Then it reads the player's adapter, the server and
-// both Pokémon from main RAM and plays the steps of gen5-moment-plan.ts from a fixed frame after
-// the mark battle: hold the server, answer the action menu and write one block per moment. It
-// writes a frame per mark under build/gen5/frames/ and the last mark's state under
-// build/gen5/states/ (gitignored, ADR 0002).
+// The S6 run of the Gen 5 spike (#72), its run from the shipped save (#78) and the direct start
+// (#97): one battle moment driven from outside. It starts the session as gen5-moment-args.ts
+// says, as one plan: by default through our routine from boot, with a save or none, the park
+// writing the team of gen5-moment-team.ts (gen5-moment-direct.ts); with --entry walk from boot
+// with a save the page fetches from /saves/ and the continue route to the trainer's action menu,
+// or from the spike's battle state. A double's run ends after the readings at the action menu:
+// the moment is a single's. Then it reads the player's adapter, the server and both Pokémon from
+// main RAM and plays the steps of gen5-moment-plan.ts from a fixed frame after the mark battle:
+// hold the server, answer the action menu and write one block per moment. It writes a frame per
+// mark under build/gen5/frames/ and the last mark's state under build/gen5/states/ (gitignored,
+// ADR 0002).
 // Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts [--scene known|unknown] [--save <name>]
-// [--entry walk|direct] [--battle single|double] [--player <name>] [--opponent <name>]
+// [--entry direct|walk] [--battle single|double] [--player <name>] [--opponent <name>]
 // [--minutes 15].
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'

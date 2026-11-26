@@ -23,20 +23,30 @@ const STATE: StateFile = { state: 'c3RhdGU=', frame: 1234, ramSha: 'ab'.repeat(3
 
 // Scene: the moment run's command line, as the spike gave it and as #78's run from the save does.
 describe('readMomentOptions', () => {
-  it('runs the known scene from the spike state s5-battle by default, for 15 minutes', () => {
+  // Scene: the direct start (#97) has passed its runs from boot, so it is the default (D16): with
+  // no flag the page boots with no save, and the routine writes the team.
+  it('starts the known scene through the routine from boot with no save by default, for 15 minutes', () => {
     expect(readMomentOptions([], NOW)).toEqual({
       scene: 'known',
-      start: { from: 'state', state: 's5-battle' },
-      entry: 'walk',
+      start: { from: 'boot', query: '' },
+      entry: 'direct',
       battle: 'single',
       names: { player: 'Viewer', opponent: 'Showdown' },
-      label: 's6-known',
+      label: 'nosave-direct-known',
       deadlineMs: NOW + 15 * 60_000,
     })
   })
 
-  it('plays one session from boot with --save: the page address names the save', () => {
-    const args = ['--scene', 'known', '--save', 'route-20']
+  it('runs the walk from the spike state s5-battle with --entry walk and no save', () => {
+    expect(readMomentOptions(['--entry', 'walk'], NOW)).toMatchObject({
+      start: { from: 'state', state: 's5-battle' },
+      entry: 'walk',
+      label: 's6-known',
+    })
+  })
+
+  it('walks from boot with --entry walk --save: the page address names the save', () => {
+    const args = ['--scene', 'known', '--entry', 'walk', '--save', 'route-20']
     expect(readMomentOptions(args, NOW)).toEqual({
       scene: 'known',
       start: { from: 'boot', save: 'route-20', query: '?save=route-20' },
@@ -50,7 +60,7 @@ describe('readMomentOptions', () => {
 
   it('reads the unknown scene and the minutes', () => {
     const options = readMomentOptions(['--scene', 'unknown', '--minutes', '20'], NOW)
-    expect(options).toMatchObject({ scene: 'unknown', label: 's6-unknown' })
+    expect(options).toMatchObject({ scene: 'unknown', label: 'nosave-direct-unknown' })
     expect(options.deadlineMs).toBe(NOW + 20 * 60_000)
   })
 
@@ -66,10 +76,12 @@ describe('readMomentOptions', () => {
     )
   })
 
-  // Scene: the direct start (#97) comes beside the walk, which stays the default until a run from
-  // boot proves the direct one (D16).
-  it('starts the battle through the routine with --entry direct, from boot with the save', () => {
-    const args = ['--entry', 'direct', '--save', 'route-20', '--player', 'Ann', '--opponent', 'Bo']
+  // Scene: the direct start (#97) loads a save when one is named, and writes the names given.
+  it('starts the battle through the routine from boot with the save, with or without --entry', () => {
+    const args = ['--save', 'route-20', '--player', 'Ann', '--opponent', 'Bo']
+    expect(readMomentOptions(['--entry', 'direct', ...args], NOW)).toEqual(
+      readMomentOptions(args, NOW),
+    )
     expect(readMomentOptions(args, NOW)).toMatchObject({
       start: { from: 'boot', save: 'route-20' },
       entry: 'direct',
@@ -110,15 +122,17 @@ describe('readMomentOptions', () => {
     )
     const walk =
       "--battle is for --entry direct alone: the walk meets the save's trainer in a single."
-    expect(() => readMomentOptions(['--save', 'route-20', '--battle', 'double'], NOW)).toThrow(walk)
-    expect(() => readMomentOptions(['--battle', 'single'], NOW)).toThrow(walk)
+    const walking = ['--entry', 'walk', '--save', 'route-20']
+    expect(() => readMomentOptions([...walking, '--battle', 'double'], NOW)).toThrow(walk)
+    expect(() => readMomentOptions(['--entry', 'walk', '--battle', 'single'], NOW)).toThrow(walk)
+    expect(readMomentOptions(['--battle', 'double'], NOW)).toMatchObject({ battle: 'double' })
   })
 
   it('says where the session starts', () => {
     const line = (args: string[]) => startLine(readMomentOptions(args, NOW).start)
-    expect(line([])).toBe('state s5-battle')
+    expect(line(['--entry', 'walk'])).toBe('state s5-battle')
     expect(line(['--save', 'route-20'])).toBe('boot with the save route-20')
-    expect(line(['--entry', 'direct'])).toBe('boot with no save')
+    expect(line([])).toBe('boot with no save')
   })
 
   it('refuses an option it does not know', () => {
@@ -132,7 +146,7 @@ describe('firstRun', () => {
   }
 
   it('starts from boot with the continue route to the action menu, and loads no state', () => {
-    const start = readMomentOptions(['--save', 'route-20'], NOW).start
+    const start = readMomentOptions(['--entry', 'walk', '--save', 'route-20'], NOW).start
     const plan = firstRun(start, REFS, TRAINER, noState)
     expect(plan.steps).toEqual(continueRoute(TRAINER, CHECKS))
     expect(plan.state).toBeUndefined()
@@ -143,19 +157,24 @@ describe('firstRun', () => {
   })
 
   it('ends the route at the mark battle, where the action menu stands untouched', () => {
-    const start = readMomentOptions(['--save', 'route-20'], NOW).start
+    const start = readMomentOptions(['--entry', 'walk', '--save', 'route-20'], NOW).start
     const marks = firstRun(start, REFS, TRAINER, noState).steps.flatMap((step) =>
       step.kind === 'mark' ? [step.name] : [],
     )
     expect(marks.at(-1)).toBe('battle')
   })
 
-  it('loads the spike state with no flag and waits two frames, as the spike did', () => {
+  it('loads the spike state with --entry walk alone and waits two frames, as the spike did', () => {
     const read: string[] = []
-    const plan = firstRun(readMomentOptions([], NOW).start, REFS, TRAINER, (base) => {
-      read.push(base)
-      return STATE
-    })
+    const plan = firstRun(
+      readMomentOptions(['--entry', 'walk'], NOW).start,
+      REFS,
+      TRAINER,
+      (base) => {
+        read.push(base)
+        return STATE
+      },
+    )
     expect(read).toEqual(['s5-battle'])
     expect(plan).toEqual({
       steps: [{ kind: 'wait', frames: 2 }],

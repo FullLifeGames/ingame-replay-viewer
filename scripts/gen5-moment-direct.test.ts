@@ -34,7 +34,7 @@ const lastMark = (steps: readonly MacroStep[]) =>
 // Scene: the moment script plays the session's one plan until the battle's action menu.
 describe('sessionPlan', () => {
   it('plays the walk as one plan, the continue route, and reads no routine', () => {
-    const options = readMomentOptions(['--save', 'route-20'], NOW)
+    const options = readMomentOptions(['--entry', 'walk', '--save', 'route-20'], NOW)
     const { plan, notes } = sessionPlan(options, {
       ...input,
       readRoutine: noRoutine,

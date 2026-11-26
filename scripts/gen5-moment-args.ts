@@ -1,12 +1,12 @@
-// The command line of scripts/gen5-moment.ts (#72, #78) and the session's first run. With no flag
-// the run starts as the spike's did, from the state s5-battle under build/gen5/states/. With
-// --save <name> it plays one session from boot: the page fetches the save from /saves/, and the
-// continue route (src/gen5/continue-route.ts) plays to the trainer's action menu, where the moment
-// starts. With --entry direct (#97), the routine starts the battle from boot instead
-// (gen5-moment-direct.ts), with the names of --player and --opponent and the team of
-// gen5-moment-team.ts; with no --save the page boots with no save at all, and --battle double
-// plays a double. Usage: --scene known|unknown, --save <name>, --entry walk|direct,
-// --battle single|double, --player <name>, --opponent <name>, --minutes <n>.
+// The command line of scripts/gen5-moment.ts (#72, #78, #97) and the session's first run. By
+// default the routine starts the battle from boot (gen5-moment-direct.ts, D16), with the names of
+// --player and --opponent and the team of gen5-moment-team.ts; with no --save the page boots with
+// no save at all, and --battle double plays a double. With --entry walk the session walks as #78
+// did: from --save <name> the page fetches the save from /saves/, and the continue route
+// (src/gen5/continue-route.ts) plays to the trainer's action menu, where the moment starts; with
+// no save it starts as the spike's did, from the state s5-battle under build/gen5/states/.
+// Usage: --scene known|unknown, --save <name>, --entry direct|walk, --battle single|double,
+// --player <name>, --opponent <name>, --minutes <n>.
 import { parseArgs } from 'node:util'
 
 import type { ActorPlace } from '../src/gen5/bw2-numbers.ts'
@@ -24,7 +24,8 @@ const SPIKE_STATE = 's5-battle'
  * or, for the direct entry, with none. */
 type MomentStart = { from: 'state'; state: string } | { from: 'boot'; save?: string; query: string }
 
-/** How the session reaches the battle: the continue route's walk, or the routine from boot. */
+/** How the session reaches the battle: the routine from boot (the default), or the continue
+ * route's walk. */
 type MomentEntry = 'walk' | 'direct'
 
 /** The direct entry's battle style. */
@@ -94,7 +95,7 @@ export function readMomentOptions(args: string[], now: number): MomentOptions {
       scene: { type: 'string', default: 'known' },
       save: { type: 'string' },
       minutes: { type: 'string', default: '15' },
-      entry: { type: 'string', default: 'walk' },
+      entry: { type: 'string', default: 'direct' },
       battle: { type: 'string' },
       player: { type: 'string', default: 'Viewer' },
       opponent: { type: 'string', default: 'Showdown' },
