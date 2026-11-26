@@ -33,6 +33,7 @@
     "wasm:diff": "node scripts/wasm-diff.ts",
     "wasm:op-frames": "node scripts/op-frames.ts",
     "wasm:divide": "node scripts/wasm-divide.ts",
+    "wasm:sound-phases": "node scripts/wasm-sound-phases.ts",
     "gen3:tables": "node scripts/gen3-tables.ts"
   },
   "devDependencies": {
