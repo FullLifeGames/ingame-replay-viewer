@@ -37,17 +37,20 @@ export const EFFECT_RULES = {
       },
     ],
   },
+  // The parser moves `[of]` into the third argument: Trick names its target there.
   '|-activate|': {
-    arity: 2,
-    reads: ['damage', 'consumed'],
-    build: ({ line, args: [, ident, effect], kwArgs, battle }) => {
+    arity: 3,
+    reads: ['of', 'damage', 'consumed'],
+    build: ({ line, args: [, ident, effect, of], kwArgs, battle }) => {
       const who = refIfAny(battle, ident, line)
+      const source = refIfAny(battle, of, line)
       return [
         {
           kind: 'effectActivate',
           line,
           ...(who ? { who } : {}),
           effect: effectOf(effect),
+          ...(source ? { source } : {}),
           ...flagsOf(kwArgs, ['damage', 'consumed']),
         },
       ]

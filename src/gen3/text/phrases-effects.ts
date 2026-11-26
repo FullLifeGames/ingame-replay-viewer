@@ -116,6 +116,8 @@ export const EFFECT_TEMPLATES = {
   copiedStats: tagged('STRINGID_PKMNCOPIEDSTATCHANGES', (who: Mon, from: Mon) => {
     return `${nameAtStart(who)} copied ${nameInside(from)}'s stat changes!`
   }),
+  // `BattleScript_EffectTrick`, with the user as B_ATK, before the two items' lines.
+  switchedItems: tagged('STRINGID_PKMNSWITCHEDITEMS', start('switched items with its target!')),
 }
 
 const E = EFFECT_TEMPLATES
@@ -195,6 +197,8 @@ const ACTS: Readonly<Record<string, Line>> = {
   confusion: E.isConfused.render,
   destinybond: E.tookFoe.render,
   bide: E.storingEnergy.render,
+  trick: E.switchedItems.render,
+  switcheroo: E.switchedItems.render,
   // Heal Bell's shape from Gen 5 on; Gen 2 to 4 log `-cureteam`, which says the same line.
   healbell: STATUS_TEMPLATES.bell.render,
 }

@@ -124,6 +124,32 @@ describe('the effect rules of a Pokémon', () => {
     ])
   })
 
+  // Showdown's Trick, `onHit`: `this.add('-activate', source, 'move: Trick', '[of] ' + target)`.
+  it("keeps the target of Trick's activation as its source", () => {
+    const script = scriptOf('|-activate|p1a: Dugtrio|move: Trick|[of] p2a: Tyranitar')
+
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+    expect(eventsAt(script, NEXT)).toEqual([
+      {
+        kind: 'effectActivate',
+        line: NEXT,
+        who: DUGTRIO,
+        effect: { name: 'Trick', kind: 'move' },
+        source: TYRANITAR,
+      },
+    ])
+  })
+
+  it("drops Skill Swap's activation, whose abilities no event holds yet", () => {
+    const line = '|-activate|p1a: Dugtrio|Skill Swap|Arena Trap|Sand Stream|[of] p2a: Tyranitar'
+
+    expect(scriptOf(line).dropped.at(-1)).toMatchObject({
+      line: NEXT,
+      reason: 'unsupported',
+      detail: 'keyword argument [ability]',
+    })
+  })
+
   it('keeps the cause of an effect that ends', () => {
     const script = scriptOf(
       '|-start|p1a: Dugtrio|move: Leech Seed',
