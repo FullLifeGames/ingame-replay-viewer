@@ -220,4 +220,11 @@ describe('the scripts', () => {
       )
     expect(users).toEqual([])
   })
+
+  it('give the send-out spec the tree rom:shots plays from, never the tree for readers', () => {
+    const here = dirname(fileURLToPath(import.meta.url))
+    const spec = readFileSync(join(here, 'wasm-sendouts.test.ts'), 'utf8')
+    expect(spec).toMatch(/\bsendOutTree\(\)/)
+    expect(spec).not.toMatch(/\b(?:readerTree|IRV_EXPANSION_TREE)\b/)
+  })
 })

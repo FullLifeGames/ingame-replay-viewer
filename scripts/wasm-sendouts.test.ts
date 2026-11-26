@@ -7,7 +7,7 @@ import { decodeStream } from '../src/gen3/stream/decode.ts'
 import { encodeStream } from '../src/gen3/stream/encode.ts'
 import speciesTable from '../src/gen3/tables/species.json'
 import trainerPics from '../src/gen3/tables/trainer-pics.json'
-import { readerTree } from './rom-paths.ts'
+import { sendOutTree } from './rom-shot-stream.ts'
 import { readSendOutAnimations, sendOutCoverage, sendOutStreams } from './wasm-sendouts.ts'
 import type { SendOutStream } from './wasm-sendouts.ts'
 import { SEND_OUTS } from './wasm-sendouts-name.ts'
@@ -183,7 +183,7 @@ describe('sendOutStreams', () => {
   })
 })
 
-const tree = readerTree()
+const tree = sendOutTree()
 describe.skipIf(!existsSync(tree))('the send-out streams of the pinned tree', () => {
   const read = (path: string) => readFileSync(join(tree, path), 'utf8')
 
