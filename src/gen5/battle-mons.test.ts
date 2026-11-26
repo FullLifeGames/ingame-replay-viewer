@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { frontMon, findServers, singleBattlePos } from './battle-mons'
+import { frontMon, findServers, partyMons, singleBattlePos } from './battle-mons'
 import type { BattleNumbers } from './bw2-numbers'
 import type { ReadRam } from './ram-check'
 
@@ -34,7 +34,11 @@ const BATTLE: BattleNumbers = {
       mainModule: { offset: 0x8c, size: 4 },
     },
   },
-  party: { size: 0x20, align: 4, fields: { mons: { offset: 0x04, size: 0x18 } } },
+  party: {
+    size: 0x20,
+    align: 4,
+    fields: { count: { offset: 0x00, size: 1 }, mons: { offset: 0x04, size: 0x18 } },
+  },
   monCore: {
     size: 0x1f,
     align: 4,
@@ -43,6 +47,8 @@ const BATTLE: BattleNumbers = {
       species: { offset: 0x02, size: 2 },
       hp: { offset: 0x04, size: 2 },
       maxHP: { offset: 0x06, size: 2 },
+      heldItem: { offset: 0x0a, size: 2 },
+      baseAbility: { offset: 0x0e, size: 2 },
       level: { offset: 0x1c, size: 1 },
       monId: { offset: 0x1e, size: 1 },
     },
@@ -58,6 +64,8 @@ const CLIENT_CON = 0x02000420
 const SERVER_CON = CLIENT_CON + 0x90
 const NEAR = 0x02000800
 const FAR = 0x02000a00
+const SECOND = 0x02000c00
+const THIRD = 0x02000e00
 
 function memory() {
   const bytes = new Uint8Array(0x2000)
@@ -78,11 +86,19 @@ function memory() {
   put(SERVER_CON, 1, 4)
   put(CLIENT_CON + 0x04 + 0x04, NEAR, 4)
   put(CLIENT_CON + 0x04 + 0x20 + 0x04, FAR, 4)
-  for (const [mon, species, hp, maxHp, level, monId] of [
-    [NEAR, 25, 33, 40, 17, 4],
-    [FAR, 133, 30, 30, 18, 9],
+  put(CLIENT_CON + 0x04, 3, 1)
+  put(CLIENT_CON + 0x04 + 0x04 + 4, SECOND, 4)
+  put(CLIENT_CON + 0x04 + 0x04 + 8, THIRD, 4)
+  put(CLIENT_CON + 0x04 + 0x20, 1, 1)
+  for (const [mon, species, hp, maxHp, level, monId, item, ability] of [
+    [NEAR, 25, 33, 40, 17, 4, 210, 9],
+    [FAR, 133, 30, 30, 18, 9, 0, 50],
+    [SECOND, 7, 41, 41, 20, 5, 13, 44],
+    [THIRD, 52, 0, 35, 19, 6, 88, 101],
   ] as const) {
     put(mon + 0x02, species, 2)
+    put(mon + 0x0a, item, 2)
+    put(mon + 0x0e, ability, 2)
     put(mon + 0x04, hp, 2)
     put(mon + 0x06, maxHp, 2)
     put(mon + 0x1c, level, 1)
@@ -134,6 +150,39 @@ describe('frontMon', () => {
     const other = memory()
     other.put(CLIENT_CON + 0x8c, 0x02000500, 4)
     expect(() => frontMon(other.read, SERVER, BATTLE, 0)).toThrow(/main module/)
+  })
+})
+
+// Scene: the readings of a run without a save hold each side's whole party as the battle copied
+// it, to compare with the party the park wrote.
+describe('partyMons', () => {
+  it("reads every Pokémon of the client's party in the clients' container, in party order", () => {
+    const { read } = memory()
+    const one = (species: number, level: number, hp: number, maxHp: number) => ({
+      species,
+      level,
+      hp,
+      maxHp,
+    })
+    expect(partyMons(read, SERVER, BATTLE, 0)).toEqual([
+      { ...one(25, 17, 33, 40), address: NEAR, monId: 4, item: 210, ability: 9 },
+      { ...one(7, 20, 41, 41), address: SECOND, monId: 5, item: 13, ability: 44 },
+      { ...one(52, 19, 0, 35), address: THIRD, monId: 6, item: 88, ability: 101 },
+    ])
+    expect(partyMons(read, SERVER, BATTLE, 1).map((mon) => mon.species)).toEqual([133])
+  })
+
+  it('refuses a count above the slots, and a Pokémon outside main RAM', () => {
+    const many = memory()
+    many.put(CLIENT_CON + 0x04, 7, 1)
+    expect(() => partyMons(many.read, SERVER, BATTLE, 0)).toThrow(
+      "client 0's party counts more Pokémon than its slots",
+    )
+    const outside = memory()
+    outside.put(CLIENT_CON + 0x04 + 0x04 + 8, 0x0100, 4)
+    expect(() => partyMons(outside.read, SERVER, BATTLE, 0)).toThrow(
+      /Pokémon 2 at 0x100 lies outside/,
+    )
   })
 })
 
