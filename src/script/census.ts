@@ -98,7 +98,6 @@ export const NAMED_KINDS: Readonly<Partial<Record<Protocol.ArgName, NamedKind>>>
   '|-zpower|': newer('a Z-Move'),
   '|-zbroken|': newer('a Z-Move breaking through protection'),
   '|-candynamax|': newer('Dynamax becoming available'),
-  '|-terastallize|': newer('Terastallization'),
 
   // Refused formats.
   '|swap|': notSingles('a Pokémon moving to another position'),

@@ -13,7 +13,7 @@ const FORMS = import.meta.glob<string>('../../.github/ISSUE_TEMPLATE/*.yml', {
 
 /** A real value for each slot a line can hold. */
 const REAL_VALUES: Readonly<Record<string, string>> = {
-  gen: '9',
+  gen: '8',
   formats: PLAYED_FORMATS,
   gameType: 'doubles',
   line: '42',

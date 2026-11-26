@@ -75,10 +75,14 @@ describe.skipIf(!existsSync(file))('the trap start lines against gWrappedStringI
     const template = templateOf(message)
     expect(template, `a template tagged ${message}`).toBeDefined()
     const line = template && render(template)
-    expect(effectStarted(TRAPPED, { name: move, kind: 'move' }, TRAPPER)).toEqual({ text: line })
+    expect(effectStarted(TRAPPED, { name: move, kind: 'move' }, { source: TRAPPER })).toEqual({
+      text: line,
+    })
   })
 
   it.each(rows.filter(([move]) => !inGen3(move)))('%s after Gen 3 keeps a fallback', (move) => {
-    expect(effectStarted(TRAPPED, { name: move, kind: 'move' }, TRAPPER).fallback).toBeDefined()
+    expect(
+      effectStarted(TRAPPED, { name: move, kind: 'move' }, { source: TRAPPER }).fallback,
+    ).toBeDefined()
   })
 })

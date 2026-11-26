@@ -7,7 +7,7 @@ import type { Side } from '../script/types'
 import { REPLAYS, replayScript } from '../script/testing'
 import { crc32 } from '../patch/crc32'
 import { buildGen3Stream, type Gen3Stream } from './backend'
-import { type Fallback, mechanicGap, showsInPlace } from './fallbacks'
+import { animGap, type Fallback, mechanicGap, showsInPlace } from './fallbacks'
 import { decodeStream } from './stream/decode'
 import { itemOf } from './tables/lookup'
 import { itemGaps } from './tables/testing'
@@ -36,13 +36,19 @@ const HEADER_KINDS: ReadonlySet<ScriptEvent['kind']> = new Set(['player', 'teamS
 const charsetRead = (text: string) => decodeText(encodeText(text))
 
 /**
- * The mechanic fallbacks the test replays may take, each a line the game shows nothing for:
+ * The mechanic fallbacks the test replays may take, each a look or a state the stream lacks:
  * Perish Song's first count, whose later counts print; Bide's first turn, which the expansion
- * shows as the move alone. A new one fails until it is named here.
+ * shows as the move alone; Protosynthesis's end, which the expansion has no message for; and the
+ * looks of a Terastallization and of snow, whose lines print (#88). A new one fails until it is
+ * named here.
  */
 const NAMED_MECHANICS: ReadonlySet<string> = new Set([
   mechanicGap('perish3', 'starting').detail,
   mechanicGap('Bide', 'starting').detail,
+  mechanicGap('Protosynthesis', 'ending').detail,
+  mechanicGap('Terastallization', 'starting').detail,
+  mechanicGap('Snow', 'starting').detail,
+  mechanicGap('Snow', 'continuing').detail,
 ])
 
 /**
@@ -51,6 +57,13 @@ const NAMED_MECHANICS: ReadonlySet<string> = new Set([
  * fails until it is named here.
  */
 const NAMED_PHRASES: ReadonlySet<string> = new Set([phraseGap(PARTIAL_TRAP_SCENE).detail])
+
+/**
+ * The move fallbacks a test replay may take, each a look of a move that the log names and the game
+ * lacks, so the move plays its own animation: Ogerpon's Ivy Cudgel in its Water look (#88). A new
+ * one fails until it is named here.
+ */
+const NAMED_LOOKS: ReadonlySet<string> = new Set([animGap('Ivy Cudgel Water', 'Ivy Cudgel').detail])
 
 /**
  * The item fallbacks a test replay may take: the items of its generation the expansion lacks
@@ -62,6 +75,7 @@ const itemGapDetails = (gen: number): ReadonlySet<string> =>
 /** Whether a list above names `fallback`, from a battle of `gen`. */
 function isNamed({ kind, detail }: Fallback, gen: number): boolean {
   if (kind === 'item') return itemGapDetails(gen).has(detail)
+  if (kind === 'move') return NAMED_LOOKS.has(detail)
   return kind === 'phrase' && NAMED_PHRASES.has(detail)
 }
 

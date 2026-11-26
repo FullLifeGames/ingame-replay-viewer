@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
+import { mechanicGap } from '../fallbacks'
 import { abilityOf, moveOf } from '../tables/lookup'
 import { plain, sceneOf, streamOfLog } from '../testing'
 
@@ -44,11 +45,6 @@ describe('weather', () => {
     ])
   })
 
-  it('plays no animation for a weather the game lacks, even from an ability', () => {
-    const scene = sceneOf('|-weather|Snow|[from] ability: Snow Warning|[of] p2a: Tyranitar')
-    expect(scene.map(({ op }) => op)).toEqual(['ability', 'print', 'ability'])
-  })
-
   it('says the sandstorm rages, plays it, then hurts with it (X10)', () => {
     const scene = sceneOf(
       '|-weather|Sandstorm',
@@ -84,14 +80,94 @@ describe('weather', () => {
     ])
   })
 
-  it('says a weather the game lacks with a line of ours and lists it', () => {
-    const result = streamOfLog('|-weather|Snow', '|-weather|Snow|[upkeep]')
+  // Gen 3's own weather, which the stream holds: snow's path (D12) leaves it as rain's.
+  it('sets the hail a move starts, plays it each turn, and clears it as it ends', () => {
+    const lines = [
+      '|move|p1a: Dugtrio|Hail|p1a: Dugtrio',
+      '|-weather|Hail',
+      '|-weather|Hail|[upkeep]',
+      '|-weather|none',
+    ]
+    expect(sceneOf(...lines).map(plain)).toEqual([
+      'Dugtrio used Hail!',
+      { op: 'move', user: 'near', target: 'near', move: moveOf('Hail').number, animTurn: 0 },
+      { op: 'weather', weather: 'hail' },
+      'It started to hail!',
+      'The hail is crashing down.',
+      { op: 'anim', side: 'near', anim: 'hailContinues' },
+      { op: 'weather', weather: 'none' },
+      'The hail stopped.',
+    ])
+    expect(streamOfLog(...lines).fallbacks.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
+
+  it('says a weather the game has no words for with a line of ours and lists it', () => {
+    const result = streamOfLog('|-weather|PrimordialSea', '|-weather|PrimordialSea|[upkeep]')
     expect(result.instructions.filter(({ line }) => line >= NEXT).map(({ line }) => line)).toEqual([
+      NEXT,
       NEXT,
       NEXT + 1,
       NEXT + 1,
     ])
-    expect(result.fallbacks.map(({ kind }) => kind)).toEqual(['phrase', 'phrase'])
+    expect(result.fallbacks.map(({ kind }) => kind).toSorted()).toEqual([
+      'mechanic',
+      'mechanic',
+      'phrase',
+      'phrase',
+    ])
+  })
+})
+
+// The expansion says snow in its own words (`STRINGID_STARTEDSNOW`, `STRINGID_SNOWCONTINUES`,
+// `STRINGID_SNOWSTOPPED`), but the stream holds no snow: its start clears the weather the stream
+// holds (D12), and its start and each turn list the look the stream lacks.
+describe('snow (#88)', () => {
+  const snowWarning = '|-weather|Snowscape|[from] ability: Snow Warning|[of] p2a: Tyranitar'
+  const gapsOf = (...lines: string[]) =>
+    streamOfLog(...lines)
+      .fallbacks.filter(({ line }) => line >= NEXT)
+      .map(({ kind, detail }) => ({ kind, detail }))
+
+  it('clears the weather, then says the snow Snow Warning starts inside its pop-up', () => {
+    expect(sceneOf(snowWarning).map(plain)).toEqual([
+      popUp('Snow Warning', true),
+      { op: 'weather', weather: 'none' },
+      'It started to snow!',
+      popUp('Snow Warning', false),
+    ])
+    expect(gapsOf(snowWarning)).toEqual([mechanicGap('Snow', 'starting')])
+  })
+
+  it('says the snow of each turn and lists its look', () => {
+    const lines = [snowWarning, '|-weather|Snowscape|[upkeep]']
+    expect(
+      sceneOf(...lines)
+        .slice(4)
+        .map(plain),
+    ).toEqual(['Snow continues to fall.'])
+    expect(gapsOf(...lines)).toEqual([
+      mechanicGap('Snow', 'starting'),
+      mechanicGap('Snow', 'continuing'),
+    ])
+  })
+
+  it('says the snow stopped and lists nothing for it', () => {
+    const lines = [snowWarning, '|-weather|none']
+    expect(
+      sceneOf(...lines)
+        .slice(4)
+        .map(plain),
+    ).toEqual(['The snow stopped.'])
+    expect(gapsOf(...lines)).toEqual([mechanicGap('Snow', 'starting')])
+  })
+
+  it('clears the rain that the snow replaces', () => {
+    expect(sceneOf('|-weather|RainDance', snowWarning).slice(2).map(plain)).toEqual([
+      popUp('Snow Warning', true),
+      { op: 'weather', weather: 'none' },
+      'It started to snow!',
+      popUp('Snow Warning', false),
+    ])
   })
 })
 
@@ -109,6 +185,21 @@ describe('sides and the field', () => {
       'Reflect made your side stronger against physical moves!',
       "Your side's Reflect wore off!",
     ])
+  })
+
+  // `BattleScript_EffectAuroraVeil` says STRINGID_PKMNAURORAVEIL; the side's timer ends it with
+  // `BattleScript_SideStatusWoreOff`, STRINGID_PKMNSXWOREOFF with the move as B_BUFF1
+  // (`src/battle_end_turn.c`, SECOND_EVENT_BLOCK_AURORA_VEIL).
+  it("says Aurora Veil's start and its end in the game's words", () => {
+    const lines = [
+      '|-sidestart|p1: Alice|move: Aurora Veil',
+      '|-sideend|p1: Alice|move: Aurora Veil',
+    ]
+    expect(sceneOf(...lines).map(plain)).toEqual([
+      'Aurora Veil made your side stronger against physical and special moves!',
+      "Your side's Aurora Veil wore off!",
+    ])
+    expect(streamOfLog(...lines).fallbacks.filter(({ line }) => line >= NEXT)).toEqual([])
   })
 
   // Showdown's Gen 3 Mist is a side condition (`data/moves.ts` `mist`); the game says

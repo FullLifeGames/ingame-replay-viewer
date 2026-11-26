@@ -1,5 +1,6 @@
 // Phrases for effects on one Pokémon (plan §5): Substitute, Leech Seed, confusion, the perish
-// count, partial traps and the like as they start, act and end, effects for one turn, and blocks.
+// count, partial traps and the like as they start, act and end. Effects for one turn or one move,
+// and blocks, are in `phrases-turn.ts`.
 import { toID } from '@pkmn/dex'
 
 import type { Effect } from '../../script/types'
@@ -15,11 +16,13 @@ import {
 import { FIELD_TEMPLATES, screenRaised } from './phrases-field'
 import { isTrapping } from './phrases-hp'
 import { STATUS_TEMPLATES } from './phrases-status'
+import { type TypeChange, typeAdded, typeChanged } from './phrases-types'
 import { ownPhrase, type Phrase, tagged } from './template'
 
-type Line = (who: Mon) => string
+export type Line = (who: Mon) => string
 
-const start =
+/** A line that starts with `who`'s name. */
+export const start =
   (rest: string): Line =>
   (who) =>
     `${nameAtStart(who)} ${rest}`
@@ -35,6 +38,15 @@ export const EFFECT_TEMPLATES = {
   taunted: tagged('STRINGID_PKMNFELLFORTAUNT', start('fell for the taunt!')),
   encored: tagged('STRINGID_PKMNGOTENCORE', start('must do an encore!')),
   inLove: tagged('STRINGID_PKMNFELLINLOVE', start('fell in love!')),
+  // `BattleScript_MoveUsedIsInLove`, with the one in love as B_ATK and the one it loves as B_SCR.
+  inLoveWith: tagged('STRINGID_PKMNINLOVE', (who: Mon, love: Mon) => {
+    return `${nameAtStart(who)} is in love with ${nameInside(love)}!`
+  }),
+  // `BattleScript_EffectLockOn` (Lock-On, Mind Reader), with the user as B_ATK and its target
+  // as B_DEF.
+  tookAim: tagged('STRINGID_PKMNTOOKAIM', (who: Mon, target: Mon) => {
+    return `${nameAtStart(who)} took aim at ${nameInside(target)}!`
+  }),
   drowsy: tagged('STRINGID_PKMNWASMADEDROWSY', start('grew drowsy!')),
   nightmare: tagged('STRINGID_PKMNFELLINTONIGHTMARE', start('began having a nightmare!')),
   cursed: tagged('STRINGID_PKMNLAIDCURSE', (user: Mon, target: Mon) => {
@@ -45,7 +57,6 @@ export const EFFECT_TEMPLATES = {
   }),
   nothing: tagged('STRINGID_BUTNOTHINGHAPPENED', () => 'But nothing happened!'),
   isConfused: tagged('STRINGID_PKMNISCONFUSED', start('is confused!')),
-  protected: tagged('STRINGID_PKMNPROTECTEDITSELF', start('protected itself!')),
   substituteFaded: tagged('STRINGID_PKMNSUBSTITUTEFADED', (who: Mon) => {
     return `${ownerAtStart(who)} substitute faded!`
   }),
@@ -58,9 +69,6 @@ export const EFFECT_TEMPLATES = {
   freed: tagged('STRINGID_PKMNFREEDFROM', (who: Mon, move: string) => {
     return `${nameAtStart(who)} was freed from ${move}!`
   }),
-  protecting: tagged('STRINGID_PKMNPROTECTEDITSELF2', start('protected itself!')),
-  braced: tagged('STRINGID_PKMNBRACEDITSELF', start('braced itself!')),
-  focusing: tagged('STRINGID_PKMNTIGHTENINGFOCUS', start('is tightening its focus!')),
   tookFoe: tagged('STRINGID_PKMNTOOKFOE', start('took its attacker down with it!')),
   squeezed: tagged('STRINGID_PKMNSQUEEZEDBYBIND', (who: Mon, trapper: Mon) => {
     return `${nameAtStart(who)} was squeezed by ${nameInside(trapper)}!`
@@ -86,7 +94,11 @@ export const EFFECT_TEMPLATES = {
   // `BattleScript_BattlerFormChangeWithString`, after the form change (Castform's Forecast).
   formChanged: tagged('STRINGID_PKMNTRANSFORMED', start('transformed!')),
   // Bide's second turn (`BattleScript_BideStoringEnergy`) and its third (`BattleScript_BideAttack`).
+  // `BattleScript_Terastallization` says it first too, then the change with B_BUFF1 the type.
   storingEnergy: tagged('STRINGID_PKMNSTORINGENERGY', start('is storing energy!')),
+  terastallized: tagged('STRINGID_PKMNTERASTALLIZEDINTO', (who: Mon, type: string) => {
+    return `${nameAtStart(who)} terastallized into the ${type} type!`
+  }),
   unleashedEnergy: tagged('STRINGID_PKMNUNLEASHEDENERGY', start('unleashed its energy!')),
   // `BattleScript_RageIsBuilding` says it after a hit raises the Attack of a Pokémon in a rage
   // (`rage.ts`); a `-start|<mon>|Rage` line says it as Rage starts.
@@ -100,18 +112,17 @@ export const EFFECT_TEMPLATES = {
   tookAttack: tagged('STRINGID_PKMNTOOKATTACK', (who: Mon, move: string) => {
     return `${nameAtStart(who)} took the ${move} attack!`
   }),
-  // `BattleScript_EffectDestinyBond` and `BattleScript_EffectGrudge`, with the user as B_ATK.
-  hopingToTakeFoe: tagged(
-    'STRINGID_PKMNTRYINGTOTAKEFOE',
-    start('is hoping to take its attacker down with it!'),
-  ),
-  grudge: tagged('STRINGID_PKMNWANTSGRUDGE', start('wants its target to bear a grudge!')),
-  // `BattleScript_SafeguardProtected`, with the Pokémon Safeguard guards as B_SCR.
-  safeguarded: tagged('STRINGID_PKMNUSEDSAFEGUARD', start('is protected by Safeguard!')),
   // `BattleScript_EffectPsychUp`, with the user as B_SCR and the target as B_EFF.
   copiedStats: tagged('STRINGID_PKMNCOPIEDSTATCHANGES', (who: Mon, from: Mon) => {
     return `${nameAtStart(who)} copied ${nameInside(from)}'s stat changes!`
   }),
+  // `BattleScript_EffectTrick`, with the user as B_ATK, before the two items' lines.
+  switchedItems: tagged('STRINGID_PKMNSWITCHEDITEMS', start('switched items with its target!')),
+  // `BattleScript_NeutralizingGasExits`, with no pop-up.
+  neutralizingGasOver: tagged(
+    'STRINGID_NEUTRALIZINGGASOVER',
+    () => 'The effects of the neutralizing gas wore off!',
+  ),
 }
 
 const E = EFFECT_TEMPLATES
@@ -161,29 +172,39 @@ function startText(who: Mon, id: string, source: Mon | undefined): string | unde
   return STARTS[id]?.(who) ?? screenRaised(who.side, id)
 }
 
-/** The start lines that name the effect's detail, by the effect's id. */
-const STARTS_WITH_DETAIL: Readonly<Record<string, (who: Mon, detail: string) => string>> = {
-  disable: (who, move) => E.disabled.render(who, moveName(move)),
+/** The start lines that read the effect's detail or its cause, by the effect's id. */
+const STARTS_READING: Readonly<Record<string, (who: Mon, by: Started) => string | undefined>> = {
+  disable: (who, { detail }) => detail && E.disabled.render(who, moveName(detail)),
+  typechange: typeChanged,
+  typeadd: typeAdded,
 }
 
 /**
- * An effect that starts on `who`; `source` is the Pokémon of `[of]`: Curse's user, or the
- * trapper of a partial trap. `detail` is what the line names beside the effect (Disable's move);
- * a line that does not use it lists it, so it never goes unseen.
+ * What a start line can read beside its Pokémon: `source` is the Pokémon of `[of]` (Curse's user,
+ * the trapper of a partial trap), `cause` the effect of `[from]`, `detail` what the line names
+ * beside the effect (Disable's move, a new type).
  */
-export function effectStarted(
-  who: Mon,
-  effect: Effect,
-  source: Mon | undefined,
-  detail?: string,
-): Phrase {
-  const id = toID(effect.name)
-  const withDetail = STARTS_WITH_DETAIL[id]
-  if (detail !== undefined && withDetail !== undefined) return { text: withDetail(who, detail) }
-  const game = startText(who, id, source)
+type Started = TypeChange
+
+/** A start listed with what it names: our line, or the game's line that leaves the detail out. */
+function ownStart(who: Mon, effect: Effect, detail: string | undefined, game?: string): Phrase {
   const text = game ?? `${nameAtStart(who)} is under ${held(effect.name)}!`
-  if (detail !== undefined) return ownPhrase(text, `${effect.name} starting with ${detail}`)
-  return game === undefined ? ownPhrase(text, `${effect.name} starting`) : { text }
+  const what = detail === undefined ? 'starting' : `starting with ${detail}`
+  return ownPhrase(text, `${effect.name} ${what}`)
+}
+
+/**
+ * An effect that starts on `who`. A line that does not read the detail lists it, so it never
+ * goes unseen.
+ */
+export function effectStarted(who: Mon, effect: Effect, by: Started = {}): Phrase {
+  const id = toID(effect.name)
+  const reading = STARTS_READING[id]
+  const game = reading === undefined ? startText(who, id, by.source) : reading(who, by)
+  if (game === undefined) return ownStart(who, effect, by.detail)
+  if (reading === undefined && by.detail !== undefined)
+    return ownStart(who, effect, by.detail, game)
+  return { text: game }
 }
 
 const ACTS: Readonly<Record<string, Line>> = {
@@ -191,15 +212,25 @@ const ACTS: Readonly<Record<string, Line>> = {
   confusion: E.isConfused.render,
   destinybond: E.tookFoe.render,
   bide: E.storingEnergy.render,
+  trick: E.switchedItems.render,
+  switcheroo: E.switchedItems.render,
   // Heal Bell's shape from Gen 5 on; Gen 2 to 4 log `-cureteam`, which says the same line.
   healbell: STATUS_TEMPLATES.bell.render,
 }
 
-/** An effect that acts; Splash's "nothing" names no Pokémon. */
-export function effectActivated(who: Mon | undefined, effect: Effect): Phrase {
+/** The act lines that name the Pokémon of `[of]` too, by the effect's id. */
+const ACTS_WITH_SOURCE: Readonly<Record<string, (who: Mon, source: Mon) => string>> = {
+  attract: E.inLoveWith.render,
+  lockon: E.tookAim.render,
+  mindreader: E.tookAim.render,
+}
+
+/** An effect that acts, with `source` the Pokémon of `[of]`; Splash's "nothing" names no Pokémon. */
+export function effectActivated(who: Mon | undefined, effect: Effect, source?: Mon): Phrase {
   const id = toID(effect.name)
   if (id === 'splash') return { text: E.nothing.render() }
-  const text = who && ACTS[id]?.(who)
+  const withSource = source && ACTS_WITH_SOURCE[id]
+  const text = who && (withSource ? withSource(who, source) : ACTS[id]?.(who))
   if (text !== undefined) return { text }
   const name = held(effect.name)
   const own = who === undefined ? `${name} took effect!` : `${nameAtStart(who)} used ${name}!`
@@ -213,6 +244,7 @@ const ENDS: Readonly<Record<string, Line>> = {
   encore: E.encoreEnded.render,
   disable: E.disableEnded.render,
   bide: E.unleashedEnergy.render,
+  neutralizinggas: E.neutralizingGasOver.render,
 }
 
 /** The end lines that name the effect's move, by the effect's id. */
@@ -229,38 +261,6 @@ export function effectEnded(who: Mon, effect: Effect): Phrase {
   return ownPhrase(own, `${effect.name} ending`)
 }
 
-const SINGLE_TURN: Readonly<Record<string, Line>> = {
-  protect: E.protecting.render,
-  endure: E.braced.render,
-  focuspunch: E.focusing.render,
-}
-
-/** An effect that lasts the turn, such as Protect or Focus Punch's focus. */
-export function singleTurn(who: Mon, effect: Effect): Phrase {
-  const text = SINGLE_TURN[toID(effect.name)]?.(who)
-  if (text !== undefined) return { text }
-  const own = `${nameAtStart(who)} is ready with ${held(effect.name)}!`
-  return ownPhrase(own, `${effect.name} for one turn`)
-}
-
-const SINGLE_MOVE: Readonly<Record<string, Line>> = {
-  destinybond: E.hopingToTakeFoe.render,
-  grudge: E.grudge.render,
-}
-
-/** Effects the game starts without a line: Rage says its line as a hit raises Attack. */
-const SILENT_SINGLE_MOVE: ReadonlySet<string> = new Set(['rage'])
-
-/** An effect that lasts until `who` moves again, or undefined where the game says nothing. */
-export function singleMove(who: Mon, effect: Effect): Phrase | undefined {
-  const id = toID(effect.name)
-  if (SILENT_SINGLE_MOVE.has(id)) return undefined
-  const text = SINGLE_MOVE[id]?.(who)
-  if (text !== undefined) return { text }
-  const own = `${nameAtStart(who)} readied ${held(effect.name)}!`
-  return ownPhrase(own, `${effect.name} until the next move`)
-}
-
 /** `who`'s rage builds as a hit raises its Attack. */
 export const rageBuilding = (who: Mon) => E.rageBuilding.render(who)
 
@@ -274,11 +274,8 @@ export const transformed = (who: Mon, species: string) =>
 /** `who` took another form of its species. */
 export const formChanged = (who: Mon) => E.formChanged.render(who)
 
-/** A move `who` kept off, such as by Protect or Safeguard. */
-export function blocked(who: Mon, effect: Effect): Phrase {
-  const id = toID(effect.name)
-  if (id === 'protect') return { text: E.protected.render(who) }
-  if (id === 'safeguard') return { text: E.safeguarded.render(who) }
-  const own = `${nameAtStart(who)} was protected by ${held(effect.name)}!`
-  return ownPhrase(own, `a block by ${effect.name}`)
-}
+/** The two lines of `who`'s Terastallization into `type`, in the order the game says them. */
+export const terastallizing = (who: Mon, type: string): readonly [string, string] => [
+  E.storingEnergy.render(who),
+  E.terastallized.render(who, type),
+]

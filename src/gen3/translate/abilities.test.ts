@@ -153,3 +153,23 @@ describe('ability pop-ups', () => {
     ])
   })
 })
+
+// The expansion's `BattleScript_SwitchInAbilityMsg` with B_MSG_SWITCHIN_NEUTRALIZING_GAS, and
+// `BattleScript_NeutralizingGasExits`, which prints its line with no pop-up.
+describe('Neutralizing Gas', () => {
+  it("fills the area inside its pop-up and wears off in the game's words", () => {
+    const result = streamOfLog(
+      '|-ability|p1a: Dugtrio|Neutralizing Gas',
+      '|-end|p1a: Dugtrio|ability: Neutralizing Gas',
+    )
+    const scene = result.instructions.filter(({ line }) => line >= NEXT)
+    expect(scene.map(({ instruction }) => plain(instruction))).toEqual([
+      popUp('near', 'Neutralizing Gas', true),
+      'Neutralizing gas filled the area!',
+      popUp('near', 'Neutralizing Gas', false),
+      'The effects of the neutralizing gas wore off!',
+      { op: 'end', outcome: 'unknown' },
+    ])
+    expect(result.fallbacks.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
+})

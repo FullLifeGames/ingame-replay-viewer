@@ -6,6 +6,7 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { gens, names } from '../src/gen3/tables/testing.ts'
 import type { AnyTemplate } from '../src/gen3/text/template.ts'
 import { defaultFill, FAR, type Sample, SAMPLES, TEMPLATE_GROUPS } from './gen3-phrase-samples.ts'
 import { readerTree } from './rom-paths.ts'
@@ -115,3 +116,20 @@ describe.skipIf(!existsSync(file))(
     })
   },
 )
+
+const typesFile = join(readerTree(), 'src', 'data', 'types_info.h')
+
+/** The names `types_info.h` gives its types, as written in the C file. */
+const typeNames = (source: string) =>
+  [...source.matchAll(/\.name\s*=\s*_\("([^"]*)"\)/g)].map((m) => m[1])
+
+// A Terastallization prints the type the log names (#88), so each Gen 9 type @pkmn reads must be
+// the name the game gives it (D16).
+describe.skipIf(!existsSync(typesFile))('the type names against the pinned tree (#88)', () => {
+  it('holds every Gen 9 type of @pkmn, Stellar included, as the game names it', () => {
+    const pkmn = names(gens.get(9).types)
+    expect(pkmn).toContain('Stellar')
+    const pinned = new Set(typeNames(readFileSync(typesFile, 'utf8')))
+    expect(pkmn.filter((name) => !pinned.has(name))).toEqual([])
+  })
+})

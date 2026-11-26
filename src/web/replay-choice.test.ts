@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import replay994052 from '../../test/fixtures/replays/smogtours-gen3ou-994052.json'
 import replay994176 from '../../test/fixtures/replays/smogtours-gen3ou-994176.json'
-import { NEWEST_GEN } from '../gen3/backend'
+import { PLAYED_GENS_TEXT } from '../gen3/backend'
 import { readReplay } from '../script/replay'
 import { downloadedFile, jsonFile, rawLog, replayPage } from '../script/saved-replay-testing'
 import {
@@ -165,11 +165,11 @@ describe('a replay file', () => {
   it('keeps the earlier replay when a file gives no stream', async () => {
     const { choice } = showdown()
     await choice.pickTestReplay(REPLAY_994086)
-    const gen9 = rawLog({ ...REPLAY, log: REPLAY.log.replace('|gen|3\n', '|gen|9\n') })
-    const failure = choice.loadFile(savedFile('gen9.log', gen9).file)
+    const gen8 = rawLog({ ...REPLAY, log: REPLAY.log.replace('|gen|3\n', '|gen|8\n') })
+    const failure = choice.loadFile(savedFile('gen8.log', gen8).file)
     await expect(failure).rejects.toThrow(SessionError)
     await expect(failure).rejects.toThrow(
-      `Could not turn the replay into a stream: the stream plays Gen 1 to ${String(NEWEST_GEN)} battles, this one is Gen 9`,
+      `Could not turn the replay into a stream: the stream plays ${PLAYED_GENS_TEXT} battles, this one is Gen 8`,
     )
     expect((await choice.chosen())?.summary.id).toBe('smogtours-gen3ou-994086')
   })

@@ -21,8 +21,11 @@
 // (src/battle_util.c) runs in `TARGET_FAILURE_TARGET_BLOCKED` (src/battle_move_resolution.c),
 // which sets MOVE_RESULT_FAILED. Showdown logs it as a heal of the target by its ability right
 // after the move, or an `-immune` at full HP. The rule reads no ability names.
+import { Dex } from '@pkmn/dex'
+
 import type { ScriptEvent } from '../../script/events'
 import type { PokemonRef } from '../../script/types'
+import { animGap } from '../fallbacks'
 import type { Instruction } from '../stream/instructions'
 import { chargeTurnOf } from '../tables/charge'
 import { moveOf } from '../tables/lookup'
@@ -94,6 +97,21 @@ function didNothing(event: EventOf<'move'>, ctx: Context): boolean {
   return next?.kind === 'statLimit' && onlyLimits(event, eventsOfMove(ctx, event))
 }
 
+/**
+ * The move whose animation the MOVE op plays: the move an `[anim]` names, else the move itself;
+ * a look the game lacks (`Ivy Cudgel Water`, no move in @pkmn's Dex) plays the move's own and
+ * notes it.
+ */
+function animatedMove({ move: name, anim: look, line }: EventOf<'move'>, ctx: Context): string {
+  if (look === undefined) return name
+  if (Dex.moves.get(look).exists) {
+    ctx.note(line, moveOf(look).fallback)
+    return look
+  }
+  ctx.note(line, animGap(look, name))
+  return name
+}
+
 /** Sleep Talk and a locked move (`calledBy`) change nothing: the game says "used" each time. */
 export function move(event: EventOf<'move'>, ctx: Context): void {
   const { user, target, line } = event
@@ -105,7 +123,7 @@ export function move(event: EventOf<'move'>, ctx: Context): void {
   if (!(event.miss || event.still || event.notarget || didNothing(event, ctx))) {
     const animTurn = animTurnOf(event, events, ctx)
     showBeforeMove(event, animTurn, ctx)
-    played = playMove(event, target ?? user, animTurn, ctx)
+    played = playMove({ ...event, move: animatedMove(event, ctx) }, target ?? user, animTurn, ctx)
   }
   afterHitTurn(event, played, events, ctx)
   startMove(events, played, ctx)

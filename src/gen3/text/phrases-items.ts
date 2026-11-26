@@ -31,9 +31,16 @@ export const ITEM_TEMPLATES = {
   pressure: tagged('STRINGID_PRESSUREENTERS', (who: Mon) => {
     return `${nameAtStart(who)} is exerting its pressure!`
   }),
+  // B_MSG_SWITCHIN_NEUTRALIZING_GAS in `gSwitchInAbilityStringIds`, inside the pop-up.
+  neutralizingGas: tagged('STRINGID_NEUTRALIZINGGASENTERS', () => {
+    return 'Neutralizing gas filled the area!'
+  }),
 }
 
 const STEALS = new Set(['thief', 'covet'])
+
+/** Trick and Switcheroo (EFFECT_TRICK) say each item by `gItemSwapStringIds`. */
+const SWAPS = new Set(['trick', 'switcheroo'])
 
 /**
  * The Air Balloon says its lines with no pop-up: as its holder comes in, and as a hit pops it
@@ -58,7 +65,7 @@ export function itemShown(
   if (isSteal(cause) && source !== undefined) {
     return { text: ITEM_TEMPLATES.stole.render(who, source, name) }
   }
-  if (id === 'trick') return { text: ITEM_TEMPLATES.obtained.render(who, name) }
+  if (id !== undefined && SWAPS.has(id)) return { text: ITEM_TEMPLATES.obtained.render(who, name) }
   if (cause === undefined && toID(item) === AIR_BALLOON) {
     return { text: ITEM_TEMPLATES.airBalloon.render(who) }
   }
@@ -100,9 +107,15 @@ export function loweredStatsReset(who: Mon, item: string | undefined): Phrase {
   )
 }
 
+/** The lines abilities add to their pop-ups, by the ability's id. */
+const SHOWN: Readonly<Record<string, (who: Mon) => string>> = {
+  pressure: ITEM_TEMPLATES.pressure.render,
+  neutralizinggas: ITEM_TEMPLATES.neutralizingGas.render,
+}
+
 /** The line an ability adds to its pop-up, if it has one. */
 export function abilityShown(who: Mon, ability: string): string | undefined {
-  return toID(ability) === 'pressure' ? ITEM_TEMPLATES.pressure.render(who) : undefined
+  return SHOWN[toID(ability)]?.(who)
 }
 
 /** An ability the expansion lacks has no pop-up; this line of ours stands in for it. */

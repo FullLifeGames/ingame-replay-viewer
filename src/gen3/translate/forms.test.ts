@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
+import { mechanicGap } from '../fallbacks'
 import { speciesOf } from '../tables/lookup'
 import { plain, popUp, streamOfLog } from '../testing'
 
@@ -101,5 +102,31 @@ describe('a form change by anything but Forecast', () => {
       species: speciesOf('Rockruff').number,
     })
     expect(fallbacksOf(...lines).map(({ kind }) => kind)).toEqual(['form'])
+  })
+})
+
+describe('a Terastallization (#88)', () => {
+  // `BattleScript_Terastallization`: flushtextbox, STRINGID_PKMNSTORINGENERGY, the charge and the
+  // activate animations, then STRINGID_PKMNTERASTALLIZEDINTO. The stream holds no look for it.
+  const TERA_GAP = { line: NEXT, ...mechanicGap('Terastallization', 'starting') }
+
+  it('empties the text box and says both lines of the far Pokémon, with the look named', () => {
+    const line = '|-terastallize|p2a: Tyranitar|Fairy'
+    expect(sceneFrom(NEXT, line)).toEqual([
+      { op: 'flushTextBox' },
+      'The opposing Tyranitar is storing energy!',
+      'The opposing Tyranitar terastallized into the Fairy type!',
+    ])
+    expect(fallbacksOf(line)).toEqual([TERA_GAP])
+  })
+
+  it('names our own Pokémon without "The opposing"', () => {
+    const line = '|-terastallize|p1a: Dugtrio|Normal'
+    expect(sceneFrom(NEXT, line)).toEqual([
+      { op: 'flushTextBox' },
+      'Dugtrio is storing energy!',
+      'Dugtrio terastallized into the Normal type!',
+    ])
+    expect(fallbacksOf(line)).toEqual([TERA_GAP])
   })
 })

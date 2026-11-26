@@ -4,6 +4,7 @@
 // other people's replays, links and files: the pages write a line as text, a value fills its slot
 // once, and a value from outside is cut to SLOT_LONGEST characters. A line whose entry says so
 // gets the report link (report-link.ts).
+import { PLAYED_GENS_TEXT } from '../gen3/backend'
 import { Gen3Error, GenerationRefusal } from '../gen3/errors'
 import { BpsError } from '../patch/bps-format'
 import { SlotError, SlotMismatchError } from '../patch/slot'
@@ -27,8 +28,8 @@ import { clip } from './report-link'
 import { BuildMismatchError, DumpRefusal } from './rom'
 import { MemoryRefusal, RunFailure, type RunFailureKind } from './wasm/failures'
 
-/** The formats the viewer plays; the viewer's intro names them too. */
-export const PLAYED_FORMATS = 'Gen 1 to 5 singles'
+/** The formats the viewer plays, in the backend's words; the viewer's intro names them too. */
+export const PLAYED_FORMATS = `${PLAYED_GENS_TEXT} singles`
 
 const REPORT = 'Report it with the link below.'
 const RELOAD = 'Reload the page. If it fails again, report it with the link below.'

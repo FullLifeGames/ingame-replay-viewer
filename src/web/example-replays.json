@@ -23,6 +23,10 @@
     "format": "[Gen 5] OU",
     "players": ["isolatedstar", "abc2158"]
   },
+  "gen9ou-2719598518": {
+    "format": "[Gen 9] OU",
+    "players": ["hat_fm", "Snurke"]
+  },
   "smogtours-gen1ou-995161": {
     "format": "[Gen 1] OU",
     "players": ["DADDY TAUROS", "koalacancee"]
@@ -58,5 +62,9 @@
   "smogtours-gen5ou-862240": {
     "format": "[Gen 5] OU",
     "players": ["tizio potente ao", "Monai"]
+  },
+  "smogtours-gen9ou-886489": {
+    "format": "[Gen 9] OU",
+    "players": ["Setsu", "badcluelesswashed"]
   }
 }
