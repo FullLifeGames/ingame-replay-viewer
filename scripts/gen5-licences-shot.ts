@@ -11,7 +11,8 @@ import { join } from 'node:path'
 
 import { chromium, type Page } from '@playwright/test'
 
-import { LICENCES_PAGE, SOURCE_PREFIX } from './gen5-files.ts'
+import { LICENCES_PAGE, SITE_PREFIX, SOURCE_PREFIX } from './gen5-files.ts'
+import { archiveName, COMPONENTS, type ComponentId } from './gen5-manifest.ts'
 import { log } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { watchRequests } from './gen5-requests.ts'
@@ -60,14 +61,31 @@ interface Licences {
   hrefs: string[]
 }
 
+/** The core the page loads (the manifest's logged core file): its row names its five components. */
+const CORE_ROW = `${SITE_PREFIX}data/cores/melonds-wasm.data`
+
+/** A component's notice heading, under the notices' heading (the licence texts repeat it). */
+const noticeOf = (id: ComponentId) => `#notices ~ h3:text-is("${COMPONENTS[id].name}")`
+
+/** A component's archive link in the sources list (the files' rows link it too). */
+const archiveOf = (id: ComponentId) =>
+  `#sources + ul a[href="${SOURCE_PREFIX}${archiveName(COMPONENTS[id].source)}"]`
+
 /** The parts of the licences page saved as frames, each at the top of the screen: the two lists,
- * the row of the page's own unpacker, libretro-common's notices and its files without one. */
+ * the core's row, the row of the page's own unpacker, Emscripten's and zlib's notices,
+ * libretro-common's notices and its files without one, and the archives of Emscripten and zlib
+ * in the sources list. */
 const SECTIONS: readonly (readonly [string, string])[] = [
   ['files', '#files'],
   ['sources', '#sources'],
+  ['core', `tr[data-path="${CORE_ROW}"]`],
   ['unpacker', 'tr[data-own="unpacker"]'],
+  ['emscripten', noticeOf('emscripten')],
+  ['zlib', noticeOf('zlib')],
   ['libretro-common', 'h4:text-is("libretro-common")'],
   ['no-notice', 'p.from:has-text("No notice in the file")'],
+  ['emscripten-archive', archiveOf('emscripten')],
+  ['zlib-archive', archiveOf('zlib')],
 ]
 
 /** Follows the notice's link and saves the licences page's first screen and its SECTIONS. */
