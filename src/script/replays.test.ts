@@ -19,14 +19,9 @@ function foldedLines(script: BattleScript): number[] {
   return script.events.flatMap((event) => ('folded' in event ? (event.folded ?? []) : []))
 }
 
-/**
- * A line of a kind the named list keeps as "no rule yet" (#60): it may stand in a test replay as
- * an `unsupported` drop, since the list gives its reason. Every other such drop fails.
- */
-function isNamedGap({ reason, text }: DroppedLine): boolean {
-  const kind = readLines(text)[0]?.key
-  const named = kind === undefined ? undefined : NAMED_KINDS[kind]
-  return reason === 'unsupported' && named?.group === 'no rule yet'
+/** The dropped lines the battle script cannot show: no test replay may hold one (#92). */
+function cannotShow(dropped: readonly DroppedLine[]): DroppedLine[] {
+  return dropped.filter(({ reason }) => reason === 'unknown' || reason === 'unsupported')
 }
 
 function isSorted(numbers: readonly number[]): boolean {
@@ -65,9 +60,7 @@ describe.each(replays)('the battle script of $id', ({ id, log, script }) => {
   })
 
   it('has no line it cannot show', () => {
-    const failing = script.dropped.filter(
-      (drop) => (drop.reason === 'unknown' || drop.reason === 'unsupported') && !isNamedGap(drop),
-    )
+    const failing = cannotShow(script.dropped)
 
     expect(failing, `lines it cannot show:\n${failing.map(({ text }) => text).join('\n')}`).toEqual(
       [],
@@ -79,11 +72,13 @@ describe.each(replays)('the battle script of $id', ({ id, log, script }) => {
   })
 })
 
-describe('a named gap in a test replay', () => {
-  it('is a line of a kind with no rule yet, never one that only Gen 4 and later log (#86)', () => {
+describe('a line the battle script cannot show', () => {
+  it('fails a test replay also when the named list gives its kind a reason (#86, #92)', () => {
     const fieldStart = '|-fieldstart|move: Trick Room|[of] p1a: Dugtrio'
-    const dropped = buildBattleScript(`|gen|4\n${fieldStart}\n`).dropped.at(-1)
-    expect(dropped).toMatchObject({ text: fieldStart, reason: 'unsupported' })
-    expect(dropped === undefined || isNamedGap(dropped)).toBe(false)
+    const { dropped } = buildBattleScript(`|gen|4\n${fieldStart}\n`)
+    expect(NAMED_KINDS['|-fieldstart|']?.group).toBe('newer generation')
+    expect(cannotShow(dropped)).toEqual([
+      expect.objectContaining({ text: fieldStart, reason: 'unsupported' }),
+    ])
   })
 })

@@ -221,7 +221,7 @@ The check that walks every kind of battle log line the protocol library knows an
 _Avoid_: coverage list
 
 **Named list**:
-The kinds of battle log line the battle script has no rule for, in four groups, each with its reason: kinds a replay's log never holds, kinds of formats the viewer refuses, kinds that only Gen 4 and later log, which no rule shows yet, and kinds with no rule yet. Since #65 the last group holds none. Of the four, a test replay may hold only lines of the last group. A dropped line of a kind on the list carries that kind's reason, and the page's list "Not shown in the game" prints it.
+The kinds of battle log line the battle script has no rule for, in three groups, each with its reason: kinds a replay's log never holds, kinds of formats the viewer refuses, and kinds that only Gen 4 and later log, which no rule shows yet. A test replay holds no line of a kind on the list. A dropped line of a kind on the list carries that kind's reason, and the page's list "Not shown in the game" prints it.
 _Avoid_: named gap list, allow list
 
 **Content gap**:
