@@ -25,12 +25,12 @@ describe('an effect that starts (P1)', () => {
   ])('words %s', (rest, text) => {
     const { event, mon } = sceneOf('effectStart', `|-start|${rest}`)
     const source = event.source && mon(event.source)
-    expect(effectStarted(mon(event.who), event.effect, source)).toEqual({ text })
+    expect(effectStarted(mon(event.who), event.effect, { source })).toEqual({ text })
   })
 
   it('gives an effect without a message our wording and a fallback', () => {
     const { event, mon } = sceneOf('effectStart', '|-start|p2a: Tyranitar|Magnet Rise')
-    expect(effectStarted(mon(event.who), event.effect, undefined)).toEqual({
+    expect(effectStarted(mon(event.who), event.effect)).toEqual({
       text: `The opposing Tyranitar is under Magnet${NBSP}Rise!`,
       fallback: { kind: 'phrase', detail: 'no game message for Magnet Rise starting' },
     })
@@ -39,14 +39,16 @@ describe('an effect that starts (P1)', () => {
   it('words a type change with the type the line names (#88)', () => {
     const line = '|-start|p2a: Tyranitar|typechange|Ice|[from] ability: Protean'
     const { event, mon } = sceneOf('effectStart', line)
-    expect(effectStarted(mon(event.who), event.effect, undefined, event.detail)).toEqual({
+    expect(
+      effectStarted(mon(event.who), event.effect, { cause: event.cause, detail: event.detail }),
+    ).toEqual({
       text: 'The opposing Tyranitar transformed into the Ice type!',
     })
   })
 
   it('gives a Curse without its user our wording', () => {
     const { event, mon } = sceneOf('effectStart', '|-start|p2a: Tyranitar|Curse')
-    expect(effectStarted(mon(event.who), event.effect, undefined).fallback).toBeDefined()
+    expect(effectStarted(mon(event.who), event.effect).fallback).toBeDefined()
   })
 })
 
@@ -85,12 +87,12 @@ describe('a partial trap that starts (P1, `gWrappedStringIds`)', () => {
   it.each(scenes)('words %s on %s by %s', (move, target, trapper, text) => {
     const { event, mon } = sceneOf('effectStart', `|-start|${target}|move: ${move}|[of] ${trapper}`)
     const source = event.source && mon(event.source)
-    expect(effectStarted(mon(event.who), event.effect, source)).toEqual({ text })
+    expect(effectStarted(mon(event.who), event.effect, { source })).toEqual({ text })
   })
 
   it('gives a trap that names no trapper our wording and a fallback', () => {
     const { event, mon } = sceneOf('effectStart', '|-start|p2a: Tyranitar|move: Wrap')
-    expect(effectStarted(mon(event.who), event.effect, undefined).fallback).toBeDefined()
+    expect(effectStarted(mon(event.who), event.effect).fallback).toBeDefined()
   })
 })
 

@@ -16,6 +16,7 @@ import {
 import { FIELD_TEMPLATES, screenRaised } from './phrases-field'
 import { isTrapping } from './phrases-hp'
 import { STATUS_TEMPLATES } from './phrases-status'
+import { type TypeChange, typeAdded, typeChanged } from './phrases-types'
 import { ownPhrase, type Phrase, tagged } from './template'
 
 export type Line = (who: Mon) => string
@@ -88,10 +89,6 @@ export const EFFECT_TEMPLATES = {
   storingEnergy: tagged('STRINGID_PKMNSTORINGENERGY', start('is storing energy!')),
   terastallized: tagged('STRINGID_PKMNTERASTALLIZEDINTO', (who: Mon, type: string) => {
     return `${nameAtStart(who)} terastallized into the ${type} type!`
-  }),
-  // `BattleScript_ProteanActivates`, inside the pop-up of Protean or Libero; B_BUFF1 is the type.
-  changedType: tagged('STRINGID_PKMNCHANGEDTYPE', (who: Mon, type: string) => {
-    return `${nameAtStart(who)} transformed into the ${type} type!`
   }),
   unleashedEnergy: tagged('STRINGID_PKMNUNLEASHEDENERGY', start('unleashed its energy!')),
   // `BattleScript_RageIsBuilding` says it after a hit raises the Attack of a Pokémon in a rage
@@ -166,31 +163,39 @@ function startText(who: Mon, id: string, source: Mon | undefined): string | unde
   return STARTS[id]?.(who) ?? screenRaised(who.side, id)
 }
 
-/** The start lines that name the effect's detail, by the effect's id. */
-const STARTS_WITH_DETAIL: Readonly<Record<string, (who: Mon, detail: string) => string>> = {
-  disable: (who, move) => E.disabled.render(who, moveName(move)),
-  // The log names the new type as @pkmn does, and the game names each type alike (D16).
-  typechange: E.changedType.render,
+/** The start lines that read the effect's detail or its cause, by the effect's id. */
+const STARTS_READING: Readonly<Record<string, (who: Mon, by: Started) => string | undefined>> = {
+  disable: (who, { detail }) => detail && E.disabled.render(who, moveName(detail)),
+  typechange: typeChanged,
+  typeadd: typeAdded,
 }
 
 /**
- * An effect that starts on `who`; `source` is the Pokémon of `[of]`: Curse's user, or the
- * trapper of a partial trap. `detail` is what the line names beside the effect (Disable's move);
- * a line that does not use it lists it, so it never goes unseen.
+ * What a start line can read beside its Pokémon: `source` is the Pokémon of `[of]` (Curse's user,
+ * the trapper of a partial trap), `cause` the effect of `[from]`, `detail` what the line names
+ * beside the effect (Disable's move, a new type).
  */
-export function effectStarted(
-  who: Mon,
-  effect: Effect,
-  source: Mon | undefined,
-  detail?: string,
-): Phrase {
-  const id = toID(effect.name)
-  const withDetail = STARTS_WITH_DETAIL[id]
-  if (detail !== undefined && withDetail !== undefined) return { text: withDetail(who, detail) }
-  const game = startText(who, id, source)
+type Started = TypeChange
+
+/** A start listed with what it names: our line, or the game's line that leaves the detail out. */
+function ownStart(who: Mon, effect: Effect, detail: string | undefined, game?: string): Phrase {
   const text = game ?? `${nameAtStart(who)} is under ${held(effect.name)}!`
-  if (detail !== undefined) return ownPhrase(text, `${effect.name} starting with ${detail}`)
-  return game === undefined ? ownPhrase(text, `${effect.name} starting`) : { text }
+  const what = detail === undefined ? 'starting' : `starting with ${detail}`
+  return ownPhrase(text, `${effect.name} ${what}`)
+}
+
+/**
+ * An effect that starts on `who`. A line that does not read the detail lists it, so it never
+ * goes unseen.
+ */
+export function effectStarted(who: Mon, effect: Effect, by: Started = {}): Phrase {
+  const id = toID(effect.name)
+  const reading = STARTS_READING[id]
+  const game = reading === undefined ? startText(who, id, by.source) : reading(who, by)
+  if (game === undefined) return ownStart(who, effect, by.detail)
+  if (reading === undefined && by.detail !== undefined)
+    return ownStart(who, effect, by.detail, game)
+  return { text: game }
 }
 
 const ACTS: Readonly<Record<string, Line>> = {

@@ -77,7 +77,8 @@ export function effectStart(event: EventOf<'effectStart'>, ctx: Context): void {
 function startLine(event: EventOf<'effectStart'>, ctx: Context): void {
   const { who, effect, line } = event
   const source = event.source && ctx.mon(event.source)
-  ctx.print(line, effectStarted(ctx.mon(who), effect, source, event.detail))
+  const { cause, detail } = event
+  ctx.print(line, effectStarted(ctx.mon(who), effect, { source, cause, detail }))
   if (toID(effect.name) === PERISH_ZERO) drain(who, line, ctx)
 }
 
