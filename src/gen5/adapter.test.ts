@@ -7,30 +7,12 @@ import {
   commandWrites,
   holdWrites,
 } from './adapter'
-import type { Bw2Numbers, StructLayout } from './bw2-numbers'
+import { ADAPTER_LAYOUT as LAYOUT } from './adapter.fixtures'
+import type { Bw2Numbers } from './bw2-numbers'
 import type { MemoryWrite } from './ram-write'
 
-// An invented layout and invented values: other offsets, `returned` in the high bits of its byte,
-// the size before the command, and a 0x20-byte data field so the limit shows in a short block. An
-// adapter.ts that hard-codes an offset or a value fails here.
-const LAYOUT: StructLayout = {
-  size: 0x4c,
-  align: 4,
-  fields: {
-    netHandle: { offset: 0x00, size: 4 },
-    returnSize: { offset: 0x08, size: 4 },
-    returnData: { offset: 0x10, size: 4 },
-    isNet: { offset: 0x20, size: 1, bit: 0, bits: 4 },
-    returned: { offset: 0x20, size: 1, bit: 4, bits: 3 },
-    clientId: { offset: 0x21, size: 1 },
-    cmd: { offset: 0x22, size: 1 },
-    state: { offset: 0x23, size: 1 },
-    sendCmd: { offset: 0x28, size: 0x24 },
-    'sendCmd.size': { offset: 0x28, size: 2 },
-    'sendCmd.cmd': { offset: 0x2a, size: 2 },
-    'sendCmd.data': { offset: 0x2c, size: 0x20 },
-  },
-}
+// Invented values over the invented layout of adapter.fixtures.ts. An adapter.ts that hard-codes
+// an offset or a value fails here.
 const NUMBERS: AdapterNumbers = {
   layout: LAYOUT,
   serverCmd: 0x0b,
@@ -63,7 +45,7 @@ describe('adapterWrites', () => {
       'cmd @2180022 11',
       'state @2180023 2',
       'returnData @2180010 0,0,0,0',
-      'returnSize @2180008 0,0,0,0',
+      'returnSize @218000c 0,0,0,0',
       'returned @2180020 bits 112=0',
     ])
   })
@@ -134,7 +116,7 @@ describe('commandWrites', () => {
       'cmd @2180022 6',
       'state @2180023 2',
       'returnData @2180010 0,0,0,0',
-      'returnSize @2180008 0,0,0,0',
+      'returnSize @218000c 0,0,0,0',
       'returned @2180020 bits 112=0',
     ])
   })

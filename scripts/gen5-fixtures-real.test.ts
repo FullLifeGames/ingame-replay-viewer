@@ -10,6 +10,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
+import { ADAPTER_LAYOUT } from '../src/gen5/adapter.fixtures.ts'
 import { ENTRY } from '../src/gen5/direct-entry.fixtures.ts'
 import { PKM, TEAM_PKM, TERMINATOR } from '../src/gen5/pkm.fixtures.ts'
 import { battleNumbers } from './gen5-bw2-battle.ts'
@@ -38,6 +39,12 @@ const COMPARED = [
     path: ['entry', 'constants', 'CHAR_EOM'],
   },
   { module: 'src/gen5/direct-entry.fixtures.ts', name: 'ENTRY', value: ENTRY, path: ['entry'] },
+  {
+    module: 'src/gen5/adapter.fixtures.ts',
+    name: 'ADAPTER_LAYOUT',
+    value: ADAPTER_LAYOUT,
+    path: ['adapter'],
+  },
   {
     module: 'scripts/gen5-bw2-entry.fixtures.ts',
     name: 'ENTRY_INPUT',

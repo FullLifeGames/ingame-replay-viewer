@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { AdapterNumbers } from '../src/gen5/adapter'
+import { ADAPTER_LAYOUT } from '../src/gen5/adapter.fixtures'
 import type { ServerCmdTable } from '../src/gen5/bw2-numbers'
 import type { MacroStep } from '../src/gen5/macro'
 import type { Moment } from '../src/gen5/moment'
@@ -10,20 +11,7 @@ import { MOMENT_GAP, momentStart, momentSteps } from './gen5-moment-plan'
 /** The adapter command that starts an action selection (BTL_ACMD_SELECT_ACTION), invented. */
 const SELECT_ACTION = 6
 const ADAPTER_NUMBERS: AdapterNumbers = {
-  layout: {
-    size: 0x4c,
-    align: 4,
-    fields: {
-      returnSize: { offset: 0x08, size: 4 },
-      returnData: { offset: 0x10, size: 4 },
-      returned: { offset: 0x20, size: 1, bit: 4, bits: 3 },
-      cmd: { offset: 0x22, size: 1 },
-      state: { offset: 0x23, size: 1 },
-      'sendCmd.size': { offset: 0x28, size: 2 },
-      'sendCmd.cmd': { offset: 0x2a, size: 2 },
-      'sendCmd.data': { offset: 0x2c, size: 0x20 },
-    },
-  },
+  layout: ADAPTER_LAYOUT,
   serverCmd: 0x0b,
   heldState: 2,
   queueSize: 0x40,
