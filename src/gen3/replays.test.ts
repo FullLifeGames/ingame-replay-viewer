@@ -40,7 +40,7 @@ const charsetRead = (text: string) => decodeText(encodeText(text))
  * Perish Song's first count, whose later counts print; Bide's first turn, which the expansion
  * shows as the move alone; Protosynthesis's end, which the expansion has no message for; and the
  * looks of a Terastallization and of snow, whose lines print (#88). A new one fails until it is
- * named here.
+ * named here, and one that no test replay takes fails unless NAMED_AHEAD holds it.
  */
 const NAMED_MECHANICS: ReadonlySet<string> = new Set([
   mechanicGap('perish3', 'starting').detail,
@@ -64,6 +64,15 @@ const NAMED_PHRASES: ReadonlySet<string> = new Set([phraseGap(PARTIAL_TRAP_SCENE
  * one fails until it is named here.
  */
 const NAMED_LOOKS: ReadonlySet<string> = new Set([animGap('Ivy Cudgel Water', 'Ivy Cudgel').detail])
+
+/**
+ * The entries above that no test replay takes yet, named ahead for a replay to come: Bide's first
+ * turn (#60) and Gen 1's partial trap, which the content-gap test below takes.
+ */
+const NAMED_AHEAD: ReadonlySet<string> = new Set([
+  mechanicGap('Bide', 'starting').detail,
+  phraseGap(PARTIAL_TRAP_SCENE).detail,
+])
 
 /**
  * The item fallbacks a test replay may take: the items of its generation the expansion lacks
@@ -158,6 +167,16 @@ describe.each(replays)('the instruction stream of $id', ({ id, script, stream, t
       parties: { near: party('near'), far: party('far') },
       instructions,
     })
+  })
+})
+
+describe('the named lists', () => {
+  // A gap that the backend closes leaves its entry behind (D9): the lists shrink with the gaps.
+  it('name only fallbacks that a test replay takes, or those named ahead', () => {
+    const taken = new Set(replays.flatMap(({ stream }) => stream.fallbacks.map((f) => f.detail)))
+    const named = [...NAMED_MECHANICS, ...NAMED_PHRASES, ...NAMED_LOOKS]
+    const untaken = named.filter((detail) => !taken.has(detail))
+    expect(untaken.toSorted()).toEqual([...NAMED_AHEAD].toSorted())
   })
 })
 
