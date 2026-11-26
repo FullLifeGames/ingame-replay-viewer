@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { buildBattleScript } from '../script/build'
 import { scriptOf } from '../script/testing'
-import { buildGen3Stream } from './backend'
+import { buildGen3Stream, gensText, PLAYED_GENS, PLAYED_GENS_TEXT } from './backend'
 import { Gen3Error, GenerationRefusal } from './errors'
 import { decodeStream } from './stream/decode'
 import { speciesOf } from './tables/lookup'
@@ -98,22 +98,50 @@ describe('buildGen3Stream', () => {
     })
   })
 
-  it('refuses a Gen 6 battle with a GenerationRefusal that carries the gen (#87)', () => {
-    const script = buildBattleScript('|gen|6\n')
-    expect(() => buildGen3Stream(script)).toThrow(GenerationRefusal)
-    expect(() => buildGen3Stream(script)).toThrow(expect.objectContaining({ gen: 6 }))
+  it('builds a stream for a Gen 9 battle (#88)', () => {
+    const script = buildBattleScript(
+      ['|gen|9', '|player|p1|Alice|1|', '|player|p2|Bob|2|', '|start'].join('\n') +
+        '\n|switch|p1a: Ogerpon|Ogerpon, F|100/100\n|switch|p2a: Gholdengo|Gholdengo|100/100\n',
+    )
+    expect(buildGen3Stream(script).instructions.at(-1)).toEqual({
+      line: 5,
+      instruction: { op: 'end', outcome: 'unknown' },
+    })
   })
 
-  it('refuses a Gen 9 log with a GenerationRefusal that carries the gen (#59)', () => {
-    const script = buildBattleScript('|gen|9\n')
+  it.each([6, 7, 8])(
+    'refuses a Gen %i battle with a GenerationRefusal that carries the gen (#87, #88)',
+    (gen) => {
+      const script = buildBattleScript(`|gen|${String(gen)}\n`)
+      expect(() => buildGen3Stream(script)).toThrow(GenerationRefusal)
+      expect(() => buildGen3Stream(script)).toThrow(expect.objectContaining({ gen }))
+    },
+  )
+
+  it('refuses a Gen 8 log with a GenerationRefusal that names the played generations (#59, #88)', () => {
+    const script = buildBattleScript('|gen|8\n')
     expect(() => buildGen3Stream(script)).toThrow(Gen3Error)
     expect(() => buildGen3Stream(script)).toThrow(
       expect.objectContaining({
         name: 'GenerationRefusal',
-        gen: 9,
-        message: 'the stream plays Gen 1 to 5 battles, this one is Gen 9',
+        gen: 8,
+        message: 'the stream plays Gen 1 to 5 and Gen 9 battles, this one is Gen 8',
       }),
     )
+  })
+})
+
+describe('gensText', () => {
+  it('writes a run of generations as a range and joins the runs with "and" (#88)', () => {
+    expect(gensText([1, 2, 3, 4, 5, 9])).toBe('Gen 1 to 5 and Gen 9')
+  })
+
+  it('writes a lone generation by its number', () => {
+    expect(gensText([3])).toBe('Gen 3')
+  })
+
+  it('gives the played generations their words', () => {
+    expect(PLAYED_GENS_TEXT).toBe(gensText(PLAYED_GENS))
   })
 })
 
