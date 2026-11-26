@@ -173,18 +173,24 @@ function noticesOf(
     .join('\n')
 }
 
-function noticesSection(input: LicencesInput): string {
-  const ids = Object.keys(input.components) as ComponentId[]
+/** The parts without a notice, under their heading; nothing while every part has one. */
+function unfoundList(input: LicencesInput): string {
+  if (input.unfound.length === 0) return ''
   const unfound = input.unfound.map(
     (part) =>
       `<li>${escapeHtml(part.part)}, in ${escapeHtml(input.components[part.component].name)}: ${escapeHtml(part.says)}</li>`,
   )
-  return `<h2 id="notices">Copyright notices</h2>
-${noticesOf(input, ids, 'notice')}
+  return `
 <h3>Parts without a notice in the pinned sources</h3>
 <ul>
 ${unfound.join('\n')}
 </ul>`
+}
+
+function noticesSection(input: LicencesInput): string {
+  const ids = Object.keys(input.components) as ComponentId[]
+  return `<h2 id="notices">Copyright notices</h2>
+${noticesOf(input, ids, 'notice')}${unfoundList(input)}`
 }
 
 /** The GPL, then the MIT texts and the viewer's LICENSE, then the core's third-party licences. */

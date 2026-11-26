@@ -170,6 +170,13 @@ describe('licencesHtml', () => {
     expect(text).toContain(`src/core.c, lines 1 to 2, at commit ${CORE.commit.slice(0, 7)}`)
   })
 
+  // Scene: once every part of the core has its notice (79-5), the page shows no empty heading.
+  it('shows no heading for parts without a notice when none is unfound', () => {
+    const none = licencesHtml({ ...INPUT, unfound: [] })
+    expect(none).not.toContain('Parts without a notice')
+    expect(html).toContain('Parts without a notice')
+  })
+
   it("shows a notice tree's groups under its component, after the component's own notices", () => {
     const section = textOf(html.slice(html.indexOf('<h2 id="notices">')))
     expect(section).toContain('Core library')

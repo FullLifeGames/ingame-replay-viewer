@@ -1,6 +1,7 @@
 // The words a visitor reads about what the licences page holds (#79): the notice before the file
-// input says no more than the page covers and names its gaps, and the components that closed the
-// last gaps (79-5) carry the versions their pins state (review W2, U-a, U-b).
+// input says no more than the page covers and names its gaps exactly while one is open, and the
+// components that closed the last gaps (79-5) carry the versions their pins state (review W2,
+// U-a, U-b).
 import { readFileSync } from 'node:fs'
 
 import { describe, expect, it } from 'vitest'
@@ -25,14 +26,14 @@ describe('the notice before the file input', () => {
     })
   })
 
-  it('names the licences page for the licence text, the notices and the archives, and its gaps', () => {
+  it('names the licences page for the licence text, the notices and the archives, and its gaps exactly while one is open', () => {
     for (const words of [
       '<a href="licences.html">Licences and source code</a>',
       'the licence text, the copyright notices and the source archives',
-      'lists what it cannot cover yet',
     ]) {
       expect(notice).toContain(words)
     }
+    expect(notice.includes('lists what it cannot cover yet')).toBe(open)
     expect(notice).not.toMatch(/[\u2013\u2014]/)
   })
 })
