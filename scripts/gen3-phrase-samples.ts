@@ -131,6 +131,8 @@ export const SAMPLES: Readonly<Record<string, Sample>> = {
   'effects.transformed': withValue('B_BUFF1', 'Tyranitar', FAR),
   'effects.terastallized': withValue('B_BUFF1', 'Fairy', FAR),
   'effects.tookAttack': withValue('B_BUFF1', nb('Future Sight'), FAR),
+  'effects.inLoveWith': { args: [FAR, NEAR], fill: { B_SCR_NAME_WITH_PREFIX2: 'Dugtrio' } },
+  'effects.tookAim': { args: [FAR, NEAR], fill: { B_DEF_NAME_WITH_PREFIX2: 'Dugtrio' } },
   'effects.copiedStats': { args: [FAR, NEAR], fill: { B_EFF_NAME_WITH_PREFIX2: 'Dugtrio' } },
   'effects.squeezed': { args: [FAR, NEAR], fill: { B_SCR_NAME_WITH_PREFIX2: 'Dugtrio' } },
   'effects.wrapped': { args: [FAR, NEAR], fill: { B_SCR_NAME_WITH_PREFIX2: 'Dugtrio' } },

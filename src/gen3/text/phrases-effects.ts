@@ -38,6 +38,15 @@ export const EFFECT_TEMPLATES = {
   taunted: tagged('STRINGID_PKMNFELLFORTAUNT', start('fell for the taunt!')),
   encored: tagged('STRINGID_PKMNGOTENCORE', start('must do an encore!')),
   inLove: tagged('STRINGID_PKMNFELLINLOVE', start('fell in love!')),
+  // `BattleScript_MoveUsedIsInLove`, with the one in love as B_ATK and the one it loves as B_SCR.
+  inLoveWith: tagged('STRINGID_PKMNINLOVE', (who: Mon, love: Mon) => {
+    return `${nameAtStart(who)} is in love with ${nameInside(love)}!`
+  }),
+  // `BattleScript_EffectLockOn` (Lock-On, Mind Reader), with the user as B_ATK and its target
+  // as B_DEF.
+  tookAim: tagged('STRINGID_PKMNTOOKAIM', (who: Mon, target: Mon) => {
+    return `${nameAtStart(who)} took aim at ${nameInside(target)}!`
+  }),
   drowsy: tagged('STRINGID_PKMNWASMADEDROWSY', start('grew drowsy!')),
   nightmare: tagged('STRINGID_PKMNFELLINTONIGHTMARE', start('began having a nightmare!')),
   cursed: tagged('STRINGID_PKMNLAIDCURSE', (user: Mon, target: Mon) => {
@@ -209,11 +218,19 @@ const ACTS: Readonly<Record<string, Line>> = {
   healbell: STATUS_TEMPLATES.bell.render,
 }
 
-/** An effect that acts; Splash's "nothing" names no Pokémon. */
-export function effectActivated(who: Mon | undefined, effect: Effect): Phrase {
+/** The act lines that name the Pokémon of `[of]` too, by the effect's id. */
+const ACTS_WITH_SOURCE: Readonly<Record<string, (who: Mon, source: Mon) => string>> = {
+  attract: E.inLoveWith.render,
+  lockon: E.tookAim.render,
+  mindreader: E.tookAim.render,
+}
+
+/** An effect that acts, with `source` the Pokémon of `[of]`; Splash's "nothing" names no Pokémon. */
+export function effectActivated(who: Mon | undefined, effect: Effect, source?: Mon): Phrase {
   const id = toID(effect.name)
   if (id === 'splash') return { text: E.nothing.render() }
-  const text = who && ACTS[id]?.(who)
+  const withSource = source && ACTS_WITH_SOURCE[id]
+  const text = who && (withSource ? withSource(who, source) : ACTS[id]?.(who))
   if (text !== undefined) return { text }
   const name = held(effect.name)
   const own = who === undefined ? `${name} took effect!` : `${nameAtStart(who)} used ${name}!`

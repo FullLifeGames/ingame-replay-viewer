@@ -141,7 +141,7 @@ function substituteBreaks(event: EventOf<'effectEnd'>, ctx: Context): void {
 
 /**
  * A substitute that takes a hit (`[damage]`) plays the hit first; a berry eaten as it acts says its
- * own line; any other effect is a line.
+ * own line; any other effect is a line, which can name the Pokémon of `[of]` (Attract, Lock-On).
  */
 export function effectActivate(event: EventOf<'effectActivate'>, ctx: Context): void {
   const { who, effect, line } = event
@@ -155,7 +155,8 @@ export function effectActivate(event: EventOf<'effectActivate'>, ctx: Context): 
     return
   }
   if (event.damage && who !== undefined) hit(line, ctx.activeSide(who), event.effectiveness, ctx)
-  ctx.print(line, effectActivated(who && ctx.mon(who), effect))
+  const source = event.source && ctx.mon(event.source)
+  ctx.print(line, effectActivated(who && ctx.mon(who), effect, source))
   hitLines(event, ctx)
 }
 
