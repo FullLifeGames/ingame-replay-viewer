@@ -94,6 +94,10 @@ describe('sides and the field (P1)', () => {
       'Light Screen made the\u00a0opposing side stronger against special moves!',
     ],
     ['Safeguard', 'The\u00a0opposing side became cloaked in a mystical veil!'],
+    [
+      'move: Aurora Veil',
+      'Aurora Veil made the\u00a0opposing side stronger against physical and special moves!',
+    ],
   ])('words %s starting on the far side', (condition, text) => {
     const { event } = sceneOf('sideStart', `|-sidestart|p2: Bob|${condition}`)
     expect(sideStarted(event.side, event.condition)).toEqual({ text })
@@ -111,6 +115,7 @@ describe('sides and the field (P1)', () => {
     ['Reflect', "The\u00a0opposing side's Reflect wore off!"],
     ['Light Screen', "The\u00a0opposing side's Light Screen wore off!"],
     ['Safeguard', 'The\u00a0opposing side is no longer protected by the mystical veil!'],
+    ['move: Aurora Veil', "The\u00a0opposing side's Aurora\u00a0Veil wore off!"],
   ])('words %s ending', (condition, text) => {
     const { event, mon } = sceneOf('sideEnd', `|-sideend|p2: Bob|${condition}`)
     const source = event.source && mon(event.source)

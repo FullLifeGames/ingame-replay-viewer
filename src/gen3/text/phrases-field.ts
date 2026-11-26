@@ -5,7 +5,7 @@ import { toID } from '@pkmn/dex'
 
 import type { Effect, Side } from '../../script/types'
 import { type Fitted, fitCharset } from './charset'
-import { held, type Mon, nameAtStart, teamAtStart, teamInside } from './names'
+import { held, type Mon, moveName, nameAtStart, teamAtStart, teamInside } from './names'
 import { ownPhrase, type Phrase, tagged } from './template'
 
 type Phase = 'start' | 'upkeep' | 'end'
@@ -55,6 +55,9 @@ export const FIELD_TEMPLATES = {
   lightScreen: tagged('STRINGID_PKMNRAISEDSPDEF', (team: string) => {
     return `Light Screen made ${team} side stronger against special moves!`
   }),
+  auroraVeil: tagged('STRINGID_PKMNAURORAVEIL', (team: string) => {
+    return `Aurora Veil made ${team} side stronger against physical and special moves!`
+  }),
   safeguard: tagged('STRINGID_PKMNCOVEREDBYVEIL', (Team: string) => {
     return `${Team} side became cloaked in a mystical veil!`
   }),
@@ -85,6 +88,7 @@ export const FIELD_TEMPLATES = {
   safeguardGone: tagged('STRINGID_PKMNSAFEGUARDEXPIRED', (Team: string) => {
     return `${Team} side is no longer protected by the mystical veil!`
   }),
+  // `BattleScript_SideStatusWoreOff`, as a side's timer ends a screen; B_BUFF1 is the move.
   woreOff: tagged('STRINGID_PKMNSXWOREOFF', (Team: string, condition: string) => {
     return `${Team} side's ${condition} wore off!`
   }),
@@ -135,6 +139,7 @@ const SIDE_STARTS: Readonly<Record<string, (side: Side) => string>> = {
   stealthrock: (side) => T.stealthRock.render(teamInside(side)),
   reflect: (side) => T.reflect.render(teamInside(side)),
   lightscreen: (side) => T.lightScreen.render(teamInside(side)),
+  auroraveil: (side) => T.auroraVeil.render(teamInside(side)),
   safeguard: (side) => T.safeguard.render(teamAtStart(side)),
 }
 
@@ -164,10 +169,11 @@ export function sideStarted(side: Side, condition: Effect, user?: Mon): Phrase {
   return ownPhrase(own, `${condition.name} starting on a side`)
 }
 
-const SIDE_ENDS: Readonly<Record<string, (side: Side) => string>> = {
+const SIDE_ENDS: Readonly<Record<string, (side: Side, condition: Effect) => string>> = {
   stealthrock: (side) => T.stealthRockCleared.render(teamInside(side)),
   reflect: (side) => T.reflectGone.render(teamAtStart(side)),
   lightscreen: (side) => T.lightScreenGone.render(teamAtStart(side)),
+  auroraveil: (side, veil) => T.woreOff.render(teamAtStart(side), moveName(veil.name)),
   safeguard: (side) => T.safeguardGone.render(teamAtStart(side)),
 }
 
@@ -181,7 +187,7 @@ const SIDE_ENDS_BY_SOURCE: Readonly<Record<string, (source: Mon) => string>> = {
 export function sideEnded(side: Side, condition: Effect, source: Mon | undefined): Phrase {
   const id = toID(condition.name)
   const bySource = SIDE_ENDS_BY_SOURCE[id]
-  const text = source && bySource ? bySource(source) : SIDE_ENDS[id]?.(side)
+  const text = source && bySource ? bySource(source) : SIDE_ENDS[id]?.(side, condition)
   if (text !== undefined) return { text }
   const own = T.woreOff.render(teamAtStart(side), held(condition.name))
   return ownPhrase(own, `${condition.name} ending on a side`)

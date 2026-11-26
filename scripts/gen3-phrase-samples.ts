@@ -114,6 +114,7 @@ export const SAMPLES: Readonly<Record<string, Sample>> = {
   'field.stealthRockCleared': { args: [FOES_INSIDE] },
   'field.reflect': { args: [FOES_INSIDE] },
   'field.lightScreen': { args: [FOES_INSIDE] },
+  'field.auroraVeil': { args: [FOES_INSIDE] },
   'field.safeguard': { args: [FOES] },
   'field.reflectGone': { args: [FOES] },
   'field.lightScreenGone': { args: [FOES] },

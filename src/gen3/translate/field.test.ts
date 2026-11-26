@@ -166,6 +166,21 @@ describe('sides and the field', () => {
     ])
   })
 
+  // `BattleScript_EffectAuroraVeil` says STRINGID_PKMNAURORAVEIL; the side's timer ends it with
+  // `BattleScript_SideStatusWoreOff`, STRINGID_PKMNSXWOREOFF with the move as B_BUFF1
+  // (`src/battle_end_turn.c`, SECOND_EVENT_BLOCK_AURORA_VEIL).
+  it("says Aurora Veil's start and its end in the game's words", () => {
+    const lines = [
+      '|-sidestart|p1: Alice|move: Aurora Veil',
+      '|-sideend|p1: Alice|move: Aurora Veil',
+    ]
+    expect(sceneOf(...lines).map(plain)).toEqual([
+      'Aurora Veil made your side stronger against physical and special moves!',
+      "Your side's Aurora Veil wore off!",
+    ])
+    expect(streamOfLog(...lines).fallbacks.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
+
   // Showdown's Gen 3 Mist is a side condition (`data/moves.ts` `mist`); the game says
   // gText_PkmnShroudedInMist with the user as B_ATK (`BattleScript_EffectMist`).
   it("says Mist's start on a side by its user, as the game does", () => {
