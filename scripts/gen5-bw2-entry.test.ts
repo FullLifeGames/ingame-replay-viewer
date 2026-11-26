@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Bw2Symbol } from '../src/gen5/bw2-numbers'
-import { callAddress, ENTRY_FUNCTIONS, type EntryInput, entryNumbers } from './gen5-bw2-entry'
+import { callAddress, ENTRY_FUNCTIONS, entryNumbers } from './gen5-bw2-entry'
+import { ENTRY_INPUT as INPUT, link } from './gen5-bw2-entry.fixtures'
 
 // Every input here is written for the spec; none is copied from pokebw2, and every address,
-// offset and value is invented.
+// offset and value is invented. The reader's texts are in gen5-bw2-entry.fixtures.ts.
 
 const fn = (address: number, mode?: 'thumb' | 'arm'): Bw2Symbol => ({
   name: 'Spin_Main',
@@ -31,72 +32,6 @@ describe('callAddress', () => {
   })
 })
 
-const symbolLines = (names: readonly string[], kind: string, from: number) =>
-  names.map((name, at) => `${name} ${kind} addr:0x${(from + at * 0x10).toString(16)}`).join('\n')
-
-const link = (start: number, end: number) =>
-  `    .text       start:0x${start.toString(16)} end:0x${end.toString(16)} kind:code align:32\n\n`
-
-/** A whole invented input: tiny structs with the members the entry reads, and invented numbers. */
-const INPUT: EntryInput = {
-  arm9Symbols: [
-    symbolLines(ENTRY_FUNCTIONS, 'kind:function(thumb,size=0x20)', 0x02004000),
-    symbolLines(['sGameProcManager', 'sBootScreensParam'], 'kind:bss', 0x02100000),
-    'EVENT_TITLE_FUNCS kind:data(any) addr:0x02080000',
-  ].join('\n'),
-  bootScreensSymbols: 'BOOT_SCREENS_PROC_FUNCTIONS kind:data(any) addr:0x02200000 ambiguous',
-  battleSymbols: 'BATTLE_PROC_FUNCTIONS kind:data(any) addr:0x02190100 ambiguous',
-  battleOverlay: 'ov101',
-  battleLink: link(0x02190000, 0x02190600),
-  bootLinks: { ov004: link(0x02180000, 0x02190000), ov031: link(0x021a0000, 0x021a0800) },
-  gameMainC:
-    'static void GameInit(void) { GFL_OvlLoad(OVERLAY_ID(4)); GFL_OvlLoad(OVERLAY_ID(31)); }',
-  procsysC: `struct GameProcManager { HeapID heapId; s32 overlayId; GameProc *proc; BOOL queued;
-    BOOL replace; s32 nextOverlayId; const GameProcFunctions *nextFunctions; void *nextParam; };`,
-  heapH: 'typedef u16 HeapID;\nenum { HEAPID_SYSTEM = 0x0, HEAPID_USER = 0x5 };',
-  overlayH: '#define OVERLAY_NONE (-1)',
-  soundH: '#define SND_CHANNEL_MASK_ALL 0xff',
-  strbufC: 'struct StrBuf { u16 size; u16 length; u32 magic; u16 chars[1]; };',
-  setupH: `struct BtlFieldSituation { u16 bgm; u16 winBgm; };
-struct BtlSetupTrainer { u32 trainerId; u32 trainerClass; StrBuf *name; PMSData winWords; };
-struct BtlSetup { u32 battleType; u32 battleStyle; BtlFieldSituation fieldSituation;
-    PokeParty *party[4]; PlayerInfo *playerInfo[4]; BtlSetupTrainer *trainers[4];
-    GameData *gameData; Config *config; MATHRandContext32 rand; };`,
-  regulationH: '',
-  pmsH: '#define PMS_WORDS 2\nstruct PMSData { u16 type; u16 words[PMS_WORDS]; };',
-  fieldEventH: 'struct BtlFieldStatus { u32 bgId; u8 weather; };',
-  mathH: 'typedef struct { u64 x; u64 mul; } MATHRandContext32;',
-  partyH: `#define PARTY_SIZE 6
-struct PartyPkm { u32 pid; MailData mail; };
-struct PokeParty { s32 capacity; s32 count; PartyPkm pkms[PARTY_SIZE]; u8 slotExists; };`,
-  mailH: 'struct MailData { u32 trainerId; u16 words[3]; };',
-  playerInfoH: 'struct PlayerInfo { u16 name[8]; u32 id; u8 gender; };',
-  configH: `enum { CONFIG_TEXT_SPEED_SLOW = 0, CONFIG_TEXT_SPEED_FAST = 3 };
-struct Config { u16 textSpeed : 4; u16 : 12; };`,
-  battleProcH: '#define OVERLAY_BATTLE_MAIN OVERLAY_ID(101)',
-  trainerClasses: 'TRAINER_CLASS_HIKER = 0\nTRAINER_CLASS_YOUNGSTER\n',
-  printsysC: '#define CHAR_NEWLINE 0xe000\n#define CHAR_EOM 0xfffe',
-  battleH: '#define BTL_STYLE_SINGLE 4\n#define BTL_STYLE_DOUBLE 9',
-  soundList: 'SEQ_SILENCE\nSEQ_BGM_VS_WILD = 100\nSEQ_BGM_VS_TRAINER\n',
-  setupC: `static void Kite_Init(Kite *kite) { kite->name = GFL_StrBufCreate(3, heapId); }
-BtlSetupTrainer *TrainerBattleSetup_Create(HeapID heapId) {
-    BtlSetupTrainer *trainer = GFL_HeapAllocate(heapId, sizeof(BtlSetupTrainer), TRUE, "x.c", 9);
-
-    trainer->name = GFL_StrBufCreate(12, heapId);
-    return trainer;
-}
-static void BtlSetup_LoadTrainer(BtlSetup *setup, u32 client, PokeParty **party, HeapID heapId);
-static void BtlSetup_LoadPlayerParty(BtlSetup *setup, HeapID heapId) {
-    setup->party[3] = PokeParty_Create(heapId);
-}
-static void BtlSetup_LoadGameData(BtlSetup *setup, GameData *gameData) {
-    setup->playerInfo[3] = GetGameDataPlayerInfo(gameData);
-}
-void BtlSetup_SetTrainer1v1Single(BtlSetup *setup, u32 trainerId, HeapID heapId) {
-    BtlSetup_LoadTrainer(setup, 2, &setup->party[2], heapId);
-}`,
-}
-
 // Scene: the direct entry's routine and the page take every number from the generated file.
 describe('entryNumbers', () => {
   it('gives each function its call address, each data symbol, and the constants by name', () => {
@@ -111,7 +46,7 @@ describe('entryNumbers', () => {
     expect(entry.constants).toEqual({
       HEAPID_USER: 5,
       OVERLAY_BATTLE_MAIN: 101,
-      OVERLAY_NONE: -1,
+      OVERLAY_NONE: -3,
       SND_CHANNEL_MASK_ALL: 0xff,
       TRAINER_CLASS_YOUNGSTER: 1,
       CONFIG_TEXT_SPEED_FAST: 3,
@@ -146,15 +81,15 @@ describe('entryNumbers', () => {
       'BtlFieldStatus',
       'PartyPkm',
     ])
-    expect(layouts.GameProcManager?.fields.nextParam).toEqual({ offset: 0x1c, size: 4 })
-    expect(layouts.BtlSetup?.fields['fieldSituation.bgm']).toEqual({ offset: 8, size: 2 })
-    expect(layouts.BtlSetup?.fields.party).toEqual({ offset: 0x0c, size: 0x10 })
-    expect(layouts.BtlSetup?.fields.rand).toEqual({ offset: 0x44, size: 0x10 })
-    expect(layouts.BtlSetup?.size).toBe(0x54)
-    expect(layouts.BtlSetupTrainer?.size).toBe(0x14)
-    expect(layouts.PokeParty?.fields.pkms).toEqual({ offset: 8, size: 0x60 })
+    expect(layouts.GameProcManager?.fields.nextParam).toEqual({ offset: 4, size: 4 })
+    expect(layouts.BtlSetup?.fields['fieldSituation.bgm']).toEqual({ offset: 4, size: 2 })
+    expect(layouts.BtlSetup?.fields.party).toEqual({ offset: 0x0c, size: 0x14 })
+    expect(layouts.BtlSetup?.fields.rand).toEqual({ offset: 0x50, size: 0x10 })
+    expect(layouts.BtlSetup?.size).toBe(0x60)
+    expect(layouts.BtlSetupTrainer?.size).toBe(0x0c)
+    expect(layouts.PokeParty?.fields.pkms).toEqual({ offset: 12, size: 0x40 })
     expect(layouts.PartyPkm?.size).toBe(0x10)
-    expect(layouts.Config?.fields.textSpeed).toEqual({ offset: 0, size: 2, bit: 0, bits: 4 })
+    expect(layouts.Config?.fields.textSpeed).toEqual({ offset: 0, size: 1, bit: 3, bits: 2 })
   })
 
   it('spans the battle overlay and the boot overlays from their link files', () => {

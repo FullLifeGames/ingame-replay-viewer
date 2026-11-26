@@ -12,27 +12,55 @@ import { describe, expect, it } from 'vitest'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { ENTRY } from '../src/gen5/direct-entry.fixtures.ts'
 import { PKM, TEAM_PKM, TERMINATOR } from '../src/gen5/pkm.fixtures.ts'
+import { battleNumbers } from './gen5-bw2-battle.ts'
+import { BATTLE_SOURCES } from './gen5-bw2-battle.fixtures.ts'
+import { entryNumbers } from './gen5-bw2-entry.ts'
+import { ENTRY_INPUT } from './gen5-bw2-entry.fixtures.ts'
+import { pkmNumbers } from './gen5-bw2-pkm.ts'
+import { PKM_INPUT } from './gen5-bw2-pkm.fixtures.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
 const FILE = GEN5_PATHS.bw2Json
 
+/** The folders whose `*.fixtures.ts` modules the guard walks. */
+const FOLDERS = ['src/gen5/', 'scripts/']
+
 /** Each fixture under pokebw2's names: its module, its export, and where the generated file keeps
- * the numbers of the same names. */
+ * the numbers of the same names. A fixture of C texts is compared by what its reader computes
+ * from them. */
 const COMPARED = [
-  { module: 'pkm.fixtures.ts', name: 'PKM', value: PKM, path: ['pkm'] },
-  { module: 'pkm.fixtures.ts', name: 'TEAM_PKM', value: TEAM_PKM, path: ['pkm'] },
+  { module: 'src/gen5/pkm.fixtures.ts', name: 'PKM', value: PKM, path: ['pkm'] },
+  { module: 'src/gen5/pkm.fixtures.ts', name: 'TEAM_PKM', value: TEAM_PKM, path: ['pkm'] },
   {
-    module: 'pkm.fixtures.ts',
+    module: 'src/gen5/pkm.fixtures.ts',
     name: 'TERMINATOR',
     value: TERMINATOR,
     path: ['entry', 'constants', 'CHAR_EOM'],
   },
-  { module: 'direct-entry.fixtures.ts', name: 'ENTRY', value: ENTRY, path: ['entry'] },
+  { module: 'src/gen5/direct-entry.fixtures.ts', name: 'ENTRY', value: ENTRY, path: ['entry'] },
+  {
+    module: 'scripts/gen5-bw2-entry.fixtures.ts',
+    name: 'ENTRY_INPUT',
+    value: entryNumbers(ENTRY_INPUT),
+    path: ['entry'],
+  },
+  {
+    module: 'scripts/gen5-bw2-pkm.fixtures.ts',
+    name: 'PKM_INPUT',
+    value: pkmNumbers(PKM_INPUT),
+    path: ['pkm'],
+  },
+  {
+    module: 'scripts/gen5-bw2-battle.fixtures.ts',
+    name: 'BATTLE_SOURCES',
+    value: battleNumbers(BATTLE_SOURCES),
+    path: ['battle'],
+  },
 ]
 
 /** The fixture modules that hold no number of pokebw2: the archives' fixtures. `ROUTINE` beside
  * `ENTRY` stays out of the compare too: it is the build of our own routine, not pokebw2's. */
-const NOT_POKEBW2 = ['lzma.fixtures.ts', 'seven-zip.fixtures.ts']
+const NOT_POKEBW2 = ['src/gen5/lzma.fixtures.ts', 'src/gen5/seven-zip.fixtures.ts']
 
 // Scene: CI must never pass with the spec on the real numbers skipped.
 it.runIf(Boolean(process.env.CI))('finds build/gen5/bw2.json under CI', () => {
@@ -58,14 +86,19 @@ function sameField(a: Record<string, unknown>, b: Record<string, unknown>): bool
   return !isZero(a) || (a.size === b.size && a.bits === b.bits)
 }
 
+/** A struct's alignment: on the game's compiler 1, 2 or 4 by its widest member, so like a field's
+ * width it says nothing on its own. */
+const isAlign = (struct: Record<string, unknown>, key: string) =>
+  key === 'align' && isObject(struct.fields)
+
 /** Every name under `name` whose fixture number equals the generated number at the same place: a
- * field by `sameField`, or any other number. */
+ * field by `sameField`, or any other number but a struct's alignment. */
 function equalNames(fixture: unknown, real: unknown, name: string): string[] {
   if (typeof fixture === 'number') return fixture === real ? [name] : []
   if (isField(fixture) && isField(real)) return sameField(fixture, real) ? [name] : []
   if (!isObject(fixture) || !isObject(real)) return []
   return Object.keys(fixture)
-    .filter((key) => key in real)
+    .filter((key) => key in real && !isAlign(fixture, key))
     .flatMap((key) => equalNames(fixture[key], real[key], `${name}.${key}`))
 }
 
@@ -95,6 +128,14 @@ describe("the guard's compare on invented numbers", () => {
     expect(equalNames({ offset: 0, size: 2, bit: 0, bits: 3 }, first, 'S.first')).toEqual([])
   })
 
+  // Scene: on the game's compiler a struct's alignment is 1, 2 or 4 by its widest member, so a
+  // struct of a pointer or a word shares it with every such struct, as a field's width does.
+  it('passes a struct whose alignment alone equals the real one, and names its size', () => {
+    const struct = { size: 12, align: 4, fields: { first } }
+    expect(equalNames(struct, { ...struct, size: 16 }, 'S')).toEqual(['S.fields.first'])
+    expect(equalNames(struct, struct, 'S')).toEqual(['S.size', 'S.fields.first'])
+  })
+
   it('names any other number equal under the same name', () => {
     expect(equalNames({ COUNT: 6, CODE: 2 }, { COUNT: 6, CODE: 3 }, 'C')).toEqual(['C.COUNT'])
   })
@@ -102,9 +143,11 @@ describe("the guard's compare on invented numbers", () => {
 
 describe('the fixtures under the guard', () => {
   // Scene: a new fixture module with pokebw2's names must not slip past the compare below.
-  it('compares every fixture module of src/gen5 or names it as no pokebw2 fixture', () => {
-    const modules = readdirSync(new URL('../src/gen5/', import.meta.url)).filter((file) =>
-      file.endsWith('.fixtures.ts'),
+  it('compares every fixture module of its folders or names it as no pokebw2 fixture', () => {
+    const modules = FOLDERS.flatMap((folder) =>
+      readdirSync(new URL(`../${folder}`, import.meta.url))
+        .filter((file) => file.endsWith('.fixtures.ts'))
+        .map((file) => `${folder}${file}`),
     )
     const known = new Set([...COMPARED.map(({ module }) => module), ...NOT_POKEBW2])
     expect(modules.filter((module) => !known.has(module))).toEqual([])
