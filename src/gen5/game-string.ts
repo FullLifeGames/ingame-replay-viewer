@@ -23,25 +23,43 @@ export interface GameString {
   cut?: string
 }
 
-/** The units of `name`, one per character; throws on one that needs two, that is the terminator
- * or that is too wide for the buffer. */
-function units(name: string, buffer: StringBuffer, terminator: number): number[] {
-  return Array.from(name, (char, i) => {
+/** A name's units that fit a buffer's room beside the terminator, and the log line of its cut if
+ * it did not fit. */
+export interface NameUnits {
+  kept: number[]
+  cut?: string
+}
+
+/** The units of `name`, one per character, cut to `buffer`'s room with the terminator counted;
+ * throws on a character that needs two units, is the terminator or is too wide for the buffer. */
+export function nameUnits(
+  name: string,
+  buffer: Pick<StringBuffer, 'field' | 'room' | 'charWidth'>,
+  terminator: number,
+): NameUnits {
+  const { field, room, charWidth } = buffer
+  if (room < 2) throw new RangeError(`${field} holds no character beside its terminator`)
+  const all = Array.from(name, (char, i) => {
     const unit = char.codePointAt(0) ?? 0
-    if (unit > 0xffff || unit === terminator || unit >= 2 ** (8 * buffer.charWidth)) {
-      throw new RangeError(`${buffer.field}: character ${String(i)} of "${name}" does not fit`)
+    if (unit > 0xffff || unit === terminator || unit >= 2 ** (8 * charWidth)) {
+      throw new RangeError(`${field}: character ${String(i)} of "${name}" does not fit`)
     }
     return unit
   })
+  const kept = all.slice(0, room - 1)
+  if (kept.length === all.length) return { kept }
+  const short = String.fromCodePoint(...kept)
+  return {
+    kept,
+    cut: `${field}: "${name}" cut to "${short}", the ${String(room - 1)} characters it holds`,
+  }
 }
 
 /** The writes that put `name` into `buffer`, cut to the buffer's room. The count comes first, then
  * the characters with the terminator after them; nothing past the terminator changes. */
 export function stringWrites(name: string, buffer: StringBuffer, terminator: number): GameString {
-  const { field, room, charWidth } = buffer
-  if (room < 2) throw new RangeError(`${field} holds no character beside its terminator`)
-  const all = units(name, buffer, terminator)
-  const kept = all.slice(0, room - 1)
+  const { field, charWidth } = buffer
+  const { kept, cut } = nameUnits(name, buffer, terminator)
   const chars = [...kept, terminator].flatMap((unit) => littleEndian(unit, charWidth, field))
   const writes: MemoryWrite[] = []
   if (buffer.length) {
@@ -50,10 +68,5 @@ export function stringWrites(name: string, buffer: StringBuffer, terminator: num
     writes.push({ kind: 'bytes', field: `${field} length`, ...at, bytes })
   }
   writes.push({ kind: 'bytes', field, ...buffer.chars, bytes: chars })
-  if (kept.length === all.length) return { writes }
-  const short = String.fromCodePoint(...kept)
-  return {
-    writes,
-    cut: `${field}: "${name}" cut to "${short}", the ${String(room - 1)} characters it holds`,
-  }
+  return cut === undefined ? { writes } : { writes, cut }
 }
