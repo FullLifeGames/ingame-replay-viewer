@@ -280,9 +280,9 @@ export interface LinkSteps {
 /**
  * The link, then the division rewrite, then the sizes and the patch, so the patch, the sizes and
  * the page all see the rewritten module. Returns the report's lines. When the rewrite fails, the
- * plain link goes, so no later step, such as --patch, takes it for a finished module. A sanitized module gets no
- * rewrite: it is the tool that finds a fault, and a division that traps there is its finding. No
- * page loads it (#44), so it gets no patch either.
+ * plain link goes, so no later step, such as --patch, takes it for a finished module. A sanitized
+ * module gets no rewrite: it is the tool that finds a fault, and a division that traps there is
+ * its finding. No page loads it (#44), so it gets no patch either.
  */
 export async function linkSteps(steps: LinkSteps, sanitize?: Sanitizer): Promise<string[]> {
   const lines: string[] = []

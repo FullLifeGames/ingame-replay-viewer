@@ -1,9 +1,9 @@
 // What the viewer does with a press or a failed Load while a game plays (#69), in Chromium. Each
 // test reads the user's US Emerald by the build's rule and skips without it or without the
 // module. A double click on Start during a run starts the run over once, as its second click
-// plays nothing (#90), and leaves Start enabled. A Load that Showdown answers with 404 during a run says that the
-// game plays on, and the next pick's line leaves nothing of that failure. No request leaves the
-// page but the routed one.
+// plays nothing (#90), and leaves Start enabled. A Load that Showdown answers with 404 during a
+// run says that the game plays on, and the next pick's line leaves nothing of that failure. No
+// request leaves the page but the routed one.
 import { expect, type Page, test } from '@playwright/test'
 
 import { WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'

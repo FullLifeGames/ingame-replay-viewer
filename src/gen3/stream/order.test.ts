@@ -194,7 +194,8 @@ describe('checkOrder, the encoder and the decoder', () => {
     })
   }
 
-  // One case per test replay: the loop over all of them ran past 5 s under a second heavy run (#92).
+  // One case per test replay: the loop over all of them ran past 5 s under a second heavy run
+  // (#92).
   it.each(REPLAYS)("lets test replay $id's stream through", ({ log }) => {
     const { bytes } = buildGen3Stream(buildBattleScript(log))
     expect(() => {

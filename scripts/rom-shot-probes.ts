@@ -42,9 +42,9 @@ export const SCREEN = {
   healthboxBackground: 0xffffde,
   // The colour of the text box with no line in it, which the outro of an unknown end shows.
   // Measured on frames of the shot runs before #91 (step 91-1b): the message region shows this
-  // colour alone on 994176's intro frame of rom:shots, on the module's intro frames of hand-made and
-  // 994052, and on 422 of mGBA's frames of 994052 between two lines, from frame 120 to END; each
-  // frame with a line in the box has it as its most common colour.
+  // colour alone on 994176's intro frame of rom:shots, on the module's intro frames of hand-made
+  // and 994052, and on 422 of mGBA's frames of 994052 between two lines, from frame 120 to END;
+  // each frame with a line in the box has it as its most common colour.
   messageBackground: 0x6ba5a5,
   // The far healthbox is centred on (44, 30) (:846). Measured only, on the first-hp frames of the
   // hand-made run (B6a) and of 994052 (fix step): in row 33 a full bar fills x 52 to 99, 48 pixels
