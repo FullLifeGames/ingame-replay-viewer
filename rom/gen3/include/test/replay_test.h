@@ -119,6 +119,8 @@ void ReplayStream_FlushTextBox(void);
 void ReplayStream_FormChange(u32 side, u32 species);
 // Shows the side's mon again, as the game shows a hidden Fly user whose hit turn plays no move.
 void ReplayStream_ShowMon(u32 side);
+// The side's mon Terastallizes into teraType (TYPE_*).
+void ReplayStream_Tera(u32 side, u32 teraType);
 void ReplayStream_Weather(u32 weather);
 void ReplayStream_Volatile(u32 side, u32 volatileId, bool32 on);
 // show: TRUE shows the ability pop-up, FALSE hides it.

@@ -50,6 +50,7 @@ bool32 Replay_OpStat(const volatile u8 *operands, u32 step);
 bool32 Replay_OpItem(const volatile u8 *operands, u32 step);
 bool32 Replay_OpItemPopUp(const volatile u8 *operands, u32 step);
 bool32 Replay_OpFormChange(const volatile u8 *operands, u32 step);
+bool32 Replay_OpTera(const volatile u8 *operands, u32 step);
 
 // replay_anims.c
 bool32 Replay_OpAnim(const volatile u8 *operands, u32 step);

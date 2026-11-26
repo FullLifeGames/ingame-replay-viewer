@@ -91,6 +91,7 @@
 #define REPLAY_OP_FLUSH_TEXT_BOX 0x14 // no operands: empties the text box, as flushtextbox does
 #define REPLAY_OP_FORM_CHANGE    0x15 // side u8, species u16 (SPECIES_*, not SPECIES_NONE): the mon's form until it leaves the field
 #define REPLAY_OP_SHOW_MON       0x16 // side u8: shows the mon's sprite again, with no animation
+#define REPLAY_OP_TERA           0x17 // side u8, teraType u8 (TYPE_*, TYPE_NORMAL to NUMBER_OF_MON_TYPES - 1): the mon Terastallizes
 
 // The size byte of each op but PRINT.
 #define REPLAY_OP_END_SIZE            1
@@ -115,6 +116,7 @@
 #define REPLAY_OP_FLUSH_TEXT_BOX_SIZE 0
 #define REPLAY_OP_FORM_CHANGE_SIZE    3
 #define REPLAY_OP_SHOW_MON_SIZE       1
+#define REPLAY_OP_TERA_SIZE           2
 
 // PRINT's size byte: one glyph and EOS at least.
 #define REPLAY_PRINT_MIN_SIZE 2
@@ -192,9 +194,9 @@
 
 // The masks of the order rules, a bit per REPLAY_OP_* and REPLAY_ANIM_* number:
 // WITHDRAW, MOVE, HIT, HP, FAINT, STAT, ANIM, VOLATILE, ABILITY, ITEM_POP_UP, TRAP_TURN,
-// FORM_CHANGE and SHOW_MON, whose side operands name a side with a battler out, and the five
+// FORM_CHANGE, SHOW_MON and TERA, whose side operands name a side with a battler out, and the five
 // weather animations, which need none. replay_stream_check.c asserts each against the names.
-#define REPLAY_ORDER_ON_FIELD_OPS 0x6DB7A0
+#define REPLAY_ORDER_ON_FIELD_OPS 0xEDB7A0
 #define REPLAY_ORDER_FREE_ANIMS   0x400F0
 
 struct ReplayStreamHeader

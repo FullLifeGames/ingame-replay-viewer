@@ -94,7 +94,23 @@ describe('decodeStream', () => {
   })
 
   it('refuses an unknown op, the one after the last op of version 4', () => {
-    expect(patched([END], STREAM.tablesEnd, [0x17])).toThrow(/op 23/)
+    expect(patched([END], STREAM.tablesEnd, [0x18])).toThrow(/op 24/)
+  })
+
+  it('reads back a TERA and refuses a type outside TYPE_NORMAL to the last', () => {
+    const tera: Instruction = { op: 'tera', side: 'far', teraType: 19 }
+    expect(decodeStream(encodeStream(streamWithLeads([tera, END])))).toEqual(
+      streamWithLeads([tera, END]),
+    )
+    const count = counts.NUMBER_OF_MON_TYPES
+    const types: [Instruction, number, RegExp][] = [[tera, AFTER_LEADS + 3, /tera teraType/]]
+    for (const [instruction, at, message] of types) {
+      for (const type of [0, count]) {
+        expect(patched([...LEADS, instruction, END], at, [type])).toThrow(message)
+      }
+      const last = patched([...LEADS, instruction, END], at, [count - 1])()
+      expect(last.instructions[LEADS.length], instruction.op).toMatchObject({ op: instruction.op })
+    }
   })
 
   it('refuses a header whose sizes or offsets are not those of version 4', () => {

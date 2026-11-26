@@ -255,6 +255,12 @@ void ReplayStream_ShowMon(u32 side)
     ReplayStream_Op(REPLAY_OP_SHOW_MON, REPLAY_OP_SHOW_MON_SIZE, operands);
 }
 
+void ReplayStream_Tera(u32 side, u32 teraType)
+{
+    const u8 operands[REPLAY_OP_TERA_SIZE] = { side, teraType };
+    ReplayStream_Op(REPLAY_OP_TERA, REPLAY_OP_TERA_SIZE, operands);
+}
+
 const u8 *ReplayStream_Data(void)
 {
     return sStream;

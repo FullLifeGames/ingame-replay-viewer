@@ -206,6 +206,21 @@ describe('encodeInstruction', () => {
     expect(encodeInstruction({ op: 'showMon', side: 'far' })).toEqual([0x16, 1, 1])
   })
 
+  it('encodes TERA as the side and the Tera type', () => {
+    expect(encodeInstruction({ op: 'tera', side: 'far', teraType: 19 })).toEqual([0x17, 2, 1, 19])
+  })
+
+  it('takes the types TYPE_NORMAL to NUMBER_OF_MON_TYPES - 1 and refuses TYPE_NONE and the count', () => {
+    const last = counts.NUMBER_OF_MON_TYPES - 1
+    const tera = (teraType: number): Instruction => ({ op: 'tera', side: 'near', teraType })
+    for (const [make, size] of [[tera, 4]] as const) {
+      expect(encodeInstruction(make(1))).toHaveLength(size)
+      expect(encodeInstruction(make(last))).toHaveLength(size)
+      expect(() => encodeInstruction(make(0))).toThrow(Gen3Error)
+      expect(() => encodeInstruction(make(last + 1))).toThrow(Gen3Error)
+    }
+  })
+
   it('takes FORM_CHANGE species 1 to NUM_SPECIES - 1 and refuses 0 and NUM_SPECIES', () => {
     const change = (species: number): Instruction => ({ op: 'formChange', side: 'near', species })
     expect(encodeInstruction(change(1))).toHaveLength(5)

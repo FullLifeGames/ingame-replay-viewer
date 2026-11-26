@@ -98,6 +98,7 @@ export const OP = {
   flushTextBox: 0x14,
   formChange: 0x15,
   showMon: 0x16,
+  tera: 0x17,
 } as const
 
 export type Op = keyof typeof OP
@@ -126,6 +127,7 @@ export const OP_SIZE = {
   flushTextBox: 0,
   formChange: 3,
   showMon: 1,
+  tera: 2,
 } as const satisfies Record<Exclude<Op, 'print'>, number>
 
 /** PRINT's operand: its text in the game's charset and EOS, one glyph at least. */
@@ -192,7 +194,7 @@ export const ANIM = {
 /**
  * The masks of the order rules, as bits by OP and ANIM number: the ops whose side operands name a
  * side with a battler out (WITHDRAW, MOVE, HIT, HP, FAINT, STAT, ANIM, VOLATILE, ABILITY,
- * ITEM_POP_UP, TRAP_TURN, FORM_CHANGE, SHOW_MON), and the five weather anims that need none.
+ * ITEM_POP_UP, TRAP_TURN, FORM_CHANGE, SHOW_MON, TERA), and the five weather anims that need none.
  * order.test.ts holds each mask equal to the OR of those names.
  */
-export const ORDER = { onFieldOps: 0x6db7a0, freeAnims: 0x400f0 } as const
+export const ORDER = { onFieldOps: 0xedb7a0, freeAnims: 0x400f0 } as const

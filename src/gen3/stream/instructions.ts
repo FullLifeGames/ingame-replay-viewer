@@ -88,6 +88,8 @@ interface Operands {
    * user whose hit turn plays no move animation (the controller's sprite invisibility command).
    */
   showMon: OnSide
+  /** The side's mon Terastallizes into `teraType`, the game's `TYPE_*`, until the battle ends. */
+  tera: OnSide & { readonly teraType: number }
 }
 
 export type Instruction = { [K in Op]: { readonly op: K } & Operands[K] }[Op]
@@ -131,6 +133,9 @@ const below = (count: number, min = 0) => ({ bytes: 2, min, max: count - 1 }) as
 
 /** A species of the expansion; 0 is SPECIES_NONE, no mon. */
 const species = below(counts.NUM_SPECIES, 1)
+
+/** A type of the game; 0 is TYPE_NONE, no type. */
+const type = { bytes: 1, min: 1, max: counts.NUMBER_OF_MON_TYPES - 1 } as const
 
 /** The operands of each op but PRINT, in byte order. */
 export const LAYOUT: { readonly [K in FixedOp]: Fields<Operands[K]> } = {
@@ -210,6 +215,10 @@ export const LAYOUT: { readonly [K in FixedOp]: Fields<Operands[K]> } = {
     ['species', species],
   ],
   showMon: [['side', side]],
+  tera: [
+    ['side', side],
+    ['teraType', type],
+  ],
 }
 
 /** A trainer's fields; their offsets are TRAINER_OFFSET's under the same names. */
