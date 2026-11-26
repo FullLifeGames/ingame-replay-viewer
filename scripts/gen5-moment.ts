@@ -1,14 +1,16 @@
 // The S6 run of the Gen 5 spike (#72) and its run from the shipped save (#78): one battle moment
 // driven from outside. It starts the session as gen5-moment-args.ts says: from the spike's battle
 // state, or from boot with a save the page fetches from /saves/ and the continue route to the
-// trainer's action menu, or with --entry direct through our routine from boot (#97,
-// gen5-moment-direct.ts), each as one plan. Then it reads the player's adapter, the server and
+// trainer's action menu, or with --entry direct through our routine from boot, with a save or
+// none, the park writing the team of gen5-moment-team.ts (#97, gen5-moment-direct.ts), each as one
+// plan. A double's run ends after the readings at the action menu: the moment is a single's. Then it reads the player's adapter, the server and
 // both Pokémon from main RAM and plays the steps of gen5-moment-plan.ts from a fixed frame after
 // the mark battle: hold the server, answer the action menu and write one block per moment. It
 // writes a frame per mark under build/gen5/frames/ and the last mark's state under
 // build/gen5/states/ (gitignored, ADR 0002).
 // Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts [--scene known|unknown] [--save <name>]
-// [--entry walk|direct] [--player <name>] [--opponent <name>] [--minutes 15].
+// [--entry walk|direct] [--battle single|double] [--player <name>] [--opponent <name>]
+// [--minutes 15].
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -21,14 +23,20 @@ import { type BattleMonReading, findServers, frontMon } from '../src/gen5/battle
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import type { Gen5Global, MarkRecord, RunPlan, RunReport } from '../src/gen5/hook.ts'
 import { MAIN_RAM_SIZE, MAIN_RAM_START } from '../src/gen5/main-ram.ts'
+import { pkmFormat } from '../src/gen5/pkm-members.ts'
 import type { RamRef } from '../src/gen5/ram-check.ts'
 import type { RoutineBuild } from '../src/gen5/routine-order.ts'
-import { type MomentOptions, readMomentOptions, type StateFile } from './gen5-moment-args.ts'
+import {
+  type MomentOptions,
+  readMomentOptions,
+  startLine,
+  type StateFile,
+} from './gen5-moment-args.ts'
 import { sessionPlan } from './gen5-moment-direct.ts'
+import { teamParties } from './gen5-moment-team.ts'
 import { markLines, writeLines } from './gen5-moment-log.ts'
 import { MOMENT_GAP, momentStart, momentSteps } from './gen5-moment-plan.ts'
 import { listedReader } from './gen5-bw2-source.ts'
-import { readSaveSides } from './gen5-save-party.ts'
 import {
   moveLineLabel,
   sceneBlocks,
@@ -64,6 +72,14 @@ const hook = (page: Page) => ({
       ;(globalThis as unknown as Gen5Global).gen5.uncapped(true)
     }),
 })
+
+type Team = ReturnType<typeof teamParties>
+
+/** The session's options and the direct entry's team. */
+interface Session {
+  options: MomentOptions
+  team: Team | undefined
+}
 
 interface Battle {
   adapter: number
@@ -182,7 +198,8 @@ function readStateFile(base: string): StateFile {
 /** Picks the dump and plays the session's plan to where the moment starts. A run from boot is
  * queued before the pick, so it counts from the first frame; a run from a state once the game is
  * up. */
-async function startSession(page: Page, dump: string, numbers: Bw2Numbers, options: MomentOptions) {
+async function startSession(page: Page, dump: string, numbers: Bw2Numbers, session: Session) {
+  const { options, team } = session
   const { start, label, deadlineMs } = options
   const { plan, notes } = sessionPlan(options, {
     refs: battleRefs(numbers),
@@ -190,12 +207,11 @@ async function startSession(page: Page, dump: string, numbers: Bw2Numbers, optio
     entry: numbers.entry,
     readRoutine: () => JSON.parse(readFileSync(GEN5_PATHS.routineJson, 'utf8')) as RoutineBuild,
     readState: readStateFile,
-    readParties: (save) => readSaveSides(save, numbers.pkm),
+    parties: team?.parties,
   })
   for (const note of notes) log(`name cut: ${note}`)
   const fromBoot = start.from === 'boot'
-  const from = start.from === 'boot' ? `boot with the save ${start.save}` : `state ${start.state}`
-  log(`entry ${options.entry}: ${String(plan.steps.length)} steps from ${from}`)
+  log(`entry ${options.entry}: ${String(plan.steps.length)} steps from ${startLine(start)}`)
   for (const line of writeLines(plan.steps)) log(line)
   if (fromBoot) await hook(page).queueRun(plan)
   await page.setInputFiles('#dump', dump)
@@ -205,14 +221,27 @@ async function startSession(page: Page, dump: string, numbers: Bw2Numbers, optio
   return follow(page, label, deadlineMs)
 }
 
+/** The direct entry's team, its cut names logged; the walk writes none. */
+function sessionTeam(numbers: Bw2Numbers, options: MomentOptions): Team | undefined {
+  if (options.entry !== 'direct') return undefined
+  const team = teamParties(pkmFormat(numbers), options.names)
+  for (const note of team.notes) log(`team: ${note}`)
+  return team
+}
+
 async function play(page: Page, dump: string, numbers: Bw2Numbers, options: MomentOptions) {
   const { scene, label, deadlineMs } = options
-  const first = await startSession(page, dump, numbers, options)
+  const team = sessionTeam(numbers, options)
+  const first = await startSession(page, dump, numbers, { options, team })
   logReport(first)
   if (first.status !== 'done') return 1
   await hook(page).uncapped()
   const battle = await readBattle(page, numbers)
   log(`adapter ${hex(battle.adapter)}, server ${hex(battle.server)}`)
+  if (options.battle === 'double') {
+    log("double: the moment is a single's; the run ends at the action menu")
+    return 0
+  }
   const std = textId(bank('standard'), 'Bank0019_Text_ItsSuperEffective')
   const blocks = sceneBlocks(scene, battle, numbers.battle.single, std)
   for (const { name, moment } of blocks) {

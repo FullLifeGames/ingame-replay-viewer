@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { ActorPlace } from '../src/gen5/bw2-numbers'
 import { continueRoute } from '../src/gen5/continue-route'
 import type { RamCheck, RamRef } from '../src/gen5/ram-check'
-import { firstRun, readMomentOptions, type StateFile } from './gen5-moment-args'
+import { firstRun, readMomentOptions, startLine, type StateFile } from './gen5-moment-args'
 
 const NOW = 1_000_000
 
@@ -28,6 +28,7 @@ describe('readMomentOptions', () => {
       scene: 'known',
       start: { from: 'state', state: 's5-battle' },
       entry: 'walk',
+      battle: 'single',
       names: { player: 'Viewer', opponent: 'Showdown' },
       label: 's6-known',
       deadlineMs: NOW + 15 * 60_000,
@@ -40,6 +41,7 @@ describe('readMomentOptions', () => {
       scene: 'known',
       start: { from: 'boot', save: 'route-20', query: '?save=route-20' },
       entry: 'walk',
+      battle: 'single',
       names: { player: 'Viewer', opponent: 'Showdown' },
       label: 'route-20-known',
       deadlineMs: NOW + 15 * 60_000,
@@ -76,13 +78,47 @@ describe('readMomentOptions', () => {
     })
   })
 
-  it('refuses an entry it does not know, and the direct one with no save', () => {
+  // Scene: a run of the direct start needs no save (plan E-6, decision 4): the page boots with
+  // none, and the park writes both parties.
+  it('boots with no save for --entry direct alone, and labels the run nosave', () => {
+    const options = readMomentOptions(['--entry', 'direct'], NOW)
+    expect(options).toMatchObject({
+      start: { from: 'boot', query: '' },
+      entry: 'direct',
+      battle: 'single',
+      label: 'nosave-direct-known',
+    })
+    expect(options.start).not.toHaveProperty('save')
+  })
+
+  it('plays a double with --battle double, its label ending in -double', () => {
+    const args = ['--entry', 'direct', '--battle', 'double', '--scene', 'unknown']
+    expect(readMomentOptions(args, NOW)).toMatchObject({
+      battle: 'double',
+      label: 'nosave-direct-unknown-double',
+    })
+    const saved = readMomentOptions([...args, '--save', 'route-20'], NOW)
+    expect(saved).toMatchObject({ battle: 'double', label: 'route-20-direct-unknown-double' })
+  })
+
+  it('refuses an entry it does not know, a style it does not know and --battle for the walk', () => {
     expect(() => readMomentOptions(['--entry', 'fly', '--save', 'route-20'], NOW)).toThrow(
       '--entry takes walk or direct, not "fly".',
     )
-    expect(() => readMomentOptions(['--entry', 'direct'], NOW)).toThrow(
-      "--entry direct needs --save: the first run copies the save's first Pokémon.",
+    expect(() => readMomentOptions(['--entry', 'direct', '--battle', 'triple'], NOW)).toThrow(
+      '--battle takes single or double, not "triple".',
     )
+    const walk =
+      "--battle is for --entry direct alone: the walk meets the save's trainer in a single."
+    expect(() => readMomentOptions(['--save', 'route-20', '--battle', 'double'], NOW)).toThrow(walk)
+    expect(() => readMomentOptions(['--battle', 'single'], NOW)).toThrow(walk)
+  })
+
+  it('says where the session starts', () => {
+    const line = (args: string[]) => startLine(readMomentOptions(args, NOW).start)
+    expect(line([])).toBe('state s5-battle')
+    expect(line(['--save', 'route-20'])).toBe('boot with the save route-20')
+    expect(line(['--entry', 'direct'])).toBe('boot with no save')
   })
 
   it('refuses an option it does not know', () => {

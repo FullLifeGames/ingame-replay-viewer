@@ -24,17 +24,10 @@ const noState = () => {
 const noRoutine = () => {
   throw new Error('the walk reads no routine')
 }
-const noParties = () => {
-  throw new Error('the walk reads no parties')
-}
-/** An invented sealed Pokémon of the fixture's PartyPkm size, for each side. */
+/** Invented sealed Pokémon of the fixture's PartyPkm size: two for the player, one opponent. */
 const PKM = new Uint8Array(0x60).fill(5)
-const saves: string[] = []
-const readParties = (save: string) => {
-  saves.push(save)
-  return { player: [PKM], opponent: [PKM] }
-}
-const input = { refs: REFS, trainer: TRAINER, entry: ENTRY, readState: noState, readParties }
+const parties = { player: [PKM, PKM], opponent: [PKM] }
+const input = { refs: REFS, trainer: TRAINER, entry: ENTRY, readState: noState, parties }
 const lastMark = (steps: readonly MacroStep[]) =>
   steps.flatMap((step) => (step.kind === 'mark' ? [step.name] : [])).at(-1)
 
@@ -45,24 +38,26 @@ describe('sessionPlan', () => {
     const { plan, notes } = sessionPlan(options, {
       ...input,
       readRoutine: noRoutine,
-      readParties: noParties,
+      parties: undefined,
     })
     expect(plan).toEqual(firstRun(options.start, REFS, TRAINER, noState))
     expect(notes).toEqual([])
   })
 
   it('plays the direct entry as one plan, from power-on through the park to the action menu', () => {
-    const options = readMomentOptions(['--entry', 'direct', '--save', 'route-20'], NOW)
+    const options = readMomentOptions(['--entry', 'direct'], NOW)
     const { plan } = sessionPlan(options, { ...input, readRoutine: () => ROUTINE })
     expect(plan.steps[0]).toMatchObject({ kind: 'until', name: 'takeover-window' })
     expect(lastMark(plan.steps)).toBe('battle')
     expect(plan.state).toBeUndefined()
     expect(plan.stateMarks).toEqual([])
-    expect(saves.at(-1)).toBe('route-20')
     const park = plan.steps.find((step) => step.kind === 'write' && step.name === 'park')
     const fields = park?.kind === 'write' ? park.writes.map((write) => write.field) : []
-    expect(fields).toContain('player.party.pkms[0]')
-    expect(fields).toContain('opponent.party.pkms[0]')
+    expect(fields.filter((field) => field.includes('.party.pkms['))).toEqual([
+      'player.party.pkms[0]',
+      'player.party.pkms[1]',
+      'opponent.party.pkms[0]',
+    ])
     expect(fields).toContain('battleStyle')
     expect(plan.watch.map((ref) => ref.name)).toEqual([
       'manager.queued',
@@ -75,17 +70,33 @@ describe('sessionPlan', () => {
     ])
   })
 
-  it('refuses the direct entry from a state, which holds no save to read the parties from', () => {
-    const options = readMomentOptions(['--entry', 'direct', '--save', 'route-20'], NOW)
+  // Scene: a double (plan E-6, decision 5) writes its style at the park and reads it back.
+  it('writes the double style at the park and reads it back before the go', () => {
+    const options = readMomentOptions(['--entry', 'direct', '--battle', 'double'], NOW)
+    const { plan } = sessionPlan(options, { ...input, readRoutine: () => ROUTINE })
+    const park = plan.steps.find((step) => step.kind === 'write' && step.name === 'park')
+    const style =
+      park?.kind === 'write' ? park.writes.find((w) => w.field === 'battleStyle') : undefined
+    expect(style).toMatchObject({ kind: 'bytes', bytes: [6, 0, 0, 0] })
+    const written = plan.steps.find((step) => step.kind === 'until' && step.name === 'park-written')
+    const check =
+      written?.kind === 'until' ? written.checks.find((c) => c.name === 'battleStyle') : undefined
+    expect(check?.oneOf).toEqual([ENTRY.constants.BTL_STYLE_DOUBLE])
+  })
+
+  it('refuses the direct entry from a state, and with no parties to write', () => {
+    const options = readMomentOptions(['--entry', 'direct'], NOW)
     const fromState = { ...options, start: { from: 'state' as const, state: 's5-battle' } }
     expect(() => sessionPlan(fromState, { ...input, readRoutine: () => ROUTINE })).toThrow(
-      'the direct entry starts from boot with a save',
+      'the direct entry starts from boot',
     )
+    const none = { ...input, readRoutine: () => ROUTINE, parties: undefined }
+    expect(() => sessionPlan(options, none)).toThrow('the direct entry needs both parties')
   })
 
   it('gives the cut of a name for the log', () => {
     const names = ['--player', 'Ann', '--opponent', 'Bartholomew']
-    const args = ['--entry', 'direct', '--save', 'route-20', ...names]
+    const args = ['--entry', 'direct', ...names]
     const { notes } = sessionPlan(readMomentOptions(args, NOW), {
       ...input,
       readRoutine: () => ROUTINE,
