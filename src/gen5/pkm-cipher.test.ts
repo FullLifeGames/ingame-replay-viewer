@@ -176,6 +176,21 @@ describe('openPkm', () => {
     expect([...opened.plain]).toEqual([...plain])
   })
 
+  // Scene: the team's PIDs reach few rows of the table, so every row must give its bytes back.
+  it('gives the plain bytes back under a PID of every row of the table', () => {
+    const { mask, shift } = PKM.selector
+    const back = PKM.blockOffsets.map((_, row) => {
+      const pid = ((row << shift) | 0x0005_0001) >>> 0
+      const plain = plainUnder(pid)
+      const opened = openPkm(sealPkm(plain, PKM), PKM)
+      const sum = halfwordSum(plain.subarray(CONTENT, CONTENT_END))
+      new DataView(plain.buffer).setUint16(CHECKSUM, sum, true)
+      const picked = (pid & mask) >>> shift === row
+      return picked && opened.checksumRight && [...opened.plain].join() === [...plain].join()
+    })
+    expect(back).toEqual([true, true, true, true])
+  })
+
   it('says the checksum is wrong when one byte of the box part flips', () => {
     const sealed = sealPkm(plainUnder(ROW_0), PKM)
     sealed[CONTENT + 5] = (sealed[CONTENT + 5] ?? 0) ^ 0x10

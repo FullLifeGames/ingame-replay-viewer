@@ -10,7 +10,7 @@ import { isDeepStrictEqual } from 'node:util'
 import { describe, expect, it } from 'vitest'
 
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
-import { openPkm, pkmConstant, pkmLayout, sealPkm } from '../src/gen5/pkm-cipher.ts'
+import { openPkm, pkmConstant, pkmField, pkmLayout, sealPkm } from '../src/gen5/pkm-cipher.ts'
 import { plainPkm, type ReadPkm, readPkm } from '../src/gen5/pkm-fields.ts'
 import { pkmFormat } from '../src/gen5/pkm-members.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
@@ -68,6 +68,25 @@ describe.skipIf(!existsSync(FILE))(
         sameBytes(sealPkm(opened.plain, pkm), sealed),
         'sealed again as the save holds it',
       ).toBe(true)
+    })
+
+    // Scene: the save's one PID reaches one row of the table; the encoder writes under any row.
+    it('seals and opens the first Pokémon back under a PID of every row of the table', () => {
+      const { pkm } = real()
+      const { plain } = openPkm(firstPkm(real()), pkm)
+      const at = pkmField(pkm, 'PartyPkm', 'base.pid').offset
+      const pid = new DataView(plain.buffer, plain.byteOffset).getUint32(at, true)
+      const { mask, shift } = pkm.selector
+      const back = pkm.blockOffsets.map((_, row) => {
+        const moved = Uint8Array.from(plain)
+        const under = ((pid & ~mask) | (row << shift)) >>> 0
+        new DataView(moved.buffer).setUint32(at, under, true)
+        const opened = openPkm(sealPkm(moved, pkm), pkm)
+        const picked = (under & mask) >>> shift === row
+        return picked && opened.checksumRight && sameBytes(opened.plain, moved)
+      })
+      expect(back.length > 1, 'a table of more than one row').toBe(true)
+      expect(back.every(Boolean), 'every row gives the plain bytes back').toBe(true)
     })
 
     it('reads its fields by name', () => {

@@ -68,6 +68,19 @@ describe('entryNumbers', () => {
     expect(entryNumbers(INPUT).setupIndices).toEqual({ player: 3, opponent: 2 })
   })
 
+  // Scene: the park writes through each side's element; one past an array writes another member.
+  it("refuses a side's index that lies outside one of the setup's per-client arrays", () => {
+    const short = (array: string, to: string) => ({
+      ...INPUT,
+      setupH: INPUT.setupH.replace(`*${array}[5]`, `*${array}[${to}]`),
+    })
+    expect(() => entryNumbers(short('party', '3'))).toThrow(/BtlSetup party.*the player's/)
+    expect(() => entryNumbers(short('trainers', '2'))).toThrow(
+      /BtlSetup trainers.*the player's, the opponent's/,
+    )
+    expect(() => entryNumbers(short('playerInfo', '4'))).not.toThrow()
+  })
+
   it('lays out the structs the page writes, nested and 64-bit members as the compiler does', () => {
     const { layouts } = entryNumbers(INPUT)
     expect(Object.keys(layouts)).toEqual([

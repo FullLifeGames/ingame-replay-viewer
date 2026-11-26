@@ -8,8 +8,10 @@ import type {
   Bw2Symbol,
   EntryFunction,
   EntryNumbers,
+  Sides,
   StructLayout,
 } from '../src/gen5/bw2-numbers.ts'
+import { type SetupSide, WORD } from '../src/gen5/setup-chain.ts'
 import { defineValue, enumAround, parseSymbols, pickSymbols } from './gen5-bw2-c.ts'
 import { setupIndices } from './gen5-bw2-clients.ts'
 import {
@@ -227,8 +229,28 @@ function entryLayouts(input: EntryInput): Record<string, StructLayout> {
   )
 }
 
-/** Everything the direct entry needs, checked: the battle overlay meets no boot overlay, and
- * GameInit loads exactly the boot overlays whose link files were read. */
+/** The setup's per-client pointer arrays, which the park writes at each side's index. */
+const SETUP_ARRAYS = ['party', 'playerInfo', 'trainers']
+
+/** Each side's setup index, checked: every per-client array holds an element at it. */
+function insideSetup(layouts: Record<string, StructLayout>, sides: Sides): Sides {
+  for (const array of SETUP_ARRAYS) {
+    const size = layouts.BtlSetup?.fields[array]?.size ?? 0
+    const outside = (Object.keys(sides) as SetupSide[]).filter(
+      (side) =>
+        !Number.isInteger(sides[side]) || sides[side] < 0 || (sides[side] + 1) * WORD > size,
+    )
+    if (outside.length > 0) {
+      const roles = outside.map((side) => `the ${side}'s`).join(', ')
+      throw new Error(`BtlSetup ${array} ends before ${roles} element`)
+    }
+  }
+  return sides
+}
+
+/** Everything the direct entry needs, checked: the battle overlay meets no boot overlay, GameInit
+ * loads exactly the boot overlays whose link files were read, and each side's setup index lies
+ * inside the setup's arrays. */
 export function entryNumbers(input: EntryInput): EntryNumbers {
   const arm9 = parseSymbols(input.arm9Symbols, 'arm9')
   checkBootOverlays(gameInitOverlays(input.gameMainC), Object.keys(input.bootLinks))
@@ -237,15 +259,16 @@ export function entryNumbers(input: EntryInput): EntryNumbers {
   )
   const battleOverlay = linkSpan(input.battleLink, input.battleOverlay)
   checkApart(input.battleOverlay, battleOverlay, bootOverlays)
+  const layouts = entryLayouts(input)
   return {
     functions: entryFunctions(arm9),
     data: entryData(input, arm9),
     constants: entryConstants(input),
-    layouts: entryLayouts(input),
+    layouts,
     bufferSizes: Object.fromEntries(
       BUFFER_MAKERS.map((name) => [name, bufferSize(input.setupC, name)]),
     ),
-    setupIndices: setupIndices(input.setupC),
+    setupIndices: insideSetup(layouts, setupIndices(input.setupC)),
     battleOverlay,
     bootOverlays,
   }

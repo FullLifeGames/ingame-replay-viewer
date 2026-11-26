@@ -74,6 +74,25 @@ describe('singleClients', () => {
     expect(main('AloneSingle', 'AloneTriple')).toThrow(/BtlMain_SetupAloneSingle/)
   })
 
+  // Scene: a setup whose clients the reader cannot tell apart must stop the generator.
+  it('refuses a third live create, a create without its isAI, and an isAI written as a name', () => {
+    const main = (from: string, to: string) => () => singleClients(swap(MAIN_C, from, to), CLIENT_H)
+    const third =
+      'mainModule->clients[1] = BattleClient_Create(mainModule, 0, &mainModule->pokeCons[1], 1, 0, h);'
+    expect(main('    return TRUE;', `    ${third}\n    return TRUE;`)).toThrow(
+      /2 clients as the player's/,
+    )
+    expect(
+      main('BattleClient_Create(mainModule, 5', 'BattleClient_Create(mainModule, TRUE'),
+    ).toThrow(/isAI is "TRUE"/)
+    const lastAI = swap(
+      swap(CLIENT_H, 'u8 isAI,', 'u8 mode,'),
+      'HeapID heapId);',
+      'HeapID heapId, u8 isAI);',
+    )
+    expect(() => singleClients(MAIN_C, lastAI)).toThrow(/isAI is "undefined"/)
+  })
+
   it('refuses a prototype without the parameters it reads', () => {
     const client = (from: string, to: string) => () =>
       singleClients(MAIN_C, swap(CLIENT_H, from, to))
@@ -91,21 +110,26 @@ describe('setupIndices', () => {
     expect(setupIndices(SETUP_C)).toEqual({ player: 2, opponent: 3 })
   })
 
-  it('refuses a trainer loaded twice, at another party, or at the player', () => {
+  it('refuses a trainer loaded twice, at another party, at the player, or at a named client', () => {
     const setup = (from: string, to: string) => () => setupIndices(swap(SETUP_C, from, to))
     const load = 'BtlSetup_LoadTrainer(setup, &setup->party[3], trainerId, 3, heapId);'
     expect(setup(load, `${load}\n${load}`)).toThrow(/2 times, not once/)
     expect(setup('&setup->party[3]', '&setup->party[1]')).toThrow(/outside its client's/)
     expect(setup('&setup->party[3]', 'setup->party')).toThrow(/party is "undefined"/)
     expect(setup('party[3], trainerId, 3,', 'party[2], trainerId, 2,')).toThrow(/player's element/)
+    expect(setup('trainerId, 3, heapId', 'trainerId, OPPONENT, heapId')).toThrow(
+      /client is "OPPONENT"/,
+    )
   })
 
-  it("refuses a player's party or info set twice or apart", () => {
+  it("refuses a player's party or info set twice or apart, and the info never set", () => {
     const setup = (from: string, to: string) => () => setupIndices(swap(SETUP_C, from, to))
     expect(setup('PokeParty_Copy(', 'setup->party[2] = Other(); PokeParty_Copy(')).toThrow(
       /the player's party 2 times/,
     )
     expect(setup('playerInfo[2] = Get', 'playerInfo[1] = Get')).toThrow(/player's info outside/)
+    const info = 'setup->playerInfo[2] = GetGameDataPlayerInfo(gameData);'
+    expect(setup(info, '')).toThrow(/the player's info 0 times/)
   })
 })
 
@@ -118,5 +142,14 @@ describe('checkPlayerClient', () => {
     expect(() => {
       checkPlayerClient({ player: 0, opponent: 2 }, SETUP_C)
     }).toThrow(/playerClientId is not the client/)
+  })
+
+  it('throws when the setup sets playerClientId never or twice', () => {
+    const named = 'setup->fieldSituation.playerClientId = 2;'
+    const check = (setupC: string) => () => {
+      checkPlayerClient({ player: 2, opponent: 0 }, setupC)
+    }
+    expect(check(swap(SETUP_C, named, ''))).toThrow(/playerClientId 0 times/)
+    expect(check(swap(SETUP_C, named, `${named}\n    ${named}`))).toThrow(/playerClientId 2 times/)
   })
 })
