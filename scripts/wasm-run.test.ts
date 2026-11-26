@@ -1,8 +1,14 @@
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
+
 import { describe, expect, it } from 'vitest'
 
 import { checkShots, SCREEN } from './rom-shot-probes.ts'
 import type { ProgressLayout } from './rom-shot-run.ts'
 import type { Scene } from './rom-shot-scenes.ts'
+import type { ShotPlan } from './rom-shot.ts'
 import { frameLines } from './wasm-hashes.ts'
 import {
   AUDIO_SAMPLES,
@@ -12,7 +18,8 @@ import {
   playing,
   SLOT_LAYOUT,
 } from './wasm-run-fake.ts'
-import { playCommand, playModule, runPlace, STALL_FRAMES } from './wasm-run.ts'
+import { finishStreams, playStreams } from './wasm-run-report.ts'
+import { playCommand, playModule, runPlace, runStream, STALL_FRAMES } from './wasm-run.ts'
 
 // The class of a WebAssembly trap, by its name.
 class RuntimeError extends Error {
@@ -201,6 +208,63 @@ describe('the run of one stream', () => {
       '--play',
       '/repo/build/wasm/run/hand-made',
     ])
+  })
+})
+
+// A module of one function, trap, whose body is WebAssembly's unreachable.
+const TRAP_WASM = [
+  0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x04, 0x01, 0x60, 0x00, 0x00, 0x03, 0x02,
+  0x01, 0x00, 0x07, 0x08, 0x01, 0x04, 0x74, 0x72, 0x61, 0x70, 0x00, 0x00, 0x0a, 0x05, 0x01, 0x03,
+  0x00, 0x00, 0x0b,
+]
+
+/** A factory module for --play: the fake, which calls the real trap on frame `frame`. */
+function writeTrapModule(dir: string, frame: number): string {
+  const path = join(dir, 'trap-module.mjs')
+  const fake = pathToFileURL(join(import.meta.dirname, 'wasm-run-fake.ts')).href
+  writeFileSync(
+    path,
+    `import { fakeModule, playing } from '${fake}'
+const bytes = Uint8Array.from(${JSON.stringify(TRAP_WASM)})
+const { trap } = new WebAssembly.Instance(new WebAssembly.Module(bytes)).exports
+const script = (frame) => {
+  if (frame === ${String(frame)}) trap()
+  return { progress: playing(1), colour: 0 }
+}
+export default (hooks) => fakeModule(script).factory(hooks)
+`,
+  )
+  return path
+}
+
+// The live trap starts timeout and a plain Node process that loads the runner: 1 to 3 s alone,
+// so the limit leaves room for a loaded machine (#92).
+const LIVE_TRAP_LIMIT = 20_000
+
+describe('a trap of the module in its own process', { timeout: LIVE_TRAP_LIMIT }, () => {
+  it('reaches the report through timeout and node --play, with the trap and its frame', async () => {
+    const runDir = mkdtempSync(join(tmpdir(), 'irv-trap-'))
+    try {
+      const module = writeTrapModule(runDir, 5)
+      const plan: ShotPlan = {
+        name: 'trap',
+        stream: undefined,
+        scenes: [],
+        missing: [],
+        expect: 'finished',
+        ops: [],
+      }
+      const run = { runDir, module, errors: [], baseline: { mode: 'plain' as const, out: runDir } }
+      const reports = await playStreams([plan], (one) => Promise.resolve(runStream(one, run)))
+      expect(reports[0]?.failure).toEqual({ message: 'RuntimeError: unreachable', frame: 4 })
+      const lines: string[] = []
+      finishStreams(reports, runDir, (line) => lines.push(line))
+      expect(lines[0]).toMatch(
+        /^trap: FAILED, the module trapped after 4 frames: RuntimeError: unreachable, [\d.]+ s$/,
+      )
+    } finally {
+      rmSync(runDir, { recursive: true, force: true })
+    }
   })
 })
 
