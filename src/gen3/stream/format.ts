@@ -1,4 +1,4 @@
-// The instruction stream, version 3 (plan §2): the numbers both sides of the seam share. The C
+// The instruction stream, version 4 (plan §2): the numbers both sides of the seam share. The C
 // side is rom/gen3/include/replay_stream.h; format.test.ts holds the two equal, name by name
 // (`OP.sendOut` is REPLAY_OP_SEND_OUT). The stream is little-endian; it starts with its version.
 //
@@ -18,7 +18,7 @@ import type { Side } from '../../script/types'
 
 /** The stream header's values and where the team tables and the instructions start. */
 export const STREAM = {
-  version: 3,
+  version: 4,
   headerSize: 0x10,
   sideCount: 2,
   partySize: 6,

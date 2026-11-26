@@ -1,7 +1,7 @@
 #ifndef GUARD_REPLAY_STREAM_H
 #define GUARD_REPLAY_STREAM_H
 
-// The instruction stream, version 3: the Gen 3 game backend writes it into the replay slot's
+// The instruction stream, version 4: the Gen 3 game backend writes it into the replay slot's
 // stream (replay_slot.h) and the ROM interpreter plays it. src/gen3/stream/format.ts holds the same
 // numbers; its spec checks that both files define the same REPLAY_* names with the same values.
 // Keep each value a plain number.
@@ -21,7 +21,7 @@
 // 5. Every other op is free: PRINT, TURN, WEATHER, END, FLUSH_TEXT_BOX, and STATUS and ITEM,
 //    which name a party slot (Heal Bell reaches the whole party).
 
-#define REPLAY_STREAM_VERSION        3
+#define REPLAY_STREAM_VERSION        4
 #define REPLAY_STREAM_HEADER_SIZE    0x10
 #define REPLAY_STREAM_SIDE_COUNT     2
 #define REPLAY_STREAM_PARTY_SIZE     6

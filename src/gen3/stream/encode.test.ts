@@ -21,9 +21,9 @@ const u16 = (bytes: Uint8Array, at: number) => (bytes[at] ?? 0) | ((bytes[at + 1
 const u32 = (bytes: Uint8Array, at: number) => u16(bytes, at) + u16(bytes, at + 2) * 0x10000
 
 describe('encodeStream', () => {
-  it('starts a stream of END alone with version 3 and header size 16 (F1)', () => {
+  it('starts a stream of END alone with version 4 and header size 16 (F1)', () => {
     const bytes = encodeStream(streamOf([END]))
-    expect([...bytes.subarray(0, 4)]).toEqual([0x03, 0x00, 0x10, 0x00])
+    expect([...bytes.subarray(0, 4)]).toEqual([0x04, 0x00, 0x10, 0x00])
     expect([bytes[4], bytes[5], u16(bytes, 6)]).toEqual([24, 24, 0])
     expect([u32(bytes, 8), u32(bytes, 12)]).toEqual([STREAM.tablesEnd, 3])
     expect([...bytes.subarray(STREAM.tablesEnd)]).toEqual([0x00, 0x01, 0x00])
