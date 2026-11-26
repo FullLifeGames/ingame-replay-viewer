@@ -19,11 +19,13 @@ import {
   ROUTINE_STAGES,
 } from './routine-order.ts'
 
-/** Frames from power-on to the boot proc's first queue: the save's read lies in them. */
-const WINDOW_LIMIT = 1200
+/** Frames from power-on to the boot proc's first queue: the save's read lies in them. E-5's runs
+ * measured frame 216. */
+const WINDOW_LIMIT = 450
 
-/** Frames from the takeover to the park: the switch, then our init in the next update or so. */
-const PARK_LIMIT = 300
+/** Frames from the takeover to the park: the switch, then our init in the next update or so. E-5's
+ * runs measured 29. */
+const PARK_LIMIT = 90
 
 const WORD = 4
 

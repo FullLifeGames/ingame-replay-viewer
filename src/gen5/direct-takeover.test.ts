@@ -119,6 +119,15 @@ describe('takeover', () => {
     expect(checksOf('park-region')).toEqual(region)
   })
 
+  // E-5's two runs measured the window at frame 216 from power-on and the park 29 frames after the
+  // takeover; the limits leave about twice and three times that.
+  it('waits for the window and the park within limits fitted to the measured frames', () => {
+    const limitOf = (name: string) =>
+      steps.find((step) => step.kind === 'until' && step.name === name)
+    expect(limitOf('takeover-window')).toMatchObject({ limit: 450 })
+    expect(limitOf('routine-stage')).toMatchObject({ limit: 90 })
+  })
+
   it('checks a code tail short of a word byte by byte', () => {
     const odd = { ...ROUTINE, bytes: [...ROUTINE.bytes, 0x5a], size: 0x25 }
     const region = takeover(ENTRY, odd).steps[2]

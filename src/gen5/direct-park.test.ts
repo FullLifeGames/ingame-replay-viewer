@@ -94,6 +94,14 @@ describe('park', () => {
     expect(named(steps, 'action')).toMatchObject({ kind: 'until', markEvery: 30 })
   })
 
+  // E-5's two runs measured gone 11 frames after the go, the adapter 27 after gone and the action
+  // menu 652 after the adapter; the limits leave room, the most for the opening of a double.
+  it('waits for gone, the adapter and the action menu within limits fitted to the runs', () => {
+    expect(named(steps, 'gone')).toMatchObject({ limit: 30 })
+    expect(named(steps, 'battle-start')).toMatchObject({ limit: 120 })
+    expect(named(steps, 'action')).toMatchObject({ limit: 1000 })
+  })
+
   it('writes nothing after the wait for gone', () => {
     const gone = steps.findIndex((step) => step.kind === 'until' && step.name === 'gone')
     expect(steps.slice(gone).filter((step) => step.kind === 'write')).toEqual([])

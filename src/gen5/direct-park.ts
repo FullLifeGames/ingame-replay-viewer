@@ -35,12 +35,13 @@ const OPPONENT = 1
 
 const WORD = 4
 
-/** Frames from the go to gone: the routine's main runs in the next update. */
-const GONE_LIMIT = 60
+/** Frames from the go to gone: the routine's main runs in the next update. E-5's runs measured 11. */
+const GONE_LIMIT = 30
 
 /** Frames from gone to the battle's adapter (the battle overlay's load and the battle proc's
- * init), and from there through the opening to the action menu: no run has measured them. */
-const LIMITS: EntryLimits = { start: 900, battle: 900 }
+ * init), and from there through the opening to the action menu. E-5's runs of a single measured
+ * 27 and 652; a double's opening sends out two a side. */
+const LIMITS: EntryLimits = { start: 120, battle: 1000 }
 
 /** A on a quick beat through the opening, with a frame every 30 frames on the way to the adapter
  * and through the opening, whose intro shows the written names. */
