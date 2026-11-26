@@ -25,6 +25,14 @@ export function mechanicGap(effect: string, phase: string): MechanicFallback {
   return { kind: 'mechanic', detail: `no state in the stream for ${effect} ${phase}` }
 }
 
+/**
+ * A look of `move` that the log names (`[anim] Ivy Cudgel Water`) and the game lacks: the MOVE op
+ * carries the move alone, so the game plays the move's own animation.
+ */
+export function animGap(look: string, move: string): NonNullable<Found['fallback']> {
+  return { kind: 'move', detail: `the game has no look for ${look}; it plays ${move}` }
+}
+
 export interface Fallback {
   readonly line: number
   readonly kind: Noted['kind']

@@ -126,6 +126,8 @@ interface MoveEvent {
   readonly target?: PokemonRef
   /** The move or effect that called this one, such as Sleep Talk (`[from]`). */
   readonly calledBy?: Effect
+  /** The look the log names for the move's animation (`[anim]`): a move, or a look of its own. */
+  readonly anim?: string
   readonly miss?: true
   /** No animation (`[still]`). */
   readonly still?: true
