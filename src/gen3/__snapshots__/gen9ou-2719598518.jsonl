@@ -1,0 +1,512 @@
+{"length":7590,"crc32":"c2829e40","trainers":{"near":{"name":"hat_fm","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"Snurke","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":889,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zamazenta"},{"species":491,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Darkrai"},{"species":594,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Alomomola"},{"species":815,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Cinderace"},{"species":962,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ninetales"},{"species":1294,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Skeledirge"}],"far":[{"species":1376,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Great Tusk"},{"species":1393,"maxHp":100,"level":100,"gender":"none","shiny":true,"nickname":"Luka Magic"},{"species":1412,"maxHp":100,"level":100,"gender":"none","shiny":true,"nickname":"Sinistcha"},{"species":730,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Primarina"},{"species":1371,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Clodsire"},{"species":663,"maxHp":100,"level":100,"gender":"female","shiny":true,"nickname":"Talonflame"}]}}
+{"line":39,"op":"intro"}
+{"line":39,"op":"print","text":"You are challenged by Snurke!"}
+{"line":41,"op":"print","text":"Snurke sent out Talonflame!"}
+{"line":41,"op":"sendOut","side":"far","slot":5,"hp":100,"status":"none"}
+{"line":40,"op":"print","text":"Go! Darkrai!"}
+{"line":40,"op":"sendOut","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":42,"op":"turn","number":1}
+{"line":45,"op":"print","text":"Darkrai used Dark Pulse!"}
+{"line":45,"op":"move","user":"near","target":"far","move":399,"animTurn":0}
+{"line":46,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":46,"op":"hp","side":"far","hp":39}
+{"line":47,"op":"print","text":"The opposing Talonflame used U-turn!"}
+{"line":47,"op":"move","user":"far","target":"near","move":369,"animTurn":0}
+{"line":50,"op":"hit","side":"near","effectiveness":"super"}
+{"line":50,"op":"hp","side":"near","hp":44}
+{"line":50,"op":"print","text":"A critical hit!"}
+{"line":50,"op":"print","text":"It's super effective!"}
+{"line":53,"op":"withdraw","side":"far"}
+{"line":53,"op":"print","text":"Snurke sent out Primarina!"}
+{"line":53,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":56,"op":"turn","number":2}
+{"line":59,"op":"print","text":"Darkrai, come back!"}
+{"line":59,"op":"withdraw","side":"near"}
+{"line":59,"op":"print","text":"Go! Ninetales!"}
+{"line":59,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":60,"op":"ability","side":"near","ability":117,"show":true}
+{"line":60,"op":"weather","weather":"none"}
+{"line":60,"op":"print","text":"It started to snow!"}
+{"line":60,"op":"ability","side":"near","ability":117,"show":false}
+{"line":61,"op":"print","text":"The opposing Primarina used Moonblast!"}
+{"line":61,"op":"move","user":"far","target":"near","move":585,"animTurn":0}
+{"line":62,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":62,"op":"hp","side":"near","hp":26}
+{"line":64,"op":"print","text":"Snow continues to fall."}
+{"line":66,"op":"turn","number":3}
+{"line":69,"op":"print","text":"Ninetales used Aurora Veil!"}
+{"line":69,"op":"move","user":"near","target":"near","move":657,"animTurn":0}
+{"line":70,"op":"print","text":"Aurora Veil made your side stronger against physical and special moves!"}
+{"line":71,"op":"print","text":"The opposing Primarina used Moonblast!"}
+{"line":71,"op":"move","user":"far","target":"near","move":585,"animTurn":0}
+{"line":72,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":72,"op":"hp","side":"near","hp":0}
+{"line":73,"op":"faint","side":"near"}
+{"line":73,"op":"print","text":"Ninetales fainted!"}
+{"line":75,"op":"print","text":"Snow continues to fall."}
+{"line":79,"op":"print","text":"Go! Darkrai!"}
+{"line":79,"op":"switchIn","side":"near","slot":1,"hp":44,"status":"none"}
+{"line":80,"op":"turn","number":4}
+{"line":83,"op":"print","text":"Snurke withdrew Primarina!"}
+{"line":83,"op":"withdraw","side":"far"}
+{"line":83,"op":"print","text":"Snurke sent out Clodsire!"}
+{"line":83,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":84,"op":"print","text":"Darkrai used Trick!"}
+{"line":84,"op":"move","user":"near","target":"far","move":271,"animTurn":0}
+{"line":85,"op":"print","text":"Darkrai switched items with its target!"}
+{"line":86,"op":"item","side":"far","slot":4,"item":444}
+{"line":86,"op":"print","text":"The opposing Clodsire obtained Choice Scarf."}
+{"line":87,"op":"item","side":"near","slot":1,"item":472}
+{"line":87,"op":"print","text":"Darkrai obtained Leftovers."}
+{"line":89,"op":"print","text":"Snow continues to fall."}
+{"line":90,"op":"itemPopUp","side":"near","item":472}
+{"line":90,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":90,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":90,"op":"hp","side":"near","hp":50}
+{"line":92,"op":"turn","number":5}
+{"line":95,"op":"print","text":"Darkrai used Ice Beam!"}
+{"line":95,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
+{"line":97,"op":"hit","side":"far","effectiveness":"super"}
+{"line":97,"op":"hp","side":"far","hp":60}
+{"line":97,"op":"print","text":"It's super effective!"}
+{"line":98,"op":"print","text":"The opposing Clodsire used Poison Jab!"}
+{"line":98,"op":"move","user":"far","target":"near","move":398,"animTurn":0}
+{"line":99,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":99,"op":"hp","side":"near","hp":37}
+{"line":101,"op":"print","text":"Snow continues to fall."}
+{"line":102,"op":"itemPopUp","side":"near","item":472}
+{"line":102,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":102,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":102,"op":"hp","side":"near","hp":43}
+{"line":104,"op":"turn","number":6}
+{"line":107,"op":"print","text":"Snurke withdrew Clodsire!"}
+{"line":107,"op":"withdraw","side":"far"}
+{"line":107,"op":"print","text":"Snurke sent out Primarina!"}
+{"line":107,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":108,"op":"print","text":"Darkrai used Ice Beam!"}
+{"line":108,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
+{"line":110,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":110,"op":"hp","side":"far","hp":83}
+{"line":110,"op":"print","text":"It's not very effective…"}
+{"line":112,"op":"print","text":"The snow stopped."}
+{"line":113,"op":"itemPopUp","side":"near","item":472}
+{"line":113,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":113,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":113,"op":"hp","side":"near","hp":49}
+{"line":115,"op":"turn","number":7}
+{"line":118,"op":"flushTextBox"}
+{"line":118,"op":"print","text":"Darkrai is storing energy!"}
+{"line":118,"op":"print","text":"Darkrai terastallized into the Poison type!"}
+{"line":119,"op":"print","text":"Darkrai used Sludge Bomb!"}
+{"line":119,"op":"move","user":"near","target":"far","move":188,"animTurn":0}
+{"line":122,"op":"hit","side":"far","effectiveness":"super"}
+{"line":122,"op":"hp","side":"far","hp":0}
+{"line":122,"op":"print","text":"A critical hit!"}
+{"line":122,"op":"print","text":"It's super effective!"}
+{"line":123,"op":"faint","side":"far"}
+{"line":123,"op":"print","text":"The opposing Primarina fainted!"}
+{"line":125,"op":"itemPopUp","side":"near","item":472}
+{"line":125,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":125,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":125,"op":"hp","side":"near","hp":55}
+{"line":129,"op":"print","text":"Snurke sent out Talonflame!"}
+{"line":129,"op":"switchIn","side":"far","slot":5,"hp":39,"status":"none"}
+{"line":130,"op":"turn","number":8}
+{"line":134,"op":"print","text":"The opposing Talonflame used Roost!"}
+{"line":134,"op":"move","user":"far","target":"far","move":355,"animTurn":0}
+{"line":135,"op":"hp","side":"far","hp":90}
+{"line":135,"op":"print","text":"The opposing Talonflame's HP was restored."}
+{"line":137,"op":"print","text":"Darkrai used Dark Pulse!"}
+{"line":137,"op":"move","user":"near","target":"far","move":399,"animTurn":0}
+{"line":138,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":138,"op":"hp","side":"far","hp":33}
+{"line":140,"op":"itemPopUp","side":"near","item":472}
+{"line":140,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":140,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":140,"op":"hp","side":"near","hp":61}
+{"line":142,"op":"turn","number":9}
+{"line":145,"op":"print","text":"The opposing Talonflame used Roost!"}
+{"line":145,"op":"move","user":"far","target":"far","move":355,"animTurn":0}
+{"line":146,"op":"hp","side":"far","hp":84}
+{"line":146,"op":"print","text":"The opposing Talonflame's HP was restored."}
+{"line":148,"op":"print","text":"Darkrai used Dark Pulse!"}
+{"line":148,"op":"move","user":"near","target":"far","move":399,"animTurn":0}
+{"line":149,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":149,"op":"hp","side":"far","hp":21}
+{"line":151,"op":"itemPopUp","side":"near","item":472}
+{"line":151,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":151,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":151,"op":"hp","side":"near","hp":67}
+{"line":153,"op":"turn","number":10}
+{"line":156,"op":"print","text":"The opposing Talonflame used Roost!"}
+{"line":156,"op":"move","user":"far","target":"far","move":355,"animTurn":0}
+{"line":157,"op":"hp","side":"far","hp":71}
+{"line":157,"op":"print","text":"The opposing Talonflame's HP was restored."}
+{"line":159,"op":"print","text":"Darkrai used Sludge Bomb!"}
+{"line":159,"op":"move","user":"near","target":"far","move":188,"animTurn":0}
+{"line":160,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":160,"op":"hp","side":"far","hp":5}
+{"line":162,"op":"itemPopUp","side":"near","item":472}
+{"line":162,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":162,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":162,"op":"hp","side":"near","hp":73}
+{"line":163,"op":"print","text":"Your side's Aurora Veil wore off!"}
+{"line":165,"op":"turn","number":11}
+{"line":168,"op":"print","text":"The opposing Talonflame used Brave Bird!"}
+{"line":168,"op":"move","user":"far","target":"near","move":413,"animTurn":0}
+{"line":169,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":169,"op":"hp","side":"near","hp":29}
+{"line":170,"op":"hp","side":"far","hp":0}
+{"line":170,"op":"print","text":"The opposing Talonflame was damaged by the recoil!"}
+{"line":171,"op":"faint","side":"far"}
+{"line":171,"op":"print","text":"The opposing Talonflame fainted!"}
+{"line":172,"op":"print","text":"Darkrai used Dark Pulse!"}
+{"line":173,"op":"print","text":"But it failed!"}
+{"line":175,"op":"itemPopUp","side":"near","item":472}
+{"line":175,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":175,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":175,"op":"hp","side":"near","hp":35}
+{"line":179,"op":"print","text":"Snurke sent out Luka Magic!"}
+{"line":179,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":180,"op":"turn","number":12}
+{"line":183,"op":"print","text":"Darkrai, come back!"}
+{"line":183,"op":"withdraw","side":"near"}
+{"line":183,"op":"print","text":"Go! Alomomola!"}
+{"line":183,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":184,"op":"print","text":"The opposing Luka Magic used Shadow Ball!"}
+{"line":184,"op":"move","user":"far","target":"near","move":247,"animTurn":0}
+{"line":185,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":185,"op":"hp","side":"near","hp":58}
+{"line":188,"op":"turn","number":13}
+{"line":192,"op":"print","text":"The opposing Luka Magic used Shadow Ball!"}
+{"line":192,"op":"move","user":"far","target":"near","move":247,"animTurn":0}
+{"line":193,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":193,"op":"hp","side":"near","hp":17}
+{"line":194,"op":"print","text":"Alomomola used Flip Turn!"}
+{"line":194,"op":"move","user":"near","target":"far","move":740,"animTurn":0}
+{"line":196,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":196,"op":"hp","side":"far","hp":78}
+{"line":196,"op":"print","text":"A critical hit!"}
+{"line":199,"op":"withdraw","side":"near"}
+{"line":199,"op":"print","text":"Go! Cinderace!"}
+{"line":199,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":202,"op":"turn","number":14}
+{"line":206,"op":"print","text":"Snurke withdrew Luka Magic!"}
+{"line":206,"op":"withdraw","side":"far"}
+{"line":206,"op":"print","text":"Snurke sent out Sinistcha!"}
+{"line":206,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":207,"op":"print","text":"Cinderace used Pyro Ball!"}
+{"line":207,"op":"move","user":"near","target":"far","move":708,"animTurn":0}
+{"line":209,"op":"hit","side":"far","effectiveness":"super"}
+{"line":209,"op":"hp","side":"far","hp":62}
+{"line":209,"op":"print","text":"It's super effective!"}
+{"line":212,"op":"turn","number":15}
+{"line":216,"op":"print","text":"Cinderace used U-turn!"}
+{"line":216,"op":"move","user":"near","target":"far","move":369,"animTurn":0}
+{"line":217,"op":"ability","side":"near","ability":236,"show":true}
+{"line":217,"op":"print","text":"Cinderace transformed into the Bug type!"}
+{"line":217,"op":"ability","side":"near","ability":236,"show":false}
+{"line":218,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":218,"op":"hp","side":"far","hp":39}
+{"line":219,"op":"hp","side":"near","hp":84}
+{"line":219,"op":"print","text":"Cinderace was hurt by the Rocky Helmet!"}
+{"line":222,"op":"withdraw","side":"near"}
+{"line":222,"op":"print","text":"Go! Skeledirge!"}
+{"line":222,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
+{"line":223,"op":"print","text":"The opposing Sinistcha used Stun Spore!"}
+{"line":223,"op":"move","user":"far","target":"near","move":78,"animTurn":0}
+{"line":224,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":224,"op":"print","text":"Skeledirge is paralyzed, so it may be unable to move!"}
+{"line":224,"op":"status","side":"near","slot":5,"status":"par"}
+{"line":227,"op":"turn","number":16}
+{"line":231,"op":"print","text":"The opposing Sinistcha used Hex!"}
+{"line":231,"op":"move","user":"far","target":"near","move":506,"animTurn":0}
+{"line":233,"op":"hit","side":"near","effectiveness":"super"}
+{"line":233,"op":"hp","side":"near","hp":23}
+{"line":233,"op":"print","text":"It's super effective!"}
+{"line":234,"op":"print","text":"Skeledirge used Will-O-Wisp!"}
+{"line":234,"op":"move","user":"near","target":"far","move":261,"animTurn":0}
+{"line":235,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":235,"op":"print","text":"The opposing Sinistcha was burned!"}
+{"line":235,"op":"status","side":"far","slot":2,"status":"brn"}
+{"line":237,"op":"print","text":"The opposing Sinistcha was hurt by its burn!"}
+{"line":237,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":237,"op":"hp","side":"far","hp":36}
+{"line":239,"op":"turn","number":17}
+{"line":242,"op":"print","text":"The opposing Sinistcha used Hex!"}
+{"line":242,"op":"move","user":"far","target":"near","move":506,"animTurn":0}
+{"line":244,"op":"hit","side":"near","effectiveness":"super"}
+{"line":244,"op":"hp","side":"near","hp":0}
+{"line":244,"op":"print","text":"It's super effective!"}
+{"line":245,"op":"faint","side":"near"}
+{"line":245,"op":"print","text":"Skeledirge fainted!"}
+{"line":247,"op":"print","text":"The opposing Sinistcha was hurt by its burn!"}
+{"line":247,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":247,"op":"hp","side":"far","hp":33}
+{"line":251,"op":"print","text":"Go! Cinderace!"}
+{"line":251,"op":"switchIn","side":"near","slot":3,"hp":84,"status":"none"}
+{"line":252,"op":"turn","number":18}
+{"line":255,"op":"flushTextBox"}
+{"line":255,"op":"print","text":"The opposing Sinistcha is storing energy!"}
+{"line":255,"op":"print","text":"The opposing Sinistcha terastallized into the Fairy type!"}
+{"line":256,"op":"print","text":"Cinderace used Pyro Ball!"}
+{"line":256,"op":"move","user":"near","target":"far","move":708,"animTurn":0}
+{"line":257,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":257,"op":"hp","side":"far","hp":12}
+{"line":258,"op":"print","text":"The opposing Sinistcha used Strength Sap!"}
+{"line":258,"op":"move","user":"far","target":"near","move":631,"animTurn":0}
+{"line":259,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"one"}
+{"line":259,"op":"print","text":"Cinderace's Attack fell!"}
+{"line":260,"op":"hp","side":"far","hp":100}
+{"line":260,"op":"print","text":"The opposing Sinistcha's HP was restored."}
+{"line":262,"op":"print","text":"The opposing Sinistcha was hurt by its burn!"}
+{"line":262,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":262,"op":"hp","side":"far","hp":98}
+{"line":264,"op":"turn","number":19}
+{"line":268,"op":"print","text":"Cinderace used U-turn!"}
+{"line":268,"op":"move","user":"near","target":"far","move":369,"animTurn":0}
+{"line":269,"op":"ability","side":"near","ability":236,"show":true}
+{"line":269,"op":"print","text":"Cinderace transformed into the Bug type!"}
+{"line":269,"op":"ability","side":"near","ability":236,"show":false}
+{"line":271,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":271,"op":"hp","side":"far","hp":89}
+{"line":271,"op":"print","text":"It's not very effective…"}
+{"line":272,"op":"hp","side":"near","hp":67}
+{"line":272,"op":"print","text":"Cinderace was hurt by the Rocky Helmet!"}
+{"line":275,"op":"withdraw","side":"near"}
+{"line":275,"op":"print","text":"Go! Alomomola!"}
+{"line":275,"op":"switchIn","side":"near","slot":2,"hp":51,"status":"none"}
+{"line":276,"op":"print","text":"The opposing Sinistcha used Stun Spore!"}
+{"line":276,"op":"move","user":"far","target":"near","move":78,"animTurn":0}
+{"line":277,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":277,"op":"print","text":"Alomomola is paralyzed, so it may be unable to move!"}
+{"line":277,"op":"status","side":"near","slot":2,"status":"par"}
+{"line":279,"op":"print","text":"The opposing Sinistcha was hurt by its burn!"}
+{"line":279,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":279,"op":"hp","side":"far","hp":87}
+{"line":281,"op":"turn","number":20}
+{"line":285,"op":"print","text":"The opposing Sinistcha used Matcha Gotcha!"}
+{"line":285,"op":"move","user":"far","target":"near","move":830,"animTurn":0}
+{"line":287,"op":"hit","side":"near","effectiveness":"super"}
+{"line":287,"op":"hp","side":"near","hp":0}
+{"line":287,"op":"print","text":"It's super effective!"}
+{"line":288,"op":"hp","side":"far","hp":100}
+{"line":288,"op":"print","text":"Alomomola had its energy drained!"}
+{"line":289,"op":"faint","side":"near"}
+{"line":289,"op":"print","text":"Alomomola fainted!"}
+{"line":291,"op":"print","text":"The opposing Sinistcha was hurt by its burn!"}
+{"line":291,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":291,"op":"hp","side":"far","hp":98}
+{"line":295,"op":"print","text":"Go! Darkrai!"}
+{"line":295,"op":"switchIn","side":"near","slot":1,"hp":35,"status":"none"}
+{"line":296,"op":"turn","number":21}
+{"line":299,"op":"print","text":"Snurke withdrew Sinistcha!"}
+{"line":299,"op":"withdraw","side":"far"}
+{"line":299,"op":"print","text":"Snurke sent out Clodsire!"}
+{"line":299,"op":"switchIn","side":"far","slot":4,"hp":60,"status":"none"}
+{"line":300,"op":"print","text":"Darkrai used Dark Pulse!"}
+{"line":300,"op":"move","user":"near","target":"far","move":399,"animTurn":0}
+{"line":301,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":301,"op":"hp","side":"far","hp":36}
+{"line":303,"op":"itemPopUp","side":"near","item":472}
+{"line":303,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":303,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":303,"op":"hp","side":"near","hp":41}
+{"line":305,"op":"turn","number":22}
+{"line":308,"op":"print","text":"Darkrai used Ice Beam!"}
+{"line":308,"op":"move","user":"near","target":"far","move":58,"animTurn":0}
+{"line":310,"op":"hit","side":"far","effectiveness":"super"}
+{"line":310,"op":"hp","side":"far","hp":0}
+{"line":310,"op":"print","text":"It's super effective!"}
+{"line":311,"op":"faint","side":"far"}
+{"line":311,"op":"print","text":"The opposing Clodsire fainted!"}
+{"line":313,"op":"itemPopUp","side":"near","item":472}
+{"line":313,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":313,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":313,"op":"hp","side":"near","hp":47}
+{"line":318,"op":"print","text":"Snurke sent out Luka Magic!"}
+{"line":318,"op":"switchIn","side":"far","slot":1,"hp":78,"status":"none"}
+{"line":319,"op":"turn","number":23}
+{"line":322,"op":"print","text":"Darkrai, come back!"}
+{"line":322,"op":"withdraw","side":"near"}
+{"line":322,"op":"print","text":"Go! Cinderace!"}
+{"line":322,"op":"switchIn","side":"near","slot":3,"hp":67,"status":"none"}
+{"line":323,"op":"print","text":"The opposing Luka Magic used Make It Rain!"}
+{"line":323,"op":"move","user":"far","target":"near","move":802,"animTurn":0}
+{"line":325,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":325,"op":"hp","side":"near","hp":32}
+{"line":325,"op":"print","text":"It's not very effective…"}
+{"line":326,"op":"stat","side":"far","stat":"spa","stages":-1,"arrows":"one"}
+{"line":326,"op":"print","text":"The opposing Luka Magic's Sp. Atk fell!"}
+{"line":329,"op":"turn","number":24}
+{"line":332,"op":"print","text":"Snurke withdrew Luka Magic!"}
+{"line":332,"op":"withdraw","side":"far"}
+{"line":332,"op":"print","text":"Snurke sent out Sinistcha!"}
+{"line":332,"op":"switchIn","side":"far","slot":2,"hp":98,"status":"brn"}
+{"line":333,"op":"print","text":"Cinderace used U-turn!"}
+{"line":333,"op":"move","user":"near","target":"far","move":369,"animTurn":0}
+{"line":334,"op":"ability","side":"near","ability":236,"show":true}
+{"line":334,"op":"print","text":"Cinderace transformed into the Bug type!"}
+{"line":334,"op":"ability","side":"near","ability":236,"show":false}
+{"line":336,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":336,"op":"hp","side":"far","hp":86}
+{"line":336,"op":"print","text":"It's not very effective…"}
+{"line":337,"op":"hp","side":"near","hp":15}
+{"line":337,"op":"print","text":"Cinderace was hurt by the Rocky Helmet!"}
+{"line":340,"op":"withdraw","side":"near"}
+{"line":340,"op":"print","text":"Go! Zamazenta!"}
+{"line":340,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":341,"op":"ability","side":"near","ability":235,"show":true}
+{"line":342,"op":"stat","side":"near","stat":"def","stages":1,"arrows":"one"}
+{"line":342,"op":"print","text":"Zamazenta's Defense rose!"}
+{"line":341,"op":"ability","side":"near","ability":235,"show":false}
+{"line":344,"op":"print","text":"The opposing Sinistcha was hurt by its burn!"}
+{"line":344,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":344,"op":"hp","side":"far","hp":83}
+{"line":346,"op":"turn","number":25}
+{"line":349,"op":"print","text":"Zamazenta used Heavy Slam!"}
+{"line":349,"op":"move","user":"near","target":"far","move":484,"animTurn":0}
+{"line":351,"op":"hit","side":"far","effectiveness":"super"}
+{"line":351,"op":"hp","side":"far","hp":0}
+{"line":351,"op":"print","text":"It's super effective!"}
+{"line":352,"op":"hp","side":"near","hp":84}
+{"line":352,"op":"print","text":"Zamazenta was hurt by the Rocky Helmet!"}
+{"line":353,"op":"faint","side":"far"}
+{"line":353,"op":"print","text":"The opposing Sinistcha fainted!"}
+{"line":359,"op":"print","text":"Snurke sent out Luka Magic!"}
+{"line":359,"op":"switchIn","side":"far","slot":1,"hp":78,"status":"none"}
+{"line":360,"op":"turn","number":26}
+{"line":364,"op":"print","text":"Zamazenta, come back!"}
+{"line":364,"op":"withdraw","side":"near"}
+{"line":364,"op":"print","text":"Go! Cinderace!"}
+{"line":364,"op":"switchIn","side":"near","slot":3,"hp":15,"status":"none"}
+{"line":365,"op":"print","text":"The opposing Luka Magic used Recover!"}
+{"line":365,"op":"move","user":"far","target":"far","move":105,"animTurn":0}
+{"line":366,"op":"hp","side":"far","hp":100}
+{"line":366,"op":"print","text":"The opposing Luka Magic's HP was restored."}
+{"line":369,"op":"turn","number":27}
+{"line":373,"op":"print","text":"Cinderace used Pyro Ball!"}
+{"line":373,"op":"move","user":"near","target":"far","move":708,"animTurn":0}
+{"line":375,"op":"hit","side":"far","effectiveness":"super"}
+{"line":375,"op":"hp","side":"far","hp":0}
+{"line":375,"op":"print","text":"It's super effective!"}
+{"line":376,"op":"faint","side":"far"}
+{"line":376,"op":"print","text":"The opposing Luka Magic fainted!"}
+{"line":382,"op":"print","text":"Snurke sent out Great Tusk!"}
+{"line":382,"op":"switchIn","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":383,"op":"turn","number":28}
+{"line":386,"op":"print","text":"Cinderace used U-turn!"}
+{"line":386,"op":"move","user":"near","target":"far","move":369,"animTurn":0}
+{"line":387,"op":"ability","side":"near","ability":236,"show":true}
+{"line":387,"op":"print","text":"Cinderace transformed into the Bug type!"}
+{"line":387,"op":"ability","side":"near","ability":236,"show":false}
+{"line":389,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":389,"op":"hp","side":"far","hp":88}
+{"line":389,"op":"print","text":"It's not very effective…"}
+{"line":392,"op":"withdraw","side":"near"}
+{"line":392,"op":"print","text":"Go! Zamazenta!"}
+{"line":392,"op":"switchIn","side":"near","slot":0,"hp":84,"status":"none"}
+{"line":393,"op":"print","text":"The opposing Great Tusk used Rapid Spin!"}
+{"line":393,"op":"move","user":"far","target":"near","move":229,"animTurn":0}
+{"line":394,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":394,"op":"hp","side":"near","hp":66}
+{"line":395,"op":"stat","side":"far","stat":"spe","stages":1,"arrows":"one"}
+{"line":395,"op":"print","text":"The opposing Great Tusk's Speed rose!"}
+{"line":397,"op":"itemPopUp","side":"far","item":472}
+{"line":397,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":397,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":397,"op":"hp","side":"far","hp":94}
+{"line":399,"op":"turn","number":29}
+{"line":402,"op":"print","text":"The opposing Great Tusk used Knock Off!"}
+{"line":402,"op":"move","user":"far","target":"near","move":282,"animTurn":0}
+{"line":404,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":404,"op":"hp","side":"near","hp":50}
+{"line":404,"op":"print","text":"It's not very effective…"}
+{"line":405,"op":"print","text":"The opposing Great Tusk knocked off Zamazenta's Choice Band!"}
+{"line":405,"op":"item","side":"near","slot":0,"item":0}
+{"line":406,"op":"print","text":"Zamazenta used Psychic Fangs!"}
+{"line":406,"op":"move","user":"near","target":"far","move":660,"animTurn":0}
+{"line":408,"op":"hit","side":"far","effectiveness":"super"}
+{"line":408,"op":"hp","side":"far","hp":51}
+{"line":408,"op":"print","text":"It's super effective!"}
+{"line":410,"op":"itemPopUp","side":"far","item":472}
+{"line":410,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":410,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":410,"op":"hp","side":"far","hp":57}
+{"line":412,"op":"turn","number":30}
+{"line":415,"op":"print","text":"The opposing Great Tusk used Ice Spinner!"}
+{"line":415,"op":"move","user":"far","target":"near","move":789,"animTurn":0}
+{"line":416,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":416,"op":"hp","side":"near","hp":24}
+{"line":417,"op":"print","text":"Zamazenta used Psychic Fangs!"}
+{"line":417,"op":"move","user":"near","target":"far","move":660,"animTurn":0}
+{"line":419,"op":"hit","side":"far","effectiveness":"super"}
+{"line":419,"op":"hp","side":"far","hp":15}
+{"line":419,"op":"print","text":"It's super effective!"}
+{"line":421,"op":"itemPopUp","side":"far","item":472}
+{"line":421,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":421,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":421,"op":"hp","side":"far","hp":22}
+{"line":423,"op":"turn","number":31}
+{"line":426,"op":"print","text":"The opposing Great Tusk used Headlong Rush!"}
+{"line":426,"op":"move","user":"far","target":"near","move":766,"animTurn":0}
+{"line":427,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":427,"op":"hp","side":"near","hp":0}
+{"line":428,"op":"stat","side":"far","stat":"def","stages":-1,"arrows":"several"}
+{"line":428,"op":"print","text":"The opposing Great Tusk's Defense fell!"}
+{"line":429,"op":"stat","side":"far","stat":"spd","stages":-1,"arrows":"none"}
+{"line":429,"op":"print","text":"The opposing Great Tusk's Sp. Def fell!"}
+{"line":430,"op":"faint","side":"near"}
+{"line":430,"op":"print","text":"Zamazenta fainted!"}
+{"line":432,"op":"itemPopUp","side":"far","item":472}
+{"line":432,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":432,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":432,"op":"hp","side":"far","hp":28}
+{"line":436,"op":"print","text":"Go! Darkrai!"}
+{"line":436,"op":"switchIn","side":"near","slot":1,"hp":47,"status":"none"}
+{"line":437,"op":"turn","number":32}
+{"line":440,"op":"print","text":"The opposing Great Tusk used Headlong Rush!"}
+{"line":440,"op":"move","user":"far","target":"near","move":766,"animTurn":0}
+{"line":442,"op":"hit","side":"near","effectiveness":"super"}
+{"line":442,"op":"hp","side":"near","hp":0}
+{"line":442,"op":"print","text":"It's super effective!"}
+{"line":443,"op":"stat","side":"far","stat":"def","stages":-1,"arrows":"several"}
+{"line":443,"op":"print","text":"The opposing Great Tusk's Defense fell!"}
+{"line":444,"op":"stat","side":"far","stat":"spd","stages":-1,"arrows":"none"}
+{"line":444,"op":"print","text":"The opposing Great Tusk's Sp. Def fell!"}
+{"line":445,"op":"faint","side":"near"}
+{"line":445,"op":"print","text":"Darkrai fainted!"}
+{"line":447,"op":"itemPopUp","side":"far","item":472}
+{"line":447,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":447,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":447,"op":"hp","side":"far","hp":34}
+{"line":451,"op":"print","text":"Go! Cinderace!"}
+{"line":451,"op":"switchIn","side":"near","slot":3,"hp":15,"status":"none"}
+{"line":452,"op":"turn","number":33}
+{"line":455,"op":"print","text":"Cinderace used Sucker Punch!"}
+{"line":455,"op":"move","user":"near","target":"far","move":389,"animTurn":0}
+{"line":456,"op":"ability","side":"near","ability":236,"show":true}
+{"line":456,"op":"print","text":"Cinderace transformed into the Dark type!"}
+{"line":456,"op":"ability","side":"near","ability":236,"show":false}
+{"line":458,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":458,"op":"hp","side":"far","hp":8}
+{"line":458,"op":"print","text":"It's not very effective…"}
+{"line":459,"op":"print","text":"The opposing Great Tusk used Headlong Rush!"}
+{"line":459,"op":"move","user":"far","target":"near","move":766,"animTurn":0}
+{"line":460,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":460,"op":"hp","side":"near","hp":0}
+{"line":461,"op":"stat","side":"far","stat":"def","stages":-1,"arrows":"several"}
+{"line":461,"op":"print","text":"The opposing Great Tusk's Defense fell!"}
+{"line":462,"op":"stat","side":"far","stat":"spd","stages":-1,"arrows":"none"}
+{"line":462,"op":"print","text":"The opposing Great Tusk's Sp. Def fell!"}
+{"line":463,"op":"faint","side":"near"}
+{"line":463,"op":"print","text":"Cinderace fainted!"}
+{"line":465,"op":"print","text":"Snurke won the battle!"}
+{"line":465,"op":"end","outcome":"farWon"}
+{"line":60,"fallback":"mechanic","detail":"no state in the stream for Snow starting"}
+{"line":64,"fallback":"mechanic","detail":"no state in the stream for Snow continuing"}
+{"line":75,"fallback":"mechanic","detail":"no state in the stream for Snow continuing"}
+{"line":89,"fallback":"mechanic","detail":"no state in the stream for Snow continuing"}
+{"line":101,"fallback":"mechanic","detail":"no state in the stream for Snow continuing"}
+{"line":118,"fallback":"mechanic","detail":"no state in the stream for Terastallization starting"}
+{"line":255,"fallback":"mechanic","detail":"no state in the stream for Terastallization starting"}

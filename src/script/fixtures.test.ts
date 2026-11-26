@@ -36,10 +36,10 @@ function kindOf(line: string): string | undefined {
 const kinds = new Set(replays.flatMap(({ replay }) => replay.log.split('\n').map(kindOf)))
 
 /**
- * The ids a test replay may have: a Gen 1 to 5 OU battle or random battle, from a Smogon
- * tournament (`smogtours-`) or the ladder. The group is the format the id names.
+ * The ids a test replay may have: a Gen 1 to 5 or Gen 9 OU battle or random battle, from a
+ * Smogon tournament (`smogtours-`) or the ladder. The group is the format the id names.
  */
-const TEST_REPLAY_ID = /^(?:smogtours-)?(gen[1-5](?:ou|randombattle))-\d+$/
+const TEST_REPLAY_ID = /^(?:smogtours-)?(gen(?:[1-5]|9)(?:ou|randombattle))-\d+$/
 
 /** The format an id names: `gen1ou` for `smogtours-gen1ou-995161`. */
 const formatOf = (id: string) => TEST_REPLAY_ID.exec(id)?.[1]
@@ -51,13 +51,15 @@ describe('the test replays', () => {
   // battle from the ladder with Shuckle's Wrap, a partial trap that runs for several turns (#71),
   // and two Gen 4 OU replays with Stealth Rock, one from a Smogon tournament with exact HP and one
   // from the ladder with HP in percent (#86), and two Gen 5 OU replays that open with Team
-  // Preview, one from a Smogon tournament and one from the ladder (#87).
-  it('are nine tournament replays and six from the ladder', () => {
-    expect(replays.filter(({ file }) => file.startsWith('smogtours-'))).toHaveLength(9)
-    expect(replays).toHaveLength(15)
+  // Preview, one from a Smogon tournament and one from the ladder (#87), and two Gen 9 OU replays
+  // with Terastallization, one from a Smogon tournament with Ivy Cudgel's looks and one from the
+  // ladder with snow (#88).
+  it('are ten tournament replays and seven from the ladder', () => {
+    expect(replays.filter(({ file }) => file.startsWith('smogtours-'))).toHaveLength(10)
+    expect(replays).toHaveLength(17)
   })
 
-  it('hold seven Gen 3 OU, one Gen 3 random battle, one Gen 1, two Gen 2, two Gen 4, two Gen 5', () => {
+  it('hold seven Gen 3 OU, one Gen 3 random battle, one Gen 1, two each of Gen 2, 4, 5 and 9', () => {
     const formats = replays.map(({ file }) => formatOf(file))
     expect(formats.filter((format) => format === 'gen3ou')).toHaveLength(7)
     expect(formats.filter((format) => format === 'gen3randombattle')).toHaveLength(1)
@@ -65,10 +67,11 @@ describe('the test replays', () => {
     expect(formats.filter((format) => format === 'gen2ou')).toHaveLength(2)
     expect(formats.filter((format) => format === 'gen4ou')).toHaveLength(2)
     expect(formats.filter((format) => format === 'gen5ou')).toHaveLength(2)
+    expect(formats.filter((format) => format === 'gen9ou')).toHaveLength(2)
   })
 
   it.each(replays)(
-    '$file is a saved Gen 1 to 5 singles replay, OU or random',
+    '$file is a saved Gen 1 to 5 or Gen 9 singles replay, OU or random',
     ({ file, replay }) => {
       expect(replay.id).toBe(file)
       expect(replay.id).toMatch(TEST_REPLAY_ID)
@@ -89,14 +92,20 @@ describe('formatOf', () => {
     ['gen3randombattle-2717609379', 'gen3randombattle'],
     ['smogtours-gen4ou-690421', 'gen4ou'],
     ['smogtours-gen5ou-862240', 'gen5ou'],
+    ['smogtours-gen9ou-886489', 'gen9ou'],
+    ['gen9ou-2719598518', 'gen9ou'],
   ])('reads the format of %s as %s', (id, format) => {
     expect(formatOf(id)).toBe(format)
   })
 
-  it.each(['gen6ou-1', 'gen3uu-1', 'gen3randomdoublesbattle-1', 'gen3ou', 'replay-gen3ou-1'])(
-    'refuses %s, which names no test-replay format',
-    (id) => {
-      expect(formatOf(id)).toBeUndefined()
-    },
-  )
+  it.each([
+    'gen6ou-1',
+    'gen8ou-1',
+    'gen3uu-1',
+    'gen3randomdoublesbattle-1',
+    'gen3ou',
+    'replay-gen3ou-1',
+  ])('refuses %s, which names no test-replay format', (id) => {
+    expect(formatOf(id)).toBeUndefined()
+  })
 })
