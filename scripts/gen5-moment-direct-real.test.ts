@@ -11,11 +11,13 @@ import { battleRefs } from '../src/gen5/battle-check.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { takeover } from '../src/gen5/direct-takeover.ts'
 import type { MacroStep } from '../src/gen5/macro.ts'
+import { openPkm } from '../src/gen5/pkm-cipher.ts'
 import type { RoutineBuild } from '../src/gen5/routine-order.ts'
 import { ROUTINE_PIECES } from '../src/gen5/routine-layout.ts'
 import { readMomentOptions } from './gen5-moment-args.ts'
 import { sessionPlan } from './gen5-moment-direct.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
+import { readSaveSides } from './gen5-save-party.ts'
 
 const FILES = [GEN5_PATHS.bw2Json, GEN5_PATHS.routineJson]
 const readJson = (file: string): unknown => JSON.parse(readFileSync(file, 'utf8'))
@@ -43,6 +45,7 @@ describe.skipIf(!FILES.every((file) => existsSync(file)))(
       readState: () => {
         throw new Error('no state')
       },
+      readParties: (save: string) => readSaveSides(save, real().numbers.pkm),
     })
 
     it('build one plan: the takeover right after its window, park, then go before gone', () => {
@@ -50,16 +53,33 @@ describe.skipIf(!FILES.every((file) => existsSync(file)))(
       const steps = named(plan.steps)
       expect(steps.slice(0, 2)).toEqual(['until takeover-window', 'write takeover'])
       const park = steps.indexOf('mark park')
-      expect(steps.slice(park, park + 6)).toEqual([
+      expect(steps.slice(park, park + 7)).toEqual([
         'mark park',
         'until park-check',
         'write park',
+        'until park-written',
         'until go-region',
         'write go',
         'until gone',
       ])
       expect(steps.at(-1)).toBe('mark battle')
       expect(notes, 'the default names fit').toEqual([])
+    })
+
+    it("write the save's first Pokémon for each side, each opening with a right checksum", () => {
+      const { pkm } = real().numbers
+      const { plan } = sessionPlan(options, input())
+      const step = plan.steps.find((one) => one.kind === 'write' && one.name === 'park')
+      const writes = step?.kind === 'write' ? step.writes : []
+      const pkms = writes.flatMap((write) =>
+        write.kind === 'bytes' && write.field.includes('.party.pkms[') ? [write] : [],
+      )
+      expect(pkms.map((write) => write.field)).toEqual([
+        'player.party.pkms[0]',
+        'opponent.party.pkms[0]',
+      ])
+      const opened = pkms.map((write) => openPkm(Uint8Array.from(write.bytes), pkm).checksumRight)
+      expect(opened, 'both open with a right checksum').toEqual([true, true])
     })
 
     it("lay the routine apart from every value the battle's checks read", () => {

@@ -12,8 +12,14 @@ const BATTLE: RamCheck[] = [
   { name: 'adapter', address: 0x02150000, width: 4, mainRamPointer: true },
 ]
 const NAMES = { player: 'Ann', opponent: 'Bo' }
+const PKM = new Uint8Array(0x60).fill(7)
+const SIDES = {
+  names: NAMES,
+  parties: { player: [PKM], opponent: [PKM] },
+  style: 'single',
+} as const
 
-const { steps, notes, watch } = directEntry(ENTRY, ROUTINE, NAMES, BATTLE)
+const { steps, notes, watch } = directEntry(ENTRY, ROUTINE, SIDES, BATTLE)
 const names = steps.map((step) => ('name' in step ? `${step.kind} ${step.name}` : step.kind))
 const at = (name: string) => names.indexOf(name)
 const untilOf = (name: string) => {
@@ -28,7 +34,7 @@ const frameless = (step: MacroStep) =>
 // Scene: two runs of the direct entry differed after the park, since the script queued the park's
 // plan at wall time. As one plan, the park's writes follow the parked stage in the same frame.
 describe('directEntry', () => {
-  it('plays one plan from power-on to the action menu: the takeover, the park, the battle', () => {
+  it('plays one plan of 22 steps from power-on to the action menu', () => {
     expect(names).toEqual([
       'until takeover-window',
       'write takeover',
@@ -41,6 +47,7 @@ describe('directEntry', () => {
       'mark park',
       'until park-check',
       'write park',
+      'until park-written',
       'until go-region',
       'write go',
       'until gone',
@@ -52,6 +59,7 @@ describe('directEntry', () => {
       'until battle',
       'mark battle',
     ])
+    expect(steps).toHaveLength(22)
     expect(notes).toEqual([])
   })
 
@@ -86,7 +94,8 @@ describe('directEntry', () => {
   })
 
   it('gives the cuts of the names for the log', () => {
-    const long = directEntry(ENTRY, ROUTINE, { player: 'Ann', opponent: 'Bartholomew' }, BATTLE)
+    const names = { player: 'Ann', opponent: 'Bartholomew' }
+    const long = directEntry(ENTRY, ROUTINE, { ...SIDES, names }, BATTLE)
     expect(long.notes).toEqual([
       'opponent.name: "Bartholomew" cut to "Bartholo", the 8 characters it holds',
     ])

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { pkmField, pkmLayout, sealPkm } from '../src/gen5/pkm-cipher'
 import { PKM } from '../src/gen5/pkm.fixtures'
-import { firstSavePkm, partiesIn } from './gen5-save-party'
+import { firstSavePkm, partiesIn, saveSides } from './gen5-save-party'
 
 // Every size and offset here is invented (src/gen5/pkm.fixtures.ts): a PokeParty of 480 bytes
 // with count at 0, capacity at 4 and pkms at 8, a party of three, a PartyPkm of 156 bytes.
@@ -27,7 +27,8 @@ function saveWith(pkm: Uint8Array, capacity = 3): Uint8Array {
   return bytes
 }
 
-// Scene: a spec reads the save's first Pokémon as the save keeps it.
+// Scene: until the script writes a team of its own (E-6d), the park writes the save's first
+// Pokémon for both sides, as the copy did before.
 describe('the save party', () => {
   const tepig = sealed(0x1234_5678)
 
@@ -36,8 +37,12 @@ describe('the save party', () => {
     expect(partiesIn(saveWith(tepig, 4), PKM)).toEqual([])
   })
 
-  it('gives the first Pokémon sealed as the save holds it', () => {
-    expect([...firstSavePkm(saveWith(tepig), PKM)]).toEqual([...tepig])
+  it('gives the first Pokémon sealed as the save holds it, to each side once', () => {
+    const save = saveWith(tepig)
+    expect([...firstSavePkm(save, PKM)]).toEqual([...tepig])
+    const sides = saveSides(save, PKM)
+    expect(sides.player.map((one) => [...one])).toEqual([[...tepig]])
+    expect(sides.opponent.map((one) => [...one])).toEqual([[...tepig]])
   })
 
   it('throws on a save that holds no party', () => {

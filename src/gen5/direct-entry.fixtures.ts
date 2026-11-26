@@ -48,6 +48,9 @@ export const ENTRY: EntryNumbers = {
     TRAINER_CLASS_YOUNGSTER: 0x21,
     CONFIG_TEXT_SPEED_FAST: 3,
     CHAR_EOM: 0xfffe,
+    BTL_STYLE_SINGLE: 4,
+    BTL_STYLE_DOUBLE: 6,
+    SEQ_BGM_VS_TRAINER: 0x3a7,
   },
   layouts: {
     GameProcManager: layout(0x2c, {
@@ -75,7 +78,7 @@ export const ENTRY: EntryNumbers = {
     PokeParty: layout(0x260, {
       count: word(0),
       capacity: word(8),
-      pkms: { offset: 0x10, size: 0x240 },
+      pkms: { offset: 0x10, size: 0x1e0 },
       slotExists: { offset: 0x250, size: 1 },
     }),
     PlayerInfo: layout(0x24, { name: { offset: 0, size: 12 }, gender: { offset: 0x1a, size: 1 } }),

@@ -28,6 +28,7 @@ import { sessionPlan } from './gen5-moment-direct.ts'
 import { markLines, writeLines } from './gen5-moment-log.ts'
 import { MOMENT_GAP, momentStart, momentSteps } from './gen5-moment-plan.ts'
 import { listedReader } from './gen5-bw2-source.ts'
+import { readSaveSides } from './gen5-save-party.ts'
 import {
   moveLineLabel,
   sceneBlocks,
@@ -189,6 +190,7 @@ async function startSession(page: Page, dump: string, numbers: Bw2Numbers, optio
     entry: numbers.entry,
     readRoutine: () => JSON.parse(readFileSync(GEN5_PATHS.routineJson, 'utf8')) as RoutineBuild,
     readState: readStateFile,
+    readParties: (save) => readSaveSides(save, numbers.pkm),
   })
   for (const note of notes) log(`name cut: ${note}`)
   const fromBoot = start.from === 'boot'

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import { ENTRY, ROUTINE } from './direct-entry.fixtures'
-import { park } from './direct-park'
+import { park, type ParkSides } from './direct-park'
 import { takeover } from './direct-takeover'
 import type { MacroStep } from './macro'
-import type { RamCheck } from './ram-check'
+import { failingCheck, type RamCheck, type ReadRam } from './ram-check'
 import type { MemoryWrite } from './ram-write'
 
 // Every address, offset, size and constant here is invented (direct-entry.fixtures.ts).
@@ -21,6 +21,14 @@ const BATTLE: RamCheck[] = [
 
 const boot = takeover(ENTRY, ROUTINE)
 const NAMES = { player: 'Ann', opponent: 'Bo' }
+/** Invented sealed Pokémon of PartyPkm's size: two for the player, one for the opponent. */
+const pkm = (seed: number) => Uint8Array.from({ length: 0x60 }, (_, i) => (seed * 3 + i) % 256)
+const SIDES: ParkSides = {
+  names: NAMES,
+  parties: { player: [pkm(1), pkm(2)], opponent: [pkm(3)] },
+  style: 'single',
+}
+const withNames = (names: ParkSides['names']): ParkSides => ({ ...SIDES, names })
 
 const writesOf = (step: MacroStep | undefined): readonly MemoryWrite[] =>
   step?.kind === 'write' ? step.writes : []
@@ -30,13 +38,14 @@ const named = (steps: readonly MacroStep[], name: string) =>
 // Scene: the routine waits at the park; the page writes both sides, then the go, and from the
 // battle's start the page presses A through the opening to the action menu.
 describe('park', () => {
-  const { steps, notes } = park(ENTRY, boot, NAMES, BATTLE)
+  const { steps, notes } = park(ENTRY, boot, SIDES, BATTLE)
 
   it('checks the setup, writes the park, then the go, waits for gone and enters the battle', () => {
     const names = steps.map((step) => ('name' in step ? `${step.kind} ${step.name}` : step.kind))
     expect(names).toEqual([
       'until park-check',
       'write park',
+      'until park-written',
       'until go-region',
       'write go',
       'until gone',
@@ -51,14 +60,20 @@ describe('park', () => {
     expect(notes).toEqual([])
   })
 
-  it('writes the names, the class, the text speed and the party before the go, the go alone', () => {
+  it('writes the names, the class, the speed, the style, the music and both parties, then the go', () => {
     expect(writesOf(named(steps, 'park')).map((write) => write.field)).toEqual([
       'opponent.name length',
       'opponent.name',
       'opponent.trainerClass',
       'player.name',
       'config.textSpeed',
-      'opponent.party',
+      'battleStyle',
+      'fieldSituation.bgm',
+      'player.party.pkms[0]',
+      'player.party.pkms[1]',
+      'player.party.count',
+      'player.party.slotExists',
+      'opponent.party.pkms[0]',
       'opponent.party.count',
       'opponent.party.slotExists',
     ])
@@ -80,8 +95,8 @@ describe('park', () => {
     expect(boot.region.length).toBeGreaterThan(0)
   })
 
-  it("reads the setup and both clients' party pointers, which the copy goes through", () => {
-    const { watch } = park(ENTRY, boot, NAMES, BATTLE)
+  it("reads the setup and both clients' party pointers, which the parties are written behind", () => {
+    const { watch } = park(ENTRY, boot, SIDES, BATTLE)
     expect(watch).toEqual([
       { name: 'stage', address: STAGE, width: 4 },
       { name: 'setup', address: SETUP, width: 4 },
@@ -132,38 +147,87 @@ describe('park', () => {
       mask: 0x1c,
       value: 3 << 2,
     })
-    expect(of('opponent.party')).toEqual({
-      kind: 'copy',
-      field: 'opponent.party',
-      from: { address: SETUP, hops: [0x20, 0x10] },
-      to: { address: SETUP, hops: [0x24, 0x10] },
-      length: 0x60,
-    })
-    expect(of('opponent.party.count')).toMatchObject({ hops: [0x24, 0], bytes: [1, 0, 0, 0] })
-    expect(of('opponent.party.slotExists')).toMatchObject({
-      hops: [0x24, 0x250],
-      mask: 1,
-      value: 1,
-    })
   })
 
-  it("checks the opponent's buffer and both parties before it writes", () => {
+  it("checks the opponent's buffer and both parties' room before it writes", () => {
     const check = named(steps, 'park-check')
     const checks = check?.kind === 'until' ? check.checks : []
     expect(check).toMatchObject({ limit: 0 })
     expect(checks.map((one) => one.name)).toEqual([
       'setup',
       'opponent.name size',
-      'player.party.count',
+      'player.party.capacity',
+      'opponent.party.capacity',
       'opponent.party.count',
     ])
     expect(checks[1]).toMatchObject({ hops: [0x48, 0x08, 6], width: 2, oneOf: [9] })
-    expect(checks[2]).toMatchObject({ hops: [0x20, 0], noneOf: [0] })
-    expect(checks[3]).toMatchObject({ hops: [0x24, 0], oneOf: [0] })
+    expect(checks[2]).toMatchObject({ hops: [0x20, 8], oneOf: [5] })
+    expect(checks[3]).toMatchObject({ hops: [0x24, 8], oneOf: [5] })
+    expect(checks[4]).toMatchObject({ hops: [0x24, 0], oneOf: [0] })
+  })
+
+  // Scene: a run without a save. The game's party is empty, so the setup's copy of it is too.
+  it("passes a setup whose player party is empty, and fails on an opponent's Pokémon", () => {
+    const check = named(steps, 'park-check')
+    const checks = check?.kind === 'until' ? check.checks : []
+    const memory = setupMemory()
+    expect(failingCheck(checks, memory.read)).toBeUndefined()
+    memory.put(OPPONENT_PARTY, [1, 0, 0, 0])
+    expect(failingCheck(checks, memory.read)).toMatch(/^opponent\.party\.count/)
+  })
+
+  it('writes the battle style by name: a single, or a double', () => {
+    const style = (sides: ParkSides) =>
+      writesOf(named(park(ENTRY, boot, sides, BATTLE).steps, 'park')).find(
+        (write) => write.field === 'battleStyle',
+      )
+    expect(style(SIDES)).toEqual({
+      kind: 'bytes',
+      field: 'battleStyle',
+      address: SETUP,
+      hops: [0x0c],
+      bytes: [4, 0, 0, 0],
+    })
+    expect(style({ ...SIDES, style: 'double' })).toMatchObject({ bytes: [6, 0, 0, 0] })
+  })
+
+  it("writes the trainer's track into the music word", () => {
+    const writes = writesOf(named(steps, 'park'))
+    expect(writes.find((write) => write.field === 'fieldSituation.bgm')).toEqual({
+      kind: 'bytes',
+      field: 'fieldSituation.bgm',
+      address: SETUP,
+      hops: [0x0a],
+      bytes: [0xa7, 0x03],
+    })
+  })
+
+  it('copies nothing: every Pokémon of the park is written as bytes', () => {
+    const writes = writesOf(named(steps, 'park'))
+    expect(writes.filter((write) => write.kind === 'copy')).toEqual([])
+  })
+
+  it('reads back the style, the music and both counts in the frame after the write', () => {
+    const at = steps.findIndex((step) => step.kind === 'write' && step.name === 'park')
+    expect(steps[at + 1]).toMatchObject({ kind: 'until', name: 'park-written', limit: 0 })
+    expect(steps[at + 2]).toMatchObject({ kind: 'until', name: 'go-region' })
+    const step = steps[at + 1]
+    const checks = step?.kind === 'until' ? step.checks : []
+    expect(checks).toEqual([
+      { name: 'battleStyle', address: SETUP, hops: [0x0c], width: 4, oneOf: [4] },
+      { name: 'fieldSituation.bgm', address: SETUP, hops: [0x0a], width: 2, oneOf: [0x3a7] },
+      { name: 'player.party.count', address: SETUP, hops: [0x20, 0], width: 4, oneOf: [2] },
+      { name: 'opponent.party.count', address: SETUP, hops: [0x24, 0], width: 4, oneOf: [1] },
+    ])
   })
 
   it('cuts names past their room and gives the cuts for the log', () => {
-    const long = park(ENTRY, boot, { player: 'Annabel', opponent: 'Bartholomew' }, BATTLE)
+    const long = park(
+      ENTRY,
+      boot,
+      withNames({ player: 'Annabel', opponent: 'Bartholomew' }),
+      BATTLE,
+    )
     expect(long.notes).toEqual([
       'opponent.name: "Bartholomew" cut to "Bartholo", the 8 characters it holds',
       'player.name: "Annabel" cut to "Annab", the 5 characters it holds',
@@ -177,7 +241,7 @@ describe('park', () => {
       fields: { textSpeed: { offset: 0, size: 2, bit: 6, bits: 4 } },
     }
     const entry = { ...ENTRY, layouts: { ...ENTRY.layouts, Config: config } }
-    expect(() => park(entry, boot, NAMES, BATTLE)).toThrow(/textSpeed/)
+    expect(() => park(entry, boot, SIDES, BATTLE)).toThrow(/textSpeed/)
   })
   it('throws on a text speed that is no bit-field, a count of no width and no name buffer size', () => {
     const layouts = (struct: string, fields: object) => ({
@@ -185,12 +249,45 @@ describe('park', () => {
       [struct]: { size: 0x260, align: 8, fields: { ...ENTRY.layouts[struct]?.fields, ...fields } },
     })
     const speed = { ...ENTRY, layouts: layouts('Config', { textSpeed: { offset: 0, size: 2 } }) }
-    expect(() => park(speed, boot, NAMES, BATTLE)).toThrow(
+    expect(() => park(speed, boot, SIDES, BATTLE)).toThrow(
       'config.textSpeed is no bit-field in one byte',
     )
     const count = { ...ENTRY, layouts: layouts('PokeParty', { count: { offset: 0, size: 3 } }) }
-    expect(() => park(count, boot, NAMES, BATTLE)).toThrow('PokeParty.count fills no byte')
+    expect(() => park(count, boot, SIDES, BATTLE)).toThrow('PokeParty.count fills no byte')
     const sizes = { ...ENTRY, bufferSizes: {} }
-    expect(() => park(sizes, boot, NAMES, BATTLE)).toThrow("no size of the trainer's name buffer")
+    expect(() => park(sizes, boot, SIDES, BATTLE)).toThrow("no size of the trainer's name buffer")
   })
 })
+
+/** Invented places of the setup's objects in main RAM, behind the block's setup word. */
+const SETUP_AT = 0x02180000
+const PLAYER_PARTY = 0x02190000
+const OPPONENT_PARTY = 0x021a0000
+const TRAINER = 0x021b0000
+const STRBUF = 0x021c0000
+
+const le = (value: number) => [0, 8, 16, 24].map((shift) => (value >>> shift) & 0xff)
+
+/** The setup as the routine parks it with no save: both parties empty, each of five places. */
+function setupMemory(): {
+  read: ReadRam
+  put: (address: number, bytes: readonly number[]) => void
+} {
+  const bytes = new Map<number, number>()
+  const put = (address: number, values: readonly number[]) => {
+    values.forEach((value, i) => bytes.set(address + i, value))
+  }
+  const read: ReadRam = (address, width) => {
+    let value = 0
+    for (let i = width - 1; i >= 0; i -= 1) value = value * 256 + (bytes.get(address + i) ?? 0)
+    return value
+  }
+  put(SETUP, le(SETUP_AT))
+  put(SETUP_AT + 0x20, le(PLAYER_PARTY))
+  put(SETUP_AT + 0x24, le(OPPONENT_PARTY))
+  put(SETUP_AT + 0x48, le(TRAINER))
+  put(TRAINER + 0x08, le(STRBUF))
+  put(STRBUF + 6, [9, 0])
+  for (const party of [PLAYER_PARTY, OPPONENT_PARTY]) put(party + 8, le(5))
+  return { read, put }
+}
