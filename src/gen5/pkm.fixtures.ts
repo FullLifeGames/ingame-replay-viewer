@@ -28,8 +28,8 @@ const PARTY_PKM = layout(156, {
   'base.partyDecrypted': bits(2, 2, 3, 1),
   'base.boxDecrypted': bits(2, 2, 4, 1),
   'base.badEgg': bits(2, 2, 6, 1),
-  'base.pid': at(4, 4),
-  'base.contentBuffer': at(8, 4 * CHUNK),
+  'base.contentBuffer': at(4, 4 * CHUNK),
+  'base.pid': at(116, 4),
   statusCond: at(120, 4),
   level: at(124, 1),
   nowHP: at(126, 2),
@@ -50,8 +50,8 @@ export const PKM: PkmNumbers = {
     PokeParty: layout(480, {
       count: at(0, 4),
       capacity: at(4, 4),
-      pkms: at(8, 3 * 156),
-      slotExists: at(476, 1),
+      slotExists: at(8, 1),
+      pkms: at(12, 3 * 156),
     }),
     PkmBufferChunk: layout(CHUNK, { rawData: at(0, CHUNK) }),
     PkmBlockA: layout(CHUNK, {

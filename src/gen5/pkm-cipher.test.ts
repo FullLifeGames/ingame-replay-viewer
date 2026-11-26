@@ -13,14 +13,15 @@ import {
 import { PKM } from './pkm.fixtures'
 
 // Every number here is invented for the spec, as is the whole format of pkm.fixtures.ts: a
-// Pokémon of 156 bytes, the checksum at 0, the flag bits at 2, the PID at 4, the content buffer at 8
-// with four chunks of 28, the party part from 120.
+// Pokémon of 156 bytes, the checksum at 0, the flag bits at 2, the content buffer at 4 with four
+// chunks of 28, the PID at 116, the party part from 120.
 
 const CHECKSUM = 0
 const FLAGS = 2
-const PID = 4
-const CONTENT = 8
+const PID = 116
+const CONTENT = 4
 const CHUNK = 28
+const CONTENT_END = CONTENT + 4 * CHUNK
 const PARTY = 120
 const SIZE = 156
 
@@ -128,16 +129,17 @@ describe('sealPkm', () => {
   it('places the blocks by the PID, sums, then ciphers each part under its key', () => {
     const plain = plainUnder(ROW_2)
     const sealed = sealPkm(plain, PKM)
-    const content = plain.subarray(CONTENT, PARTY)
+    const content = plain.subarray(CONTENT, CONTENT_END)
     const checksum = halfwordSum(content)
     expect(u16(sealed, CHECKSUM)).toBe(checksum)
     expect([...sealed.subarray(FLAGS, CONTENT)]).toEqual([...plain.subarray(FLAGS, CONTENT)])
+    expect([...sealed.subarray(PID, PARTY)]).toEqual([...plain.subarray(PID, PARTY)])
     const placed = new Uint8Array(4 * CHUNK)
     // Row 2: B, C, A, D.
     ;[1, 2, 0, 3].forEach((block, i) => {
       placed.set(content.subarray(block * CHUNK, (block + 1) * CHUNK), i * CHUNK)
     })
-    expect([...sealed.subarray(CONTENT, PARTY)]).toEqual([
+    expect([...sealed.subarray(CONTENT, CONTENT_END)]).toEqual([
       ...cipherHalfwords(placed, checksum, PKM.cipher),
     ])
     expect([...sealed.subarray(PARTY)]).toEqual([
@@ -150,7 +152,7 @@ describe('sealPkm', () => {
     const one = sealPkm(plainUnder(ROW_0), PKM)
     const two = sealPkm(plainUnder(other), PKM)
     expect(u16(one, CHECKSUM)).toBe(u16(two, CHECKSUM))
-    expect([...one.subarray(CONTENT, PARTY)]).toEqual([...two.subarray(CONTENT, PARTY)])
+    expect([...one.subarray(CONTENT, CONTENT_END)]).toEqual([...two.subarray(CONTENT, CONTENT_END)])
     expect([...one.subarray(PARTY)]).not.toEqual([...two.subarray(PARTY)])
   })
 
@@ -168,7 +170,7 @@ describe('openPkm', () => {
     expect(opened.checksumRight).toBe(true)
     new DataView(plain.buffer).setUint16(
       CHECKSUM,
-      halfwordSum(plain.subarray(CONTENT, PARTY)),
+      halfwordSum(plain.subarray(CONTENT, CONTENT_END)),
       true,
     )
     expect([...opened.plain]).toEqual([...plain])

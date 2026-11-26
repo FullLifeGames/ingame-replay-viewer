@@ -5,7 +5,7 @@ import { PKM } from '../src/gen5/pkm.fixtures'
 import { firstSavePkm, partiesIn } from './gen5-save-party'
 
 // Every size and offset here is invented (src/gen5/pkm.fixtures.ts): a PokeParty of 480 bytes
-// with count at 0, capacity at 4 and pkms at 8, a party of three, a PartyPkm of 156 bytes.
+// with count at 0, capacity at 4, slotExists at 8 and pkms at 12, a party of three, a PartyPkm of 156 bytes.
 
 const PARTY_AT = 0x40
 const SIZE = pkmLayout(PKM, 'PartyPkm').size

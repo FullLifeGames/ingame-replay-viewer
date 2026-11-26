@@ -3,15 +3,15 @@ import { describe, expect, it } from 'vitest'
 import { isShiny, pidFor, plainPkm, type PkmGender, readPkm, type WrittenPkm } from './pkm-fields'
 import { PKM, TERMINATOR } from './pkm.fixtures'
 
-// Every number here is invented for the spec, as is the whole format of pkm.fixtures.ts: the PID
-// at 4, the blocks in logical order at 8 (A), 36 (B), 64 (C) and 92 (D), the party part from 120.
+// Every number here is invented for the spec, as is the whole format of pkm.fixtures.ts: the blocks
+// in logical order at 4 (A), 32 (B), 60 (C) and 88 (D), the PID at 116, the party part from 120.
 
 const FORMAT = { pkm: PKM, terminator: TERMINATOR }
-const PID = 4
-const A = 8
-const B = 36
-const C = 64
-const D = 92
+const PID = 116
+const A = 4
+const B = 32
+const C = 60
+const D = 88
 
 /** An invented Pokémon with every default left out. */
 const BUDLING: WrittenPkm = {
@@ -141,8 +141,8 @@ describe('plainPkm', () => {
     expect([...bytes.subarray(140)]).toEqual([...onto.subarray(140)])
     // The nickname's tail after its terminator, and the byte between nickname and originGame.
     expect([...bytes.subarray(C + 8, C + 18)]).toEqual([...onto.subarray(C + 8, C + 18)])
-    // The checksum and the flag bits before the PID.
-    expect([...bytes.subarray(0, PID)]).toEqual([...onto.subarray(0, PID)])
+    // The checksum and the flag bits before the content buffer.
+    expect([...bytes.subarray(0, A)]).toEqual([...onto.subarray(0, A)])
   })
 
   it('takes a PID it is given, and throws when it contradicts the shininess', () => {

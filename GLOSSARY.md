@@ -283,5 +283,5 @@ A party Pokémon's bytes as Black 2 keeps them: checksummed, its blocks placed b
 _Avoid_: encrypted mon, PKM file
 
 **Fixtures' guard**:
-`scripts/gen5-fixtures-real.test.ts`: it fails by name when a fixture's number equals the generated number under the same name, so a fixture under pokebw2's names holds invented numbers in an order of its own.
+`scripts/gen5-fixtures-real.test.ts`: it fails by name when a fixture's field sits at its real place or another number of a fixture equals the generated one under the same name, so a fixture under pokebw2's names holds invented numbers in an order of its own.
 _Avoid_: leak test
