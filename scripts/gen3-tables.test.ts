@@ -63,7 +63,25 @@ const TREE: Record<string, string> = {
     '    [TRAINER_PIC_HIKER] = { .frontPic = TRAINER_FRONT_PIC(i, j), /* .backPic = k */ },',
     '};',
   ].join('\n'),
-  'include/constants/pokemon.h': '#define MAX_LEVEL 100\n',
+  // The expansion's enums carry an attribute between the keyword and the name.
+  'include/constants/pokemon.h': [
+    '#define MAX_LEVEL 100',
+    'enum __attribute__((packed)) Type',
+    '{',
+    '    TYPE_NONE = 0,',
+    '    TYPE_NORMAL,',
+    '    TYPE_MYSTERY,',
+    '    NUMBER_OF_MON_TYPES',
+    '};',
+  ].join('\n'),
+  'src/data/types_info.h': [
+    'const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =',
+    '{',
+    '    [TYPE_NONE] = { .name = _("None"), .generic = _("a move") },',
+    '    [TYPE_NORMAL] = { .name = _("Normal"), .generic = _("a NORMAL move") },',
+    '    [TYPE_MYSTERY] = { .name = _("???"), .generic = _("a ??? move") },',
+    '};',
+  ].join('\n'),
   'src/data/pokemon/species_info.h': [
     '#include "constants/abilities.h"',
     '[SPECIES_NONE] = { .speciesName = _("??????????") },',
@@ -113,6 +131,11 @@ describe('generateTables on a small tree', () => {
       SPECIES_EGG: [30, null],
     })
     expect(parsed('items.json')).toEqual({ ITEM_NONE: [0, null], ITEM_POKE_BALL: [4, 'Poké Ball'] })
+    expect(parsed('types.json')).toEqual({
+      TYPE_NONE: [0, 'None'],
+      TYPE_NORMAL: [1, 'Normal'],
+      TYPE_MYSTERY: [2, '???'],
+    })
     expect(parsed('trainer-pics.json')).toEqual({
       TRAINER_PIC_NONE: 0,
       TRAINER_PIC_BRENDAN: 1,
@@ -140,6 +163,7 @@ describe('generateTables on a small tree', () => {
       MOVES_COUNT_ALL: 6,
       ABILITIES_COUNT: 2,
       ITEMS_COUNT: 5,
+      NUMBER_OF_MON_TYPES: 3,
       TRAINER_PIC_COUNT: 3,
       MAX_LEVEL: 100,
     })
