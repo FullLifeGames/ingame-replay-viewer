@@ -199,9 +199,9 @@ describe('the words for visitors', () => {
     expect(page(VIEWER).match(/id="progress"/g)).toHaveLength(1)
   })
 
-  // The web README quotes the line a Gen 9 replay gets; the quote follows PLAYED_FORMATS.
+  // The web README quotes the line a Gen 8 replay gets; the quote follows PLAYED_FORMATS.
   it('quotes the generation line in the web README as the viewer shows it', () => {
-    const line = fillLine(VISITOR_LINES.generation.text, { gen: '9', formats: PLAYED_FORMATS })
+    const line = fillLine(VISITOR_LINES.generation.text, { gen: '8', formats: PLAYED_FORMATS })
     expect(squeezed(README)).toContain(`"${line}"`)
   })
 

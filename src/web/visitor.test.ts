@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import replay994052 from '../../test/fixtures/replays/smogtours-gen3ou-994052.json'
-import { buildGen3Stream, NEWEST_GEN } from '../gen3/backend'
+import { buildGen3Stream, PLAYED_GENS_TEXT } from '../gen3/backend'
 import { Gen3Error, GenerationRefusal } from '../gen3/errors'
 import { SlotError } from '../patch/slot'
 import { buildBattleScript } from '../script/build'
@@ -51,27 +51,29 @@ const answering = (answer: Response | Error) => () =>
 
 const SHOWDOWN_URL = 'https://replay.pokemonshowdown.com/gen3ou-1.json'
 const HTML_PAGE = '<!DOCTYPE html>\n<html><body>Not here</body></html>'
-const GEN9 = readReplay({ ...replay994052, log: replay994052.log.replace('|gen|3\n', '|gen|9\n') })
+const GEN8 = readReplay({ ...replay994052, log: replay994052.log.replace('|gen|3\n', '|gen|8\n') })
 
 describe('visitorLine for the replay', () => {
-  it('names every generation the backend plays (#86)', () => {
-    expect(PLAYED_FORMATS).toBe(`Gen 1 to ${String(NEWEST_GEN)} singles`)
+  it('names every generation the backend plays (#86, #88)', () => {
+    expect(PLAYED_FORMATS).toBe('Gen 1 to 5 and Gen 9 singles')
   })
 
-  it('gives a log that starts with |gen|9 the generation line, from the typed refusal', () => {
-    const refusal = caught(() => buildGen3Stream(buildBattleScript('|gen|9\n')))
+  it('gives a log that starts with |gen|8 the generation line, from the typed refusal', () => {
+    const refusal = caught(() => buildGen3Stream(buildBattleScript('|gen|8\n')))
     expect(refusal).toBeInstanceOf(GenerationRefusal)
-    const link: ReplayPlace = { source: 'link', replay: 'gen9ou-1' }
+    const link: ReplayPlace = { source: 'link', replay: 'gen8ou-1' }
     expect(visitorLine(failed(STREAM, refusal, link))).toEqual({
-      line: `This replay is a Gen 9 battle. The viewer plays ${PLAYED_FORMATS} for now.`,
-      detail: `${STREAM}: the stream plays Gen 1 to ${String(NEWEST_GEN)} battles, this one is Gen 9`,
+      line: `This replay is a Gen 8 battle. The viewer plays ${PLAYED_FORMATS} for now.`,
+      detail: `${STREAM}: the stream plays ${PLAYED_GENS_TEXT} battles, this one is Gen 8`,
       report: false,
-      replay: 'gen9ou-1',
+      replay: 'gen8ou-1',
     })
   })
 
   it('reads the generation from the refusal, never from its message', () => {
-    const refusal = Object.assign(new GenerationRefusal(7, 3), { message: 'this one is Gen 8' })
+    const refusal = Object.assign(new GenerationRefusal(7, PLAYED_GENS_TEXT), {
+      message: 'this one is Gen 8',
+    })
     expect(visitorLine(refusal).line).toMatch(/^This replay is a Gen 7 battle\./)
   })
 
@@ -116,15 +118,15 @@ describe('visitorLine for the replay', () => {
   })
 
   it.each([
-    [downloadedFile(GEN9), 'a replay saved with "Download replay"'],
-    [replayPage(GEN9), 'a saved replay page'],
-    [rawLog(GEN9), 'a battle log'],
-    [jsonFile(GEN9), "a replay's JSON file"],
+    [downloadedFile(GEN8), 'a replay saved with "Download replay"'],
+    [replayPage(GEN8), 'a saved replay page'],
+    [rawLog(GEN8), 'a battle log'],
+    [jsonFile(GEN8), "a replay's JSON file"],
   ])('names the kind of a saved file, never its name: %#', async (text, kind) => {
     const choice = createReplayChoice(() => Promise.reject(new Error('offline')))
     const refusal = await refusalOf(choice.loadFile(fileOf('My replay.html', text)))
     expect(visitorLine(refusal)).toMatchObject({ report: false, replay: kind })
-    expect(visitorLine(refusal).line).toMatch(/^This replay is a Gen 9 battle\./)
+    expect(visitorLine(refusal).line).toMatch(/^This replay is a Gen 8 battle\./)
   })
 
   // A phone that drops the network while the page fetches the example's file (#59).

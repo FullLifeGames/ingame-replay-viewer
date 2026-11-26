@@ -1,6 +1,8 @@
 // The battle script's events for the effects on one Pokémon, items and abilities. `events.ts`
 // holds the other events and the union of them all.
 
+import type { TypeName } from '@pkmn/data'
+
 import type { Caused, Hit } from './events'
 import type { Effect, PokemonRef } from './types'
 
@@ -27,12 +29,14 @@ export interface EffectEndEvent extends Caused, Hit {
  * A Substitute that takes a hit is one (`[damage]`). Splash's `|-nothing` is one on no Pokémon:
  * the parser reads it as `-activate||move: Splash`, and the game says "But nothing happened!".
  * An item that acts as it is used up carries `[consumed]` (Custap Berry, after its `[eat]`).
+ * `source` is the Pokémon of `[of]`, such as the target of Trick.
  */
 export interface EffectActivateEvent extends Hit {
   readonly kind: 'effectActivate'
   readonly line: number
   readonly who?: PokemonRef
   readonly effect: Effect
+  readonly source?: PokemonRef
   readonly damage?: true
   readonly consumed?: true
 }
@@ -55,6 +59,14 @@ export interface FormChangeEvent extends Caused {
   readonly who: PokemonRef
   readonly species: string
   readonly msg?: true
+}
+
+/** `who` terastallizes into `type`, the type the log names (#88). */
+export interface TerastallizeEvent {
+  readonly kind: 'terastallize'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly type: TypeName
 }
 
 /** An effect that lasts the turn: Protect, Endure, Focus Punch's focus. */

@@ -69,15 +69,18 @@ describe('weather (P1)', () => {
     ['|-weather|Sandstorm\n|-weather|none', 'The sandstorm subsided.'],
     ['|-weather|SunnyDay\n|-weather|none', 'The sunlight faded.'],
     ['|-weather|Hail\n|-weather|none', 'The hail stopped.'],
+    ['|-weather|Snowscape', 'It started to snow!'],
+    ['|-weather|Snowscape\n|-weather|Snowscape|[upkeep]', 'Snow continues to fall.'],
+    ['|-weather|Snowscape\n|-weather|none', 'The snow stopped.'],
   ])('words %j', (lines, text) => {
     const { last } = sceneOf('weather', ...lines.split('\n'))
     expect(weatherText(last.weather, last.phase)).toEqual({ text })
   })
 
   it('gives a weather without a Gen 3 message our wording and a fallback', () => {
-    expect(weatherText('Snow', 'start')).toEqual({
-      text: 'The weather changed to Snow!',
-      fallback: { kind: 'phrase', detail: 'no game message for Snow at its start' },
+    expect(weatherText('Heavy Rain', 'start')).toEqual({
+      text: 'The weather changed to Heavy\u00a0Rain!',
+      fallback: { kind: 'phrase', detail: 'no game message for Heavy Rain at its start' },
     })
   })
 })
@@ -91,6 +94,10 @@ describe('sides and the field (P1)', () => {
       'Light Screen made the\u00a0opposing side stronger against special moves!',
     ],
     ['Safeguard', 'The\u00a0opposing side became cloaked in a mystical veil!'],
+    [
+      'move: Aurora Veil',
+      'Aurora Veil made the\u00a0opposing side stronger against physical and special moves!',
+    ],
   ])('words %s starting on the far side', (condition, text) => {
     const { event } = sceneOf('sideStart', `|-sidestart|p2: Bob|${condition}`)
     expect(sideStarted(event.side, event.condition)).toEqual({ text })
@@ -108,6 +115,7 @@ describe('sides and the field (P1)', () => {
     ['Reflect', "The\u00a0opposing side's Reflect wore off!"],
     ['Light Screen', "The\u00a0opposing side's Light Screen wore off!"],
     ['Safeguard', 'The\u00a0opposing side is no longer protected by the mystical veil!'],
+    ['move: Aurora Veil', "The\u00a0opposing side's Aurora\u00a0Veil wore off!"],
   ])('words %s ending', (condition, text) => {
     const { event, mon } = sceneOf('sideEnd', `|-sideend|p2: Bob|${condition}`)
     const source = event.source && mon(event.source)

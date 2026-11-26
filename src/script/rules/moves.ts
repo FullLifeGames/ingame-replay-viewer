@@ -10,7 +10,7 @@ import type { Rules } from './index'
 export const MOVE_RULES = {
   '|move|': {
     arity: 3,
-    reads: ['from', 'miss', 'still', 'notarget'],
+    reads: ['from', 'anim', 'miss', 'still', 'notarget'],
     build: ({ line, args: [, user, move, target], kwArgs, battle }) => {
       const ref = refIfAny(battle, target, line)
       return [
@@ -21,6 +21,7 @@ export const MOVE_RULES = {
           move,
           ...(ref ? { target: ref } : {}),
           ...(kwArgs.from ? { calledBy: effectOf(kwArgs.from) } : {}),
+          ...(kwArgs.anim ? { anim: kwArgs.anim } : {}),
           ...flagsOf(kwArgs, ['miss', 'still', 'notarget']),
         },
       ]
