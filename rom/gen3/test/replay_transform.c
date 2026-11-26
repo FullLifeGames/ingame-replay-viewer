@@ -164,6 +164,39 @@ REPLAY_TEST("A Transform copy keeps the target's shiny colours after its substit
     }
 }
 
+// The fade's reload draws a Spinda copy's spots from the copy's personality (#92), so a copy of
+// the far side keeps the target's spots only if MOVE Transform gave it the target's personality.
+REPLAY_TEST("A Spinda copy keeps the target's spots after its substitute fades")
+{
+    u32 user = Replay_GetBattler(REPLAY_SIDE_FAR);
+    u32 target = Replay_GetBattler(REPLAY_SIDE_NEAR);
+
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        StartDittoVs(REPLAY_SIDE_FAR, SPECIES_SPINDA, FALSE);
+        ReplayStream_Move(REPLAY_SIDE_FAR, REPLAY_SIDE_NEAR, MOVE_TRANSFORM);
+        ReplayStream_Move(REPLAY_SIDE_FAR, REPLAY_SIDE_FAR, MOVE_SUBSTITUTE);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 75);
+        ReplayStream_Volatile(REPLAY_SIDE_FAR, REPLAY_VOLATILE_SUBSTITUTE, TRUE);
+        ReplayStream_Anim(REPLAY_SIDE_FAR, REPLAY_ANIM_SUBSTITUTE_FADE);
+        ReplayStream_Volatile(REPLAY_SIDE_FAR, REPLAY_VOLATILE_SUBSTITUTE, FALSE);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_TRANSFORM, farMon);
+        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_SUBSTITUTE_FADE, farMon);
+    }
+    THEN
+    {
+        u32 personality = GetMonData(GetBattlerMon(target), MON_DATA_PERSONALITY);
+
+        FORCE_MOVE_ANIM(FALSE);
+        EXPECT(DrawsFrontPicWith(user, SPECIES_SPINDA, personality));
+    }
+}
+
 // The engine clears the copy when the next mon enters (SwitchInClearSetData clears the
 // volatiles, the switch-in animation the transformed species), and so does SWITCH_IN.
 REPLAY_TEST("SWITCH_IN after a Transform brings in a mon that is no copy")
