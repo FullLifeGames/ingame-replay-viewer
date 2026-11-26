@@ -3,13 +3,24 @@ import type { Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { Script } from 'node:vm'
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import { BUILT_PORT, builtServerOptions, startBuiltServer } from './gen5-built'
+import {
+  BUILT_PORT,
+  builtServerOptions,
+  bundleUnpacker,
+  startBuiltServer,
+  writeUnpackerScript,
+} from './gen5-built'
 import { writeLicencesPage } from './gen5-licences-read'
-import { archiveName, COMPONENTS, SITE_FILES, sourceOf } from './gen5-manifest'
+import { archiveName, COMPONENTS, SITE_FILES } from './gen5-manifest'
 import { GEN5_PATHS } from './gen5-paths'
+import { DONE, FILE, UNPACK_REPORT, type UnpackGlobal } from '../src/gen5/core-unpack'
+import { UNPACKER_PATH, UNPACKER_SCRIPT } from '../src/gen5/unpacker'
+import { fromBase64 } from '../src/gen5/lzma.fixtures'
+import { ARCHIVES } from '../src/gen5/seven-zip.fixtures'
 
 describe('builtServerOptions', () => {
   it('binds to loopback on port 5184 unless told otherwise', () => {
@@ -76,7 +87,7 @@ describe('startBuiltServer', () => {
     saves: join(root, 'saves'),
     sources: join(root, 'sources'),
   }
-  const archive = archiveName(sourceOf(COMPONENTS.melonds))
+  const archive = archiveName(COMPONENTS.melonds.source)
   let server: Server | undefined
 
   beforeAll(async () => {
@@ -84,6 +95,8 @@ describe('startBuiltServer', () => {
       'page/index.html',
       'site/data/loader.js',
       'site/data/version.json',
+      'site/data/compression/extract7z.js',
+      `page/${UNPACKER_SCRIPT}`,
       `sources/${archive}`,
       'sources/other.tar.gz',
     ]) {
@@ -140,10 +153,90 @@ describe('startBuiltServer', () => {
     expect(await status('/emulatorjs/data/version.json')).toBe(404)
   })
 
+  // Scene: the page names its own worker for EmulatorJS's unpacker (79-4b).
+  it("answers the page's unpacker as JavaScript, and 404 for EmulatorJS's", async () => {
+    const response = await answer(UNPACKER_PATH)
+    expect(response.status).toBe(200)
+    expect(response.headers.get('content-type')).toBe('text/javascript')
+    expect(await status('/emulatorjs/data/compression/extract7z.js')).toBe(404)
+  })
+
   it('answers an archive the manifest names as gzip, and 404 for another name', async () => {
     const response = await answer(`/source/${archive}`)
     expect(response.status).toBe(200)
     expect(response.headers.get('content-type')).toBe('application/gzip')
     expect(await status('/source/other.tar.gz')).toBe(404)
+  })
+})
+
+interface Posted {
+  message: { t: number; file?: string; data?: Uint8Array }
+  transfer: readonly ArrayBuffer[]
+}
+
+type Scope = { onmessage?: (event: { data: unknown }) => void } & UnpackGlobal &
+  Record<string, unknown>
+
+/** Runs `script` as EmulatorJS runs its unpacker: a classic script (a module's import or export
+ * fails to compile here) whose global scope is `self`, then one message with the archive. Gives
+ * the posts and the scope the script left behind. */
+function runClassic(script: string, archive: Uint8Array): { posted: Posted[]; scope: Scope } {
+  const posted: Posted[] = []
+  const scope: Scope = {
+    postMessage: (message: Posted['message'], options: { transfer: ArrayBuffer[] }) =>
+      posted.push({ message, transfer: options.transfer }),
+  }
+  new Script(script).runInNewContext({ self: scope, performance, TextDecoder })
+  scope.onmessage?.({ data: archive })
+  return { posted, scope }
+}
+
+// Scene: EmulatorJS fetches the unpacker as text and starts it from a Blob URL as a classic
+// worker, so the script must stand alone: no import, no export, no module.
+describe('the unpacker script', () => {
+  let script = ''
+
+  beforeAll(async () => {
+    script = await bundleUnpacker()
+  }, 60_000)
+
+  it('is one classic script that unpacks an archive in EmulatorJS shapes', () => {
+    expect(script).not.toMatch(/^\s*(import|export)\b/m)
+    const { posted } = runClassic(script, fromBase64(ARCHIVES.encodedHeader))
+    expect(posted.map(({ message }) => [message.t, message.file])).toEqual([
+      [4, undefined],
+      [FILE, 'alpha.txt'],
+      [4, undefined],
+      [FILE, 'beta/zeros.bin'],
+      [DONE, undefined],
+    ])
+    expect(posted[1]?.transfer).toEqual([posted[1]?.message.data?.buffer])
+  })
+
+  // Scene: scripts/gen5-page.ts reads the unpack report from the worker under the name that
+  // src/gen5/core-unpack.ts gives it (review W3).
+  it('leaves its report on its global scope under the name the scripts read', () => {
+    const { scope } = runClassic(script, fromBase64(ARCHIVES.encodedHeader))
+    expect(scope[UNPACK_REPORT]).toEqual({
+      files: 2,
+      bytes: 5500,
+      ms: expect.any(Number) as number,
+    })
+  })
+
+  it('is what the build writes beside the page', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'gen5-unpacker-'))
+    try {
+      await writeUnpackerScript(dir)
+      expect(readFileSync(join(dir, UNPACKER_SCRIPT), 'utf8')).toBe(script)
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  }, 60_000)
+
+  it('is the script the page names for extract7z.js through window.EJS_paths', () => {
+    const main = readFileSync(`${GEN5_PATHS.page}/main.ts`, 'utf8')
+    expect(main).toContain('window.EJS_paths = emulatorPaths()')
+    expect(main.indexOf('window.EJS_paths')).toBeLessThan(main.indexOf('loader.js'))
   })
 })

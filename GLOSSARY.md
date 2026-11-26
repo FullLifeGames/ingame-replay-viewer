@@ -235,3 +235,53 @@ _Avoid_: placeholder, substitute (a move)
 **Live play**:
 The later goal: using a target game's own menus to play a battle on Showdown in real time.
 _Avoid_: online mode, reverse mode
+
+## Gen 5
+
+**Generated numbers**:
+`build/gen5/bw2.json`: pokebw2's addresses, layouts, constants and lists, which `scripts/gen5-bw2.ts` reads by name from the pinned checkout at run time. They never enter the tracked tree.
+_Avoid_: table, offsets file
+
+**Mark**:
+A named point of a Gen 5 run, at which the log gives the frame and the SHA-256 of main RAM. Two equal runs compare mark by mark.
+_Avoid_: checkpoint, savepoint (a mark saves no state)
+
+**Moment**:
+One move played in a Gen 5 battle while the page holds the battle's server: a block of the game's own server commands with the move's line, its animation, the HP change and an optional standard line (`src/gen5/moment.ts`).
+_Avoid_: turn (a turn holds several moments)
+
+**Direct entry**:
+How the Gen 5 page starts a battle since #97: in the game's first frames it has the game run our routine in place of the boot screens, writes both sides into the battle's setup, and lets the game start its own trainer battle. It needs no title, no save and no walk.
+_Avoid_: injection, boot hack
+
+**Walk**:
+The older way into a Gen 5 battle (#78): the page loads the save before a trainer, takes Continue and walks into the trainer's sight (`src/gen5/continue-route.ts`, `--entry walk`).
+_Avoid_: route (the spike's route from New Game is `src/gen5/route.ts`)
+
+**Routine**:
+Our C proc in `rom/gen5/routine.c`, which the page writes into the emulator's memory for the direct entry. It holds no number of the game.
+_Avoid_: payload, patch (the game stays unmodified)
+
+**Order block**:
+The 17 words the page writes beside the routine and hands to it as its param: the call addresses, the game's constants and room it needs, and the words the routine and the page trade (the stage, the go, the game data, the setup).
+_Avoid_: config, parameter block
+
+**Takeover**:
+The page's write in the frame the game's boot proc queues the boot screens: it points the proc manager's next proc at the routine's table and order block.
+_Avoid_: hook (the page's frame hook is another thing)
+
+**Park**:
+The routine's stage once its init has built the battle's setup: it waits frame after frame while the page writes the names, the parties, the style, the track and the text speed into the setup. Those are the park writes.
+_Avoid_: pause (a control of the viewer)
+
+**Go**:
+The order block's word the page sets after the park writes. On it the routine switches both displays on, starts the track and hands over to the battle's proc.
+_Avoid_: start, trigger
+
+**Sealed Pokémon**:
+A party Pokémon's bytes as Black 2 keeps them: checksummed, its blocks placed by its personality and ciphered. `sealPkm` makes one from the plain bytes, and `openPkm` gives them back.
+_Avoid_: encrypted mon, PKM file
+
+**Fixtures' guard**:
+`scripts/gen5-fixtures-real.test.ts`: it fails by name when a fixture's field sits at its real place or another number of a fixture equals the generated one under the same name, so a fixture under pokebw2's names, the C texts for the generator's readers among them, holds invented numbers in an order of its own.
+_Avoid_: leak test

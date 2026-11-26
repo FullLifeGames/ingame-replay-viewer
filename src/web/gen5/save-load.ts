@@ -1,7 +1,7 @@
 // The save loader of the Gen 5 page (#78). EmulatorJS 4.2.3 builds its GameManager, awaits its
 // `mountFileSystems` and only then calls the core's main, which loads the game and reads its save.
 // GameManager.js mounts the save folder on IndexedDB there and reads the origin's copy into the
-// tab. The page wraps the class as GameManager.js assigns it, as frame-hook.ts wraps the core's
+// tab. The page wraps the class as GameManager.js assigns it, as core-runtime.ts wraps the core's
 // factory, and mounts an in-memory folder instead: it writes the page's save there, if it has
 // one, and never touches IndexedDB. EmulatorJS's own save buttons are hidden and do nothing.
 import {

@@ -40,6 +40,8 @@ export interface EntryPace {
   /** A through the battle's opening as well, up to the first frame the checks hold (mark
    * `action`), instead of no input from the adapter on. */
   throughOpening?: boolean
+  /** Through the opening, marks `action-NNN` every this many frames on the way. */
+  openingMarkEvery?: number
 }
 
 type Mash = NonNullable<Extract<MacroStep, { kind: 'until' }>['mash']>
@@ -55,11 +57,13 @@ function afterAdapter(
   checks: readonly RamCheck[],
   limit: number,
   mash: Mash | undefined,
+  markEvery: number | undefined,
 ): MacroStep[] {
   const standing = { kind: 'until', name: 'battle', checks, holdFor: STANDING_FRAMES } as const
   if (mash === undefined) return [{ ...standing, limit }, mark('battle')]
+  const marks = markEvery === undefined ? {} : { markEvery }
   return [
-    { kind: 'until', name: 'action', checks, holdFor: 1, limit, mash },
+    { kind: 'until', name: 'action', checks, holdFor: 1, limit, mash, ...marks },
     mark('action'),
     { ...standing, limit: STANDING_LIMIT },
     mark('battle'),
@@ -74,7 +78,7 @@ export function battleEntry(
   limits: EntryLimits,
   pace: EntryPace = {},
 ): MacroStep[] {
-  const { markEvery, every, throughOpening } = pace
+  const { markEvery, every, throughOpening, openingMarkEvery } = pace
   const mash = mashOf(every)
   return [
     {
@@ -87,6 +91,11 @@ export function battleEntry(
       ...(markEvery === undefined ? {} : { markEvery }),
     },
     mark('battle-start'),
-    ...afterAdapter(checks, limits.battle, throughOpening === true ? mash : undefined),
+    ...afterAdapter(
+      checks,
+      limits.battle,
+      throughOpening === true ? mash : undefined,
+      openingMarkEvery,
+    ),
   ]
 }

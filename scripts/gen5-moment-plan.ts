@@ -17,6 +17,10 @@ const MASH_EVERY = 30
 /** Frames a block may take, and a frame of it every BLOCK_FRAMES_EVERY frames. */
 const BLOCK_LIMIT = 3000
 const BLOCK_FRAMES_EVERY = 10
+/** Frames from the session's mark `battle` to the moment's start: room for the script's reading
+ * of the battle. E-5's runs queued the moment about 35 frames after the mark on the build machine;
+ * ten seconds at the DS's pace leave room for a faster core. */
+export const MOMENT_GAP = 600
 
 export interface MomentSetup {
   adapterNumbers: AdapterNumbers
@@ -49,6 +53,13 @@ function blockSteps(setup: MomentSetup, name: string, moment: Moment): MacroStep
     },
     { kind: 'mark', name: `${name}-answered` },
   ]
+}
+
+/** The frame the moment's plan starts at: MOMENT_GAP frames after the session's mark `battle`,
+ * or undefined for a session with no such mark. */
+export function momentStart(marks: readonly { name: string; frame: number }[]): number | undefined {
+  const battle = marks.findLast((mark) => mark.name === 'battle')
+  return battle === undefined ? undefined : battle.frame + MOMENT_GAP
 }
 
 export function momentSteps(setup: MomentSetup): MacroStep[] {

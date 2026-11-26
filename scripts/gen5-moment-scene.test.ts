@@ -2,7 +2,14 @@ import { Dex } from '@pkmn/dex'
 import { describe, expect, it } from 'vitest'
 
 import type { BattleMonReading } from '../src/gen5/battle-mons'
-import { moveLineLabel, sceneBlocks, sceneMove, textId, textLine } from './gen5-moment-scene'
+import {
+  moveLineLabel,
+  sceneBlocks,
+  sceneMove,
+  sideClient,
+  textId,
+  textLine,
+} from './gen5-moment-scene'
 
 // Invented readings in the shape the page reads from the clients' container.
 const NEAR: BattleMonReading = {
@@ -21,15 +28,16 @@ const FAR: BattleMonReading = {
   maxHp: 30,
   level: 9,
 }
-// Two invented setups, neither the game's: three clients with the near one (client 0) at
-// position 1 and the far one (client 1) at position 2, and two clients in swapped order.
-const INVENTED = { clientCount: 3, posClientIds: [2, 0, 1] }
-const SWAPPED = { clientCount: 2, posClientIds: [1, 0] }
+// Two invented setups, neither the game's: three clients with the near one (the player's, client
+// 2) at position 0 and the far one (the opponent's, client 1) at position 2, and two clients with
+// the player's client 1 at position 0 and the opponent's client 0 at position 1.
+const INVENTED = { clientCount: 3, posClientIds: [2, 0, 1], clients: { player: 2, opponent: 1 } }
+const SWAPPED = { clientCount: 2, posClientIds: [1, 0], clients: { player: 1, opponent: 0 } }
 const BANK = 'Bank_Text_Zero = zero\nBank_Text_One = {0102:0} used\\nOne!\nBank_Text_Two = two\n'
 
 // Scene: the game decides nothing. The first block's HP is one no damage roll of the move gives,
 // the second block comes from the far side, and the "unknown" scene uses moves Tepig lacks. In the
-// invented setup the near side stands at position 1 and the far side at position 2.
+// invented setup the near side stands at position 0 and the far side at position 2.
 describe('sceneBlocks', () => {
   const tackle = Dex.forGen(5).moves.get('Tackle').num
 
@@ -37,7 +45,7 @@ describe('sceneBlocks', () => {
     const blocks = sceneBlocks('known', { near: NEAR, far: FAR }, INVENTED, 41)
     expect(blocks.map((block) => block.name)).toEqual(['b1', 'b2'])
     expect(blocks[0]?.moment).toEqual({
-      attacker: { monId: 4, pos: 1 },
+      attacker: { monId: 4, pos: 0 },
       target: { monId: 9, pos: 2, hp: 30, maxHp: 30 },
       move: tackle,
       hpAfter: 1,
@@ -45,7 +53,7 @@ describe('sceneBlocks', () => {
     })
     expect(blocks[1]?.moment).toMatchObject({
       attacker: { monId: 9, pos: 2 },
-      target: { monId: 4, pos: 1, hp: 26 },
+      target: { monId: 4, pos: 0, hp: 26 },
       move: tackle,
     })
   })
@@ -58,11 +66,22 @@ describe('sceneBlocks', () => {
     expect(moves).toEqual([dex.get('Flamethrower').num, dex.get('Hydro Pump').num])
   })
 
-  // In the swapped setup the near side stands at position 1 and the far side at position 0.
+  // In the swapped setup the near side stands at position 0 and the far side at position 1.
   it("takes each side's position from the single battle's setup", () => {
     const [b1] = sceneBlocks('known', { near: NEAR, far: FAR }, SWAPPED, 41)
-    expect(b1?.moment.attacker).toEqual({ monId: 4, pos: 1 })
-    expect(b1?.moment.target).toMatchObject({ monId: 9, pos: 0 })
+    expect(b1?.moment.attacker).toEqual({ monId: 4, pos: 0 })
+    expect(b1?.moment.target).toMatchObject({ monId: 9, pos: 1 })
+  })
+})
+
+// Scene: the near side is the player's client and the far side the opponent's, as the setup
+// creates them; the readings and the moments take them from there.
+describe('sideClient', () => {
+  it("gives the near side the player's client and the far side the opponent's", () => {
+    expect(sideClient(INVENTED, 'near')).toBe(2)
+    expect(sideClient(INVENTED, 'far')).toBe(1)
+    expect(sideClient(SWAPPED, 'near')).toBe(1)
+    expect(sideClient(SWAPPED, 'far')).toBe(0)
   })
 })
 

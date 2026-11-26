@@ -1,8 +1,9 @@
 // The sources of the Gen 5 page's components (#79): each a git repository at one full commit,
 // pinned by the SHA-256 of the tar that `git archive` writes of it (scripts/gen5-sources.ts; each
-// read with --print under git 2.53.0, 25.11.2026, and held on a fresh fetch). Each names its
-// basis: how we know the served files came from that commit, in the words the licences page
-// prints beside its archive. scripts/gen5-manifest.ts gives them to its components.
+// read with --print under git 2.53.0, on 25.11.2026 and for Emscripten and zlib on 26.11.2026,
+// and held on a fresh fetch). Each names its basis: how we know the served files came from that
+// commit, in the words the licences page prints beside its archive. scripts/gen5-manifest.ts
+// gives them to its components.
 import type { Source } from './gen5-manifest.ts'
 
 /** EmulatorJS's commit: the registry's gitHead of both pinned packages (scripts/gen5-fetch.ts). */
@@ -64,4 +65,31 @@ export const SOCKET_IO_SOURCE: Source = {
   commit: '91e1c8b3584054db6072046404a24e79a17c1367',
   tar: '81780e2ad998b36375cbe33f6420e700f0f830b9f921bf98b090648cf1f9a932',
   basis: "the tag socket.io@4.8.1, the version the served file's header names",
+}
+
+/** The LLVM commit the core's wasm names as its compiler ("21.0.0git (https:/github.com/llvm/
+ * llvm-project 23e3cbb...)"). Of Emscripten's releases only 4.0.8 builds with it: the DEPS of
+ * emscripten-releases at 4.0.8 (56f86607aeb458086e72f23188789be2ee0e971a) name it beside the
+ * emscripten commit below. */
+export const EMSCRIPTEN_LLVM_COMMIT = '23e3cbb2e82b62586266116c8ab77ce68e412cf8'
+
+/** The tag 4.0.8: the emscripten_revision of 4.0.8's DEPS. The build scripts' CI took its
+ * Emscripten version from a setting the pin does not hold, so the release is an inference from
+ * the LLVM commit; the notices are the same at every emscripten commit that LLVM commit built. */
+export const EMSCRIPTEN_SOURCE: Source = {
+  name: 'emscripten',
+  repository: 'https://github.com/emscripten-core/emscripten',
+  commit: '70404efec4458b60b953bc8f1529f2fa112cdfd1',
+  tar: '9506c8b4b94d5a15a39de95a052c5fc8a1b18232abfd3ba28dcc8421385b98d2',
+  basis: "inferred: the one Emscripten release whose LLVM commit the core's wasm names",
+}
+
+/** The tag v1.3.1. Emscripten 4.0.8's tools/ports/zlib.py names VERSION 1.3.1 and fetches
+ * GitHub's archive of this tag, whose SHA-512 is the port's HASH; the core's wasm holds 1.3.1. */
+export const ZLIB_SOURCE: Source = {
+  name: 'zlib',
+  repository: 'https://github.com/madler/zlib',
+  commit: '51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf',
+  tar: 'c26b1af0562377fe129e26be73e8adf50a2ac9250c2523fa5805bdbca47fabc7',
+  basis: "the tag v1.3.1, the version Emscripten 4.0.8's zlib port names and the core's wasm holds",
 }

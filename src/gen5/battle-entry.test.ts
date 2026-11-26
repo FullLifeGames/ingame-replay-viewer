@@ -93,6 +93,19 @@ describe('battleEntry through the opening', () => {
     expect(rest).toEqual([])
   })
 
+  it('marks the opening every so many frames, if asked to, so its text shows in the frames', () => {
+    const pace = { every: 4, throughOpening: true, openingMarkEvery: 30 }
+    expect(battleEntry([MODE, POINTER], limits, pace)[2]).toEqual({
+      kind: 'until',
+      name: 'action',
+      checks: [MODE, POINTER],
+      holdFor: 1,
+      limit: 300,
+      mash,
+      markEvery: 30,
+    })
+  })
+
   it('keeps the steps of today without the option', () => {
     expect(battleEntry([MODE, POINTER], limits, { every: 4, throughOpening: false })).toEqual(
       battleEntry([MODE, POINTER], limits, { every: 4 }),

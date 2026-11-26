@@ -1,11 +1,9 @@
 // The spike page's frame hook (#72): one call before each iteration of the core's main loop, which
 // plays a macro one emulated frame at a time (src/gen5/macro.ts), saves a state and a frame at each
-// mark, logs the watched RAM values and drives the page's fixed clock (src/gen5/clock.ts).
-// Emscripten's main loop calls `Module.preMainLoop` before each iteration; EmulatorJS builds the
-// Module itself, so the page wraps the core's factory `EJS_Runtime` as the core's script defines
-// it and adds the call. RetroArch runs at most one core frame per iteration; the core's frame
-// counter tells which iterations ran one, and the hook counts the frames it did not see.
-import { CLOCK_START, clockMs } from '../../gen5/clock.ts'
+// mark, logs the watched RAM values and gives the emulated frame that drives the page's fixed clock
+// (src/gen5/clock.ts). core-runtime.ts hands the call to the core. RetroArch runs at most one core
+// frame per iteration; the core's frame counter tells which iterations ran one, and the hook counts
+// the frames it did not see.
 import type { Gen5Hook, MarkRecord, RunPlan, RunReport } from '../../gen5/hook.ts'
 import {
   type Button,
@@ -34,26 +32,6 @@ type FrameHookCalls = Pick<Gen5Hook, 'queueRun' | 'runReport' | 'takeMark'>
 const WATCH_LINES = 400
 /** A run from a state loads it once the core has run this many frames, so RetroArch is up. */
 const LOAD_AFTER_FRAMES = 10
-
-/** Wraps the core's factory as its script assigns it, so the Module gets `preMainLoop`. */
-export function wrapRuntime(preMainLoop: () => boolean): void {
-  type Factory = (options: Record<string, unknown>) => Promise<unknown>
-  let wrapped: Factory | undefined
-  Object.defineProperty(window, 'EJS_Runtime', {
-    configurable: true,
-    get: () => wrapped,
-    set: (factory: Factory) => {
-      wrapped = (options) => factory(Object.assign(options, { preMainLoop }))
-    },
-  })
-}
-
-/** `Date.now` from the emulated frame: the core's real-time clock reads it (src/gen5/clock.ts). */
-export function fixClock(frame: () => number): void {
-  const { year, monthIndex, day, hour } = CLOCK_START
-  const startMs = new Date(year, monthIndex, day, hour).getTime()
-  Date.now = () => clockMs(startMs, frame())
-}
 
 function readWidth(ram: MainRam, address: number, width: 1 | 2 | 4): number {
   if (width === 4) return ram.read32(address)
@@ -94,7 +72,8 @@ class FrameDriver {
   private offset = 0
   /** The page frame at which a state load was asked for. */
   private loadedAt: number | undefined
-  private shots: Promise<unknown> = Promise.resolve()
+  /** The page frame of the last picture asked for, and its promise. */
+  private lastShot: { page: number; shot: Promise<Uint8Array> } | undefined
   private run: Run | undefined
   private lastPage: number | undefined
   private readonly read: ReadRam
@@ -138,16 +117,27 @@ class FrameDriver {
     if (run) this.step(g, run, page, starting ? 0 : skipped)
   }
 
-  /** True when a queued run starts at this frame: at once from boot; from a state at the first
-   * frame after the load, which waits until RetroArch is up. */
+  /** True when a queued run starts at this frame: at once from boot, or at its frame; from a
+   * state at the first frame after the load, which waits until RetroArch is up. */
   private ready(g: FrameGame, plan: RunPlan, page: number): boolean {
-    if (plan.state === undefined) return true
+    if (plan.state === undefined) return plan.startAt === undefined || this.due(plan.startAt, page)
     if (this.loadedAt !== undefined && page > this.loadedAt) {
       this.checkLoad(plan)
       return true
     }
     if (this.loadedAt === undefined && page >= LOAD_AFTER_FRAMES) this.load(g, plan.state, page)
     return false
+  }
+
+  /** True at the frame `startAt`; past it the queued run fails, as it can no longer start there. */
+  private due(startAt: number, page: number): boolean {
+    const frame = page + this.offset
+    if (frame > startAt) {
+      this.queued = undefined
+      this.report.status = 'failed'
+      this.report.failed = `the run was to start at frame ${String(startAt)}, and the hook first saw frame ${String(frame)}`
+    }
+    return frame === startAt
   }
 
   /** Loads a state; the run starts at the next frame the hook sees, once the load took hold. */
@@ -182,9 +172,11 @@ class FrameDriver {
   }
 
   private step(g: FrameGame, run: Run, page: number, skipped: number): void {
-    for (let i = 0; i < skipped; i += 1) this.applyAll(run.player.next(this.read))
+    for (let i = 0; i < skipped; i += 1) {
+      if (!this.applied(g, run, run.player.next(this.read), page)) return
+    }
     const input = run.player.next(this.read)
-    this.applyAll(input)
+    if (!this.applied(g, run, input, page)) return
     for (const name of input.marks) this.capture(g, name, page)
     for (const change of buttonChanges(run.held, input.buttons)) {
       g.simulateInput(0, change.index, change.value)
@@ -195,18 +187,31 @@ class FrameDriver {
     if (input.done) this.finish(g, run, input.failed, page)
   }
 
-  /** A frame's writes into main RAM, applied before it runs and logged among the watched values;
-   * a frame the hook did not see still gets its writes. */
-  private applyAll(input: FrameInput): void {
-    for (const write of input.writes ?? []) this.apply(write)
+  /** A frame's writes, applied before it runs, also for a frame the hook did not see. A write
+   * whose chain leaves main RAM fails the run at its step, as an `until` past its limit does,
+   * and none of the step's later writes follow: false then. */
+  private applied(g: FrameGame, run: Run, input: FrameInput, page: number): boolean {
+    for (const write of input.writes ?? []) {
+      const fault = this.apply(write)
+      if (fault === undefined) continue
+      const step = run.plan.steps[input.step]
+      const name = step?.kind === 'write' ? `"${step.name}" ` : ''
+      this.report.step = input.step
+      for (const mark of input.marks) this.capture(g, mark, page)
+      this.finish(g, run, `step ${String(input.step)} ${name}could not write ${fault}`, page)
+      return false
+    }
+    return true
   }
 
-  private apply(write: MemoryWrite): void {
+  /** Writes `write` and logs its field, never a heap address; or gives its chain's fault. */
+  private apply(write: MemoryWrite): string | undefined {
     const ram = this.ram()
-    for (const word of wordWrites(write, ram.read32)) ram.write32(word.address, word.value)
-    this.report.watch.push(
-      `${String(this.frame)}: wrote ${write.field} at 0x${write.address.toString(16)}`,
-    )
+    const words = wordWrites(write, ram.read32)
+    if ('fault' in words) return words.fault
+    for (const word of words.words) ram.write32(word.address, word.value)
+    this.report.watch.push(`${String(this.frame)}: wrote ${write.field}`)
+    return undefined
   }
 
   private watch(run: Run): void {
@@ -228,6 +233,20 @@ class FrameDriver {
     this.run = undefined
   }
 
+  /** One picture per emulated frame. EmulatorJS's screenshot has the core write one file and
+   * polls for it while the core runs on, so a picture shows the core's frame soon after the
+   * mark's, not the mark's own, and it is the same picture for every mark of that frame. A
+   * second request on the frame would picture a later one, set by wall time. Each request waits
+   * for the one before, so pictures keep the frames' order. Keyed by the page's frame counter,
+   * which `preMainLoop` sees once per core frame. */
+  private shotOf(g: FrameGame, page: number): Promise<Uint8Array> {
+    if (this.lastShot?.page === page) return this.lastShot.shot
+    const before = this.lastShot?.shot ?? Promise.resolve()
+    const shot = before.then(() => g.screenshot())
+    this.lastShot = { page, shot }
+    return shot
+  }
+
   /** The plan's mark values read now, as `name=0x…`. */
   private markValues(): string {
     const refs = this.run?.plan.markRefs ?? []
@@ -239,14 +258,13 @@ class FrameDriver {
     )
   }
 
-  /** The state now, the core's frame soon after, and a hash of main RAM now. */
+  /** The state now, the frame's picture (see `shotOf`), and a hash of main RAM now. */
   private capture(g: FrameGame, name: string, page: number): void {
     // getState serializes main RAM into the heap: a second copy the scan would also find.
     const ramNow = this.ram().read(MAIN_RAM_START, MAIN_RAM_SIZE)
     const kept = this.run?.plan.stateMarks
     const state = kept === undefined || kept.includes(name) ? g.getState() : new Uint8Array()
-    const shot = this.shots.then(() => g.screenshot())
-    this.shots = shot
+    const shot = this.shotOf(g, page)
     this.captures.set(name, { state, shot })
     const record: MarkRecord = {
       name,

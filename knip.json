@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["src/web/gen5/main.ts", "scripts/gen5-*.ts"],
+  "entry": ["src/web/gen5/main.ts", "src/web/gen5/extract7z.ts", "scripts/gen5-*.ts"],
   "project": ["src/**/*.ts", "scripts/**/*.ts"],
   "ignoreBinaries": ["arm-none-eabi-nm", "make"]
 }

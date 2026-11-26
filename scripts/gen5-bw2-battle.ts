@@ -1,17 +1,20 @@
 // The battle structs of the pinned pokebw2 checkout that lead from the server to the Pokémon
 // (#72): laid out by gen5-bw2-struct.ts, the long ones only up to the member the spike reads,
-// whose offset does not depend on the members after it. Also the single battle's clients and the
-// client at each position, from its setup (#77). Part of build/gen5/bw2.json.
+// whose offset does not depend on the members after it. Also the single battle's clients, the
+// client at each position (#77) and the player's client and the opponent's (#93), from its setup.
+// Part of build/gen5/bw2.json.
 import type { BattleNumbers, SingleBattle } from '../src/gen5/bw2-numbers.ts'
 import { bodyOf, enumAround, literal, stripComments } from './gen5-bw2-c.ts'
+import { singleClients } from './gen5-bw2-clients.ts'
 import { firstMember, structLayout } from './gen5-bw2-struct.ts'
 
-/** The sources read: btl_server.c and .h, btl_main.c and .h, and btl_pokeparam.h. */
+/** The sources read: btl_server.c and .h, btl_main.c and .h, btl_client.h and btl_pokeparam.h. */
 export interface BattleSources {
   serverC: string
   serverH: string
   mainC: string
   mainH: string
+  clientH: string
   pokeparamH: string
 }
 
@@ -39,8 +42,9 @@ function positions(body: string): number[] {
   return posClientIds
 }
 
-/** The client count and the client at each position that the single battle's setup assigns. */
-function singleBattle(mainC: string): SingleBattle {
+/** The client count, the client at each position, and the player's client and the opponent's,
+ * as the single battle's setup assigns them. */
+function singleBattle(mainC: string, clientH: string): SingleBattle {
   const body = stripComments(bodyOf(mainC, `${SINGLE_SETUP}(`))
   const counts = [...body.matchAll(COUNT)].map((match) => match[1] ?? '')
   const [count] = counts
@@ -55,11 +59,17 @@ function singleBattle(mainC: string): SingleBattle {
       throw new Error(`${SINGLE_SETUP} puts client ${String(client)} at ${String(at)} positions`)
     }
   }
-  return { clientCount, posClientIds }
+  const clients = singleClients(mainC, clientH)
+  if ([clients.player, clients.opponent].some((client) => client >= clientCount)) {
+    throw new Error(
+      `${SINGLE_SETUP} creates the player's or the opponent's client outside the count`,
+    )
+  }
+  return { clientCount, posClientIds, clients }
 }
 
 export function battleNumbers(sources: BattleSources): BattleNumbers {
-  const { serverC, serverH, mainC, mainH, pokeparamH } = sources
+  const { serverC, serverH, mainC, mainH, clientH, pokeparamH } = sources
   const first = firstMember(pokeparamH, 'BattleMon')
   if (first !== MON_CORE) throw new Error(`BattleMon starts with "${first}", not ${MON_CORE}`)
   const waitSelectSeq = enumAround(serverC, WAIT_SELECT)[WAIT_SELECT]
@@ -71,6 +81,6 @@ export function battleNumbers(sources: BattleSources): BattleNumbers {
     party: structLayout(mainH, 'BattleParty'),
     monCore: structLayout(pokeparamH, 'BattleMonCore', 'monId'),
     waitSelectSeq,
-    single: singleBattle(mainC),
+    single: singleBattle(mainC, clientH),
   }
 }
