@@ -25,6 +25,7 @@ import {
   handMadeBytes,
   missingForModule,
   playStream,
+  REFUSING_AUDIO,
   waitFor,
 } from './wasm-hook.ts'
 
@@ -133,11 +134,6 @@ test('a replay loaded by link starts at fast in the viewer and plays its instruc
   expect(notSameOriginGets).toEqual([`GET ${showdownUrl(LINKED)}`])
   expect(errors).toEqual([])
 })
-
-// An AudioContext whose resume() rejects; the e2e's tsconfig knows no DOM, so the script is text.
-const REFUSING_AUDIO =
-  'globalThis.AudioContext = class extends AudioContext {' +
-  "resume() { return Promise.reject(new Error('refused for the test')) } }"
 
 // #59: the END line replaces the running line, so a run without sound keeps the reason there. The
 // page's AudioContext refuses to resume, as a browser that blocks the page's sound does; its words

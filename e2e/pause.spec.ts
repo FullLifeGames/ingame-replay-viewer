@@ -1,10 +1,11 @@
 // The viewer's Pause and Play (#57) in Chromium. Each test reads the user's US Emerald by the
 // build's rule and skips without it or without the module. A pause holds the hand-made battle's
 // frame and its sound counts, and Play takes the battle to the END frame an unpaused run reaches.
-// Start plays a replay picked during a run, and during a pause too. A mouse click on Start hands
-// the focus to Pause once the run begins, so Space pauses that run. Space toggles the pause on the
-// page's body and through the focused button, and leaves a focused radio its own use. The tests
-// leave 994086 within its first seconds; no request leaves the page.
+// Start plays a replay picked during a run, and during a pause too, and a Play refused its sound
+// after such a pick keeps the pick's line. A mouse click on Start hands the focus to Pause once the
+// run begins, so Space pauses that run. Space toggles the pause on the page's body and through the
+// focused button, and leaves a focused radio its own use. The tests leave 994086 within its first
+// seconds; no request leaves the page.
 import { expect, type Page, test } from '@playwright/test'
 
 import { WASM_BUILD_STEPS } from '../scripts/wasm-link.ts'
@@ -17,6 +18,7 @@ import {
   handMadeBytes,
   missingForModule,
   playStream,
+  REFUSING_AUDIO,
   report,
   status,
   waitFor,
@@ -187,6 +189,41 @@ test('a pick during a pause leaves the run paused, and Start plays the pick', as
   expect((await read(page)).paused).toBe(false)
   // Start opens the sound again inside its click, so the new run plays with it.
   await expect.poll(async () => (await read(page)).audio.state).toBe('running')
+  expect(errors).toEqual([])
+  expect(requests).toEqual([])
+})
+
+// #90 D4: Play asks for the sound again. A refusal writes the running line with its reason, but
+// while the page shows another pick, "Picked …" stays: the next Start makes that pick's own run.
+test('a Play refused its sound keeps the line of a pick made during the pause', async ({
+  page,
+  baseURL,
+}) => {
+  test.setTimeout(300_000)
+  await page.addInitScript(REFUSING_AUDIO)
+  const { errors, requests } = await openWithDump(page, baseURL)
+  const pause = pauseButton(page)
+  const line = page.getByRole('status')
+  await startReplay(page, FIRST)
+  await waitFor(page, (now) => now.frame > 60, 30_000)
+  await pause.click()
+  await expect(pause).toHaveText('Play')
+  // Without a pick, the refused Play says so.
+  await pause.click()
+  await expect(line).toHaveText(
+    `Running ${labelOf(FIRST)}. It plays without sound: the audio did not resume.`,
+  )
+  await pause.click()
+  await expect(pause).toHaveText('Play')
+  await page.locator('#test-replay').selectOption(OTHER)
+  const picked = `Picked ${labelOf(OTHER)}. Press Start to play it.`
+  await expect(line).toHaveText(picked)
+  await pause.click()
+  await expect(pause).toHaveText('Pause')
+  await expect.poll(async () => (await read(page)).paused).toBe(false)
+  // The refusal settles within a task; the line still names the pick a second later.
+  await page.waitForTimeout(1_000)
+  await expect(line).toHaveText(picked)
   expect(errors).toEqual([])
   expect(requests).toEqual([])
 })

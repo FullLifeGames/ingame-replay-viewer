@@ -31,6 +31,12 @@ const NEEDED = [
 export const missingForModule = (): string[] =>
   [DUMP, ...NEEDED].filter((path) => !existsSync(path))
 
+// An AudioContext whose resume() rejects, as a browser that blocks the page's sound has; its
+// words read "refused for the test". The e2e's tsconfig knows no DOM, so the script is text.
+export const REFUSING_AUDIO =
+  'globalThis.AudioContext = class extends AudioContext {' +
+  "resume() { return Promise.reject(new Error('refused for the test')) } }"
+
 /** The hand-made battle's id, as the shot tool plans it. */
 export const HAND_MADE = 'hand-made'
 
