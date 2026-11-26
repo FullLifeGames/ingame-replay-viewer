@@ -9,11 +9,12 @@ import { isDeepStrictEqual } from 'node:util'
 
 import { describe, expect, it } from 'vitest'
 
-import type { Bw2Numbers, PkmNumbers } from '../src/gen5/bw2-numbers.ts'
-import { openPkm, pkmConstant, pkmField, pkmLayout, sealPkm } from '../src/gen5/pkm-cipher.ts'
+import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
+import { openPkm, pkmConstant, pkmLayout, sealPkm } from '../src/gen5/pkm-cipher.ts'
 import { plainPkm, type ReadPkm, readPkm } from '../src/gen5/pkm-fields.ts'
 import { pkmFormat } from '../src/gen5/pkm-members.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
+import { firstSavePkm, partiesIn } from './gen5-save-party.ts'
 
 const FILE = GEN5_PATHS.bw2Json
 const SAVE = `${GEN5_PATHS.saves}/route-20.sav`
@@ -34,33 +35,8 @@ const sameBytes = (a: Uint8Array, b: Uint8Array) =>
 const nameOf = (list: Record<string, number>, value: number) =>
   Object.entries(list).find(([, number]) => number === value)?.[0]
 
-/** Each place in `bytes` where a PokeParty of the party's capacity starts, its count in range and
- * its first Pokémon opening with a right checksum. */
-function partiesIn(bytes: Uint8Array, pkm: PkmNumbers): number[] {
-  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
-  const capacity = pkmField(pkm, 'PokeParty', 'capacity').offset
-  const count = pkmField(pkm, 'PokeParty', 'count').offset
-  const first = pkmField(pkm, 'PokeParty', 'pkms').offset
-  const partySize = pkmConstant(pkm, 'PARTY_SIZE')
-  const pkmSize = pkmLayout(pkm, 'PartyPkm').size
-  const found: number[] = []
-  for (let at = 0; at + pkmLayout(pkm, 'PokeParty').size <= bytes.length; at += 4) {
-    const n = view.getInt32(at + count, true)
-    if (view.getInt32(at + capacity, true) !== partySize || n < 1 || n > partySize) continue
-    const sealed = bytes.subarray(at + first, at + first + pkmSize)
-    if (openPkm(sealed, pkm).checksumRight) found.push(at)
-  }
-  return found
-}
-
 /** The save's first party Pokémon, sealed as the save holds it. */
-function firstPkm(numbers: Bw2Numbers): Uint8Array {
-  const { pkm } = numbers
-  const bytes = save()
-  const [party = -1] = partiesIn(bytes, pkm)
-  const at = party + pkmField(pkm, 'PokeParty', 'pkms').offset
-  return bytes.subarray(at, at + pkmLayout(pkm, 'PartyPkm').size)
-}
+const firstPkm = (numbers: Bw2Numbers): Uint8Array => firstSavePkm(save(), numbers.pkm)
 
 /** The fields whose values differ between two readings, by name. */
 const differing = (a: ReadPkm, b: ReadPkm) =>
