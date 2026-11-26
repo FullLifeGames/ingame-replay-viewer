@@ -72,7 +72,8 @@ class FrameDriver {
   private offset = 0
   /** The page frame at which a state load was asked for. */
   private loadedAt: number | undefined
-  private shots: Promise<unknown> = Promise.resolve()
+  /** The page frame of the last picture asked for, and its promise. */
+  private lastShot: { page: number; shot: Promise<Uint8Array> } | undefined
   private run: Run | undefined
   private lastPage: number | undefined
   private readonly read: ReadRam
@@ -232,6 +233,20 @@ class FrameDriver {
     this.run = undefined
   }
 
+  /** One picture per emulated frame. EmulatorJS's screenshot has the core write one file and
+   * polls for it while the core runs on, so a picture shows the core's frame soon after the
+   * mark's, not the mark's own, and it is the same picture for every mark of that frame. A
+   * second request on the frame would picture a later one, set by wall time. Each request waits
+   * for the one before, so pictures keep the frames' order. Keyed by the page's frame counter,
+   * which `preMainLoop` sees once per core frame. */
+  private shotOf(g: FrameGame, page: number): Promise<Uint8Array> {
+    if (this.lastShot?.page === page) return this.lastShot.shot
+    const before = this.lastShot?.shot ?? Promise.resolve()
+    const shot = before.then(() => g.screenshot())
+    this.lastShot = { page, shot }
+    return shot
+  }
+
   /** The plan's mark values read now, as `name=0x…`. */
   private markValues(): string {
     const refs = this.run?.plan.markRefs ?? []
@@ -243,14 +258,13 @@ class FrameDriver {
     )
   }
 
-  /** The state now, the core's frame soon after, and a hash of main RAM now. */
+  /** The state now, the frame's picture (see `shotOf`), and a hash of main RAM now. */
   private capture(g: FrameGame, name: string, page: number): void {
     // getState serializes main RAM into the heap: a second copy the scan would also find.
     const ramNow = this.ram().read(MAIN_RAM_START, MAIN_RAM_SIZE)
     const kept = this.run?.plan.stateMarks
     const state = kept === undefined || kept.includes(name) ? g.getState() : new Uint8Array()
-    const shot = this.shots.then(() => g.screenshot())
-    this.shots = shot
+    const shot = this.shotOf(g, page)
     this.captures.set(name, { state, shot })
     const record: MarkRecord = {
       name,
