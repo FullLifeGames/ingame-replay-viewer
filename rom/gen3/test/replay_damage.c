@@ -184,6 +184,24 @@ REPLAY_TEST("HP out of the red stops the low-HP beep with that op")
     }
 }
 
+// The beep is the near side's alone: the game calls HandleLowHpMusicChange for a player-side
+// battler only (SetBattlerMonData in battle_controllers.c).
+REPLAY_TEST("HP into the red of a far mon starts no beep")
+{
+    STREAM
+    {
+        StartDugtrioVsMagneton(100, 100);
+        ReplayStream_Hp(REPLAY_SIDE_FAR, 10);
+        ReplayStream_End(REPLAY_OUTCOME_TIE);
+    }
+    SCENE { HP_BAR(farMon, hp: 10); }
+    THEN
+    {
+        EXPECT_EQ(LowHpSong(REPLAY_SIDE_FAR), 0);
+        EXPECT(!ReplayTest_PlaysLowHpBeep());
+    }
+}
+
 REPLAY_TEST("FAINT after HP 0 takes the mon off the field on both sides")
 {
     u32 nearBattler = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
