@@ -35,7 +35,7 @@ The licences page holds, in this order:
 ## Where it lives
 
 - `scripts/gen5-manifest.ts` lists every file the page serves from EmulatorJS's packages. Each file names its components; each component names its version, licence, source by commit and notice files. The servers answer no other file of the site.
-- `scripts/gen5-notices.ts` names, for each component, the files at its pin that hold its notices and those of the parts its build compiles in, and the folders whose files each carry their own notice. It quotes nothing. The list comes from the build files at the pins: RetroArch's `Makefile.emulatorjs` and `Makefile.common`, melonDS's `Makefile.common`.
+- `scripts/gen5-notices.ts` names, for each component, the files at its pin that hold its notices and those of the parts its build compiles in, and the folders whose files each carry their own notice. It quotes nothing. The list comes from the build files at the pins: RetroArch's `Makefile.emulatorjs` and `Makefile.common`, melonDS's `Makefile.common`. Emscripten's parts follow the link flags in `Makefile.emulatorjs`.
 - `scripts/gen5-sources.ts` fetches each source's commit into a bare repository under `.cache/gen5/sources/git/`. It keeps a ref under `refs/pins/` on that commit, writes the archive with `git archive` and checks the tar's SHA-256 against the pin before it places the file.
 - `scripts/gen5-licences-read.ts` reads each notice and the GPL's text from the bare repositories with `git show <commit>:<path>`, and every file of such a folder in one `git cat-file --batch`. `scripts/gen5-notice-groups.ts` groups those files by their opening comment. `scripts/gen5-licences.ts` turns them into the page and escapes every string it got from a file.
 - `scripts/gen5-built.ts` writes `licences.html` beside the built page. The dev server (`scripts/gen5-serve.ts`) makes it on each request. Both answer `/source/<archive>` for the manifest's archives alone.
@@ -52,14 +52,34 @@ The core's package names no commit of melonDS or RetroArch. The core's own bytes
 
 The build scripts' commit is an inference from dates. Each core's `build.json` names the scripts' version 2.0.2, and `b24e5b5` was the head of EmulatorJS/build's main branch around the core's build day. Nothing in the core's bytes names that commit.
 
-`scripts/gen5-pins.ts` records each commit with its basis in a few words, and the licences page prints that basis beside the archive: the registry's `gitHead` for EmulatorJS, the commit named in the core's own bytes for melonDS and RetroArch, the inference from dates for the build scripts, and the tag of the version the served file equals or names for nipplejs and Socket.IO.
+`scripts/gen5-pins.ts` records each commit with its basis in a few words, and the licences page prints that basis beside the archive: the registry's `gitHead` for EmulatorJS, the commit named in the core's own bytes for melonDS and RetroArch, the inference from dates for the build scripts, the tag of the version the served file equals or names for nipplejs and Socket.IO, and for Emscripten and zlib the chain in the next section.
 
-## Parts with no notice in the pinned sources
+## The compiler's runtime and zlib
 
-Two parts the core holds carry no notice in any pinned source. The licences page names both and says so.
+Emscripten compiled and linked the core, and RetroArch's web build links zlib through Emscripten's port (`-s USE_ZLIB=1` in `Makefile.emulatorjs`); RetroArch's copy in `deps/libz` is not compiled in. Both are components of the core with a pinned source of their own, so the licences page quotes their notices from their own trees.
 
-- Emscripten's runtime. The build scripts' `build_env.sh` names emsdk 3.1.74 for a local build; their CI takes the version from a setting the pin does not hold. The core's wasm names its compiler as `21.0.0git (https:/github.com/llvm/llvm-project 23e3cbb2e82b62586266116c8ab77ce68e412cf8)`. Which Emscripten release that was is not established. No pinned tree holds Emscripten.
-- zlib. RetroArch's web build links Emscripten's own zlib port (`-s USE_ZLIB=1`); RetroArch's copy in `deps/libz` is not compiled in. The core's wasm holds zlib's messages and the string `1.3.1`, but no copyright line of zlib.
+Which Emscripten:
+
+- The core's wasm names its compiler as `21.0.0git (https:/github.com/llvm/llvm-project 23e3cbb2e82b62586266116c8ab77ce68e412cf8)`. A spec finds that commit in all four cores.
+- Each Emscripten release pins its LLVM commit in the `DEPS` file of emscripten-releases. Of the tagged releases, only 4.0.8 and 4.0.8-asserts name `23e3cbb`, and both name the emscripten commit `70404ef`, the tag 4.0.8.
+- The build scripts' `build_env.sh` names emsdk 3.1.74 for a local build, and their CI took the version from a setting the pin does not hold. So the release is an inference, and the licences page says so beside the archive.
+- The repository emscripten-releases held that LLVM commit for 13 days, across 47 emscripten commits. None of them changed `LICENSE`, the library notices below or the zlib port, so the notices are the same whichever of those commits built the core.
+
+Which zlib:
+
+- Emscripten's `tools/ports/zlib.py` at `70404ef` names version 1.3.1 and fetches GitHub's archive of zlib's tag `v1.3.1`; the port's SHA-512 is that archive's. The tag points at commit `51b7f2a`. The core's wasm holds the string `1.3.1`, and a spec finds it in all four cores.
+- zlib's notice stands in `zlib.h`, lines 1 to 23. Its `LICENSE` at the tag still names the years 1995-2022, so the page quotes `zlib.h`.
+
+What of Emscripten the core holds, from the link flags and the strings in the wasm:
+
+- the JavaScript runtime, which is the core's glue `melonds_libretro.js`, with Node.js's `path` code: Emscripten's `LICENSE`, MIT or NCSA, with Node's MIT notice;
+- musl, the C library: `system/lib/libc/musl/COPYRIGHT`, MIT;
+- libc++, libc++abi and compiler-rt: each its `LICENSE.TXT`, Apache-2.0 with the LLVM exception and the older NCSA and MIT texts;
+- dlmalloc, the default allocator, which no flag changes: `system/lib/dlmalloc.c`, lines 52 to 55, public domain.
+
+Left out: libunwind, mimalloc, emmalloc and SDL, which no flag links in, and the tools of LLVM and Binaryen, which made the output but put none of their code in it.
+
+GPL-3.0 leaves a work's System Libraries out of its Corresponding Source, and section 1 counts the compiler that produced the work as a Major Component. A System Library is a part that "serves only to enable use of the work with that Major Component, or to implement a Standard Interface for which an implementation is available to the public in source code form." Emscripten's runtime and libraries fit that reading, so their source may not be owed, while their MIT notices are owed all the same. zlib is in doubt: Emscripten ships the recipe of its port, not zlib itself. The page offers both sources anyway, so no reading changes what it serves.
 
 ## libretro-common's notices
 
