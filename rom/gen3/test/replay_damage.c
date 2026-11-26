@@ -2,6 +2,7 @@
 #include "battle.h"
 #include "battle_anim.h"
 #include "pokemon.h"
+#include "replay_ops.h"
 #include "sprite.h"
 #include "test/replay_test.h"
 #include "constants/battle.h"
@@ -13,7 +14,8 @@
 
 // A move and its damage (#6, #15): MOVE plays the user's move animation, HIT the effectiveness
 // sound and the hit animation, HP moves the HP bar and sets the mon's HP, FAINT plays the faint cry
-// and the faint animation, and FLUSH_TEXT_BOX empties the text box before a later hit.
+// and the faint animation, and FLUSH_TEXT_BOX empties the text box before a later hit. HP starts
+// and stops the low-HP beep of a near mon (#91).
 
 // Dugtrio near and Magneton far, both on the field.
 static void StartDugtrioVsMagneton(u32 nearHp, u32 farHp)
@@ -138,6 +140,47 @@ REPLAY_TEST("HP keeps to the mon's max HP")
     {
         EXPECT_EQ(farMon->hp, 100);
         EXPECT_EQ(GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_HP), 100);
+    }
+}
+
+// The low-HP beep (#91). The game sets the HP after the bar with datahpupdate, whose SetMonData
+// handler starts or stops the beep on the new HP (HandleLowHpMusicChange in battle_controllers.c).
+// The bar's end calls it too, on the HP from before the op. The beep is a burst that ends by
+// itself, so the tests read lowHpSong, the flag that says it runs.
+static u32 LowHpSong(u32 side)
+{
+    return gBattleSpritesDataPtr->battlerData[Replay_GetBattler(side)].lowHpSong;
+}
+
+REPLAY_TEST("HP into the red starts the low-HP beep with that op")
+{
+    STREAM
+    {
+        StartDugtrioVsMagneton(100, 100);
+        ReplayStream_Hp(REPLAY_SIDE_NEAR, 10);
+        ReplayStream_End(REPLAY_OUTCOME_TIE);
+    }
+    SCENE { HP_BAR(nearMon, hp: 10); }
+    THEN
+    {
+        EXPECT_EQ(LowHpSong(REPLAY_SIDE_NEAR), 1);
+        EXPECT(ReplayTest_PlaysLowHpBeep());
+    }
+}
+
+REPLAY_TEST("HP out of the red stops the low-HP beep with that op")
+{
+    STREAM
+    {
+        StartDugtrioVsMagneton(10, 100);
+        ReplayStream_Hp(REPLAY_SIDE_NEAR, 100);
+        ReplayStream_End(REPLAY_OUTCOME_TIE);
+    }
+    SCENE { HP_BAR(nearMon, hp: 100); }
+    THEN
+    {
+        EXPECT_EQ(LowHpSong(REPLAY_SIDE_NEAR), 0);
+        EXPECT(!ReplayTest_PlaysLowHpBeep());
     }
 }
 
