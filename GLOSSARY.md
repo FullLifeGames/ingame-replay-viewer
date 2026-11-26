@@ -137,7 +137,7 @@ The BPS patch from the base ROM to the WebAssembly module (`irv-emerald-wasm.bps
 _Avoid_: wasm patch, module download
 
 **Sanitized module**:
-A WebAssembly module built with one of clang's runtime checks, so that a replay run reports every place in the game's C that breaks the check (#44: shifts). It stays on devbox beside the module the page loads and has no module patch.
+A WebAssembly module built with one of clang's runtime checks, so that a replay run reports every place in the game's C that breaks the check (#44: shifts). It stays on the build machine beside the module the page loads and has no module patch.
 _Avoid_: debug build, test module
 
 **Overlay patch**:
@@ -161,6 +161,10 @@ _Avoid_: old page, mGBA page
 **Example replay**:
 A test replay that both pages offer in their select.
 _Avoid_: demo, sample
+
+**Replay label**:
+How the pages name a replay: its format, its players and the number its replay ID ends in, such as "Gen 3 OU: A Welcome Guest vs xXEricXx (994052)". The example select and every status line use it. A replay without a format leaves that part out, and one with neither format nor players goes by its replay ID.
+_Avoid_: replay name, title
 
 **Panel**:
 The lines above the game on the viewer: the two players' names by side and the turn the game has reached.
@@ -217,7 +221,7 @@ The check that walks every kind of battle log line the protocol library knows an
 _Avoid_: coverage list
 
 **Named list**:
-The kinds of battle log line the battle script has no rule for, in four groups, each with its reason: kinds a replay's log never holds, kinds of formats the viewer refuses, kinds that only Gen 4 and later log, which no rule shows yet, and kinds with no rule yet. Since #65 the last group holds none. Of the four, a test replay may hold only lines of the last group. A dropped line of a kind on the list carries that kind's reason, and the page's list "Not shown in the game" prints it.
+The kinds of battle log line the battle script has no rule for, in three groups, each with its reason: kinds a replay's log never holds, kinds of formats the viewer refuses, and kinds that only Gen 4 and later log, which no rule shows yet. A test replay holds no line of a kind on the list. A dropped line of a kind on the list carries that kind's reason, and the page's list "Not shown in the game" prints it.
 _Avoid_: named gap list, allow list
 
 **Content gap**:

@@ -1,5 +1,5 @@
 // Showdown for the e2e: a route that answers a replay's JSON from the test fixture, so no request
-// leaves devbox, and the Load of a replay by link or ID that both pages offer.
+// leaves the build machine, and the Load of a replay by link or ID that both pages offer.
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 

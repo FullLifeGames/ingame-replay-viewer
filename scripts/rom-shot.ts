@@ -41,7 +41,7 @@ import type { Expected, SceneVerdict, ToolOutput } from './rom-shot-run.ts'
 import { missingScenes, refusalScenes, scenesOf, shotArgs } from './rom-shot-scenes.ts'
 import type { Scene } from './rom-shot-scenes.ts'
 import type * as ShotStream from './rom-shot-stream.ts'
-import { SEND_OUTS } from './wasm-sendouts.ts'
+import { SEND_OUTS } from './wasm-sendouts-name.ts'
 
 const HAND_MADE = 'hand-made'
 const DEFAULT_REPLAY = '994052'

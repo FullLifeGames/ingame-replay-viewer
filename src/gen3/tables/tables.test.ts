@@ -1,5 +1,6 @@
 // The committed tables against the pin and against @pkmn's data. These run in CI, which has no
-// checkout of the expansion; scripts/gen3-tables.test.ts regenerates the tables on devbox.
+// checkout of the expansion; scripts/gen3-tables.test.ts regenerates the tables on the build
+// machine.
 import { describe, expect, it } from 'vitest'
 
 import build from '../../../rom/gen3/build.json'

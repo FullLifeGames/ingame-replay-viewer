@@ -2,6 +2,7 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   realpathSync,
   rmSync,
@@ -14,6 +15,8 @@ import { dirname, join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 
 import { withoutGitVariables } from './rom-git.ts'
+import { readSeries } from './rom-upstream.ts'
+import { WASM_DIR } from './wasm-config.ts'
 import { patchedFiles, prepareCopies } from './wasm-overlay.ts'
 import type { CopySet } from './wasm-overlay.ts'
 
@@ -140,5 +143,22 @@ describe('the patched copies', () => {
   it('refuse a folder for the copies outside build/wasm', () => {
     const set = layout({})
     expect(() => prepareCopies({ ...set, to: join(set.from, 'copies') })).toThrow(/may not delete/)
+  })
+})
+
+describe('rom/gen3/wasm/patches/series', () => {
+  const dir = join(WASM_DIR, 'patches')
+  const names = readSeries(readFileSync(join(dir, 'series'), 'utf8'))
+  const files = names.flatMap((name) => patchedFiles(readFileSync(join(dir, name), 'utf8'), name))
+
+  it('lists every patch of its folder and no other', () => {
+    const folder = readdirSync(dir).filter((name) => name.endsWith('.patch'))
+    expect([...names].sort()).toEqual(folder.sort())
+  })
+
+  // The division rewrite gives libgcc's result for every division of the module (#66), so the
+  // shake animations' zero divisor needs no patch of its own (#91).
+  it('leaves the shake animations of pokemon_animation.c to the division rewrite', () => {
+    expect(files).not.toContain('src/pokemon_animation.c')
   })
 })

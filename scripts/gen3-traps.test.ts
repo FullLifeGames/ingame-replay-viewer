@@ -1,4 +1,4 @@
-// P2 for the partial traps (devbox): each row of the pinned `gWrappedStringIds`
+// P2 for the partial traps (pinned tree): each row of the pinned `gWrappedStringIds`
 // (`src/battle_message.c`) names a trapping move in its `// MOVE_*` comment and the message the game
 // prints when that move traps a Pokémon. `phrases-effects.ts` keys the trap start lines by move id,
 // so this spec ties those ids to the table: a Gen 3 move starts with the template of its row's

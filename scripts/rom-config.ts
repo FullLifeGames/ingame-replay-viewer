@@ -1,5 +1,6 @@
 // rom/gen3/build.json: the pinned upstream, the SHA1 of the base ROM the patch is made from, and
-// the make job cap (3 keeps a build beside another session on devbox's 6 shared cores and 12 GB).
+// the make job cap (3 keeps a build beside another session on the build machine's 6 shared cores
+// and 12 GB).
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 

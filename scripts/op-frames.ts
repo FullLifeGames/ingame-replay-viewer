@@ -1,4 +1,4 @@
-// The per-op frame log (#71): `node scripts/op-frames.ts [--threshold <n>] <stream>...` compares
+// The per-op frame log (#71): `npm run wasm:op-frames -- [--threshold <n>] <stream>...` compares
 // the frames at which each op of a stream starts in mGBA (build/rom/shots/<stream>/, from
 // `npm run rom:shots`) and in the module (build/wasm/run/<stream>/, from `npm run wasm:run`), and
 // names the first op where the two part by more than the threshold.
@@ -309,7 +309,7 @@ function main(): void {
     })
     const threshold = values.threshold === undefined ? DEFAULT_THRESHOLD : Number(values.threshold)
     if (!Number.isInteger(threshold) || threshold < 0 || positionals.length === 0) {
-      throw new Error('usage: node scripts/op-frames.ts [--threshold <frames>] <stream>...')
+      throw new Error('usage: npm run wasm:op-frames -- [--threshold <frames>] <stream>...')
     }
     for (const stream of positionals) {
       for (const line of compareStream(stream, threshold)) process.stdout.write(`${line}\n`)

@@ -8,8 +8,9 @@
 // the .err files in build/wasm/compile and the report, and fails when a file fails. `--link
 // [report.md]` compiles the glue again and links it with the objects of compile.json and build/wasm/asm (npm run wasm:convert) into
 // build/wasm/irv-emerald.js and irv-emerald.wasm, turns each division of the module into a call of
-// the glue's helper (scripts/wasm-divide.ts, #66), then writes the patch from the dump to the
-// module (irv-emerald-wasm.bps); `--patch [report.md]` writes that patch alone. `--sanitize shift`
+// the glue's helper (scripts/wasm-divide.ts, #66; when that fails it removes irv-emerald.wasm),
+// then writes the patch from the dump to the module (irv-emerald-wasm.bps); `--patch [report.md]`
+// writes that patch alone. `--sanitize shift`
 // beside `--compile` or `--link` builds a module with clang's shift check (#44) under
 // build/wasm/sanitize, with no division rewrite and no patch, and leaves the normal outputs alone.
 // Everything it writes lies under build/wasm, apart from a report path named on the command line.
@@ -20,7 +21,7 @@ import { isAbsolute, join } from 'node:path'
 
 import { runCliAsync } from './rom-cli.ts'
 import { loadBuildConfig } from './rom-config.ts'
-import { REPO_DIR } from './rom-paths.ts'
+import { removeInside, REPO_DIR } from './rom-paths.ts'
 import { readPreflightInput } from './rom-preflight.ts'
 import { renderCensus } from './wasm-census.ts'
 import type { CensusEntry } from './wasm-census.ts'
@@ -248,6 +249,9 @@ async function link(paths: WasmPaths, config: WasmConfig, args: BuildArgs): Prom
         return `Sizes: ${sizes.join(', ')}.`
       },
       patch: () => patch(paths),
+      discard: () => {
+        removeInside(wasmRoots(REPO_DIR), wasm)
+      },
     },
     sanitize,
   )
@@ -269,13 +273,16 @@ export interface LinkSteps {
   sizes: () => string
   /** The module patch from the dump; its line of the report. */
   patch: () => string
+  /** Removes the linked module whose rewrite failed. */
+  discard: () => void
 }
 
 /**
  * The link, then the division rewrite, then the sizes and the patch, so the patch, the sizes and
- * the page all see the rewritten module. Returns the report's lines. A sanitized module gets no
- * rewrite: it is the tool that finds a fault, and a division that traps there is its finding. No
- * page loads it (#44), so it gets no patch either.
+ * the page all see the rewritten module. Returns the report's lines. When the rewrite fails, the
+ * plain link goes, so no later step, such as --patch, takes it for a finished module. A sanitized
+ * module gets no rewrite: it is the tool that finds a fault, and a division that traps there is
+ * its finding. No page loads it (#44), so it gets no patch either.
  */
 export async function linkSteps(steps: LinkSteps, sanitize?: Sanitizer): Promise<string[]> {
   const lines: string[] = []
@@ -284,20 +291,19 @@ export async function linkSteps(steps: LinkSteps, sanitize?: Sanitizer): Promise
     say(line)
   }
   add(steps.link())
-  add(
-    sanitize === undefined
-      ? await divideLine(steps.divide)
-      : 'Divide: none for a sanitized module.',
-  )
+  add(sanitize === undefined ? await divideLine(steps) : 'Divide: none for a sanitized module.')
   add(steps.sizes())
   // patch() names its own line.
   lines.push(sanitize === undefined ? steps.patch() : 'Patch: none for a sanitized module.')
   return lines
 }
 
-async function divideLine(divide: LinkSteps['divide']): Promise<string> {
+async function divideLine(steps: LinkSteps): Promise<string> {
   const start = performance.now()
-  const counts = await divide()
+  const counts = await steps.divide().catch((error: unknown) => {
+    steps.discard()
+    throw error
+  })
   const seconds = Math.round((performance.now() - start) / 1000)
   return (
     `Divide: calls the helpers at ${countLine(counts.rewritten)}; ` +

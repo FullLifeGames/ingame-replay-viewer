@@ -55,7 +55,7 @@ export function showPick(
 export const pickedFrom =
   (view: PickView): Then =>
   (summary) => {
-    view.status(pickedLine(summary.id))
+    view.status(pickedLine(summary.label))
   }
 
 /** After a Load or a file: no test replay is picked, and the page asks for Start. */
@@ -63,5 +63,5 @@ export const loadedFrom =
   (view: PickView): Then =>
   (summary) => {
     view.testReplay.selectedIndex = -1
-    view.status(pickedLine(summary.id))
+    view.status(pickedLine(summary.label))
   }

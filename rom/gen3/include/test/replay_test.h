@@ -75,6 +75,10 @@ const struct ReplayProgress *ReplayTest_ProgressAtOutroStart(void);
 bool32 ReplayTest_PlaysLowHpBeep(void);
 bool32 ReplayTest_LowHpBeepAtOutroStart(void);
 
+// Whether the mon of a side (REPLAY_SIDE_*) was visible when the outro sent it back into its
+// ball. FALSE if no outro sent it back.
+bool32 ReplayTest_VisibleAtReturn(u32 side);
+
 // Called in STREAM: B is held on every frame the interpreter runs the battle, from the frame it
 // takes over the battle to END, as a player who holds B through the whole replay.
 void ReplayTest_HoldB(void);

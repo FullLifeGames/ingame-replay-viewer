@@ -4,11 +4,10 @@
 import { applyBps } from '../../patch/bps-apply'
 import type { SlotDescription } from '../../patch/slot'
 import { fetchBytes, fetchJson } from '../fetch'
-import { messageOf } from '../message'
 import { checkBaseRom, readSlotDescription } from '../rom'
 import { ROM_FILES } from '../rom-files'
 import { AUDIO_PROCESSOR, AUDIO_STOP, AudioMeter, type AudioProcessorOptions } from './audio'
-import type { Sound } from './audio-opener'
+import { type Silence, silenceOf, type Sound } from './audio-opener'
 import workletUrl from './audio-worklet.ts?worker&url'
 import { TickClock } from './clock'
 import { buildFailure, type FailedReport, RunFailure, workerFailure } from './failures'
@@ -59,7 +58,7 @@ export interface Run {
   /** The processor's link to the speakers, which a Start during the run's pause cuts first. */
   readonly speakers: Speakers
   /** Why the run plays without sound; undefined when it has sound. */
-  readonly silence: string | undefined
+  readonly silence: Silence | undefined
   readonly startedAt: number
   finishedMs: number | undefined
   /** The samples written into the ring by the page's first look at END. */
@@ -90,7 +89,7 @@ export async function openAudioContext(): Promise<AudioContext> {
 
 /** The run's sound: a processor that plays the ring into the context, or why there is none. */
 function connectRing(sound: Sound, ring: SharedArrayBuffer) {
-  if (typeof sound === 'string') return { output: undefined, silence: sound }
+  if ('reason' in sound) return { output: undefined, silence: sound }
   const processorOptions: AudioProcessorOptions = {
     ring,
     rate: MIXER_RATE,
@@ -106,7 +105,7 @@ function connectRing(sound: Sound, ring: SharedArrayBuffer) {
     node.connect(sound.destination)
     return { output: node, silence: undefined }
   } catch (error: unknown) {
-    return { output: undefined, silence: `the audio worklet failed: ${messageOf(error)}` }
+    return { output: undefined, silence: silenceOf('the audio worklet failed', error) }
   }
 }
 

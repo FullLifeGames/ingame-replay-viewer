@@ -106,8 +106,8 @@ function stagedHeads(repo: string): Staged[] {
   })
 }
 
-const offending = (repo: string) =>
-  stagedHeads(repo)
+const offending = (heads: readonly Staged[]) =>
+  heads
     .filter(({ head }) =>
       [
         hasGbaHeader,
@@ -168,7 +168,7 @@ describe('the check of a repo index', () => {
   unlinkSync(join(repo, 'renamed.txt'))
 
   it('finds a ROM header, the magics and the data assembly under any name, also when the file left the disk', () => {
-    expect(offending(repo)).toEqual([
+    expect(offending(stagedHeads(repo))).toEqual([
       'a.dat',
       'b.dat',
       'c.dat',
@@ -234,15 +234,24 @@ describe('the name rule', () => {
   })
 })
 
+// The scan reads every blob of the index. It took 8.9 s in a full check while a second heavy run
+// loaded the machine (#92), when it still read the index twice; the limit is twice that or more.
+const HEADER_SCAN_LIMIT = 20_000
+
 describe('the tracked tree', () => {
   it('holds no ROM, savestate, ELF, patch, frame, archive or core by name', () => {
     expect(tracked.filter((path) => isForbiddenName(path))).toEqual([])
   })
 
-  it('holds no file that starts with a GBA header, a patch, frame, wasm, gzip or 7z magic, or data assembly', () => {
-    expect(stagedHeads(root).length).toBeGreaterThan(0)
-    expect(offending(root)).toEqual([])
-  })
+  it(
+    'holds no file that starts with a GBA header, a patch, frame, wasm, gzip or 7z magic, or data assembly',
+    () => {
+      const heads = stagedHeads(root)
+      expect(heads.length).toBeGreaterThan(0)
+      expect(offending(heads)).toEqual([])
+    },
+    HEADER_SCAN_LIMIT,
+  )
 
   it.each([
     '.cache/rom/expansion/Makefile',

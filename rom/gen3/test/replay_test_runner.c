@@ -35,6 +35,7 @@ static EWRAM_DATA bool8 sPlayOutro = FALSE;
 static EWRAM_DATA bool8 sHoldB = FALSE;
 static EWRAM_DATA struct ReplayProgress sProgressAtOutroStart = {0};
 static EWRAM_DATA bool8 sLowHpBeepAtOutroStart = FALSE;
+static EWRAM_DATA bool8 sVisibleAtOutroReturn[REPLAY_STREAM_SIDE_COUNT] = {0};
 
 static void CB2_ReplayTest_Done(void);
 
@@ -56,6 +57,7 @@ static void ReplayTest_SetUp(void *data)
     sHoldB = FALSE;
     memset(&sProgressAtOutroStart, 0, sizeof(sProgressAtOutroStart));
     sLowHpBeepAtOutroStart = FALSE;
+    memset(sVisibleAtOutroReturn, 0, sizeof(sVisibleAtOutroReturn));
     Replay_Unload();
 }
 
@@ -168,6 +170,16 @@ bool32 ReplayTest_PlaysLowHpBeep(void)
 bool32 ReplayTest_LowHpBeepAtOutroStart(void)
 {
     return sLowHpBeepAtOutroStart;
+}
+
+void ReplayTest_AtOutroReturn(u32 side)
+{
+    sVisibleAtOutroReturn[side] = !gSprites[gBattlerSpriteIds[Replay_GetBattler(side)]].invisible;
+}
+
+bool32 ReplayTest_VisibleAtReturn(u32 side)
+{
+    return sVisibleAtOutroReturn[side];
 }
 
 static void CheckRecordedOp(u32 op)

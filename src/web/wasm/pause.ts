@@ -1,8 +1,8 @@
 // The viewer's Pause and Play (#57): the button's state, the Space rule and the toggle. DOM-free,
 // so a Node spec holds it; main.ts wires the button, the key and the draw loop to it. The pause
 // itself lives in the clock (clock.ts), so the page asks the clock whether a run stands paused.
-import { runningLine } from '../status'
-import type { AudioOpener, Sound } from './audio-opener'
+import { runningLine, type StatusLine } from '../status'
+import type { AudioOpener, Silence, Sound } from './audio-opener'
 import type { TickClock } from './clock'
 import { grant, readStatus } from './protocol'
 import type { Runs } from './runs'
@@ -65,10 +65,14 @@ export function spaceToggles(press: KeyPress, run: PausedRun | undefined): boole
   return press.key === ' ' && plain && !ownsSpace(press.target)
 }
 
-/** A run as the toggle sees it: the pause's run, the id of its replay and why it has no sound. */
+/**
+ * A run as the toggle sees it: the pause's run, its replay label, why it has no sound, and the
+ * summary of the pick it plays, which the hook's own stream lacks.
+ */
 export interface ToggledRun extends PausedRun {
-  readonly id: string
-  readonly silence: string | undefined
+  readonly label: string
+  readonly silence: Silence | undefined
+  readonly summary?: object | undefined
 }
 
 /** The runs whose last Play the browser refused to resume, so their line says so. */
@@ -78,7 +82,7 @@ const refused = new WeakSet<ToggledRun>()
  * The status line after a Play: the refusal's line, or the running line once a Play resumes the
  * sound after a refusal. The run's own reason for no sound stays in it. Undefined otherwise.
  */
-function playLine(run: ToggledRun, silence: string | undefined): string | undefined {
+function playLine(run: ToggledRun, silence: Silence | undefined): StatusLine | undefined {
   if (silence !== undefined) {
     refused.add(run)
     return runningLine(run, { silence })
@@ -87,19 +91,28 @@ function playLine(run: ToggledRun, silence: string | undefined): string | undefi
 }
 
 /**
+ * Whether the page shows another pick than the one `run` plays: a pick during the pause wrote
+ * "Picked …", which stays until the next Start makes a run with its own line (#90, D4).
+ */
+const showsOtherPick = (run: ToggledRun, shown: object | undefined): boolean =>
+  run.summary !== undefined && run.summary !== shown
+
+/**
  * Pauses a playing run at the frame its game reports and suspends the sound, or plays a paused run
  * on: the sound resumes first, inside the caller's click, then the clock counts on. Writes the
  * grant at once, so the worker stops or goes on before the next animation frame. Nothing happens
  * before the first run or once the run reached END. Resolves with the status line for a Play whose
  * resume the browser refused (#69): the game plays on without sound, and the line says why. The
  * next Play whose resume succeeds resolves with the running line again. A refused suspend gives no
- * line, since the clock holds the game anyway (S5-16).
+ * line, since the clock holds the game anyway (S5-16). Neither line comes while the page shows
+ * `shown`, the summary of another pick than the run's.
  */
 export function togglePause(
   run: ToggledRun | undefined,
   audio: Pick<AudioOpener, 'resumeNow' | 'suspend'>,
   now: number,
-): Promise<string | undefined> {
+  shown?: object,
+): Promise<StatusLine | undefined> {
   if (run === undefined || reachedEnd(run)) return Promise.resolve(undefined)
   const { frame } = readStatus(run.control)
   if (!run.clock.paused) {
@@ -112,7 +125,10 @@ export function togglePause(
   const resumed = audio.resumeNow()
   run.clock.play(now)
   grant(run.control, run.clock.allowed(now, frame))
-  return resumed.then((silence) => playLine(run, silence))
+  return resumed.then((silence) => {
+    const line = playLine(run, silence)
+    return showsOtherPick(run, shown) ? undefined : line
+  })
 }
 
 /**
@@ -123,7 +139,7 @@ export function togglePause(
 export function soundForNewRun(
   run: Pick<PausedRun, 'clock'>,
   audio: Pick<AudioOpener, 'resumeNow'>,
-): Promise<string | undefined> {
+): Promise<Silence | undefined> {
   return run.clock.paused ? Promise.resolve(undefined) : audio.resumeNow()
 }
 

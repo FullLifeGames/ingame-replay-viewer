@@ -1,7 +1,8 @@
 // npm run rom:repro (plan §7): two clean builds of the pinned tree, the second in a fresh git
 // worktree at another path, must give the same ROM, patch and slot description. The worktree goes
 // again when the run ends, pass or fail; both builds' outputs stay in build/rom/ for a look.
-// A heavy check on devbox: about two full builds, alone and in the background (AGENTS.md).
+// A heavy check on the build machine: about two full builds, alone and in the background
+// (AGENTS.md).
 import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'

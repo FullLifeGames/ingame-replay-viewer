@@ -1,4 +1,4 @@
-// Samples for the devbox phrase spec (P2, `gen3-phrases.test.ts`): the arguments each tagged
+// Samples for the pinned-tree phrase spec (P2, `gen3-phrases.test.ts`): the arguments each tagged
 // template takes and the values the pinned string's placeholders take in the same scene. The
 // spec renders both and holds them equal. A template that takes one Pokémon and no other value
 // needs no sample: it gets the far Pokémon, which every Pokémon placeholder names by default.

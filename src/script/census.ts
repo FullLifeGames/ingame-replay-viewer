@@ -7,10 +7,9 @@ import type { Protocol } from '@pkmn/protocol'
 
 /**
  * Why a kind is on the named list: a server never writes it into a battle room's log, only
- * formats the build refuses log it, only Gen 4 and later log it and no rule shows it yet, or a
- * Gen 1 to 3 singles battle can log it and no rule shows it yet.
+ * formats the build refuses log it, or only Gen 4 and later log it and no rule shows it yet.
  */
-type NamedGroup = 'not in a replay log' | 'refused format' | 'newer generation' | 'no rule yet'
+type NamedGroup = 'not in a replay log' | 'refused format' | 'newer generation'
 
 interface NamedKind {
   readonly group: NamedGroup

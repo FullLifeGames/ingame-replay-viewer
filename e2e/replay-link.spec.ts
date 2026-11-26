@@ -2,14 +2,15 @@
 // wasm-page.spec.ts compares its list). Showdown is a route that answers from the test fixture,
 // so no request leaves the machine; the page needs no dump for this. A failure shows its visitor
 // line, the module's words under "Details" and, where the line offers one, the report link (#59).
-// The select labels each example replay by its format, players and number (#69).
+// The select labels each example replay by its format, players and number (#69). The summary
+// names the replay by that label, and its counts wait under "Details" (#90).
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { expect, test } from '@playwright/test'
 
 import { REPO_DIR } from '../scripts/rom-paths.ts'
-import { notShownCount } from './page-text.ts'
+import { COUNTS, labelOf, notShownCount } from './page-text.ts'
 import { guardRequests } from './requests.ts'
 import { loadReplay, routeShowdown, showdownUrl } from './showdown.ts'
 
@@ -33,21 +34,23 @@ test('a replay loaded by its link fills the list, and only Showdown is asked', a
   await routeShowdown(page, LINKED)
   await page.goto('/')
   const summary = page.locator('#replay-summary')
-  await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
+  await expect(summary).toHaveText(labelOf(FIRST))
 
   const status = page.getByRole('status')
   const detail = page.locator('#status-detail')
   const details = page.locator('#details')
-  // Start without a dump: the line says it all, so the page shows no "Details" (#59).
+  // Start without a dump: the line says it all, so it adds no words to "Details" (#59), which
+  // holds the picked replay's counts (#90).
   await page.getByRole('button', { name: 'Start', exact: true }).click()
   await expect(status).toHaveText('Pick your US Emerald dump first, then press Start.')
-  await expect(details).toBeHidden()
+  await expect(detail).toHaveText('')
+  await expect(page.locator('#replay-detail')).toHaveText(COUNTS)
 
   await loadReplay(page, 'https://example.com/smogtours-gen3ou-994176')
   await expect(status).toHaveText(LINK_LINE)
   await expect(detail).toHaveText(/^Could not read the replay link: example\.com is not /)
   await expect(details).toBeVisible()
-  await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
+  await expect(summary).toHaveText(labelOf(FIRST))
 
   // A link with markup in it shows as text: the page writes no line as HTML.
   await loadReplay(page, '<img id=injected src=x>')
@@ -59,7 +62,8 @@ test('a replay loaded by its link fills the list, and only Showdown is asked', a
   await expect(page.locator('#report')).toBeHidden()
 
   await loadReplay(page, `https://replay.pokemonshowdown.com/${LINKED}`)
-  await expect(summary).toHaveText(new RegExp(`^${LINKED}: \\d+ instructions`))
+  await expect(summary).toHaveText(labelOf(LINKED))
+  await expect(page.locator('#replay-detail')).toHaveText(COUNTS)
   const count = await notShownCount(page)
   expect(count).toBeGreaterThan(0)
   await expect(page.locator('#not-shown-rows li')).toHaveCount(count)
@@ -78,14 +82,16 @@ test('after a new pick or a Load the page asks for Start and shows which replay 
   await expect(status).toHaveText(/^Pick your US Emerald dump/)
 
   await testReplay.selectOption('smogtours-gen3ou-994086')
-  await expect(status).toHaveText(/^Picked smogtours-gen3ou-994086\. Press Start/)
+  await expect(status).toHaveText(
+    `Picked ${labelOf('smogtours-gen3ou-994086')}. Press Start to play it.`,
+  )
 
   await loadReplay(page, LINKED)
-  await expect(status).toHaveText(new RegExp(`^Picked ${LINKED}\\. Press Start`))
+  await expect(status).toHaveText(`Picked ${labelOf(LINKED)}. Press Start to play it.`)
   await expect(testReplay).toHaveValue('')
 
   await testReplay.selectOption(FIRST)
-  await expect(status).toHaveText(new RegExp(`^Picked ${FIRST}\\. Press Start`))
+  await expect(status).toHaveText(`Picked ${labelOf(FIRST)}. Press Start to play it.`)
 })
 
 test('an example replay that fails to load leaves the select on the replay the page holds', async ({
@@ -103,7 +109,7 @@ test('an example replay that fails to load leaves the select on the replay the p
   const status = page.getByRole('status')
   const summary = page.locator('#replay-summary')
   const testReplay = page.locator('#test-replay')
-  await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
+  await expect(summary).toHaveText(labelOf(FIRST))
 
   const detail = page.locator('#status-detail')
   const report = page.locator('#report')
@@ -114,18 +120,19 @@ test('an example replay that fails to load leaves the select on the replay the p
   await expect(page.locator('#details')).toBeVisible()
   await expect(report).toBeHidden()
   expect(aborted.length).toBeGreaterThan(0)
-  await expect(summary).toHaveText(new RegExp(`^${FIRST}: `))
+  await expect(summary).toHaveText(labelOf(FIRST))
   await expect(testReplay).toHaveValue(FIRST)
 
-  // A line that went well clears the old failure's words, and "Details" hides with nothing in it.
+  // A line that went well clears the old failure's words; "Details" keeps the new replay's counts.
   await loadReplay(page, LINKED)
-  await expect(status).toHaveText(new RegExp(`^Picked ${LINKED}\\. Press Start`))
+  await expect(status).toHaveText(`Picked ${labelOf(LINKED)}. Press Start to play it.`)
   await expect(detail).toHaveText('')
-  await expect(page.locator('#details')).toBeHidden()
+  await expect(page.locator('#details p:not(:empty)')).toHaveCount(1)
+  await expect(page.locator('#replay-detail')).toHaveText(COUNTS)
   await expect(report).toBeHidden()
   await testReplay.selectOption(OTHER)
   await expect(status).toHaveText(EXAMPLE_LINE)
-  await expect(summary).toHaveText(new RegExp(`^${LINKED}: `))
+  await expect(summary).toHaveText(labelOf(LINKED))
   await expect(testReplay).toHaveValue('')
   expect(notSameOriginGets).toEqual([`GET ${SHOWDOWN}`])
 })
@@ -160,6 +167,6 @@ test('the example select labels each replay by its format, players and number', 
   }
   // The value stays the id, so a pick by id still loads the replay.
   await page.getByLabel('Example replay').selectOption(OTHER)
-  await expect(page.locator('#replay-summary')).toHaveText(new RegExp(`^${OTHER}: `))
+  await expect(page.locator('#replay-summary')).toHaveText(labelOf(OTHER))
   expect(notSameOriginGets).toEqual([])
 })
