@@ -17,7 +17,8 @@ import { CONTENT_NAME, saveName, saveQueryProblem } from '../../gen5/save-file.t
 import { emulatorPaths } from '../../gen5/unpacker.ts'
 import { wireControls } from './controls.ts'
 import { fromBase64, sha256, toBase64 } from './codec.ts'
-import { fixClock, frameHook, wrapRuntime } from './frame-hook.ts'
+import { fixClock, wrapRuntime } from './core-runtime.ts'
+import { frameHook } from './frame-hook.ts'
 import { ramHook, readFacts } from './ram-hook.ts'
 import {
   fetchSave,
