@@ -98,6 +98,9 @@ function textCheck(text: TextNumbers): string {
   return `text labels of the backend's lines found: ${banks.join(', ')}`
 }
 
+/** The generator has held each of the backend's lines to what its function puts, or thrown. */
+const LINES_CHECKED = "line sources checked: each of the backend's lines is what its function puts"
+
 /** The report for a public log: the pin, the count of the symbols it looked up by our own names,
  * and the two checks, and no number of pokebw2: no address, offset, value or size. Each of
  * pokebw2's lists runs from 0, so a list's size would give away its last entry's number. */
@@ -111,6 +114,7 @@ export function quietLines(numbers: Bw2Numbers): string[] {
     ...entryChecks(numbers.entry),
     pkmCheck(numbers.pkm),
     textCheck(numbers.text),
+    LINES_CHECKED,
   ]
 }
 
@@ -180,6 +184,8 @@ export function fullLines(numbers: Bw2Numbers): string[] {
     ...Object.entries(GEN5_LINES).map(
       ([name, line]) => `line ${name} ${line.label} ${String(numbers.text[line.bank][line.label])}`,
     ),
+    LINES_CHECKED,
+    `flow ${JSON.stringify(numbers.flow)}`,
   ]
 }
 

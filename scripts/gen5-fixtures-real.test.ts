@@ -14,6 +14,8 @@ import { ADAPTER_LAYOUT } from '../src/gen5/adapter.fixtures.ts'
 import { ENTRY } from '../src/gen5/direct-entry.fixtures.ts'
 import { PKM, TEAM_PKM, TERMINATOR } from '../src/gen5/pkm.fixtures.ts'
 import { battleNumbers } from './gen5-bw2-battle.ts'
+import { flowNumbers } from './gen5-bw2-flow.ts'
+import { FLOW_INPUT } from './gen5-bw2-flow.fixtures.ts'
 import { BATTLE_SOURCES } from './gen5-bw2-battle.fixtures.ts'
 import { entryNumbers } from './gen5-bw2-entry.ts'
 import { ENTRY_INPUT } from './gen5-bw2-entry.fixtures.ts'
@@ -78,6 +80,12 @@ const COMPARED = [
     name: 'TEXT_INPUT',
     value: textNumbers(TEXT_INPUT),
     path: ['text'],
+  },
+  {
+    module: 'scripts/gen5-bw2-flow.fixtures.ts',
+    name: 'FLOW_INPUT',
+    value: flowNumbers(FLOW_INPUT),
+    path: ['flow'],
   },
 ]
 

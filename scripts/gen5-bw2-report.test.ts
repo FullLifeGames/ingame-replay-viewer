@@ -98,6 +98,7 @@ describe('quietLines', () => {
       standard: { Bank0019_Text_CriticalHit: 3, Bank0019_Text_FillerOne: 8 },
       set: { Bank0018_Text_FillerTwo: 5 },
     },
+    flow: { damageKinds: { plain: 8, super: 6, resisted: 9 }, recoverEffect: 0x4d },
   }
 
   it('gives the pin, the count of symbols and the checks, and no address, offset or value', () => {
@@ -112,6 +113,7 @@ describe('quietLines', () => {
       'entry layouts Kite, Lamp',
       'pkm layouts PartyPkm, PkmBlockA, PkmBlockB; block table, cipher and shiny bound read',
       "text labels of the backend's lines found: standard 1 of 4, set 0 of 3",
+      "line sources checked: each of the backend's lines is what its function puts",
     ])
   })
 

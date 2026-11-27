@@ -240,6 +240,15 @@ export interface TextNumbers {
   set: Record<string, number>
 }
 
+/** The numbers the server's flow puts as literals (scripts/gen5-bw2-flow.ts), which pokebw2 has
+ * no name for (#107). */
+export interface FlowNumbers {
+  /** The effectiveness category of the hit flash's SC_DAMAGE_PLURAL, which picks the hit sound. */
+  damageKinds: { plain: number; super: number; resisted: number }
+  /** The effect SC_EFFECT_BY_POS shows at a Pokémon that heals. */
+  recoverEffect: number
+}
+
 /** The whole of build/gen5/bw2.json. */
 export interface Bw2Numbers extends ServerCmdTable {
   pokebw2: { repository: string; commit: string }
@@ -258,4 +267,5 @@ export interface Bw2Numbers extends ServerCmdTable {
   pkm: PkmNumbers
   font: FontNumbers
   text: TextNumbers
+  flow: FlowNumbers
 }
