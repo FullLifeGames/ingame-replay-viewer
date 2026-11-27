@@ -54,7 +54,7 @@ const commandsOf = (...lines: string[]) =>
 /** The replay's fallbacks of events, by kind, line and detail. */
 const eventFallbacks = (...lines: string[]) =>
   replayOf(...lines).fallbacks.flatMap((one) =>
-    one.kind === 'later' || one.kind === 'line'
+    one.kind === 'unplayed' || one.kind === 'line'
       ? [`${one.event} ${String(one.line - NEXT)} ${one.detail}`]
       : [],
   )
@@ -175,13 +175,13 @@ describe('a heal by Leftovers', () => {
       { command: 'SC_UPDATE_HP_GAUGE', args: [TYRANITAR.monId] },
       msgSet('leftovers', TYRANITAR.monId, gen5Item('Leftovers')),
     ])
-    expect(replay.fallbacks.filter((one) => one.kind === 'later')).toEqual([])
+    expect(replay.fallbacks.filter((one) => one.kind === 'unplayed')).toEqual([])
   })
 })
 
-// Scene: Dugtrio's Rocky Helmet hurts Tyranitar, a cause no module writes yet. Its line plays
-// with #110; until then the bar moves the way ServerDisplay_SimpleHP moves it, with no line, so it
-// stays at the log's HP.
+// Scene: Dugtrio's Rocky Helmet hurts Tyranitar, a cause no module writes yet. Its line is listed
+// as unplayed; the bar moves the way ServerDisplay_SimpleHP moves it, with no line, so it stays at
+// the log's HP.
 describe('an HP change that does not play yet', () => {
   it('moves the bar of a Pokémon in place silently and lists its line', () => {
     const lines = ['|-damage|p2a: Tyranitar|90/100|[from] item: Rocky Helmet|[of] p1a: Dugtrio']
@@ -189,7 +189,7 @@ describe('an HP change that does not play yet', () => {
       subtract(TYRANITAR.monId, 10),
       { command: 'SC_UPDATE_HP_GAUGE', args: [TYRANITAR.monId] },
     ])
-    expect(eventFallbacks(...lines)).toEqual(['damage 1 plays with #110'])
+    expect(eventFallbacks(...lines)).toEqual(['damage 1 Black 2 does not play this yet'])
   })
 })
 

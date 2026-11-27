@@ -5,9 +5,10 @@
 // plays the server's faint (faints.ts) and takes its Pokémon's HP to 0, and the end of Illusion's
 // disguise keeps the game's Pokémon in place (battle-state.ts). Each effect plays by the module
 // that copies its server function (effects.ts, #109), and the turn's end opens with the hidden
-// message window. An event that plays and names a Pokémon not in place fails by name. An action
-// with a called move, several hits, a charge turn or a look of its own waits whole. Pure: every
-// number of the game comes in from build/gen5/bw2.json.
+// message window. An event that plays and names a Pokémon not in place fails by name. A charge
+// skip plays its charge and release (charge.ts, #110); an action with a called move, several
+// hits, a charge turn the move spends or a look of its own waits whole, listed as unplayed. Pure:
+// every number of the game comes in from build/gen5/bw2.json.
 import type { BattleScript, ScriptEvent } from '../../script/events.ts'
 import type { PokemonRef } from '../../script/types.ts'
 import type { EffectNumbers, FlowNumbers } from '../bw2-flow-numbers.ts'
@@ -16,12 +17,13 @@ import { PLAIN_TURN } from '../moment.ts'
 import type { ServerCommand } from '../server-cmd.ts'
 import { battleState, type BattleState } from './battle-state.ts'
 import { type Action, actionsOf, residualOf, type Written } from './blocks.ts'
+import { chargeCommands, type ChargeSkip, chargeSkipOf } from './charge.ts'
 import { effectCommands } from './effects.ts'
 import { faintCommands } from './faints.ts'
-import { type Gen5Fallback, laterFallback } from './fallbacks.ts'
+import { type Gen5Fallback, unplayedFallback } from './fallbacks.ts'
 import { hitCommands, type PlayedMove, silentBar } from './hits.ts'
 import { gen5, gen5Move } from './names.ts'
-import { type EventOf, LATER_ISSUES, type Outcome, outcomesOf } from './rules.ts'
+import { type EventOf, type Outcome, outcomesOf } from './rules.ts'
 import { substituteShows } from './substitute.ts'
 import { switchCommands } from './switches.ts'
 
@@ -50,8 +52,6 @@ export interface ScriptWrite {
   readonly orders: PartyOrders[]
 }
 
-const { whole: WHOLE } = LATER_ISSUES
-
 /** What the writer carries through the script: the turn the log began last, its last move, and
  * whether the turn's end has hidden the message window follow the events (`follow`). */
 interface Scene {
@@ -76,32 +76,35 @@ function refsOf(event: ScriptEvent): PokemonRef[] {
   return 'source' in event ? [event.source] : []
 }
 
-/** The issue an action waits for whole: a charge turn, a look of its own or several hits
- * (D11), or a called move. */
-function heldBy(action: Action): number | undefined {
+/** Whether an action waits whole: a charge turn or a look of its own that is no charge skip,
+ * several hits (D11), or a called move. */
+function heldWhole(action: Action, charge: ChargeSkip | undefined): boolean {
   const kinds = new Set(action.map((event) => event.kind))
-  if (kinds.has('prepare') || kinds.has('anim') || kinds.has('hitCount')) return WHOLE
+  const looks = kinds.has('prepare') || kinds.has('anim')
+  if ((looks && charge === undefined) || kinds.has('hitCount')) return true
   const [first] = action
-  return first?.kind === 'move' && first.calledBy !== undefined ? WHOLE : undefined
+  return first?.kind === 'move' && first.calledBy !== undefined
 }
 
-/** An action as it plays: its move when that plays, and else the issue its events wait for. */
+/** An action as it plays: its move when that plays, and its charge skip. */
 interface Played {
   readonly action: Action
   readonly move: PlayedMove | undefined
-  readonly waits: number | undefined
+  readonly charge: ChargeSkip | undefined
 }
 
 /** `action` with the move that opens it, when that plays: no wait of the whole action. Its user
- * and target must stand in place. */
+ * and target must stand in place; a charge skip's target is the one its release names. */
 function playedOf(action: Action, state: BattleState): Played {
   const [first] = action
-  const held = heldBy(action)
-  if (first?.kind !== 'move' || held !== undefined) return { action, move: undefined, waits: held }
-  const targetRef = first.target ?? first.user
+  const charge = chargeSkipOf(action)
+  if (first?.kind !== 'move' || heldWhole(action, charge)) {
+    return { action, move: undefined, charge: undefined }
+  }
+  const targetRef = first.target ?? charge?.target ?? first.user
   const user = state.placed(first.user, first.line)
   const target = state.placed(targetRef, first.line)
-  return { action, move: { user, target, targetRef, move: gen5Move(first.move) }, waits: undefined }
+  return { action, move: { user, target, targetRef, move: gen5Move(first.move) }, charge }
 }
 
 /** The kinds of event after a move that mean the server took its target out. */
@@ -142,11 +145,15 @@ interface Place {
   readonly at: number
 }
 
-/** The commands of an event of an effect or a hit (effects.ts, hits.ts), or undefined. The
- * effects come first: a Substitute's start wrote its HP drop, which no hit may play again. */
+/** The commands of a move, its charge skip (charge.ts), an effect or a hit (effects.ts, hits.ts),
+ * or undefined. The effects come first: a Substitute's start wrote its HP drop, which no hit may
+ * play again. */
 function playedCommands(scene: Scene, { played, index, at }: Place, event: ScriptEvent) {
-  const { action, move } = played
+  const { action, move, charge } = played
   if (event.kind === 'move') return move && moveCommands(action, move)
+  if (event.kind === 'prepare' || event.kind === 'anim') {
+    return move && charge && chargeCommands(scene, event, move, charge)
+  }
   const effect = { ...scene, events: scene.script.events, action, index, at }
   return (
     effectCommands(effect, event) ??
@@ -154,8 +161,8 @@ function playedCommands(scene: Scene, { played, index, at }: Place, event: Scrip
   )
 }
 
-/** The commands of one event; a fallback for an event whose rule plays it but which does not
- * (lane plan D13). */
+/** The commands of one event; an unplayed fallback for an event whose rule plays it but which
+ * does not (lane plan D13, #110 D8). */
 function eventCommands(scene: Scene, place: Place, event: ScriptEvent): ServerCommand[] {
   const hits = { state: scene.state, numbers: scene.numbers, move: place.played.move }
   if (scene.outcomes.get(event)?.as !== 'play') return silentBar(hits, event)
@@ -164,7 +171,7 @@ function eventCommands(scene: Scene, place: Place, event: ScriptEvent): ServerCo
   for (const ref of refsOf(event)) scene.state.placed(ref, event.line)
   const commands = playedCommands(scene, place, event)
   if (commands !== undefined) return commands
-  scene.fallbacks.push(laterFallback(event, place.played.waits ?? WHOLE))
+  scene.fallbacks.push(unplayedFallback(event))
   return silentBar(hits, event)
 }
 

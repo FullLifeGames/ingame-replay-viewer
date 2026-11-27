@@ -73,10 +73,10 @@ describe('endLines', () => {
 })
 
 describe('notShownLines', () => {
-  it('gives a line per issue or kind with its events counted', () => {
-    const list = { '#109': { weather: 2, status: 1 }, line: { message: 1 } }
+  it('gives a line per kind with its events counted', () => {
+    const list = { unplayed: { weather: 2, status: 1 }, line: { message: 1 } }
     expect(notShownLines(list)).toEqual([
-      'not shown, #109: weather 2, status 1',
+      'not shown, unplayed: weather 2, status 1',
       'not shown, line: message 1',
     ])
   })

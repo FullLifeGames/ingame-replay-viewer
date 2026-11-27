@@ -1,4 +1,4 @@
-// The fallbacks of the Gen 5 backend (#106 to #109): what the game shows in place of content
+// The fallbacks of the Gen 5 backend (#106 to #110): what the game shows in place of content
 // it lacks or cannot hold, and each event that does not play yet or plays only in part. The backend
 // lists each one with its log line beside the battle script's dropped lines, as the Gen 3 backend
 // does (src/gen3/fallbacks.ts).
@@ -16,25 +16,25 @@ interface TeamFallback {
   readonly detail: string
 }
 
-/** `later`: an event that a later issue plays, named in `detail`. `line`: a line that Black 2 has
- * no message for, so nothing shows for it. `plain`: a switch-in that plays as a plain switch or
- * drag, and `detail` names what of it does not show. `event` is the battle script's kind of the
- * event. */
+/** `unplayed`: an event that Black 2 does not play yet (#110, lane plan D8). `line`: a line that
+ * Black 2 has no message for, so nothing shows for it. `plain`: a switch-in that plays as a plain
+ * switch or drag, and `detail` names what of it does not show. `event` is the battle script's
+ * kind of the event. */
 interface EventFallback {
   readonly line: number
-  readonly kind: 'later' | 'line' | 'plain'
+  readonly kind: 'unplayed' | 'line' | 'plain'
   readonly event: ScriptEvent['kind']
   readonly detail: string
 }
 
 export type Gen5Fallback = TeamFallback | EventFallback
 
-/** The fallback of an event that plays with issue `issue`. */
-export const laterFallback = (event: ScriptEvent, issue: number): Gen5Fallback => ({
+/** The fallback of an event that Black 2 does not play yet. */
+export const unplayedFallback = (event: ScriptEvent): Gen5Fallback => ({
   line: event.line,
-  kind: 'later',
+  kind: 'unplayed',
   event: event.kind,
-  detail: `plays with #${String(issue)}`,
+  detail: 'Black 2 does not play this yet',
 })
 
 /** The fallback of an event whose line Black 2 lacks. */
