@@ -5,6 +5,7 @@ import { replayScript } from '../../script/testing.ts'
 import { blockRoom } from '../adapter.ts'
 import { packCommands } from '../server-cmd.ts'
 import type { Gen5Fallback } from './fallbacks.ts'
+import { notShown } from './not-shown.ts'
 import { buildGen5Replay, type Gen5Replay } from './replay.ts'
 import { REPLAY_NUMBERS as NUMBERS } from './replay.fixtures.ts'
 
@@ -23,11 +24,13 @@ const REPLAYS = Object.entries(FIXTURES).map(([id, script]) => ({
  * before the first turn itself (lane plan D3). */
 const SHOWN = new Set<ScriptEvent['kind']>(['player', 'teamSize', 'battleStart', 'turn'])
 
-/** The events whose line Black 2 lacks: a message of the simulator, a weather's turn (D2) and the
- * end of a disguise (D14). */
+/** The events whose line Black 2 lacks: a message of the simulator, a weather's turn (D2), the
+ * end of a disguise (D14) and the battle's end, where the game holds the last scene (#110, D5). */
 const lacksLine = (event: ScriptEvent) =>
   event.kind === 'message' ||
   event.kind === 'replace' ||
+  event.kind === 'win' ||
+  event.kind === 'tie' ||
   (event.kind === 'weather' && event.phase === 'upkeep')
 /** The kinds that play in a block while a part of them is listed: a bar that moves silently
  * while its line waits (D6), and a switch-in that plays as a plain switch (`plain`). */
@@ -60,22 +63,9 @@ function placesOf(script: BattleScript, replay: Gen5Replay) {
   }))
 }
 
-/** The not-shown list, every fallback by issue (`#110`) or by kind (`line`, `plain`, and the
- * party's `form`, `character` and `moves`), then by event kind, or `party` for the party's. */
-function notShown(fallbacks: readonly Gen5Fallback[]) {
-  const counts: Record<string, Record<string, number>> = {}
-  for (const one of fallbacks) {
-    const by = one.kind === 'later' ? one.detail.replace('plays with ', '') : one.kind
-    const what = 'event' in one ? one.event : 'party'
-    const of = (counts[by] ??= {})
-    of[what] = (of[what] ?? 0) + 1
-  }
-  return counts
-}
-
 // Scene: the replay spec of #107. Both Gen 5 OU test replays go through the backend; each event
 // plays in a block, is shown by the park, the game or a turn, or is listed as not shown, and the
-// list names the issue that plays it.
+// list names why by its kind.
 describe('the Gen 5 OU test replays', () => {
   it('give each event one place: a block, the park, the game, a turn or the list', () => {
     for (const { script, replay } of REPLAYS) {
@@ -108,20 +98,18 @@ describe('the Gen 5 OU test replays', () => {
     }
   })
 
-  // The list that #110 shrinks.
-  it('list what does not show yet by the issue that plays it and by event kind', () => {
+  // The list that #110 leaves: nothing unplayed, only the lines Black 2 lacks and the forms.
+  it('list what does not show by its kind and by event kind', () => {
     const lists = Object.fromEntries(
       REPLAYS.map(({ id, replay }) => [id, notShown(replay.fallbacks)]),
     )
     expect(lists).toEqual({
       'gen5ou-2718717830': {
-        '#110': { prepare: 1, anim: 1, move: 1, damage: 1, win: 1 },
-        line: { message: 1, weather: 10 },
+        line: { message: 1, weather: 10, win: 1 },
         form: { party: 1 },
       },
       'smogtours-gen5ou-862240': {
-        '#110': { win: 1 },
-        line: { message: 1, weather: 15 },
+        line: { message: 1, weather: 15, win: 1 },
         form: { party: 2 },
       },
     })

@@ -2,8 +2,8 @@
 // (#109, lane plan 109-5): status.ts, abilities.ts, stats.ts, field.ts, items.ts, substitute.ts
 // and move-effects.ts each give their commands or undefined for a cause not their own. The
 // abilities come before the stats: both write a drop with no cause, and only Intimidate's run adds
-// the pop-up's end. An event that no module writes has no sequence, and the writer lists it with
-// #110 (D13). Pure: every number of the game comes in from build/gen5/bw2.json.
+// the pop-up's end. An event that no module writes has no sequence, and the writer lists it as
+// unplayed (D13, #110). Pure: every number of the game comes in from build/gen5/bw2.json.
 import type { ScriptEvent } from '../../script/events.ts'
 import type { ServerCommand } from '../server-cmd.ts'
 import { ABILITY_SEQUENCES } from './abilities.ts'

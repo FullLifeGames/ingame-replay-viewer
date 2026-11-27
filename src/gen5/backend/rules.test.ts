@@ -4,8 +4,7 @@ import type { ScriptEvent } from '../../script/events.ts'
 import { eventsFrom, NEXT, scriptOf } from '../../script/testing.ts'
 import { type Outcome, outcomesOf, ruleFallbacks, ruleOf } from './rules.ts'
 
-const shown = (outcome: Outcome) =>
-  outcome.as === 'later' ? `later #${String(outcome.issue)}` : outcome.as
+const shown = (outcome: Outcome) => outcome.as
 
 /** Each event of `script` from line NEXT on, by kind, with its outcome. */
 function outcomesFrom(...lines: string[]): string[] {
@@ -63,8 +62,8 @@ describe('outcomesOf the intro and the turns', () => {
   })
 })
 
-// Scene: the kinds that play, and those a later issue plays, by the lane plan's not-yet map.
-describe('outcomesOf the kinds that play later', () => {
+// Scene: the kinds that play, the end, and the kinds Black 2 does not play yet.
+describe('outcomesOf the kinds that play and those that do not', () => {
   it('plays a move, its hit, a miss, a failure, an immunity and a Leftovers heal', () => {
     expect(
       outcomesFrom(
@@ -173,28 +172,68 @@ describe('outcomesOf the kinds that play later', () => {
     ).toEqual(['turn boundary', 'damage play', 'replace line', 'effectEnd play'])
   })
 
-  it('lists the kinds no issue names with #110', () => {
+  // Lane plan D5: Black 2 holds the last scene, and the page names the winner or the tie.
+  it('plays a charge skip and lists the end as a line naming the winner', () => {
+    const lines = [
+      '|turn|1',
+      '|move|p1a: Dugtrio|Solar Beam||[still]',
+      '|-prepare|p1a: Dugtrio|Solar Beam',
+      '|-anim|p1a: Dugtrio|Solar Beam|p2a: Tyranitar',
+      '|win|Alice',
+    ]
+    expect(outcomesFrom(...lines)).toEqual([
+      'turn boundary',
+      'move play',
+      'prepare play',
+      'anim play',
+      'win line',
+    ])
+    expect(outcomesOf(scriptOf(...lines).events).at(-1)).toEqual({
+      as: 'line',
+      detail: 'Black 2 holds the last scene; the page names the winner, Alice',
+    })
+    expect(outcomesFrom('|turn|1', '|move|p1a: Dugtrio|Solar Beam||[still]', '|tie')).toEqual([
+      'turn boundary',
+      'move play',
+      'tie line',
+    ])
+  })
+
+  // Lane plan D8: the kinds no fixture holds wait as unplayed, each a rest for the gate.
+  it('lists a hit count and the kinds no fixture holds as unplayed', () => {
     expect(
       outcomesFrom(
         '|turn|1',
-        '|move|p1a: Dugtrio|Solar Beam||[still]',
-        '|-prepare|p1a: Dugtrio|Solar Beam',
-        '|win|Alice',
+        '|move|p2a: Tyranitar|Rock Blast|p1a: Dugtrio',
+        '|-damage|p1a: Dugtrio|80/100',
+        '|-hitcount|p1a: Dugtrio|1',
+        '|-ohko|',
+        '|-sethp|p1a: Dugtrio|50/100',
+        '|-transform|p1a: Dugtrio|p2a: Tyranitar',
       ),
-    ).toEqual(['turn boundary', 'move play', 'prepare later #110', 'win later #110'])
+    ).toEqual([
+      'turn boundary',
+      'move play',
+      'damage play',
+      'hitCount unplayed',
+      'ohko unplayed',
+      'setHp unplayed',
+      'transform unplayed',
+    ])
   })
 })
 
 // Scene: the replay lists each event that does not play yet beside the dropped lines.
 describe('ruleFallbacks', () => {
-  it('names the kind and the issue of each later event and the text of each missing line', () => {
-    const script = scriptOf(
-      '|turn|1',
-      '|-prepare|p2a: Tyranitar|Solar Beam',
-      '|message|Bob forfeited.',
-    )
+  it('names each unplayed event and the text of each missing line', () => {
+    const script = scriptOf('|turn|1', '|-hitcount|p2a: Tyranitar|2', '|message|Bob forfeited.')
     expect(ruleFallbacks(script.events)).toEqual([
-      { line: NEXT + 1, kind: 'later', event: 'prepare', detail: 'plays with #110' },
+      {
+        line: NEXT + 1,
+        kind: 'unplayed',
+        event: 'hitCount',
+        detail: 'Black 2 does not play this yet',
+      },
       {
         line: NEXT + 2,
         kind: 'line',

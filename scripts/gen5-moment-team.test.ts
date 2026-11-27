@@ -111,7 +111,8 @@ describe('momentTeam', () => {
   it('gives the hand team with the names given and no fallback', async () => {
     const team = await momentTeam({ from: 'hand', names: NAMES }, NUMBERS)
     const parties = teamParties(pkmFormat(NUMBERS), NAMES)
-    expect(team).toEqual({ ...parties, names: NAMES, fallbacks: [], orders: [] })
+    expect(team).toEqual({ ...parties, names: NAMES, fallbacks: [], orders: [], lines: [] })
+    expect(team.end).toBeUndefined()
   })
 
   it('loads a test replay’s teams and names through the module runner', async () => {

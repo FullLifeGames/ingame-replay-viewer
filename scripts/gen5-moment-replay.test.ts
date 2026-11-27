@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 
 import { describe, expect, it } from 'vitest'
 
+import { replayEnd } from '../src/gen5/backend/end'
 import { writeScript } from '../src/gen5/backend/moves'
 import { sealParties } from '../src/gen5/backend/party-mon'
 import { buildGen5Replay } from '../src/gen5/backend/replay'
@@ -32,7 +33,10 @@ describe('replayTeam', () => {
     expect(team.notes).toEqual(sealed.notes)
     expect(team.fallbacks).toEqual(replay.fallbacks)
     expect(team.replay).toEqual(replay)
-    const ofTeams = team.fallbacks.filter((one) => one.kind !== 'later' && one.kind !== 'line')
+    expect(team.lines).toEqual(replayLog('gen5ou-2718717830').split('\n').slice(0, -1))
+    expect(team.lines[286]).toBe('|-message|isolatedstar forfeited.')
+    expect(team.end).toEqual(replayEnd(replayScript('gen5ou-2718717830')))
+    const ofTeams = team.fallbacks.filter((one) => one.kind !== 'unplayed' && one.kind !== 'line')
     expect(ofTeams.map((one) => one.kind)).toEqual(['form'])
   })
 

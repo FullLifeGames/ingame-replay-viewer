@@ -1,7 +1,8 @@
 // What the Gen 5 backend makes of Gen 5's Frisk and Mummy lines (#117): the battle script gives
 // Frisk's item event for the foe in place and Mummy's change of ability for the attacker. The
 // party reads both through revealed.ts; the writer's rules play both events, no module writes
-// their commands yet, and the replay lists each with #110 (lane plan D13). The pop-ups stay out.
+// their commands yet, and the replay lists each as unplayed (#110, lane plan D8). The pop-ups stay
+// out.
 import { describe, expect, it } from 'vitest'
 
 import { gen5ScriptOf, NEXT } from '../../script/testing.ts'
@@ -16,7 +17,7 @@ const MUMMY = '|-activate|p2a: Tyranitar|ability: Mummy|Arena Trap|[of] p1a: Dug
 /** The replay's fallbacks of events, by kind, line after NEXT and detail. */
 const eventFallbacks = (...lines: string[]) =>
   buildGen5Replay(gen5ScriptOf(...lines), NUMBERS).fallbacks.flatMap((one) =>
-    one.kind === 'later' || one.kind === 'line'
+    one.kind === 'unplayed' || one.kind === 'line'
       ? [`${one.event} ${String(one.line - NEXT)} ${one.detail}`]
       : [],
   )
@@ -46,10 +47,10 @@ describe('the writer', () => {
   })
 
   // Scene: both lines come in turn 1; their rules play them, and no module writes them yet.
-  it('lists both lines in a turn with #110', () => {
+  it('lists both lines in a turn as unplayed', () => {
     expect(eventFallbacks('|turn|1', FRISK, MUMMY)).toEqual([
-      'item 1 plays with #110',
-      'ability 2 plays with #110',
+      'item 1 Black 2 does not play this yet',
+      'ability 2 Black 2 does not play this yet',
     ])
   })
 })

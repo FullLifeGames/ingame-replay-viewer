@@ -83,6 +83,25 @@ describe('a faint after a hit to 0', () => {
   })
 })
 
+// Scene: Rock Blast hits Dugtrio twice, to 0. A multi-hit move waits as unplayed and its bars
+// move silently, while the faint still plays its line and SC_FAINT, so Dugtrio falls on screen
+// (review-108 U2, lane plan D9). The line leaves once multi-hit moves play.
+describe('a faint after a multi-hit move that waits', () => {
+  const ROCK_BLAST = [
+    '|move|p2a: Tyranitar|Rock Blast|p1a: Dugtrio',
+    '|-damage|p1a: Dugtrio|40/100',
+    '|-damage|p1a: Dugtrio|0 fnt',
+    '|-hitcount|p1a: Dugtrio|2',
+    '|faint|p1a: Dugtrio',
+  ]
+
+  it('sends the fainted line and SC_FAINT after the silent bars', () => {
+    expect(writtenAt(5, ...ROCK_BLAST)).toEqual(fainted(40))
+    expect(listedOf('faint', ...ROCK_BLAST)).toEqual([])
+    expect(listedOf('hitCount', ...ROCK_BLAST).map((one) => one.kind)).toEqual(['unplayed'])
+  })
+})
+
 // Scene: Dugtrio's Explosion leaves it with HP, and the log has `|faint|` alone, as after
 // Destiny Bond: ServerControl_FaintPokemon takes the HP to zero first (lane plan D5).
 describe('a faint with HP left', () => {
