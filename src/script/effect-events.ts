@@ -1,10 +1,10 @@
 // The battle script's events for the effects on one Pokémon, items and abilities. `events.ts`
 // holds the other events and the union of them all.
 
-import type { TypeName } from '@pkmn/data'
+import type { StatusName, TypeName } from '@pkmn/data'
 
 import type { Caused, Hit } from './events'
-import type { Effect, PokemonRef } from './types'
+import type { Effect, HpFraction, PokemonRef } from './types'
 
 export interface EffectStartEvent extends Caused {
   readonly kind: 'effectStart'
@@ -59,6 +59,19 @@ export interface FormChangeEvent extends Caused {
   readonly who: PokemonRef
   readonly species: string
   readonly msg?: true
+}
+
+/**
+ * Illusion's disguise ends (#98, `|replace|`): `who`, the real Pokémon, stands where `replaces`,
+ * the disguise, stood, at the HP and status the client copies from it. The line carries neither.
+ */
+export interface ReplaceEvent {
+  readonly kind: 'replace'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly replaces: PokemonRef
+  readonly hp: HpFraction
+  readonly status?: StatusName
 }
 
 /** `who` terastallizes into `type`, the type the log names (#88). */

@@ -1,5 +1,5 @@
-// Rules for the lines about one Pokémon: switches, drags, faints, HP, status, stat stages, forms
-// and Terastallization.
+// Rules for the lines about one Pokémon: switches, drags, Illusion's end, faints, HP, status, stat
+// stages, forms and Terastallization.
 
 import type { Pokemon } from '@pkmn/client'
 import type { BoostID } from '@pkmn/data'
@@ -39,6 +39,21 @@ function switchIn({ line, args, kwArgs, battle, before }: RuleInput<SwitchKey>):
       ...healthOf(hpStatus, pokemon.maxhp, line),
     },
   ]
+}
+
+/**
+ * Illusion's end (#98): the client puts the real Pokémon where the disguise stood and copies the
+ * disguise's HP and status over (`Side.replace`), as the line carries neither.
+ */
+function replace({ line, args: [, ident], battle, before }: RuleInput<'|replace|'>): ScriptEvent[] {
+  const pokemon = pokemonOf(battle, ident, line)
+  const who = refOfPokemon(pokemon, line)
+  const disguise = before.active[who.side]
+  if (!disguise) throw new ScriptError(line, `no disguise stands where "${ident}" appears`)
+  const hp = { hp: pokemon.hp, max: pokemon.maxhp }
+  const replaces = refOfPokemon(disguise, line)
+  const status = pokemon.status ? { status: pokemon.status } : {}
+  return [{ kind: 'replace', line, who, replaces, hp, ...status }]
 }
 
 type HpKey = '|-damage|' | '|-heal|'
@@ -148,6 +163,8 @@ function formChange({ line, args, kwArgs, battle }: RuleInput<'|-formechange|'>)
 export const POKEMON_RULES = {
   '|switch|': { arity: 3, reads: ['from'], build: switchIn },
   '|drag|': { arity: 3, reads: [], build: switchIn },
+  // The details, the second argument, name the real Pokémon; the client reads them.
+  '|replace|': { arity: 2, reads: [], build: replace },
   '|faint|': {
     arity: 1,
     reads: [],

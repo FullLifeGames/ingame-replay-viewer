@@ -31,6 +31,14 @@ export function teraTypeGap(type: string): MechanicFallback {
 }
 
 /**
+ * Illusion's end, which the game plays as a morph of the sprite in place (`B_ANIM_ILLUSION_OFF`)
+ * and the stream as a switch: the disguise goes back and the real Pokémon comes in (#98).
+ */
+export function illusionGap(): MechanicFallback {
+  return { kind: 'mechanic', detail: "Illusion's end, which the game plays as a switch" }
+}
+
+/**
  * A look of `move` that the log names (`[anim] Shell Side Arm Physical`) and the game lacks: the
  * MOVE op carries the move alone, so the game plays the move's own animation. A look by type
  * (`[anim] Ivy Cudgel Water`) is none: its MOVE_TYPE gives the game the type (#89).

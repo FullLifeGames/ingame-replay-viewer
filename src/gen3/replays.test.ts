@@ -7,7 +7,7 @@ import type { Side } from '../script/types'
 import { REPLAYS, replayScript } from '../script/testing'
 import { crc32 } from '../patch/crc32'
 import { buildGen3Stream, type Gen3Stream } from './backend'
-import { type Fallback, mechanicGap, showsInPlace } from './fallbacks'
+import { type Fallback, illusionGap, mechanicGap, showsInPlace } from './fallbacks'
 import { decodeStream } from './stream/decode'
 import { itemOf } from './tables/lookup'
 import { itemGaps } from './tables/testing'
@@ -38,14 +38,15 @@ const charsetRead = (text: string) => decodeText(encodeText(text))
 /**
  * The mechanic fallbacks the test replays may take, each a look or a state the stream lacks:
  * Perish Song's first count, whose later counts print; Bide's first turn, which the expansion
- * shows as the move alone; and Protosynthesis's end, which the expansion has no message for. A
- * new one fails until it is named here, and one that no test replay takes fails unless
+ * shows as the move alone; Protosynthesis's end, which the expansion has no message for; and
+ * Illusion's end, which the stream plays as a switch (#98). A new one fails until it is named here, and one that no test replay takes fails unless
  * NAMED_AHEAD holds it.
  */
 const NAMED_MECHANICS: ReadonlySet<string> = new Set([
   mechanicGap('perish3', 'starting').detail,
   mechanicGap('Bide', 'starting').detail,
   mechanicGap('Protosynthesis', 'ending').detail,
+  illusionGap().detail,
 ])
 
 /**
@@ -64,11 +65,13 @@ const NAMED_LOOKS: ReadonlySet<string> = new Set<string>()
 
 /**
  * The entries above that no test replay takes yet, named ahead for a replay to come: Bide's first
- * turn (#60) and Gen 1's partial trap, which the content-gap test below takes. Bide's entry leaves
- * this list once a test replay with Bide's first turn joins the fixtures.
+ * turn (#60), Illusion's end (#98) and Gen 1's partial trap, which the content-gap test below
+ * takes. Bide's entry leaves this list once a test replay with Bide's first turn joins the
+ * fixtures, and Illusion's once the two test replays of #98 join them.
  */
 const NAMED_AHEAD: ReadonlySet<string> = new Set([
   mechanicGap('Bide', 'starting').detail,
+  illusionGap().detail,
   phraseGap(PARTIAL_TRAP_SCENE).detail,
 ])
 

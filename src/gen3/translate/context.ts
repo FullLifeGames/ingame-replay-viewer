@@ -215,11 +215,16 @@ export class Context {
     return this.active.near === undefined && this.active.far !== undefined ? 'far' : 'near'
   }
 
-  /** The line that first sends the team member in, for what its name or form needs. */
+  /**
+   * The line that first sends the team member in, for what its name or form needs: a switch, or
+   * the end of a disguise for a Pokémon that came in under Illusion's.
+   */
   firstLine(ref: PokemonRef): number {
     const entry = this.script.events.find(
       (event) =>
-        event.kind === 'switchIn' && event.who.side === ref.side && event.who.index === ref.index,
+        (event.kind === 'switchIn' || event.kind === 'replace') &&
+        event.who.side === ref.side &&
+        event.who.index === ref.index,
     )
     return entry?.line ?? 0
   }
