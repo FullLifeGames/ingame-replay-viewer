@@ -6,10 +6,10 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-export const POKEBW2 = {
-  repository: 'https://github.com/fuddlesworth/pokebw2.git',
-  commit: '345b790e6000869b481b79838bb5727309f832fb',
-}
+import { POKEBW2 } from '../src/gen5/pokebw2-pin.ts'
+
+/** The pin lives in src/gen5/, where the page reads it too (#111). */
+export { POKEBW2 }
 
 /** Every file of pokebw2 that the generator (gen5-bw2.ts) and the moment script read, and no
  * other; a spec holds it equal to their reads. */
