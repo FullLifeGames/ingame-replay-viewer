@@ -5,7 +5,7 @@ import { textLabels, textNumbers } from './gen5-bw2-text'
 
 // Invented: a bank of three lines, its pad line last, as each of pokebw2's text banks ends.
 const BANK = [
-  'Bank0042_Text_First = One {0102:0} line.',
+  'Bank0042_Text_First = One line.',
   'Bank0042_Text_Second = Another\\nline!',
   'Bank0042_Text_Third = ',
   '\\pad{17}',

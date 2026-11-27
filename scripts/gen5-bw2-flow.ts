@@ -4,7 +4,8 @@
 // pokebw2 has no name for either (BtlvCore_PlayDamageSE says the set has none yet), so the reader
 // takes each from its function by shape and throws on any other. The cross-check holds each of the
 // backend's lines (src/gen5/backend/lines.ts) against the message IDs its function puts (D9). The
-// errors name functions, labels and the C they met, and show no number.
+// errors name the function, the role and the shape the reader expected, never the C they met, so
+// they show no number of pokebw2.
 import type { Gen5Line } from '../src/gen5/backend/lines.ts'
 import type { FlowNumbers, TextNumbers } from '../src/gen5/bw2-numbers.ts'
 import { bodyOf, enumAround, literal, stripComments } from './gen5-bw2-c.ts'
@@ -24,16 +25,16 @@ const bodyText = (source: string, fn: string) =>
     .replace(/\s+/g, ' ')
     .trim()
 
-/** A literal of `fn`'s body, or a throw that names what stood there. */
+/** A literal of `fn`'s body, or a throw that names `fn` and the role alone. */
 function literalOf(text: string, fn: string, role: string): number {
   const value = literal(text)
-  if (value === undefined) throw new Error(`${fn}: the ${role} "${text}" is no literal`)
+  if (value === undefined) throw new Error(`${fn}: the ${role} is no number literal`)
   return value
 }
 
 const DAMAGE = 'ServerDisplay_Damage'
 const KIND_CHAIN =
-  /if \(superEffective\) \{ kind = (\w+); \} else if \(notVeryEffective\) \{ kind = (\w+); \} else \{ kind = (\w+); \}/
+  /if \(superEffective\) \{ kind = ([^;]+); \} else if \(notVeryEffective\) \{ kind = ([^;]+); \} else \{ kind = ([^;]+); \}/
 
 /** The kinds of the hit flash for a super effective, a resisted and any other hit. */
 export function damageKinds(flowC: string): FlowNumbers['damageKinds'] {
@@ -67,7 +68,7 @@ export function recoverEffect(flowC: string): number {
     ),
   ]
   if (puts.length !== 1) {
-    throw new Error(`${RECOVER} puts SC_EFFECT_BY_POS ${String(puts.length)} times, not once`)
+    throw new Error(`${RECOVER} puts SC_EFFECT_BY_POS not exactly once`)
   }
   return literalOf(puts[0]?.[1]?.trim() ?? '', RECOVER, 'effect')
 }
@@ -109,11 +110,7 @@ export function putIds(input: FlowInput, source: Gen5Line['source']): number[] {
   const messages = putsOf(bodyText(sourceText(input, source.file), fn), input.flowC, source.put)
   const what = source.put === 'StrSetup set' ? 'set string' : source.put.slice('PutMsg '.length)
   if (messages.length === 0) throw new Error(`${fn} puts no ${what}`)
-  return messages.map((message) => {
-    const id = literal(message)
-    if (id === undefined) throw new Error(`${fn} puts the message "${message}", no literal`)
-    return id
-  })
+  return messages.map((message) => literalOf(message, fn, `message of a ${what}`))
 }
 
 /** Throws by label when a line's label is missing from its bank or its index is none of the IDs

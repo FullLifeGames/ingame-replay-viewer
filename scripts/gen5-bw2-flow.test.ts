@@ -27,17 +27,20 @@ describe('damageKinds', () => {
         '        kind = 7;\n    } else {\n        kind = 5;\n    }',
     )
     expect(() => damageKinds(swapped)).toThrow(
-      'ServerDisplay_Damage: no chain if (superEffective) … else if (notVeryEffective) … else',
+      new Error(
+        'ServerDisplay_Damage: no chain if (superEffective) … else if (notVeryEffective) … else that sets kind',
+      ),
     )
   })
 
+  // The error names the role alone, never the C it met: a sum shows no number.
   it('refuses a kind that is no literal', () => {
     const named = damage(
-      '    if (superEffective) { kind = KIND_A; } else if (notVeryEffective) { kind = 4; }' +
+      '    if (superEffective) { kind = KIND_A + 3; } else if (notVeryEffective) { kind = 4; }' +
         ' else { kind = 5; }',
     )
     expect(() => damageKinds(named)).toThrow(
-      'ServerDisplay_Damage: the kind "KIND_A" is no literal',
+      new Error('ServerDisplay_Damage: the kind is no number literal'),
     )
   })
 
@@ -46,7 +49,9 @@ describe('damageKinds', () => {
       '    if (superEffective) { kind = 7; } else if (notVeryEffective) { kind = 4; }' +
         ' else { kind = 5; }\n    kind = 9;',
     )
-    expect(() => damageKinds(again)).toThrow('ServerDisplay_Damage sets kind outside its chain')
+    expect(() => damageKinds(again)).toThrow(
+      new Error('ServerDisplay_Damage sets kind outside its chain'),
+    )
   })
 
   it('refuses a body that sends no SC_DAMAGE_PLURAL with the kind', () => {
@@ -54,7 +59,7 @@ describe('damageKinds', () => {
       '    if (superEffective) { kind = 7; } else if (notVeryEffective) { kind = 4; } else { kind = 5; }'
     const without = damage(chain).replace('(u8)kind', '(u8)count')
     expect(() => damageKinds(without)).toThrow(
-      'ServerDisplay_Damage sends no SC_DAMAGE_PLURAL with the kind',
+      new Error('ServerDisplay_Damage sends no SC_DAMAGE_PLURAL with the kind'),
     )
   })
 })
@@ -71,10 +76,10 @@ describe('recoverEffect', () => {
     const put = (effect: string) =>
       `    BtlServerCmdQueue_Put(flow->queue, SC_EFFECT_BY_POS, pos, ${effect});`
     expect(() => recoverEffect(body(put('EFFECT_HEAL')))).toThrow(
-      'ServerControl_RecoverHPCore: the effect "EFFECT_HEAL" is no literal',
+      new Error('ServerControl_RecoverHPCore: the effect is no number literal'),
     )
     expect(() => recoverEffect(body(`${put('1')}\n${put('2')}`))).toThrow(
-      'ServerControl_RecoverHPCore puts SC_EFFECT_BY_POS 2 times, not once',
+      new Error('ServerControl_RecoverHPCore puts SC_EFFECT_BY_POS not exactly once'),
     )
   })
 })
@@ -102,9 +107,11 @@ describe('putIds', () => {
       function: 'ServerDisplay_MoveFailed',
       put: 'PutMsg SC_MSG_SET',
     } as const
-    expect(() => putIds(FLOW_INPUT, source)).toThrow('ServerDisplay_MoveFailed puts no SC_MSG_SET')
+    expect(() => putIds(FLOW_INPUT, source)).toThrow(
+      new Error('ServerDisplay_MoveFailed puts no SC_MSG_SET'),
+    )
     expect(() => putIds(FLOW_INPUT, { ...source, file: 'src/battle/other.c' })).toThrow(
-      'src/battle/other.c is no source of the flow',
+      new Error('src/battle/other.c is no source of the flow'),
     )
   })
 
@@ -114,7 +121,9 @@ describe('putIds', () => {
       flowC: `${FLOW_INPUT.flowC}\nvoid Named(BtlServerFlow *flow) {\n    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, MSG_ID, SC_MSG_ARG_END);\n}\n`,
     }
     const source = { file: FLOW, function: 'Named', put: 'PutMsg SC_MSG_STD' } as const
-    expect(() => putIds(named, source)).toThrow('Named puts the message "MSG_ID", no literal')
+    expect(() => putIds(named, source)).toThrow(
+      new Error('Named: the message of a SC_MSG_STD is no number literal'),
+    )
   })
 })
 
@@ -135,7 +144,9 @@ describe('checkLineSources', () => {
     }
     expect(() => {
       checkLineSources(FLOW_INPUT, moved, GEN5_LINES)
-    }).toThrow('Bank0019_Text_CriticalHit is not what ServerDisplay_CriticalHitMessage puts')
+    }).toThrow(
+      new Error('Bank0019_Text_CriticalHit is not what ServerDisplay_CriticalHitMessage puts'),
+    )
   })
 
   it('names a set string put with the standard kind', () => {
@@ -145,13 +156,15 @@ describe('checkLineSources', () => {
     }
     expect(() => {
       checkLineSources(FLOW_INPUT, moved, GEN5_LINES)
-    }).toThrow('Bank0018_Text_RestoredLittleHpUsing is not what HandlerLeftoversUse puts')
+    }).toThrow(
+      new Error('Bank0018_Text_RestoredLittleHpUsing is not what HandlerLeftoversUse puts'),
+    )
   })
 
   it('names a label its bank lacks', () => {
     const lacking: TextNumbers = { ...text, set: {} }
     expect(() => {
       checkLineSources(FLOW_INPUT, lacking, GEN5_LINES)
-    }).toThrow('the set bank has no Bank0018_Text_AvoidedAttack')
+    }).toThrow(new Error('the set bank has no Bank0018_Text_AvoidedAttack'))
   })
 })
