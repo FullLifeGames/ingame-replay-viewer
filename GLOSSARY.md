@@ -285,3 +285,23 @@ _Avoid_: encrypted mon, PKM file
 **Fixtures' guard**:
 `scripts/gen5-fixtures-real.test.ts`: it fails by name when a fixture's field sits at its real place or another number of a fixture equals the generated one under the same name, so a fixture under pokebw2's names, the C texts for the generator's readers among them, holds invented numbers in an order of its own.
 _Avoid_: leak test
+
+**Gen 5 replay**:
+What the Gen 5 game backend makes of a battle script: the pokebw2 pin its numbers come from, both trainers' names, both parties as written, the blocks of the game's server commands, the Gen 5 fallbacks and the dropped lines. It starts with its format's version.
+_Avoid_: Gen 5 stream, Gen 5 script
+
+**Revealed set**:
+What the battle log shows of a team member's own moves, item and ability. A move, item or ability the log never shows, or shows only after it changed hands, falls back to a default.
+_Avoid_: known set, inferred set
+
+**Party order**:
+The order of a side's Pokémon in a Gen 5 replay's party: the members by their first switch-in, then the ones that never switch in, in team order. The game sends the first slot out first, so the replay's lead leads.
+_Avoid_: team order, preview order (Team Preview's order is another)
+
+**Mon ID**:
+The number Black 2's battle gives each Pokémon in it, by its side and its party slot. The game's server commands name a Pokémon by it.
+_Avoid_: battle index, position
+
+**Gen 5 fallback**:
+A Gen 5 replay's note of a content gap, with its log line: a forme the game draws as its base form, a character of a name that the battle's font lacks and shows as "?", or a move past the four a Pokémon holds. The run lists each one.
+_Avoid_: warning, cut (a name cut to its room is a note, not a fallback)
