@@ -1,6 +1,13 @@
 // The report of the pokebw2 generator (gen5-bw2.ts): the full one with every number it read, for a
 // run on the build machine, and the quiet one for CI's public log, with no number of pokebw2.
-import type { Bw2Numbers, Bw2Symbol, EntryNumbers, PkmNumbers } from '../src/gen5/bw2-numbers.ts'
+import { GEN5_LINES } from '../src/gen5/backend/lines.ts'
+import type {
+  Bw2Numbers,
+  Bw2Symbol,
+  EntryNumbers,
+  PkmNumbers,
+  TextNumbers,
+} from '../src/gen5/bw2-numbers.ts'
 import { inMainRam } from '../src/gen5/main-ram.ts'
 import { packCommands, type ServerCommand } from '../src/gen5/server-cmd.ts'
 
@@ -79,6 +86,21 @@ function entryChecks(entry: EntryNumbers): string[] {
 const pkmCheck = (pkm: PkmNumbers) =>
   `pkm layouts ${Object.keys(pkm.layouts).join(', ')}; block table, cipher and shiny bound read`
 
+/** How many of the backend's lines each bank holds by label, of how many it names: counts of our
+ * own list, as a bank's own size would give away its last line's index. */
+function textCheck(text: TextNumbers): string {
+  const lines = Object.values(GEN5_LINES)
+  const banks = (['standard', 'set'] as const).map((bank) => {
+    const named = lines.filter((line) => line.bank === bank)
+    const found = named.filter((line) => Object.hasOwn(text[bank], line.label))
+    return `${bank} ${String(found.length)} of ${String(named.length)}`
+  })
+  return `text labels of the backend's lines found: ${banks.join(', ')}`
+}
+
+/** The generator has held each of the backend's lines to what its function puts, or thrown. */
+const LINES_CHECKED = "line sources checked: each of the backend's lines is what its function puts"
+
 /** The report for a public log: the pin, the count of the symbols it looked up by our own names,
  * and the two checks, and no number of pokebw2: no address, offset, value or size. Each of
  * pokebw2's lists runs from 0, so a list's size would give away its last entry's number. */
@@ -91,6 +113,8 @@ export function quietLines(numbers: Bw2Numbers): string[] {
     LAYOUT_CHECKED,
     ...entryChecks(numbers.entry),
     pkmCheck(numbers.pkm),
+    textCheck(numbers.text),
+    LINES_CHECKED,
   ]
 }
 
@@ -156,6 +180,12 @@ export function fullLines(numbers: Bw2Numbers): string[] {
     ...entryLines(numbers.entry),
     ...entryChecks(numbers.entry),
     ...pkmLines(numbers.pkm),
+    `text standard ${count(numbers.text.standard)} labels, set ${count(numbers.text.set)} labels`,
+    ...Object.entries(GEN5_LINES).map(
+      ([name, line]) => `line ${name} ${line.label} ${String(numbers.text[line.bank][line.label])}`,
+    ),
+    LINES_CHECKED,
+    `flow ${JSON.stringify(numbers.flow)}`,
   ]
 }
 

@@ -9,7 +9,7 @@ import type { Context, EventOf } from './context'
 import { pursuedBefore, takeDown } from './effects'
 import { afterFaint } from './hits'
 import { endIntro, sendOutLead } from './intro'
-import { scaleHp } from './scale'
+import { scaleHp } from '../../script/hp-scale'
 
 type SwitchInEvent = EventOf<'switchIn'>
 

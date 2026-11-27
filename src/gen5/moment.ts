@@ -25,7 +25,7 @@ export interface Moment {
 
 /** The effect index of SC_MOVE_ANIM for a move's only turn, as the server sends it for a plain
  * move (pokebw2 src/battle/btl_server_flow.c, the SC_MOVE_ANIM puts with a last argument 0). */
-const PLAIN_TURN = 0
+export const PLAIN_TURN = 0
 
 function checkHp(moment: Moment): void {
   const { hp, maxHp } = moment.target

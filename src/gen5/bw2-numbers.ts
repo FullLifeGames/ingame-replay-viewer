@@ -233,6 +233,22 @@ export interface FontNumbers {
   chars: string
 }
 
+/** The labels of the battle's standard and set text banks (scripts/gen5-bw2-text.ts), each with
+ * its line's index in the bank, which is the message ID the server sends (#107). */
+export interface TextNumbers {
+  standard: Record<string, number>
+  set: Record<string, number>
+}
+
+/** The numbers the server's flow puts as literals (scripts/gen5-bw2-flow.ts), which pokebw2 has
+ * no name for (#107). */
+export interface FlowNumbers {
+  /** The effectiveness category of the hit flash's SC_DAMAGE_PLURAL, which picks the hit sound. */
+  damageKinds: { plain: number; super: number; resisted: number }
+  /** The effect SC_EFFECT_BY_POS shows at a Pokémon that heals. */
+  recoverEffect: number
+}
+
 /** The whole of build/gen5/bw2.json. */
 export interface Bw2Numbers extends ServerCmdTable {
   pokebw2: { repository: string; commit: string }
@@ -250,4 +266,6 @@ export interface Bw2Numbers extends ServerCmdTable {
   entry: EntryNumbers
   pkm: PkmNumbers
   font: FontNumbers
+  text: TextNumbers
+  flow: FlowNumbers
 }

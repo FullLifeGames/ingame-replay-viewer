@@ -15,7 +15,7 @@ import { healed, hpSet, hurt, isTrapping, wishCameTrue } from '../text/phrases-h
 import { type Context, type EventOf, type PrintText, sameMon } from './context'
 import { hit, hitLines } from './hits'
 import { itemPopUp, shownBefore } from './items'
-import { scaleHp } from './scale'
+import { scaleHp } from '../../script/hp-scale'
 import { STATUS_ANIM } from './status'
 
 type Step = 'say' | 'hit' | 'bar' | Anim
