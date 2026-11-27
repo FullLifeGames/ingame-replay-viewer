@@ -59,6 +59,20 @@ export interface HeldLines {
   readonly texts: readonly string[]
 }
 
+/**
+ * Where the game says an item's lines in the hit after them: as the hit's result, after the
+ * critical hit line (`Cmd_resultmessage`), or as the move ends, after the effectiveness
+ * (`MoveEndResistBerryMessage`).
+ */
+export type HitStage = 'result' | 'moveEnd'
+
+/** An item's instructions that wait for the hit on `who` (`hits.ts` says them). */
+export interface HeldForHit {
+  readonly who: PokemonRef
+  readonly stage: HitStage
+  readonly placed: readonly Placed[]
+}
+
 /** A Pokémon that its charge turn hid (`hidden.ts`). */
 export interface Hidden {
   readonly who: PokemonRef
@@ -94,6 +108,8 @@ export class Context {
   multiHit: MultiHit | undefined
   /** A multi-hit move's last lines, which its knocked out target's faint says. */
   afterFaint: HeldLines | undefined
+  /** An item's lines that the next hit on its holder says (#105, D8). */
+  afterHit: HeldForHit | undefined
   /** The Pokémon that a charge turn hid, by side; only `hidden.ts` writes it. */
   readonly hidden: Record<Side, Hidden | undefined> = { near: undefined, far: undefined }
   /** The index in `script.events` of the event in hand; the walk sets it. */

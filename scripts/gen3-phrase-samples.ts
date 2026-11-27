@@ -153,6 +153,8 @@ export const SAMPLES: Readonly<Record<string, Sample>> = {
     args: [NEAR, FAR, nb('Choice Band')],
     fill: { B_ATK_NAME_WITH_PREFIX: 'Dugtrio', B_LAST_ITEM: nb('Choice Band') },
   },
+  'items.hungOn': withValue('B_LAST_ITEM', nb('Focus Sash'), FAR),
+  'items.berryWeakened': withValue('B_LAST_ITEM', nb('Chople Berry'), FAR),
   'items.whiteHerb': withValue('B_LAST_ITEM', nb('White Herb'), FAR),
   'items.actsFaster': withValue('B_BUFF1', nb('Custap Berry'), FAR),
 }

@@ -25,6 +25,13 @@ export const ITEM_TEMPLATES = {
   actsFaster: tagged('STRINGID_CANACTFASTERTHANKSTO', (who: Mon, item: string) => {
     return `${nameAtStart(who)} can act faster than normal, thanks to its ${item}!`
   }),
+  hungOn: tagged('STRINGID_PKMNHUNGONWITHX', (who: Mon, item: string) => {
+    return `${nameAtStart(who)} hung on using its ${item}!`
+  }),
+  // `BattleScript_BerryReduceDmg`, after the hit that the berry weakened.
+  berryWeakened: tagged('STRINGID_BERRYDMGREDUCES', (who: Mon, item: string) => {
+    return `${nameAtStart(who)}'s ${item} lessened the damage it took!`
+  }),
   whiteHerb: tagged('STRINGID_PKMNSITEMRESTOREDSTATUS', (who: Mon, item: string) => {
     return `${nameAtStart(who)} returned its stats to normal using its ${item}!`
   }),
@@ -41,6 +48,9 @@ const STEALS = new Set(['thief', 'covet'])
 
 /** Trick and Switcheroo (EFFECT_TRICK) say each item by `gItemSwapStringIds`. */
 const SWAPS = new Set(['trick', 'switcheroo'])
+
+/** Whether `item` is Focus Sash, which says its holder hung on (`BattleScript_HangedOnMsg`). */
+export const hangsOn = (item: string) => toID(item) === 'focussash'
 
 /**
  * The Air Balloon says its lines with no pop-up: as its holder comes in, and as a hit pops it
@@ -87,8 +97,16 @@ export function itemRemoved(
   if (cause === undefined && toID(item) === AIR_BALLOON) {
     return { text: ITEM_TEMPLATES.airBalloonPopped.render(who) }
   }
+  if (cause === undefined && hangsOn(item)) {
+    return { text: ITEM_TEMPLATES.hungOn.render(who, name) }
+  }
   return ownPhrase(`${ownerAtStart(who)} ${name} was used up!`, `${item} used up`)
 }
+
+/** The berry `who` ate lessened the damage of the hit on it. */
+export const berryWeakened = (who: Mon, item: string): Phrase => ({
+  text: ITEM_TEMPLATES.berryWeakened.render(who, itemName(item)),
+})
 
 /** The item `who` ate or held let it move first in its priority (Custap Berry, Quick Claw). */
 export const actedFaster = (who: Mon, item: string): Phrase => ({

@@ -107,6 +107,8 @@ export interface ItemEndEvent extends Caused {
   readonly item: string
   /** A berry eaten (`[eat]`). */
   readonly eaten?: true
+  /** A berry eaten on the line before that weakens the hit after it (`[weaken]`). */
+  readonly weakened?: true
   readonly silent?: true
 }
 
