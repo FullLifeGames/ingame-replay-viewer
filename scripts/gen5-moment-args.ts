@@ -6,8 +6,9 @@
 // (src/gen5/continue-route.ts) plays to the trainer's action menu, where the moment starts; with
 // no save it starts as the spike's did, from the state s5-battle under build/gen5/states/. With
 // --replay <id> the direct entry writes a test replay's teams and trainer names (#106), and with
-// --scene hits beside it the run plays a hand turn of the replay's leads as blocks (#107).
-// Usage: --scene known|unknown|hits, --save <name>, --entry direct|walk, --battle single|double,
+// --scene hits or switches beside it the run plays hand turns after the replay's start as blocks
+// (#107, #108).
+// Usage: --scene known|unknown|hits|switches, --save <name>, --entry direct|walk, --battle single|double,
 // --player <name>, --opponent <name>, --replay <id>, --minutes <n>.
 import { parseArgs } from 'node:util'
 
@@ -17,7 +18,9 @@ import type { RunPlan } from '../src/gen5/hook.ts'
 import type { ParkNames, ParkSides } from '../src/gen5/direct-park.ts'
 import type { RamCheck, RamRef } from '../src/gen5/ram-check.ts'
 import { isSaveName, SAVE_NAME_RULE } from '../src/gen5/save-file.ts'
+import { HITS_TURN } from './gen5-moment-hits.ts'
 import type { SceneName } from './gen5-moment-scene.ts'
+import { SWITCHES_TURNS } from './gen5-moment-switches.ts'
 
 /** The spike's state at the rival battle's action menu (#72). */
 const SPIKE_STATE = 's5-battle'
@@ -33,14 +36,21 @@ type MomentEntry = 'walk' | 'direct'
 /** The direct entry's battle style. */
 type MomentBattle = ParkSides['style']
 
-/** What the direct entry writes: the hand team of gen5-moment-team.ts with the names given, or
- * the teams and trainer names of the test replay `id` (test/fixtures/replays/), with `hits` for
- * the hand turn of gen5-moment-hits.ts in place of the replay's turns. */
-export type MomentTeam =
-  { from: 'hand'; names: ParkNames } | { from: 'replay'; id: string; hits: boolean }
+/** The scenes that play hand turns after a test replay's start, each with its turns. */
+const HAND_TURNS = { hits: HITS_TURN, switches: SWITCHES_TURNS } as const
 
-/** A scene of the moment's blocks, or `hits`: the blocks of a replay's hand turn. */
-export type MomentScene = SceneName | 'hits'
+/** A scene of hand turns after a test replay's start. */
+type HandScene = keyof typeof HAND_TURNS
+
+/** What the direct entry writes: the hand team of gen5-moment-team.ts with the names given, or
+ * the teams and trainer names of the test replay `id` (test/fixtures/replays/), with a hand
+ * scene's `turns` in place of the replay's turns. */
+export type MomentTeam =
+  | { from: 'hand'; names: ParkNames }
+  | { from: 'replay'; id: string; turns: readonly string[] | undefined }
+
+/** A scene of the moment's blocks, or a hand scene: the blocks of a replay's hand turns. */
+export type MomentScene = SceneName | HandScene
 
 export interface MomentOptions {
   scene: MomentScene
@@ -61,8 +71,10 @@ export interface StateFile {
   ramSha: string | undefined
 }
 
+/** Whether `scene` plays hand turns after a test replay's start. */
+export const isHandScene = (scene: string): scene is HandScene => Object.hasOwn(HAND_TURNS, scene)
 const isScene = (name: string): name is MomentScene =>
-  name === 'known' || name === 'unknown' || name === 'hits'
+  name === 'known' || name === 'unknown' || isHandScene(name)
 const isEntry = (name: string): name is MomentEntry => name === 'walk' || name === 'direct'
 const isBattle = (name: string): name is MomentBattle => name === 'single' || name === 'double'
 
@@ -95,8 +107,17 @@ function startOf(save: string | undefined, entry: MomentEntry): MomentStart {
 /** A test replay's id: lower-case letters and digits with single hyphens between them. */
 const REPLAY_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
+/** The hand team with the names given or their defaults; a hand scene needs a replay. */
+function handTeam(scene: MomentScene, player?: string, opponent?: string): MomentTeam {
+  if (isHandScene(scene)) {
+    const needs = "plays hand turns after a test replay's start: give it --replay <id>."
+    throw new Error(`--scene ${scene} ${needs}`)
+  }
+  return { from: 'hand', names: { player: player ?? 'Viewer', opponent: opponent ?? 'Showdown' } }
+}
+
 /** The hand team with the names given or their defaults, or the replay, which brings its own
- * names and plays a single of the direct entry; the hits scene needs the replay. */
+ * names and plays a single of the direct entry; a hand scene needs the replay. */
 function teamOf(
   values: {
     scene: MomentScene
@@ -107,12 +128,8 @@ function teamOf(
   entry: MomentEntry,
   battle: MomentBattle,
 ): MomentTeam {
-  const { replay: id, player, opponent } = values
-  const hits = values.scene === 'hits'
-  if (id === undefined) {
-    if (hits) throw new Error("--scene hits plays a test replay's leads: give it --replay <id>.")
-    return { from: 'hand', names: { player: player ?? 'Viewer', opponent: opponent ?? 'Showdown' } }
-  }
+  const { scene, replay: id, player, opponent } = values
+  if (id === undefined) return handTeam(scene, player, opponent)
   if (entry !== 'direct') {
     throw new Error("--replay is for --entry direct alone: the walk meets the save's trainer.")
   }
@@ -126,16 +143,16 @@ function teamOf(
     const rule = 'lower-case letters and digits with single hyphens between them'
     throw new Error(`--replay takes a test replay's id, ${rule}, not "${id}".`)
   }
-  return { from: 'replay', id, hits }
+  return { from: 'replay', id, turns: isHandScene(scene) ? HAND_TURNS[scene] : undefined }
 }
 
 /** The prefix of the run's frames: the save or nosave, or s6 from the state, then the entry, and
- * the replay's id with the hits scene's mark or the scene, and a double's mark. */
+ * the replay's id with a hand scene's name or the scene, and a double's mark. */
 function labelOf(start: MomentStart, entry: MomentEntry, scene: MomentScene, team: MomentTeam) {
   const from = start.from === 'boot' ? (start.save ?? 'nosave') : 's6'
   const via = entry === 'direct' ? '-direct' : ''
   if (team.from === 'hand') return `${from}${via}-${scene}`
-  return `${from}${via}-${team.id}${team.hits ? '-hits' : ''}`
+  return `${from}${via}-${team.id}${isHandScene(scene) ? `-${scene}` : ''}`
 }
 
 export function readMomentOptions(args: string[], now: number): MomentOptions {
@@ -153,7 +170,8 @@ export function readMomentOptions(args: string[], now: number): MomentOptions {
     },
   })
   const { scene } = values
-  if (!isScene(scene)) throw new Error(`--scene takes known, unknown or hits, not "${scene}".`)
+  if (!isScene(scene))
+    throw new Error(`--scene takes known, unknown, hits or switches, not "${scene}".`)
   const minutes = Number(values.minutes)
   if (!(minutes > 0)) throw new Error(`--minutes takes a positive number, not "${values.minutes}".`)
   const entry = entryOf(values.entry)
