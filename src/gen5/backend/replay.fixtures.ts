@@ -1,12 +1,13 @@
-// The invented numbers of the Gen 5 backend's specs (#106, #107, #108): the Pokémon format and
+// The invented numbers of the Gen 5 backend's specs (#106 to #109): the Pokémon format and
 // the entry of src/gen5's fixtures, a font of printable ASCII, a made-up pin, and the numbers the
 // blocks need. The server commands keep pokebw2's `SC_*` names with numbers above any the game
 // has; the formats carry names, codes and puts of their own, each argument in a halfword. The
-// labels keep pokebw2's names with message IDs of their own, and the battle's clients sit in an
-// order of their own. scripts/gen5-fixtures-real.test.ts holds that no number here equals the
-// generated one under the same name.
+// labels keep pokebw2's names with message IDs of their own, the battle's constants keep theirs
+// with values of their own, and the battle's clients sit in an order of their own.
+// scripts/gen5-fixtures-real.test.ts holds that no number here equals the generated one under the
+// same name.
 import { ADAPTER_LAYOUT } from '../adapter.fixtures.ts'
-import type { ArgFormat } from '../bw2-numbers.ts'
+import type { ArgFormat, BattleNumbers, Bw2Numbers } from '../bw2-numbers.ts'
 import { ENTRY } from '../direct-entry.fixtures.ts'
 import { TEAM_PKM } from '../pkm.fixtures.ts'
 import type { ReplayNumbers } from './replay.ts'
@@ -21,7 +22,10 @@ const halves = (code: number, argCount: number): ArgFormat => ({
   })),
 })
 
-export const REPLAY_NUMBERS: ReplayNumbers = {
+/** The replay's numbers with the effects' and the battle's constants (#109), which the backend
+ * picks once its sequences are wired. */
+export const REPLAY_NUMBERS: ReplayNumbers &
+  Pick<Bw2Numbers, 'effects'> & { readonly battle: Pick<BattleNumbers, 'constants'> } = {
   pkm: TEAM_PKM,
   entry: ENTRY,
   font: { chars: Array.from({ length: 95 }, (_, i) => String.fromCharCode(32 + i)).join('') },
@@ -47,6 +51,26 @@ export const REPLAY_NUMBERS: ReplayNumbers = {
     SC_SEND_OUT: 0x6a26,
     SC_FAINT_HP_GAUGE: 0x6a28,
     SC_OP_SETUP_ILLUSION: 0x6a35,
+    SC_STAT_DOWN_EFFECT: 0x6a66,
+    SC_OP_CURE_CONDITION: 0x6a62,
+    SC_WEATHER_START: 0x6a67,
+    SC_ABILITY_POPUP_OUT: 0x6a6a,
+    SC_OP_SET_CONDITION: 0x6a60,
+    SC_EFFECT: 0x6a6b,
+    SC_OP_LOWER_STAT_STAGE: 0x6a64,
+    SC_SET_GAUGE_STATUS: 0x6a61,
+    SC_WEATHER_END: 0x6a68,
+    SC_OP_RAISE_STAT_STAGE: 0x6a63,
+    SC_ABILITY_POPUP_IN: 0x6a69,
+    SC_STAT_UP_EFFECT: 0x6a65,
+    SC_SUBSTITUTE_CREATE: 0x6a73,
+    SC_OP_SET_ITEM: 0x6a70,
+    SC_DAMAGE_EFFECT: 0x6a76,
+    SC_OP_DELETE_SUBSTITUTE: 0x6a74,
+    SC_HIDE_MSG_WINDOW: 0x6a77,
+    SC_OP_CONSUME_ITEM: 0x6a71,
+    SC_SUBSTITUTE_DELETE: 0x6a75,
+    SC_OP_CREATE_SUBSTITUTE: 0x6a72,
   },
   argFormats: {
     HALF_ONE: halves(0x41, 1),
@@ -77,6 +101,26 @@ export const REPLAY_NUMBERS: ReplayNumbers = {
     SC_SEND_OUT: 'HALF_FOUR',
     SC_FAINT_HP_GAUGE: 'HALF_TWO',
     SC_OP_SETUP_ILLUSION: 'HALF_ONE',
+    SC_STAT_DOWN_EFFECT: 'HALF_THREE',
+    SC_OP_CURE_CONDITION: 'HALF_ONE',
+    SC_WEATHER_START: 'HALF_TWO',
+    SC_ABILITY_POPUP_OUT: 'HALF_ONE',
+    SC_OP_SET_CONDITION: 'HALF_THREE',
+    SC_EFFECT: 'HALF_ONE',
+    SC_OP_LOWER_STAT_STAGE: 'HALF_THREE',
+    SC_SET_GAUGE_STATUS: 'HALF_TWO',
+    SC_WEATHER_END: 'HALF_ONE',
+    SC_OP_RAISE_STAT_STAGE: 'HALF_THREE',
+    SC_ABILITY_POPUP_IN: 'HALF_ONE',
+    SC_STAT_UP_EFFECT: 'HALF_THREE',
+    SC_SUBSTITUTE_CREATE: 'HALF_ONE',
+    SC_OP_SET_ITEM: 'HALF_TWO',
+    SC_DAMAGE_EFFECT: 'HALF_THREE',
+    SC_OP_DELETE_SUBSTITUTE: 'HALF_ONE',
+    SC_HIDE_MSG_WINDOW: 'HALF_ONE',
+    SC_OP_CONSUME_ITEM: 'HALF_TWO',
+    SC_SUBSTITUTE_DELETE: 'HALF_ONE',
+    SC_OP_CREATE_SUBSTITUTE: 'HALF_TWO',
   },
   messages: { formats: ['SAY', 'SAY_SE'], soundCommand: 'SC_MSG_STD_SE', argEnd: 0x7e5d0000 },
   adapter: ADAPTER_LAYOUT,
@@ -87,6 +131,8 @@ export const REPLAY_NUMBERS: ReplayNumbers = {
       Bank0019_Text_CriticalHit: 0x4b8b,
       Bank0019_Text_ItsNotVeryEffective: 0x4b91,
       Bank0019_Text_ItsSuperEffective: 0x4b97,
+      Bank0019_Text_PointedStonesDisappearedFrom: 0x4c4b,
+      Bank0019_Text_PointedStonesFloatAir: 0x4c41,
     },
     set: {
       Bank0018_Text_RestoredLittleHpUsing: 0x4bad,
@@ -94,6 +140,39 @@ export const REPLAY_NUMBERS: ReplayNumbers = {
       Bank0018_Text_DoesntAffect: 0x4bb9,
       Bank0018_Text_DraggedOut: 0x4bbf,
       Bank0018_Text_Fainted: 0x4bc5,
+      Bank0018_Text_HurtByItsBurn: 0x4c15,
+      Bank0018_Text_SAttackWontGo_2: 0x4c3b,
+      Bank0018_Text_BadlyPoisoned: 0x4c03,
+      Bank0018_Text_FlinchedCouldntMove: 0x4c21,
+      Bank0018_Text_SAttackRose: 0x4c27,
+      Bank0018_Text_PointedStonesDugInto: 0x4c45,
+      Bank0018_Text_Burned: 0x4c09,
+      Bank0018_Text_FellAsleep: 0x4c07,
+      Bank0018_Text_FrozenSolid: 0x4c05,
+      Bank0018_Text_ParalyzedMayUnableMove: 0x4c0b,
+      Bank0018_Text_WokeUp: 0x4c19,
+      Bank0018_Text_SStatusReturnedNormal: 0x4c1b,
+      Bank0018_Text_ThawedOut: 0x4c17,
+      Bank0018_Text_BadlyPoisonedBy: 0x4c0d,
+      Bank0018_Text_SAttackFell: 0x4c2d,
+      Bank0018_Text_HurtByPoison: 0x4c11,
+      Bank0018_Text_ParalyzedCantMove: 0x4c1d,
+      Bank0018_Text_SAttackWontGo: 0x4c35,
+      Bank0018_Text_BuffetedBySandstorm: 0x4c31,
+      Bank0018_Text_SubstituteTookDamage: 0x4c5b,
+      Bank0018_Text_RestoredItsHealthUsing: 0x4c51,
+      Bank0018_Text_KnockedOffS: 0x4c63,
+      Bank0018_Text_SLetMoveFirst: 0x4c53,
+      Bank0018_Text_ProtectedItself_2: 0x4c69,
+      Bank0018_Text_LostSomeItsHp: 0x4c55,
+      Bank0018_Text_PutSubstitute: 0x4c59,
+      Bank0018_Text_FloatsAirItsAir: 0x4c57,
+      Bank0018_Text_Hurt_2: 0x4c65,
+      Bank0018_Text_SAirBalloonPopped: 0x4c5f,
+      Bank0018_Text_TighteningItsFocus: 0x4c6b,
+      Bank0018_Text_ProtectedItself: 0x4c67,
+      Bank0018_Text_HadItsEnergyDrained: 0x4c6d,
+      Bank0018_Text_SSubstituteFaded: 0x4c5d,
     },
   },
   flow: {
@@ -102,8 +181,46 @@ export const REPLAY_NUMBERS: ReplayNumbers = {
     switchEffects: { switchOut: 0x6d9, drag: 0x6df },
     faintGaugeFlag: 3,
   },
+  effects: {
+    addEffects: {
+      CONDITION_SLEEP: 0x6e1,
+      CONDITION_POISON: 0x6e3,
+      CONDITION_BURN: 0x6e5,
+      CONDITION_PARALYSIS: 0x6e7,
+      CONDITION_FREEZE: 0x6e9,
+    },
+    damageEffects: { CONDITION_POISON: 0x6ed, CONDITION_BURN: 0x6ef },
+    conditionValues: { permanent: 0x1e40, badlyPoisoned: 0x1e57, sleep: 0x2c90 },
+    badlyPoisonedGauge: 0x2d,
+    weatherTurns: 0x5a,
+    sideMask: 0x5,
+    sandEffects: { hit: 0x6f3, after: 0x6f5 },
+    hideWindow: 5,
+    focusEffect: 0x6f9,
+    memberInAbilities: ['ABILITY_SAND_STREAM', 'ABILITY_DRIZZLE', 'ABILITY_INTIMIDATE'],
+  },
   battle: {
     single: { clientCount: 4, posClientIds: [3, 2], clients: { player: 3, opponent: 2 } },
     monIds: { firstByClient: [30, 20, 10, 40], perClient: 9 },
+    constants: {
+      BATTLEMON_SPEED_STAGE: 0x55,
+      CONDITION_BURN: 0x2e,
+      BTL_WEATHER_RAIN: 0x3a,
+      BATTLEMON_ATTACK_STAGE: 0x51,
+      CONDITION_PARALYSIS: 0x29,
+      BATTLEMON_SP_DEFENSE_STAGE: 0x54,
+      BTL_WEATHER_SANDSTORM: 0x3c,
+      CONDITION_POISON: 0x2c,
+      BATTLEMON_DEFENSE_STAGE: 0x52,
+      BTL_WEATHER_SUN: 0x39,
+      CONDITION_SLEEP: 0x2a,
+      BATTLEMON_SP_ATTACK_STAGE: 0x53,
+      BTL_WEATHER_HAIL: 0x3b,
+      CONDITION_FREEZE: 0x2b,
+      CONDITION_NONE: 0x28,
+      TYPE_EFFECTIVENESS_HALF: 0x5c,
+      TYPE_EFFECTIVENESS_DOUBLE: 0x5f,
+      TYPE_EFFECTIVENESS_NORMAL: 0x5d,
+    },
   },
 }

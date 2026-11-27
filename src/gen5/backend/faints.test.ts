@@ -142,7 +142,7 @@ describe('a faint off the front', () => {
 
 // Scene: Alice's Zoroark comes in disguised as Dugtrio, and Crunch ends the disguise. The game
 // keeps Dugtrio's mon ID 40 in place, and Zoroark's later events play under it until Zoroark
-// leaves (lane plan D8). The disguise's end waits for #109.
+// leaves (lane plan D8). The disguise's end has no look of its own (#109, lane plan D14).
 describe('a Pokémon under Illusion’s disguise', () => {
   const CRUNCH = ['|move|p2a: Tyranitar|Crunch|p1a: Dugtrio', '|-supereffective|p1a: Dugtrio']
   const REVEALED = [
@@ -169,9 +169,14 @@ describe('a Pokémon under Illusion’s disguise', () => {
     expect(commandsAt(script, 10)[0]).toEqual(cmd('SC_OP_SUBTRACT_HP', 40, 30))
   })
 
-  it('lists the disguise’s end once, with #109', () => {
+  it('lists the disguise’s end once, as a line Black 2 lacks', () => {
     expect(listedOf('replace', ...REVEALED)).toEqual([
-      { line: NEXT + 4, kind: 'later', event: 'replace', detail: 'plays with #109' },
+      {
+        line: NEXT + 4,
+        kind: 'line',
+        event: 'replace',
+        detail: 'Black 2 shows the disguise throughout',
+      },
     ])
   })
 

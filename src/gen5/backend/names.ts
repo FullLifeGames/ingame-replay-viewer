@@ -3,10 +3,17 @@
 // @pkmn's Gen 5 data; scripts/gen5-names-real.test.ts holds each number to pokebw2's constant of
 // the same name under CI. Natures go by name (@pkmn numbers them in another order than the game),
 // from the generated list. Pure: no number of the game is held here.
-import { type Generation, Generations, type Move, type Nature, type Specie } from '@pkmn/data'
+import {
+  type Generation,
+  Generations,
+  type ID,
+  type Move,
+  type Nature,
+  type Specie,
+} from '@pkmn/data'
 import { Dex } from '@pkmn/dex'
 
-import type { TeamMember } from '../../script/types.ts'
+import type { Effect, TeamMember } from '../../script/types.ts'
 import type { PkmNumbers } from '../bw2-numbers.ts'
 import type { PkmGender } from '../pkm-fields.ts'
 
@@ -60,6 +67,21 @@ export const gen5Item = (name: string): number => need(gen5.items.get(name), 'it
 
 export const gen5Ability = (name: string): number =>
   need(gen5.abilities.get(name), 'ability', name).num
+
+/** The kinds of entry an effect of the log names. */
+export type EffectKind = NonNullable<Effect['kind']>
+
+const EFFECT_TABLES = { item: gen5.items, ability: gen5.abilities, move: gen5.moves }
+
+/** @pkmn's Gen 5 ID of the `kind` named `name`, such as `leftovers` for the item "Leftovers": the
+ * one way the backend tells an effect, whatever spelling the log uses. No name, or a name @pkmn
+ * lacks, gives undefined. */
+export const effectId = (kind: EffectKind, name: string | undefined): ID | undefined =>
+  name === undefined ? undefined : EFFECT_TABLES[kind].get(name)?.id
+
+/** The ID of a cause of the kind `kind`, and undefined for no cause or one of another kind. */
+export const causeId = (kind: EffectKind, cause: Effect | undefined): ID | undefined =>
+  cause?.kind === kind ? effectId(kind, cause.name) : undefined
 
 /** The one normalising rule: accents dropped, letters and digits alone, upper case. */
 const squashed = (text: string): string =>

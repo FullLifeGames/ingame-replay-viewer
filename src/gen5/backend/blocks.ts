@@ -15,10 +15,12 @@ import { afterLeads } from './rules.ts'
 /** The events that play as one block, in log order. */
 export type Action = readonly ScriptEvent[]
 
-/** The commands one event of an action writes. */
+/** The commands one event of an action writes, and the log lines it shows besides its own, as a
+ * Substitute's start shows its HP drop (lane plan D10). */
 export interface Written {
   readonly line: number
   readonly commands: readonly ServerCommand[]
+  readonly shows?: readonly number[]
 }
 
 /** How blocks pack: the command table and the bytes a block may take. */
@@ -39,13 +41,18 @@ function residualSpans(dropped: readonly DroppedLine[]): { from: number; to: num
   return spans
 }
 
+/** Whether a log line stands between a turn's residual mark and its `|upkeep|` line. */
+export function residualOf(dropped: readonly DroppedLine[]): (line: number) => boolean {
+  const spans = residualSpans(dropped)
+  return (line) => spans.some(({ from, to }) => from < line && line < to)
+}
+
 const isOpener = (event: ScriptEvent, afterTheLeads: boolean) =>
   event.kind === 'move' || event.kind === 'cant' || (event.kind === 'switchIn' && afterTheLeads)
 
 /** The script's events as actions, every event in one action, in log order. */
 export function actionsOf(script: Pick<BattleScript, 'events' | 'dropped'>): Action[] {
-  const spans = residualSpans(script.dropped)
-  const residual = (line: number) => spans.some(({ from, to }) => from < line && line < to)
+  const residual = residualOf(script.dropped)
   const after = afterLeads(script.events)
   const actions: ScriptEvent[][] = []
   let open: ScriptEvent[] | undefined
@@ -73,10 +80,10 @@ interface Part {
 function partsOf(action: readonly Written[], { table, room }: Packing): Part[] {
   const parts: Part[] = []
   let part: Part | undefined
-  const each = action.flatMap(({ line, commands }) =>
-    commands.map((command) => ({ line, command })),
+  const each = action.flatMap(({ line, commands, shows = [] }) =>
+    commands.map((command, i) => ({ line, command, shows: i === 0 ? shows : [] })),
   )
-  for (const { line, command } of each) {
+  for (const { line, command, shows } of each) {
     const bytes = packCommands(table, [command]).length
     if (bytes > room) {
       const at = `${command.command} (line ${String(line)})`
@@ -88,7 +95,7 @@ function partsOf(action: readonly Written[], { table, room }: Packing): Part[] {
     }
     part.commands.push(command)
     part.bytes += bytes
-    if (part.lines.at(-1) !== line) part.lines.push(line)
+    for (const shown of [line, ...shows]) if (!part.lines.includes(shown)) part.lines.push(shown)
   }
   return parts
 }

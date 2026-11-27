@@ -56,8 +56,9 @@ describe('battleNumbers', () => {
     expect(() => battleNumbers(mainC('clientCount = 3', 'clientCount = THREE'))).toThrow(/THREE/)
   })
 
-  // Scene: the backend names the weather, the condition and the stat it writes by pokebw2's name.
-  it("reads the weathers, the Pokémon's conditions and its stats, and no side's or field's condition", () => {
+  // Scene: the backend names the weather, the condition, the stat and a substitute hit's
+  // effectiveness it writes by pokebw2's name.
+  it("reads the weathers, the Pokémon's conditions, its stats and the type effectiveness, and no side's or field's condition", () => {
     expect(battleNumbers(SOURCES).constants).toEqual({
       BTL_WEATHER_RAIN: 0x21,
       BTL_WEATHER_NONE: 0x20,
@@ -68,6 +69,7 @@ describe('battleNumbers', () => {
       BATTLEMON_SPEED_STAGE: 30,
       BATTLEMON_HP: 26,
       BATTLEMON_ATTACK: 27,
+      TYPE_EFFECTIVENESS_DOUBLE: 0x2a,
     })
   })
 
@@ -77,6 +79,9 @@ describe('battleNumbers', () => {
       battleH: SOURCES.battleH.replace(from, to),
     })
     expect(() => battleNumbers(battleH(/^#define BTL_WEATHER_.*$/gm, ''))).toThrow(/BTL_WEATHER_/)
+    expect(() => battleNumbers(battleH(/^#define TYPE_EFFECTIVENESS_.*$/gm, ''))).toThrow(
+      /TYPE_EFFECTIVENESS_/,
+    )
     expect(() => battleNumbers(battleH('CONDITION_SLEEP 9', 'CONDITION_SLEEP (1 << 3)'))).toThrow(
       /CONDITION_SLEEP/,
     )

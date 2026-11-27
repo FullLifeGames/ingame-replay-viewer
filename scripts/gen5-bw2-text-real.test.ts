@@ -1,6 +1,6 @@
-// The lines and the flow's numbers that the Gen 5 backend sends (#107, #108) on pokebw2's real
-// numbers: build/gen5/bw2.json, which scripts/gen5-bw2.ts generates from the pinned checkout. CI
-// fetches the pin and generates the file before the check, so there a missing file fails the
+// The lines and the flow's numbers that the Gen 5 backend sends (#107, #108, #109) on pokebw2's
+// real numbers: build/gen5/bw2.json, which scripts/gen5-bw2.ts generates from the pinned checkout.
+// CI fetches the pin and generates the file before the check, so there a missing file fails the
 // guard; on a machine without it the relations skip. CI's log is public, so every assertion
 // compares names or booleans: a failure names the label or the role and shows no number of
 // pokebw2.
@@ -8,10 +8,9 @@ import { existsSync, readFileSync } from 'node:fs'
 
 import { describe, expect, it } from 'vitest'
 
-import { GEN5_LINES } from '../src/gen5/backend/lines.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { readSources } from './gen5-bw2.ts'
-import { checkLineSources } from './gen5-bw2-flow.ts'
+import { checkLineSources, LINE_TABLES } from './gen5-bw2-lines.ts'
 import { listedReader } from './gen5-bw2-source.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
@@ -26,10 +25,11 @@ let cached: Bw2Numbers | undefined
 const real = (): Bw2Numbers => (cached ??= JSON.parse(readFileSync(FILE, 'utf8')) as Bw2Numbers)
 
 describe.skipIf(!existsSync(FILE))("the backend's lines and the flow's numbers", () => {
-  // Scene: a hit, a miss, a failure or a heal sends its line by the label's index in its bank.
-  it('find every label of the backend in its bank', () => {
+  // Scene: a hit, a miss, a failure, a heal or an effect sends its line by the label's index in
+  // its bank (#107, #109).
+  it.each(Object.entries(LINE_TABLES))('find every label of the %s in its bank', (_, table) => {
     const { text } = real()
-    const missing = Object.values(GEN5_LINES).filter(
+    const missing = Object.values(table).filter(
       (line) => !Object.hasOwn(text[line.bank], line.label),
     )
     expect(missing.map((line) => line.label)).toEqual([])
@@ -37,10 +37,10 @@ describe.skipIf(!existsSync(FILE))("the backend's lines and the flow's numbers",
 
   // Scene: the generator held each label to its function; the file must still match the pin. The
   // check's error names the label and the function alone.
-  it('hold each label to what its function puts at the pin', () => {
+  it.each(Object.entries(LINE_TABLES))('hold each of the %s to its C at the pin', (_, table) => {
     const sources = readSources(listedReader(GEN5_PATHS.pokebw2))
     expect(() => {
-      checkLineSources(sources, real().text, GEN5_LINES)
+      checkLineSources(sources, real().text, table)
     }).not.toThrow()
   })
 

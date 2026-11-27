@@ -6,7 +6,9 @@ import type { TextNumbers } from '../bw2-numbers.ts'
 
 /** The C that puts a line: its file in pokebw2, its function, and the put. `PutMsg` names the
  * message command the ID goes through; `StrSetup set` is a handler's string of the set kind
- * (`BattleHandler_StrSetup` with `BTL_HANDLER_STRING_SET`), which goes out as SC_MSG_SET. */
+ * (`BattleHandler_StrSetup` with `BTL_HANDLER_STRING_SET`), which goes out as SC_MSG_SET; and
+ * `message literal` is a function that picks the ID by a switch or passes it on to the function
+ * that puts it, so the ID stands among its number literals (#109). */
 interface LineSource<Put extends string> {
   readonly file: string
   readonly function: string
@@ -19,22 +21,28 @@ export type Gen5Line =
   | { readonly bank: 'standard'; readonly label: string; readonly source: StandardSource }
   | { readonly bank: 'set'; readonly label: string; readonly source: SetSource }
 
-type StandardSource = LineSource<'PutMsg SC_MSG_STD'>
-type SetSource = LineSource<'PutMsg SC_MSG_SET' | 'StrSetup set'>
+export type StandardSource = LineSource<'PutMsg SC_MSG_STD' | 'message literal'>
+export type SetSource = LineSource<'PutMsg SC_MSG_SET' | 'StrSetup set' | 'message literal'>
 
-const FLOW = 'src/battle/btl_server_flow.c'
+/** The server's flow, where most lines are put. */
+export const FLOW = 'src/battle/btl_server_flow.c'
 
-const standard = (label: string, fn: string): Gen5Line => ({
+/** A line of the standard bank by the end of its label. */
+export const standardLine = (label: string, source: StandardSource): Gen5Line => ({
   bank: 'standard',
   label: `Bank0019_Text_${label}`,
-  source: { file: FLOW, function: fn, put: 'PutMsg SC_MSG_STD' },
+  source,
 })
 
-const set = (label: string, source: SetSource): Gen5Line => ({
+/** A line of the set bank by the end of its label. */
+export const setLine = (label: string, source: SetSource): Gen5Line => ({
   bank: 'set',
   label: `Bank0018_Text_${label}`,
   source,
 })
+
+const standard = (label: string, fn: string): Gen5Line =>
+  standardLine(label, { file: FLOW, function: fn, put: 'PutMsg SC_MSG_STD' })
 
 /** The lines of a single battle's hits, misses, failures, a heal by Leftovers, a faint and a
  * drag. */
@@ -43,27 +51,27 @@ export const GEN5_LINES = {
   notVeryEffective: standard('ItsNotVeryEffective', 'ServerDisplay_EffectivenessMessageMulti'),
   critical: standard('CriticalHit', 'ServerDisplay_CriticalHitMessage'),
   failed: standard('ButFailed', 'ServerDisplay_MoveFailed'),
-  avoided: set('AvoidedAttack', {
+  avoided: setLine('AvoidedAttack', {
     file: FLOW,
     function: 'ServerDisplay_MoveAvoided',
     put: 'PutMsg SC_MSG_SET',
   }),
-  doesNotAffect: set('DoesntAffect', {
+  doesNotAffect: setLine('DoesntAffect', {
     file: FLOW,
     function: 'ServerDisplay_DoesntAffect',
     put: 'PutMsg SC_MSG_SET',
   }),
-  leftovers: set('RestoredLittleHpUsing', {
+  leftovers: setLine('RestoredLittleHpUsing', {
     file: 'src/battle/handler/item_handlers.c',
     function: 'HandlerLeftoversUse',
     put: 'StrSetup set',
   }),
-  fainted: set('Fainted', {
+  fainted: setLine('Fainted', {
     file: FLOW,
     function: 'ServerControl_CheckFainted',
     put: 'PutMsg SC_MSG_SET',
   }),
-  draggedOut: set('DraggedOut', {
+  draggedOut: setLine('DraggedOut', {
     file: FLOW,
     function: 'ServerControl_ForceSwitchCore',
     put: 'PutMsg SC_MSG_SET',

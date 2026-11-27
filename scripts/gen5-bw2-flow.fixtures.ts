@@ -1,7 +1,8 @@
-// The invented C that the flow reader's specs hand to it (#107, #108): the functions it reads, in
-// an order of their own, each reduced to the shape the reader accepts, with numbers of our own and
+// The invented C that the flow reader's specs hand to it (#107, #108) and the line check's specs
+// (#109): the functions it reads and the functions that put or pick the backend's lines, in an
+// order of their own, each reduced to the shape the reader accepts, with numbers of our own and
 // each callee's parameters in an order of their own. The message IDs match the lines of
-// TEXT_INPUT (gen5-bw2-text.fixtures.ts), and four functions also put a message of the other
+// TEXT_INPUT (gen5-bw2-text.fixtures.ts), and some functions also put a message of the other
 // command or kind as a decoy. The reader keeps the damage kinds, the heal effect, the recall
 // effects and the faint's flag, so scripts/gen5-fixtures-real.test.ts compares those with the
 // generated ones.
@@ -102,13 +103,195 @@ void ServerDisplay_MoveAvoided(BtlServerFlow *flow, BattleMon *mon, u16 move) {
     BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 2, SC_MSG_ARG_END);
     BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 3, GetMonID(mon), SC_MSG_ARG_END);
 }
+
+void ServerControl_BreakSubstitute(BtlServerFlow *flow, BattleMon *mon) {
+    ServerDisplay_SkyDropTargetAppear(flow, mon, 40);
+}
+
+void ServerDisplay_StatChangeLimit(BtlServerFlow *flow, BattleMon *mon, int change) {
+    if (change > 0) {
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 45, monId, stat, SC_MSG_ARG_END);
+    } else {
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 24, monId, stat, SC_MSG_ARG_END);
+    }
+}
+
+void ServerControl_CureStatus(BtlServerFlow *flow, BattleMon *mon, u32 status) {
+    switch (status) {
+    case CONDITION_FREEZE:
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 22, monId, SC_MSG_ARG_END);
+        break;
+    case CONDITION_SLEEP:
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 36, monId, SC_MSG_ARG_END);
+        break;
+    default:
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 54, monId, SC_MSG_ARG_END);
+    }
+}
+
+void ServerDisplay_SideEffectEnd(BtlServerFlow *flow, u32 effect, u32 side) {
+    s32 message = -1;
+    if (effect == SIDE_CONDITION_STEALTH_ROCK) {
+        message = 8;
+    } else if (effect == SIDE_CONDITION_SPIKES) {
+        message = 2;
+    }
+    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, message, side, SC_MSG_ARG_END);
+}
+
+void ServerControl_Substitute(BtlServerFlow *flow, BattleMon *mon) {
+    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 26, GetMonID(mon), SC_MSG_ARG_END);
+    ServerDisplay_SkyDropTargetAppear(flow, mon, 9);
+}
+
+void ServerControl_WeatherDamage(BtlServerFlow *flow, BattleMon *mon, u8 weather) {
+    if (weather == BTL_WEATHER_HAIL) {
+        BattleHandler_StrSetup(&flow->message, 6, 37);
+    } else {
+        BattleHandler_StrSetup(&flow->message, 6, 51);
+    }
+    ServerControl_ViewEffect(flow, 12, pos, 13, 0, 0);
+}
+
+void ServerDisplay_MoveFailMessage(BtlServerFlow *flow, BattleMon *mon, u32 cause) {
+    switch (cause) {
+    case 7:
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 52, monId, SC_MSG_ARG_END);
+        break;
+    case 3:
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 32, monId, SC_MSG_ARG_END);
+        break;
+    case 9:
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 14, monId, SC_MSG_ARG_END);
+        break;
+    case 2:
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 42, monId, SC_MSG_ARG_END);
+        break;
+    case 5:
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 15, monId, SC_MSG_ARG_END);
+    }
+}
+
+void ServerControl_DamageDrain(BtlServerFlow *flow, BattleMon *attacker, BattleMon *target) {
+    ServerDisplay_SkyDropTargetAppear(flow, target, 29);
+}
+
+void ServerDisplay_StatChange(BtlServerFlow *flow, BattleMon *mon, int change, int context) {
+    if (change < 0) {
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 15, monId, stat, actual, SC_MSG_ARG_END);
+    } else if (context == 0) {
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 34, monId, stat, actual, SC_MSG_ARG_END);
+    }
+}
+
+void ServerControl_RemoveNoEffectTargets(BtlServerFlow *flow, BattleMon *mon) {
+    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 17, GetMonID(target), SC_MSG_ARG_END);
+}
+
+u16 ServerControl_DamageSubstitute(BtlServerFlow *flow, BattleMon *target, u16 damage) {
+    ServerDisplay_EffectivenessMessageMulti(flow, 1, &effectiveness, &target, FALSE);
+    ServerDisplay_SkyDropTargetAppear(flow, target, 8);
+    return damage;
+}
 `,
   itemsC: `// Invented
 static void HandlerLeftoversUse(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 
+static void HandlerLifeOrbReaction(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    BattleHandler_StrSetup(&param->string, 6, 21);
+}
+
 static void HandlerLeftoversUse(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     BattleHandler_StrSetup(&param->string, 5, 3);
     BattleHandler_StrSetup(&param->string, BTL_HANDLER_STRING_SET, 2);
+}
+
+static void HandlerAirBalloonDamageReaction(BattleEventItem *item, BtlServerFlow *flow, u8 monId) {
+    BattleHandler_StrSetup(&param->string, 6, 12);
+}
+
+static void HandlerToxicOrb(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    BattleHandler_StrSetup(&param->string, 6, 25);
+}
+
+static void HandlerCustapBerryUse(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    BattleHandler_StrSetup(&param->string, BTL_HANDLER_STRING_SET, 30);
+}
+
+static void HandlerAirBalloonMemberIn(BattleEventItem *item, BtlServerFlow *flow, u8 monId) {
+    BattleHandler_StrSetup(&param->string, 6, 50);
+}
+
+static void HandlerSitrusBerryUse(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    BattleHandler_StrSetup(&param->string, 6, 44);
+}
+`,
+  movesC: `// Invented
+static void HandlerFocuspunch(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    effect->effect = 11;
+    BattleHandler_StrSetup(&message->string, 6, 35);
+}
+
+static void HandlerKnockOff(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    BattleHandler_StrSetup(&param->string, 6, 16);
+}
+
+static void HandlerStealthRock(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    CommonCreateSideEffect(item, flow, monId, work, side, 4, cont, 10);
+}
+
+static void HandlerProtect(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    BattleHandler_StrSetup(&msgParam->string, 6, 47);
+}
+`,
+  abilitiesC: `// Invented
+static void HandlerRoughSkin(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    BattleHandler_StrSetup(&param->string, 6, 41);
+}
+`,
+  sideC: `// Invented
+static void HandlerSideStealthRock(BattleEventItem *item, BtlServerFlow *flow, u8 side) {
+    BattleHandler_StrSetup(&damage->string, 6, 20);
+}
+`,
+  conditionsC: `// Invented
+static s32 GetConditionAddMessage(s32 condition, BattleCondition value);
+
+static s32 GetConditionDamageMessage(u32 condition) {
+    switch (condition) {
+    case CONDITION_BURN:
+        return 10;
+    case CONDITION_CURSE:
+        return 2;
+    case CONDITION_POISON:
+        return 49;
+    }
+    return -1;
+}
+
+static s32 GetConditionAddMessage(s32 condition, BattleCondition value) {
+    s32 message = -1;
+    switch (condition) {
+    case CONDITION_SLEEP:
+        message = 19;
+        break;
+    case CONDITION_POISON:
+        message = Condition_IsBadlyPoisoned(value) ? 46 : 31;
+        break;
+    case CONDITION_PARALYSIS:
+        message = 39;
+        break;
+    case CONDITION_CONFUSION:
+        message = 13;
+        break;
+    case CONDITION_BURN:
+        message = 11;
+        break;
+    case CONDITION_FREEZE:
+        message = 27;
+        break;
+    }
+    return message;
 }
 `,
 }

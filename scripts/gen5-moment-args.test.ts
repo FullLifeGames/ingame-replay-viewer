@@ -4,6 +4,7 @@ import type { ActorPlace } from '../src/gen5/bw2-numbers'
 import { continueRoute } from '../src/gen5/continue-route'
 import type { RamCheck, RamRef } from '../src/gen5/ram-check'
 import { firstRun, readMomentOptions, startLine, type StateFile } from './gen5-moment-args'
+import { EFFECTS_TURNS } from './gen5-moment-effects'
 import { HITS_TURN } from './gen5-moment-hits'
 import { SWITCHES_TURNS } from './gen5-moment-switches'
 
@@ -68,7 +69,7 @@ describe('readMomentOptions', () => {
 
   it('refuses a scene it does not know, a bad save name and minutes that are not positive', () => {
     expect(() => readMomentOptions(['--scene', 'other'], NOW)).toThrow(
-      '--scene takes known, unknown, hits or switches, not "other".',
+      '--scene takes known, unknown, hits, switches or effects, not "other".',
     )
     expect(() => readMomentOptions(['--save', '../route-20'], NOW)).toThrow(
       '--save takes lower-case letters and digits, with single hyphens between them, not "../route-20".',
@@ -176,6 +177,21 @@ describe('readMomentOptions', () => {
     })
     expect(() => readMomentOptions(['--scene', 'switches'], NOW)).toThrow(
       "--scene switches plays hand turns after a test replay's start: give it --replay <id>.",
+    )
+  })
+
+  // Scene: the scene run of #109 plays hand turns of a Substitute, Stealth Rock, a status, sand,
+  // Leftovers and Intimidate as blocks.
+  it('plays the effects scene beside --replay alone, with -effects at the end of the label', () => {
+    const replay = ['--replay', 'smogtours-gen5ou-862240']
+    const options = readMomentOptions([...replay, '--scene', 'effects'], NOW)
+    expect(options).toMatchObject({
+      scene: 'effects',
+      team: { from: 'replay', id: 'smogtours-gen5ou-862240', turns: EFFECTS_TURNS },
+      label: 'nosave-direct-smogtours-gen5ou-862240-effects',
+    })
+    expect(() => readMomentOptions(['--scene', 'effects'], NOW)).toThrow(
+      "--scene effects plays hand turns after a test replay's start: give it --replay <id>.",
     )
   })
 
