@@ -233,6 +233,13 @@ export interface FontNumbers {
   chars: string
 }
 
+/** The labels of the battle's standard and set text banks (scripts/gen5-bw2-text.ts), each with
+ * its line's index in the bank, which is the message ID the server sends (#107). */
+export interface TextNumbers {
+  standard: Record<string, number>
+  set: Record<string, number>
+}
+
 /** The whole of build/gen5/bw2.json. */
 export interface Bw2Numbers extends ServerCmdTable {
   pokebw2: { repository: string; commit: string }
@@ -250,4 +257,5 @@ export interface Bw2Numbers extends ServerCmdTable {
   entry: EntryNumbers
   pkm: PkmNumbers
   font: FontNumbers
+  text: TextNumbers
 }

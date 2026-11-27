@@ -94,6 +94,10 @@ describe('quietLines', () => {
       natures: { NATURE_CALM: 5 },
     },
     font: { chars: 'Za' },
+    text: {
+      standard: { Bank0019_Text_CriticalHit: 3, Bank0019_Text_FillerOne: 8 },
+      set: { Bank0018_Text_FillerTwo: 5 },
+    },
   }
 
   it('gives the pin, the count of symbols and the checks, and no address, offset or value', () => {
@@ -107,6 +111,7 @@ describe('quietLines', () => {
       'battle overlay in main RAM, apart from the boot overlays',
       'entry layouts Kite, Lamp',
       'pkm layouts PartyPkm, PkmBlockA, PkmBlockB; block table, cipher and shiny bound read',
+      "text labels of the backend's lines found: standard 1 of 4, set 0 of 3",
     ])
   })
 
@@ -125,8 +130,8 @@ describe('quietLines', () => {
   })
 
   // Scene: each of pokebw2's lists runs from 0, so its size would give away its last entry's
-  // number. The invented lists here have sizes of their own; no line but the pin's and the count
-  // of our own symbol names may hold a digit.
+  // number. The invented lists here have sizes of their own; no line but the pin's and the counts
+  // of our own symbol names and lines may hold a digit.
   it("prints no size of pokebw2's lists", () => {
     const names = <T>(prefix: string, size: number, value: T) =>
       Object.fromEntries(
@@ -140,10 +145,15 @@ describe('quietLines', () => {
       argFormats: names('ARGS', 6, { code: 0, argCount: 0, puts: [] }),
       commandFormats: names('CMD', 7, 'ARGS_0'),
       pkm: { ...numbers.pkm, species: names('SPECIES', 8, 0), moves: names('MOVE', 9, 0) },
+      text: { standard: names('Bank0019_Text_Filler', 10, 0), set: names('Bank0018_Text', 11, 0) },
     }
+    const ours = "text labels of the backend's lines found: standard 0 of 4, set 0 of 3"
     const [pin, ...rest] = quietLines(sized)
     expect(pin).toBe('pokebw2 c0ffee')
-    expect(rest.filter((line) => line !== 'symbols 2' && /\d/.test(line))).toEqual([])
+    expect(rest).toContain(ours)
+    expect(rest.filter((line) => ![ours, 'symbols 2'].includes(line) && /\d/.test(line))).toEqual(
+      [],
+    )
   })
 
   it('says so when every symbol lies in main RAM', () => {

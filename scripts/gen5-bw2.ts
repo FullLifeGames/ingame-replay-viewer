@@ -4,8 +4,9 @@
 // in the map's events, the tile of the shipped save's trainer, the player's client and the
 // opponent's with each side's setup index (#93), the direct entry's numbers and a Pokémon's data
 // format (#97), the battle's constants, the mon-ID rule, the setup flag and the characters of the
-// battle's fonts (#106). The checkout lives in .cache/gen5/pokebw2/ and the output in build/gen5/; nothing
-// of pokebw2 is committed.
+// battle's fonts (#106), and the labels of the battle's standard and set text banks (#107). The
+// checkout lives in .cache/gen5/pokebw2/ and the output in build/gen5/; nothing of pokebw2 is
+// committed.
 // Usage: node scripts/gen5-bw2.ts [--checkout <dir>] [--quiet] (fetches on the first run). With
 // --quiet the report gives the pin, counts and checks and no number of pokebw2, as CI's public log
 // needs.
@@ -32,6 +33,7 @@ import { parseArgFormats, parseMessageRules } from './gen5-bw2-put.ts'
 import { fullLines, quietLines, report } from './gen5-bw2-report.ts'
 import { checkout, listedReader, POKEBW2, type Pokebw2Read } from './gen5-bw2-source.ts'
 import { structLayout } from './gen5-bw2-struct.ts'
+import { TEXT_SOURCES, textNumbers } from './gen5-bw2-text.ts'
 import { SAVE_TRAINER, saveTrainer } from './gen5-bw2-trainer.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
@@ -163,6 +165,7 @@ const SOURCES = {
   ...ENTRY_SOURCES,
   ...PKM_SOURCES,
   ...FONT_SOURCES,
+  ...TEXT_SOURCES,
 }
 
 type Sources = Record<keyof typeof SOURCES, string> & { bootLinks: Record<string, string> }
@@ -215,6 +218,7 @@ function parse(sources: Sources): Bw2Numbers {
     }),
     pkm,
     font: fontNumbers(sources),
+    text: textNumbers(sources),
   }
 }
 

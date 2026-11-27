@@ -22,6 +22,8 @@ import { FONT_INPUT } from './gen5-bw2-font.fixtures.ts'
 import { pkmNumbers } from './gen5-bw2-pkm.ts'
 import { PKM_INPUT } from './gen5-bw2-pkm.fixtures.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
+import { textNumbers } from './gen5-bw2-text.ts'
+import { TEXT_INPUT } from './gen5-bw2-text.fixtures.ts'
 
 const FILE = GEN5_PATHS.bw2Json
 
@@ -70,6 +72,12 @@ const COMPARED = [
     name: 'FONT_INPUT',
     value: fontNumbers(FONT_INPUT),
     path: ['font'],
+  },
+  {
+    module: 'scripts/gen5-bw2-text.fixtures.ts',
+    name: 'TEXT_INPUT',
+    value: textNumbers(TEXT_INPUT),
+    path: ['text'],
   },
 ]
 
