@@ -64,7 +64,8 @@ const NAMED_LOOKS: ReadonlySet<string> = new Set([animGap('Ivy Cudgel Water', 'I
 
 /**
  * The entries above that no test replay takes yet, named ahead for a replay to come: Bide's first
- * turn (#60) and Gen 1's partial trap, which the content-gap test below takes.
+ * turn (#60) and Gen 1's partial trap, which the content-gap test below takes. Bide's entry leaves
+ * this list once a test replay with Bide's first turn joins the fixtures.
  */
 const NAMED_AHEAD: ReadonlySet<string> = new Set([
   mechanicGap('Bide', 'starting').detail,

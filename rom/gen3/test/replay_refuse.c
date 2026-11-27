@@ -27,7 +27,8 @@ static void ExpectVersionRefused(u32 version)
 }
 
 // Version 1 is the format before ITEM_POP_UP and TRAP_TURN, version 2 the one before MOVE's
-// animation turn, version 3 the one before snow, as an older backend writes them.
+// animation turn, version 3 the one before snow, TERA and MOVE_TYPE, as an older backend writes
+// them.
 TEST("Replay: a stream of version 1, 2, 3 or 5 is refused before a battle starts")
 {
     ExpectVersionRefused(1);

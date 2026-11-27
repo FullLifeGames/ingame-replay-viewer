@@ -18,8 +18,8 @@
 // 4. Each side operand of the ops in REPLAY_ORDER_ON_FIELD_OPS names a side with a battler out;
 //    WITHDRAW and FAINT take it off. An ANIM of REPLAY_ORDER_FREE_ANIMS is free: the game plays
 //    the weather animations with no battler out, after a double KO.
-// 5. Every other op is free: PRINT, TURN, WEATHER, END, FLUSH_TEXT_BOX, and STATUS and ITEM,
-//    which name a party slot (Heal Bell reaches the whole party).
+// 5. Every other op is free: PRINT, TURN, WEATHER, END, FLUSH_TEXT_BOX, MOVE_TYPE, and STATUS
+//    and ITEM, which name a party slot (Heal Bell reaches the whole party).
 
 #define REPLAY_STREAM_VERSION        4
 #define REPLAY_STREAM_HEADER_SIZE    0x10
