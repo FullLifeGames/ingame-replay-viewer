@@ -5,17 +5,21 @@
 // the flag ServerControl_FaintPokemon passes on for SC_FAINT_HP_GAUGE. pokebw2 has no name for
 // any of them (BtlvCore_PlayDamageSE says the set has none yet), so the reader takes each from its
 // function by shape, a passed one at the callee's parameter of its name, and throws on any other.
-// The cross-check holds each of the backend's lines (src/gen5/backend/lines.ts) against the
-// message IDs its function puts (D9). The errors name the function, the role and the shape the
-// reader expected, never the C they met, so they show no number of pokebw2.
-import type { Gen5Line } from '../src/gen5/backend/lines.ts'
-import type { FlowNumbers, TextNumbers } from '../src/gen5/bw2-numbers.ts'
-import { bodyOf, enumAround, literal, stripComments } from './gen5-bw2-c.ts'
+// The errors name the function, the role and the shape the reader expected, never the C they met,
+// so they show no number of pokebw2. The C files that put the backend's lines are roles here too,
+// for the cross-check in gen5-bw2-lines.ts.
+import type { FlowNumbers } from '../src/gen5/bw2-numbers.ts'
+import { bodyOf, literal, stripComments } from './gen5-bw2-c.ts'
 
-/** The server's flow and the item handlers, by role. */
+/** The server's flow and the handlers of items, moves, abilities, side effects and conditions,
+ * by role. */
 export const FLOW_SOURCES = {
   flowC: 'src/battle/btl_server_flow.c',
   itemsC: 'src/battle/handler/item_handlers.c',
+  movesC: 'src/battle/handler/move_handlers.c',
+  abilitiesC: 'src/battle/handler/ability_handlers.c',
+  sideC: 'src/battle/handler/side_handlers.c',
+  conditionsC: 'src/battle/handler/condition_effects.c',
 }
 
 /** The texts of FLOW_SOURCES by role. */
@@ -179,53 +183,3 @@ export const flowNumbers = (input: FlowInput): FlowNumbers => ({
   switchEffects: switchEffects(input.flowC),
   faintGaugeFlag: faintGaugeFlag(input.flowC),
 })
-
-/** The text of the source a line's C lives in. */
-function sourceText(input: FlowInput, file: string): string {
-  const role = (Object.keys(FLOW_SOURCES) as (keyof FlowInput)[]).find(
-    (key) => FLOW_SOURCES[key] === file,
-  )
-  if (role === undefined) throw new Error(`${file} is no source of the flow`)
-  return input[role]
-}
-
-/** Each message a body puts as [command or string kind, message]: `PutMsg` by its command, and a
- * handler's `StrSetup` by the string kind's name, a literal kind resolved through the kinds'
- * enum of the flow. */
-function putsOf(body: string, flowC: string, put: Gen5Line['source']['put']): string[] {
-  if (put !== 'StrSetup set') {
-    const command = put.slice('PutMsg '.length)
-    return [...body.matchAll(/BtlServerCmdQueue_PutMsg\([^,]+, (SC_MSG_\w+), ([^,)]+)/g)]
-      .filter(([, sent]) => sent === command)
-      .map(([, , message = '']) => message)
-  }
-  const kinds = enumAround(flowC, 'BTL_HANDLER_STRING_SET')
-  return [...body.matchAll(/BattleHandler_StrSetup\([^,]+, ([^,]+), ([^,)]+)\)/g)]
-    .filter(([, kind = '']) => (literal(kind) ?? kinds[kind]) === kinds.BTL_HANDLER_STRING_SET)
-    .map(([, , message = '']) => message)
-}
-
-/** The literal message IDs a line's function puts the way its line goes out. */
-export function putIds(input: FlowInput, source: Gen5Line['source']): number[] {
-  const fn = source.function
-  const messages = putsOf(bodyText(sourceText(input, source.file), fn), input.flowC, source.put)
-  const what = source.put === 'StrSetup set' ? 'set string' : source.put.slice('PutMsg '.length)
-  if (messages.length === 0) throw new Error(`${fn} puts no ${what}`)
-  return messages.map((message) => literalOf(message, fn, `message of a ${what}`))
-}
-
-/** Throws by label when a line's label is missing from its bank or its index is none of the IDs
- * its function puts, so a pin that moves a line stops the generator (D9). */
-export function checkLineSources(
-  input: FlowInput,
-  text: TextNumbers,
-  lines: Readonly<Record<string, Gen5Line>>,
-): void {
-  for (const line of Object.values(lines)) {
-    const id = text[line.bank][line.label]
-    if (id === undefined) throw new Error(`the ${line.bank} bank has no ${line.label}`)
-    if (!putIds(input, line.source).includes(id)) {
-      throw new Error(`${line.label} is not what ${line.source.function} puts`)
-    }
-  }
-}

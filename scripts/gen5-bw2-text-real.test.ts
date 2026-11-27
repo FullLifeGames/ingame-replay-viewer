@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest'
 import { GEN5_LINES } from '../src/gen5/backend/lines.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { readSources } from './gen5-bw2.ts'
-import { checkLineSources } from './gen5-bw2-flow.ts'
+import { checkLineSources } from './gen5-bw2-lines.ts'
 import { listedReader } from './gen5-bw2-source.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 

@@ -44,6 +44,9 @@ export const POKEBW2_FILES: readonly string[] = [
   'include/battle/select/btl_pospoke.h',
   'src/battle/handler/ability_handlers.c',
   'src/battle/handler/move_handlers.c',
+  // The C that puts the effects' lines (#109): Stealth Rock's hit and the conditions' pickers.
+  'src/battle/handler/side_handlers.c',
+  'src/battle/handler/condition_effects.c',
   // The direct entry's (#97): symbols, link files, the boot, the structs and the constants.
   'config/b2_us/arm9/symbols.txt',
   'config/b2_us/arm9/overlays/ov162/symbols.txt',

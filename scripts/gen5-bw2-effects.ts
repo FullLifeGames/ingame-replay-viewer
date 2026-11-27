@@ -15,27 +15,25 @@ import {
   defineValue,
   enumAround,
   literal,
+  literalsIn,
   stripComments,
 } from './gen5-bw2-c.ts'
 import { bodyText, callsOf, literalOf, passedLiteral } from './gen5-bw2-flow.ts'
 import { memberLayout } from './gen5-bw2-struct.ts'
 
-/** The files the reader parses beside three the generator reads already, by role. */
+/** The files the reader parses beside five the generator reads already, by role. */
 export const EFFECT_SOURCES = {
   calcC: 'src/battle/btl_calc.c',
   posH: 'include/battle/select/btl_pospoke.h',
-  abilitiesC: 'src/battle/handler/ability_handlers.c',
-  movesC: 'src/battle/handler/move_handlers.c',
 }
 
-/** The texts of EFFECT_SOURCES by role, with the flow (`flowC`), btl_main.c (`mainC`) and
- * btl_pokeparam.h (`pokeparamH`) under the generator's roles. */
+/** The texts of EFFECT_SOURCES by role, with the flow (`flowC`), the ability and move handlers
+ * (`abilitiesC`, `movesC`), btl_main.c (`mainC`) and btl_pokeparam.h (`pokeparamH`) under the
+ * generator's roles. */
 export type EffectInput = Record<
-  keyof typeof EFFECT_SOURCES | 'flowC' | 'mainC' | 'pokeparamH',
+  keyof typeof EFFECT_SOURCES | 'flowC' | 'abilitiesC' | 'movesC' | 'mainC' | 'pokeparamH',
   string
 >
-
-const LITERALS = /\b(?:0x[0-9a-f]+|\d+)[ul]*\b/gi
 
 /** The one number literal of the branch `case caseName:` in `fn`'s body, up to its `break`. */
 export function caseLiteral(source: string, fn: string, caseName: string): number {
@@ -43,7 +41,7 @@ export function caseLiteral(source: string, fn: string, caseName: string): numbe
   if (branches.length === 1) throw new Error(`${fn} has no case ${caseName}`)
   if (branches.length !== 2) throw new Error(`${fn} names case ${caseName} not exactly once`)
   const branch = (branches[1] ?? '').split('break;')[0] ?? ''
-  const [found, ...more] = branch.match(LITERALS) ?? []
+  const [found, ...more] = literalsIn(branch)
   if (found === undefined || more.length > 0) {
     throw new Error(`${fn}: the effect of case ${caseName} is not one literal`)
   }
