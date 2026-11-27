@@ -30,8 +30,6 @@ const STRUGGLE = 'struggle'
 const SKILL_SWAP = 'skillswap'
 /** The one ability whose item line names its holder by `[of]`: the item is the line's Pokémon's. */
 const FRISK = 'frisk'
-/** The ability that passes itself on to the Pokémon of `[of]`, whose own ability is gone. */
-const MUMMY = 'mummy'
 
 /** A trait that changed hands before the log revealed it: no later line shows the member's own. */
 const FROZEN = Symbol('frozen')
@@ -111,9 +109,9 @@ function readItemEnd(reading: Reading, event: Extract<ScriptEvent, { kind: 'item
 }
 
 /**
- * An ability on its holder's own line: `-activate` and `-start` name the holder (Flash Fire,
- * Mummy), `-block` names it by `[of]` when it shields another Pokémon, else as the line's
- * Pokémon (Sticky Hold). Mummy also replaces the ability of the Pokémon of `[of]`.
+ * An ability on its holder's own line: `-activate` and `-start` name the holder (Flash Fire),
+ * `-block` names it by `[of]` when it shields another Pokémon, else as the line's Pokémon (Sticky
+ * Hold).
  */
 function readOwnAbility(
   reading: Reading,
@@ -122,15 +120,18 @@ function readOwnAbility(
   if (event.effect.kind !== 'ability') return
   const holder = event.kind === 'block' ? holderOf(event) : event.who
   reveal(reading.abilities, holder, event.effect.name)
-  if (toID(event.effect.name) === MUMMY) reveal(reading.abilities, event.source, FROZEN)
 }
 
-/** An ability shown: on its own, the Pokémon's; by Trace, Trace is the Pokémon's and the ability
- * its target's; by a move (Role Play, Entrainment), both changed. */
+/** An ability shown: on its own, the Pokémon's; passed on by itself (Mummy, #117), its holder's,
+ * and the one it replaces the Pokémon's own; by Trace, Trace is the Pokémon's and the ability its
+ * target's; by a move (Role Play, Entrainment), both changed. */
 function readAbility(reading: Reading, event: Extract<ScriptEvent, { kind: 'ability' }>): void {
   const { cause, source, who } = event
   if (cause === undefined) {
     reveal(reading.abilities, who, event.ability)
+  } else if (cause.kind === 'ability' && toID(cause.name) === toID(event.ability)) {
+    reveal(reading.abilities, source, event.ability)
+    reveal(reading.abilities, who, event.replaces ?? FROZEN)
   } else if (cause.kind === 'ability') {
     reveal(reading.abilities, who, cause.name)
     reveal(reading.abilities, source, event.ability)
