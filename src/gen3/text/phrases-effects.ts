@@ -122,6 +122,10 @@ export const EFFECT_TEMPLATES = {
   }),
   // `BattleScript_EffectTrick`, with the user as B_ATK, before the two items' lines.
   switchedItems: tagged('STRINGID_PKMNSWITCHEDITEMS', start('switched items with its target!')),
+  // `BattleScript_IllusionOff`, after the hit that broke the disguise (#98).
+  illusionWoreOff: tagged('STRINGID_ILLUSIONWOREOFF', (who: Mon) => {
+    return `${nameAtStart(who)}'s illusion wore off!`
+  }),
   // `BattleScript_NeutralizingGasExits`, with no pop-up.
   neutralizingGasOver: tagged(
     'STRINGID_NEUTRALIZINGGASOVER',
@@ -249,6 +253,7 @@ const ENDS: Readonly<Record<string, Line>> = {
   disable: E.disableEnded.render,
   bide: E.unleashedEnergy.render,
   neutralizinggas: E.neutralizingGasOver.render,
+  illusion: E.illusionWoreOff.render,
 }
 
 /** The end lines that name the effect's move, by the effect's id. */

@@ -136,6 +136,9 @@ describe('an effect that ends (P1)', () => {
     ['p1a: Dugtrio|Encore', 'Dugtrio ended its encore!'],
     ['p1a: Dugtrio|Disable', "Dugtrio's move is no longer disabled!"],
     ['p1a: Dugtrio|move: Fire Spin', `Dugtrio was freed from Fire${NBSP}Spin!`],
+    // STRINGID_ILLUSIONWOREOFF (#98).
+    ['p1a: Dugtrio|Illusion', "Dugtrio's illusion wore off!"],
+    ['p2a: Tyranitar|Illusion', "The opposing Tyranitar's illusion wore off!"],
   ])('words %s', (rest, text) => {
     const { event, mon } = sceneOf('effectEnd', `|-end|${rest}`)
     expect(effectEnded(mon(event.who), event.effect)).toEqual({ text })
