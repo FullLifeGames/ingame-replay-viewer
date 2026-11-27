@@ -124,6 +124,14 @@ describe('replayPlayer.start', () => {
     expect(player.progress()).toEqual({ phase: 'entry', replay: ID, block: 0, blocks: BLOCKS })
   })
 
+  // Scene: the list beside the game shows the loaded replay's rows before the emulator starts.
+  it('gives the loaded replay, its end and its lines once the entry is queued', async () => {
+    const { player } = setup()
+    expect(player.loaded()).toBeUndefined()
+    await player.start(CHOICE, '')
+    expect(player.loaded()).toEqual(LOADED)
+  })
+
   // Scene: a script queued its own run before the pick; the page leaves it alone (D14).
   it('lets a run queued from outside win', async () => {
     const { player, plans, said, report } = setup()
@@ -221,6 +229,24 @@ describe('replayPlayer during the play', () => {
     expect(said.at(-1)).toBe(endLine(LOADED.end))
     expect(player.progress()).toEqual({ phase: 'ended', replay: ID, block: BLOCKS, blocks: BLOCKS })
     expect(ticks.stopped).toBe(true)
+  })
+
+  // Scene: the list beside the game takes the end line at the play's end, and only then.
+  it('hands the end line to the list at the play’s end alone', async () => {
+    const ended: string[] = []
+    const page = setup({ ended: (line) => ended.push(line) })
+    await page.player.start(CHOICE, '')
+    page.report.marks.push(...MARKS)
+    page.end('done')
+    expect(ended).toEqual([])
+    page.end('failed', 'step 3 "b1" did not hold within 3000 frames')
+    expect(ended).toEqual([])
+    const done = setup({ ended: (line) => ended.push(line) })
+    await done.player.start(CHOICE, '')
+    done.report.marks.push(...MARKS)
+    done.end('done')
+    done.end('done')
+    expect(ended).toEqual([endLine(LOADED.end)])
   })
 
   it('names a stuck block with its lines', async () => {

@@ -34,6 +34,8 @@ export interface PlayerDeps {
   buildFiles: () => Promise<BuildFiles>
   /** Calls `tick` once a second until the returned function stops it. */
   repeat: (tick: () => void) => () => void
+  /** Hears the end line once, at the play's end, for the list beside the game. */
+  ended?: (line: string) => void
 }
 
 /** A test replay as the picker offers it. */
@@ -70,7 +72,7 @@ function blockIndex(plan: RunPlan, loaded: Loaded) {
 
 class ReplayPlayer {
   progress: ReplayProgress | undefined
-  private loaded: Loaded | undefined
+  loaded: Loaded | undefined
   private play: (RunPlan & ReturnType<typeof blockIndex>) | undefined
   private stopTicks: (() => void) | undefined
   private readonly deps: PlayerDeps
@@ -100,8 +102,8 @@ class ReplayPlayer {
     try {
       const replay = loadReplay(await choice.load(), files.numbers)
       const entry = entryRun(replay.replay, files.numbers, files.routine)
-      this.loaded = { ...replay, choice, numbers: files.numbers, every }
       this.deps.hook.queueRun(entry.plan)
+      this.loaded = { ...replay, choice, numbers: files.numbers, every }
     } catch (error) {
       return this.stop(loadFailedLine(choice.label, (error as Error).message))
     }
@@ -164,7 +166,9 @@ class ReplayPlayer {
     if (loaded === undefined || play === undefined) return
     if (report.status === 'done') {
       this.setPhase('ended', loaded.replay.blocks.length)
-      this.deps.say(endLine(loaded.end))
+      const line = endLine(loaded.end)
+      this.deps.say(line)
+      this.deps.ended?.(line)
       return
     }
     const step = play.steps[report.step]
@@ -174,14 +178,20 @@ class ReplayPlayer {
   }
 }
 
-/** The page's player of test replays; `start` runs on the pick, before the emulator starts. */
+/** The page's player of test replays; `start` runs on the pick, before the emulator starts.
+ * `loaded` gives the replay, its end and its lines once the entry is queued, for the list. */
 export function replayPlayer(deps: PlayerDeps): {
   start: (choice: ReplayChoice, search: string) => Promise<boolean>
   progress: () => ReplayProgress | undefined
+  loaded: () => LoadedReplay | undefined
 } {
   const player = new ReplayPlayer(deps)
   return {
     start: (choice, search) => player.start(choice, search),
     progress: () => player.progress,
+    loaded: () => {
+      const loaded = player.loaded
+      return loaded && { replay: loaded.replay, end: loaded.end, lines: loaded.lines }
+    },
   }
 }
