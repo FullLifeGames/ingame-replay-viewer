@@ -2,7 +2,14 @@ import { Dex } from '@pkmn/dex'
 import { describe, expect, it } from 'vitest'
 
 import type { BattleMonReading } from '../src/gen5/battle-mons'
-import { moveLineLabel, sceneBlocks, sceneMove, textId, textLine } from './gen5-moment-scene'
+import {
+  moveLineLabel,
+  sceneBlocks,
+  sceneLineLabel,
+  sceneMove,
+  textId,
+  textLine,
+} from './gen5-moment-scene'
 
 // Invented readings in the shape the page reads from the clients' container.
 const NEAR: BattleMonReading = {
@@ -77,14 +84,40 @@ describe('textId and textLine', () => {
 })
 
 // Scene: the log names a move's line by its label, as it names the standard line, so no rule of
-// the bank's order stays in code. The bank and its order are invented.
+// the bank's order stays in code. The bank's lines and their order are invented; its labels are
+// spelled as pokebw2 spells them, some apart from @pkmn's names by case (U-turn, Solar Beam) and one
+// in a word of its own (Follow Me).
 describe('moveLineLabel and sceneMove', () => {
-  const MOVES = 'Bank0016_Text_FoesUsedHydroPump = f\nBank0016_Text_UsedDoubleEdge = n\n'
+  const MOVES = [
+    'Bank0016_Text_FoesUsedHydroPump = f',
+    'Bank0016_Text_UsedDoubleEdge = n',
+    'Bank0016_Text_FoesUsedUTurn = u',
+    'Bank0016_Text_UsedSolarbeam = s',
+    'Bank0016_Text_UsedFollow = m',
+  ].join('\n')
 
-  it("gives the near side's and the far side's label of a move, its name without spaces", () => {
-    expect(moveLineLabel('Hydro Pump', 'far')).toBe('Bank0016_Text_FoesUsedHydroPump')
-    expect(textId(MOVES, moveLineLabel('Double-Edge', 'near'))).toBe(1)
-    expect(() => moveLineLabel('No Such Move', 'near')).toThrow(/No Such Move/)
+  it("finds the near side's and the far side's label of a move, its name without spaces", () => {
+    expect(moveLineLabel('Hydro Pump', 'far', MOVES)).toBe('Bank0016_Text_FoesUsedHydroPump')
+    expect(moveLineLabel('Double-Edge', 'near', MOVES)).toBe('Bank0016_Text_UsedDoubleEdge')
+  })
+
+  it('compares the name with the labels without case', () => {
+    expect(moveLineLabel('U-turn', 'far', MOVES)).toBe('Bank0016_Text_FoesUsedUTurn')
+    expect(moveLineLabel('Solar Beam', 'near', MOVES)).toBe('Bank0016_Text_UsedSolarbeam')
+  })
+
+  it('gives no label to a move whose label the bank lacks, and fails on a move @pkmn/dex lacks', () => {
+    expect(moveLineLabel('Follow Me', 'near', MOVES)).toBeUndefined()
+    expect(moveLineLabel('U-turn', 'near', MOVES)).toBeUndefined()
+    expect(() => moveLineLabel('No Such Move', 'near', MOVES)).toThrow(/No Such Move/)
+  })
+
+  // Scene: a moment scene names the move line it shows, and stops on a move with no label.
+  it("gives a scene's move label and fails by name on a missing one", () => {
+    expect(sceneLineLabel('unknown', 'far', MOVES)).toBe('Bank0016_Text_FoesUsedHydroPump')
+    expect(() => sceneLineLabel('unknown', 'near', MOVES)).toThrow(
+      'the text bank has no line label for Flamethrower',
+    )
   })
 
   it("names each side's move of a scene", () => {

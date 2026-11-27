@@ -46,10 +46,9 @@ import { markLines, writeLines } from './gen5-moment-log.ts'
 import { MOMENT_GAP, momentStart, momentSteps } from './gen5-moment-plan.ts'
 import { listedReader } from './gen5-bw2-source.ts'
 import {
-  moveLineLabel,
   sceneBlocks,
+  sceneLineLabel,
   type SceneName,
-  sceneMove,
   TEXT_BANKS,
   textId,
   textLine,
@@ -128,7 +127,7 @@ function sceneMoments(scene: SceneName, battle: Battle, numbers: Bw2Numbers) {
   const blocks = sceneBlocks(scene, battle, numbers.battle.single, std)
   for (const { name, moment } of blocks) {
     const side = moment.attacker.monId === battle.near.monId ? 'near' : 'far'
-    const line = moveLineLabel(sceneMove(scene, side), side)
+    const line = sceneLineLabel(scene, side, bank('move'))
     log(
       `${name}: ${JSON.stringify(moment)}; ${line}: ${textLine(bank('move'), textId(bank('move'), line))}`,
     )

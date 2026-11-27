@@ -1,3 +1,4 @@
+import { Dex } from '@pkmn/dex'
 import { describe, expect, it } from 'vitest'
 
 import type { AdapterNumbers } from '../src/gen5/adapter'
@@ -123,6 +124,27 @@ describe('blockLines', () => {
       'b1 SC_MSG_STD; message 1: It’s super effective!',
       'b2: lines 16; 1 command',
       'b2 SC_MSG_SET 5; message 0: {who} avoided the attack!',
+    ])
+  })
+
+  // Scene: the move bank spells some names apart from @pkmn by case, and names Follow Me in a
+  // word of its own. The log finds the first by the rule and names the move it has no label for.
+  it('finds a label that differs by case and names a move with no label', () => {
+    const num = (name: string) => Dex.forGen(5).moves.get(name).num
+    const moveMsg = (monId: number, move: string) => ({
+      command: 'SC_MOVE_MSG',
+      args: [monId, num(move)],
+    })
+    const commands = [moveMsg(FAR_MON, 'U-turn'), moveMsg(5, 'Solar Beam'), moveMsg(5, 'Follow Me')]
+    const banks = {
+      ...BANKS,
+      move: 'Bank0016_Text_UsedSolarbeam = Beam.\nBank0016_Text_FoesUsedUTurn = Turn.\n',
+    }
+    const replay = { blocks: [{ name: 'b3', lines: [20], commands }] }
+    expect(blockLines(replay, { banks, sideOf }).slice(1)).toEqual([
+      `b3 SC_MOVE_MSG 7, ${String(num('U-turn'))}; Bank0016_Text_FoesUsedUTurn: Turn.`,
+      `b3 SC_MOVE_MSG 5, ${String(num('Solar Beam'))}; Bank0016_Text_UsedSolarbeam: Beam.`,
+      `b3 SC_MOVE_MSG 5, ${String(num('Follow Me'))}; no line label for Follow Me`,
     ])
   })
 })

@@ -20,7 +20,8 @@ interface BlockText {
   readonly sideOf: (monId: number) => Side
 }
 
-/** The text a command shows: a move's line by its label, a message's line by its ID. */
+/** The text a command shows: a move's line by its label, a message's line by its ID. A move with
+ * no label in the move bank is named as such: the log never stops a run. */
 function shownText(command: ServerCommand, text: BlockText): string {
   const { banks } = text
   if (command.message !== undefined) {
@@ -31,7 +32,8 @@ function shownText(command: ServerCommand, text: BlockText): string {
   const [monId = -1, move = -1] = command.args
   const name = nameOfNumber('move', move)
   if (name === undefined) throw new Error(`@pkmn/dex knows no Gen 5 move ${String(move)}`)
-  const label = moveLineLabel(name, text.sideOf(monId))
+  const label = moveLineLabel(name, text.sideOf(monId), banks.move)
+  if (label === undefined) return `; no line label for ${name}`
   return `; ${label}: ${textLine(banks.move, textId(banks.move, label))}`
 }
 
