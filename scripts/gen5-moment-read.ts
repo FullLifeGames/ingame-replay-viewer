@@ -1,7 +1,8 @@
 // The moment script's readings of the battle at its action menu (#72, #78, #97): from main RAM
 // once, the player's adapter, the one server waiting for the actions, both front Pokémon and each
-// side's whole party as the battle copied it. With the direct entry's team the log says whether
-// each party reads as the park wrote it, and names what differs. The layouts and symbols come from
+// side's whole party as the battle copied it, each Pokémon by its species, item and ability name.
+// It checks that each front Pokémon holds its client's slot 0 by mon ID. With the direct entry's
+// team the log says whether each party reads as the park wrote it, and names what differs. The layouts and symbols come from
 // build/gen5/bw2.json; scripts/gen5-moment.ts reads main RAM through the page and logs the rest.
 import {
   type BattleMonReading,
@@ -12,7 +13,8 @@ import {
 } from '../src/gen5/battle-mons.ts'
 import { nameOfNumber } from '../src/gen5/backend/names.ts'
 import type { WrittenSides } from '../src/gen5/backend/party-mon.ts'
-import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
+import { monIdOf } from '../src/gen5/backend/slots.ts'
+import type { Bw2Numbers, MonIds } from '../src/gen5/bw2-numbers.ts'
 import { MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import type { WrittenPkm } from '../src/gen5/pkm-fields.ts'
 import { sideClient } from './gen5-moment-scene.ts'
@@ -68,13 +70,24 @@ export function partyLine(
   return [`${head} ${String(same)} of ${String(written.length)} as written`, ...differs].join('; ')
 }
 
+/** The line of a front Pokémon's mon ID against the one `monIdOf` gives its client's slot 0. */
+export function frontIdLine(side: Side, monId: number, monIds: MonIds, client: number): string {
+  const lead = monIdOf(monIds, client, 0)
+  const head = `${side} front: mon ID ${String(monId)}`
+  return monId === lead
+    ? `${head}, as monIdOf gives slot 0`
+    : `${head}, but monIdOf gives ${String(lead)} for slot 0`
+}
+
 const speciesName = (num: number) => nameOfNumber('species', num) ?? '?'
 
-function logParty(side: Side, party: readonly PartyMonReading[]): void {
+function logParty(side: Side, party: readonly PartyMonReading[], noItem: number | undefined) {
   party.forEach((mon, i) => {
-    const { species, level, hp, maxHp, item, ability } = mon
+    const { level, hp, maxHp } = mon
+    const item = mon.item === noItem ? 'no item' : (nameOfNumber('item', mon.item) ?? '?')
+    const ability = nameOfNumber('ability', mon.ability) ?? '?'
     log(
-      `${side} party pkms[${String(i)}]: ${speciesName(species)} (${String(species)}) L${String(level)}, HP ${String(hp)}/${String(maxHp)}, item ${String(item)}, ability ${String(ability)}`,
+      `${side} party pkms[${String(i)}]: ${speciesName(mon.species)} L${String(level)}, HP ${String(hp)}/${String(maxHp)}, ${item}, ${ability}`,
     )
   })
 }
@@ -98,7 +111,7 @@ export function readBattle(
   log(`servers waiting for the actions: ${servers.map(hex).join(' ') || 'none'}`)
   const [server] = servers
   if (servers.length !== 1 || server === undefined) throw new Error('need exactly one server')
-  const { single } = numbers.battle
+  const { single, monIds } = numbers.battle
   const near = frontMon(read, server, numbers.battle, sideClient(single, 'near'))
   const far = frontMon(read, server, numbers.battle, sideClient(single, 'far'))
   for (const [side, mon] of [
@@ -106,15 +119,16 @@ export function readBattle(
     ['far', far],
   ] as const) {
     log(
-      `${side}: ${speciesName(mon.species)} (${String(mon.species)}) L${String(mon.level)} mon ID ${String(mon.monId)}, HP ${String(mon.hp)}/${String(mon.maxHp)} at ${hex(mon.address)}`,
+      `${side}: ${speciesName(mon.species)} L${String(mon.level)} mon ID ${String(mon.monId)}, HP ${String(mon.hp)}/${String(mon.maxHp)} at ${hex(mon.address)}`,
     )
+    log(frontIdLine(side, mon.monId, monIds, sideClient(single, side)))
   }
   for (const [side, team] of [
     ['near', written?.player],
     ['far', written?.opponent],
   ] as const) {
     const party = partyMons(read, server, numbers.battle, sideClient(single, side))
-    logParty(side, party)
+    logParty(side, party, numbers.pkm.items.ITEM_NONE)
     log(partyLine(side, party, team))
   }
   return { adapter, server, near, far }
