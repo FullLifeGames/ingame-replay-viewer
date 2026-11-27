@@ -21,6 +21,7 @@ The viewer plays Pokémon Showdown replays back inside real Pokémon games. A ga
 - `scripts/gen5-sources.ts` fetches each component's source by commit into `.cache/gen5/sources/` and pins its tar by hash; `scripts/gen5-licences-read.ts` reads the notices there and `scripts/gen5-licences.ts` builds the licences page from them (`docs/gen5-licences.md`). Both Gen 5 servers answer the page and the archives.
 - `rom/gen5/`: the direct entry's routine (#97), a C file of ours that holds no number of the game and takes each one from its order block at run time. `scripts/gen5-routine.ts` builds it with the ARM compiler into `build/gen5/routine.json`, out of the tracked tree; CI builds nothing.
 - The direct entry's other parts: `src/gen5/direct-*.ts` plan it from power-on to the action menu, `src/gen5/pkm-*.ts` seal and open a party Pokémon, `scripts/gen5-bw2-pkm.ts` reads that format from pokebw2 by name, and `scripts/gen5-moment-team.ts` holds the moment script's team of twelve.
+- `scripts/gen5-replay.ts`: a test replay played whole in Black 2 from power-on, with its block report, its marks file and the comparison of two runs (#110, `docs/gen5-backend.md`).
 - `src/web/gen5/saves/`: the saves we made from New Game, the one kind of game file the tree may hold (ADR 0002, #78). `docs/gen5-save.md` records each one.
 - `test/fixtures/replays/`: the test replays as Showdown's replay JSON. Unit specs sit next to their source as `*.test.ts`.
 - `docs/waves/`: one booking per wave.
