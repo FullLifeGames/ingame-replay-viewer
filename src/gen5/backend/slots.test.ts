@@ -61,6 +61,20 @@ describe('a battle script’s Pokémon in the park', () => {
     expect(partyOrder(SCRIPT)).toEqual({ near: [2, 3, 0, 1], far: [1, 0] })
   })
 
+  // Scene: Scizor, team index 3, comes in disguised as Politoed and first shows when the
+  // disguise ends, before Keldeo first switches in.
+  it('takes the end of a disguise as the real Pokémon’s first send-in', () => {
+    const replace: ScriptEvent = {
+      kind: 'replace',
+      line: 2,
+      who: { side: 'near', index: 3 },
+      replaces: { side: 'near', index: 2 },
+      hp: { hp: 40, max: 100 },
+    }
+    const events = [switchIn(1, 'near', 2), replace, switchIn(3, 'near', 1)]
+    expect(partyOrder({ ...SCRIPT, events }).near).toEqual([2, 3, 1, 0])
+  })
+
   it('gives each Pokémon its slot in that order', () => {
     const order = partyOrder(SCRIPT)
     expect(partySlot(order, { side: 'near', index: 2 })).toBe(0)

@@ -175,3 +175,35 @@ describe('Team Preview’s members that never switch in', () => {
     ])
   })
 })
+
+// A short Gen 5 log without Team Preview: Ann's Zoroark, nicknamed, comes in disguised as Latios,
+// and Crunch ends the disguise before Ferrothorn first switches in.
+const ILLUSION_LOG = [
+  '|gen|5',
+  '|player|p1|Ann|1|',
+  '|player|p2|Bob|2|',
+  '|teamsize|p1|3',
+  '|teamsize|p2|1',
+  '|start',
+  '|switch|p1a: Latios|Latios, M|100/100',
+  '|switch|p2a: Tyranitar|Tyranitar, M|100/100',
+  '|turn|1',
+  '|move|p2a: Tyranitar|Crunch|p1a: Latios',
+  '|-damage|p1a: Latios|40/100',
+  '|replace|p1a: Trickster|Zoroark, F, shiny',
+  '|-end|p1a: Trickster|Illusion',
+  '|turn|2',
+  '|switch|p1a: Ferrothorn|Ferrothorn, F|100/100',
+  '|turn|3',
+  '',
+].join('\n')
+
+// Scene: the end of Illusion's disguise shows Zoroark for the first time; the party takes it
+// there, as a switch-in, with its nickname and shininess.
+describe('a member that first shows when its disguise ends', () => {
+  it('keeps its nickname and its place by that line', () => {
+    const { parties } = partyTeams(buildBattleScript(ILLUSION_LOG), ASCII)
+    expect(speciesOf(parties.near)).toEqual(['Latios', 'Zoroark', 'Ferrothorn'])
+    expect(parties.near[1]).toMatchObject({ name: 'Trickster', nicknamed: true, shiny: true })
+  })
+})

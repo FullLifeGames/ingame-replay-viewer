@@ -4,17 +4,19 @@
 // writing the team of gen5-moment-team.ts or with --replay a test replay's (gen5-moment-direct.ts);
 // with --entry walk from boot with a save the page fetches from /saves/ and the continue route to
 // the trainer's action menu, or from the spike's battle state. A double's run and a replay's end
-// after the readings at the action menu: the moment is a single's with leads that know Tackle. Then it reads the player's adapter, the server and both Pokémon from
-// main RAM and plays the steps of gen5-moment-plan.ts from a fixed frame after the mark battle:
-// hold the server, answer the action menu and write one block per moment. With --replay and
-// --scene hits it writes the blocks of a hand turn of the replay's leads instead
-// (gen5-moment-blocks.ts, #107), each logged with its commands and lines. It writes a frame per
-// mark under build/gen5/frames/ and the last mark's state under build/gen5/states/ (gitignored,
+// after the readings at the action menu: the moment is a single's with leads that know Tackle.
+// Then it reads the player's adapter, the server and both Pokémon from main RAM and plays the
+// steps of gen5-moment-plan.ts from a fixed frame after the mark battle: hold the server, answer
+// the action menu and write one block per moment. With --replay and --scene hits or switches it
+// writes the blocks of hand turns after the replay's start instead (gen5-moment-blocks.ts, #107,
+// #108), each logged with its commands and lines, and at each block's answer it checks both
+// parties' order in RAM against the backend's (gen5-moment-party.ts). It writes a frame per mark
+// under build/gen5/frames/ and the last mark's state under build/gen5/states/ (gitignored,
 // ADR 0002).
-// Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts [--scene known|unknown|hits] [--save <name>]
-// [--entry direct|walk] [--battle single|double] [--player <name>] [--opponent <name>]
-// [--replay <id>] [--minutes 15].
-import { readFileSync, writeFileSync } from 'node:fs'
+// Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts [--scene known|unknown|hits|switches]
+// [--save <name>] [--entry direct|walk] [--battle single|double] [--player <name>]
+// [--opponent <name>] [--replay <id>] [--minutes 15].
+import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { chromium, type Page } from '@playwright/test'
@@ -22,19 +24,23 @@ import { chromium, type Page } from '@playwright/test'
 import { adapterNumbers } from '../src/gen5/adapter.ts'
 import { battleRefs } from '../src/gen5/battle-check.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
-import type { Gen5Global, MarkRecord, RunPlan, RunReport } from '../src/gen5/hook.ts'
+import type { Gen5Replay } from '../src/gen5/backend/replay.ts'
+import type { RunPlan, RunReport } from '../src/gen5/hook.ts'
 import type { MacroStep } from '../src/gen5/macro.ts'
 import { MAIN_RAM_SIZE, MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import type { RamRef } from '../src/gen5/ram-check.ts'
 import type { RoutineBuild } from '../src/gen5/routine-order.ts'
 import {
+  isHandScene,
   type MomentOptions,
   readMomentOptions,
   startLine,
   type StateFile,
 } from './gen5-moment-args.ts'
-import { hitsScene } from './gen5-moment-blocks.ts'
+import { blocksScene } from './gen5-moment-blocks.ts'
 import { sessionPlan } from './gen5-moment-direct.ts'
+import { follow, hook, logReport } from './gen5-moment-follow.ts'
+import { partyLines, partyRefs } from './gen5-moment-party.ts'
 import { type Battle, readBattle } from './gen5-moment-read.ts'
 import { momentTeam } from './gen5-moment-team.ts'
 import { markLines, writeLines } from './gen5-moment-log.ts'
@@ -54,28 +60,7 @@ import { GEN5_PATHS } from './gen5-paths.ts'
 import { logStorage, type RequestLog, watchRequests } from './gen5-requests.ts'
 import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve } from './gen5-shot.ts'
 
-const POLL_MS = 1000
 const hex = (value: number) => `0x${value.toString(16)}`
-
-/** The page's hook; spelled out in each evaluate, since those run in the page, not here. */
-const hook = (page: Page) => ({
-  readBytes: (at: number, n: number) =>
-    page.evaluate(([a, l]) => (globalThis as unknown as Gen5Global).gen5.readBytes(a, l), [
-      at,
-      n,
-    ] as const),
-  takeMark: (name: string) =>
-    page.evaluate((mark) => (globalThis as unknown as Gen5Global).gen5.takeMark(mark), name),
-  queueRun: (plan: RunPlan) =>
-    page.evaluate((queued) => {
-      ;(globalThis as unknown as Gen5Global).gen5.queueRun(queued)
-    }, plan),
-  runReport: () => page.evaluate(() => (globalThis as unknown as Gen5Global).gen5.runReport()),
-  uncapped: () =>
-    page.evaluate(() => {
-      ;(globalThis as unknown as Gen5Global).gen5.uncapped(true)
-    }),
-})
 
 type Team = Awaited<ReturnType<typeof momentTeam>>
 
@@ -105,47 +90,6 @@ function watchOf(numbers: Bw2Numbers, battle: Battle): RamRef[] {
     { name: 'near.hp', address: battle.near.address + hp, width: 2 },
     { name: 'far.hp', address: battle.far.address + hp, width: 2 },
   ]
-}
-
-/** Writes a mark's frame, and its state if the page kept one. */
-async function saveMark(page: Page, record: MarkRecord, label: string): Promise<void> {
-  const taken = await hook(page).takeMark(record.name)
-  const base = `${label}-${record.name}`
-  const saved = [`${base}.png`]
-  if (taken?.shot) {
-    writeFileSync(join(GEN5_PATHS.frames, `${base}.png`), Buffer.from(taken.shot, 'base64'))
-  }
-  if (taken?.state) {
-    writeFileSync(join(GEN5_PATHS.states, `${base}.state`), Buffer.from(taken.state, 'base64'))
-    const meta = { mark: record.name, frame: record.frame, ramSha: record.ramSha }
-    writeFileSync(join(GEN5_PATHS.states, `${base}.json`), `${JSON.stringify(meta)}\n`)
-    saved.push(`${base}.state`)
-  }
-  const wall = (record.wallMs / 1000).toFixed(1)
-  log(`mark ${record.name}: frame ${String(record.frame)}, ${wall} s; ${saved.join(', ')}`)
-}
-
-/** The run's report each POLL_MS, its new marks written, until it ends or the deadline passes.
- * The page's report keeps the marks of the session's earlier runs; `known` of them are written. */
-async function follow(page: Page, label: string, deadline: number, known = 0) {
-  let written = known
-  for (;;) {
-    await new Promise((resolve) => setTimeout(resolve, POLL_MS))
-    const report: RunReport = await hook(page).runReport()
-    for (const record of report.marks.slice(written)) await saveMark(page, record, label)
-    written = report.marks.length
-    const ended = report.status === 'done' || report.status === 'failed'
-    if (ended || Date.now() > deadline) return report
-  }
-}
-
-function logReport(report: RunReport): void {
-  log(
-    `run ${report.status} at frame ${String(report.frame)}, step ${String(report.step)}; jumps ${String(report.jumps)}`,
-  )
-  if (report.failed !== undefined) log(`failed: ${report.failed}`)
-  if (report.loadCheck !== undefined) log(`load check: ${report.loadCheck}`)
-  for (const line of report.watch) log(`watch ${line}`)
 }
 
 function readStateFile(base: string): StateFile {
@@ -209,19 +153,19 @@ function sceneMoments(scene: SceneName, battle: Battle, numbers: Bw2Numbers) {
   return blocks
 }
 
-/** The hits scene's steps: the replay's blocks, each logged with its commands and lines. */
-function hitsSteps(team: Team | undefined, battle: Battle, numbers: Bw2Numbers): MacroStep[] {
+/** A hand scene's steps: the replay's blocks, each logged with its commands and lines. */
+function handSteps(team: Team | undefined, battle: Battle, numbers: Bw2Numbers): MacroStep[] {
   const banks = { move: bank('move'), standard: bank('standard'), set: bank('set') }
-  const { steps, lines } = hitsScene(team?.replay, { numbers, battle, banks })
+  const { steps, lines } = blocksScene(team?.replay, { numbers, battle, banks })
   for (const line of lines) log(line)
   return steps
 }
 
-/** The second run's steps: the hits scene's blocks or the moment's; none for a double or a
+/** The second run's steps: a hand scene's blocks or the moment's; none for a double or a
  * replay with no scene, whose run ends at the action menu. */
 function secondSteps(options: MomentOptions, battle: Battle, numbers: Bw2Numbers, team?: Team) {
   const { scene } = options
-  if (scene === 'hits') return hitsSteps(team, battle, numbers)
+  if (isHandScene(scene)) return handSteps(team, battle, numbers)
   const atMenu = options.team.from === 'replay' ? 'replay' : options.battle
   if (atMenu !== 'single') {
     log(`${atMenu}: the run ends at the action menu`)
@@ -233,6 +177,39 @@ function secondSteps(options: MomentOptions, battle: Battle, numbers: Bw2Numbers
     adapter: battle.adapter,
     blocks: sceneMoments(scene, battle, numbers),
   })
+}
+
+/** The second run: its steps, logged, from MOMENT_GAP frames after the first run's mark battle,
+ * with the values it watches and those it reads at each mark. */
+function secondPlan(
+  steps: MacroStep[],
+  first: RunReport,
+  refs: Pick<RunPlan, 'watch' | 'markRefs'>,
+): RunPlan {
+  for (const line of writeLines(steps)) log(line)
+  const startAt = momentStart(first.marks)
+  log(
+    startAt === undefined
+      ? 'moment: starts once queued, as the session has no mark battle'
+      : `moment: starts at frame ${String(startAt)}, ${String(MOMENT_GAP)} frames after the mark battle`,
+  )
+  return {
+    steps,
+    startFrame: 0,
+    ...(startAt === undefined ? {} : { startAt }),
+    ...refs,
+    stateMarks: ['end'],
+  }
+}
+
+/** The party lines of a hand scene's run, each block's orders read from RAM against the state's
+ * (gen5-moment-party.ts); false on a mismatch. A run with no replay's blocks checks nothing. */
+function partyChecked(replay: Gen5Replay | undefined, report: RunReport, battle: Battle): boolean {
+  if (replay === undefined) return true
+  const { lines, matches } = partyLines(replay.blocks, report.marks, battle.parties)
+  for (const line of lines) log(`party ${line}`)
+  if (!matches) log("party: the client's party order differs from the state's")
+  return matches
 }
 
 async function play(page: Page, dump: string, numbers: Bw2Numbers, options: MomentOptions) {
@@ -248,25 +225,15 @@ async function play(page: Page, dump: string, numbers: Bw2Numbers, options: Mome
   log(`adapter ${hex(battle.adapter)}, server ${hex(battle.server)}`)
   const steps = secondSteps(options, battle, numbers, team)
   if (steps === undefined) return 0
-  for (const line of writeLines(steps)) log(line)
-  const startAt = momentStart(first.marks)
-  log(
-    startAt === undefined
-      ? 'moment: starts once queued, as the session has no mark battle'
-      : `moment: starts at frame ${String(startAt)}, ${String(MOMENT_GAP)} frames after the mark battle`,
-  )
-  const second: RunPlan = {
-    steps,
-    startFrame: 0,
-    ...(startAt === undefined ? {} : { startAt }),
-    watch: watchOf(numbers, battle),
-    stateMarks: ['end'],
-  }
+  const replay = isHandScene(options.scene) ? team?.replay : undefined
+  const markRefs = replay === undefined ? [] : partyRefs(battle, numbers)
+  const second = secondPlan(steps, first, { watch: watchOf(numbers, battle), markRefs })
   await hook(page).queueRun(second)
   const report = await follow(page, label, deadlineMs, first.marks.length)
   logReport(report)
   for (const line of markLines(report.marks)) log(line)
-  return report.status === 'done' ? 0 : 1
+  const party = partyChecked(replay, report, battle)
+  return report.status === 'done' && party ? 0 : 1
 }
 
 async function main(): Promise<void> {

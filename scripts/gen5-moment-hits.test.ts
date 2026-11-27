@@ -6,12 +6,12 @@ import { buildGen5Replay } from '../src/gen5/backend/replay'
 import { REPLAY_NUMBERS as NUMBERS } from '../src/gen5/backend/replay.fixtures'
 import { buildBattleScript } from '../src/script/build'
 import { readReplay } from '../src/script/replay'
-import { HITS_TURN, hitsLog } from './gen5-moment-hits'
+import { handLog, HITS_TURN } from './gen5-moment-hits'
 import { GEN5_PATHS } from './gen5-paths'
 
 const ID = 'gen5ou-2718717830'
 const LOG = readReplay(JSON.parse(readFileSync(`${GEN5_PATHS.replays}/${ID}.json`, 'utf8'))).log
-const HITS = hitsLog(LOG)
+const HITS = handLog(LOG, HITS_TURN)
 const LINES = HITS.split('\n')
 /** The line of the hits log that starts with `text`. */
 const lineOf = (text: string) => LINES.findIndex((line) => line.startsWith(text))
@@ -19,7 +19,7 @@ const lineOf = (text: string) => LINES.findIndex((line) => line.startsWith(text)
 // Scene: the scene run of #107 (D14) plays a hand turn of the test replay's leads: Darmanitan's
 // Grass Knot hits Politoed super effectively and critically, Politoed's Focus Blast misses, and
 // Politoed's Leftovers heal it at the turn's end.
-describe('hitsLog', () => {
+describe('handLog', () => {
   it('keeps the test replay’s lines before its first turn and appends the hand turn', () => {
     const before = LOG.split('\n').slice(0, LOG.split('\n').indexOf('|turn|1'))
     expect(HITS).toBe(`${[...before, ...HITS_TURN].join('\n')}\n`)
@@ -28,7 +28,7 @@ describe('hitsLog', () => {
   })
 
   it('refuses a log with no turn', () => {
-    expect(() => hitsLog('|start\n')).toThrow('the log has no |turn| line')
+    expect(() => handLog('|start\n', HITS_TURN)).toThrow('the log has no |turn| line')
   })
 })
 

@@ -6,7 +6,7 @@ import { GEN5_REPLAY_VERSION, type Gen5Replay } from '../src/gen5/backend/replay
 import { REPLAY_NUMBERS } from '../src/gen5/backend/replay.fixtures'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers'
 import type { MacroStep } from '../src/gen5/macro'
-import { blockLines, blocksPlan, hitsScene } from './gen5-moment-blocks'
+import { blockLines, blocksPlan, blocksScene, sideOfMon } from './gen5-moment-blocks'
 import { momentSteps } from './gen5-moment-plan'
 import type { Battle } from './gen5-moment-read'
 
@@ -104,9 +104,24 @@ describe('blockLines', () => {
   })
 })
 
-describe('hitsScene', () => {
+// Scene: in the switches scene (#108) a Pokémon other than the leads uses a move, and the log
+// names its move line by its side, not by the lead's mon ID.
+describe('sideOfMon', () => {
+  const party = (...monIds: number[]) => ({ mons: monIds.map((monId) => ({ monId })) })
+  const sideOf = sideOfMon({ near: party(4, 5, 6), far: party(FAR_MON, 8) })
+
+  it('gives the side whose party holds the mon ID, the leads and the rest alike', () => {
+    expect([4, 6, FAR_MON, 8].map(sideOf)).toEqual(['near', 'near', 'far', 'far'])
+  })
+
+  it('fails by name on a mon ID in neither party', () => {
+    expect(() => sideOf(30)).toThrow('no party read at the action menu holds mon ID 30')
+  })
+})
+
+describe('blocksScene', () => {
   it('refuses a run with no replay', () => {
     const input = { numbers: {} as Bw2Numbers, battle: {} as Battle, banks: BANKS }
-    expect(() => hitsScene(undefined, input)).toThrow("the hits scene needs the replay's blocks")
+    expect(() => blocksScene(undefined, input)).toThrow("a hand scene needs the replay's blocks")
   })
 })
