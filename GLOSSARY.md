@@ -302,6 +302,10 @@ _Avoid_: team order, preview order (Team Preview's order is another)
 The number Black 2's battle gives each Pokémon in it, by its side and its party slot. The game's server commands name a Pokémon by it.
 _Avoid_: battle index, position
 
+**Gen 5 block**:
+The game's server commands for one action of a Gen 5 replay, or for one line at a turn's end, with the log lines they show. The page hands a block to the player's battle client once the client has answered the block before. A block too big for the client's room splits between two commands.
+_Avoid_: packet, batch, moment (a moment is the spike's block of one move)
+
 **Gen 5 fallback**:
-A Gen 5 replay's note of a content gap, with its log line: a forme the game draws as its base form, a character of a name that the battle's font lacks and shows as "?", or a move past the four a Pokémon holds. The run lists each one.
+A Gen 5 replay's note of a content gap, with its log line: a forme the game draws as its base form, a character of a name that the battle's font lacks and shows as "?", or a move past the four a Pokémon holds. An event that does not play yet is one too, and names the issue that will play it. So is a line Black 2 has no message for, which shows nothing. The run lists each one.
 _Avoid_: warning, cut (a name cut to its room is a note, not a fallback)
