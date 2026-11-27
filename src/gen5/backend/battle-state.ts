@@ -2,8 +2,10 @@
 // plan D1, D5, D6, D13): which of them stand in the battle's places, by which mon ID and position
 // the commands name them, and the HP the game shows for each. The places follow the party state
 // (party-state.ts): each side's front, fainted or not. Every Pokémon keeps the mon ID of its start
-// slot through every swap, as PokeCon_CreateClientParty gives it once. Every Pokémon starts at
-// HP_SCALE, and each HP change runs from the game's HP to the logged one on that scale.
+// slot through every swap, as PokeCon_CreateClientParty gives it once. The real Pokémon behind
+// Illusion's disguise answers for the disguise's Pokémon, by its mon ID and its HP, until it leaves
+// (lane plan D8). Every Pokémon starts at HP_SCALE, and each HP change runs from the game's HP to
+// the logged one on that scale.
 // Pure: the clients and mon IDs come from build/gen5/bw2.json's `battle`.
 import type { BattleScript } from '../../script/events.ts'
 import { HP_SCALE, scaleHp } from '../../script/hp-scale.ts'
@@ -39,6 +41,8 @@ export interface BattleState {
   sendIn(event: EventOf<'switchIn'>): SendIn
   /** Follows a faint: the HP goes to 0, and the Pokémon stays in place until the next send-in. */
   faint(ref: PokemonRef): void
+  /** Follows the end of a disguise: the real Pokémon plays as the disguise's until it leaves. */
+  alias(event: EventOf<'replace'>): void
   /** The HP the game shows for `ref`, on the scale. */
   hpOf(ref: PokemonRef): number
   /** The side's party in the game's order, by mon ID. */
@@ -57,15 +61,17 @@ export function battleState(
   const start = partyOrder(script)
   const party = partyState(script)
   const hp = new Map<string, number>()
-  const monIdOfRef = (ref: PokemonRef) =>
+  const monIdAt = (ref: PokemonRef) =>
     monIdOf(battle.monIds, clientOf(battle.single, ref.side), partySlot(start, ref))
+  const monIdOfRef = (ref: PokemonRef) => monIdAt(party.gameRef(ref))
+  const hpKey = (ref: PokemonRef) => refKey(party.gameRef(ref))
   const placeOf = (ref: PokemonRef): InPlace => ({
     monId: monIdOfRef(ref),
     pos: singleBattlePos(battle.single, clientOf(battle.single, ref.side)),
   })
-  const hpOf = (ref: PokemonRef) => hp.get(refKey(ref)) ?? HP_SCALE
+  const hpOf = (ref: PokemonRef) => hp.get(hpKey(ref)) ?? HP_SCALE
   const inPlace = (ref: PokemonRef) =>
-    party.front(ref.side).index === ref.index ? placeOf(ref) : undefined
+    party.front(ref.side).index === party.gameRef(ref).index ? placeOf(ref) : undefined
   return {
     inPlace,
     placed(ref, line) {
@@ -85,14 +91,17 @@ export function battleState(
     },
     faint(ref) {
       party.faint(ref)
-      hp.set(refKey(ref), 0)
+      hp.set(hpKey(ref), 0)
+    },
+    alias: (event) => {
+      party.alias(event)
     },
     hpOf,
-    partyMonIds: (side) => party.order(side).map((index) => monIdOfRef({ side, index })),
+    partyMonIds: (side) => party.order(side).map((index) => monIdAt({ side, index })),
     hpTo(ref, after) {
       const from = hpOf(ref)
       const to = scaleHp(after)
-      hp.set(refKey(ref), to)
+      hp.set(hpKey(ref), to)
       if (to === from) return undefined
       const command = to < from ? 'SC_OP_SUBTRACT_HP' : 'SC_OP_ADD_HP'
       return { command, args: [monIdOfRef(ref), Math.abs(from - to)] }

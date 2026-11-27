@@ -2,8 +2,10 @@
 // lane plan D1). The order starts as `partyOrder` gives it. Each send-in swaps the front's slot
 // with the incoming Pokémon's, as ServerControl_SwitchInCore does on the server and
 // BattleClient_ScOpSendIn on the client, both through BattleParty_Swap in pokebw2's
-// src/battle/btl_main.c. A fainted Pokémon keeps its place until the next send-in. A send-in that
-// the game's party cannot follow fails by its log line and species.
+// src/battle/btl_main.c. A fainted Pokémon keeps its place until the next send-in. When Illusion's
+// disguise ends, the game keeps the disguise's Pokémon in place, and the real one is its alias
+// until it leaves (lane plan D8). A send-in that the game's party cannot follow fails by its log
+// line and species.
 import type { BattleScript } from '../../script/events.ts'
 import type { PokemonRef, Side } from '../../script/types.ts'
 import type { EventOf } from './rules.ts'
@@ -27,8 +29,14 @@ export interface PartyState {
   front(side: Side): PokemonRef
   /** Swaps the incoming Pokémon to the front; throws by name where the game cannot follow. */
   sendIn(event: EventOf<'switchIn'>): SentIn
-  /** Marks `ref` fainted: it stays in place until the next send-in and never comes back. */
+  /** Marks `ref` fainted, or the Pokémon it is the alias of: it stays in place until the next
+   * send-in and never comes back. */
   faint(ref: PokemonRef): void
+  /** Follows the end of a disguise: the real Pokémon becomes the alias of the one in place until
+   * it leaves; throws by name when the disguise does not stand in place. */
+  alias(event: EventOf<'replace'>): void
+  /** The Pokémon the game holds for `ref`: the one in place for its alias, else `ref`. */
+  gameRef(ref: PokemonRef): PokemonRef
 }
 
 /** BattleParty_Swap: a copy of `order` with the entries at `pos` and `slot` swapped. */
@@ -49,17 +57,23 @@ export function speciesOf(script: Pick<BattleScript, 'teams'>, ref: PokemonRef):
   return script.teams[ref.side][ref.index]?.species ?? `Pokémon ${String(ref.index)}`
 }
 
-/** What the refusals read: the script's teams, each side's order and the fainted Pokémon. */
+/** What the refusals read: the script's teams, each side's order, the fainted Pokémon, and each
+ * side's alias by the real Pokémon's team index. */
 interface Party {
   readonly script: Pick<BattleScript, 'teams'>
   readonly orders: Readonly<Record<Side, readonly number[]>>
   readonly fainted: ReadonlySet<string>
+  readonly aliases: ReadonlyMap<Side, number>
 }
 
 const frontOf = (party: Party, side: Side): PokemonRef => ({
   side,
   index: party.orders[side][FRONT_SLOT] ?? -1,
 })
+
+/** The Pokémon the game holds for `ref`: the side's front for the side's alias, else `ref`. */
+const gameRefOf = (party: Party, ref: PokemonRef): PokemonRef =>
+  party.aliases.get(ref.side) === ref.index ? frontOf(party, ref.side) : ref
 
 /** Why the game cannot send in `who`: no such Pokémon, in place already, or fainted. */
 function inRefusal(party: Party, who: PokemonRef): string | undefined {
@@ -76,7 +90,8 @@ function backRefusal(party: Party, event: EventOf<'switchIn'>): string | undefin
   const held = frontOf(party, event.who.side)
   const back = party.fainted.has(refKey(held)) ? undefined : held
   const { replaces } = event
-  if (replaces?.index === back?.index) return undefined
+  const sentBack = replaces && gameRefOf(party, replaces)
+  if (sentBack?.index === back?.index) return undefined
   const sent = replaces === undefined ? 'no Pokémon' : speciesOf(party.script, replaces)
   const name = speciesOf(party.script, held)
   const holds = back === undefined ? `${name}, which fainted` : `${name} in place`
@@ -88,7 +103,8 @@ export function partyState(script: Pick<BattleScript, 'teams' | 'events'>): Part
   const start = partyOrder(script)
   const orders: Record<Side, readonly number[]> = { near: start.near, far: start.far }
   const fainted = new Set<string>()
-  const party: Party = { script, orders, fainted }
+  const aliases = new Map<Side, number>()
+  const party: Party = { script, orders, fainted, aliases }
   return {
     order: (side) => orders[side],
     front: (side) => frontOf(party, side),
@@ -99,10 +115,22 @@ export function partyState(script: Pick<BattleScript, 'teams' | 'events'>): Part
       const out = frontOf(party, side)
       const slot = orders[side].indexOf(index)
       orders[side] = sendInSwap(orders[side], FRONT_SLOT, slot)
+      aliases.delete(side)
       return fainted.has(refKey(out)) ? { slot } : { slot, out }
     },
     faint(ref) {
-      fainted.add(refKey(ref))
+      fainted.add(refKey(gameRefOf(party, ref)))
     },
+    alias(event) {
+      const { side } = event.who
+      const held = frontOf(party, side)
+      if (gameRefOf(party, event.replaces).index !== held.index) {
+        const ends = speciesOf(script, event.replaces)
+        const why = `the log ends the disguise of ${ends}; the game holds ${speciesOf(script, held)}`
+        throw new Error(`line ${String(event.line)}: ${why} in place`)
+      }
+      aliases.set(side, event.who.index)
+    },
+    gameRef: (ref) => gameRefOf(party, ref),
   }
 }

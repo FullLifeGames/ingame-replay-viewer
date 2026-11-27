@@ -2,10 +2,11 @@
 // D6, D11 and D1): a move sends its line and its animation, as ServerControl_Fight and
 // ServerControl_ExecuteMove do, and each event after it plays by its rule (hits.ts). A switch-in
 // after the leads plays its switch, drag or send-in (switches.ts) and moves the places; each faint
-// plays the server's faint (faints.ts) and takes its Pokémon's HP to 0 (battle-state.ts). An
-// event that plays and names a Pokémon not in place fails by name. An action with a called move,
-// several hits, a charge turn or a look of its own waits whole. Pure: every number of the game
-// comes in from build/gen5/bw2.json.
+// plays the server's faint (faints.ts) and takes its Pokémon's HP to 0, and the end of Illusion's
+// disguise keeps the game's Pokémon in place (battle-state.ts). An event that plays and names a
+// Pokémon not in place fails by name. An action with a called move, several hits, a charge turn
+// or a look of its own waits whole. Pure: every number of the game comes in from
+// build/gen5/bw2.json.
 import type { BattleScript, ScriptEvent } from '../../script/events.ts'
 import type { PokemonRef } from '../../script/types.ts'
 import type { BattleNumbers, FlowNumbers, TextNumbers } from '../bw2-numbers.ts'
@@ -130,11 +131,13 @@ function eventCommands(scene: Scene, played: Played, event: ScriptEvent): Server
   return silentBar(hits, event)
 }
 
-/** The scene after `event`: a turn's number, a move as the last one, a faint's HP at 0. */
+/** The scene after `event`: a turn's number, a move as the last one, a faint's HP at 0, the end
+ * of a disguise as the real Pokémon's alias. */
 function follow(scene: Scene, event: ScriptEvent): void {
   if (event.kind === 'turn') scene.turn = event.number
   if (event.kind === 'move') scene.lastMove = event
   if (event.kind === 'faint') scene.state.faint(event.who)
+  if (event.kind === 'replace') scene.state.alias(event)
 }
 
 /** The commands of each action of `script`, in replay order, from the battle's start. */
