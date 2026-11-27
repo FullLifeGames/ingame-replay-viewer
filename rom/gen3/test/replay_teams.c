@@ -214,9 +214,9 @@ REPLAY_TEST("A team size above six fills the party and stops there")
 
 // The personalities come from a generator of the replay's own (#103), so a mon's nature, and with
 // it the back animation of a near mon, does not follow the shared generator's state when the
-// replay starts. The generator starts from 129600, the seed of the fixed clock both engines boot
-// with, and skips the draw SetSaveBlocksPointers takes at boot. A species of one gender or none,
-// or a request of no gender, takes one draw.
+// replay starts. The generator starts from REPLAY_PERSONALITY_SEED, the seed of the fixed clock
+// both engines boot with, and skips the draw SetSaveBlocksPointers takes at boot. A species of one
+// gender or none, or a request of no gender, takes one draw.
 
 static void WriteOneDrawTeams(void)
 {
@@ -234,7 +234,7 @@ static void WriteOneDrawTeams(void)
 static void ExpectOneDrawPersonalities(void)
 {
     u32 i, personalities[4];
-    rng_value_t rng = LocalRandomSeed(129600);
+    rng_value_t rng = LocalRandomSeed(REPLAY_PERSONALITY_SEED);
 
     LocalRandom32(&rng);
     for (i = 0; i < ARRAY_COUNT(personalities); i++)

@@ -54,11 +54,11 @@ static const u8 sDefaultGenders[] =
 // The personalities come from a generator of the replay's own (#103). A mon's nature picks which
 // of its back set's three animations a near mon plays (LaunchAnimationTaskForBackSprite), and the
 // shared generator's state at the start differs between the engines: on mGBA the VBlanks of the
-// stream check advance it, and the WebAssembly module runs that check in no time. 129600 is the
-// seed of the fixed clock both engines boot with (SeedRngWithRtc), and SetSaveBlocksPointers takes
-// its first draw at boot, so the replay's generator skips one draw. The module draws what it drew
-// before, and only mGBA's natures move.
-#define REPLAY_PERSONALITY_SEED 129600
+// stream check advance it, and the WebAssembly module runs that check in no time. The replay's
+// generator starts from REPLAY_PERSONALITY_SEED (replay_interpreter.h), 129600, the seed of the
+// fixed clock both engines boot with (SeedRngWithRtc), and SetSaveBlocksPointers takes its first
+// draw at boot, so the replay's generator skips one draw. The module draws what it drew before,
+// and only mGBA's natures move.
 
 // GetMonPersonality with NATURE_RANDOM and RANDOM_UNOWN_LETTER, drawn from rng. A species of one
 // gender or none, or a request of no gender, takes the first draw (CleanIncompatibleGenderSpecies);
