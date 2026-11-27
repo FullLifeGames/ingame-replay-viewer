@@ -20,6 +20,10 @@ export interface FaintScene {
  *   ServerDisplay_FaintPokemon's SC_OP_ZERO_HP and SC_FAINT_HP_GAUGE, with the flag that
  *   ServerControl_FaintPokemon passes;
  * - then ServerControl_CheckFainted's fainted line and SC_FAINT.
+ * CheckFainted puts no gauge command after SC_FAINT. Its ServerControl_ClearMonDependentEffects
+ * goes on with SC_OP_CURE_MON_DEPENDENT_CONDITIONS for each Pokémon on the field and
+ * SC_OP_REMOVE_FIELD_EFFECT_DEPEND_MON, which clear the conditions and field effects that hang on
+ * the fainted Pokémon. The writer sets none of those, so it leaves both out.
  * After a hit to 0 the hit's HP op took the HP already, so the faint starts at the line.
  * Throws by name when the game does not hold the Pokémon in place (lane plan D1).
  */

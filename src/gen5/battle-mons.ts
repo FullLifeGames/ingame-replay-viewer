@@ -86,6 +86,12 @@ function partyOf(read: ReadRam, server: number, battle: BattleNumbers, clientId:
   return con + offsetOf(battle.pokeCon, 'parties', 'BtlPokeCon') + clientId * battle.party.size
 }
 
+/** Bytes a party slot takes: a pointer to its BattleMon. */
+const SLOT_BYTES = 4
+
+/** The address of party slot `i`, from the address of the first (`partySlotsAt`). */
+export const slotAddress = (first: number, i: number) => first + i * SLOT_BYTES
+
 /** The slots of `clientId`'s party in the clients' container, in party order: the DS address of
  * the first (each slot a pointer to a BattleMon) and how many hold a Pokémon (a byte), checked
  * against the slots' room. A send-in swaps two of these pointers (BattleParty_Swap). */
@@ -98,7 +104,7 @@ export function partySlotsAt(
   const party = partyOf(read, server, battle, clientId)
   const count = read(party + offsetOf(battle.party, 'count', 'BattleParty'), 1)
   const slots = fieldOf(battle.party, 'mons', 'BattleParty')
-  if (count * 4 > slots.size) {
+  if (count * SLOT_BYTES > slots.size) {
     throw new Error(`client ${String(clientId)}'s party counts more Pokémon than its slots`)
   }
   return { address: party + slots.offset, count }
@@ -148,7 +154,7 @@ export function partyMons(
   const slots = partySlotsAt(read, server, battle, clientId)
   const client = `client ${String(clientId)}'s`
   return Array.from({ length: slots.count }, (_, i) => {
-    const address = read(slots.address + i * 4, 4)
+    const address = read(slotAddress(slots.address, i), SLOT_BYTES)
     const what = `${client} Pokémon ${String(i)}`
     const core = coreAt(read, address, battle, what)
     const mon: PartyMonReading = {

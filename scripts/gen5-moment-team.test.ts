@@ -110,7 +110,8 @@ describe('the moment team', () => {
 describe('momentTeam', () => {
   it('gives the hand team with the names given and no fallback', async () => {
     const team = await momentTeam({ from: 'hand', names: NAMES }, NUMBERS)
-    expect(team).toEqual({ ...teamParties(pkmFormat(NUMBERS), NAMES), names: NAMES, fallbacks: [] })
+    const parties = teamParties(pkmFormat(NUMBERS), NAMES)
+    expect(team).toEqual({ ...parties, names: NAMES, fallbacks: [], orders: [] })
   })
 
   it('loads a test replay’s teams and names through the module runner', async () => {

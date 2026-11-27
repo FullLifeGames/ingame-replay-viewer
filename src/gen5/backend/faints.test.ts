@@ -119,6 +119,27 @@ describe('a faint with HP left', () => {
   })
 })
 
+// Scene: Alice sends Skarmory in for Dugtrio, and a hand-cast `|faint|` names Dugtrio on the
+// bench: the game holds Skarmory in place, so the faint is refused by name (lane plan D1).
+describe('a faint off the front', () => {
+  it('refuses by name the faint of a Pokémon on the bench', () => {
+    const script = scriptOf(
+      '|switch|p1a: Skarmory|Skarmory, M|100/100',
+      '|turn|2',
+      '|faint|p1a: Skarmory',
+    )
+    const dugtrio: PokemonRef = { side: 'near', index: 0 }
+    const events = script.events.map((event): ScriptEvent =>
+      event.kind === 'faint' ? { ...event, who: dugtrio } : event,
+    )
+    expect(() => writeScript({ ...script, events }, NUMBERS)).toThrow(
+      new Error(
+        `line ${String(NEXT + 3)}: the log names Dugtrio, which the game does not hold in place`,
+      ),
+    )
+  })
+})
+
 // Scene: Alice's Zoroark comes in disguised as Dugtrio, and Crunch ends the disguise. The game
 // keeps Dugtrio's mon ID 40 in place, and Zoroark's later events play under it until Zoroark
 // leaves (lane plan D8). The disguise's end waits for #109.

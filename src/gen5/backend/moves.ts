@@ -28,11 +28,20 @@ export interface WriteNumbers {
   readonly battle: Pick<BattleNumbers, 'single' | 'monIds'>
 }
 
-/** What a script writes: each action's commands by event, and a fallback for each event whose
- * rule plays it but which does not play here. */
+/** Each side's party in the game's order, by mon ID, after the event of log line `line`. */
+export interface PartyOrders {
+  readonly line: number
+  readonly near: readonly number[]
+  readonly far: readonly number[]
+}
+
+/** What a script writes: each action's commands by event, a fallback for each event whose rule
+ * plays it but which does not play here, and the party orders after each event in replay order,
+ * which a run compares with the game's (#108). */
 export interface ScriptWrite {
   readonly actions: Written[][]
   readonly fallbacks: Gen5Fallback[]
+  readonly orders: PartyOrders[]
 }
 
 const { effects: EFFECTS, whole: WHOLE } = LATER_ISSUES
@@ -154,13 +163,17 @@ export function writeScript(
     turn: 0,
     lastMove: undefined,
   }
+  const { state } = scene
+  const orders: PartyOrders[] = []
   const actions = actionsOf(script).map((action) => {
-    const played = playedOf(action, scene.state)
+    const played = playedOf(action, state)
     return action.map((event) => {
       const commands = eventCommands(scene, played, event)
       follow(scene, event)
-      return { line: event.line, commands }
+      const { line } = event
+      orders.push({ line, near: state.partyMonIds('near'), far: state.partyMonIds('far') })
+      return { line, commands }
     })
   })
-  return { actions, fallbacks: scene.fallbacks }
+  return { actions, fallbacks: scene.fallbacks, orders }
 }

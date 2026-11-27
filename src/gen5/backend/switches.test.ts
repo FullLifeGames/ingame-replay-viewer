@@ -205,6 +205,21 @@ describe('three swaps on one side', () => {
       [...recall(NEAR, 42), ...sendIn(NEAR, 1, 3)],
     ])
   })
+  it('keeps both parties’ order after each event for the run to compare with RAM', () => {
+    const { orders } = writeScript(scriptOf('|turn|1', ...lines), NUMBERS)
+    const after = (at: number) => orders.findLast((one) => one.line === NEXT + at)
+    expect([1, 3, 5].map((at) => after(at)?.near)).toEqual([
+      [41, 40, 42],
+      [42, 40, 41],
+      [40, 42, 41],
+    ])
+    expect(after(5)?.far).toEqual([10])
+    expect(orders.map((one) => one.line)).toEqual(
+      writeScript(scriptOf('|turn|1', ...lines), NUMBERS)
+        .actions.flat()
+        .map((event) => event.line),
+    )
+  })
 })
 
 // Scene: the six commands of a switch pack past the invented room of 0x20 bytes, so the switch
