@@ -4,14 +4,11 @@
 // HandlerProtect also sets a turn flag and its counter, and HandlerFocuspunch a turn flag; the
 // client's view never reads them, so the sequences leave them out. Pure: every number of the game
 // comes in from build/gen5/bw2.json.
-import type { Effect } from '../../script/types.ts'
 import type { ServerCommand } from '../server-cmd.ts'
 import { GEN5_EFFECT_LINES as LINES } from './effect-lines.ts'
 import { type EffectScene, message, recoverHp, type Sequences } from './effect-scene.ts'
-import { gen5 } from './names.ts'
+import { effectId } from './names.ts'
 import type { EventOf } from './rules.ts'
-
-const moveId = (effect: Effect) => gen5.moves.get(effect.name)?.id
 
 /** The effect that lasts the turn:
  * - Protect (HandlerProtect through BattleHandler_Message): its line;
@@ -21,7 +18,7 @@ const moveId = (effect: Effect) => gen5.moves.get(effect.name)?.id
 function singleTurn(scene: EffectScene, event: EventOf<'singleTurn'>) {
   const who = scene.state.inPlace(event.who)
   if (who === undefined) return undefined
-  const id = moveId(event.effect)
+  const id = effectId('move', event.effect.name)
   if (id === 'protect') return [message(scene, LINES.protected, [who.monId])]
   if (id !== 'focuspunch') return undefined
   const { hideWindow, focusEffect } = scene.numbers.effects
@@ -35,7 +32,7 @@ function singleTurn(scene: EffectScene, event: EventOf<'singleTurn'>) {
 /** ServerControl_RemoveNoEffectTargets: the line of a Pokémon whose protection blocks the move. */
 function block(scene: EffectScene, event: EventOf<'block'>): ServerCommand[] | undefined {
   const who = scene.state.inPlace(event.who)
-  if (who === undefined || moveId(event.effect) !== 'protect') return undefined
+  if (who === undefined || effectId('move', event.effect.name) !== 'protect') return undefined
   return [message(scene, LINES.protectBlocked, [who.monId])]
 }
 

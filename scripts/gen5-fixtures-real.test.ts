@@ -18,6 +18,7 @@ import { battleNumbers } from './gen5-bw2-battle.ts'
 import { effectNumbers } from './gen5-bw2-effects.ts'
 import { EFFECTS_CONSTANTS, EFFECTS_INPUT, EFFECTS_ITEMS } from './gen5-bw2-effects.fixtures.ts'
 import { flowNumbers } from './gen5-bw2-flow.ts'
+import { ROOMY_NUMBERS } from './gen5-moment-room.fixtures.ts'
 import { FLOW_INPUT } from './gen5-bw2-flow.fixtures.ts'
 import { BATTLE_SOURCES } from './gen5-bw2-battle.fixtures.ts'
 import { entryNumbers } from './gen5-bw2-entry.ts'
@@ -108,6 +109,12 @@ const COMPARED = [
     value: EFFECTS_ITEMS,
     path: ['pkm', 'items'],
   },
+  ...(['queueSize', 'adapter'] as const).map((key) => ({
+    module: 'scripts/gen5-moment-room.fixtures.ts',
+    name: `ROOMY_NUMBERS.${key}`,
+    value: ROOMY_NUMBERS[key],
+    path: [key],
+  })),
   ...(
     ['text', 'flow', 'effects', 'serverCommands', 'messages', 'queueSize', 'battle'] as const
   ).map((key) => ({

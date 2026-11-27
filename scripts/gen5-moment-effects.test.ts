@@ -3,32 +3,17 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 import { buildGen5Replay } from '../src/gen5/backend/replay'
-import { REPLAY_NUMBERS as NUMBERS } from '../src/gen5/backend/replay.fixtures'
 import { buildBattleScript } from '../src/script/build'
 import { readReplay } from '../src/script/replay'
 import { EFFECTS_TURNS } from './gen5-moment-effects'
 import { handLog } from './gen5-moment-hits'
+import { ROOMY_NUMBERS as ROOMY } from './gen5-moment-room.fixtures'
 import { GEN5_PATHS } from './gen5-paths'
 
 const ID = 'smogtours-gen5ou-862240'
 const LOG = readReplay(JSON.parse(readFileSync(`${GEN5_PATHS.replays}/${ID}.json`, 'utf8'))).log
 const EFFECTS = handLog(LOG, EFFECTS_TURNS)
 const LINES = EFFECTS.split('\n')
-/** The invented numbers with a block room wide enough that no action of the scene splits, as
- * none splits in the game's room (as in gen5-moment-switches.test.ts). */
-const WIDE = 0x200
-const data = NUMBERS.adapter.fields['sendCmd.data']
-const ROOMY = {
-  ...NUMBERS,
-  queueSize: WIDE,
-  adapter: {
-    ...NUMBERS.adapter,
-    fields: {
-      ...NUMBERS.adapter.fields,
-      'sendCmd.data': { offset: data?.offset ?? 0, size: WIDE },
-    },
-  },
-}
 /** The first line of the effects log that starts with `text`. */
 const lineOf = (text: string) => LINES.findIndex((line) => line.startsWith(text))
 /** Every line of the effects log that starts with `text`. */

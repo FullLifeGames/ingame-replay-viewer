@@ -6,7 +6,6 @@
 // these sequences before stats.ts', which writes the same drop without the pop-up. Pure: every
 // number of the game comes in from build/gen5/bw2.json.
 import type { ScriptEvent } from '../../script/events.ts'
-import type { Effect } from '../../script/types.ts'
 import type { ServerCommand } from '../server-cmd.ts'
 import { GEN5_EFFECT_LINES as LINES } from './effect-lines.ts'
 import {
@@ -17,16 +16,12 @@ import {
   type Sequences,
   simpleHp,
 } from './effect-scene.ts'
-import { gen5 } from './names.ts'
+import { causeId, effectId } from './names.ts'
 import type { EventOf } from './rules.ts'
 import { STAT_SEQUENCES } from './stats.ts'
 
-/** The ability a cause names, by @pkmn's Gen 5 ability ID. */
-const abilityId = (cause: Effect | undefined) =>
-  cause?.kind === 'ability' ? gen5.abilities.get(cause.name)?.id : undefined
-
 const isIntimidate = (event: ScriptEvent | undefined): event is EventOf<'ability'> =>
-  event?.kind === 'ability' && gen5.abilities.get(event.ability)?.id === 'intimidate'
+  event?.kind === 'ability' && effectId('ability', event.ability) === 'intimidate'
 
 /** A drop of Intimidate's run: a stat change with no cause of the log on the other side than the
  * holder's. */
@@ -68,7 +63,11 @@ function statChange(scene: EffectScene, event: EventOf<'statChange'>) {
 function ironBarbs(scene: EffectScene, event: EventOf<'damage'>) {
   const who = scene.state.inPlace(event.who)
   const holder = event.source && scene.state.inPlace(event.source)
-  if (who === undefined || holder === undefined || abilityId(event.cause) !== 'ironbarbs') {
+  if (
+    who === undefined ||
+    holder === undefined ||
+    causeId('ability', event.cause) !== 'ironbarbs'
+  ) {
     return undefined
   }
   return inPopup(holder.monId, [
@@ -81,7 +80,7 @@ function ironBarbs(scene: EffectScene, event: EventOf<'damage'>) {
  * around ServerControl_RecoverHPCore's effect, HP and gauge, with no line. */
 function poisonHeal(scene: EffectScene, event: EventOf<'heal'>) {
   const who = scene.state.inPlace(event.who)
-  if (who === undefined || abilityId(event.cause) !== 'poisonheal') return undefined
+  if (who === undefined || causeId('ability', event.cause) !== 'poisonheal') return undefined
   return inPopup(who.monId, recoverHp(scene, event.who, event.hp, who))
 }
 

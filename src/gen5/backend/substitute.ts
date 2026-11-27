@@ -19,11 +19,11 @@ import {
   simpleHp,
 } from './effect-scene.ts'
 import { hitLines } from './hits.ts'
-import { gen5, gen5Move } from './names.ts'
+import { effectId, gen5Move } from './names.ts'
 import type { EventOf } from './rules.ts'
 import { refKey } from './slots.ts'
 
-const isSubstitute = (effect: Effect) => gen5.moves.get(effect.name)?.id === 'substitute'
+const isSubstitute = (effect: Effect) => effectId('move', effect.name) === 'substitute'
 
 /** The HP drop of the Substitute's start at `at`: the next event, a damage of its holder with no
  * cause. */

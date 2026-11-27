@@ -12,14 +12,11 @@ import type { ServerCommand } from '../server-cmd.ts'
 import type { InPlace } from './battle-state.ts'
 import { GEN5_EFFECT_LINES as LINES } from './effect-lines.ts'
 import { type EffectScene, message, recoverHp, type Sequences, simpleHp } from './effect-scene.ts'
-import { gen5, gen5Item } from './names.ts'
+import { causeId, effectId, gen5Item } from './names.ts'
 import type { EventOf } from './rules.ts'
 
 /** The berries whose use has a sequence here, by @pkmn's Gen 5 item ID. */
 const BERRIES = new Set(['sitrusberry', 'custapberry'])
-
-const itemId = (name: string | undefined) =>
-  name === undefined ? undefined : gen5.items.get(name)?.id
 
 /** ITEM_NONE: what a Pokémon holds once its item is gone. HandlerAirBalloonDamageReaction
  * names it; HandlerKnockOff and ServerControl_UseHeldItem write its literal. */
@@ -42,8 +39,7 @@ function itemGone(scene: EffectScene, monId: number, consumed?: number): ServerC
  * item, then the target's item to none. */
 function knockedOff(scene: EffectScene, event: EventOf<'itemEnd'>, who: InPlace) {
   const attacker = event.source && scene.state.inPlace(event.source)
-  const knockOff =
-    event.cause?.kind === 'move' && gen5.moves.get(event.cause.name)?.id === 'knockoff'
+  const knockOff = causeId('move', event.cause) === 'knockoff'
   if (!knockOff || attacker === undefined) return undefined
   const args = [attacker.monId, who.monId, gen5Item(event.item)]
   return [message(scene, LINES.knockedOff, args), ...itemGone(scene, who.monId)]
@@ -57,7 +53,7 @@ function knockedOff(scene: EffectScene, event: EventOf<'itemEnd'>, who: InPlace)
 function itemEnd(scene: EffectScene, event: EventOf<'itemEnd'>): ServerCommand[] | undefined {
   const who = scene.state.inPlace(event.who)
   if (who === undefined || event.silent === true) return undefined
-  const item = itemId(event.item) ?? ''
+  const item = effectId('item', event.item) ?? ''
   if (event.eaten === true) {
     return BERRIES.has(item) ? [{ command: 'SC_USE_HELD_ITEM', args: [who.monId] }] : undefined
   }
@@ -80,7 +76,7 @@ function sitrusBerry(scene: EffectScene, event: EventOf<'heal'>, who: InPlace, n
 /** HandlerCustapBerryUse through BattleHandler_Message: the line, then the berry used up. */
 function custapBerry(scene: EffectScene, event: EventOf<'effectActivate'>) {
   const who = event.who && scene.state.inPlace(event.who)
-  const custap = event.consumed === true && itemId(event.effect.name) === 'custapberry'
+  const custap = event.consumed === true && effectId('item', event.effect.name) === 'custapberry'
   if (who === undefined || !custap) return undefined
   const berry = gen5Item(event.effect.name)
   return [
@@ -94,7 +90,7 @@ function custapBerry(scene: EffectScene, event: EventOf<'effectActivate'>) {
 function lifeOrb(scene: EffectScene, event: EventOf<'damage'>) {
   const who = scene.state.inPlace(event.who)
   if (who === undefined || event.cause?.kind !== 'item') return undefined
-  if (itemId(event.cause.name) !== 'lifeorb') return undefined
+  if (effectId('item', event.cause.name) !== 'lifeorb') return undefined
   return [
     ...simpleHp(scene, event.who, event.hp, who.monId),
     message(scene, LINES.lifeOrb, [who.monId]),
@@ -105,7 +101,11 @@ function lifeOrb(scene: EffectScene, event: EventOf<'damage'>) {
  * item the log reveals by a move or an ability has no sequence here. */
 function airBalloon(scene: EffectScene, event: EventOf<'item'>) {
   const who = scene.state.inPlace(event.who)
-  if (who === undefined || event.cause !== undefined || itemId(event.item) !== 'airballoon') {
+  if (
+    who === undefined ||
+    event.cause !== undefined ||
+    effectId('item', event.item) !== 'airballoon'
+  ) {
     return undefined
   }
   return [message(scene, LINES.airBalloon, [who.monId])]
@@ -117,7 +117,7 @@ export const ITEM_SEQUENCES = {
   heal: (scene, event) => {
     const who = scene.state.inPlace(event.who)
     const name = event.cause?.kind === 'item' ? event.cause.name : undefined
-    return who && itemId(name) === 'sitrusberry'
+    return who && effectId('item', name) === 'sitrusberry'
       ? sitrusBerry(scene, event, who, name ?? '')
       : undefined
   },

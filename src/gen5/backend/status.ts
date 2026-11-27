@@ -18,7 +18,7 @@ import {
   simpleHp,
 } from './effect-scene.ts'
 import type { Gen5Line } from './lines.ts'
-import { gen5, gen5Item } from './names.ts'
+import { causeId, gen5Item } from './names.ts'
 import type { EventOf } from './rules.ts'
 
 /** The line GetConditionAddMessage picks for each status. */
@@ -89,7 +89,7 @@ function statusCommands(scene: EffectScene, event: EventOf<'status'>) {
       message(scene, ADD_LINES[event.status], [who.monId]),
     )
   }
-  if (cause.kind !== 'item' || gen5.items.get(cause.name)?.id !== 'toxicorb') return undefined
+  if (causeId('item', cause) !== 'toxicorb') return undefined
   const line = message(scene, LINES.toxicOrb, [who.monId, gen5Item(cause.name)])
   return addCondition(scene, event.status, who, line)
 }

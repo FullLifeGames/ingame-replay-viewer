@@ -9,7 +9,7 @@ import type { FlowNumbers, TextNumbers } from '../bw2-numbers.ts'
 import type { ServerCommand } from '../server-cmd.ts'
 import type { BattleState, InPlace } from './battle-state.ts'
 import { type Gen5Line, GEN5_LINES, lineId } from './lines.ts'
-import { gen5Item } from './names.ts'
+import { causeId, gen5Item } from './names.ts'
 import type { EventOf } from './rules.ts'
 
 /** A move that plays: its user and its target in place, and its number. */
@@ -78,8 +78,7 @@ export function hitLines(text: TextNumbers, hit: Hit): ServerCommand[] {
   return [...effective, ...(hit.crit === true ? [std(text, GEN5_LINES.critical)] : [])]
 }
 
-const isLeftovers = (cause: Effect | undefined) =>
-  cause?.kind === 'item' && cause.name === 'Leftovers'
+const isLeftovers = (cause: Effect | undefined) => causeId('item', cause) === 'leftovers'
 
 /** ServerControl_UseHeldItem reserves SC_USE_HELD_ITEM; HandlerLeftoversUse asks for the heal,
  * ServerControl_RecoverHPCore shows its effect at the Pokémon's position and moves the bar
