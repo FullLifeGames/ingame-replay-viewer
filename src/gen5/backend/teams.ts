@@ -1,14 +1,17 @@
 // A battle script's teams as the parties the park writes (#106): each side's members in party
 // order, with what the log reveals of each and defaults for the rest (D6): nature Hardy, the
 // species' first ability, no item. Every forme goes in as form 0 and is listed (D19); a name goes
-// through the battle's font (D8). Pure: the font's characters come in from build/gen5/bw2.json.
+// through the battle's font (D8). A lead whose written ability the log never shows and which acts
+// as it comes in is listed with what the game shows (#109, lane plan D4). Pure: the font's
+// characters and the switch-in abilities come in from build/gen5/bw2.json.
 import type { BattleScript } from '../../script/events.ts'
 import type { PreviewMember, Side, TeamMember } from '../../script/types.ts'
 import { type Gen5Fallback, inLineOrder } from './fallbacks.ts'
 import { fitName } from './font.ts'
-import { baseSpecie, gen5, gen5Species } from './names.ts'
+import { baseSpecie, constantMatches, gen5, gen5Species } from './names.ts'
 import type { PartyMon } from './party-mon.ts'
 import { type RevealedSet, revealedSets } from './revealed.ts'
+import { afterLeads } from './rules.ts'
 import { partyOrder, sentIn } from './slots.ts'
 
 /** The nature of every Pokémon: the log never shows one. */
@@ -28,7 +31,9 @@ interface Shown {
   readonly line: number
 }
 
-function firstAbility(species: string): string {
+/** The ability the party writes: the one the log reveals, else the species' first. */
+function writtenAbility(set: RevealedSet, species: string): string {
+  if (set.ability !== undefined) return set.ability
   const found = gen5.species.get(species)?.abilities[0]
   if (found === undefined) throw new Error(`no ability of the Gen 5 species ${species}`)
   return found
@@ -52,7 +57,7 @@ function partyMon({ member, set, side, line }: Shown, chars: string) {
     ...(gender === undefined ? {} : { gender }),
     shiny,
     nature: NATURE,
-    ability: set.ability ?? firstAbility(species),
+    ability: writtenAbility(set, species),
     ...(set.item === undefined ? {} : { item: set.item }),
     moves: set.moves,
   }
@@ -126,4 +131,26 @@ export function partyTeams(script: BattleScript, chars: string): Teams {
     })
   const parties = { near: side('near'), far: side('far') }
   return { parties, fallbacks: inLineOrder(fallbacks) }
+}
+
+/** A `game` fallback for each lead whose ability the log never shows while the written one is
+ * among `memberIn`, the abilities whose handlers run as their Pokémon comes in: the game runs it
+ * before the first menu (BtlServerFlow_StartBattle). */
+export function leadAbilityFallbacks(
+  script: BattleScript,
+  memberIn: readonly string[],
+): Gen5Fallback[] {
+  const { sets } = revealedSets(script)
+  const after = afterLeads(script.events)
+  return script.events.flatMap((event, i): Gen5Fallback[] => {
+    if (event.kind !== 'switchIn' || after[i] === true) return []
+    const set = sets[event.who.side][event.who.index] ?? { moves: [] }
+    const species = script.teams[event.who.side][event.who.index]?.species ?? ''
+    const ability = writtenAbility(set, species)
+    if (set.ability !== undefined || !memberIn.some((one) => constantMatches(one, ability))) {
+      return []
+    }
+    const detail = `Black 2 shows the ${ability} of the ${event.who.side} side’s ${species} as it comes in`
+    return [{ line: event.line, kind: 'game', detail }]
+  })
 }

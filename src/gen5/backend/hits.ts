@@ -4,13 +4,13 @@
 // the text banks by its label (lines.ts). Pure: every number of the game comes in from
 // build/gen5/bw2.json.
 import type { Hit, ScriptEvent } from '../../script/events.ts'
-import type { HpFraction, PokemonRef } from '../../script/types.ts'
+import type { Effect, HpFraction, PokemonRef } from '../../script/types.ts'
 import type { FlowNumbers, TextNumbers } from '../bw2-numbers.ts'
 import type { ServerCommand } from '../server-cmd.ts'
 import type { BattleState, InPlace } from './battle-state.ts'
 import { type Gen5Line, GEN5_LINES, lineId } from './lines.ts'
 import { gen5Item } from './names.ts'
-import { type EventOf, isLeftovers } from './rules.ts'
+import type { EventOf } from './rules.ts'
 
 /** A move that plays: its user and its target in place, and its number. */
 export interface PlayedMove {
@@ -77,6 +77,9 @@ export function hitLines(text: TextNumbers, hit: Hit): ServerCommand[] {
       : [std(text, GEN5_LINES[effectiveness === 'super' ? 'superEffective' : 'notVeryEffective'])]
   return [...effective, ...(hit.crit === true ? [std(text, GEN5_LINES.critical)] : [])]
 }
+
+const isLeftovers = (cause: Effect | undefined) =>
+  cause?.kind === 'item' && cause.name === 'Leftovers'
 
 /** ServerControl_UseHeldItem reserves SC_USE_HELD_ITEM; HandlerLeftoversUse asks for the heal,
  * ServerControl_RecoverHPCore shows its effect at the Pokémon's position and moves the bar

@@ -59,6 +59,15 @@ function start(scene: EffectScene, event: EventOf<'effectStart'>): ServerCommand
   ]
 }
 
+/** The HP drop of a Substitute's start, which the start wrote already: no hit plays, and the bar
+ * moves only where the game's HP still differs from the log's. */
+function drop(scene: EffectScene, event: EventOf<'damage'>): ServerCommand[] | undefined {
+  if (startDrop(scene.events, scene.at - 1) !== event) return undefined
+  const who = scene.state.inPlace(event.who)
+  const op = who && scene.state.hpTo(event.who, event.hp)
+  return who && op ? [op, { command: 'SC_UPDATE_HP_GAUGE', args: [who.monId] }] : []
+}
+
 /** The move of the action that hits the holder `who`: its last move before the event, by another
  * Pokémon, on `who`. */
 function hitBy(scene: EffectScene, who: PokemonRef): EventOf<'move'> | undefined {
@@ -92,11 +101,13 @@ function hitScene(scene: EffectScene, event: EventOf<'effectActivate' | 'effectE
 }
 
 /** The Substitute's sequences by the kind of event they write:
+ * - the start's HP drop: no hit, as above;
  * - a hit that leaves the doll standing (`[damage]`): ServerControl_DamageSubstitute's hit;
  * - its end after a hit: the hit, then ServerControl_BreakSubstitute's faded line,
  *   SC_OP_DELETE_SUBSTITUTE and the doll gone from the position. */
 export const SUBSTITUTE_SEQUENCES = {
   effectStart: start,
+  damage: drop,
   effectActivate: (scene, event) => {
     const struck = event.damage === true ? hitScene(scene, event) : undefined
     return struck && hit(scene, event, struck.who, struck.move)

@@ -44,7 +44,8 @@ describe("a Substitute's start", () => {
       cmd('SC_SUBSTITUTE_CREATE', NEAR.pos),
       set('substitute', DUGTRIO),
     ])
-    expect(writtenAt(all, 2)).toBeUndefined()
+    // The drop is the start's: no hit plays for it, and its HP is in the game already.
+    expect(writtenAt(all, 2)).toEqual([])
   })
 
   it("shows the HP drop's line besides its own, and nothing for other lines", () => {

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { buildBattleScript } from '../../script/build.ts'
 import { replayScript } from '../../script/testing.ts'
-import { partyTeams } from './teams.ts'
+import { leadAbilityFallbacks, partyTeams } from './teams.ts'
 
 // The invented font of these specs: every printable ASCII character.
 const ASCII = Array.from({ length: 95 }, (_, i) => String.fromCharCode(32 + i)).join('')
@@ -205,5 +205,36 @@ describe('a member that first shows when its disguise ends', () => {
     const { parties } = partyTeams(buildBattleScript(ILLUSION_LOG), ASCII)
     expect(speciesOf(parties.near)).toEqual(['Latios', 'Zoroark', 'Ferrothorn'])
     expect(parties.near[1]).toMatchObject({ name: 'Trickster', nicknamed: true, shiny: true })
+  })
+})
+
+// Lane plan D4: a lead's written ability is its first one when the log never shows it, and the
+// game runs a switch-in ability of the lead before the first menu, which the log does not show.
+const QUIET_LEADS = [
+  '|gen|5',
+  '|player|p1|Alice|1|',
+  '|player|p2|Bob|2|',
+  '|teamsize|p1|6',
+  '|teamsize|p2|6',
+  '|start',
+  '|switch|p1a: Gyarados|Gyarados, M|100/100',
+  '|switch|p2a: Tyranitar|Tyranitar, M|100/100',
+  '|-weather|Sandstorm|[from] ability: Sand Stream|[of] p2a: Tyranitar',
+  '|turn|1',
+  '|switch|p1a: Politoed|Politoed, M|100/100',
+  '',
+].join('\n')
+
+describe('a lead whose written ability acts as it comes in', () => {
+  it('lists what the game shows for an unrevealed lead, not for a revealed one or a later switch-in', () => {
+    const script = buildBattleScript(QUIET_LEADS)
+    const memberIn = ['ABILITY_SAND_STREAM', 'ABILITY_DRIZZLE', 'ABILITY_INTIMIDATE']
+    expect(leadAbilityFallbacks(script, memberIn)).toEqual([
+      {
+        line: 6,
+        kind: 'game',
+        detail: 'Black 2 shows the Intimidate of the near side’s Gyarados as it comes in',
+      },
+    ])
   })
 })

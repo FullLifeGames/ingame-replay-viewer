@@ -18,7 +18,7 @@ import { trainerOt, type WrittenSides, writtenMon } from './party-mon.ts'
 import { writeScript } from './moves.ts'
 import { ruleFallbacks } from './rules.ts'
 import { byParkSide, PARK_SIDES } from './slots.ts'
-import { partyTeams } from './teams.ts'
+import { leadAbilityFallbacks, partyTeams } from './teams.ts'
 
 /** The version of the replay's format; a reader refuses one it does not know. Version 2 brought
  * the blocks and the fallbacks of the events. */
@@ -48,9 +48,9 @@ export interface Gen5Replay {
 /** The numbers a replay is built from. */
 export type ReplayNumbers = Pick<
   Bw2Numbers,
-  'pkm' | 'entry' | 'font' | 'pokebw2' | 'text' | 'flow' | 'adapter' | 'queueSize'
+  'pkm' | 'entry' | 'font' | 'pokebw2' | 'text' | 'flow' | 'effects' | 'adapter' | 'queueSize'
 > &
-  ServerCmdTable & { readonly battle: Pick<BattleNumbers, 'single' | 'monIds'> }
+  ServerCmdTable & { readonly battle: Pick<BattleNumbers, 'single' | 'monIds' | 'constants'> }
 
 /** The name of the player on `side`, fitted to the font. */
 function trainerOf(script: BattleScript, side: Side, chars: string) {
@@ -97,6 +97,7 @@ export function buildGen5Replay(script: BattleScript, numbers: ReplayNumbers): G
     blocks: blocksOf(writes.actions, { table: numbers, room }),
     fallbacks: inLineOrder([
       ...teams.fallbacks,
+      ...leadAbilityFallbacks(script, numbers.effects.memberInAbilities),
       ...names.near.fallbacks,
       ...names.far.fallbacks,
       ...ruleFallbacks(script.events),

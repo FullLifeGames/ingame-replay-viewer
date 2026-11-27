@@ -4,9 +4,10 @@
 import { buildBattleScript } from '../../script/build.ts'
 import type { BattleScript, ScriptEvent } from '../../script/events.ts'
 import type { ServerCommand } from '../server-cmd.ts'
-import { type BattleState, battleState } from './battle-state.ts'
+import { battleState } from './battle-state.ts'
 import { actionsOf } from './blocks.ts'
 import { type EffectScene, sequenceCommands, type Sequences } from './effect-scene.ts'
+import { silentBar } from './hits.ts'
 import { REPLAY_NUMBERS } from './replay.fixtures.ts'
 import { afterLeads } from './rules.ts'
 
@@ -42,15 +43,13 @@ export interface EffectWrite {
   readonly commands: ServerCommand[] | undefined
 }
 
-/** The game's HP follows an HP change that no sequence writes, as the writer's silent bar does
- * (hits.ts), so the next sequence starts from the logged HP. */
-function followHp(state: BattleState, event: ScriptEvent): void {
-  const hp = event.kind === 'damage' || event.kind === 'heal' || event.kind === 'setHp'
-  if (hp && state.inPlace(event.who) !== undefined) state.hpTo(event.who, event.hp)
-}
+/** What writes one event: the commands, or undefined where it has no sequence. */
+type Write = (scene: EffectScene, event: ScriptEvent) => ServerCommand[] | undefined
 
-/** The commands `sequences` write for each event of `lines` after `|turn|1`. */
-export function effectWrites(sequences: Sequences, ...lines: string[]): EffectWrite[] {
+/** The commands `write` gives each event of `lines` after `|turn|1`. The game's HP follows an HP
+ * change that `write` leaves out through the writer's own silent bar (hits.ts), so the next
+ * sequence starts from the logged HP. */
+export function effectWritesBy(write: Write, ...lines: string[]): EffectWrite[] {
   const script = effectScript(...lines)
   const state = battleState(script, REPLAY_NUMBERS.battle)
   const after = afterLeads(script.events)
@@ -66,8 +65,9 @@ export function effectWrites(sequences: Sequences, ...lines: string[]): EffectWr
         events: script.events,
         at,
       }
-      const commands = sequenceCommands(sequences, scene, event)
-      if (commands === undefined) followHp(state, event)
+      const commands = write(scene, event)
+      if (commands === undefined)
+        silentBar({ state, numbers: REPLAY_NUMBERS, move: undefined }, event)
       if (event.line >= FIRST) writes.push({ at: event.line - FIRST, commands })
       if (event.kind === 'switchIn' && after[at] === true) state.sendIn(event)
       if (event.kind === 'faint') state.faint(event.who)
@@ -75,6 +75,10 @@ export function effectWrites(sequences: Sequences, ...lines: string[]): EffectWr
   }
   return writes
 }
+
+/** The commands `sequences` write for each event of `lines` after `|turn|1`. */
+export const effectWrites = (sequences: Sequences, ...lines: string[]): EffectWrite[] =>
+  effectWritesBy((scene, event) => sequenceCommands(sequences, scene, event), ...lines)
 
 /** The commands `sequences` write for the event of line `at` after `|turn|1`. */
 export function writtenAt(writes: readonly EffectWrite[], at: number): ServerCommand[] | undefined {

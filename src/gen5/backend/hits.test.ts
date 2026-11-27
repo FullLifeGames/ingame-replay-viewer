@@ -150,8 +150,9 @@ describe('an immunity', () => {
 })
 
 // Scene: after Earthquake took Tyranitar to 60, its Leftovers heal it to 66 at the turn's end.
-// ServerControl_UseHeldItem reserves the item's command, ServerControl_RecoverHPCore shows the
-// heal's effect and the bar, and the item handler's line follows.
+// ServerControl_TurnCheck hides the message window first (#109, D9), ServerControl_UseHeldItem
+// reserves the item's command, ServerControl_RecoverHPCore shows the heal's effect and the bar,
+// and the item handler's line follows.
 describe('a heal by Leftovers', () => {
   it('plays in blocks of its own: the item, its effect, the HP, the bar and the line', () => {
     const replay = replayOf(
@@ -162,11 +163,12 @@ describe('a heal by Leftovers', () => {
       '|upkeep',
       '|turn|2',
     )
-    // The invented room of 0x20 bytes parts the five commands into two blocks; neither holds
+    // The invented room of 0x20 bytes parts the six commands into two blocks; neither holds
     // another line.
     const heal = replay.blocks.filter((block) => block.lines.includes(NEXT + 4))
     expect(heal.map((block) => block.lines)).toEqual([[NEXT + 4], [NEXT + 4]])
     expect(heal.flatMap((block) => block.commands)).toEqual([
+      { command: 'SC_HIDE_MSG_WINDOW', args: [NUMBERS.effects.hideWindow] },
       { command: 'SC_USE_HELD_ITEM', args: [TYRANITAR.monId] },
       { command: 'SC_EFFECT_BY_POS', args: [TYRANITAR.pos, NUMBERS.flow.recoverEffect] },
       { command: 'SC_OP_ADD_HP', args: [TYRANITAR.monId, 6] },
@@ -177,16 +179,17 @@ describe('a heal by Leftovers', () => {
   })
 })
 
-// Scene: Stealth Rock hurts a lead. Its line plays with #109; until then the bar moves the way
-// ServerDisplay_SimpleHP moves it, with no line, so it stays at the log's HP.
+// Scene: Dugtrio's Rocky Helmet hurts Tyranitar, a cause no module writes yet. Its line plays
+// with #110; until then the bar moves the way ServerDisplay_SimpleHP moves it, with no line, so it
+// stays at the log's HP.
 describe('an HP change that does not play yet', () => {
   it('moves the bar of a Pokémon in place silently and lists its line', () => {
-    const lines = ['|-damage|p2a: Tyranitar|88/100|[from] Stealth Rock']
+    const lines = ['|-damage|p2a: Tyranitar|90/100|[from] item: Rocky Helmet|[of] p1a: Dugtrio']
     expect(commandsOf(...lines)).toEqual([
-      subtract(TYRANITAR.monId, 12),
+      subtract(TYRANITAR.monId, 10),
       { command: 'SC_UPDATE_HP_GAUGE', args: [TYRANITAR.monId] },
     ])
-    expect(eventFallbacks(...lines)).toEqual(['damage 1 plays with #109'])
+    expect(eventFallbacks(...lines)).toEqual(['damage 1 plays with #110'])
   })
 })
 
