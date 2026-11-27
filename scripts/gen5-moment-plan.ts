@@ -28,7 +28,9 @@ export function momentStart(marks: readonly { name: string; frame: number }[]): 
   return battle === undefined ? undefined : battle.frame + MOMENT_GAP
 }
 
-export function momentSteps(setup: MomentSetup): MacroStep[] {
+/** The steps before the first block: hold the server, let the player answer the action menu by
+ * A, and mark the HP before. The hits scene starts the same way (gen5-moment-blocks.ts). */
+export function menuSteps(setup: BlockSetup): MacroStep[] {
   const { adapterNumbers, adapter } = setup
   return [
     { kind: 'write', name: 'hold', writes: holdWrites(adapterNumbers, adapter) },
@@ -42,6 +44,12 @@ export function momentSteps(setup: MomentSetup): MacroStep[] {
       markEvery: MASH_EVERY,
     },
     { kind: 'mark', name: 'hp-before' },
+  ]
+}
+
+export function momentSteps(setup: MomentSetup): MacroStep[] {
+  return [
+    ...menuSteps(setup),
     ...setup.blocks.flatMap(({ name, moment }) => blockSteps(setup, name, momentCommands(moment))),
     { kind: 'mark', name: 'end' },
   ]

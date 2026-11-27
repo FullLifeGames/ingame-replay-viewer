@@ -15,11 +15,12 @@ export type SceneName = 'known' | 'unknown'
 /** A replay side: the near one at the bottom of the screen, the far one at the top. */
 export type Side = 'near' | 'far'
 
-/** The text banks of pokebw2 that the run reads its lines from: the move lines and the
- * standard lines. */
+/** The text banks of pokebw2 that the run reads its lines from: the move lines, the standard
+ * lines and the set lines. */
 export const TEXT_BANKS = {
   move: 'res/text/system/0016.txt',
   standard: 'res/text/system/0019.txt',
+  set: 'res/text/system/0018.txt',
 }
 
 /** Per scene: the near Pokémon's move and the far HP after it, the far one's move and the near

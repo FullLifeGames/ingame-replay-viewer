@@ -162,12 +162,12 @@ export async function momentTeam(
 ): Promise<MomentReplay.ReplayTeam> {
   if (team.from === 'hand') {
     const hand = teamParties(pkmFormat(numbers), team.names)
-    return { ...hand, names: team.names, fallbacks: [] }
+    return { ...hand, names: team.names, fallbacks: [], replay: undefined }
   }
   const path = join(GEN5_PATHS.repo, 'scripts', 'gen5-moment-replay.ts')
   const { module } = await runnerImport<typeof MomentReplay>(path, {
     configFile: false,
     logLevel: 'silent',
   })
-  return module.replayTeam(team.id, numbers)
+  return module.replayTeam(team, numbers)
 }

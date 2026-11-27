@@ -66,7 +66,7 @@ describe('readMomentOptions', () => {
 
   it('refuses a scene it does not know, a bad save name and minutes that are not positive', () => {
     expect(() => readMomentOptions(['--scene', 'other'], NOW)).toThrow(
-      '--scene takes known or unknown, not "other".',
+      '--scene takes known, unknown or hits, not "other".',
     )
     expect(() => readMomentOptions(['--save', '../route-20'], NOW)).toThrow(
       '--save takes lower-case letters and digits, with single hyphens between them, not "../route-20".',
@@ -143,6 +143,22 @@ describe('readMomentOptions', () => {
       NOW,
     )
     expect(saved.label).toBe('route-20-direct-smogtours-gen5ou-862240')
+  })
+
+  // Scene: the scene run of #107 plays a hand turn of the test replay's leads as blocks.
+  it('plays the hits scene beside --replay alone, with -hits at the end of the label', () => {
+    const options = readMomentOptions(['--replay', 'gen5ou-2718717830', '--scene', 'hits'], NOW)
+    expect(options).toMatchObject({
+      scene: 'hits',
+      team: { from: 'replay', id: 'gen5ou-2718717830', hits: true },
+      label: 'nosave-direct-gen5ou-2718717830-hits',
+    })
+    expect(readMomentOptions(['--replay', 'gen5ou-2718717830'], NOW).team).toMatchObject({
+      hits: false,
+    })
+    const alone = "--scene hits plays a test replay's leads: give it --replay <id>."
+    expect(() => readMomentOptions(['--scene', 'hits'], NOW)).toThrow(alone)
+    expect(() => readMomentOptions(['--scene', 'hits', '--entry', 'walk'], NOW)).toThrow(alone)
   })
 
   it('refuses --replay for the walk, in a double, beside a name and with an id that climbs', () => {

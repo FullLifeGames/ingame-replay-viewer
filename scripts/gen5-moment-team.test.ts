@@ -113,7 +113,7 @@ describe('momentTeam', () => {
   })
 
   it('loads a test replay’s teams and names through the module runner', async () => {
-    const team = await momentTeam({ from: 'replay', id: 'gen5ou-2718717830' }, NUMBERS)
-    expect(team).toEqual(replayTeam('gen5ou-2718717830', NUMBERS))
+    const team = await momentTeam({ from: 'replay', id: 'gen5ou-2718717830', hits: true }, NUMBERS)
+    expect(team).toEqual(replayTeam({ id: 'gen5ou-2718717830', hits: true }, NUMBERS))
   })
 })
