@@ -130,15 +130,35 @@ describe('the abilities a Pokémon shows on its own line', () => {
     expect(sets.far[0]).toEqual({ moves: [], ability: 'Flash Fire' })
   })
 
-  // Scene: Starmie touches Gardevoir's Mummy and takes it on; later Starmie's Mummy shows.
-  it('reads Mummy as its holder’s and freezes the ability of the Pokémon of [of]', () => {
+  // Scene: Starmie touches Gardevoir's Mummy and takes it on in place of its Natural Cure (#117);
+  // later Starmie's Mummy shows.
+  it('reads Mummy as its holder’s and the ability it replaces as the attacker’s own', () => {
     const { sets } = revealed(
       {
-        kind: 'effectActivate',
+        kind: 'ability',
         line: 1,
-        who: GARDEVOIR,
-        effect: ability('Mummy'),
-        source: STARMIE,
+        who: STARMIE,
+        ability: 'Mummy',
+        replaces: 'Natural Cure',
+        cause: ability('Mummy'),
+        source: GARDEVOIR,
+      },
+      { kind: 'ability', line: 2, who: STARMIE, ability: 'Mummy' },
+    )
+    expect(sets.near[1]).toEqual({ moves: [], ability: 'Mummy' })
+    expect(sets.far[0]).toEqual({ moves: [], ability: 'Natural Cure' })
+  })
+
+  // Scene: Mummy's change names no ability it replaces, so Starmie's own stays unknown.
+  it('freezes the attacker’s ability where Mummy’s change names none it replaces', () => {
+    const { sets } = revealed(
+      {
+        kind: 'ability',
+        line: 1,
+        who: STARMIE,
+        ability: 'Mummy',
+        cause: ability('Mummy'),
+        source: GARDEVOIR,
       },
       { kind: 'ability', line: 2, who: STARMIE, ability: 'Mummy' },
     )

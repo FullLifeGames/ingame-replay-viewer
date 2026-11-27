@@ -132,4 +132,9 @@ export interface AbilityEvent extends Caused {
   readonly ability: string
   /** What the ability did, such as `boost` for Intimidate. */
   readonly detail?: string
+  /**
+   * The ability `who` held before the change, where the line names it: Mummy, the ability of
+   * `source`, takes its place (#117).
+   */
+  readonly replaces?: string
 }
