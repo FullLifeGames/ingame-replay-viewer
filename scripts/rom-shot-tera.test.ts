@@ -64,10 +64,11 @@ describe('the first Terastallization, on the screen (#89)', () => {
     expect(teraScene(handMadeStream())).toBe(undefined)
   })
 
+  // 886489's far Tera follows six Ivy Cudgels, each with its MOVE_TYPE since #89: op 499 became 505.
   it("finds 886489's far Tera into Normal and 2719598518's near Tera into Poison", () => {
     const far = fixtureStream('smogtours-gen9ou-886489')
-    expect(far.instructions[499]).toEqual({ op: 'tera', side: 'far', teraType: 1 })
-    expect(teraScene(far)?.shots[0]?.done).toBe(499)
+    expect(far.instructions[505]).toEqual({ op: 'tera', side: 'far', teraType: 1 })
+    expect(teraScene(far)?.shots[0]?.done).toBe(505)
     expect(teraScene(far)?.check).toMatchObject({ region: SCREEN.healthbox.far })
     const near = fixtureStream('gen9ou-2719598518')
     expect(near.instructions[103]).toEqual({ op: 'tera', side: 'near', teraType: 4 })
