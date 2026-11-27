@@ -7,15 +7,15 @@
 // after the readings at the action menu: the moment is a single's with leads that know Tackle.
 // Then it reads the player's adapter, the server and both Pokémon from main RAM and plays the
 // steps of gen5-moment-plan.ts from a fixed frame after the mark battle: hold the server, answer
-// the action menu and write one block per moment. With --replay and --scene hits or switches it
-// writes the blocks of hand turns after the replay's start instead (gen5-moment-blocks.ts, #107,
-// #108), each logged with its commands and lines, and at each block's answer it checks both
-// parties' order in RAM against the backend's (gen5-moment-party.ts). It writes a frame per mark
-// under build/gen5/frames/ and the last mark's state under build/gen5/states/ (gitignored,
-// ADR 0002).
-// Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts [--scene known|unknown|hits|switches]
-// [--save <name>] [--entry direct|walk] [--battle single|double] [--player <name>]
-// [--opponent <name>] [--replay <id>] [--minutes 15].
+// the action menu and write one block per moment. With --replay and --scene hits, switches or
+// effects it writes the blocks of hand turns after the replay's start instead
+// (gen5-moment-blocks.ts, #107 to #109), each logged with its commands and lines, and at each
+// block's answer it checks both parties' order in RAM against the backend's
+// (gen5-moment-party.ts). It writes a frame per mark under build/gen5/frames/ and the last mark's
+// state under build/gen5/states/ (gitignored, ADR 0002).
+// Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts
+// [--scene known|unknown|hits|switches|effects] [--save <name>] [--entry direct|walk]
+// [--battle single|double] [--player <name>] [--opponent <name>] [--replay <id>] [--minutes 15].
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
