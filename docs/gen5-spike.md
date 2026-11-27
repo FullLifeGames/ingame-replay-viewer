@@ -291,7 +291,7 @@ When the fetch fails, the generator step fails with git's message. The check sti
 ## What a Gen 5 backend needs next
 
 - A writer of server commands per turn of a battle script, from the moment's shape: `SC_DAMAGE` for the hit flash, faints, switches, status, weather and the set lines of bank 18, each with its handler's arguments read from pokebw2.
-- The HP rule from the battle log's percentages to the game's HP. Gen 3's rule lives in `src/gen3/translate/scale.ts` and would move to one shared module first.
+- The HP rule from the battle log's percentages to the game's HP. The rule lives in `src/script/hp-scale.ts`, a module both game backends import.
 - The teams of a replay: a map from Showdown's names to the game's numbers for species, moves, items, abilities and natures, generated from the pinned lists by name and checked by a spec, as AGENTS.md asks. The direct entry already writes up to six a side, and its team names pokebw2's constants by hand for now.
 - Forms: every Pokémon goes in as form 0.
 - The EXP bar: a replay carries no experience, so the bar draws empty; the backend decides whether to fill it or leave it.

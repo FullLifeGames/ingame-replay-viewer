@@ -4,7 +4,7 @@
 // comes in from build/gen5/bw2.json.
 import type { BattleScript } from '../../script/events.ts'
 import type { DroppedLine, Side } from '../../script/types.ts'
-import { HP_SCALE } from '../../gen3/translate/scale.ts'
+import { HP_SCALE } from '../../script/hp-scale.ts'
 import type { Bw2Numbers } from '../bw2-numbers.ts'
 import type { ParkNames } from '../direct-park.ts'
 import { pkmConstant } from '../pkm-cipher.ts'
