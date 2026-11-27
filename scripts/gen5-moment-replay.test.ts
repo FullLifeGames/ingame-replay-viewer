@@ -36,7 +36,7 @@ describe('replayTeam', () => {
     expect(team.lines).toEqual(replayLog('gen5ou-2718717830').split('\n').slice(0, -1))
     expect(team.lines[286]).toBe('|-message|isolatedstar forfeited.')
     expect(team.end).toEqual(replayEnd(replayScript('gen5ou-2718717830')))
-    const ofTeams = team.fallbacks.filter((one) => one.kind !== 'later' && one.kind !== 'line')
+    const ofTeams = team.fallbacks.filter((one) => one.kind !== 'unplayed' && one.kind !== 'line')
     expect(ofTeams.map((one) => one.kind)).toEqual(['form'])
   })
 

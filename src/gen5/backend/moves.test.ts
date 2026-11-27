@@ -21,7 +21,7 @@ function written(...lines: string[]) {
       ),
     ),
     fallbacks: fallbacks.map((one) =>
-      one.kind === 'later' ? `${one.event} ${String(one.line - NEXT)} ${one.detail}` : one.kind,
+      one.kind === 'unplayed' ? `${one.event} ${String(one.line - NEXT)} unplayed` : one.kind,
     ),
   }
 }
@@ -50,7 +50,7 @@ describe('a move that plays', () => {
   })
 
   // Showdown logs Detect's block as Protect's. Protect's block plays its line (#109); the guards'
-  // lines wait for #110.
+  // lines are listed as unplayed.
   it.each([
     ['Protect', ['SC_MOVE_MSG 10', 'SC_MSG_SET 40']],
     ['Quick Guard', ['SC_MOVE_MSG 10']],
@@ -73,10 +73,10 @@ describe('a move that plays', () => {
   })
 })
 
-// Scene: a move called by another, a multi-hit move, a charge turn and a look of its own wait
-// whole for the issue that plays them; the bars of the hits still move.
+// Scene: a move called by another and a multi-hit move wait whole as unplayed; the bars of the
+// hits still move. A charge turn and a look of its own wait the same way (charge.test.ts).
 describe('an action that waits whole', () => {
-  it('lists a called move and its hit with #110, and moves the bar silently', () => {
+  it('lists a called move and its hit as unplayed, and moves the bar silently', () => {
     expect(
       written(
         '|move|p1a: Dugtrio|Earthquake|p2a: Tyranitar|[from]move: Sleep Talk',
@@ -84,11 +84,11 @@ describe('an action that waits whole', () => {
       ),
     ).toEqual({
       commands: ['SC_OP_SUBTRACT_HP 10', 'SC_UPDATE_HP_GAUGE 10'],
-      fallbacks: ['move 1 plays with #110', 'damage 2 plays with #110'],
+      fallbacks: ['move 1 unplayed', 'damage 2 unplayed'],
     })
   })
 
-  it('lists a multi-hit move, its hits and the hit count with #110', () => {
+  it('lists a multi-hit move, its hits and the hit count as unplayed', () => {
     const lines = [
       '|move|p2a: Tyranitar|Rock Blast|p1a: Dugtrio',
       '|-damage|p1a: Dugtrio|80/100',
@@ -102,20 +102,14 @@ describe('an action that waits whole', () => {
         'SC_OP_SUBTRACT_HP 40',
         'SC_UPDATE_HP_GAUGE 40',
       ],
-      fallbacks: ['move 1 plays with #110', 'damage 2 plays with #110', 'damage 3 plays with #110'],
+      fallbacks: ['move 1 unplayed', 'damage 2 unplayed', 'damage 3 unplayed'],
     })
-  })
-
-  it('lists a charge turn with #110', () => {
-    expect(
-      written('|move|p1a: Dugtrio|Solar Beam||[still]', '|-prepare|p1a: Dugtrio|Solar Beam'),
-    ).toEqual({ commands: [], fallbacks: ['move 1 plays with #110'] })
   })
 })
 
 // Scene: lines that the writer has no sequence for where they stand.
 describe('an event that plays elsewhere', () => {
-  it('lists a hit on the user, a failure and a miss outside a move, with #110', () => {
+  it('lists a hit on the user, a failure and a miss outside a move, as unplayed', () => {
     expect(
       written(
         '|move|p1a: Dugtrio|Earthquake|p2a: Tyranitar',
@@ -131,11 +125,11 @@ describe('an event that plays elsewhere', () => {
         'SC_OP_SUBTRACT_HP 40',
         'SC_UPDATE_HP_GAUGE 40',
       ],
-      fallbacks: ['damage 2 plays with #110', 'fail 4 plays with #110', 'miss 5 plays with #110'],
+      fallbacks: ['damage 2 unplayed', 'fail 4 unplayed', 'miss 5 unplayed'],
     })
   })
 
-  it('lists a miss and an immunity of another Pokémon than the target with #110', () => {
+  it('lists a miss and an immunity of another Pokémon than the target as unplayed', () => {
     expect(
       written(
         '|move|p1a: Dugtrio|Earthquake|p2a: Tyranitar',
@@ -143,7 +137,7 @@ describe('an event that plays elsewhere', () => {
         '|move|p1a: Dugtrio|Earthquake|p2a: Tyranitar',
         '|-miss|p1a: Dugtrio|p1a: Dugtrio',
       ).fallbacks,
-    ).toEqual(['immune 2 plays with #110', 'miss 4 plays with #110'])
+    ).toEqual(['immune 2 unplayed', 'miss 4 unplayed'])
   })
 })
 

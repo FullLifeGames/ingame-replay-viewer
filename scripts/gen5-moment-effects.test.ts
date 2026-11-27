@@ -88,10 +88,10 @@ describe('the effects turns as blocks', () => {
     ).toEqual(['b7', 'b16'])
   })
 
-  it('list no effect for later: only the sand’s turns, which Black 2 shows nothing for, and the form', () => {
+  it('list no unplayed effect: only the sand’s turns, which Black 2 shows nothing for, and the form', () => {
     const turn = lineOf('|turn|1')
     const listed = replay.fallbacks.filter((one) => one.line >= turn)
-    expect(listed.filter((one) => one.kind === 'later')).toEqual([])
+    expect(listed.filter((one) => one.kind === 'unplayed')).toEqual([])
     expect(listed.map((one) => [one.line, one.kind])).toEqual(
       [
         ...linesOf('|-weather|Sandstorm|[upkeep]').map((at) => [at, 'line']),
