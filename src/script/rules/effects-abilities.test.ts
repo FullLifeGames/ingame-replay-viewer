@@ -56,12 +56,44 @@ describe("Frisk's Gen 5 line", () => {
       detail: 'Frisk names no holder among the 2 foes in place',
     })
   })
+
+  // Scene: Tyranitar has fainted, and no foe stands in place for Frisk to look at.
+  it('keeps the line as a dropped line when no foe is in place', () => {
+    const script = gen5ScriptOf('|faint|p2a: Tyranitar', FRISK)
+
+    expect(eventsAt(script, NEXT + 1)).toEqual([])
+    expect(script.dropped.at(-1)).toEqual({
+      line: NEXT + 1,
+      text: FRISK,
+      reason: 'unsupported',
+      detail: 'Frisk names no holder among the 0 foes in place',
+    })
+  })
 })
 
 describe("Mummy's line", () => {
   // Scene: Dugtrio touches Tyranitar's Mummy, and Dugtrio's Arena Trap becomes Mummy.
   it("gives the attacker's change of ability to Mummy, with the ability it replaces", () => {
     const line = '|-activate|p2a: Tyranitar|ability: Mummy|Arena Trap|[of] p1a: Dugtrio'
+    const script = gen5ScriptOf(line)
+
+    expect(script.dropped.filter(({ line: at }) => at >= NEXT)).toEqual([])
+    expect(eventsAt(script, NEXT)).toEqual([
+      {
+        kind: 'ability',
+        line: NEXT,
+        who: DUGTRIO,
+        ability: 'Mummy',
+        replaces: 'Arena Trap',
+        cause: { name: 'Mummy', kind: 'ability' },
+        source: TYRANITAR,
+      },
+    ])
+  })
+
+  // Scene: the same touch in Showdown's current shape, with the attacker as a positional argument.
+  it('reads the shape that names the attacker before the replaced ability alike', () => {
+    const line = '|-activate|p2a: Tyranitar|ability: Mummy|p1a: Dugtrio|[ability] Arena Trap'
     const script = gen5ScriptOf(line)
 
     expect(script.dropped.filter(({ line: at }) => at >= NEXT)).toEqual([])
@@ -95,6 +127,19 @@ describe("Skill Swap's line", () => {
   // Scene: a log names Skill Swap's activation without the abilities, as before #117.
   it('keeps the activation without abilities a dropped line', () => {
     const line = '|-activate|p1a: Dugtrio|move: Skill Swap|[of] p2a: Tyranitar'
+    const script = gen5ScriptOf(line)
+
+    expect(eventsAt(script, NEXT)).toEqual([])
+    expect(script.dropped.at(-1)).toMatchObject({
+      line: NEXT,
+      reason: 'unsupported',
+      detail: 'keyword argument [ability]',
+    })
+  })
+
+  // Scene: Showdown writes two empty abilities for Gen 4 and earlier, and for allies.
+  it('keeps the activation with two empty abilities a dropped line', () => {
+    const line = '|-activate|p1a: Dugtrio|move: Skill Swap|||[of] p2a: Tyranitar'
     const script = gen5ScriptOf(line)
 
     expect(eventsAt(script, NEXT)).toEqual([])

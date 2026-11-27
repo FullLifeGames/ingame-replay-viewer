@@ -2,7 +2,8 @@
 // Frisk's item event for the foe in place and Mummy's change of ability for the attacker, and the
 // existing rules play both as they arrive. Frisk's item plays inside the frisker's pop-up with our
 // wording (items.ts), and Mummy's change raises and lowers the Mummy pop-up over the attacker
-// (abilities.ts). The game's own pop-ups and lines for either ability stay out.
+// (abilities.ts). The game's own pop-ups for either ability stay out. The game's line that the
+// attacker acquired Mummy is neither printed nor listed as a fallback, as with Trace's change today.
 import { describe, expect, it } from 'vitest'
 
 import { gen5ScriptOf, NEXT } from '../../script/testing'
