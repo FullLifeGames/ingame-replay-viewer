@@ -12,7 +12,8 @@
 // too names itself again as the confusion ends (`BattleScript_BerryCureStatusAndConfusionRet`).
 // An item the expansion lacks is text alone (plan §4) and shows no pop-up. A berry that acts as it
 // is eaten (`[consumed]`, Custap Berry) says its line after the pop-up and the animation of its
-// `[eat]` (`BattleScript_CustapBerryActivation`).
+// `[eat]` (`BattleScript_CustapBerryActivation`). Quick Claw's activation says the same line alone:
+// the pop-up and the animation of `BattleScript_QuickClawActivation` stay out (#105, D9).
 import { Dex, toID } from '@pkmn/dex'
 
 import type { ScriptEvent } from '../../script/events'
@@ -90,7 +91,7 @@ export function shownBefore(who: PokemonRef, name: string, ctx: Context): boolea
  * Says the line of a berry that acts as it is eaten, right after `who` ate it, and says whether it
  * did. The `[eat]` before it showed the pop-up and played the animation.
  */
-export function berryConsumed(event: EventOf<'effectActivate'>, ctx: Context): boolean {
+function berryConsumed(event: EventOf<'effectActivate'>, ctx: Context): boolean {
   const { who, effect, line } = event
   if (!event.consumed || who === undefined || effect.kind !== 'item') return false
   const eaten = eatenBefore(who, ctx)
@@ -98,6 +99,25 @@ export function berryConsumed(event: EventOf<'effectActivate'>, ctx: Context): b
   ctx.print(line, actedFaster(ctx.mon(who), eaten))
   return true
 }
+
+/** The held items whose activation lets their holder act first in its priority, by id. */
+const ACTS_FASTER = new Set(['quickclaw'])
+
+/** Says the line of a held item that lets `who` act faster as it activates, and whether it did. */
+function heldActedFaster({ who, effect, line }: EventOf<'effectActivate'>, ctx: Context): boolean {
+  if (who === undefined || effect.kind !== 'item' || !ACTS_FASTER.has(toID(effect.name))) {
+    return false
+  }
+  ctx.print(line, actedFaster(ctx.mon(who), effect.name))
+  return true
+}
+
+/**
+ * Says the line of an item that acts (a berry as it is eaten, Quick Claw) and says whether it did;
+ * any other activation is the effect's own line.
+ */
+export const itemActed = (event: EventOf<'effectActivate'>, ctx: Context) =>
+  berryConsumed(event, ctx) || heldActedFaster(event, ctx)
 
 /** Whether `event` ends the confusion of `who`. */
 export const endsConfusion = (event: ScriptEvent | undefined, who: PokemonRef) =>

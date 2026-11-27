@@ -112,6 +112,10 @@ export const EFFECT_TEMPLATES = {
   tookAttack: tagged('STRINGID_PKMNTOOKATTACK', (who: Mon, move: string) => {
     return `${nameAtStart(who)} took the ${move} attack!`
   }),
+  // `BattleScript_BufferEndTurn`, as a timer ends at the turn's end; B_BUFF1 is the move (Taunt).
+  bufferEnds: tagged('STRINGID_BUFFERENDS', (who: Mon, move: string) => {
+    return `${ownerAtStart(who)} ${move} wore off!`
+  }),
   // `BattleScript_EffectPsychUp`, with the user as B_SCR and the target as B_EFF.
   copiedStats: tagged('STRINGID_PKMNCOPIEDSTATCHANGES', (who: Mon, from: Mon) => {
     return `${nameAtStart(who)} copied ${nameInside(from)}'s stat changes!`
@@ -251,6 +255,7 @@ const ENDS: Readonly<Record<string, Line>> = {
 const ENDS_NAMING_MOVE: Readonly<Record<string, (who: Mon, move: string) => string>> = {
   futuresight: E.tookAttack.render,
   doomdesire: E.tookAttack.render,
+  taunt: E.bufferEnds.render,
 }
 
 export function effectEnded(who: Mon, effect: Effect): Phrase {

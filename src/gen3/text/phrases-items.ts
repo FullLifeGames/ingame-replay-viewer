@@ -90,7 +90,7 @@ export function itemRemoved(
   return ownPhrase(`${ownerAtStart(who)} ${name} was used up!`, `${item} used up`)
 }
 
-/** The berry `who` ate let it move first in its priority (Custap Berry). */
+/** The item `who` ate or held let it move first in its priority (Custap Berry, Quick Claw). */
 export const actedFaster = (who: Mon, item: string): Phrase => ({
   text: ITEM_TEMPLATES.actsFaster.render(who, itemName(item)),
 })
