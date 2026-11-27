@@ -9,6 +9,10 @@ import { isDeepStrictEqual } from 'node:util'
 
 import { describe, expect, it } from 'vitest'
 
+import { buildBattleScript } from '../src/script/build.ts'
+import { readReplay } from '../src/script/replay.ts'
+import { sealParties } from '../src/gen5/backend/party-mon.ts'
+import { buildGen5Replay } from '../src/gen5/backend/replay.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { openPkm, pkmConstant, pkmField, pkmLayout, sealPkm } from '../src/gen5/pkm-cipher.ts'
 import { plainPkm, type ReadPkm, readPkm } from '../src/gen5/pkm-fields.ts'
@@ -18,6 +22,8 @@ import { firstSavePkm, partiesIn } from './gen5-save-party.ts'
 
 const FILE = GEN5_PATHS.bw2Json
 const SAVE = `${GEN5_PATHS.saves}/route-20.sav`
+/** The two Gen 5 OU test replays (#106). */
+const GEN5_REPLAYS = ['gen5ou-2718717830', 'smogtours-gen5ou-862240']
 
 // Scene: CI must never pass with the spec on the real format skipped.
 it.runIf(Boolean(process.env.CI))('finds build/gen5/bw2.json under CI', () => {
@@ -125,6 +131,37 @@ describe.skipIf(!existsSync(FILE))(
       const opened = openPkm(sealPkm(fresh, numbers.pkm), numbers.pkm)
       expect(opened.checksumRight, 'the checksum of the sealed copy is right').toBe(true)
       expect(differing(readPkm(opened.plain, format), read)).toEqual([])
+    })
+
+    // Scene: the run writes both Gen 5 OU test replays' parties into the battle (#106).
+    it("seals both Gen 5 OU test replays' parties, each opening with a right checksum", () => {
+      const numbers = real()
+      const format = pkmFormat(numbers)
+      const results = GEN5_REPLAYS.flatMap((id) => {
+        const file = new URL(`../test/fixtures/replays/${id}.json`, import.meta.url)
+        const json: unknown = JSON.parse(readFileSync(file, 'utf8'))
+        const replay = buildGen5Replay(buildBattleScript(readReplay(json).log), numbers)
+        const { parties } = sealParties(replay.parties, format)
+        return (['player', 'opponent'] as const).flatMap((side) =>
+          parties[side].map((bytes, i) => {
+            const opened = openPkm(bytes, numbers.pkm)
+            const read = readPkm(opened.plain, format)
+            const mon = replay.parties[side][i]
+            const same = (key: 'species' | 'item' | 'ability' | 'hp' | 'maxHp') =>
+              read[key] === mon?.[key]
+            return (
+              opened.checksumRight &&
+              same('species') &&
+              same('item') &&
+              same('ability') &&
+              same('hp') &&
+              same('maxHp')
+            )
+          }),
+        )
+      })
+      expect(results.length === 24, 'twelve Pokémon in each replay').toBe(true)
+      expect(results.every(Boolean), 'each opens with a right checksum, as written').toBe(true)
     })
   },
 )

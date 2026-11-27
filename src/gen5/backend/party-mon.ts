@@ -50,6 +50,10 @@ export interface WriteOptions {
   hp?: number
 }
 
+/** A trainer as the original trainer of its party: id 0 and gender 0, as PlayerInfo holds them
+ * with no save. */
+export const trainerOt = (name: string): WrittenPkm['ot'] => ({ name, id: 0, gender: 0 })
+
 /** Every IV at its top, as @pkmn counts it; the IV members hold it in their five bits. */
 const FULL_IV = 31
 /** The friendship most species start with. */
