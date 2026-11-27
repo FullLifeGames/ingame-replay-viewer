@@ -1,10 +1,10 @@
-// The invented numbers of the Gen 5 backend's specs (#106, #107): the Pokémon format and the entry
-// of src/gen5's fixtures, a font of printable ASCII, a made-up pin, and the numbers the blocks
-// need. The server commands keep pokebw2's `SC_*` names with numbers above any the game has; the
-// formats carry names, codes and puts of their own, each argument in a halfword. The labels keep
-// pokebw2's names with message IDs of their own, and the battle's clients sit in an order of
-// their own. scripts/gen5-fixtures-real.test.ts holds that no number here equals the generated one
-// under the same name.
+// The invented numbers of the Gen 5 backend's specs (#106, #107, #108): the Pokémon format and
+// the entry of src/gen5's fixtures, a font of printable ASCII, a made-up pin, and the numbers the
+// blocks need. The server commands keep pokebw2's `SC_*` names with numbers above any the game
+// has; the formats carry names, codes and puts of their own, each argument in a halfword. The
+// labels keep pokebw2's names with message IDs of their own, and the battle's clients sit in an
+// order of their own. scripts/gen5-fixtures-real.test.ts holds that no number here equals the
+// generated one under the same name.
 import { ADAPTER_LAYOUT } from '../adapter.fixtures.ts'
 import type { ArgFormat } from '../bw2-numbers.ts'
 import { ENTRY } from '../direct-entry.fixtures.ts'
@@ -38,6 +38,15 @@ export const REPLAY_NUMBERS: ReplayNumbers = {
     SC_OP_SUBTRACT_HP: 0x6a30,
     SC_USE_HELD_ITEM: 0x6a40,
     SC_MSG_STD_SE: 0x6a51,
+    SC_RECALL_MSG: 0x6a24,
+    SC_OP_SEND_IN: 0x6a36,
+    SC_FAINT: 0x6a27,
+    SC_RECALL: 0x6a25,
+    SC_OP_ZERO_HP: 0x6a37,
+    SC_OP_CLEAR_FOR_SWITCH: 0x6a34,
+    SC_SEND_OUT: 0x6a26,
+    SC_FAINT_HP_GAUGE: 0x6a28,
+    SC_OP_SETUP_ILLUSION: 0x6a35,
   },
   argFormats: {
     HALF_ONE: halves(0x41, 1),
@@ -59,6 +68,15 @@ export const REPLAY_NUMBERS: ReplayNumbers = {
     SC_OP_SUBTRACT_HP: 'HALF_TWO',
     SC_USE_HELD_ITEM: 'HALF_ONE',
     SC_MSG_STD_SE: 'SAY_SE',
+    SC_RECALL_MSG: 'HALF_TWO',
+    SC_OP_SEND_IN: 'HALF_FOUR',
+    SC_FAINT: 'HALF_ONE',
+    SC_RECALL: 'HALF_TWO',
+    SC_OP_ZERO_HP: 'HALF_ONE',
+    SC_OP_CLEAR_FOR_SWITCH: 'HALF_ONE',
+    SC_SEND_OUT: 'HALF_FOUR',
+    SC_FAINT_HP_GAUGE: 'HALF_TWO',
+    SC_OP_SETUP_ILLUSION: 'HALF_ONE',
   },
   messages: { formats: ['SAY', 'SAY_SE'], soundCommand: 'SC_MSG_STD_SE', argEnd: 0x7e5d0000 },
   adapter: ADAPTER_LAYOUT,
@@ -74,6 +92,8 @@ export const REPLAY_NUMBERS: ReplayNumbers = {
       Bank0018_Text_RestoredLittleHpUsing: 0x4bad,
       Bank0018_Text_AvoidedAttack: 0x4bb3,
       Bank0018_Text_DoesntAffect: 0x4bb9,
+      Bank0018_Text_DraggedOut: 0x4bbf,
+      Bank0018_Text_Fainted: 0x4bc5,
     },
   },
   flow: {

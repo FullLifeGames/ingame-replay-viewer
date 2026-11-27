@@ -42,3 +42,27 @@ describe('GEN5_LINES', () => {
     expect(wrong.map(([name]) => name)).toEqual([])
   })
 })
+
+// Scene: a faint and a drag each print the game's own set line, which the server's flow puts by
+// SC_MSG_SET in the function that sends it (#108).
+describe('the lines of a faint and a drag', () => {
+  it('name their labels in the set bank and the functions that put them', () => {
+    const flow = 'src/battle/btl_server_flow.c'
+    expect(GEN5_LINES).toMatchObject({
+      fainted: {
+        bank: 'set',
+        label: 'Bank0018_Text_Fainted',
+        source: { file: flow, function: 'ServerControl_CheckFainted', put: 'PutMsg SC_MSG_SET' },
+      },
+      draggedOut: {
+        bank: 'set',
+        label: 'Bank0018_Text_DraggedOut',
+        source: {
+          file: flow,
+          function: 'ServerControl_ForceSwitchCore',
+          put: 'PutMsg SC_MSG_SET',
+        },
+      },
+    })
+  })
+})

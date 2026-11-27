@@ -117,7 +117,7 @@ describe('quietLines', () => {
       'battle overlay in main RAM, apart from the boot overlays',
       'entry layouts Kite, Lamp',
       'pkm layouts PartyPkm, PkmBlockA, PkmBlockB; block table, cipher and shiny bound read',
-      "text labels of the backend's lines found: standard 1 of 4, set 0 of 3",
+      "text labels of the backend's lines found: standard 1 of 4, set 0 of 5",
       "line sources checked: each of the backend's lines is what its function puts",
     ])
   })
@@ -154,7 +154,7 @@ describe('quietLines', () => {
       pkm: { ...numbers.pkm, species: names('SPECIES', 8, 0), moves: names('MOVE', 9, 0) },
       text: { standard: names('Bank0019_Text_Filler', 10, 0), set: names('Bank0018_Text', 11, 0) },
     }
-    const ours = "text labels of the backend's lines found: standard 0 of 4, set 0 of 3"
+    const ours = "text labels of the backend's lines found: standard 0 of 4, set 0 of 5"
     const [pin, ...rest] = quietLines(sized)
     expect(pin).toBe('pokebw2 c0ffee')
     expect(rest).toContain(ours)
