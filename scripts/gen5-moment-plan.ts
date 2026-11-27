@@ -50,7 +50,9 @@ export function menuSteps(setup: BlockSetup): MacroStep[] {
 export function momentSteps(setup: MomentSetup): MacroStep[] {
   return [
     ...menuSteps(setup),
-    ...setup.blocks.flatMap(({ name, moment }) => blockSteps(setup, name, momentCommands(moment))),
+    ...setup.blocks.flatMap(({ name, moment }) =>
+      blockSteps(setup, { name, commands: momentCommands(moment) }),
+    ),
     { kind: 'mark', name: 'end' },
   ]
 }

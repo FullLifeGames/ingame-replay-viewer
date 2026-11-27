@@ -4,11 +4,11 @@
 // than the numbers it writes with. The moment script (scripts/gen5-moment-plan.ts) writes its
 // blocks through the same steps, and the page plays them frame by frame. Pure: no Node, no DOM.
 import { type AdapterNumbers, adapterWrites } from './adapter.ts'
-import { GEN5_REPLAY_VERSION, type Gen5Replay } from './backend/replay.ts'
+import { type Gen5Block, GEN5_REPLAY_VERSION, type Gen5Replay } from './backend/replay.ts'
 import type { ServerCmdTable } from './bw2-numbers.ts'
 import type { MacroStep } from './macro.ts'
 import type { RamCheck } from './ram-check.ts'
-import { packCommands, type ServerCommand } from './server-cmd.ts'
+import { packCommands } from './server-cmd.ts'
 
 /** Frames a block may take, and a frame of it every BLOCK_FRAMES_EVERY frames. */
 const BLOCK_LIMIT = 3000
@@ -37,16 +37,29 @@ export function answered(setup: BlockSetup): RamCheck {
   return { name: 'returned', address, width: 1, mask, oneOf: [2 ** (field.bit ?? 0)] }
 }
 
+/** A block to write: its name, the log lines it shows (none for a moment's block) and its
+ * commands. */
+type PlanBlock = Pick<Gen5Block, 'name' | 'commands'> & { readonly lines?: readonly number[] }
+
+/** The writes of one block; a block past the adapter's room fails by its name and lines, with the
+ * adapter's error as the cause. */
+function namedWrites(setup: BlockSetup, { name, lines, commands }: PlanBlock) {
+  const block = packCommands(setup.table, commands)
+  try {
+    return adapterWrites(setup.adapterNumbers, setup.adapter, block)
+  } catch (error) {
+    if (!(error instanceof RangeError)) throw error
+    const label = lines === undefined ? name : `${name} (lines ${lines.join(', ')})`
+    throw new RangeError(`${label}: ${error.message}`, { cause: error })
+  }
+}
+
 /** The steps of one block: its write, the wait for the client's answer, and the mark
  * `<name>-answered`. */
-export function blockSteps(
-  setup: BlockSetup,
-  name: string,
-  commands: readonly ServerCommand[],
-): MacroStep[] {
-  const block = packCommands(setup.table, commands)
+export function blockSteps(setup: BlockSetup, block: PlanBlock): MacroStep[] {
+  const { name } = block
   return [
-    { kind: 'write', name, writes: adapterWrites(setup.adapterNumbers, setup.adapter, block) },
+    { kind: 'write', name, writes: namedWrites(setup, block) },
     {
       kind: 'until',
       name,
@@ -73,5 +86,5 @@ export function checkReplay(replay: Pick<Gen5Replay, 'version' | 'pin'>, pin: st
 /** The steps of each of the replay's blocks in order, once the replay is checked. */
 export function replaySteps(replay: Gen5Replay, setup: ReplaySetup): MacroStep[] {
   checkReplay(replay, setup.pin)
-  return replay.blocks.flatMap(({ name, commands }) => blockSteps(setup, name, commands))
+  return replay.blocks.flatMap((block) => blockSteps(setup, block))
 }

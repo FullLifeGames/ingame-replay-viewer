@@ -97,3 +97,19 @@ describe('replaySteps', () => {
     expect(() => replaySteps({ ...REPLAY, version: 1 }, SETUP)).toThrow('version 1')
   })
 })
+
+// Scene: a block that the backend packed past the client's queue must name itself, so the run's
+// log points at the battle log lines whose commands overflowed, not at a byte count alone.
+describe('a block wider than the queue', () => {
+  const narrow = { ...SETUP, adapterNumbers: { ...ADAPTER_NUMBERS, queueSize: 0x18 } }
+  const commands = Array.from({ length: 5 }, () => ({ command: 'SC_MOVE_MSG', args: [2, 89] }))
+  const wide: Gen5Replay = { ...REPLAY, blocks: [{ name: 'b2', lines: [12, 13], commands }] }
+
+  it('fails by its name and lines, with the room check as the cause', () => {
+    const named = "b2 (lines 12, 13): The block has 30 bytes; the client's queue holds 24."
+    expect(() => replaySteps(wide, narrow)).toThrow(named)
+    expect(() => replaySteps(wide, narrow)).toThrow(
+      expect.objectContaining({ cause: expect.any(RangeError) as unknown }),
+    )
+  })
+})
