@@ -22,13 +22,13 @@ describe('a Gen 5 replay from a battle script', () => {
     expect(replay.dropped).toBe(SUN_RAIN.dropped)
   })
 
-  // Scene: until the hits play, every event of a test replay is the park's (the intro), the
-  // game's (the leads), a turn, or a fallback `later` or `line` that names its kind; no event
-  // writes a block.
-  it('lists every event that the park, the game or a turn does not show, by its kind', () => {
+  // Scene: the hits of the leads play as blocks; every other event of a test replay is the
+  // park's (the intro), the game's (the leads), a turn, or a fallback `later` or `line` that names
+  // its kind. Only an HP change that does not play yet is both: its bar moves silently.
+  it('plays or lists every event that the park, the game or a turn does not show', () => {
     for (const script of [SUN_RAIN, SAND]) {
       const replay = buildGen5Replay(script, NUMBERS)
-      expect(replay.blocks).toEqual([])
+      expect(replay.blocks.length).toBeGreaterThan(0)
       const key = (event: { line: number; event?: string; kind: string }) =>
         `${event.event ?? event.kind} ${String(event.line)}`
       const listed = new Set(
@@ -36,13 +36,17 @@ describe('a Gen 5 replay from a battle script', () => {
           one.kind === 'later' || one.kind === 'line' ? [key(one)] : [],
         ),
       )
+      const inBlocks = new Set(replay.blocks.flatMap((block) => block.lines))
       const firstTurn = script.events.findIndex((event) => event.kind === 'turn')
       const shown = (event: ScriptEvent, i: number) =>
         ['player', 'teamSize', 'battleStart', 'turn'].includes(event.kind) ||
         (event.kind === 'switchIn' && i < firstTurn)
-      expect(
-        script.events.filter((event, i) => listed.has(key(event)) === shown(event, i)),
-      ).toEqual([])
+      const met = (event: ScriptEvent) => listed.has(key(event)) || inBlocks.has(event.line)
+      expect(script.events.filter((event, i) => met(event) === shown(event, i))).toEqual([])
+      const both = script.events.filter(
+        (event) => listed.has(key(event)) && inBlocks.has(event.line),
+      )
+      expect(both.filter((event) => !['damage', 'heal', 'setHp'].includes(event.kind))).toEqual([])
       expect(replay.fallbacks.filter((one) => one.kind === 'line').map(key)).toEqual(
         script.events.filter((event) => event.kind === 'message').map(key),
       )

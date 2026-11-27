@@ -8,10 +8,11 @@ import type { Effect } from '../../script/types.ts'
 import { type Gen5Fallback, laterFallback, lineFallback } from './fallbacks.ts'
 
 /** What becomes of an event. `park`: the park shows it (#106). `game`: the game shows it itself.
- * `boundary`: it parts the blocks. `later`: issue `issue` plays it. `line`: Black 2 has no line
- * for it, and nothing shows. */
+ * `boundary`: it parts the blocks. `play`: the writer plays it where its Pokémon stand in place
+ * (moves.ts). `later`: issue `issue` plays it. `line`: Black 2 has no line for it, and nothing
+ * shows. */
 export type Outcome =
-  | { readonly as: 'park' | 'game' | 'boundary' }
+  | { readonly as: 'park' | 'game' | 'boundary' | 'play' }
   | { readonly as: 'later'; readonly issue: number }
   | { readonly as: 'line'; readonly detail: string }
 
@@ -31,21 +32,23 @@ type EventOf<K extends ScriptEvent['kind']> = ScriptEvent extends infer E
 
 type Rule<K extends ScriptEvent['kind']> = (event: EventOf<K>, ctx: RuleContext) => Outcome
 
-/** The issues that play what does not play yet: the hits, switches and faints, the effects
- * (status, stats, weather, hazards, items, abilities), and a whole replay. */
-const HITS = { as: 'later', issue: 107 } as const
-const SWITCHES = { as: 'later', issue: 108 } as const
-const EFFECTS = { as: 'later', issue: 109 } as const
-const WHOLE = { as: 'later', issue: 110 } as const
+/** The issues that play what does not play yet: switches and faints, the effects (status,
+ * stats, weather, hazards, items, abilities), and a whole replay. */
+export const LATER_ISSUES = { switches: 108, effects: 109, whole: 110 } as const
+
+const PLAY = { as: 'play' } as const
+const SWITCHES = { as: 'later', issue: LATER_ISSUES.switches } as const
+const EFFECTS = { as: 'later', issue: LATER_ISSUES.effects } as const
+const WHOLE = { as: 'later', issue: LATER_ISSUES.whole } as const
 
 const park = (): Outcome => ({ as: 'park' })
-const hits = (): Outcome => HITS
+const play = (): Outcome => PLAY
 const switches = (): Outcome => SWITCHES
 const effects = (): Outcome => EFFECTS
 const whole = (): Outcome => WHOLE
 
-/** Leftovers: the one cause of a heal that #107 plays. */
-const isLeftovers = (cause: Effect | undefined) =>
+/** Leftovers: the one cause of a heal that plays (hits.ts). */
+export const isLeftovers = (cause: Effect | undefined) =>
   cause?.kind === 'item' && cause.name === 'Leftovers'
 
 const RULES = {
@@ -58,21 +61,21 @@ const RULES = {
   message: (event) => ({ as: 'line', detail: `Black 2 has no line for "${event.text}"` }),
   win: whole,
   tie: whole,
-  move: (event) => (event.calledBy === undefined ? HITS : EFFECTS),
+  move: (event) => (event.calledBy === undefined ? PLAY : EFFECTS),
   prepare: whole,
   anim: whole,
   cant: effects,
-  miss: hits,
+  miss: play,
   ohko: whole,
   noTarget: whole,
-  immune: (event) => (event.cause === undefined && event.effect === undefined ? HITS : EFFECTS),
+  immune: (event) => (event.cause === undefined && event.effect === undefined ? PLAY : EFFECTS),
   fail: (event) => {
     const plain = [event.cause, event.effect, event.stat, event.weak].every((x) => x === undefined)
-    return plain ? HITS : EFFECTS
+    return plain ? PLAY : EFFECTS
   },
   block: effects,
-  damage: (event) => (event.cause === undefined ? HITS : EFFECTS),
-  heal: (event) => (event.cause === undefined || isLeftovers(event.cause) ? HITS : EFFECTS),
+  damage: (event) => (event.cause === undefined ? PLAY : EFFECTS),
+  heal: (event) => (isLeftovers(event.cause) ? PLAY : EFFECTS),
   setHp: whole,
   status: effects,
   cureStatus: effects,

@@ -11,10 +11,11 @@ import type { ParkNames } from '../direct-park.ts'
 import { pkmConstant } from '../pkm-cipher.ts'
 import { pkmFormat } from '../pkm-members.ts'
 import type { ServerCommand } from '../server-cmd.ts'
-import { type Action, actionsOf, blocksOf, type Written } from './blocks.ts'
+import { blocksOf } from './blocks.ts'
 import { type Gen5Fallback, inLineOrder } from './fallbacks.ts'
 import { fitName } from './font.ts'
 import { trainerOt, type WrittenSides, writtenMon } from './party-mon.ts'
+import { writeScript } from './moves.ts'
 import { ruleFallbacks } from './rules.ts'
 import { byParkSide, PARK_SIDES } from './slots.ts'
 import { partyTeams } from './teams.ts'
@@ -51,10 +52,6 @@ export type ReplayNumbers = Pick<
 > &
   ServerCmdTable & { readonly battle: Pick<BattleNumbers, 'single' | 'monIds'> }
 
-/** What an action writes until the hits (#107's step 4): no rule writes a command yet. */
-const silent = (action: Action): Written[] =>
-  action.map((event) => ({ line: event.line, commands: [] }))
-
 /** The name of the player on `side`, fitted to the font. */
 function trainerOf(script: BattleScript, side: Side, chars: string) {
   const player = script.events.find((event) => event.kind === 'player' && event.side === side)
@@ -85,6 +82,7 @@ export function buildGen5Replay(script: BattleScript, numbers: ReplayNumbers): G
   checkPartySize(teams.parties, numbers)
   const names = { near: trainerOf(script, 'near', chars), far: trainerOf(script, 'far', chars) }
   const trainers: ParkNames = byParkSide((side) => names[side].text)
+  const writes = writeScript(script, numbers)
   const written = (side: Side) => {
     const ot = trainerOt(trainers[PARK_SIDES[side]])
     return teams.parties[side].map((mon, salt) =>
@@ -96,12 +94,13 @@ export function buildGen5Replay(script: BattleScript, numbers: ReplayNumbers): G
     pin: numbers.pokebw2.commit,
     trainers,
     parties: byParkSide(written),
-    blocks: blocksOf(actionsOf(script).map(silent), { table: numbers, room }),
+    blocks: blocksOf(writes.actions, { table: numbers, room }),
     fallbacks: inLineOrder([
       ...teams.fallbacks,
       ...names.near.fallbacks,
       ...names.far.fallbacks,
       ...ruleFallbacks(script.events),
+      ...writes.fallbacks,
     ]),
     dropped: script.dropped,
   }

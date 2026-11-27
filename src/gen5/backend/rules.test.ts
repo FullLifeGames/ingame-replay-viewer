@@ -65,7 +65,7 @@ describe('outcomesOf the intro and the turns', () => {
 
 // Scene: the kinds that later issues play, by the lane plan's not-yet map.
 describe('outcomesOf the kinds that play later', () => {
-  it('leaves a move, its hit, a miss, a failure and a Leftovers heal to #107', () => {
+  it('plays a move, its hit, a miss, a failure, an immunity and a Leftovers heal', () => {
     expect(
       outcomesFrom(
         '|move|p1a: Dugtrio|Earthquake|p2a: Tyranitar',
@@ -79,23 +79,24 @@ describe('outcomesOf the kinds that play later', () => {
         '|-heal|p2a: Tyranitar|66/100|[from] item: Leftovers',
       ),
     ).toEqual([
-      'move later #107',
-      'damage later #107',
-      'move later #107',
-      'miss later #107',
-      'move later #107',
-      'fail later #107',
-      'move later #107',
-      'immune later #107',
-      'heal later #107',
+      'move play',
+      'damage play',
+      'move play',
+      'miss play',
+      'move play',
+      'fail play',
+      'move play',
+      'immune play',
+      'heal play',
     ])
   })
 
-  it('lists caused lines, status, weather, hazards, loose lines and called moves with #109', () => {
+  it('lists caused lines, heals of a move, status, weather, hazards, loose lines and called moves with #109', () => {
     expect(
       outcomesFrom(
         '|-damage|p2a: Tyranitar|88/100|[from] Stealth Rock',
         '|-heal|p1a: Dugtrio|50/100|[from] drain|[of] p2a: Tyranitar',
+        '|-heal|p1a: Dugtrio|60/100',
         '|-status|p1a: Dugtrio|brn',
         '|-weather|Sandstorm|[from] ability: Sand Stream|[of] p2a: Tyranitar',
         '|-sidestart|p1: Alice|move: Stealth Rock',
@@ -107,6 +108,7 @@ describe('outcomesOf the kinds that play later', () => {
       ),
     ).toEqual([
       'damage later #109',
+      'heal later #109',
       'heal later #109',
       'status later #109',
       'weather later #109',
@@ -126,7 +128,7 @@ describe('outcomesOf the kinds that play later', () => {
         '|-prepare|p1a: Dugtrio|Solar Beam',
         '|win|Alice',
       ),
-    ).toEqual(['move later #107', 'prepare later #110', 'win later #110'])
+    ).toEqual(['move play', 'prepare later #110', 'win later #110'])
   })
 })
 
