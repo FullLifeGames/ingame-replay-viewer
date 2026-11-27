@@ -54,6 +54,12 @@ export function refOf(battle: Battle, ident: string, at: number): PokemonRef {
   return refOfPokemon(pokemonOf(battle, ident, at), at)
 }
 
+/** The Pokémon in place on the other side from the Pokémon a log ident names. */
+export function foesInPlace(battle: Battle, ident: string, at: number): Pokemon[] {
+  const { active } = pokemonOf(battle, ident, at).side.foe
+  return active.filter((foe): foe is Pokemon => foe !== null)
+}
+
 /** The team member an optional ident names; a move without a target gives `''` or `null`. */
 export function refIfAny(
   battle: Battle,

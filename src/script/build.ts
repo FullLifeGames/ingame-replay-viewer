@@ -13,7 +13,7 @@ import { readLines } from './lines'
 import { genderOf, previewOf } from './preview'
 import { bySide } from './refs'
 import type { LogLine } from './lines'
-import { eventsOf, ruleFor, unreadPart } from './rules/index'
+import { eventsOf, ruleFor, unreadPart, unsupportedOf } from './rules/index'
 import type { Before } from './rules/index'
 import type { BattleScript, ScriptEvent } from './events'
 import type { DroppedLine, DropReason, Preview, Side, TeamMember } from './types'
@@ -80,7 +80,7 @@ function readLine(build: Build, line: LogLine): void {
     drop(build, line, reason ?? 'unsupported', reason ? undefined : noRuleReason(line.key))
     return
   }
-  const unread = unreadPart(rule, line)
+  const unread = unreadPart(rule, line) ?? unsupportedOf(rule, line, build.battle, before)
   if (unread !== undefined) {
     drop(build, line, 'unsupported', unread)
     return

@@ -1,5 +1,6 @@
 // A rule turns one kind of battle log line into events. Each rule states what it reads, so a
-// line with anything more becomes an `unsupported` dropped line instead of losing a part.
+// line with anything more, or one the rule cannot show, becomes an `unsupported` dropped line
+// instead of losing a part.
 
 import type { Battle, Pokemon, WeatherName } from '@pkmn/client'
 import type { BoostID } from '@pkmn/data'
@@ -43,6 +44,11 @@ interface Rule<K extends Protocol.BattleArgName> {
   readonly arity: number
   /** The keyword arguments the rule maps. */
   readonly reads: readonly (keyof Protocol.KWArgs[K])[]
+  /**
+   * Why the rule cannot show a line it reads in full, such as a holder the line does not tell;
+   * the build keeps such a line as an `unsupported` dropped line with this detail.
+   */
+  unsupported?(input: RuleInput<K>): string | undefined
   build(input: RuleInput<K>): ScriptEvent[]
 }
 
@@ -52,6 +58,7 @@ export type Rules = { readonly [K in Protocol.BattleArgName]?: Rule<K> }
 interface AnyRule {
   readonly arity: number
   readonly reads: readonly string[]
+  unsupported?(input: RuleInput<Protocol.BattleArgName>): string | undefined
   build(input: RuleInput<Protocol.BattleArgName>): ScriptEvent[]
 }
 
@@ -79,6 +86,23 @@ export function unreadPart(rule: AnyRule, line: LogLine): string | undefined {
   return name === undefined ? undefined : `keyword argument [${name}]`
 }
 
+/** What a rule reads of a line. */
+function inputOf(line: LogLine, battle: Battle, before: Before): RuleInput<Protocol.BattleArgName> {
+  // The key picked the rule, so the line's args and kwArgs have the types the rule expects.
+  const args = line.args as Protocol.Args[Protocol.BattleArgName]
+  return { line: line.index, args, kwArgs: line.kwArgs, battle, before }
+}
+
+/** Why a rule cannot show a line it reads in full, or undefined when it can. */
+export function unsupportedOf(
+  rule: AnyRule,
+  line: LogLine,
+  battle: Battle,
+  before: Before,
+): string | undefined {
+  return rule.unsupported?.(inputOf(line, battle, before))
+}
+
 /** Runs a rule on a line it has read in full. */
 export function eventsOf(
   rule: AnyRule,
@@ -86,7 +110,5 @@ export function eventsOf(
   battle: Battle,
   before: Before,
 ): ScriptEvent[] {
-  // The key picked the rule, so the line's args and kwArgs have the types the rule expects.
-  const args = line.args as Protocol.Args[Protocol.BattleArgName]
-  return rule.build({ line: line.index, args, kwArgs: line.kwArgs, battle, before })
+  return rule.build(inputOf(line, battle, before))
 }

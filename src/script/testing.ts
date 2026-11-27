@@ -36,13 +36,7 @@ export function replayScript(id: string): BattleScript {
   return script
 }
 
-const INTRO = [
-  '|gen|3',
-  '|player|p1|Alice|1|',
-  '|player|p2|Bob|2|',
-  '|teamsize|p1|6',
-  '|teamsize|p2|6',
-]
+const PLAYERS = ['|player|p1|Alice|1|', '|player|p2|Bob|2|', '|teamsize|p1|6', '|teamsize|p2|6']
 const LEADS = [
   '|start',
   '|switch|p1a: Dugtrio|Dugtrio, M|100/100',
@@ -50,12 +44,19 @@ const LEADS = [
 ]
 
 /** The index of the first line after the intro and the two leads of `scriptOf`. */
-export const NEXT = INTRO.length + LEADS.length
+export const NEXT = 1 + PLAYERS.length + LEADS.length
+
+/** The battle script of a short log of generation `gen`, as `scriptOf` builds it. */
+function scriptOfGen(gen: number, lines: readonly string[]): BattleScript {
+  const intro = [`|gen|${String(gen)}`, ...PLAYERS]
+  return buildBattleScript(`${[...intro, ...LEADS, ...lines].join('\n')}\n`)
+}
 
 /** The battle script of a short log: Alice's Dugtrio meets Bob's Tyranitar, then `lines`. */
-export function scriptOf(...lines: string[]): BattleScript {
-  return buildBattleScript(`${[...INTRO, ...LEADS, ...lines].join('\n')}\n`)
-}
+export const scriptOf = (...lines: string[]): BattleScript => scriptOfGen(3, lines)
+
+/** The same short log in Gen 5, for the lines only a later generation writes (#117). */
+export const gen5ScriptOf = (...lines: string[]): BattleScript => scriptOfGen(5, lines)
 
 /** The events of `script` from the given lines on. */
 export function eventsFrom(script: BattleScript, line: number): ScriptEvent[] {
