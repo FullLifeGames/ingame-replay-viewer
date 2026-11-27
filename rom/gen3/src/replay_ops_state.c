@@ -3,7 +3,9 @@
 #include "battle_anim.h"
 #include "battle_controllers.h"
 #include "battle_gfx_sfx_util.h"
+#include "battle_gimmick.h"
 #include "battle_interface.h"
+#include "battle_terastal.h"
 #include "pokemon.h"
 #include "replay_interpreter.h"
 #include "replay_ops.h"
@@ -12,9 +14,9 @@
 #include "constants/battle_anim.h"
 #include "constants/pokemon.h"
 
-// The ops of a mon's state (#6, #19, #65): STATUS, STAT, ITEM, ITEM_POP_UP and FORM_CHANGE. Both
-// parties are local in a recorded battle, so each writes the party mon itself; the battle mon
-// changes only while that party mon is on the field.
+// The ops of a mon's state (#6, #19, #65, #89): STATUS, STAT, ITEM, ITEM_POP_UP, FORM_CHANGE and
+// TERA. Both parties are local in a recorded battle, so each writes the party mon itself; the
+// battle mon changes only while that party mon is on the field.
 
 static bool32 IsOnField(u32 battler, u32 slot)
 {
@@ -156,4 +158,39 @@ bool32 Replay_OpFormChange(const volatile u8 *operands, u32 step)
     if (!IsOnPlayerSide(battler))
         SetBattlerShadowSpriteCallback(battler, species);
     return TRUE;
+}
+
+// TERA: the side's mon Terastallizes, as BattleScript_Terastallization plays it between
+// STRINGID_PKMNSTORINGENERGY and STRINGID_PKMNTERASTALLIZEDINTO, which come as PRINT. The party mon
+// takes the Tera type and its party slot the gimmick, the state ActivateTera sets before its battle
+// script; ActivateTera itself would run that script and spend the Tera Orb. A sprite load tints a
+// mon whose slot is Terastallized and the healthbox shows its type's indicator in place of "Lv",
+// so both stay with the mon when it switches out and back. The game loads the indicator palettes
+// at the first turn's events (LoadIndicatorSpritesGfx), which a replay never reaches, so TERA
+// loads them; LoadSpritePalette keeps a palette that is loaded already. Then come
+// B_ANIM_TERA_CHARGE, applyterastallization's tint and indicator
+// (ApplyBattlerVisualsForTeraAnim) and B_ANIM_TERA_ACTIVATE. Behind a substitute both animations
+// play nothing, as in the game (TryHandleLaunchBattleTableAnimation).
+bool32 Replay_OpTera(const volatile u8 *operands, u32 step)
+{
+    u32 battler = Replay_GetBattler(operands[0]);
+    u32 teraType = operands[1];
+
+    switch (step)
+    {
+    case 0:
+        SetMonData(GetBattlerMon(battler), MON_DATA_TERA_TYPE, &teraType);
+        SetActiveGimmick(battler, GIMMICK_TERA);
+        LoadIndicatorSpritesGfx();
+        BtlController_EmitBattleAnimation(battler, B_COMM_TO_CONTROLLER, B_ANIM_TERA_CHARGE, 0);
+        MarkBattlerForControllerExec(battler);
+        return FALSE;
+    case 1:
+        ApplyBattlerVisualsForTeraAnim(battler);
+        BtlController_EmitBattleAnimation(battler, B_COMM_TO_CONTROLLER, B_ANIM_TERA_ACTIVATE, 0);
+        MarkBattlerForControllerExec(battler);
+        return FALSE;
+    default:
+        return TRUE;
+    }
 }

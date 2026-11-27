@@ -8,9 +8,10 @@
 #include "constants/moves.h"
 #include "constants/species.h"
 
-// The field, the ability pop-ups and the HP numbers (#6): WEATHER sets the battle's weather,
-// VOLATILE puts a mon behind its substitute and takes it away again, ABILITY sets a mon's ability
-// and shows or hides its pop-up, and a replay hides the near side's HP numbers.
+// The field, the ability pop-ups and the HP numbers (#6): WEATHER sets the battle's weather (snow
+// since version 4, #89), VOLATILE puts a mon behind its substitute and takes it away again,
+// ABILITY sets a mon's ability and shows or hides its pop-up, and a replay hides the near side's HP
+// numbers.
 
 // Skarmory near and Tyranitar far, both on the field.
 static void StartSkarmoryVsTyranitar(void)
@@ -117,6 +118,73 @@ REPLAY_TEST("Hail sets hail")
     THEN
     {
         EXPECT_EQ(gBattleWeather, B_WEATHER_HAIL);
+    }
+}
+
+REPLAY_TEST("Snow Warning: the pop-up, snow and its text, then its animation")
+{
+    STREAM
+    {
+        StartSkarmoryVsTyranitar();
+        ReplayStream_Ability(REPLAY_SIDE_FAR, ABILITY_SNOW_WARNING, TRUE);
+        ReplayStream_Weather(REPLAY_WEATHER_SNOW);
+        ReplayStream_Print(COMPOUND_STRING("It started to snow!"));
+        ReplayStream_Anim(REPLAY_SIDE_NEAR, REPLAY_ANIM_SNOW_CONTINUES);
+        ReplayStream_Ability(REPLAY_SIDE_FAR, ABILITY_SNOW_WARNING, FALSE);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        ABILITY_POPUP(farMon, ABILITY_SNOW_WARNING);
+        MESSAGE("It started to snow!");
+        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_SNOW_CONTINUES, nearMon);
+    }
+    THEN
+    {
+        EXPECT_EQ(gBattleWeather, B_WEATHER_SNOW);
+        EXPECT(!gBattleStruct->battlerState[BattlerOf(farMon)].activeAbilityPopUps);
+    }
+}
+
+REPLAY_TEST("Snow upkeep: the snow stays, its text, then its animation")
+{
+    STREAM
+    {
+        StartSkarmoryVsTyranitar();
+        ReplayStream_Weather(REPLAY_WEATHER_SNOW);
+        ReplayStream_Turn(2);
+        ReplayStream_Print(COMPOUND_STRING("Snow continues to fall."));
+        ReplayStream_Anim(REPLAY_SIDE_FAR, REPLAY_ANIM_SNOW_CONTINUES);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        MESSAGE("Snow continues to fall.");
+        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_SNOW_CONTINUES, farMon);
+    }
+    THEN
+    {
+        EXPECT_EQ(gBattleWeather, B_WEATHER_SNOW);
+    }
+}
+
+REPLAY_TEST("The snow stops: no weather")
+{
+    STREAM
+    {
+        StartSkarmoryVsTyranitar();
+        ReplayStream_Weather(REPLAY_WEATHER_SNOW);
+        ReplayStream_Weather(REPLAY_WEATHER_NONE);
+        ReplayStream_Print(COMPOUND_STRING("The snow stopped."));
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        MESSAGE("The snow stopped.");
+    }
+    THEN
+    {
+        EXPECT_EQ(gBattleWeather, B_WEATHER_NONE);
     }
 }
 

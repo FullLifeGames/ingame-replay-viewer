@@ -1,0 +1,23 @@
+{
+  "TYPE_NONE": [0, "None"],
+  "TYPE_NORMAL": [1, "Normal"],
+  "TYPE_FIGHTING": [2, "Fighting"],
+  "TYPE_FLYING": [3, "Flying"],
+  "TYPE_POISON": [4, "Poison"],
+  "TYPE_GROUND": [5, "Ground"],
+  "TYPE_ROCK": [6, "Rock"],
+  "TYPE_BUG": [7, "Bug"],
+  "TYPE_GHOST": [8, "Ghost"],
+  "TYPE_STEEL": [9, "Steel"],
+  "TYPE_MYSTERY": [10, "???"],
+  "TYPE_FIRE": [11, "Fire"],
+  "TYPE_WATER": [12, "Water"],
+  "TYPE_GRASS": [13, "Grass"],
+  "TYPE_ELECTRIC": [14, "Electric"],
+  "TYPE_PSYCHIC": [15, "Psychic"],
+  "TYPE_ICE": [16, "Ice"],
+  "TYPE_DRAGON": [17, "Dragon"],
+  "TYPE_DARK": [18, "Dark"],
+  "TYPE_FAIRY": [19, "Fairy"],
+  "TYPE_STELLAR": [20, "Stellar"]
+}

@@ -43,9 +43,10 @@ static const struct ReplayAnim sAnims[] =
     [REPLAY_ANIM_STATUS_PRZ]          = { REPLAY_ANIM_KIND_STATUS,  STATUS1_PARALYSIS },
     [REPLAY_ANIM_STATUS_FRZ]          = { REPLAY_ANIM_KIND_STATUS,  STATUS1_FREEZE },
     [REPLAY_ANIM_SIMPLE_HEAL]         = { REPLAY_ANIM_KIND_GENERAL, B_ANIM_SIMPLE_HEAL },
+    [REPLAY_ANIM_SNOW_CONTINUES]      = { REPLAY_ANIM_KIND_GENERAL, B_ANIM_SNOW_CONTINUES },
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sAnims) == REPLAY_ANIM_SIMPLE_HEAL + 1, ReplayAnimsCoverTheFormat);
+STATIC_ASSERT(ARRAY_COUNT(sAnims) == REPLAY_ANIM_SNOW_CONTINUES + 1, ReplayAnimsCoverTheFormat);
 
 // ANIM: the animation on the side's mon; the op ends when the controller has played it.
 bool32 Replay_OpAnim(const volatile u8 *operands, u32 step)

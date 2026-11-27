@@ -28,7 +28,7 @@ describe('the scene points of a decoded instruction list (S6)', () => {
       'win',
       'outro',
     ])
-    expect(missingScenes(handMadeStream())).toEqual([])
+    expect(missingScenes(handMadeStream())).toEqual(['first-tera'])
   })
 
   it('names each scene a stream lacks', () => {
@@ -38,6 +38,7 @@ describe('the scene points of a decoded instruction list (S6)', () => {
       'send-outs',
       'level',
       'weather-start',
+      'first-tera',
       'first-move',
       'first-hp',
       'first-status',

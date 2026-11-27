@@ -1,4 +1,4 @@
-// The instruction stream, version 3 (plan §2): the numbers both sides of the seam share. The C
+// The instruction stream, version 4 (plan §2): the numbers both sides of the seam share. The C
 // side is rom/gen3/include/replay_stream.h; format.test.ts holds the two equal, name by name
 // (`OP.sendOut` is REPLAY_OP_SEND_OUT). The stream is little-endian; it starts with its version.
 //
@@ -10,15 +10,15 @@
 // 4. Each side operand of the ops in ORDER.onFieldOps names a side with a battler out; WITHDRAW
 //    and FAINT take it off. An ANIM of ORDER.freeAnims is free: the game plays the weather
 //    animations with no battler out, after a double KO.
-// 5. Every other op is free: PRINT, TURN, WEATHER, END, FLUSH_TEXT_BOX, and STATUS and ITEM,
-//    which name a party slot (Heal Bell reaches the whole party).
+// 5. Every other op is free: PRINT, TURN, WEATHER, END, FLUSH_TEXT_BOX, MOVE_TYPE, and STATUS
+//    and ITEM, which name a party slot (Heal Bell reaches the whole party).
 import type { BoostID, StatusName } from '@pkmn/data'
 
 import type { Side } from '../../script/types'
 
 /** The stream header's values and where the team tables and the instructions start. */
 export const STREAM = {
-  version: 3,
+  version: 4,
   headerSize: 0x10,
   sideCount: 2,
   partySize: 6,
@@ -98,6 +98,8 @@ export const OP = {
   flushTextBox: 0x14,
   formChange: 0x15,
   showMon: 0x16,
+  tera: 0x17,
+  moveType: 0x18,
 } as const
 
 export type Op = keyof typeof OP
@@ -126,6 +128,8 @@ export const OP_SIZE = {
   flushTextBox: 0,
   formChange: 3,
   showMon: 1,
+  tera: 2,
+  moveType: 1,
 } as const satisfies Record<Exclude<Op, 'print'>, number>
 
 /** PRINT's operand: its text in the game's charset and EOS, one glyph at least. */
@@ -147,7 +151,7 @@ export const STATUS = {
   tox: 6,
 } as const satisfies Record<StatusName | 'none', number>
 
-export const WEATHER = { none: 0, rain: 1, sun: 2, sand: 3, hail: 4 } as const
+export const WEATHER = { none: 0, rain: 1, sun: 2, sand: 3, hail: 4, snow: 5 } as const
 
 /** The order of the expansion's `enum Stat`, which starts with STAT_HP = 0. */
 export const STAT = {
@@ -186,12 +190,13 @@ export const ANIM = {
   statusPrz: 15,
   statusFrz: 16,
   simpleHeal: 17,
+  snowContinues: 18,
 } as const
 
 /**
  * The masks of the order rules, as bits by OP and ANIM number: the ops whose side operands name a
  * side with a battler out (WITHDRAW, MOVE, HIT, HP, FAINT, STAT, ANIM, VOLATILE, ABILITY,
- * ITEM_POP_UP, TRAP_TURN, FORM_CHANGE, SHOW_MON), and the four weather anims that need none.
+ * ITEM_POP_UP, TRAP_TURN, FORM_CHANGE, SHOW_MON, TERA), and the five weather anims that need none.
  * order.test.ts holds each mask equal to the OR of those names.
  */
-export const ORDER = { onFieldOps: 0x6db7a0, freeAnims: 0xf0 } as const
+export const ORDER = { onFieldOps: 0xedb7a0, freeAnims: 0x400f0 } as const

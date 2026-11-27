@@ -21,9 +21,9 @@ const u16 = (bytes: Uint8Array, at: number) => (bytes[at] ?? 0) | ((bytes[at + 1
 const u32 = (bytes: Uint8Array, at: number) => u16(bytes, at) + u16(bytes, at + 2) * 0x10000
 
 describe('encodeStream', () => {
-  it('starts a stream of END alone with version 3 and header size 16 (F1)', () => {
+  it('starts a stream of END alone with version 4 and header size 16 (F1)', () => {
     const bytes = encodeStream(streamOf([END]))
-    expect([...bytes.subarray(0, 4)]).toEqual([0x03, 0x00, 0x10, 0x00])
+    expect([...bytes.subarray(0, 4)]).toEqual([0x04, 0x00, 0x10, 0x00])
     expect([bytes[4], bytes[5], u16(bytes, 6)]).toEqual([24, 24, 0])
     expect([u32(bytes, 8), u32(bytes, 12)]).toEqual([STREAM.tablesEnd, 3])
     expect([...bytes.subarray(STREAM.tablesEnd)]).toEqual([0x00, 0x01, 0x00])
@@ -191,6 +191,12 @@ describe('encodeInstruction', () => {
     expect(encodeInstruction(heal)).toEqual([0x0d, 2, 1, 17])
   })
 
+  it('encodes the snow of version 4: WEATHER SNOW and ANIM SNOW_CONTINUES', () => {
+    expect(encodeInstruction({ op: 'weather', weather: 'snow' })).toEqual([0x0e, 1, 5])
+    const snow: Instruction = { op: 'anim', side: 'near', anim: 'snowContinues' }
+    expect(encodeInstruction(snow)).toEqual([0x0d, 2, 0, 18])
+  })
+
   it('encodes FORM_CHANGE as the side and a two-byte species, as ITEM_POP_UP orders them', () => {
     const change: Instruction = { op: 'formChange', side: 'far', species: 0x041b }
     expect(encodeInstruction(change)).toEqual([0x15, 3, 1, 0x1b, 0x04])
@@ -198,6 +204,26 @@ describe('encodeInstruction', () => {
 
   it('encodes SHOW_MON as the side alone', () => {
     expect(encodeInstruction({ op: 'showMon', side: 'far' })).toEqual([0x16, 1, 1])
+  })
+
+  it('encodes TERA as the side and the Tera type, and MOVE_TYPE as the type alone', () => {
+    expect(encodeInstruction({ op: 'tera', side: 'far', teraType: 19 })).toEqual([0x17, 2, 1, 19])
+    expect(encodeInstruction({ op: 'moveType', type: 11 })).toEqual([0x18, 1, 11])
+  })
+
+  it('takes the types TYPE_NORMAL to NUMBER_OF_MON_TYPES - 1 and refuses TYPE_NONE and the count', () => {
+    const last = counts.NUMBER_OF_MON_TYPES - 1
+    const tera = (teraType: number): Instruction => ({ op: 'tera', side: 'near', teraType })
+    const moveType = (type: number): Instruction => ({ op: 'moveType', type })
+    for (const [make, size] of [
+      [tera, 4],
+      [moveType, 3],
+    ] as const) {
+      expect(encodeInstruction(make(1))).toHaveLength(size)
+      expect(encodeInstruction(make(last))).toHaveLength(size)
+      expect(() => encodeInstruction(make(0))).toThrow(Gen3Error)
+      expect(() => encodeInstruction(make(last + 1))).toThrow(Gen3Error)
+    }
   })
 
   it('takes FORM_CHANGE species 1 to NUM_SPECIES - 1 and refuses 0 and NUM_SPECIES', () => {

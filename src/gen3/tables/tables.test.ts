@@ -1,14 +1,16 @@
 // The committed tables against the pin and against @pkmn's data. These run in CI, which has no
 // checkout of the expansion; scripts/gen3-tables.test.ts regenerates the tables on the build
 // machine.
+import { Dex } from '@pkmn/dex'
 import { describe, expect, it } from 'vitest'
 
 import build from '../../../rom/gen3/build.json'
 import { REPLAYS, replayScript } from '../../script/testing'
-import { abilityOf, itemOf, moveOf, speciesOf } from './lookup'
+import { abilityOf, constantOf, itemOf, moveOf, speciesOf, typeOf } from './lookup'
 import type { Found } from './lookup'
 import meta from './meta.json'
 import { gens, itemGaps, names } from './testing'
+import types from './types.json'
 
 const GENS = [1, 2, 3, 4, 5, 9] as const
 
@@ -43,6 +45,18 @@ describe('the played generations per @pkmn/data (T5)', () => {
   it('has at least one miss to compare, so the rule above is not empty', () => {
     expect(misses(names(gens.get(2).items), itemOf)).toContain('Mail')
     expect(misses(names(gens.get(2).items), itemOf).length).toBeGreaterThan(1)
+  })
+})
+
+// A Tera type crosses into the game by its TYPE_* number (#89): every type of Gen 9, Stellar
+// included, has its row under @pkmn's name.
+describe('the types of Gen 9 (#89)', () => {
+  const rows: Readonly<Record<string, readonly unknown[]>> = types
+
+  it.each(names(Dex.forGen(9).types.all()))('%s has its TYPE_* row', (name) => {
+    const [number, shown] = rows[constantOf('TYPE', name)] ?? []
+    expect(shown).toBe(name)
+    expect(typeOf(name)).toBe(number)
   })
 })
 

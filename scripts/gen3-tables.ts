@@ -81,6 +81,16 @@ const CONTENT: readonly ContentTable[] = [
     data: () => ['src/data/items.h'],
     count: 'ITEMS_COUNT',
   },
+  // The Tera type crosses into the game by its number (#89); Stellar is a type of its own there.
+  {
+    table: 'types',
+    header: 'include/constants/pokemon.h',
+    enumName: 'Type',
+    prefix: 'TYPE',
+    field: 'name',
+    data: () => ['src/data/types_info.h'],
+    count: 'NUMBER_OF_MON_TYPES',
+  },
 ]
 
 const TRAINER_PICS = {

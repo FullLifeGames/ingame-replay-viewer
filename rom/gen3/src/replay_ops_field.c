@@ -20,9 +20,10 @@ static const u16 sWeathers[] =
     [REPLAY_WEATHER_SUN]  = B_WEATHER_SUN_NORMAL,
     [REPLAY_WEATHER_SAND] = B_WEATHER_SANDSTORM,
     [REPLAY_WEATHER_HAIL] = B_WEATHER_HAIL,
+    [REPLAY_WEATHER_SNOW] = B_WEATHER_SNOW,
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sWeathers) == REPLAY_WEATHER_HAIL + 1, ReplayWeathersCoverTheFormat);
+STATIC_ASSERT(ARRAY_COUNT(sWeathers) == REPLAY_WEATHER_SNOW + 1, ReplayWeathersCoverTheFormat);
 
 // WEATHER: the battle's weather.
 bool32 Replay_OpWeather(const volatile u8 *operands, u32 step)

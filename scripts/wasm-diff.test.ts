@@ -81,7 +81,7 @@ describe('diffScenes', () => {
     const changed = blank()
     changed.rgb[3 * (2 * 4 + 1)] = 8
     writeFileSync(join(refusedOurs, 'final.ppm'), ppm(changed))
-    writeFileSync(join(refusedOurs, 'op-frames.txt'), 'op-frames 1 module version-4\n')
+    writeFileSync(join(refusedOurs, 'op-frames.txt'), 'op-frames 1 module version-5\n')
     writeFileSync(join(refusedTheirs, 'final.ppm'), ppm(blank()))
     expect(diffScenes(refusedOurs, refusedTheirs)).toEqual([
       { scene: 'final', diff: { pixels: 1, box: { x0: 1, y0: 2, x1: 1, y1: 2 } } },
