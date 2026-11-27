@@ -115,6 +115,8 @@ export const SAMPLES: Readonly<Record<string, Sample>> = {
   },
   'field.spikes': { args: [FOES_INSIDE] },
   'field.stealthRock': { args: [FOES_INSIDE] },
+  'field.toxicSpikes': { args: [FOES_INSIDE] },
+  'field.toxicSpikesAbsorbed': { args: [FOES_INSIDE] },
   'field.stealthRockCleared': { args: [FOES_INSIDE] },
   'field.reflect': { args: [FOES_INSIDE] },
   'field.lightScreen': { args: [FOES_INSIDE] },
