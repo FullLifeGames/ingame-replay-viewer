@@ -188,3 +188,5 @@ What the figures show against #104's criteria:
 - **The step max over the 2 s window** stays at 5 to 8 with the fix at fast, and at 5 to 8 at 1x in base and fix alike. These are the frames the 1x clock owes after the hold and pays in the next draws (`clock.ts`, `OWED_SECONDS`), which #104 leaves out on purpose. In the fix's third run the step after the hold went 1, 1, 8, 3, then 1 per draw.
 - **The skips hold.** The fix skips 8,440, 8,932 and 8,614 at fast, within the 1x runs' range of 8,558 to 10,266; the base's burst of 63,448 to 119,094 is gone. In its second run the fix skipped 74 samples more at fast (8,932) than at 1x (8,858) in the same browser.
 - **The underruns stay open.** Without a hold the fix counts no underrun in the 2 s after END at fast, where the base counts 1 in each run. The criterion asks for a quiet machine, and no run was quiet. The fix's second run counted 1 underrun later, in the phase "after".
+
+The quiet run for the underruns waited for the end of stage 8 of wave 6 (27.11.2026) and did not run: when it came up, the 1-minute load average stood at 4.43, above the bar of 2.0, so the criterion stays open.
