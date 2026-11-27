@@ -38,6 +38,12 @@ export const POKEBW2_FILES: readonly string[] = [
   // puts each of the backend's lines (#107).
   'src/battle/btl_server_flow.c',
   'src/battle/handler/item_handlers.c',
+  // The effects' numbers (#109): sleep's turns, the position of none, the abilities that act as
+  // their Pokémon comes in, and Focus Punch's effect.
+  'src/battle/btl_calc.c',
+  'include/battle/select/btl_pospoke.h',
+  'src/battle/handler/ability_handlers.c',
+  'src/battle/handler/move_handlers.c',
   // The direct entry's (#97): symbols, link files, the boot, the structs and the constants.
   'config/b2_us/arm9/symbols.txt',
   'config/b2_us/arm9/overlays/ov162/symbols.txt',

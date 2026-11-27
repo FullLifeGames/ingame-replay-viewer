@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Bw2Numbers, StructLayout } from '../src/gen5/bw2-numbers'
+import { REPLAY_NUMBERS } from '../src/gen5/backend/replay.fixtures'
 import { outsideMainRam, quietLines } from './gen5-bw2-report'
 
 // An invented layout; the quiet report reads none of it.
@@ -104,6 +105,7 @@ describe('quietLines', () => {
       switchEffects: { switchOut: 0x5b, drag: 0x5e },
       faintGaugeFlag: 3,
     },
+    effects: REPLAY_NUMBERS.effects,
   }
 
   it('gives the pin, the count of symbols and the checks, and no address, offset or value', () => {

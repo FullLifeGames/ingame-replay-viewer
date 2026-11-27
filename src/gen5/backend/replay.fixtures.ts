@@ -1,4 +1,4 @@
-// The invented numbers of the Gen 5 backend's specs (#106, #107, #108): the Pokémon format and
+// The invented numbers of the Gen 5 backend's specs (#106 to #109): the Pokémon format and
 // the entry of src/gen5's fixtures, a font of printable ASCII, a made-up pin, and the numbers the
 // blocks need. The server commands keep pokebw2's `SC_*` names with numbers above any the game
 // has; the formats carry names, codes and puts of their own, each argument in a halfword. The
@@ -6,7 +6,7 @@
 // order of their own. scripts/gen5-fixtures-real.test.ts holds that no number here equals the
 // generated one under the same name.
 import { ADAPTER_LAYOUT } from '../adapter.fixtures.ts'
-import type { ArgFormat } from '../bw2-numbers.ts'
+import type { ArgFormat, Bw2Numbers } from '../bw2-numbers.ts'
 import { ENTRY } from '../direct-entry.fixtures.ts'
 import { TEAM_PKM } from '../pkm.fixtures.ts'
 import type { ReplayNumbers } from './replay.ts'
@@ -21,7 +21,9 @@ const halves = (code: number, argCount: number): ArgFormat => ({
   })),
 })
 
-export const REPLAY_NUMBERS: ReplayNumbers = {
+/** The replay's numbers with the effects' (#109), which the backend picks once its sequences are
+ * wired. */
+export const REPLAY_NUMBERS: ReplayNumbers & Pick<Bw2Numbers, 'effects'> = {
   pkm: TEAM_PKM,
   entry: ENTRY,
   font: { chars: Array.from({ length: 95 }, (_, i) => String.fromCharCode(32 + i)).join('') },
@@ -101,6 +103,24 @@ export const REPLAY_NUMBERS: ReplayNumbers = {
     recoverEffect: 0x6d3,
     switchEffects: { switchOut: 0x6d9, drag: 0x6df },
     faintGaugeFlag: 3,
+  },
+  effects: {
+    addEffects: {
+      CONDITION_SLEEP: 0x6e1,
+      CONDITION_POISON: 0x6e3,
+      CONDITION_BURN: 0x6e5,
+      CONDITION_PARALYSIS: 0x6e7,
+      CONDITION_FREEZE: 0x6e9,
+    },
+    damageEffects: { CONDITION_POISON: 0x6ed, CONDITION_BURN: 0x6ef },
+    conditionValues: { permanent: 0x1e40, badlyPoisoned: 0x1e57, sleep: 0x2c90 },
+    badlyPoisonedGauge: 0x2d,
+    weatherTurns: 0x5a,
+    sideMask: 0x20,
+    sandEffects: { hit: 0x6f3, after: 0x6f5 },
+    hideWindow: 5,
+    focusEffect: 0x6f9,
+    memberInAbilities: ['ABILITY_SAND_STREAM', 'ABILITY_DRIZZLE', 'ABILITY_INTIMIDATE'],
   },
   battle: {
     single: { clientCount: 4, posClientIds: [3, 2], clients: { player: 3, opponent: 2 } },

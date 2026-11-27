@@ -15,6 +15,8 @@ import { REPLAY_NUMBERS } from '../src/gen5/backend/replay.fixtures.ts'
 import { ENTRY } from '../src/gen5/direct-entry.fixtures.ts'
 import { PKM, TEAM_PKM, TERMINATOR } from '../src/gen5/pkm.fixtures.ts'
 import { battleNumbers } from './gen5-bw2-battle.ts'
+import { effectNumbers } from './gen5-bw2-effects.ts'
+import { EFFECTS_CONSTANTS, EFFECTS_INPUT } from './gen5-bw2-effects.fixtures.ts'
 import { flowNumbers } from './gen5-bw2-flow.ts'
 import { FLOW_INPUT } from './gen5-bw2-flow.fixtures.ts'
 import { BATTLE_SOURCES } from './gen5-bw2-battle.fixtures.ts'
@@ -88,14 +90,26 @@ const COMPARED = [
     value: flowNumbers(FLOW_INPUT),
     path: ['flow'],
   },
-  ...(['text', 'flow', 'serverCommands', 'messages', 'queueSize', 'battle'] as const).map(
-    (key) => ({
-      module: 'src/gen5/backend/replay.fixtures.ts',
-      name: `REPLAY_NUMBERS.${key}`,
-      value: REPLAY_NUMBERS[key],
-      path: [key],
-    }),
-  ),
+  {
+    module: 'scripts/gen5-bw2-effects.fixtures.ts',
+    name: 'EFFECTS_INPUT',
+    value: effectNumbers(EFFECTS_INPUT, EFFECTS_CONSTANTS),
+    path: ['effects'],
+  },
+  {
+    module: 'scripts/gen5-bw2-effects.fixtures.ts',
+    name: 'EFFECTS_CONSTANTS',
+    value: EFFECTS_CONSTANTS,
+    path: ['battle', 'constants'],
+  },
+  ...(
+    ['text', 'flow', 'effects', 'serverCommands', 'messages', 'queueSize', 'battle'] as const
+  ).map((key) => ({
+    module: 'src/gen5/backend/replay.fixtures.ts',
+    name: `REPLAY_NUMBERS.${key}`,
+    value: REPLAY_NUMBERS[key],
+    path: [key],
+  })),
 ]
 
 /** The fixture modules that hold no number of pokebw2: the archives' fixtures. `ROUTINE` beside

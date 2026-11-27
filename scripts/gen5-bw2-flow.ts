@@ -22,13 +22,13 @@ export const FLOW_SOURCES = {
 export type FlowInput = Record<keyof typeof FLOW_SOURCES, string>
 
 /** The body of the function `fn`, without comments and with its white space as single blanks. */
-const bodyText = (source: string, fn: string) =>
+export const bodyText = (source: string, fn: string) =>
   stripComments(bodyOf(source, ` ${fn}(`))
     .replace(/\s+/g, ' ')
     .trim()
 
 /** A literal of `fn`'s body, or a throw that names `fn` and the role alone. */
-function literalOf(text: string, fn: string, role: string): number {
+export function literalOf(text: string, fn: string, role: string): number {
   const value = literal(text)
   if (value === undefined) throw new Error(`${fn}: the ${role} is no number literal`)
   return value
@@ -114,19 +114,37 @@ function listsOf(text: string, fn: string): { parts: string[]; next: string }[] 
   })
 }
 
-/** Where `fn`'s definition has the parameter `param`. */
-function paramIndex(source: string, fn: string, param: string): number {
+/** The names of the parameters of `fn`'s definition, in order. */
+function paramsOf(source: string, fn: string): string[] {
   const definition = listsOf(stripComments(source), fn).find(({ next }) => next === '{')
   if (definition === undefined) throw new Error(`no definition of ${fn} in the source`)
-  const index = definition.parts.findIndex(
-    (part) => /(\w+)(\s*\[[^\]]*\])*$/.exec(part)?.[1] === param,
-  )
+  return definition.parts.map((part) => /(\w+)(\s*\[[^\]]*\])*$/.exec(part)?.[1] ?? '')
+}
+
+/** Where `fn`'s definition has the parameter `param`. */
+function paramIndex(source: string, fn: string, param: string): number {
+  const index = paramsOf(source, fn).indexOf(param)
   if (index < 0) throw new Error(`${fn} has no parameter ${param}`)
   return index
 }
 
-/** The literal `caller` passes to `callee` at the parameter `param`, which also names its role. */
-function passedLiteral(flowC: string, caller: string, callee: string, param: string): number {
+/** Each call of `callee` in `caller`'s body, its arguments by the names of the callee's
+ * parameters, both functions defined in `source` (#109). */
+export function callsOf(source: string, caller: string, callee: string): Record<string, string>[] {
+  const params = paramsOf(source, callee)
+  return listsOf(bodyText(source, caller), callee).map(({ parts }) =>
+    Object.fromEntries(params.map((param, at) => [param, parts[at] ?? ''])),
+  )
+}
+
+/** The literal `caller` passes to `callee` at the parameter `param`, which also names its role;
+ * both functions are defined in `flowC`. */
+export function passedLiteral(
+  flowC: string,
+  caller: string,
+  callee: string,
+  param: string,
+): number {
   const calls = listsOf(bodyText(flowC, caller), callee)
   if (calls.length !== 1) throw new Error(`${caller} calls ${callee} not exactly once`)
   const index = paramIndex(flowC, callee, param)
