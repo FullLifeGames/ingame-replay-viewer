@@ -9,7 +9,7 @@ import { fitName } from './font.ts'
 import { baseSpecie, gen5, gen5Species } from './names.ts'
 import type { PartyMon } from './party-mon.ts'
 import { type RevealedSet, revealedSets } from './revealed.ts'
-import { partyOrder } from './slots.ts'
+import { partyOrder, sentIn } from './slots.ts'
 
 /** The nature of every Pokémon: the log never shows one. */
 const NATURE = 'Hardy'
@@ -76,13 +76,12 @@ function previewOnly(script: BattleScript, side: Side): PreviewMember[] {
   })
 }
 
-/** The line of each member's first switch-in, by team index. */
+/** The line where each member is first sent in (`sentIn`), by team index. */
 function firstSwitchIns(script: BattleScript, side: Side): Map<number, number> {
   const found = new Map<number, number>()
   for (const event of script.events) {
-    if (event.kind === 'switchIn' && event.who.side === side && !found.has(event.who.index)) {
-      found.set(event.who.index, event.line)
-    }
+    const index = sentIn(event, side)
+    if (index !== undefined && !found.has(index)) found.set(index, event.line)
   }
   return found
 }

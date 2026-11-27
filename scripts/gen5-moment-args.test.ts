@@ -4,6 +4,8 @@ import type { ActorPlace } from '../src/gen5/bw2-numbers'
 import { continueRoute } from '../src/gen5/continue-route'
 import type { RamCheck, RamRef } from '../src/gen5/ram-check'
 import { firstRun, readMomentOptions, startLine, type StateFile } from './gen5-moment-args'
+import { HITS_TURN } from './gen5-moment-hits'
+import { SWITCHES_TURNS } from './gen5-moment-switches'
 
 const NOW = 1_000_000
 
@@ -66,7 +68,7 @@ describe('readMomentOptions', () => {
 
   it('refuses a scene it does not know, a bad save name and minutes that are not positive', () => {
     expect(() => readMomentOptions(['--scene', 'other'], NOW)).toThrow(
-      '--scene takes known, unknown or hits, not "other".',
+      '--scene takes known, unknown, hits or switches, not "other".',
     )
     expect(() => readMomentOptions(['--save', '../route-20'], NOW)).toThrow(
       '--save takes lower-case letters and digits, with single hyphens between them, not "../route-20".',
@@ -150,15 +152,31 @@ describe('readMomentOptions', () => {
     const options = readMomentOptions(['--replay', 'gen5ou-2718717830', '--scene', 'hits'], NOW)
     expect(options).toMatchObject({
       scene: 'hits',
-      team: { from: 'replay', id: 'gen5ou-2718717830', hits: true },
+      team: { from: 'replay', id: 'gen5ou-2718717830', turns: HITS_TURN },
       label: 'nosave-direct-gen5ou-2718717830-hits',
     })
-    expect(readMomentOptions(['--replay', 'gen5ou-2718717830'], NOW).team).toMatchObject({
-      hits: false,
+    expect(readMomentOptions(['--replay', 'gen5ou-2718717830'], NOW).team).toEqual({
+      from: 'replay',
+      id: 'gen5ou-2718717830',
+      turns: undefined,
     })
-    const alone = "--scene hits plays a test replay's leads: give it --replay <id>."
+    const alone =
+      "--scene hits plays hand turns after a test replay's start: give it --replay <id>."
     expect(() => readMomentOptions(['--scene', 'hits'], NOW)).toThrow(alone)
     expect(() => readMomentOptions(['--scene', 'hits', '--entry', 'walk'], NOW)).toThrow(alone)
+  })
+
+  // Scene: the scene run of #108 plays hand turns of switches, a drag and a faint as blocks.
+  it('plays the switches scene beside --replay alone, with -switches at the end of the label', () => {
+    const options = readMomentOptions(['--replay', 'gen5ou-2718717830', '--scene', 'switches'], NOW)
+    expect(options).toMatchObject({
+      scene: 'switches',
+      team: { from: 'replay', id: 'gen5ou-2718717830', turns: SWITCHES_TURNS },
+      label: 'nosave-direct-gen5ou-2718717830-switches',
+    })
+    expect(() => readMomentOptions(['--scene', 'switches'], NOW)).toThrow(
+      "--scene switches plays hand turns after a test replay's start: give it --replay <id>.",
+    )
   })
 
   it('refuses --replay for the walk, in a double, beside a name and with an id that climbs', () => {

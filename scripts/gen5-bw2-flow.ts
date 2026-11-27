@@ -1,11 +1,13 @@
-// The numbers the server's flow puts as literals (#107), from pokebw2 at its pin: the damage kinds
-// of the hit flash, which ServerDisplay_Damage picks in an if chain and sends with
-// SC_DAMAGE_PLURAL, and the heal effect ServerControl_RecoverHPCore shows with SC_EFFECT_BY_POS.
-// pokebw2 has no name for either (BtlvCore_PlayDamageSE says the set has none yet), so the reader
-// takes each from its function by shape and throws on any other. The cross-check holds each of the
-// backend's lines (src/gen5/backend/lines.ts) against the message IDs its function puts (D9). The
-// errors name the function, the role and the shape the reader expected, never the C they met, so
-// they show no number of pokebw2.
+// The numbers the server's flow puts as literals (#107, #108), from pokebw2 at its pin: the damage
+// kinds of the hit flash, which ServerDisplay_Damage picks in an if chain and sends with
+// SC_DAMAGE_PLURAL; the heal effect ServerControl_RecoverHPCore shows with SC_EFFECT_BY_POS; the
+// recall effects ServerControl_SwitchOut and ServerControl_ForceSwitch pass on for SC_RECALL; and
+// the flag ServerControl_FaintPokemon passes on for SC_FAINT_HP_GAUGE. pokebw2 has no name for
+// any of them (BtlvCore_PlayDamageSE says the set has none yet), so the reader takes each from its
+// function by shape, a passed one at the callee's parameter of its name, and throws on any other.
+// The cross-check holds each of the backend's lines (src/gen5/backend/lines.ts) against the
+// message IDs its function puts (D9). The errors name the function, the role and the shape the
+// reader expected, never the C they met, so they show no number of pokebw2.
 import type { Gen5Line } from '../src/gen5/backend/lines.ts'
 import type { FlowNumbers, TextNumbers } from '../src/gen5/bw2-numbers.ts'
 import { bodyOf, enumAround, literal, stripComments } from './gen5-bw2-c.ts'
@@ -73,10 +75,91 @@ export function recoverEffect(flowC: string): number {
   return literalOf(puts[0]?.[1]?.trim() ?? '', RECOVER, 'effect')
 }
 
-/** The damage kinds and the heal effect. */
+/** The index just past the parenthesis that closes the one at `open`, or the text's end. */
+function closingParen(text: string, open: number): number {
+  let depth = 0
+  for (let at = open; at < text.length; at++) {
+    if (text[at] === '(') depth++
+    else if (text[at] === ')' && --depth === 0) return at + 1
+  }
+  return text.length
+}
+
+/** A list of C arguments or parameters split at its top-level commas, each trimmed. */
+function splitList(list: string): string[] {
+  const parts: string[] = []
+  let depth = 0
+  let start = 0
+  for (let at = 0; at < list.length; at++) {
+    if (list[at] === '(') depth++
+    else if (list[at] === ')') depth--
+    else if (list[at] === ',' && depth === 0) {
+      parts.push(list.slice(start, at).trim())
+      start = at + 1
+    }
+  }
+  return [...parts, list.slice(start).trim()]
+}
+
+/** Each place `fn` stands with its list in `text`: the list's parts, and the first character
+ * after it (`{` for a definition). */
+function listsOf(text: string, fn: string): { parts: string[]; next: string }[] {
+  return [...text.matchAll(new RegExp(`(?<!\\w)${fn}\\(`, 'g'))].map(({ index }) => {
+    const open = index + fn.length
+    const close = closingParen(text, open)
+    return {
+      parts: splitList(text.slice(open + 1, close - 1)),
+      next: text.slice(close).trim()[0] ?? '',
+    }
+  })
+}
+
+/** Where `fn`'s definition has the parameter `param`. */
+function paramIndex(source: string, fn: string, param: string): number {
+  const definition = listsOf(stripComments(source), fn).find(({ next }) => next === '{')
+  if (definition === undefined) throw new Error(`no definition of ${fn} in the source`)
+  const index = definition.parts.findIndex(
+    (part) => /(\w+)(\s*\[[^\]]*\])*$/.exec(part)?.[1] === param,
+  )
+  if (index < 0) throw new Error(`${fn} has no parameter ${param}`)
+  return index
+}
+
+/** The literal `caller` passes to `callee` at the parameter `param`, which also names its role. */
+function passedLiteral(flowC: string, caller: string, callee: string, param: string): number {
+  const calls = listsOf(bodyText(flowC, caller), callee)
+  if (calls.length !== 1) throw new Error(`${caller} calls ${callee} not exactly once`)
+  const index = paramIndex(flowC, callee, param)
+  return literalOf(calls[0]?.parts[index] ?? '', caller, param)
+}
+
+/** The effects SC_RECALL shows as a Pokémon leaves: ServerControl_SwitchOut's for a switch, and
+ * ServerControl_ForceSwitch's for a drag by Roar or Whirlwind. */
+export const switchEffects = (flowC: string): FlowNumbers['switchEffects'] => ({
+  switchOut: passedLiteral(
+    flowC,
+    'ServerControl_SwitchOut',
+    'ServerControl_SwitchOutCore',
+    'effect',
+  ),
+  drag: passedLiteral(
+    flowC,
+    'ServerControl_ForceSwitch',
+    'ServerControl_ForceSwitchCore',
+    'effect',
+  ),
+})
+
+/** The flag of SC_FAINT_HP_GAUGE for a Pokémon that faints with HP left. */
+export const faintGaugeFlag = (flowC: string): number =>
+  passedLiteral(flowC, 'ServerControl_FaintPokemon', 'ServerDisplay_FaintPokemon', 'flag')
+
+/** The damage kinds, the heal effect, the recall effects and the faint's flag. */
 export const flowNumbers = (input: FlowInput): FlowNumbers => ({
   damageKinds: damageKinds(input.flowC),
   recoverEffect: recoverEffect(input.flowC),
+  switchEffects: switchEffects(input.flowC),
+  faintGaugeFlag: faintGaugeFlag(input.flowC),
 })
 
 /** The text of the source a line's C lives in. */

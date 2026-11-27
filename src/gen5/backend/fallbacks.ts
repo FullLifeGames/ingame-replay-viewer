@@ -1,6 +1,7 @@
-// The fallbacks of the Gen 5 backend (#106, #107): what the game shows in place of content it lacks
-// or cannot hold, and each event that does not play yet. The backend lists each one with its log
-// line beside the battle script's dropped lines, as the Gen 3 backend does (src/gen3/fallbacks.ts).
+// The fallbacks of the Gen 5 backend (#106, #107, #108): what the game shows in place of content
+// it lacks or cannot hold, and each event that does not play yet or plays only in part. The backend
+// lists each one with its log line beside the battle script's dropped lines, as the Gen 3 backend
+// does (src/gen3/fallbacks.ts).
 import type { ScriptEvent } from '../../script/events.ts'
 
 /**
@@ -15,10 +16,12 @@ interface TeamFallback {
 }
 
 /** `later`: an event that a later issue plays, named in `detail`. `line`: a line that Black 2 has
- * no message for, so nothing shows for it. `event` is the battle script's kind of the event. */
+ * no message for, so nothing shows for it. `plain`: a switch-in that plays as a plain switch or
+ * drag, and `detail` names what of it does not show. `event` is the battle script's kind of the
+ * event. */
 interface EventFallback {
   readonly line: number
-  readonly kind: 'later' | 'line'
+  readonly kind: 'later' | 'line' | 'plain'
   readonly event: ScriptEvent['kind']
   readonly detail: string
 }
@@ -39,6 +42,14 @@ export const lineFallback = (event: ScriptEvent, detail: string): Gen5Fallback =
   kind: 'line',
   event: event.kind,
   detail,
+})
+
+/** The fallback of a switch-in that plays as a plain one; `missing` is what does not show. */
+export const plainFallback = (event: ScriptEvent, missing: string): Gen5Fallback => ({
+  line: event.line,
+  kind: 'plain',
+  event: event.kind,
+  detail: `plays as a plain switch: ${missing}`,
 })
 
 /** The fallbacks in line order; fallbacks of one line keep their order. */

@@ -295,7 +295,7 @@ What the battle log shows of a team member's own moves, item and ability. A move
 _Avoid_: known set, inferred set
 
 **Party order**:
-The order of a side's Pokémon in a Gen 5 replay's party: the members by their first switch-in, then the ones that never switch in, in team order. The game sends the first slot out first, so the replay's lead leads.
+The order of a side's Pokémon in a Gen 5 replay's party: the members by the line that first shows them, their first switch-in or the end of a disguise that reveals them, then the ones never shown, in team order. The game sends the first slot out first, so the replay's lead leads.
 _Avoid_: team order, preview order (Team Preview's order is another)
 
 **Mon ID**:
@@ -307,5 +307,5 @@ The game's server commands for one action of a Gen 5 replay, or for one line at 
 _Avoid_: packet, batch, moment (a moment is the spike's block of one move)
 
 **Gen 5 fallback**:
-A Gen 5 replay's note of a content gap, with its log line: a forme the game draws as its base form, a character of a name that the battle's font lacks and shows as "?", or a move past the four a Pokémon holds. An event that does not play yet is one too, and names the issue that will play it. So is a line Black 2 has no message for, which shows nothing. The run lists each one.
+A Gen 5 replay's note of a content gap, with its log line: a forme the game draws as its base form, a character of a name that the battle's font lacks and shows as "?", or a move past the four a Pokémon holds. An event that does not play yet is one too, and names the issue that will play it. So is a line Black 2 has no message for, which shows nothing, and a switch that plays as a plain one (`plain`): a drag after a move other than Roar or Whirlwind, which shows Roar's look, and a Baton Pass, whose stat stages the game does not carry over. The run lists each one.
 _Avoid_: warning, cut (a name cut to its room is a note, not a fallback)

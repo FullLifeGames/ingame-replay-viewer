@@ -2,22 +2,31 @@
 // of its side, its side's client, and the mon ID by which the battle's commands name it. Pure: the
 // clients and mon IDs come from build/gen5/bw2.json's `battle`, the mon IDs by the rule of
 // GetClientIDFromMonID.
-import type { BattleScript } from '../../script/events.ts'
+import type { BattleScript, ScriptEvent } from '../../script/events.ts'
 import type { PokemonRef, Side } from '../../script/types.ts'
 import type { MonIds, SingleBattle } from '../bw2-numbers.ts'
 import type { PartySides } from '../direct-party.ts'
 
+/** The team index of the member of `side` that `event` sends in: a switch-in, or the end of
+ * Illusion's disguise, where a member that came in under it first shows (as Gen 3's `firstLine`
+ * in src/gen3/translate/context.ts reads it). Undefined for any other event. */
+export function sentIn(event: ScriptEvent, side: Side): number | undefined {
+  const sends = event.kind === 'switchIn' || event.kind === 'replace'
+  return sends && event.who.side === side ? event.who.index : undefined
+}
+
 /** Each side's team indices in party order. The game sends out slot 0 first, so the members
- * that switch in come first, in the order of their first switch-in, the lead in slot 0; the rest
- * follow in team order. A log with Team Preview orders the team as the preview does (@pkmn/client
- * keeps it so), so a team index is no party slot. */
+ * that switch in come first, in the order they are first sent in (`sentIn`), the lead in slot 0;
+ * the rest follow in team order. A log with Team Preview orders the team as the preview does
+ * (@pkmn/client keeps it so), so a team index is no party slot. */
 export function partyOrder(
   script: Pick<BattleScript, 'teams' | 'events'>,
 ): Readonly<Record<Side, readonly number[]>> {
   const order = (side: Side) => {
-    const sent = script.events.flatMap((event) =>
-      event.kind === 'switchIn' && event.who.side === side ? [event.who.index] : [],
-    )
+    const sent = script.events.flatMap((event) => {
+      const index = sentIn(event, side)
+      return index === undefined ? [] : [index]
+    })
     const rest = script.teams[side].map((_, index) => index)
     return [...new Set([...sent, ...rest])]
   }

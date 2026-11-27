@@ -1,9 +1,12 @@
-// What each action of a battle script writes into Black 2's battle (#107, lane plan D5, D6, D11):
-// a move whose user and target stand in place sends its line and its animation, as
-// ServerControl_Fight and ServerControl_ExecuteMove do, and each event after it plays by its
-// rule (hits.ts). An event of a Pokémon not in place waits for #108, and an action with a called
-// move, several hits, a charge turn or a look of its own waits whole. Pure: every number of the
-// game comes in from build/gen5/bw2.json.
+// What each action of a battle script writes into Black 2's battle (#107, #108, lane plans D5,
+// D6, D11 and D1): a move sends its line and its animation, as ServerControl_Fight and
+// ServerControl_ExecuteMove do, and each event after it plays by its rule (hits.ts). A switch-in
+// after the leads plays its switch, drag or send-in (switches.ts) and moves the places; each faint
+// plays the server's faint (faints.ts) and takes its Pokémon's HP to 0, and the end of Illusion's
+// disguise keeps the game's Pokémon in place (battle-state.ts). An event that plays and names a
+// Pokémon not in place fails by name. An action with a called move, several hits, a charge turn
+// or a look of its own waits whole. Pure: every number of the game comes in from
+// build/gen5/bw2.json.
 import type { BattleScript, ScriptEvent } from '../../script/events.ts'
 import type { PokemonRef } from '../../script/types.ts'
 import type { BattleNumbers, FlowNumbers, TextNumbers } from '../bw2-numbers.ts'
@@ -11,10 +14,12 @@ import { PLAIN_TURN } from '../moment.ts'
 import type { ServerCommand } from '../server-cmd.ts'
 import { battleState, type BattleState } from './battle-state.ts'
 import { type Action, actionsOf, type Written } from './blocks.ts'
+import { faintCommands } from './faints.ts'
 import { type Gen5Fallback, laterFallback } from './fallbacks.ts'
 import { hitCommands, type PlayedMove, silentBar } from './hits.ts'
 import { gen5, gen5Move } from './names.ts'
-import { LATER_ISSUES, type Outcome, outcomesOf } from './rules.ts'
+import { type EventOf, LATER_ISSUES, type Outcome, outcomesOf } from './rules.ts'
+import { switchCommands } from './switches.ts'
 
 /** The numbers the writer takes. */
 export interface WriteNumbers {
@@ -23,20 +28,33 @@ export interface WriteNumbers {
   readonly battle: Pick<BattleNumbers, 'single' | 'monIds'>
 }
 
-/** What a script writes: each action's commands by event, and a fallback for each event whose
- * rule plays it but which does not play here. */
+/** Each side's party in the game's order, by mon ID, after the event of log line `line`. */
+export interface PartyOrders {
+  readonly line: number
+  readonly near: readonly number[]
+  readonly far: readonly number[]
+}
+
+/** What a script writes: each action's commands by event, a fallback for each event whose rule
+ * plays it but which does not play here, and the party orders after each event in replay order,
+ * which a run compares with the game's (#108). */
 export interface ScriptWrite {
   readonly actions: Written[][]
   readonly fallbacks: Gen5Fallback[]
+  readonly orders: PartyOrders[]
 }
 
-const { switches: SWITCHES, effects: EFFECTS, whole: WHOLE } = LATER_ISSUES
+const { effects: EFFECTS, whole: WHOLE } = LATER_ISSUES
 
+/** What the writer carries through the script: the turn the log began last and its last move
+ * follow the events (`follow`). */
 interface Scene {
   readonly state: BattleState
   readonly numbers: WriteNumbers
   readonly outcomes: ReadonlyMap<ScriptEvent, Outcome | undefined>
   readonly fallbacks: Gen5Fallback[]
+  turn: number
+  lastMove: EventOf<'move'> | undefined
 }
 
 /** The Pokémon an event of a kind that plays names: a move's or a miss's user and target,
@@ -64,18 +82,15 @@ interface Played {
   readonly waits: number | undefined
 }
 
-/** `action` with the move that opens it, when that plays: no wait of the whole action, and its
- * user and target in place. A move of a Pokémon not in place waits for #108 with its events. */
+/** `action` with the move that opens it, when that plays: no wait of the whole action. Its user
+ * and target must stand in place. */
 function playedOf(action: Action, state: BattleState): Played {
   const [first] = action
   const held = heldBy(action)
   if (first?.kind !== 'move' || held !== undefined) return { action, move: undefined, waits: held }
   const targetRef = first.target ?? first.user
-  const user = state.inPlace(first.user)
-  const target = state.inPlace(targetRef)
-  if (user === undefined || target === undefined) {
-    return { action, move: undefined, waits: SWITCHES }
-  }
+  const user = state.placed(first.user, first.line)
+  const target = state.placed(targetRef, first.line)
   return { action, move: { user, target, targetRef, move: gen5Move(first.move) }, waits: undefined }
 }
 
@@ -115,15 +130,23 @@ function eventCommands(scene: Scene, played: Played, event: ScriptEvent): Server
   const { action, move } = played
   const hits = { state: scene.state, numbers: scene.numbers, move }
   if (scene.outcomes.get(event)?.as !== 'play') return silentBar(hits, event)
-  if (!refsOf(event).every((ref) => scene.state.inPlace(ref) !== undefined)) {
-    scene.fallbacks.push(laterFallback(event, SWITCHES))
-    return []
-  }
+  if (event.kind === 'switchIn') return switchCommands(scene, event)
+  if (event.kind === 'faint') return faintCommands(scene, event)
+  for (const ref of refsOf(event)) scene.state.placed(ref, event.line)
   const commands =
     event.kind === 'move' ? move && moveCommands(action, move) : hitCommands(hits, event)
   if (commands !== undefined) return commands
   scene.fallbacks.push(laterFallback(event, played.waits ?? WHOLE))
   return silentBar(hits, event)
+}
+
+/** The scene after `event`: a turn's number, a move as the last one, a faint's HP at 0, the end
+ * of a disguise as the real Pokémon's alias. */
+function follow(scene: Scene, event: ScriptEvent): void {
+  if (event.kind === 'turn') scene.turn = event.number
+  if (event.kind === 'move') scene.lastMove = event
+  if (event.kind === 'faint') scene.state.faint(event.who)
+  if (event.kind === 'replace') scene.state.alias(event)
 }
 
 /** The commands of each action of `script`, in replay order, from the battle's start. */
@@ -137,13 +160,20 @@ export function writeScript(
     numbers,
     outcomes: new Map(script.events.map((event, i) => [event, outcomes[i]])),
     fallbacks: [],
+    turn: 0,
+    lastMove: undefined,
   }
+  const { state } = scene
+  const orders: PartyOrders[] = []
   const actions = actionsOf(script).map((action) => {
-    const played = playedOf(action, scene.state)
-    return action.map((event) => ({
-      line: event.line,
-      commands: eventCommands(scene, played, event),
-    }))
+    const played = playedOf(action, state)
+    return action.map((event) => {
+      const commands = eventCommands(scene, played, event)
+      follow(scene, event)
+      const { line } = event
+      orders.push({ line, near: state.partyMonIds('near'), far: state.partyMonIds('far') })
+      return { line, commands }
+    })
   })
-  return { actions, fallbacks: scene.fallbacks }
+  return { actions, fallbacks: scene.fallbacks, orders }
 }

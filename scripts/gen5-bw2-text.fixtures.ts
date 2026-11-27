@@ -7,7 +7,7 @@ import type { TextInput } from './gen5-bw2-text.ts'
 
 const bank = (lines: readonly string[]) => `${lines.join('\n')}\n`
 
-/** A standard bank of seven labels and a set bank of five, each with filler labels between the
+/** A standard bank of seven labels and a set bank of eight, each with filler labels between the
  * backend's own. */
 export const TEXT_INPUT: TextInput = {
   standardBank: bank([
@@ -25,7 +25,10 @@ export const TEXT_INPUT: TextInput = {
     'Bank0018_Text_FillerDelta = An invented line on the target.',
     'Bank0018_Text_RestoredLittleHpUsing = The holder feels better with its item.',
     'Bank0018_Text_AvoidedAttack = The target steps aside in an invented line.',
-    'Bank0018_Text_FillerEpsilon = A last invented line.',
+    'Bank0018_Text_FillerEpsilon = Another invented line.',
+    'Bank0018_Text_DraggedOut = The invented line of a Pokémon pulled in.',
+    'Bank0018_Text_FillerZeta = A last invented line.',
+    'Bank0018_Text_Fainted = The invented line of a Pokémon that falls.',
     '\\pad{5}',
   ]),
 }

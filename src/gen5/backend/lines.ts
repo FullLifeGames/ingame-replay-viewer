@@ -1,4 +1,4 @@
-// The lines of Black 2's text banks that the Gen 5 backend sends (#107), each by its label in
+// The lines of Black 2's text banks that the Gen 5 backend sends (#107, #108), each by its label in
 // pokebw2's bank and with the C that puts it in the server's flow. The generator checks each label
 // against the message IDs its function puts (scripts/gen5-bw2-flow.ts, D9), so a pin that moves a
 // line fails by the line's label; the backend finds the line's ID in bw2.json by its label.
@@ -36,7 +36,8 @@ const set = (label: string, source: SetSource): Gen5Line => ({
   source,
 })
 
-/** The lines of a single battle's hits, misses, failures and a heal by Leftovers. */
+/** The lines of a single battle's hits, misses, failures, a heal by Leftovers, a faint and a
+ * drag. */
 export const GEN5_LINES = {
   superEffective: standard('ItsSuperEffective', 'ServerDisplay_EffectivenessMessageMulti'),
   notVeryEffective: standard('ItsNotVeryEffective', 'ServerDisplay_EffectivenessMessageMulti'),
@@ -56,6 +57,16 @@ export const GEN5_LINES = {
     file: 'src/battle/handler/item_handlers.c',
     function: 'HandlerLeftoversUse',
     put: 'StrSetup set',
+  }),
+  fainted: set('Fainted', {
+    file: FLOW,
+    function: 'ServerControl_CheckFainted',
+    put: 'PutMsg SC_MSG_SET',
+  }),
+  draggedOut: set('DraggedOut', {
+    file: FLOW,
+    function: 'ServerControl_ForceSwitchCore',
+    put: 'PutMsg SC_MSG_SET',
   }),
 } as const satisfies Record<string, Gen5Line>
 

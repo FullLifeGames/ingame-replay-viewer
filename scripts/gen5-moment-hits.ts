@@ -1,9 +1,10 @@
 // The hits scene of the moment script (#107, lane plan D14): a turn written by hand for the leads
 // of the test replay gen5ou-2718717830, Politoed on the near side and Darmanitan on the far one.
 // Darmanitan's Grass Knot hits Politoed super effectively and critically, Politoed's Focus Blast
-// misses, and Politoed's Leftovers heal it at the turn's end. The log keeps the test replay's
-// lines before its first turn, so the parties, the names and their fallbacks stay the replay's,
-// and the hand turn reveals Politoed's Leftovers.
+// misses, and Politoed's Leftovers heal it at the turn's end. `handLog` is the one rule of every
+// hand scene: the log keeps the test replay's lines before its first turn, so the parties, the
+// names and their fallbacks stay the replay's, and the hand turns follow (here they reveal
+// Politoed's Leftovers; gen5-moment-switches.ts holds the switches scene's).
 
 /** The hand turn, in the order Showdown writes its lines. */
 export const HITS_TURN: readonly string[] = [
@@ -19,10 +20,10 @@ export const HITS_TURN: readonly string[] = [
   '|upkeep',
 ]
 
-/** `log`'s lines before its first `|turn|` line, then the hand turn. */
-export function hitsLog(log: string): string {
+/** `log`'s lines before its first `|turn|` line, then the hand turns. */
+export function handLog(log: string, turns: readonly string[]): string {
   const lines = log.split('\n')
   const turn = lines.findIndex((line) => line.startsWith('|turn|'))
   if (turn < 0) throw new Error('the log has no |turn| line')
-  return `${[...lines.slice(0, turn), ...HITS_TURN].join('\n')}\n`
+  return `${[...lines.slice(0, turn), ...turns].join('\n')}\n`
 }

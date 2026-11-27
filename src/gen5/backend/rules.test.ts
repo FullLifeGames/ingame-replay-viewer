@@ -49,10 +49,10 @@ describe('outcomesOf the intro and the turns', () => {
     ])
   })
 
-  it('lists a switch-in after the leads and a faint with #108', () => {
+  it('plays a switch-in after the leads and a faint', () => {
     expect(
       outcomesFrom('|turn|1', '|switch|p1a: Skarmory|Skarmory, M|100/100', '|faint|p2a: Tyranitar'),
-    ).toEqual(['turn boundary', 'switchIn later #108', 'faint later #108'])
+    ).toEqual(['turn boundary', 'switchIn play', 'faint play'])
   })
 
   it('lists a message of the simulator as a line the game lacks', () => {
@@ -147,9 +147,9 @@ describe('outcomesOf the kinds that play later', () => {
 // Scene: the replay lists each event that does not play yet beside the dropped lines.
 describe('ruleFallbacks', () => {
   it('names the kind and the issue of each later event and the text of each missing line', () => {
-    const script = scriptOf('|turn|1', '|faint|p2a: Tyranitar', '|message|Bob forfeited.')
+    const script = scriptOf('|turn|1', '|-status|p2a: Tyranitar|brn', '|message|Bob forfeited.')
     expect(ruleFallbacks(script.events)).toEqual([
-      { line: NEXT + 1, kind: 'later', event: 'faint', detail: 'plays with #108' },
+      { line: NEXT + 1, kind: 'later', event: 'status', detail: 'plays with #109' },
       {
         line: NEXT + 2,
         kind: 'line',
