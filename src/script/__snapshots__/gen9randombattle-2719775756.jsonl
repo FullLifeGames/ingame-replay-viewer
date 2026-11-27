@@ -1,0 +1,83 @@
+{"gen":9,"format":"[Gen 9] Random Battle","teams":{"near":[{"species":"Cyclizar","name":"Cyclizar","gender":"F","level":84,"shiny":false},{"species":"Reshiram","name":"Reshiram","level":76,"shiny":false},{"species":"Zoroark-Hisui","name":"Zoroark","gender":"M","level":80,"shiny":false}],"far":[{"species":"Ambipom","name":"Ambipom","gender":"F","level":84,"shiny":false}]}}
+{"line":0,"text":"|j|☆yourmomisaduck","reason":"chat"}
+{"line":1,"text":"|j|☆mmesmerizer","reason":"chat"}
+{"line":2,"text":"|t:|1795698161","reason":"timestamp"}
+{"line":3,"text":"|gametype|singles","reason":"metadata"}
+{"kind":"player","line":4,"side":"near","name":"yourmomisaduck","avatar":"dawn","rating":1405}
+{"kind":"player","line":5,"side":"far","name":"mmesmerizer","avatar":"colress","rating":1437}
+{"line":6,"text":"|gen|9","reason":"metadata"}
+{"line":7,"text":"|tier|[Gen 9] Random Battle","reason":"metadata"}
+{"line":8,"text":"|rated|","reason":"metadata"}
+{"line":9,"text":"|rule|Species Clause: Limit one of each Pokemon","reason":"rule"}
+{"line":10,"text":"|rule|HP Percentage Mod: HP is shown in percentages","reason":"rule"}
+{"line":11,"text":"|rule|Sleep Clause Mod: Limit one foe put to sleep","reason":"rule"}
+{"line":12,"text":"|rule|Illusion Level Mod: Illusion disguises the Pokemon's true level","reason":"rule"}
+{"line":13,"text":"|","reason":"spacer"}
+{"line":14,"text":"|t:|1795698161","reason":"timestamp"}
+{"kind":"teamSize","line":15,"side":"near","size":6}
+{"kind":"teamSize","line":16,"side":"far","size":6}
+{"kind":"battleStart","line":17}
+{"kind":"switchIn","line":18,"who":{"side":"near","index":0},"dragged":false,"hp":{"hp":255,"max":255}}
+{"kind":"switchIn","line":19,"who":{"side":"far","index":0},"dragged":false,"hp":{"hp":263,"max":263}}
+{"kind":"turn","line":20,"number":1}
+{"line":21,"text":"|inactive|Battle timer is ON: inactive players will automatically lose when time's up. (requested by yourmomisaduck)","reason":"timer"}
+{"line":22,"text":"|inactive|mmesmerizer has 120 seconds left.","reason":"timer"}
+{"line":23,"text":"|inactive|mmesmerizer has 90 seconds left.","reason":"timer"}
+{"line":24,"text":"|inactive|mmesmerizer has 60 seconds left.","reason":"timer"}
+{"line":25,"text":"|inactive|mmesmerizer has 30 seconds left.","reason":"timer"}
+{"line":26,"text":"|inactive|mmesmerizer has 20 seconds left.","reason":"timer"}
+{"line":27,"text":"|inactive|mmesmerizer has 15 seconds left.","reason":"timer"}
+{"line":28,"text":"|","reason":"spacer"}
+{"line":29,"text":"|t:|1795698300","reason":"timestamp"}
+{"kind":"move","line":30,"user":{"side":"near","index":0},"move":"Shed Tail","target":{"side":"near","index":0}}
+{"kind":"effectStart","line":31,"who":{"side":"near","index":0},"effect":{"name":"Substitute"},"cause":{"name":"Shed Tail","kind":"move"}}
+{"kind":"damage","line":32,"who":{"side":"near","index":0},"hp":{"hp":127,"max":255}}
+{"line":33,"text":"|inactive|yourmomisaduck has 120 seconds left.","reason":"timer"}
+{"line":34,"text":"|","reason":"spacer"}
+{"line":35,"text":"|t:|1795698336","reason":"timestamp"}
+{"kind":"switchIn","line":36,"who":{"side":"near","index":1},"replaces":{"side":"near","index":0},"dragged":false,"cause":{"name":"Shed Tail"},"hp":{"hp":219,"max":219}}
+{"kind":"move","line":37,"user":{"side":"far","index":0},"move":"Triple Axel","target":{"side":"near","index":1}}
+{"kind":"effectActivate","line":38,"who":{"side":"near","index":1},"effect":{"name":"Substitute","kind":"move"},"damage":true}
+{"kind":"hitCount","line":39,"who":{"side":"near","index":1},"hits":1}
+{"line":40,"text":"|","reason":"spacer"}
+{"line":41,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":42,"number":2}
+{"line":43,"text":"|n|!yourmomisaduck|yourmomisaduck","reason":"chat"}
+{"line":44,"text":"|inactive|mmesmerizer has 60 seconds left.","reason":"timer"}
+{"line":45,"text":"|","reason":"spacer"}
+{"line":46,"text":"|t:|1795698368","reason":"timestamp"}
+{"kind":"move","line":47,"user":{"side":"far","index":0},"move":"Triple Axel","target":{"side":"near","index":1},"miss":true}
+{"kind":"miss","line":48,"user":{"side":"far","index":0},"target":{"side":"near","index":1}}
+{"kind":"move","line":49,"user":{"side":"near","index":1},"move":"Will-O-Wisp","target":{"side":"far","index":0}}
+{"kind":"status","line":50,"who":{"side":"far","index":0},"status":"brn"}
+{"line":51,"text":"|","reason":"spacer"}
+{"kind":"damage","line":52,"who":{"side":"far","index":0},"hp":{"hp":247,"max":263},"status":"brn","cause":{"name":"brn"}}
+{"line":53,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":54,"number":3}
+{"line":55,"text":"|inactive|mmesmerizer has 60 seconds left.","reason":"timer"}
+{"line":56,"text":"|inactive|yourmomisaduck has 120 seconds left.","reason":"timer"}
+{"line":57,"text":"|","reason":"spacer"}
+{"line":58,"text":"|t:|1795698398","reason":"timestamp"}
+{"kind":"move","line":59,"user":{"side":"far","index":0},"move":"Triple Axel","target":{"side":"near","index":1}}
+{"kind":"effectEnd","line":60,"who":{"side":"near","index":1},"effect":{"name":"Substitute"}}
+{"kind":"damage","line":61,"who":{"side":"near","index":1},"hp":{"hp":172,"max":219}}
+{"kind":"replace","line":62,"who":{"side":"near","index":2},"replaces":{"side":"near","index":1},"hp":{"hp":172,"max":219}}
+{"kind":"effectEnd","line":63,"who":{"side":"near","index":2},"effect":{"name":"Illusion"}}
+{"line":64,"text":"|-hint|Illusion Level Mod is active, so this Pokémon's true level was hidden.","reason":"hint"}
+{"kind":"damage","line":65,"who":{"side":"near","index":2},"hp":{"hp":107,"max":219}}
+{"kind":"hitCount","line":66,"who":{"side":"near","index":2},"hits":3}
+{"kind":"move","line":67,"user":{"side":"near","index":2},"move":"Focus Blast","target":{"side":"far","index":0},"miss":true}
+{"kind":"miss","line":68,"user":{"side":"near","index":2},"target":{"side":"far","index":0}}
+{"line":69,"text":"|","reason":"spacer"}
+{"kind":"damage","line":70,"who":{"side":"far","index":0},"hp":{"hp":231,"max":263},"status":"brn","cause":{"name":"brn"}}
+{"line":71,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":72,"number":4}
+{"line":73,"text":"|inactive|mmesmerizer has 60 seconds left.","reason":"timer"}
+{"line":74,"text":"|inactive|mmesmerizer has 30 seconds left.","reason":"timer"}
+{"line":75,"text":"|inactive|mmesmerizer has 20 seconds left.","reason":"timer"}
+{"line":76,"text":"|inactive|mmesmerizer has 15 seconds left.","reason":"timer"}
+{"line":77,"text":"|inactive|mmesmerizer has 10 seconds left.","reason":"timer"}
+{"line":78,"text":"|inactive|mmesmerizer has 5 seconds left.","reason":"timer"}
+{"kind":"message","line":79,"text":"mmesmerizer lost due to inactivity."}
+{"line":80,"text":"|","reason":"spacer"}
+{"kind":"win","line":81,"side":"near","name":"yourmomisaduck"}

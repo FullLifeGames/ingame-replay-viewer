@@ -1,0 +1,97 @@
+{"gen":9,"format":"[Gen 9] Random Battle","teams":{"near":[{"species":"Serperior","name":"Serperior","gender":"M","level":79,"shiny":false},{"species":"Torkoal","name":"Torkoal","gender":"F","level":88,"shiny":false},{"species":"Zoroark","name":"Zoroark","gender":"M","level":83,"shiny":false},{"species":"Banette","name":"Banette","gender":"M","level":93,"shiny":false}],"far":[{"species":"Flygon","name":"Flygon","gender":"M","level":82,"shiny":false},{"species":"Scyther","name":"Scyther","gender":"F","level":82,"shiny":false},{"species":"Lucario","name":"Lucario","gender":"M","level":84,"shiny":false}]}}
+{"line":0,"text":"|j|☆yiurfhasa+","reason":"chat"}
+{"line":1,"text":"|j|☆aroki 5.0","reason":"chat"}
+{"line":2,"text":"|t:|1795703989","reason":"timestamp"}
+{"line":3,"text":"|gametype|singles","reason":"metadata"}
+{"kind":"player","line":4,"side":"near","name":"yiurfhasa+","avatar":"lucas","rating":1425}
+{"kind":"player","line":5,"side":"far","name":"aroki 5.0","avatar":"roxie","rating":1475}
+{"line":6,"text":"|gen|9","reason":"metadata"}
+{"line":7,"text":"|tier|[Gen 9] Random Battle","reason":"metadata"}
+{"line":8,"text":"|rated|","reason":"metadata"}
+{"line":9,"text":"|rule|Species Clause: Limit one of each Pokemon","reason":"rule"}
+{"line":10,"text":"|rule|HP Percentage Mod: HP is shown in percentages","reason":"rule"}
+{"line":11,"text":"|rule|Sleep Clause Mod: Limit one foe put to sleep","reason":"rule"}
+{"line":12,"text":"|rule|Illusion Level Mod: Illusion disguises the Pokemon's true level","reason":"rule"}
+{"line":13,"text":"|","reason":"spacer"}
+{"line":14,"text":"|t:|1795703989","reason":"timestamp"}
+{"kind":"teamSize","line":15,"side":"near","size":6}
+{"kind":"teamSize","line":16,"side":"far","size":6}
+{"kind":"battleStart","line":17}
+{"kind":"switchIn","line":18,"who":{"side":"near","index":0},"dragged":false,"hp":{"hp":235,"max":235}}
+{"kind":"switchIn","line":19,"who":{"side":"far","index":0},"dragged":false,"hp":{"hp":265,"max":265}}
+{"kind":"turn","line":20,"number":1}
+{"line":21,"text":"|inactive|Battle timer is ON: inactive players will automatically lose when time's up. (requested by aroki 5.0)","reason":"timer"}
+{"line":22,"text":"|","reason":"spacer"}
+{"line":23,"text":"|t:|1795704007","reason":"timestamp"}
+{"kind":"switchIn","line":24,"who":{"side":"far","index":1},"replaces":{"side":"far","index":0},"dragged":false,"hp":{"hp":249,"max":249}}
+{"kind":"move","line":25,"user":{"side":"near","index":0},"move":"Dark Pulse","target":{"side":"far","index":1}}
+{"kind":"damage","line":26,"who":{"side":"far","index":1},"hp":{"hp":99,"max":249}}
+{"line":27,"text":"|","reason":"spacer"}
+{"line":28,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":29,"number":2}
+{"line":30,"text":"|","reason":"spacer"}
+{"line":31,"text":"|t:|1795704020","reason":"timestamp"}
+{"kind":"switchIn","line":32,"who":{"side":"far","index":2},"replaces":{"side":"far","index":1},"dragged":false,"hp":{"hp":255,"max":255}}
+{"kind":"move","line":33,"user":{"side":"near","index":0},"move":"Dark Pulse","target":{"side":"far","index":2}}
+{"kind":"damage","line":35,"who":{"side":"far","index":2},"hp":{"hp":174,"max":255},"effectiveness":"resisted","folded":[34]}
+{"line":36,"text":"|","reason":"spacer"}
+{"line":37,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":38,"number":3}
+{"line":39,"text":"|","reason":"spacer"}
+{"line":40,"text":"|t:|1795704043","reason":"timestamp"}
+{"kind":"switchIn","line":41,"who":{"side":"near","index":1},"replaces":{"side":"near","index":0},"dragged":false,"hp":{"hp":266,"max":266}}
+{"kind":"weather","line":42,"weather":"Sun","phase":"start","cause":{"name":"Drought","kind":"ability"},"source":{"side":"near","index":1}}
+{"kind":"move","line":43,"user":{"side":"far","index":2},"move":"Nasty Plot","target":{"side":"far","index":2}}
+{"kind":"statChange","line":44,"who":{"side":"far","index":2},"stat":"spa","stages":2}
+{"line":45,"text":"|","reason":"spacer"}
+{"kind":"weather","line":46,"weather":"Sun","phase":"upkeep"}
+{"line":47,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":48,"number":4}
+{"line":49,"text":"|","reason":"spacer"}
+{"line":50,"text":"|t:|1795704057","reason":"timestamp"}
+{"kind":"move","line":51,"user":{"side":"far","index":2},"move":"Aura Sphere","target":{"side":"near","index":1}}
+{"kind":"damage","line":52,"who":{"side":"near","index":1},"hp":{"hp":0,"max":266}}
+{"kind":"faint","line":53,"who":{"side":"near","index":1}}
+{"kind":"damage","line":54,"who":{"side":"far","index":2},"hp":{"hp":149,"max":255},"cause":{"name":"Life Orb","kind":"item"}}
+{"line":55,"text":"|","reason":"spacer"}
+{"kind":"weather","line":56,"weather":"Sun","phase":"upkeep"}
+{"line":57,"text":"|upkeep","reason":"upkeep"}
+{"line":58,"text":"|inactive|yiurfhasa+ has 120 seconds left.","reason":"timer"}
+{"line":59,"text":"|inactive|yiurfhasa+ has 90 seconds left.","reason":"timer"}
+{"line":60,"text":"|","reason":"spacer"}
+{"line":61,"text":"|t:|1795704107","reason":"timestamp"}
+{"kind":"switchIn","line":62,"who":{"side":"near","index":0},"dragged":false,"hp":{"hp":235,"max":235}}
+{"kind":"turn","line":63,"number":5}
+{"line":64,"text":"|","reason":"spacer"}
+{"line":65,"text":"|t:|1795704114","reason":"timestamp"}
+{"kind":"move","line":66,"user":{"side":"far","index":2},"move":"Vacuum Wave","target":{"side":"near","index":0}}
+{"kind":"damage","line":68,"who":{"side":"near","index":0},"hp":{"hp":0,"max":235},"effectiveness":"super","folded":[67]}
+{"kind":"replace","line":69,"who":{"side":"near","index":2},"replaces":{"side":"near","index":0},"hp":{"hp":0,"max":235}}
+{"kind":"effectEnd","line":70,"who":{"side":"near","index":2},"effect":{"name":"Illusion"}}
+{"line":71,"text":"|-hint|Illusion Level Mod is active, so this Pokémon's true level was hidden.","reason":"hint"}
+{"kind":"faint","line":72,"who":{"side":"near","index":2}}
+{"kind":"damage","line":73,"who":{"side":"far","index":2},"hp":{"hp":124,"max":255},"cause":{"name":"Life Orb","kind":"item"}}
+{"line":74,"text":"|","reason":"spacer"}
+{"kind":"weather","line":75,"weather":"Sun","phase":"upkeep"}
+{"line":76,"text":"|upkeep","reason":"upkeep"}
+{"line":77,"text":"|","reason":"spacer"}
+{"line":78,"text":"|t:|1795704125","reason":"timestamp"}
+{"kind":"switchIn","line":79,"who":{"side":"near","index":3},"dragged":false,"hp":{"hp":270,"max":270}}
+{"kind":"turn","line":80,"number":6}
+{"line":81,"text":"|","reason":"spacer"}
+{"line":82,"text":"|t:|1795704134","reason":"timestamp"}
+{"kind":"move","line":83,"user":{"side":"far","index":2},"move":"Flash Cannon","target":{"side":"near","index":3}}
+{"kind":"damage","line":84,"who":{"side":"near","index":3},"hp":{"hp":0,"max":270}}
+{"kind":"effectStart","line":85,"who":{"side":"far","index":2},"effect":{"name":"Disable"},"detail":"Flash Cannon","cause":{"name":"Cursed Body","kind":"ability"},"source":{"side":"near","index":3}}
+{"kind":"faint","line":86,"who":{"side":"near","index":3}}
+{"kind":"damage","line":87,"who":{"side":"far","index":2},"hp":{"hp":99,"max":255},"cause":{"name":"Life Orb","kind":"item"}}
+{"line":88,"text":"|","reason":"spacer"}
+{"kind":"weather","line":89,"weather":"Sun","phase":"upkeep"}
+{"line":90,"text":"|upkeep","reason":"upkeep"}
+{"kind":"message","line":91,"text":"yiurfhasa+ forfeited."}
+{"line":92,"text":"|","reason":"spacer"}
+{"kind":"win","line":93,"side":"far","name":"aroki 5.0"}
+{"line":94,"text":"|raw|yiurfhasa+'s rating: 1425 &rarr; <strong>1408</strong><br />(-17 for losing)","reason":"room"}
+{"line":95,"text":"|raw|aroki 5.0's rating: 1475 &rarr; <strong>1492</strong><br />(+17 for winning)","reason":"room"}
+{"line":96,"text":"|l|☆yiurfhasa+","reason":"chat"}
+{"line":97,"text":"|player|p1|","reason":"room"}

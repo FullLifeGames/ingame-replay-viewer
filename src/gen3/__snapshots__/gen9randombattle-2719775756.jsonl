@@ -1,0 +1,62 @@
+{"length":1344,"crc32":"b3d638d7","trainers":{"near":{"name":"yourmomisaduck","trainerPic":1,"teamSize":6,"revealed":3},"far":{"name":"mmesmerizer","trainerPic":2,"teamSize":6,"revealed":1}},"parties":{"near":[{"species":1356,"maxHp":100,"level":84,"gender":"female","shiny":false,"nickname":"Cyclizar"},{"species":643,"maxHp":100,"level":76,"gender":"none","shiny":false,"nickname":"Reshiram"},{"species":1003,"maxHp":100,"level":80,"gender":"male","shiny":false,"nickname":"Zoroark"},null,null,null],"far":[{"species":424,"maxHp":100,"level":84,"gender":"female","shiny":false,"nickname":"Ambipom"},null,null,null,null,null]}}
+{"line":17,"op":"intro"}
+{"line":17,"op":"print","text":"You are challenged by mmesmerizer!"}
+{"line":19,"op":"print","text":"mmesmerizer sent out Ambipom!"}
+{"line":19,"op":"sendOut","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":18,"op":"print","text":"Go! Cyclizar!"}
+{"line":18,"op":"sendOut","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":20,"op":"turn","number":1}
+{"line":30,"op":"print","text":"Cyclizar used Shed Tail!"}
+{"line":30,"op":"move","user":"near","target":"near","move":806,"animTurn":0}
+{"line":31,"op":"volatile","side":"near","volatile":"substitute","on":true}
+{"line":32,"op":"hp","side":"near","hp":50}
+{"line":31,"op":"print","text":"Cyclizar put in a substitute!"}
+{"line":36,"op":"withdraw","side":"near"}
+{"line":36,"op":"print","text":"Go! Reshiram!"}
+{"line":36,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":37,"op":"print","text":"The opposing Ambipom used Triple Axel!"}
+{"line":37,"op":"move","user":"far","target":"near","move":741,"animTurn":0}
+{"line":38,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":38,"op":"print","text":"The substitute took damage for Reshiram!"}
+{"line":39,"op":"print","text":"The Pokémon was hit 1 time!"}
+{"line":42,"op":"turn","number":2}
+{"line":47,"op":"print","text":"The opposing Ambipom used Triple Axel!"}
+{"line":48,"op":"print","text":"Reshiram avoided the attack!"}
+{"line":49,"op":"print","text":"Reshiram used Will-O-Wisp!"}
+{"line":49,"op":"move","user":"near","target":"far","move":261,"animTurn":0}
+{"line":50,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":50,"op":"print","text":"The opposing Ambipom was burned!"}
+{"line":50,"op":"status","side":"far","slot":0,"status":"brn"}
+{"line":52,"op":"print","text":"The opposing Ambipom was hurt by its burn!"}
+{"line":52,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":52,"op":"hp","side":"far","hp":94}
+{"line":54,"op":"turn","number":3}
+{"line":59,"op":"print","text":"The opposing Ambipom used Triple Axel!"}
+{"line":59,"op":"move","user":"far","target":"near","move":741,"animTurn":0}
+{"line":60,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":60,"op":"print","text":"The substitute took damage for Reshiram!"}
+{"line":60,"op":"anim","side":"near","anim":"substituteFade"}
+{"line":60,"op":"print","text":"Reshiram's substitute faded!"}
+{"line":60,"op":"volatile","side":"near","volatile":"substitute","on":false}
+{"line":61,"op":"flushTextBox"}
+{"line":61,"op":"move","user":"far","target":"near","move":741,"animTurn":0}
+{"line":61,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":61,"op":"hp","side":"near","hp":79}
+{"line":62,"op":"withdraw","side":"near"}
+{"line":62,"op":"switchIn","side":"near","slot":2,"hp":79,"status":"none"}
+{"line":63,"op":"print","text":"Zoroark's illusion wore off!"}
+{"line":65,"op":"flushTextBox"}
+{"line":65,"op":"move","user":"far","target":"near","move":741,"animTurn":0}
+{"line":65,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":65,"op":"hp","side":"near","hp":49}
+{"line":66,"op":"print","text":"The Pokémon was hit 3 times!"}
+{"line":67,"op":"print","text":"Zoroark used Focus Blast!"}
+{"line":68,"op":"print","text":"The opposing Ambipom avoided the attack!"}
+{"line":70,"op":"print","text":"The opposing Ambipom was hurt by its burn!"}
+{"line":70,"op":"anim","side":"far","anim":"statusBrn"}
+{"line":70,"op":"hp","side":"far","hp":88}
+{"line":72,"op":"turn","number":4}
+{"line":79,"op":"print","text":"mmesmerizer lost due to inactivity."}
+{"line":81,"op":"print","text":"yourmomisaduck won the battle!"}
+{"line":81,"op":"end","outcome":"nearWon"}
+{"line":62,"fallback":"mechanic","detail":"Illusion's end, which the game plays as a switch"}
