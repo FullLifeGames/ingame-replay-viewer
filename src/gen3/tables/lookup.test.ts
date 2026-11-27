@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { Gen3Error } from '../errors'
 import abilities from './abilities.json'
 import { genericMove } from './generic'
-import { abilityOf, constantOf, itemOf, moveOf, readTable, speciesOf } from './lookup'
+import { abilityOf, constantOf, itemOf, moveOf, readTable, speciesOf, typeOf } from './lookup'
 
 describe('constantOf (T8)', () => {
   it.each([
@@ -32,6 +32,12 @@ describe('lookups by @pkmn name', () => {
 
   it('take the given name where the expansion has no display name', () => {
     expect(itemOf('TM01')).toEqual({ number: 582, name: 'TM01' })
+  })
+
+  it('give a Tera type its TYPE_* number, and none for the type the game calls ???', () => {
+    expect(typeOf('Fairy')).toBe(19)
+    expect(typeOf('Stellar')).toBe(20)
+    expect(typeOf('???')).toBeUndefined()
   })
 
   it('play every Hidden Power type as Hidden Power', () => {

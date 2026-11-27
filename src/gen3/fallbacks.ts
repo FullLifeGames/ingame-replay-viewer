@@ -6,7 +6,7 @@ import type { Phrase } from './text/template'
 
 /**
  * A mechanic the stream holds no state for. On a silent line nothing shows in its place; on a line
- * that prints, the text shows and the look the stream lacks does not (a Terastallization, #88).
+ * that prints, the text shows and the look the stream lacks does not (a Tera type the game lacks).
  */
 interface MechanicFallback {
   readonly kind: 'mechanic'
@@ -25,9 +25,15 @@ export function mechanicGap(effect: string, phase: string): MechanicFallback {
   return { kind: 'mechanic', detail: `no state in the stream for ${effect} ${phase}` }
 }
 
+/** A Terastallization into `type`, which the game has no `TYPE_*` for: the lines show alone. */
+export function teraTypeGap(type: string): MechanicFallback {
+  return { kind: 'mechanic', detail: `the game has no Tera type ${type}` }
+}
+
 /**
- * A look of `move` that the log names (`[anim] Ivy Cudgel Water`) and the game lacks: the MOVE op
- * carries the move alone, so the game plays the move's own animation.
+ * A look of `move` that the log names (`[anim] Shell Side Arm Physical`) and the game lacks: the
+ * MOVE op carries the move alone, so the game plays the move's own animation. A look by type
+ * (`[anim] Ivy Cudgel Water`) is none: its MOVE_TYPE gives the game the type (#89).
  */
 export function animGap(look: string, move: string): NonNullable<Found['fallback']> {
   return { kind: 'move', detail: `the game has no look for ${look}; it plays ${move}` }

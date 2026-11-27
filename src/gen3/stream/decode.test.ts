@@ -49,12 +49,21 @@ describe('decodeStream', () => {
     expect(decodeStream(slot.subarray(8, 8 + bytes.length))).toEqual(streamOf([END]))
   })
 
-  it('refuses versions 1, 2 and 4 (F7)', () => {
-    for (const version of [1, 2, 4]) {
+  it('refuses versions 1, 2, 3 and 5 (F7)', () => {
+    for (const version of [1, 2, 3, 5]) {
       expect(patched([END], 0, [version])).toThrow(
-        `stream version ${String(version)} is unknown; this reads version 3`,
+        `stream version ${String(version)} is unknown; this reads version 4`,
       )
     }
+  })
+
+  it('reads back the snow and its animation of each turn, which version 3 lacked', () => {
+    const snow = streamOf([
+      { op: 'weather', weather: 'snow' },
+      { op: 'anim', side: 'far', anim: 'snowContinues' },
+      END,
+    ])
+    expect(decodeStream(encodeStream(snow))).toEqual(snow)
   })
 
   it('refuses a MOVE of size 4, as version 2 wrote it, and reads its animation turn', () => {
@@ -84,11 +93,31 @@ describe('decodeStream', () => {
     expect(patched([turn, END], at, [1])).toThrow(Gen3Error)
   })
 
-  it('refuses an unknown op, the one after the last op of version 3', () => {
-    expect(patched([END], STREAM.tablesEnd, [0x17])).toThrow(/op 23/)
+  it('refuses an unknown op, the one after the last op of version 4', () => {
+    expect(patched([END], STREAM.tablesEnd, [0x19])).toThrow(/op 25/)
   })
 
-  it('refuses a header whose sizes or offsets are not those of version 3', () => {
+  it('reads back a TERA and a MOVE_TYPE and refuses a type outside TYPE_NORMAL to the last', () => {
+    const tera: Instruction = { op: 'tera', side: 'far', teraType: 19 }
+    const moveType: Instruction = { op: 'moveType', type: 11 }
+    expect(decodeStream(encodeStream(streamWithLeads([tera, moveType, END])))).toEqual(
+      streamWithLeads([tera, moveType, END]),
+    )
+    const count = counts.NUMBER_OF_MON_TYPES
+    const types: [Instruction, number, RegExp][] = [
+      [tera, AFTER_LEADS + 3, /tera teraType/],
+      [moveType, AFTER_LEADS + 2, /moveType type/],
+    ]
+    for (const [instruction, at, message] of types) {
+      for (const type of [0, count]) {
+        expect(patched([...LEADS, instruction, END], at, [type])).toThrow(message)
+      }
+      const last = patched([...LEADS, instruction, END], at, [count - 1])()
+      expect(last.instructions[LEADS.length], instruction.op).toMatchObject({ op: instruction.op })
+    }
+  })
+
+  it('refuses a header whose sizes or offsets are not those of version 4', () => {
     const cases: [number, number][] = [
       [STREAM_OFFSET.headerSize, 0x20],
       [STREAM_OFFSET.trainerSize, 25],

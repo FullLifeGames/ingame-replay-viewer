@@ -3,6 +3,7 @@
 #include "test/replay_test.h"
 #include "constants/items.h"
 #include "constants/moves.h"
+#include "constants/pokemon.h"
 #include "constants/species.h"
 
 // The interpreter refuses a stream that breaks the order rules (replay_stream.h, #18) before a
@@ -152,6 +153,27 @@ TEST("Replay: order: a SHOW_MON after a WITHDRAW is refused")
     ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
     ReplayStream_Withdraw(REPLAY_SIDE_NEAR);
     ReplayStream_ShowMon(REPLAY_SIDE_NEAR);
+    ReplayStream_End(REPLAY_OUTCOME_TIE);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_ORDER);
+}
+
+TEST("Replay: order: a TERA before any SEND_OUT is refused")
+{
+    ReplayStream_Begin();
+    ReplayStream_Intro();
+    ReplayStream_Tera(REPLAY_SIDE_NEAR, TYPE_FAIRY);
+    ReplayStream_End(REPLAY_OUTCOME_TIE);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_ORDER);
+}
+
+TEST("Replay: order: a TERA on a fainted side is refused")
+{
+    ReplayStream_Begin();
+    ReplayStream_Intro();
+    ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+    ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+    ReplayStream_Faint(REPLAY_SIDE_FAR);
+    ReplayStream_Tera(REPLAY_SIDE_FAR, TYPE_FAIRY);
     ReplayStream_End(REPLAY_OUTCOME_TIE);
     EXPECT_EQ(Validate(), REPLAY_ERROR_ORDER);
 }

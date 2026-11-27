@@ -10,15 +10,16 @@
 #include "test_runner.h"
 #include "constants/battle.h"
 #include "constants/battle_move_effects.h"
+#include "constants/pokemon.h"
 #include "constants/songs.h"
 
-// The ops of a move and its damage (#6, #65, #68): MOVE, HIT, HP, FAINT and SHOW_MON. Each emits its
-// controller commands as the battle engine does for a move that hits (CancelerMoveAnimation,
-// CancelerEffectivenessSound, CancelerHitAnimation, CancelerHealthBarUpdate in
-// battle_move_resolution.c), for a mon that faints (BattleScript_FaintBattler) and for a user that
-// a move left hidden (MoveEndAttackerVisible). HP also starts and stops the low-HP beep, as the
-// engine's datahpupdate does. An op with two commands for one battler emits one per step, because
-// a battler has one bufferA.
+// The ops of a move and its damage (#6, #65, #68, #89): MOVE_TYPE, MOVE, HIT, HP, FAINT and
+// SHOW_MON. Each emits its controller commands as the battle engine does for a move that hits
+// (CancelerMoveAnimation, CancelerEffectivenessSound, CancelerHitAnimation,
+// CancelerHealthBarUpdate in battle_move_resolution.c), for a mon that faints
+// (BattleScript_FaintBattler) and for a user that a move left hidden (MoveEndAttackerVisible). HP
+// also starts and stops the low-HP beep, as the engine's datahpupdate does. An op with two
+// commands for one battler emits one per step, because a battler has one bufferA.
 
 // The sound of each REPLAY_EFFECTIVENESS_*, as CancelerEffectivenessSound picks it.
 static const u16 sEffectivenessSounds[] =
@@ -46,6 +47,15 @@ static void SetTransformedMon(u32 user, u32 target)
         gBattleMons[user].volatiles.isTransformedMonShiny = gBattleMons[user].isShiny;
 }
 
+// MOVE_TYPE: the type the next MOVE's animation reads (GetBattleMoveType), as the engine sets
+// gBattleStruct->dynamicMoveType before Ivy Cudgel's or Tera Blast's animation picks its look.
+// MOVE clears it once its animation has played, and TURN clears one that no MOVE took.
+bool32 Replay_OpMoveType(const volatile u8 *operands, u32 step)
+{
+    gBattleStruct->dynamicMoveType = operands[0];
+    return TRUE;
+}
+
 // MOVE: the user's move animation against the target. The animation reads gBattlerAttacker and
 // gBattlerTarget (DoMoveAnim), so they and gCurrentMove are set first. The animation turn goes to
 // the controller as the stream gives it, as the engine passes gBattleScripting.animTurn. The stream
@@ -57,7 +67,10 @@ bool32 Replay_OpMove(const volatile u8 *operands, u32 step)
     u32 animTurn = operands[4];
 
     if (step != 0)
+    {
+        gBattleStruct->dynamicMoveType = TYPE_NONE;
         return TRUE;
+    }
     gBattlerAttacker = user;
     gBattlerTarget = Replay_GetBattler(operands[1]);
     gCurrentMove = move;
