@@ -47,6 +47,22 @@ describe("a move line's [anim]", () => {
     },
   )
 
+  it("writes no MOVE_TYPE for another move's look by type, and lists it", () => {
+    const look = 'Tera Blast Fire'
+    const result = streamOfLog(`|move|p1a: Dugtrio|Ivy Cudgel|p2a: Tyranitar|[anim] ${look}`)
+    const scene = result.instructions.filter(({ line }) => line >= NEXT)
+    expect(scene.map(({ instruction }) => plain(instruction))).toEqual([
+      'Dugtrio used Ivy Cudgel!',
+      { op: 'move', user: 'near', target: 'far', move: moveOf('Ivy Cudgel').number, animTurn: 0 },
+      { op: 'end', outcome: 'unknown' },
+    ])
+    const detail = `the game has no look for ${look}; it plays Ivy Cudgel`
+    expect(animGap(look, 'Ivy Cudgel')).toEqual({ kind: 'move', detail })
+    expect(result.fallbacks.filter(({ line }) => line >= NEXT)).toEqual([
+      { line: NEXT, kind: 'move', detail },
+    ])
+  })
+
   it('writes no MOVE_TYPE for a move with no [anim]', () => {
     const result = streamOfLog('|move|p1a: Dugtrio|Ivy Cudgel|p2a: Tyranitar')
     const ops = result.instructions.filter(({ line }) => line >= NEXT)
