@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { BattleScript, ScriptEvent } from '../../script/events.ts'
+import { scriptOf } from '../../script/testing.ts'
 import type { TeamMember } from '../../script/types.ts'
 import { revealedSets } from './revealed.ts'
 
@@ -116,6 +117,36 @@ describe('the abilities the log reveals', () => {
   })
 })
 
+describe('the abilities a Pokémon shows on its own line', () => {
+  // Scene: Tyranitar's Sticky Hold keeps its item; the script reads the line as a block.
+  it('reads Sticky Hold’s line as its holder’s ability', () => {
+    const { sets } = revealedSets(scriptOf('|-activate|p2a: Tyranitar|ability: Sticky Hold'))
+    expect(sets.far[0]).toEqual({ moves: [], ability: 'Sticky Hold' })
+  })
+
+  // Scene: a Fire move powers up Tyranitar's Flash Fire.
+  it('reads Flash Fire’s start as its holder’s ability', () => {
+    const { sets } = revealedSets(scriptOf('|-start|p2a: Tyranitar|ability: Flash Fire'))
+    expect(sets.far[0]).toEqual({ moves: [], ability: 'Flash Fire' })
+  })
+
+  // Scene: Starmie touches Gardevoir's Mummy and takes it on; later Starmie's Mummy shows.
+  it('reads Mummy as its holder’s and freezes the ability of the Pokémon of [of]', () => {
+    const { sets } = revealed(
+      {
+        kind: 'effectActivate',
+        line: 1,
+        who: GARDEVOIR,
+        effect: ability('Mummy'),
+        source: STARMIE,
+      },
+      { kind: 'ability', line: 2, who: STARMIE, ability: 'Mummy' },
+    )
+    expect(sets.near[1]).toEqual({ moves: [], ability: 'Mummy' })
+    expect(sets.far[0]).toEqual({ moves: [] })
+  })
+})
+
 describe('the items the log reveals', () => {
   // Scene: Starmie tricks its Choice Scarf onto Ferrothorn; each one shows the other's item.
   it('freezes both items on Trick', () => {
@@ -178,6 +209,17 @@ describe('the items the log reveals', () => {
       { moves: [], item: 'Leftovers' },
       { moves: [], item: 'Custap Berry', ability: 'Frisk' },
     ])
+  })
+  // Scene: Tyranitar's Pickpocket takes Dugtrio's Leftovers on contact, as Showdown writes it.
+  it('freezes both items on Pickpocket and gives the ability to the thief', () => {
+    const { sets } = revealedSets(
+      scriptOf(
+        '|-enditem|p1a: Dugtrio|Leftovers|[silent]|[from] ability: Pickpocket|[of] p1a: Dugtrio',
+        '|-item|p2a: Tyranitar|Leftovers|[from] ability: Pickpocket|[of] p1a: Dugtrio',
+      ),
+    )
+    expect(sets.far[0]).toEqual({ moves: [], ability: 'Pickpocket' })
+    expect(sets.near[0]).toEqual({ moves: [], item: 'Leftovers' })
   })
 })
 
