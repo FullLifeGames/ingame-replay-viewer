@@ -45,10 +45,8 @@ import { log, sampleLine } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { type ReplayOptions, readReplayOptions } from './gen5-replay-args.ts'
 import { blockReport, endLines, notShownLines, runSummary } from './gen5-replay-log.ts'
-import { compareMarks, marksOf, pendingMarks, type RunMark } from './gen5-replay-marks.ts'
-
-/** Polls of the page's report after the run while a mark's hash is pending, one each POLL_MS. */
-const HASH_POLLS = 10
+import { HASH_POLLS, marksFile, marksVerdict, runExit } from './gen5-replay-exit.ts'
+import { marksOf, pendingMarks, type RunMark } from './gen5-replay-marks.ts'
 
 const hex = (value: number) => `0x${value.toString(16)}`
 
@@ -160,14 +158,9 @@ function marksChecked(run: Run, report: RunReport): boolean {
   const file = { label, status: report.status, marks }
   writeFileSync(join(GEN5_PATHS.runs, `${label}.json`), `${JSON.stringify(file, null, 1)}\n`)
   log(`marks: ${String(marks.length)} written to build/gen5/runs/${label}.json`)
-  const pending = pendingMarks(marks)
-  if (pending.length > 0) {
-    log(`marks: main RAM sha256 pending after ${String(HASH_POLLS)} polls: ${pending.join(', ')}`)
-  }
-  if (run.against === undefined) return pending.length === 0
-  const { equal, lines } = compareMarks(marks, run.against)
+  const { agree, lines } = marksVerdict(marks, run.against)
   for (const line of lines) log(line)
-  return pending.length === 0 && equal
+  return agree
 }
 
 async function play(page: Page, run: Run): Promise<number> {
@@ -188,21 +181,17 @@ async function play(page: Page, run: Run): Promise<number> {
   const party = logPlay(report, battle, team, replay)
   const marks = marksChecked(run, report)
   log(runSummary(replay.blocks, report.marks, Date.now() - began))
-  return report.status === 'done' && party && marks ? 0 : 1
-}
-
-/** The marks of an earlier run's file. */
-function readMarks(path: string): RunMark[] {
-  const file = JSON.parse(readFileSync(path, 'utf8')) as { marks?: RunMark[] }
-  if (!Array.isArray(file.marks)) throw new Error(`${path} holds no marks of a run`)
-  return file.marks
+  return runExit({ status: report.status, party, marks })
 }
 
 async function main(): Promise<void> {
   const options = readReplayOptions(process.argv.slice(2), Date.now())
   const dump = process.env.GEN5_DUMP
   if (!dump) throw new Error('set GEN5_DUMP to the path of the Black 2 (USA) dump')
-  const against = options.against === undefined ? undefined : readMarks(options.against)
+  const against =
+    options.against === undefined
+      ? undefined
+      : marksFile(readFileSync(options.against, 'utf8'), options.against)
   log(`gen5-replay: ${JSON.stringify(options)}; ${sampleLine()}`)
   const numbers = readNumbers()
   await withGen5Page('', (page) => play(page, { dump, numbers, options, against }))

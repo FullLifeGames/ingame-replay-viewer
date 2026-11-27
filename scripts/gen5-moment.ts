@@ -44,12 +44,10 @@ import { type Battle, readBattle } from './gen5-moment-read.ts'
 import { momentTeam } from './gen5-moment-team.ts'
 import { markLines, writeLines } from './gen5-moment-log.ts'
 import { MOMENT_GAP, momentStart, momentSteps } from './gen5-moment-plan.ts'
-import { listedReader } from './gen5-bw2-source.ts'
 import {
   sceneBlocks,
   sceneLineLabel,
   type SceneName,
-  TEXT_BANKS,
   textId,
   textLine,
 } from './gen5-moment-scene.ts'
@@ -74,9 +72,6 @@ interface Session {
   options: MomentOptions
   team: Team | undefined
 }
-
-const readPokebw2 = listedReader(GEN5_PATHS.pokebw2)
-const bank = (name: keyof typeof TEXT_BANKS) => readPokebw2(TEXT_BANKS[name])
 
 function readStateFile(base: string): StateFile {
   const meta = JSON.parse(readFileSync(join(GEN5_PATHS.states, `${base}.json`), 'utf8')) as {
@@ -123,16 +118,17 @@ async function sessionTeam(numbers: Bw2Numbers, options: MomentOptions) {
 
 /** The scene's blocks for the battle read, each logged with the move line it shows. */
 function sceneMoments(scene: SceneName, battle: Battle, numbers: Bw2Numbers) {
-  const std = textId(bank('standard'), 'Bank0019_Text_ItsSuperEffective')
+  const banks = textBanks()
+  const std = textId(banks.standard, 'Bank0019_Text_ItsSuperEffective')
   const blocks = sceneBlocks(scene, battle, numbers.battle.single, std)
   for (const { name, moment } of blocks) {
     const side = moment.attacker.monId === battle.near.monId ? 'near' : 'far'
-    const line = sceneLineLabel(scene, side, bank('move'))
+    const line = sceneLineLabel(scene, side, banks.move)
     log(
-      `${name}: ${JSON.stringify(moment)}; ${line}: ${textLine(bank('move'), textId(bank('move'), line))}`,
+      `${name}: ${JSON.stringify(moment)}; ${line}: ${textLine(banks.move, textId(banks.move, line))}`,
     )
   }
-  log(`standard line ${String(std)}: ${textLine(bank('standard'), std)}`)
+  log(`standard line ${String(std)}: ${textLine(banks.standard, std)}`)
   return blocks
 }
 
