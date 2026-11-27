@@ -9,8 +9,9 @@ import type { PokemonRef, Side } from '../../script/types.ts'
 import type { EventOf } from './rules.ts'
 import { partyOrder, refKey } from './slots.ts'
 
-/** The party slot of the Pokémon in place: in a single battle slot 0 is the front. */
-const FRONT_SLOT = 0
+/** The party slot of the Pokémon in place: in a single battle slot 0 is the front, and the
+ * place within its client that SC_OP_SEND_IN and SC_SEND_OUT name. */
+export const FRONT_SLOT = 0
 
 /** What a send-in did to the party: the incoming Pokémon's slot before the swap, and the
  * Pokémon it sent back; none after a faint. */

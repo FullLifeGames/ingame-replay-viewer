@@ -23,7 +23,7 @@ export interface InPlace {
 
 /** What a send-in names: the side's client, the incoming Pokémon's party slot before the swap,
  * and the Pokémon it sends back, in place until then; none after a faint. */
-interface SendIn {
+export interface SendIn {
   readonly client: number
   readonly slot: number
   readonly out?: InPlace & { readonly ref: PokemonRef }

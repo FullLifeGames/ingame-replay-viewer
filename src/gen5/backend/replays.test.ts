@@ -104,7 +104,7 @@ describe('the Gen 5 OU test replays', () => {
     )
     expect(lists).toEqual({
       'gen5ou-2718717830': {
-        '#108': { switchIn: 13, faint: 3 },
+        '#108': { faint: 3 },
         '#109': {
           weather: 15,
           singleTurn: 2,
@@ -123,7 +123,7 @@ describe('the Gen 5 OU test replays', () => {
         line: { message: 1 },
       },
       'smogtours-gen5ou-862240': {
-        '#108': { switchIn: 15, faint: 8 },
+        '#108': { faint: 8 },
         '#109': {
           ability: 4,
           statChange: 16,

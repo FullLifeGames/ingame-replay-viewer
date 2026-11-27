@@ -9,8 +9,8 @@ import { type Gen5Fallback, laterFallback, lineFallback } from './fallbacks.ts'
 
 /** What becomes of an event. `park`: the park shows it (#106). `game`: the game shows it itself.
  * `boundary`: it parts the blocks. `play`: the writer plays it where its Pokémon stand in place
- * (moves.ts). `later`: issue `issue` plays it. `line`: Black 2 has no line for it, and nothing
- * shows. */
+ * (moves.ts), and a switch-in as its switch, drag or send-in (switches.ts). `later`: issue
+ * `issue` plays it. `line`: Black 2 has no line for it, and nothing shows. */
 export type Outcome =
   | { readonly as: 'park' | 'game' | 'boundary' | 'play' }
   | { readonly as: 'later'; readonly issue: number }
@@ -56,7 +56,7 @@ const RULES = {
   teamSize: park,
   battleStart: park,
   turn: () => ({ as: 'boundary' }),
-  switchIn: (_, ctx) => (ctx.afterLeads ? SWITCHES : { as: 'game' }),
+  switchIn: (_, ctx) => (ctx.afterLeads ? PLAY : { as: 'game' }),
   faint: switches,
   message: (event) => ({ as: 'line', detail: `Black 2 has no line for "${event.text}"` }),
   win: whole,

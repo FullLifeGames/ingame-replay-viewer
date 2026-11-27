@@ -191,21 +191,21 @@ describe('an HP change that does not play yet', () => {
 })
 
 // Scene: Bob sends in Skarmory, his team's second Pokémon and so mon ID 11, at position 1, and
-// Dugtrio's Rock Slide hits it there. The switch-in itself waits for #108.
+// Dugtrio's Rock Slide hits it there.
 describe('a hit on a Pokémon sent in', () => {
-  it('names the Pokémon sent in by its own mon ID and lists only the switch-in', () => {
+  it('names the Pokémon sent in by its own mon ID', () => {
     const lines = [
       '|switch|p2a: Skarmory|Skarmory, M|100/100',
       '|move|p1a: Dugtrio|Rock Slide|p2a: Skarmory',
       '|-damage|p2a: Skarmory|80/100',
     ]
     const skarmory = { monId: 11, pos: 1 }
-    expect(commandsOf(...lines)).toEqual([
+    expect(commandsOf(...lines).slice(-4)).toEqual([
       moveMsg(DUGTRIO.monId, 'Rock Slide'),
       moveAnim(DUGTRIO.pos, skarmory.pos, 'Rock Slide'),
       subtract(skarmory.monId, 20),
       flash(KINDS.plain, 'Rock Slide', skarmory.monId),
     ])
-    expect(eventFallbacks(...lines)).toEqual(['switchIn 1 plays with #108'])
+    expect(eventFallbacks(...lines)).toEqual([])
   })
 })

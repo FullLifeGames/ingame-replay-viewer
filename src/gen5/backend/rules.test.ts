@@ -49,10 +49,10 @@ describe('outcomesOf the intro and the turns', () => {
     ])
   })
 
-  it('lists a switch-in after the leads and a faint with #108', () => {
+  it('plays a switch-in after the leads and lists a faint with #108', () => {
     expect(
       outcomesFrom('|turn|1', '|switch|p1a: Skarmory|Skarmory, M|100/100', '|faint|p2a: Tyranitar'),
-    ).toEqual(['turn boundary', 'switchIn later #108', 'faint later #108'])
+    ).toEqual(['turn boundary', 'switchIn play', 'faint later #108'])
   })
 
   it('lists a message of the simulator as a line the game lacks', () => {

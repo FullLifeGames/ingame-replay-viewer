@@ -180,6 +180,12 @@ describe('the Pokémon a switch-in sends in', () => {
       ),
     ).toEqual({
       commands: [
+        'SC_RECALL_MSG 2',
+        'SC_RECALL 1',
+        'SC_OP_CLEAR_FOR_SWITCH 10',
+        'SC_OP_SETUP_ILLUSION 2',
+        'SC_OP_SEND_IN 2',
+        'SC_SEND_OUT 2',
         'SC_OP_SUBTRACT_HP 11',
         'SC_UPDATE_HP_GAUGE 11',
         'SC_USE_HELD_ITEM 11',
