@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { frontMon, findServers, partyMons, partySlotsAt, singleBattlePos } from './battle-mons'
+import {
+  frontMon,
+  findServers,
+  partyMons,
+  partySlotsAt,
+  singleBattlePos,
+  slotAddress,
+} from './battle-mons'
 import type { BattleNumbers } from './bw2-numbers'
 import type { ReadRam } from './ram-check'
 
@@ -188,9 +195,6 @@ describe('partyMons', () => {
   })
 })
 
-// Scene: the moment's positions follow the single battle's setup, not the client ID. Both setups
-// are invented: in the three clients' one, client 0 stands at position 1, client 1 at 2 and
-// client 2 at 0; the other holds two clients in swapped order.
 // Scene: the switches scene's run reads each party slot's Pokémon at every mark (#108, D9): the
 // slots stay where they are, and a send-in swaps the pointers in them.
 describe('partySlotsAt', () => {
@@ -205,8 +209,20 @@ describe('partySlotsAt', () => {
       count: 1,
     })
   })
+
+  it('gives each slot’s address from the first, a pointer apart', () => {
+    const { address } = partySlotsAt(memory().read, SERVER, BATTLE, 0)
+    expect([0, 1, 2].map((i) => slotAddress(address, i))).toEqual([
+      address,
+      address + 4,
+      address + 8,
+    ])
+  })
 })
 
+// Scene: the moment's positions follow the single battle's setup, not the client ID. Both setups
+// are invented: in the three clients' one, client 0 stands at position 1, client 1 at 2 and
+// client 2 at 0; the other holds two clients in swapped order.
 describe('singleBattlePos', () => {
   const swapped = { clientCount: 2, posClientIds: [1, 0], clients: { player: 1, opponent: 0 } }
 

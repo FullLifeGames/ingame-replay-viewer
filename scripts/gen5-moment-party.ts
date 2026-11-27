@@ -8,15 +8,13 @@
 import { nameOfNumber } from '../src/gen5/backend/names.ts'
 import type { PartyOrders } from '../src/gen5/backend/moves.ts'
 import type { Gen5Block } from '../src/gen5/backend/replay.ts'
-import { offsetOf } from '../src/gen5/battle-mons.ts'
+import { offsetOf, slotAddress } from '../src/gen5/battle-mons.ts'
 import type { BattleNumbers } from '../src/gen5/bw2-numbers.ts'
 import type { MarkRecord } from '../src/gen5/hook.ts'
 import type { RamRef } from '../src/gen5/ram-check.ts'
 import type { PartyReading } from './gen5-moment-read.ts'
 import type { Side } from './gen5-moment-scene.ts'
 
-/** Bytes a party slot takes: a pointer to its BattleMon. */
-const SLOT = 4
 const SIDES: readonly Side[] = ['near', 'far']
 
 /** Each side's party as read at the action menu: its client, its first slot and its Pokémon. */
@@ -40,7 +38,7 @@ export function partyRefs(
     const { slots, mons } = battle.parties[side]
     return mons.map((_, slot) => ({
       name: slotName(side, slot),
-      address: slots + slot * SLOT,
+      address: slotAddress(slots, slot),
       hops: [monId],
       width: 1 as const,
     }))

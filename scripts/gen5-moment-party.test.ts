@@ -1,3 +1,4 @@
+import { Dex } from '@pkmn/dex'
 import { describe, expect, it } from 'vitest'
 
 import type { PartyOrders } from '../src/gen5/backend/moves'
@@ -6,33 +7,30 @@ import type { BattleNumbers } from '../src/gen5/bw2-numbers'
 import { type PartyStart, partyLines, partyRefs } from './gen5-moment-party'
 
 // Invented numbers: the mon ID's offset in BattleMonCore, the slots' addresses, the clients and
-// the mon IDs. The species are national dex numbers, which @pkmn names.
+// the mon IDs. The species are national dex numbers, read from @pkmn.
 const MON_ID_AT = 0x31
 const NUMBERS = {
   battle: { monCore: { size: 0x40, fields: { monId: { offset: MON_ID_AT, size: 1 } } } },
 } as unknown as { battle: BattleNumbers }
-const POLITOED = 186
-const FERROTHORN = 598
-const KELDEO = 647
-const DARMANITAN = 555
-const BLISSEY = 242
+/** A species' national dex number, from @pkmn. */
+const dex = (name: string) => Dex.species.get(name).num
 
 const START: PartyStart = {
   near: {
     client: 3,
     slots: 0x02180010,
     mons: [
-      { monId: 20, species: POLITOED },
-      { monId: 21, species: FERROTHORN },
-      { monId: 22, species: KELDEO },
+      { monId: 20, species: dex('Politoed') },
+      { monId: 21, species: dex('Ferrothorn') },
+      { monId: 22, species: dex('Keldeo') },
     ],
   },
   far: {
     client: 5,
     slots: 0x02180100,
     mons: [
-      { monId: 40, species: DARMANITAN },
-      { monId: 41, species: BLISSEY },
+      { monId: 40, species: dex('Darmanitan') },
+      { monId: 41, species: dex('Blissey') },
     ],
   },
 }
