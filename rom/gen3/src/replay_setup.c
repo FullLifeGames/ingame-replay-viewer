@@ -3,6 +3,7 @@
 #include "battle_main.h"
 #include "malloc.h"
 #include "pokemon.h"
+#include "random.h"
 #include "recorded_battle.h"
 #include "replay_interpreter.h"
 #include "replay_stream.h"
@@ -34,8 +35,8 @@ static void CopyString(u8 *dest, const volatile u8 *src, u32 length)
     dest[length] = EOS;
 }
 
-// GetMonPersonality's gender of each REPLAY_GENDER_*. It gives a species of one gender, or of
-// none, its own.
+// DrawPersonality's gender of each REPLAY_GENDER_*. It gives a species of one gender, or of none,
+// its own.
 static const u8 sGenders[] =
 {
     [REPLAY_GENDER_MALE]   = MON_MALE,
@@ -50,14 +51,48 @@ static const u8 sDefaultGenders[] =
     [REPLAY_SIDE_FAR]  = FEMALE,
 };
 
+// The personalities come from a generator of the replay's own (#103). A mon's nature picks which
+// of its back set's three animations a near mon plays (LaunchAnimationTaskForBackSprite), and the
+// shared generator's state at the start differs between the engines: on mGBA the VBlanks of the
+// stream check advance it, and the WebAssembly module runs that check in no time. 129600 is the
+// seed of the fixed clock both engines boot with (SeedRngWithRtc), and SetSaveBlocksPointers takes
+// its first draw at boot, so the replay's generator skips one draw. The module draws what it drew
+// before, and only mGBA's natures move.
+#define REPLAY_PERSONALITY_SEED 129600
+
+// GetMonPersonality with NATURE_RANDOM and RANDOM_UNOWN_LETTER, drawn from rng. A species of one
+// gender or none, or a request of no gender, takes the first draw (CleanIncompatibleGenderSpecies);
+// any other draws until the personality gives the gender.
+static u32 DrawPersonality(rng_value_t *rng, u32 species, u32 gender)
+{
+    u32 personality;
+
+    switch (gSpeciesInfo[species].genderRatio)
+    {
+    case MON_MALE:
+    case MON_FEMALE:
+    case MON_GENDERLESS:
+        return LocalRandom32(rng);
+    }
+    if (gender == MON_GENDERLESS)
+        return LocalRandom32(rng);
+    do
+    {
+        personality = LocalRandom32(rng);
+    }
+    while (GetGenderFromSpeciesAndPersonality(species, personality) != gender);
+    return personality;
+}
+
 // A mon of a team table: species, level, gender and shininess, the nickname, and HP on the battle
-// log's scale. Only the gender comes from the personality, so the rest of it stays random.
-static void CreateReplayMon(struct Pokemon *mon, const volatile u8 *entry)
+// log's scale. Only the gender comes from the stream; the rest of the personality comes from the
+// replay's generator.
+static void CreateReplayMon(struct Pokemon *mon, const volatile u8 *entry, rng_value_t *rng)
 {
     u8 nickname[REPLAY_MON_NICKNAME_LENGTH];
     u32 species = Replay_ReadU16(entry + REPLAY_MON_OFFSET_SPECIES);
     u32 hp = Replay_ReadU16(entry + REPLAY_MON_OFFSET_MAX_HP);
-    u32 personality = GetMonPersonality(species, sGenders[entry[REPLAY_MON_OFFSET_GENDER]], NATURE_RANDOM, RANDOM_UNOWN_LETTER);
+    u32 personality = DrawPersonality(rng, species, sGenders[entry[REPLAY_MON_OFFSET_GENDER]]);
     u8 shiny = entry[REPLAY_MON_OFFSET_SHINY];
 
     CreateMon(mon, species, entry[REPLAY_MON_OFFSET_LEVEL], personality, OTID_STRUCT_PRESET(0));
@@ -74,7 +109,7 @@ static void CreateReplayMon(struct Pokemon *mon, const volatile u8 *entry)
 // empty slot up to the team size, at most PARTY_SIZE, gets a copy of the side's first revealed
 // mon, with full HP and no status, so it shows as a ball. It never reaches the field:
 // Replay_Validate refuses a slot operand whose stream slot holds no mon.
-static void FillUnrevealedTeamMembers(struct Pokemon *party, const volatile u8 *stream, u32 side)
+static void FillUnrevealedTeamMembers(struct Pokemon *party, const volatile u8 *stream, u32 side, rng_value_t *rng)
 {
     u32 slot, mons = 0;
     u32 teamSize = min(Replay_GetTrainer(stream, side)[REPLAY_TRAINER_OFFSET_TEAM_SIZE], PARTY_SIZE);
@@ -93,12 +128,12 @@ static void FillUnrevealedTeamMembers(struct Pokemon *party, const volatile u8 *
     {
         if (Replay_HoldsMon(stream, side, slot))
             continue;
-        CreateReplayMon(&party[slot], firstMon);
+        CreateReplayMon(&party[slot], firstMon, rng);
         mons++;
     }
 }
 
-static void FillParties(struct RecordedBattleSave *save, const volatile u8 *stream)
+static void FillParties(struct RecordedBattleSave *save, const volatile u8 *stream, rng_value_t *rng)
 {
     u32 side, slot;
 
@@ -107,9 +142,9 @@ static void FillParties(struct RecordedBattleSave *save, const volatile u8 *stre
         for (slot = 0; slot < REPLAY_STREAM_PARTY_SIZE; slot++)
         {
             if (Replay_HoldsMon(stream, side, slot))
-                CreateReplayMon(&save->parties[side][slot], Replay_GetMon(stream, side, slot));
+                CreateReplayMon(&save->parties[side][slot], Replay_GetMon(stream, side, slot), rng);
         }
-        FillUnrevealedTeamMembers(save->parties[side], stream, side);
+        FillUnrevealedTeamMembers(save->parties[side], stream, side, rng);
     }
 }
 
@@ -169,12 +204,15 @@ u32 Replay_GetTrainerPic(u32 battler, u32 fallback)
 enum ReplayError Replay_Start(const volatile u8 *stream, u32 length, enum ReplayEnd end, MainCallback afterBattle)
 {
     struct RecordedBattleSave *save;
+    rng_value_t rng;
     enum ReplayError error = Replay_Load(stream, length, end);
 
     if (error != REPLAY_ERROR_NONE)
         return error;
+    rng = LocalRandomSeed(REPLAY_PERSONALITY_SEED);
+    LocalRandom32(&rng);
     save = AllocZeroed(sizeof(*save));
-    FillParties(save, stream);
+    FillParties(save, stream, &rng);
     FillLinkPlayers(save, stream);
     KeepTrainerPics(stream);
     save->battleFlags = REPLAY_BATTLE_FLAGS;

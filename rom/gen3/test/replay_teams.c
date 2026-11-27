@@ -3,6 +3,7 @@
 #include "data.h"
 #include "link.h"
 #include "pokemon.h"
+#include "random.h"
 #include "sprite.h"
 #include "trainer.h"
 #include "test/replay_test.h"
@@ -208,5 +209,91 @@ REPLAY_TEST("A team size above six fills the party and stops there")
     {
         for (slot = 0; slot < PARTY_SIZE; slot++)
             EXPECT(ShowsAsBall(&gParties[B_TRAINER_PLAYER][slot]));
+    }
+}
+
+// The personalities come from a generator of the replay's own (#103), so a mon's nature, and with
+// it the back animation of a near mon, does not follow the shared generator's state when the
+// replay starts. The generator starts from 129600, the seed of the fixed clock both engines boot
+// with, and skips the draw SetSaveBlocksPointers takes at boot. A species of one gender or none,
+// or a request of no gender, takes one draw.
+
+static void WriteOneDrawTeams(void)
+{
+    ReplayStream_Mon(REPLAY_SIDE_NEAR, 0, SPECIES_MAGNEMITE, 100);
+    ReplayStream_SetU8(ReplayStream_MonOffset(REPLAY_SIDE_NEAR, 0) + REPLAY_MON_OFFSET_GENDER, REPLAY_GENDER_NONE);
+    ReplayStream_Mon(REPLAY_SIDE_NEAR, 1, SPECIES_TAUROS, 100);
+    SetTeamSize(REPLAY_SIDE_NEAR, 3);
+    ReplayStream_Mon(REPLAY_SIDE_FAR, 0, SPECIES_CHANSEY, 100);
+    ReplayStream_SetU8(ReplayStream_MonOffset(REPLAY_SIDE_FAR, 0) + REPLAY_MON_OFFSET_GENDER, REPLAY_GENDER_FEMALE);
+    ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+}
+
+// The fill order: the near side's mons by slot, then its unrevealed copy of slot 0, then the far
+// side's mon. EXPECT_EQ reads its arguments again when it fails, so each draw is taken first.
+static void ExpectOneDrawPersonalities(void)
+{
+    u32 i, personalities[4];
+    rng_value_t rng = LocalRandomSeed(129600);
+
+    LocalRandom32(&rng);
+    for (i = 0; i < ARRAY_COUNT(personalities); i++)
+        personalities[i] = LocalRandom32(&rng);
+    EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_PERSONALITY), personalities[0]);
+    EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][1], MON_DATA_PERSONALITY), personalities[1]);
+    EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][2], MON_DATA_PERSONALITY), personalities[2]);
+    EXPECT_EQ(GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_PERSONALITY), personalities[3]);
+}
+
+REPLAY_TEST("The personalities come from the replay's generator after one state of the shared one")
+{
+    STREAM
+    {
+        gRngValue = LocalRandomSeed(1);
+        WriteOneDrawTeams();
+    }
+    THEN
+    {
+        ExpectOneDrawPersonalities();
+    }
+}
+
+REPLAY_TEST("The personalities come from the replay's generator after another state of the shared one")
+{
+    STREAM
+    {
+        gRngValue = LocalRandomSeed(2);
+        Random32();
+        Random32();
+        Random32();
+        WriteOneDrawTeams();
+    }
+    THEN
+    {
+        ExpectOneDrawPersonalities();
+    }
+}
+
+REPLAY_TEST("Each mon keeps the gender the team table names when its personality is drawn")
+{
+    STREAM
+    {
+        gRngValue = LocalRandomSeed(2);
+        Random32();
+        ReplayStream_Mon(REPLAY_SIDE_NEAR, 1, SPECIES_WOBBUFFET, 100);
+        ReplayStream_SetU8(ReplayStream_MonOffset(REPLAY_SIDE_NEAR, 1) + REPLAY_MON_OFFSET_GENDER, REPLAY_GENDER_FEMALE);
+        ReplayStream_Mon(REPLAY_SIDE_NEAR, 2, SPECIES_MAGNEMITE, 100);
+        ReplayStream_SetU8(ReplayStream_MonOffset(REPLAY_SIDE_NEAR, 2) + REPLAY_MON_OFFSET_GENDER, REPLAY_GENDER_NONE);
+        ReplayStream_SetU8(ReplayStream_MonOffset(REPLAY_SIDE_FAR, 0) + REPLAY_MON_OFFSET_GENDER, REPLAY_GENDER_FEMALE);
+        ReplayStream_Mon(REPLAY_SIDE_FAR, 1, SPECIES_WOBBUFFET, 100);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    THEN
+    {
+        EXPECT_EQ(GetMonGender(&gParties[B_TRAINER_PLAYER][0]), MON_MALE);
+        EXPECT_EQ(GetMonGender(&gParties[B_TRAINER_PLAYER][1]), MON_FEMALE);
+        EXPECT_EQ(GetMonGender(&gParties[B_TRAINER_PLAYER][2]), MON_GENDERLESS);
+        EXPECT_EQ(GetMonGender(&gParties[B_TRAINER_OPPONENT_A][0]), MON_FEMALE);
+        EXPECT_EQ(GetMonGender(&gParties[B_TRAINER_OPPONENT_A][1]), MON_MALE);
     }
 }
