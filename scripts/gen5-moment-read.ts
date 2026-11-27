@@ -10,11 +10,12 @@ import {
   type PartyMonReading,
   partyMons,
 } from '../src/gen5/battle-mons.ts'
+import { nameOfNumber } from '../src/gen5/backend/names.ts'
+import type { WrittenSides } from '../src/gen5/backend/party-mon.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import type { WrittenPkm } from '../src/gen5/pkm-fields.ts'
 import { sideClient } from './gen5-moment-scene.ts'
-import { dexSpecies } from './gen5-moment-team.ts'
 import { log } from './gen5-page.ts'
 
 export interface Battle {
@@ -22,12 +23,6 @@ export interface Battle {
   server: number
   near: BattleMonReading
   far: BattleMonReading
-}
-
-/** Each side's Pokémon as the park wrote them. */
-export interface WrittenSides {
-  player: readonly WrittenPkm[]
-  opponent: readonly WrittenPkm[]
 }
 
 type Side = 'near' | 'far'
@@ -73,7 +68,7 @@ export function partyLine(
   return [`${head} ${String(same)} of ${String(written.length)} as written`, ...differs].join('; ')
 }
 
-const speciesName = (num: number) => dexSpecies(num)?.name ?? '?'
+const speciesName = (num: number) => nameOfNumber('species', num) ?? '?'
 
 function logParty(side: Side, party: readonly PartyMonReading[]): void {
   party.forEach((mon, i) => {
