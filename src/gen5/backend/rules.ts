@@ -58,6 +58,8 @@ const RULES = {
   turn: () => ({ as: 'boundary' }),
   switchIn: (_, ctx) => (ctx.afterLeads ? SWITCHES : { as: 'game' }),
   faint: switches,
+  // Illusion's end: its look and the game's own disguise belong with the abilities.
+  replace: effects,
   message: (event) => ({ as: 'line', detail: `Black 2 has no line for "${event.text}"` }),
   win: whole,
   tie: whole,

@@ -7,7 +7,7 @@ import type { Side } from '../script/types'
 import { REPLAYS, replayScript } from '../script/testing'
 import { crc32 } from '../patch/crc32'
 import { buildGen3Stream, type Gen3Stream } from './backend'
-import { type Fallback, mechanicGap, showsInPlace } from './fallbacks'
+import { type Fallback, illusionGap, mechanicGap, showsInPlace } from './fallbacks'
 import { decodeStream } from './stream/decode'
 import { itemOf } from './tables/lookup'
 import { itemGaps } from './tables/testing'
@@ -38,14 +38,16 @@ const charsetRead = (text: string) => decodeText(encodeText(text))
 /**
  * The mechanic fallbacks the test replays may take, each a look or a state the stream lacks:
  * Perish Song's first count, whose later counts print; Bide's first turn, which the expansion
- * shows as the move alone; and Protosynthesis's end, which the expansion has no message for. A
- * new one fails until it is named here, and one that no test replay takes fails unless
- * NAMED_AHEAD holds it.
+ * shows as the move alone; Protosynthesis's end, which the expansion has no message for; and
+ * Illusion's end, which the stream plays as a switch (#98), in both Gen 9 random battles. A new
+ * one fails until it is named here, and one that no test replay takes fails unless NAMED_AHEAD
+ * holds it.
  */
 const NAMED_MECHANICS: ReadonlySet<string> = new Set([
   mechanicGap('perish3', 'starting').detail,
   mechanicGap('Bide', 'starting').detail,
   mechanicGap('Protosynthesis', 'ending').detail,
+  illusionGap().detail,
 ])
 
 /**

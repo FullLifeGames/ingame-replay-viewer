@@ -12,14 +12,25 @@
 // too names itself again as the confusion ends (`BattleScript_BerryCureStatusAndConfusionRet`).
 // An item the expansion lacks is text alone (plan §4) and shows no pop-up. A berry that acts as it
 // is eaten (`[consumed]`, Custap Berry) says its line after the pop-up and the animation of its
-// `[eat]` (`BattleScript_CustapBerryActivation`).
+// `[eat]` (`BattleScript_CustapBerryActivation`). Quick Claw's activation says the same line alone:
+// the pop-up and the animation of `BattleScript_QuickClawActivation` stay out (#105, D9). Focus
+// Sash and a berry that weakens a hit (`[weaken]`) end before the hit's `-damage` in the log; the
+// game says them in the hit's lines (#105, D8), so their lines wait for it. Focus Sash shows no
+// pop-up and no animation here, which `BattleScript_HangedOnMsg` plays before its line.
 import { Dex, toID } from '@pkmn/dex'
 
 import type { ScriptEvent } from '../../script/events'
 import type { PokemonRef } from '../../script/types'
 import { itemOf } from '../tables/lookup'
-import { actedFaster, isSteal, itemRemoved, itemShown } from '../text/phrases-items'
-import { type Context, type EventOf, sameMon } from './context'
+import {
+  actedFaster,
+  berryWeakened,
+  hangsOn,
+  isSteal,
+  itemRemoved,
+  itemShown,
+} from '../text/phrases-items'
+import { type Context, type EventOf, type HitStage, type Placed, sameMon } from './context'
 
 /** The expansion's number of the item, or undefined for an item it lacks. */
 function numberOf(name: string): number | undefined {
@@ -90,7 +101,7 @@ export function shownBefore(who: PokemonRef, name: string, ctx: Context): boolea
  * Says the line of a berry that acts as it is eaten, right after `who` ate it, and says whether it
  * did. The `[eat]` before it showed the pop-up and played the animation.
  */
-export function berryConsumed(event: EventOf<'effectActivate'>, ctx: Context): boolean {
+function berryConsumed(event: EventOf<'effectActivate'>, ctx: Context): boolean {
   const { who, effect, line } = event
   if (!event.consumed || who === undefined || effect.kind !== 'item') return false
   const eaten = eatenBefore(who, ctx)
@@ -98,6 +109,25 @@ export function berryConsumed(event: EventOf<'effectActivate'>, ctx: Context): b
   ctx.print(line, actedFaster(ctx.mon(who), eaten))
   return true
 }
+
+/** The held items whose activation lets their holder act first in its priority, by id. */
+const ACTS_FASTER = new Set(['quickclaw'])
+
+/** Says the line of a held item that lets `who` act faster as it activates, and whether it did. */
+function heldActedFaster({ who, effect, line }: EventOf<'effectActivate'>, ctx: Context): boolean {
+  if (who === undefined || effect.kind !== 'item' || !ACTS_FASTER.has(toID(effect.name))) {
+    return false
+  }
+  ctx.print(line, actedFaster(ctx.mon(who), effect.name))
+  return true
+}
+
+/**
+ * Says the line of an item that acts (a berry as it is eaten, Quick Claw) and says whether it did;
+ * any other activation is the effect's own line.
+ */
+export const itemActed = (event: EventOf<'effectActivate'>, ctx: Context) =>
+  berryConsumed(event, ctx) || heldActedFaster(event, ctx)
 
 /** Whether `event` ends the confusion of `who`. */
 export const endsConfusion = (event: ScriptEvent | undefined, who: PokemonRef) =>
@@ -155,7 +185,49 @@ function takerOf({ who, cause, source }: EventOf<'itemEnd'>, ctx: Context): Poke
   return ctx.mover?.side === who.side ? undefined : ctx.mover
 }
 
+/**
+ * Where the game says the end of an item in the hit after it: Focus Sash as the hit's result, a
+ * berry that weakened the hit as the move ends; undefined for any other end.
+ */
+function hitStageOf(event: EventOf<'itemEnd'>): HitStage | undefined {
+  if (event.weakened) return 'moveEnd'
+  return usedUp(event) && hangsOn(event.item) ? 'result' : undefined
+}
+
+/** Whether `next` is a move's hit on `who`. */
+const hitOn = (next: ScriptEvent | undefined, who: PokemonRef, ctx: Context) =>
+  next?.kind === 'damage' &&
+  next.cause === undefined &&
+  next.silent !== true &&
+  sameMon(next.who, who) &&
+  !sameMon(ctx.mover, who)
+
+/**
+ * An item gone. One whose line the game says in the hit after it waits for that hit, which
+ * `hits.ts` plays; the end with no hit after it says its line where the log has it.
+ */
 export function itemEnd(event: EventOf<'itemEnd'>, ctx: Context): void {
+  const say = () => {
+    if (event.weakened) weakened(event, ctx)
+    else endItem(event, ctx)
+  }
+  const stage = hitStageOf(event)
+  if (stage === undefined || !hitOn(ctx.near(1), event.who, ctx)) {
+    say()
+    return
+  }
+  const placed: Placed[] = []
+  ctx.capture(placed, say)
+  ctx.afterHit = { who: event.who, stage, placed }
+}
+
+/** The berry eaten on the line before lessened the hit; that `[eat]` cleared the item. */
+function weakened({ who, item, line }: EventOf<'itemEnd'>, ctx: Context): void {
+  heldItem(ctx, line, item)
+  ctx.print(line, berryWeakened(ctx.mon(who), item))
+}
+
+function endItem(event: EventOf<'itemEnd'>, ctx: Context): void {
   const { who, cause, line } = event
   const source = takerOf(event, ctx)
   const number = heldItem(ctx, line, event.item)

@@ -136,16 +136,26 @@ describe('an effect that ends (P1)', () => {
     ['p1a: Dugtrio|Encore', 'Dugtrio ended its encore!'],
     ['p1a: Dugtrio|Disable', "Dugtrio's move is no longer disabled!"],
     ['p1a: Dugtrio|move: Fire Spin', `Dugtrio was freed from Fire${NBSP}Spin!`],
+    // STRINGID_ILLUSIONWOREOFF (#98).
+    ['p1a: Dugtrio|Illusion', "Dugtrio's illusion wore off!"],
+    ['p2a: Tyranitar|Illusion', "The opposing Tyranitar's illusion wore off!"],
   ])('words %s', (rest, text) => {
     const { event, mon } = sceneOf('effectEnd', `|-end|${rest}`)
     expect(effectEnded(mon(event.who), event.effect)).toEqual({ text })
   })
 
-  it('gives an effect without a message our wording and a fallback', () => {
-    const { event, mon } = sceneOf('effectEnd', '|-end|p1a: Dugtrio|move: Taunt')
+  it("words Taunt's end as the game's turn end does (STRINGID_BUFFERENDS)", () => {
+    const { event, mon } = sceneOf('effectEnd', '|-end|p2a: Tyranitar|move: Taunt')
     expect(effectEnded(mon(event.who), event.effect)).toEqual({
-      text: "Dugtrio's Taunt wore off!",
-      fallback: { kind: 'phrase', detail: 'no game message for Taunt ending' },
+      text: "The opposing Tyranitar's Taunt wore off!",
+    })
+  })
+
+  it('gives an effect without a message our wording and a fallback', () => {
+    const { event, mon } = sceneOf('effectEnd', '|-end|p1a: Dugtrio|move: Magnet Rise')
+    expect(effectEnded(mon(event.who), event.effect)).toEqual({
+      text: `Dugtrio's Magnet${NBSP}Rise wore off!`,
+      fallback: { kind: 'phrase', detail: 'no game message for Magnet Rise ending' },
     })
   })
 })

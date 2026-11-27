@@ -31,8 +31,10 @@ const FINISHED = 'finished'
 /**
  * Frames by which a start, counted from op 0, may part before the compare names the op. Over the
  * hand-made battle and the eleven test replays a move steps the gap by 3 frames at most and a stat
- * change or an animation by 1, while a send-out or a switch-in steps it by up to 44 (#71). Three
- * keeps the small steps out and names the first large one.
+ * change or an animation by 1, while a send-out or a switch-in stepped it by up to 44 (#71): the
+ * engines drew a near mon's nature from different draws, and the nature picks its back animation.
+ * Since #103 the ROM draws each personality from a generator of its own, so both engines play the
+ * same back animation. Three keeps the small steps out and names the first large one.
  */
 export const DEFAULT_THRESHOLD = 3
 

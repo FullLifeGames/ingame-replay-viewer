@@ -1,0 +1,90 @@
+{"length":1676,"crc32":"cd07e267","trainers":{"near":{"name":"yiurfhasa+","trainerPic":1,"teamSize":6,"revealed":4},"far":{"name":"aroki 5.0","trainerPic":2,"teamSize":6,"revealed":3}},"parties":{"near":[{"species":497,"maxHp":100,"level":79,"gender":"male","shiny":false,"nickname":"Serperior"},{"species":324,"maxHp":100,"level":88,"gender":"female","shiny":false,"nickname":"Torkoal"},{"species":571,"maxHp":100,"level":83,"gender":"male","shiny":false,"nickname":"Zoroark"},{"species":354,"maxHp":100,"level":93,"gender":"male","shiny":false,"nickname":"Banette"},null,null],"far":[{"species":330,"maxHp":100,"level":82,"gender":"male","shiny":false,"nickname":"Flygon"},{"species":123,"maxHp":100,"level":82,"gender":"female","shiny":false,"nickname":"Scyther"},{"species":448,"maxHp":100,"level":84,"gender":"male","shiny":false,"nickname":"Lucario"},null,null,null]}}
+{"line":17,"op":"intro"}
+{"line":17,"op":"print","text":"You are challenged by aroki 5.0!"}
+{"line":19,"op":"print","text":"aroki 5.0 sent out Flygon!"}
+{"line":19,"op":"sendOut","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":18,"op":"print","text":"Go! Serperior!"}
+{"line":18,"op":"sendOut","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":20,"op":"turn","number":1}
+{"line":24,"op":"print","text":"aroki 5.0 withdrew Flygon!"}
+{"line":24,"op":"withdraw","side":"far"}
+{"line":24,"op":"print","text":"aroki 5.0 sent out Scyther!"}
+{"line":24,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":25,"op":"print","text":"Serperior used Dark Pulse!"}
+{"line":25,"op":"move","user":"near","target":"far","move":399,"animTurn":0}
+{"line":26,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":26,"op":"hp","side":"far","hp":40}
+{"line":29,"op":"turn","number":2}
+{"line":32,"op":"print","text":"aroki 5.0 withdrew Scyther!"}
+{"line":32,"op":"withdraw","side":"far"}
+{"line":32,"op":"print","text":"aroki 5.0 sent out Lucario!"}
+{"line":32,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":33,"op":"print","text":"Serperior used Dark Pulse!"}
+{"line":33,"op":"move","user":"near","target":"far","move":399,"animTurn":0}
+{"line":35,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":35,"op":"hp","side":"far","hp":68}
+{"line":35,"op":"print","text":"It's not very effective…"}
+{"line":38,"op":"turn","number":3}
+{"line":41,"op":"print","text":"Serperior, come back!"}
+{"line":41,"op":"withdraw","side":"near"}
+{"line":41,"op":"print","text":"Go! Torkoal!"}
+{"line":41,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":42,"op":"ability","side":"near","ability":70,"show":true}
+{"line":42,"op":"weather","weather":"sun"}
+{"line":42,"op":"print","text":"The sunlight turned harsh!"}
+{"line":42,"op":"anim","side":"near","anim":"sunContinues"}
+{"line":42,"op":"ability","side":"near","ability":70,"show":false}
+{"line":43,"op":"print","text":"The opposing Lucario used Nasty Plot!"}
+{"line":43,"op":"move","user":"far","target":"far","move":417,"animTurn":0}
+{"line":44,"op":"stat","side":"far","stat":"spa","stages":2,"arrows":"one"}
+{"line":44,"op":"print","text":"The opposing Lucario's Sp. Atk rose sharply!"}
+{"line":46,"op":"print","text":"The sunlight is strong."}
+{"line":46,"op":"anim","side":"near","anim":"sunContinues"}
+{"line":48,"op":"turn","number":4}
+{"line":51,"op":"print","text":"The opposing Lucario used Aura Sphere!"}
+{"line":51,"op":"move","user":"far","target":"near","move":396,"animTurn":0}
+{"line":52,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":52,"op":"hp","side":"near","hp":0}
+{"line":53,"op":"faint","side":"near"}
+{"line":53,"op":"print","text":"Torkoal fainted!"}
+{"line":54,"op":"hp","side":"far","hp":58}
+{"line":54,"op":"print","text":"The opposing Lucario was hurt by the Life Orb!"}
+{"line":56,"op":"print","text":"The sunlight is strong."}
+{"line":56,"op":"anim","side":"far","anim":"sunContinues"}
+{"line":62,"op":"print","text":"Go! Serperior!"}
+{"line":62,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":63,"op":"turn","number":5}
+{"line":66,"op":"print","text":"The opposing Lucario used Vacuum Wave!"}
+{"line":66,"op":"move","user":"far","target":"near","move":410,"animTurn":0}
+{"line":68,"op":"hit","side":"near","effectiveness":"super"}
+{"line":68,"op":"hp","side":"near","hp":0}
+{"line":68,"op":"print","text":"It's super effective!"}
+{"line":69,"op":"withdraw","side":"near"}
+{"line":69,"op":"switchIn","side":"near","slot":2,"hp":0,"status":"none"}
+{"line":70,"op":"print","text":"Zoroark's illusion wore off!"}
+{"line":72,"op":"faint","side":"near"}
+{"line":72,"op":"print","text":"Zoroark fainted!"}
+{"line":73,"op":"hp","side":"far","hp":49}
+{"line":73,"op":"print","text":"The opposing Lucario was hurt by the Life Orb!"}
+{"line":75,"op":"print","text":"The sunlight is strong."}
+{"line":75,"op":"anim","side":"far","anim":"sunContinues"}
+{"line":79,"op":"print","text":"Go! Banette!"}
+{"line":79,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":80,"op":"turn","number":6}
+{"line":83,"op":"print","text":"The opposing Lucario used Flash Cannon!"}
+{"line":83,"op":"move","user":"far","target":"near","move":430,"animTurn":0}
+{"line":84,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":84,"op":"hp","side":"near","hp":0}
+{"line":85,"op":"ability","side":"near","ability":130,"show":true}
+{"line":85,"op":"print","text":"The opposing Lucario's Flash Cannon was disabled!"}
+{"line":85,"op":"ability","side":"near","ability":130,"show":false}
+{"line":86,"op":"faint","side":"near"}
+{"line":86,"op":"print","text":"Banette fainted!"}
+{"line":87,"op":"hp","side":"far","hp":39}
+{"line":87,"op":"print","text":"The opposing Lucario was hurt by the Life Orb!"}
+{"line":89,"op":"print","text":"The sunlight is strong."}
+{"line":89,"op":"anim","side":"far","anim":"sunContinues"}
+{"line":91,"op":"print","text":"yiurfhasa+ forfeited."}
+{"line":93,"op":"print","text":"aroki 5.0 won the battle!"}
+{"line":93,"op":"end","outcome":"farWon"}
+{"line":69,"fallback":"mechanic","detail":"Illusion's end, which the game plays as a switch"}

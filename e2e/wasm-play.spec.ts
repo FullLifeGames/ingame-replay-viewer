@@ -6,7 +6,8 @@
 // plays at 1x and 2x and stays silent at fast; the test counts the samples
 // that pass the audio ring and measures their loudness. A second Start press during the build
 // finds Start disabled, so one run starts, and at END the page leaves fast for 1x. A second test measures mGBA on the emulator page
-// at fast-forward, for the write-up's speed comparison (B7).
+// at fast-forward, for the write-up's speed comparison (B7). A third switches the hand-made battle
+// from fast to 1x with the main thread held, and the game stops at the frame of the switch (#104).
 // The frames and the sound come from the dump, so only numbers leave the tests.
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -269,4 +270,82 @@ test('mGBA on the emulator page plays 994052 at fast-forward (B7 measurement)', 
     expect(measured.fps).toBeGreaterThan(0)
   }
   expect(await page.evaluate(() => (globalThis as Probe).irvCrashed)).toBe(false)
+})
+
+/** The frame of the hand-made battle at fast from which the third test clicks 1x. */
+const LEAVE_FAST_AT = 1000
+/** How long the third test holds the page's main thread after the click, as a loaded machine. */
+const HOLD_MS = 300
+
+/** What the page callback of the third test uses; the e2e's tsconfig knows no DOM. */
+interface PageSide {
+  irvWasmViewer: { status(): { frame: number } | undefined }
+  requestAnimationFrame(callback: () => void): number
+  document: { querySelector(selector: string): { click(): void } | null }
+}
+
+// In an animation frame at LEAVE_FAST_AT or later it clicks 1x as a visitor does, reads the frame,
+// holds the main thread HOLD_MS and reads the frame again, so no draw grants a frame in between.
+// The page's draw asked for its animation frame first, so the callback runs right after a draw.
+async function leaveFastHeld(page: Page): Promise<{ from: number; to: number }> {
+  return page.evaluate(
+    ([at, ms]) =>
+      new Promise<{ from: number; to: number }>((done) => {
+        const side = globalThis as unknown as PageSide
+        const frameNow = () => side.irvWasmViewer.status()?.frame ?? 0
+        const tick = () => {
+          if (frameNow() < at) {
+            side.requestAnimationFrame(tick)
+            return
+          }
+          side.document.querySelector('#speed input[value="1x"]')?.click()
+          const from = frameNow()
+          const until = performance.now() + ms
+          while (performance.now() < until) {
+            // The main thread stays busy, as on a loaded machine.
+          }
+          done({ from, to: frameNow() })
+        }
+        side.requestAnimationFrame(tick)
+      }),
+    [LEAVE_FAST_AT, HOLD_MS] as const,
+  )
+}
+
+test('the viewer holds hand-made at the frame where it leaves fast for 1x, with the main thread held, and plays it to END at 1x', async ({
+  page,
+}) => {
+  const missing = missingForModule()
+  test.skip(
+    missing.length > 0,
+    `missing ${missing.join(', ')}; run ${WASM_BUILD_STEPS}, or set IRV_BASE_ROM`,
+  )
+  test.setTimeout(400_000)
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  const handMade = await handMadeBytes()
+
+  await page.goto('/')
+  await page.getByLabel('Your US Emerald (stays in this tab)').setInputFiles(DUMP)
+  await page.getByLabel('Fast').check()
+  await playStream(page, HAND_MADE, handMade)
+  expect((await status(page))?.speed).toBe('fast')
+
+  await test.step('leaving fast for 1x holds the game at the frame of the switch', async () => {
+    const { from, to } = await leaveFastHeld(page)
+    report({ stream: HAND_MADE, speed: 'fast to 1x, held', from, to, step: to - from })
+    expect(from).toBeGreaterThanOrEqual(LEAVE_FAST_AT)
+    // Before #104 the worker ran on at fast through the hold: 143 frames (docs/sound-skip.md).
+    expect(to - from).toBeLessThanOrEqual(2)
+    expect((await status(page))?.speed).toBe('1x')
+  })
+
+  await test.step('the hand-made battle reaches END at 1x', async () => {
+    const end = await finished(page, 240_000)
+    expect(end.done).toBe(end.total)
+    expect((await status(page))?.speed).toBe('1x')
+    await expect(page.getByLabel('1x')).toBeChecked()
+  })
+
+  expect(errors).toEqual([])
 })

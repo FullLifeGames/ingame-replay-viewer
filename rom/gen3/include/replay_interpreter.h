@@ -68,6 +68,10 @@ enum ReplayError Replay_Validate(const volatile u8 *stream, u32 length);
 // afterBattle runs when the battle has been left.
 enum ReplayError Replay_Start(const volatile u8 *stream, u32 length, enum ReplayEnd end, MainCallback afterBattle);
 
+// The seed of the generator Replay_Start draws the replay mons' personalities from (#103);
+// replay_setup.c says why it is 129600.
+#define REPLAY_PERSONALITY_SEED 129600
+
 // Called at the end of BeginBattleIntro (patch 0001): takes over gBattleMainFunc while a replay is
 // loaded, and does nothing in any other battle.
 void Replay_TakeOverBattleMain(void);

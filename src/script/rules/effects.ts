@@ -101,7 +101,7 @@ export const EFFECT_RULES = {
   },
   '|-enditem|': {
     arity: 2,
-    reads: ['from', 'of', 'eat', 'silent'],
+    reads: ['from', 'of', 'eat', 'weaken', 'silent'],
     build: ({ line, args: [, who, item], kwArgs, battle }) => [
       {
         kind: 'itemEnd',
@@ -110,6 +110,7 @@ export const EFFECT_RULES = {
         item,
         ...causeOf(kwArgs, battle, line),
         ...(kwArgs.eat ? { eaten: true } : {}),
+        ...(kwArgs.weaken ? { weakened: true } : {}),
         ...flagsOf(kwArgs, ['silent']),
       },
     ],

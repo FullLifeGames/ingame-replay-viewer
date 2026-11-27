@@ -68,12 +68,22 @@ export const FIELD_TEMPLATES = {
   stealthRock: tagged('STRINGID_POINTEDSTONESFLOAT', (team: string) => {
     return `Pointed stones float in the air on ${team} side!`
   }),
+  toxicSpikes: tagged('STRINGID_POISONSPIKESSCATTERED', (team: string) => {
+    return `Toxic spikes were scattered on the ground all around ${team} side!`
+  }),
   spikesGone: tagged('STRINGID_PKMNBLEWAWAYSPIKES', (who: Mon) => {
     return `${nameAtStart(who)} blew away Spikes!`
   }),
   // Gen 4's line for Rapid Spin, kept in the pinned file "Not in gen 5+", as Spikes' above.
   stealthRockGone: tagged('STRINGID_PKMNBLEWAWAYSTEALTHROCK', (who: Mon) => {
     return `${nameAtStart(who)} blew away Stealth Rock!`
+  }),
+  toxicSpikesGone: tagged('STRINGID_PKMNBLEWAWAYTOXICSPIKES', (who: Mon) => {
+    return `${nameAtStart(who)} blew away Toxic Spikes!`
+  }),
+  // A Poison-type Pokémon of the side takes them up as it comes in; B_EFF is that Pokémon.
+  toxicSpikesAbsorbed: tagged('STRINGID_TOXICSPIKESABSORBED', (team: string) => {
+    return `The toxic spikes disappeared from the ground around ${team} side!`
   }),
   stealthRockCleared: tagged('STRINGID_STEALTHROCKDISAPPEAREDFROMTEAM', (team: string) => {
     return `The pointed stones disappeared from ${team} side!`
@@ -137,6 +147,7 @@ export function weatherText(weather: WeatherName, phase: Phase): Phrase {
 const SIDE_STARTS: Readonly<Record<string, (side: Side) => string>> = {
   spikes: (side) => T.spikes.render(teamInside(side)),
   stealthrock: (side) => T.stealthRock.render(teamInside(side)),
+  toxicspikes: (side) => T.toxicSpikes.render(teamInside(side)),
   reflect: (side) => T.reflect.render(teamInside(side)),
   lightscreen: (side) => T.lightScreen.render(teamInside(side)),
   auroraveil: (side) => T.auroraVeil.render(teamInside(side)),
@@ -181,13 +192,36 @@ const SIDE_ENDS: Readonly<Record<string, (side: Side, condition: Effect) => stri
 const SIDE_ENDS_BY_SOURCE: Readonly<Record<string, (source: Mon) => string>> = {
   spikes: T.spikesGone.render,
   stealthrock: T.stealthRockGone.render,
+  toxicspikes: T.toxicSpikesGone.render,
 }
 
-/** A condition gone from a side; `source` blew a hazard away, as with Rapid Spin. */
-export function sideEnded(side: Side, condition: Effect, source: Mon | undefined): Phrase {
+/**
+ * The hazards a Pokémon of their side takes up as it comes in, by the condition's id: the log
+ * names it by `[of]` and gives no cause.
+ */
+const SIDE_ENDS_ABSORBED: Readonly<Record<string, (side: Side) => string>> = {
+  toxicspikes: (side) => T.toxicSpikesAbsorbed.render(teamInside(side)),
+}
+
+function sideEndText(side: Side, condition: Effect, source?: Mon, cause?: Effect) {
   const id = toID(condition.name)
+  const absorbed = SIDE_ENDS_ABSORBED[id]
+  if (source && !cause && absorbed) return absorbed(side)
   const bySource = SIDE_ENDS_BY_SOURCE[id]
-  const text = source && bySource ? bySource(source) : SIDE_ENDS[id]?.(side, condition)
+  return source && bySource ? bySource(source) : SIDE_ENDS[id]?.(side, condition)
+}
+
+/**
+ * A condition gone from a side; `source` blew a hazard away by `cause`, as with Rapid Spin, or
+ * took it up with no cause, as a Poison-type Pokémon takes up Toxic Spikes.
+ */
+export function sideEnded(
+  side: Side,
+  condition: Effect,
+  source: Mon | undefined,
+  cause: Effect | undefined,
+): Phrase {
+  const text = sideEndText(side, condition, source, cause)
   if (text !== undefined) return { text }
   const own = T.woreOff.render(teamAtStart(side), held(condition.name))
   return ownPhrase(own, `${condition.name} ending on a side`)

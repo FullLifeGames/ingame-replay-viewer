@@ -63,4 +63,22 @@ describe('the item rules', () => {
     ])
     expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
   })
+
+  it('reads a berry that weakens a hit (`[weaken]`) and drops nothing (#105)', () => {
+    const script = scriptOf(
+      '|-enditem|p2a: Tyranitar|Chople Berry|[eat]',
+      '|-enditem|p2a: Tyranitar|Chople Berry|[weaken]',
+    )
+
+    expect(eventsAt(script, NEXT + 1)).toEqual([
+      {
+        kind: 'itemEnd',
+        line: NEXT + 1,
+        who: { side: 'far', index: 0 },
+        item: 'Chople Berry',
+        weakened: true,
+      },
+    ])
+    expect(script.dropped.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
 })
