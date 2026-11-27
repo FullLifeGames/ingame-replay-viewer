@@ -55,6 +55,7 @@ const BATTLE: BattleNumbers = {
   },
   waitSelectSeq: 7,
   single: { clientCount: 3, posClientIds: [2, 0, 1], clients: { player: 2, opponent: 0 } },
+  constants: {},
 }
 const BASE = 0x02000000
 const PROC = 0x021357a0

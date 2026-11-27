@@ -4,11 +4,12 @@
 // client at each position (#77) and the player's client and the opponent's (#93), from its setup.
 // Part of build/gen5/bw2.json.
 import type { BattleNumbers, SingleBattle } from '../src/gen5/bw2-numbers.ts'
-import { bodyOf, enumAround, literal, stripComments } from './gen5-bw2-c.ts'
+import { bodyOf, definesByPrefix, enumAround, literal, stripComments } from './gen5-bw2-c.ts'
 import { singleClients } from './gen5-bw2-clients.ts'
 import { firstMember, structLayout } from './gen5-bw2-struct.ts'
 
-/** The sources read: btl_server.c and .h, btl_main.c and .h, btl_client.h and btl_pokeparam.h. */
+/** The sources read: btl_server.c and .h, btl_main.c and .h, btl_client.h, btl_pokeparam.h and
+ * the battle's constants. */
 export interface BattleSources {
   serverC: string
   serverH: string
@@ -16,7 +17,12 @@ export interface BattleSources {
   mainH: string
   clientH: string
   pokeparamH: string
+  battleH: string
 }
+
+/** The prefixes of the battle's constants the backend names: the weathers, a battle Pokémon's
+ * conditions (the side's and the field's start otherwise) and its stats and stat stages. */
+export const CONSTANT_PREFIXES = ['BTL_WEATHER_', 'CONDITION_', 'BATTLEMON_']
 
 const WAIT_SELECT = 'BTL_SERVER_ACTION_SEQ_WAIT_SELECT'
 const MON_CORE = 'BattleMonCore core'
@@ -69,7 +75,7 @@ function singleBattle(mainC: string, clientH: string): SingleBattle {
 }
 
 export function battleNumbers(sources: BattleSources): BattleNumbers {
-  const { serverC, serverH, mainC, mainH, clientH, pokeparamH } = sources
+  const { serverC, serverH, mainC, mainH, clientH, pokeparamH, battleH } = sources
   const first = firstMember(pokeparamH, 'BattleMon')
   if (first !== MON_CORE) throw new Error(`BattleMon starts with "${first}", not ${MON_CORE}`)
   const waitSelectSeq = enumAround(serverC, WAIT_SELECT)[WAIT_SELECT]
@@ -82,5 +88,8 @@ export function battleNumbers(sources: BattleSources): BattleNumbers {
     monCore: structLayout(pokeparamH, 'BattleMonCore', 'monId'),
     waitSelectSeq,
     single: singleBattle(mainC, clientH),
+    constants: Object.fromEntries(
+      CONSTANT_PREFIXES.flatMap((prefix) => Object.entries(definesByPrefix(battleH, prefix))),
+    ),
   }
 }

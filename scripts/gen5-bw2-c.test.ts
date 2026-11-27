@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   bodyOf,
   defineValue,
+  definesByPrefix,
   enumAround,
   parseFormatTable,
   parseSymbols,
@@ -100,6 +101,33 @@ describe('enumAround', () => {
     expect(defineValue(header, 'LIMIT')).toBe(12)
     expect(defineValue('#define END 0x7eed0000', 'END')).toBe(0x7eed0000)
     expect(() => defineValue(header, 'GONE')).toThrow(/GONE/)
+  })
+})
+
+// Scene: the backend looks up a weather, a condition or a stat by its constant's name.
+describe('definesByPrefix', () => {
+  const header = `
+    #define SIDE_TOOL_KITE 9
+    #define TOOL_KITE 0x21 // a kite
+    // #define TOOL_GONE 3
+    #define TOOL_LAMP 5u
+    #define TOOLBOX 40
+    #define TOOL_ROPE 17
+  `
+
+  it('takes every define that starts with the prefix and carries a plain number', () => {
+    expect(definesByPrefix(header, 'TOOL_')).toEqual({
+      TOOL_KITE: 0x21,
+      TOOL_LAMP: 5,
+      TOOL_ROPE: 17,
+    })
+  })
+
+  it('throws by name on a define it would have to compute, and on a prefix that names none', () => {
+    const odd = `${header}\n#define TOOL_ANY (TOOL_KITE | TOOL_LAMP)`
+    expect(() => definesByPrefix(odd, 'TOOL_')).toThrow(/TOOL_ANY/)
+    expect(() => definesByPrefix(`${header}\n#define TOOL_BARE`, 'TOOL_')).toThrow(/TOOL_BARE/)
+    expect(() => definesByPrefix(header, 'GEAR_')).toThrow(/GEAR_/)
   })
 })
 

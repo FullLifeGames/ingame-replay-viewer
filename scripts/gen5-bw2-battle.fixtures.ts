@@ -31,6 +31,20 @@ BOOL BtlMain_SetupAloneSingle(u32 *state, BtlMainModule *mainModule) {
 }`,
   // The prototype puts `isAI` before `clientId`; client 1 is the player's, client 0 the AI's.
   clientH: 'BtlClient *BattleClient_Create(BtlMainModule *mainModule, u8 isAI, u16 clientId);',
+  // The weathers, the Pokémon's conditions and its stats out of order, beside a side's and a field's
+  // condition that the anchored prefix leaves out.
+  battleH: `#define BTL_STYLE_SINGLE 3
+#define BTL_WEATHER_RAIN 0x21
+#define BTL_WEATHER_NONE 0x20
+#define SIDE_CONDITION_SPIKES 40
+#define BTL_WEATHER_SUN 0x24
+#define FIELD_CONDITION_TRICK_ROOM 41
+#define CONDITION_BURN 17 // burnt
+#define CONDITION_SLEEP 9
+#define CONDITION_NONE 12
+#define BATTLEMON_SPEED_STAGE 30
+#define BATTLEMON_HP 26
+#define BATTLEMON_ATTACK 27u`,
   pokeparamH: `typedef struct { u16 hp; u32 seen; u16 species; u8 monId; Mystery more[COUNT]; } BattleMonCore;
 struct BattleMon { BattleMonCore core; s8 boost; };`,
 }

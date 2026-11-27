@@ -124,6 +124,21 @@ export function defineValue(source: string, name: string): number {
   return value
 }
 
+/** Every `#define <prefix>… <literal>` by name; the name must start with the prefix, so
+ * `CONDITION_` leaves `SIDE_CONDITION_` out. Throws by name on a define of the prefix whose value
+ * is no plain number, and when the source has none. */
+export function definesByPrefix(source: string, prefix: string): Record<string, number> {
+  const found: Record<string, number> = {}
+  const lines = new RegExp(`^[ \\t]*#define[ \\t]+(${prefix}\\w*)(.*)$`, 'gm')
+  for (const [, name = '', text = ''] of stripComments(source).matchAll(lines)) {
+    const value = literal(text)
+    if (value === undefined) throw new Error(`#define ${name} carries no plain number`)
+    found[name] = value
+  }
+  if (Object.keys(found).length === 0) throw new Error(`no #define of the prefix ${prefix}`)
+  return found
+}
+
 export interface FormatTable {
   /** The name in the table's brackets, which bounds the commands it covers. */
   bound: string

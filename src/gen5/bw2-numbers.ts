@@ -106,6 +106,9 @@ export interface BattleNumbers {
   waitSelectSeq: number
   /** The single battle's setup. */
   single: SingleBattle
+  /** The battle's constants by name (include/constants/battle.h): the weathers (`BTL_WEATHER_`),
+   * a battle Pokémon's conditions (`CONDITION_`) and its stats and stat stages (`BATTLEMON_`). */
+  constants: Record<string, number>
 }
 
 /** A trigger of the map's events: the player steps on row `z` from column `x` on, across `width`
