@@ -91,6 +91,19 @@ describe('the spike page', () => {
     }
   })
 
+  // Scene: a test replay loads; its list of what Black 2 does not show stands beside the game
+  // from 56rem up and under it on a phone (#111, lane plan D9).
+  it('holds the list after the game inside the stage, hidden until a replay loads', () => {
+    const stage = /<div id="stage">(.*?)\n {4}<\/div>/s.exec(html)?.[1] ?? ''
+    const game = stage.indexOf('<div id="game"></div>')
+    const beside = /<section id="beside" hidden>(.*?)<\/section>/s.exec(stage)
+    expect(game).toBeGreaterThan(-1)
+    expect(beside?.index).toBeGreaterThan(game)
+    const ids = [...(beside?.[1] ?? '').matchAll(/id="([^"]+)"/g)].map((id) => id[1])
+    expect(ids).toEqual(['replay-end', 'not-shown', 'not-shown-counts', 'not-shown-rows'])
+    expect(html).toMatch(/@media \(min-width: 56rem\) \{\s*#stage \{\s*display: grid;/)
+  })
+
   it('shows the speed cap, the core switch, the copy button and the phone note', () => {
     for (const id of ['uncapped', 'core-switch', 'vsync-switch', 'copy', 'figures', 'phone-note']) {
       expect(html).toContain(`id="${id}"`)

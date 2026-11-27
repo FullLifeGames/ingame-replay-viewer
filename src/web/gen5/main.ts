@@ -8,7 +8,8 @@
 // `?save=<name>` the page fetches that save from its own server and loads it before the game
 // starts; the save folder lives in memory alone, never in IndexedDB (save-load.ts). `window.gen5`
 // is the hook that the scripts read. The picker above the dump offers the Gen 5 test replays and
-// opens on none; a picked replay plays by itself from power-on (replay-player.ts, #111).
+// opens on none; a picked replay plays by itself from power-on (replay-player.ts, #111), and the
+// list beside the game shows what Black 2 does not show of it from the pick to the end line.
 import { figuresLine } from '../../gen5/figures.ts'
 import type { Calibration, Gen5Hook, SaveReport } from '../../gen5/hook.ts'
 import type { MainRamFacts } from '../../gen5/main-ram.ts'
@@ -21,6 +22,8 @@ import { wireControls } from './controls.ts'
 import { fromBase64, sha256, toBase64 } from './codec.ts'
 import { fixClock, wrapRuntime } from './core-runtime.ts'
 import { frameHook } from './frame-hook.ts'
+import { notShownList, notShownRows } from './not-shown.ts'
+import { showEnd, showNotShown } from './not-shown-view.ts'
 import { ramHook, readFacts } from './ram-hook.ts'
 import { replayPlayer } from './replay-player.ts'
 import { GEN5_REPLAYS, replayOptions } from './replays.ts'
@@ -104,6 +107,7 @@ const player = replayPlayer({
       clearInterval(timer)
     }
   },
+  ended: showEnd,
 })
 for (const { value, text } of replayOptions()) replayPicker?.add(new Option(text, value))
 
@@ -225,6 +229,8 @@ async function onPick(picker: HTMLInputElement): Promise<void> {
   }
   const replay = GEN5_REPLAYS.find(({ id }) => id === replayPicker?.value)
   if (replay !== undefined && !(await player.start(replay, location.search))) return
+  const loaded = player.loaded()
+  if (loaded) showNotShown(notShownList(notShownRows(loaded.replay, loaded.lines)))
   if (!(await fetchAddressSave())) return
   facts = await readFacts(file, check.header, headerBytes)
   picker.disabled = true
