@@ -44,6 +44,8 @@ bool32 Replay_OpWithdraw(const volatile u8 *operands, u32 step);
 // The side's mon goes back into its ball, for WITHDRAW and the outro.
 void Replay_ReturnMonToBall(u32 side);
 bool32 Replay_OpSwitchIn(const volatile u8 *operands, u32 step);
+// The game's own Illusion stays off for a mon that SEND_OUT or SWITCH_IN puts on the field.
+void Replay_KeepIllusionOff(u32 battler);
 
 // replay_ops_state.c
 bool32 Replay_OpStatus(const volatile u8 *operands, u32 step);
