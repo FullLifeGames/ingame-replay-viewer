@@ -4,55 +4,21 @@
 // client then starts no action selection, and no trainer's hint line shows (#76,
 // CheckTrainerHintMsg). The page plays the steps frame by frame (src/web/gen5/frame-hook.ts);
 // scripts/gen5-moment.ts reads the addresses and the Pokémon from RAM first.
-import { type AdapterNumbers, adapterWrites, holdWrites } from '../src/gen5/adapter.ts'
-import type { ServerCmdTable } from '../src/gen5/bw2-numbers.ts'
+import { holdWrites } from '../src/gen5/adapter.ts'
 import type { MacroStep } from '../src/gen5/macro.ts'
 import { momentCommands, type Moment } from '../src/gen5/moment.ts'
-import type { RamCheck } from '../src/gen5/ram-check.ts'
-import { packCommands } from '../src/gen5/server-cmd.ts'
+import { answered, type BlockSetup, blockSteps } from '../src/gen5/replay-plan.ts'
 
 /** Frames the player's answer to the menu may take; A every MASH_EVERY frames for 3. */
 const MENU_LIMIT = 1800
 const MASH_EVERY = 30
-/** Frames a block may take, and a frame of it every BLOCK_FRAMES_EVERY frames. */
-const BLOCK_LIMIT = 3000
-const BLOCK_FRAMES_EVERY = 10
 /** Frames from the session's mark `battle` to the moment's start: room for the script's reading
  * of the battle. E-5's runs queued the moment about 35 frames after the mark on the build machine;
  * ten seconds at the DS's pace leave room for a faster core. */
 export const MOMENT_GAP = 600
 
-export interface MomentSetup {
-  adapterNumbers: AdapterNumbers
-  table: ServerCmdTable
-  /** The player's adapter, read from sAdapters. */
-  adapter: number
+export interface MomentSetup extends BlockSetup {
   blocks: { name: string; moment: Moment }[]
-}
-
-/** The check that the client answered its last command: `returned` reads 1 at the adapter. */
-function answered(setup: MomentSetup): RamCheck {
-  const field = setup.adapterNumbers.layout.fields.returned
-  if (field?.size !== 1) throw new Error("the adapter's returned must sit in one byte")
-  const mask = (2 ** (field.bits ?? 8) - 1) * 2 ** (field.bit ?? 0)
-  const address = setup.adapter + field.offset
-  return { name: 'returned', address, width: 1, mask, oneOf: [2 ** (field.bit ?? 0)] }
-}
-
-function blockSteps(setup: MomentSetup, name: string, moment: Moment): MacroStep[] {
-  const block = packCommands(setup.table, momentCommands(moment))
-  return [
-    { kind: 'write', name, writes: adapterWrites(setup.adapterNumbers, setup.adapter, block) },
-    {
-      kind: 'until',
-      name,
-      checks: [answered(setup)],
-      holdFor: 1,
-      limit: BLOCK_LIMIT,
-      markEvery: BLOCK_FRAMES_EVERY,
-    },
-    { kind: 'mark', name: `${name}-answered` },
-  ]
 }
 
 /** The frame the moment's plan starts at: MOMENT_GAP frames after the session's mark `battle`,
@@ -76,7 +42,7 @@ export function momentSteps(setup: MomentSetup): MacroStep[] {
       markEvery: MASH_EVERY,
     },
     { kind: 'mark', name: 'hp-before' },
-    ...setup.blocks.flatMap(({ name, moment }) => blockSteps(setup, name, moment)),
+    ...setup.blocks.flatMap(({ name, moment }) => blockSteps(setup, name, momentCommands(moment))),
     { kind: 'mark', name: 'end' },
   ]
 }
