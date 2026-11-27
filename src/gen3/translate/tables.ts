@@ -8,7 +8,7 @@ import type { Party, Stream, StreamMon, StreamTrainer } from '../stream/instruct
 import { speciesOf } from '../tables/lookup'
 import { trainerPicOf } from '../tables/avatars'
 import type { Context } from './context'
-import { HP_SCALE } from './scale'
+import { HP_SCALE } from '../../script/hp-scale'
 
 const GENDERS = { M: 'male', F: 'female' } as const
 

@@ -4,6 +4,7 @@ import {
   type AdapterNumbers,
   adapterNumbers,
   adapterWrites,
+  blockRoom,
   commandWrites,
   holdWrites,
 } from './adapter'
@@ -62,6 +63,12 @@ describe('adapterWrites', () => {
     expect(() => adapterWrites(small, ADAPTER, new Uint8Array(0x11))).toThrow(
       /17 bytes.*queue holds 16/,
     )
+  })
+
+  // Scene: a block must fit both the adapter's data field and the client's queue.
+  it('gives the room of a block as the smaller of the data field and the queue', () => {
+    expect(blockRoom(NUMBERS)).toBe(0x20)
+    expect(blockRoom({ ...NUMBERS, queueSize: 0x10 })).toBe(0x10)
   })
 
   it('refuses an empty block', () => {

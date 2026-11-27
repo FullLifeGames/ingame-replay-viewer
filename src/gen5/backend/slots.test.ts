@@ -3,7 +3,15 @@ import { describe, expect, it } from 'vitest'
 import type { ScriptEvent } from '../../script/events.ts'
 import type { Side } from '../../script/types.ts'
 import type { MonIds } from '../bw2-numbers.ts'
-import { byParkSide, monIdOf, PARK_SIDES, partyOrder, partySlot } from './slots.ts'
+import {
+  byParkSide,
+  clientOf,
+  monIdOf,
+  PARK_SIDES,
+  partyOrder,
+  partySlot,
+  refKey,
+} from './slots.ts'
 
 // Invented: four clients whose ranges of mon IDs neither start at 0 nor follow the clients'
 // order, eight IDs each. Client 1 stands for the far side's client.
@@ -63,11 +71,34 @@ describe('a battle script’s Pokémon in the park', () => {
     )
   })
 
+  it('keys each Pokémon by its side and team index, the same for each ref to it', () => {
+    expect(refKey({ side: 'near', index: 2 })).toBe(refKey({ side: 'near', index: 2 }))
+    const keys = [
+      { side: 'near', index: 2 },
+      { side: 'far', index: 2 },
+      { side: 'near', index: 3 },
+    ] as const
+    expect(new Set(keys.map(refKey)).size).toBe(3)
+  })
+
   it('takes the near side to the player and the far side to the opponent', () => {
     expect(PARK_SIDES).toEqual({ near: 'player', far: 'opponent' })
     expect(byParkSide((side) => `${side} side`)).toEqual({
       player: 'near side',
       opponent: 'far side',
     })
+  })
+})
+
+// Scene: the near side's Pokémon are the player's client's and the far side's the opponent's, as
+// the single battle's setup creates them; the clients are invented.
+describe('clientOf', () => {
+  it("gives the near side the player's client and the far side the opponent's", () => {
+    const single = { clientCount: 4, posClientIds: [3, 2], clients: { player: 3, opponent: 2 } }
+    expect(clientOf(single, 'near')).toBe(3)
+    expect(clientOf(single, 'far')).toBe(2)
+    const swapped = { ...single, clients: { player: 1, opponent: 0 } }
+    expect(clientOf(swapped, 'near')).toBe(1)
+    expect(clientOf(swapped, 'far')).toBe(0)
   })
 })

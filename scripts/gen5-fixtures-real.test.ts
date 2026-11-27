@@ -11,9 +11,12 @@ import { describe, expect, it } from 'vitest'
 
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { ADAPTER_LAYOUT } from '../src/gen5/adapter.fixtures.ts'
+import { REPLAY_NUMBERS } from '../src/gen5/backend/replay.fixtures.ts'
 import { ENTRY } from '../src/gen5/direct-entry.fixtures.ts'
 import { PKM, TEAM_PKM, TERMINATOR } from '../src/gen5/pkm.fixtures.ts'
 import { battleNumbers } from './gen5-bw2-battle.ts'
+import { flowNumbers } from './gen5-bw2-flow.ts'
+import { FLOW_INPUT } from './gen5-bw2-flow.fixtures.ts'
 import { BATTLE_SOURCES } from './gen5-bw2-battle.fixtures.ts'
 import { entryNumbers } from './gen5-bw2-entry.ts'
 import { ENTRY_INPUT } from './gen5-bw2-entry.fixtures.ts'
@@ -22,11 +25,13 @@ import { FONT_INPUT } from './gen5-bw2-font.fixtures.ts'
 import { pkmNumbers } from './gen5-bw2-pkm.ts'
 import { PKM_INPUT } from './gen5-bw2-pkm.fixtures.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
+import { textNumbers } from './gen5-bw2-text.ts'
+import { TEXT_INPUT } from './gen5-bw2-text.fixtures.ts'
 
 const FILE = GEN5_PATHS.bw2Json
 
 /** The folders whose `*.fixtures.ts` modules the guard walks. */
-const FOLDERS = ['src/gen5/', 'scripts/']
+const FOLDERS = ['src/gen5/', 'src/gen5/backend/', 'scripts/']
 
 /** Each fixture under pokebw2's names: its module, its export, and where the generated file keeps
  * the numbers of the same names. A fixture of C texts is compared by what its reader computes
@@ -71,6 +76,26 @@ const COMPARED = [
     value: fontNumbers(FONT_INPUT),
     path: ['font'],
   },
+  {
+    module: 'scripts/gen5-bw2-text.fixtures.ts',
+    name: 'TEXT_INPUT',
+    value: textNumbers(TEXT_INPUT),
+    path: ['text'],
+  },
+  {
+    module: 'scripts/gen5-bw2-flow.fixtures.ts',
+    name: 'FLOW_INPUT',
+    value: flowNumbers(FLOW_INPUT),
+    path: ['flow'],
+  },
+  ...(['text', 'flow', 'serverCommands', 'messages', 'queueSize', 'battle'] as const).map(
+    (key) => ({
+      module: 'src/gen5/backend/replay.fixtures.ts',
+      name: `REPLAY_NUMBERS.${key}`,
+      value: REPLAY_NUMBERS[key],
+      path: [key],
+    }),
+  ),
 ]
 
 /** The fixture modules that hold no number of pokebw2: the archives' fixtures. `ROUTINE` beside

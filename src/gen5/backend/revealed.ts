@@ -6,6 +6,7 @@ import { toID } from '@pkmn/data'
 import type { BattleScript, ScriptEvent } from '../../script/events.ts'
 import type { PokemonRef, Side } from '../../script/types.ts'
 import type { Gen5Fallback } from './fallbacks.ts'
+import { refKey } from './slots.ts'
 
 /** One member's moves in the order the log first shows them, and its item and ability. */
 export interface RevealedSet {
@@ -45,15 +46,13 @@ interface Reading {
   readonly fallbacks: Gen5Fallback[]
 }
 
-const keyOf = (ref: PokemonRef) => `${ref.side} ${String(ref.index)}`
-
 /** The first word on a trait wins, a value or a freeze. */
 function reveal(trait: Trait, ref: PokemonRef | undefined, value: string | typeof FROZEN): void {
-  if (ref !== undefined && !trait.has(keyOf(ref))) trait.set(keyOf(ref), value)
+  if (ref !== undefined && !trait.has(refKey(ref))) trait.set(refKey(ref), value)
 }
 
 function addMove(reading: Reading, ref: PokemonRef, move: string, line: number): void {
-  const key = keyOf(ref)
+  const key = refKey(ref)
   if (reading.transformed.has(key) || toID(move) === STRUGGLE) return
   const moves = reading.moves.get(key) ?? []
   reading.moves.set(key, moves)
@@ -162,8 +161,8 @@ const READERS: Readers = {
   cant: (reading, event) => {
     if (event.move !== undefined) addMove(reading, event.who, event.move, event.line)
   },
-  transform: (reading, event) => reading.transformed.add(keyOf(event.who)),
-  switchIn: (reading, event) => reading.transformed.delete(keyOf(event.who)),
+  transform: (reading, event) => reading.transformed.add(refKey(event.who)),
+  switchIn: (reading, event) => reading.transformed.delete(refKey(event.who)),
   item: readItem,
   itemEnd: readItemEnd,
   ability: readAbility,
@@ -182,7 +181,7 @@ function readEvent(reading: Reading, event: ScriptEvent): void {
 }
 
 function setOf(reading: Reading, ref: PokemonRef): RevealedSet {
-  const key = keyOf(ref)
+  const key = refKey(ref)
   const item = reading.items.get(key)
   const ability = reading.abilities.get(key)
   return {

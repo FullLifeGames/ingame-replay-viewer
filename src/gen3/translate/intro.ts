@@ -5,7 +5,7 @@ import { fitCharset } from '../text/charset'
 import { nameTrainer } from '../text/names'
 import { challenged, sentOut } from '../text/phrases-field'
 import type { Context, EventOf, Leads } from './context'
-import { scaleHp } from './scale'
+import { scaleHp } from '../../script/hp-scale'
 
 export function player(event: EventOf<'player'>, ctx: Context): void {
   const text = nameTrainer(event.name)

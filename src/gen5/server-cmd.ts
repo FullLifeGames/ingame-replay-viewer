@@ -7,12 +7,15 @@
 import type { ArgPut, ServerCmdTable } from './bw2-numbers'
 
 /** One command: its name (`SC_*`), its arguments, and for a message command its message ID and,
- * for the one command that carries it, a sound. */
+ * for the one command that carries it, a sound. `bytes` follow a formatted command's arguments,
+ * one byte each, as the server's BtlServerCmdQueue_PutByte writes them after a command (the mon
+ * IDs of SC_DAMAGE_PLURAL); a message command takes none. */
 export interface ServerCommand {
   command: string
   args: number[]
   message?: number
   sound?: number
+  bytes?: number[]
 }
 
 /** The widths the queue writes outside the formats; scripts/gen5-bw2-put.ts checks the C for them
@@ -60,11 +63,17 @@ function packFormatted(
   for (const put of puts) {
     pushBigEndian(out, putValue(put, entry.args, entry.command), put.bytes, entry.command)
   }
+  for (const [i, byte] of (entry.bytes ?? []).entries()) {
+    pushBigEndian(out, byte, 1, `${entry.command}: byte ${String(i)}`)
+  }
 }
 
 function packMessage(out: number[], table: ServerCmdTable, entry: ServerCommand): void {
   const { soundCommand, argEnd } = table.messages
   if (entry.message === undefined) throw new Error(`${entry.command} needs a message ID`)
+  if (entry.bytes !== undefined) {
+    throw new Error(`${entry.command} is a message command and takes no trailing bytes`)
+  }
   pushBigEndian(out, entry.message, MESSAGE_BYTES, `${entry.command}'s message`)
   if ((entry.command === soundCommand) !== (entry.sound !== undefined)) {
     throw new Error(`${entry.command}: only ${soundCommand} carries a sound, and it always does`)
