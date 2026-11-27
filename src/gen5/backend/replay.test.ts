@@ -109,4 +109,13 @@ describe('a Gen 5 replay from a battle script', () => {
       'the log names no player on the far side',
     )
   })
+
+  // Scene: a log whose side shows more Pokémon than a party holds.
+  it('fails by name on a party longer than the game’s PARTY_SIZE', () => {
+    const constants = { ...TEAM_PKM.constants, PARTY_SIZE: 5 }
+    const small = { ...NUMBERS, pkm: { ...TEAM_PKM, constants } }
+    expect(() => buildGen5Replay(SUN_RAIN, small)).toThrow(
+      'the near side’s party holds 6 Pokémon; the game’s PARTY_SIZE is 5',
+    )
+  })
 })

@@ -57,7 +57,8 @@ describe.skipIf(!FILES.every((file) => existsSync(file)))(
   'the direct entry on the real files',
   () => {
     const options = readMomentOptions(['--entry', 'direct'], 0)
-    const team = () => teamParties(pkmFormat(real().numbers), options.names)
+    const names = { player: 'Viewer', opponent: 'Showdown' }
+    const team = () => teamParties(pkmFormat(real().numbers), names)
     const input = () => ({
       refs: battleRefs(real().numbers),
       trainer: real().numbers.saveTrainer,
@@ -66,7 +67,7 @@ describe.skipIf(!FILES.every((file) => existsSync(file)))(
       readState: () => {
         throw new Error('no state')
       },
-      parties: team().parties,
+      team: { parties: team().parties, names },
     })
 
     it('build one plan: the takeover right after its window, park, then go before gone', () => {

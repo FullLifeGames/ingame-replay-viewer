@@ -3,10 +3,19 @@
 // save. They go through the backend's one way from names to a written Pokémon
 // (src/gen5/backend/party-mon.ts) at level 50, with the HP that @pkmn calculates. No shiny, no
 // status, no Illusion or Transform user. Both leads know Tackle for the scene "known", and neither
-// is the save's Tepig.
-import { type PartyMon, sealParties, writtenMon } from '../src/gen5/backend/party-mon.ts'
+// is the save's Tepig. With --replay the run writes a test replay's teams instead
+// (gen5-moment-replay.ts, #106), which this module loads through Vite's module runner.
+import { join } from 'node:path'
+
+import { runnerImport } from 'vite'
+
+import { type PartyMon, sealParties, trainerOt, writtenMon } from '../src/gen5/backend/party-mon.ts'
+import type { ReplayNumbers } from '../src/gen5/backend/replay.ts'
 import type { ParkNames } from '../src/gen5/direct-park.ts'
-import type { PkmFormat } from '../src/gen5/pkm-members.ts'
+import { type PkmFormat, pkmFormat } from '../src/gen5/pkm-members.ts'
+import type { MomentTeam } from './gen5-moment-args.ts'
+import type * as MomentReplay from './gen5-moment-replay.ts'
+import { GEN5_PATHS } from './gen5-paths.ts'
 
 /** A Pokémon of the team by Showdown's names; with no nickname it shows its species' name. */
 export type TeamMon = Omit<PartyMon, 'name' | 'nicknamed' | 'level' | 'shiny'> & {
@@ -133,13 +142,32 @@ const partyMon = ({ nickname, ...mon }: TeamMon): PartyMon => ({
 })
 
 /** The team as the park takes it: each side's Pokémon as written and sealed, with the side's name
- * as their original trainer (id 0 and gender 0, as PlayerInfo holds them with no save), and a log
- * line per name cut to its room, which names the slot. */
+ * as their original trainer (`trainerOt`), and a log line per name cut to its room, which names
+ * the slot. */
 export function teamParties(format: PkmFormat, names: ParkNames, team: Team = TEAM) {
   const side = (of: TeamSide) => {
-    const ot = { name: names[of], id: 0, gender: 0 }
+    const ot = trainerOt(names[of])
     return team[of].map((mon, salt) => writtenMon(partyMon(mon), { ot, salt, format }))
   }
   const written = { player: side('player'), opponent: side('opponent') }
   return { ...sealParties(written, format), written }
+}
+
+/** The direct entry's team as the park writes it: the hand team with the names given, which has
+ * no fallback, or the test replay's teams and names. src/script/ resolves as the page's bundler
+ * does, which plain Node cannot load, so the replay's module goes through Vite's module runner. */
+export async function momentTeam(
+  team: MomentTeam,
+  numbers: ReplayNumbers,
+): Promise<MomentReplay.ReplayTeam> {
+  if (team.from === 'hand') {
+    const hand = teamParties(pkmFormat(numbers), team.names)
+    return { ...hand, names: team.names, fallbacks: [] }
+  }
+  const path = join(GEN5_PATHS.repo, 'scripts', 'gen5-moment-replay.ts')
+  const { module } = await runnerImport<typeof MomentReplay>(path, {
+    configFile: false,
+    logLevel: 'silent',
+  })
+  return module.replayTeam(team.id, numbers)
 }

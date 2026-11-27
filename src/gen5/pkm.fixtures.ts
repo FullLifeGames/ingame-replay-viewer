@@ -115,10 +115,11 @@ export const PKM: PkmNumbers = {
 export const TERMINATOR = 0xfff0
 
 /** The invented format of the backend's Pokémon (src/gen5/backend/party-mon.ts) and the moment
- * script's team (scripts/gen5-moment-team.ts): its natures and Hardy, and the format's "no item",
- * each under a number of its own. Species, moves, items and abilities go by @pkmn's dex numbers. */
+ * script's team (scripts/gen5-moment-team.ts): its natures and Hardy, the format's "no item" and a
+ * party of seven, each under a number of its own. Species, moves, items and abilities go by @pkmn's dex numbers. */
 export const TEAM_PKM: PkmNumbers = {
   ...PKM,
+  constants: { ...PKM.constants, PARTY_SIZE: 7 },
   items: { ...PKM.items, ITEM_NONE: 11 },
   natures: {
     ...PKM.natures,

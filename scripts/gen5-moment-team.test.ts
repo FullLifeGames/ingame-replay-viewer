@@ -1,11 +1,14 @@
 import { Dex } from '@pkmn/dex'
 import { describe, expect, it } from 'vitest'
 
+import type { ReplayNumbers } from '../src/gen5/backend/replay'
+import { ENTRY } from '../src/gen5/direct-entry.fixtures'
 import { openPkm } from '../src/gen5/pkm-cipher'
 import { readPkm } from '../src/gen5/pkm-fields'
-import type { PkmFormat } from '../src/gen5/pkm-members'
+import { type PkmFormat, pkmFormat } from '../src/gen5/pkm-members'
 import { TEAM_PKM, TERMINATOR } from '../src/gen5/pkm.fixtures'
-import { TEAM, type Team, teamParties } from './gen5-moment-team'
+import { replayTeam } from './gen5-moment-replay'
+import { momentTeam, TEAM, type Team, teamParties } from './gen5-moment-team'
 
 // Every number of the format is invented (src/gen5/pkm.fixtures.ts): a nickname holds seven
 // characters, and the lists hold the team's natures. Species, moves, items and abilities take
@@ -100,5 +103,27 @@ describe('the moment team', () => {
     )
     expect(notes.filter((note) => note.includes('"Axel"'))).toEqual([])
     expect(written.opponent.find((one) => one.nicknamed)?.name).toBe('Axel')
+  })
+})
+
+/** The invented numbers of a replay's team: the format and entry of the fixtures, a font of
+ * printable ASCII, a made-up pin. */
+const NUMBERS: ReplayNumbers = {
+  pkm: TEAM_PKM,
+  entry: ENTRY,
+  font: { chars: Array.from({ length: 95 }, (_, i) => String.fromCharCode(32 + i)).join('') },
+  pokebw2: { repository: 'https://example.invalid/pokebw2.git', commit: 'c0ffee' },
+}
+
+// Scene: the run writes the hand team with the names given, or a test replay's teams and names.
+describe('momentTeam', () => {
+  it('gives the hand team with the names given and no fallback', async () => {
+    const team = await momentTeam({ from: 'hand', names: NAMES }, NUMBERS)
+    expect(team).toEqual({ ...teamParties(pkmFormat(NUMBERS), NAMES), names: NAMES, fallbacks: [] })
+  })
+
+  it('loads a test replay’s teams and names through the module runner', async () => {
+    const team = await momentTeam({ from: 'replay', id: 'gen5ou-2718717830' }, NUMBERS)
+    expect(team).toEqual(replayTeam('gen5ou-2718717830', NUMBERS))
   })
 })

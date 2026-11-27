@@ -27,7 +27,8 @@ const noRoutine = () => {
 /** Invented sealed Pokémon of the fixture's PartyPkm size: two for the player, one opponent. */
 const PKM = new Uint8Array(0x60).fill(5)
 const parties = { player: [PKM, PKM], opponent: [PKM] }
-const input = { refs: REFS, trainer: TRAINER, entry: ENTRY, readState: noState, parties }
+const team = { parties, names: { player: 'Viewer', opponent: 'Showdown' } }
+const input = { refs: REFS, trainer: TRAINER, entry: ENTRY, readState: noState, team }
 const lastMark = (steps: readonly MacroStep[]) =>
   steps.flatMap((step) => (step.kind === 'mark' ? [step.name] : [])).at(-1)
 
@@ -38,7 +39,7 @@ describe('sessionPlan', () => {
     const { plan, notes } = sessionPlan(options, {
       ...input,
       readRoutine: noRoutine,
-      parties: undefined,
+      team: undefined,
     })
     expect(plan).toEqual(firstRun(options.start, REFS, TRAINER, noState))
     expect(notes).toEqual([])
@@ -90,15 +91,15 @@ describe('sessionPlan', () => {
     expect(() => sessionPlan(fromState, { ...input, readRoutine: () => ROUTINE })).toThrow(
       'the direct entry starts from boot',
     )
-    const none = { ...input, readRoutine: () => ROUTINE, parties: undefined }
+    const none = { ...input, readRoutine: () => ROUTINE, team: undefined }
     expect(() => sessionPlan(options, none)).toThrow('the direct entry needs both parties')
   })
 
   it('gives the cut of a name for the log', () => {
-    const names = ['--player', 'Ann', '--opponent', 'Bartholomew']
-    const args = ['--entry', 'direct', ...names]
-    const { notes } = sessionPlan(readMomentOptions(args, NOW), {
+    const names = { player: 'Ann', opponent: 'Bartholomew' }
+    const { notes } = sessionPlan(readMomentOptions(['--entry', 'direct'], NOW), {
       ...input,
+      team: { parties, names },
       readRoutine: () => ROUTINE,
     })
     expect(notes).toEqual([

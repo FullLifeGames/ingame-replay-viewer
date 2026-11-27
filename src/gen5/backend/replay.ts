@@ -7,6 +7,7 @@ import type { DroppedLine, Side } from '../../script/types.ts'
 import { HP_SCALE } from '../../gen3/translate/scale.ts'
 import type { Bw2Numbers } from '../bw2-numbers.ts'
 import type { ParkNames } from '../direct-park.ts'
+import { pkmConstant } from '../pkm-cipher.ts'
 import { pkmFormat } from '../pkm-members.ts'
 import type { ServerCommand } from '../server-cmd.ts'
 import { type Gen5Fallback, inLineOrder } from './fallbacks.ts'
@@ -48,12 +49,26 @@ function trainerOf(script: BattleScript, side: Side, chars: string) {
   return fitName(player.name, chars, { line: player.line, what: `the ${side} trainer’s name` })
 }
 
+/** Throws by name when a side's party holds more Pokémon than the game's PARTY_SIZE. */
+function checkPartySize(parties: Record<Side, readonly unknown[]>, numbers: ReplayNumbers) {
+  const size = pkmConstant(numbers.pkm, 'PARTY_SIZE')
+  for (const side of ['near', 'far'] as const) {
+    const held = parties[side].length
+    if (held > size) {
+      const room = `the game’s PARTY_SIZE is ${String(size)}`
+      throw new Error(`the ${side} side’s party holds ${String(held)} Pokémon; ${room}`)
+    }
+  }
+}
+
 /** The Gen 5 replay of a battle script: its trainers, both parties at HP_SCALE, and the
- * fallbacks. Throws by name on a species, move, item or ability Gen 5 lacks. */
+ * fallbacks. Throws by name on a species, move, item or ability Gen 5 lacks, and on a party
+ * longer than the game's. */
 export function buildGen5Replay(script: BattleScript, numbers: ReplayNumbers): Gen5Replay {
   const { chars } = numbers.font
   const format = pkmFormat(numbers)
   const teams = partyTeams(script, chars)
+  checkPartySize(teams.parties, numbers)
   const names = { near: trainerOf(script, 'near', chars), far: trainerOf(script, 'far', chars) }
   const trainers: ParkNames = byParkSide((side) => names[side].text)
   const written = (side: Side) => {
