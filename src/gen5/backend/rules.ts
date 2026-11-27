@@ -9,8 +9,9 @@ import { type Gen5Fallback, laterFallback, lineFallback } from './fallbacks.ts'
 
 /** What becomes of an event. `park`: the park shows it (#106). `game`: the game shows it itself.
  * `boundary`: it parts the blocks. `play`: the writer plays it where its Pokémon stand in place
- * (moves.ts). `later`: issue `issue` plays it. `line`: Black 2 has no line for it, and nothing
- * shows. */
+ * (moves.ts), a switch-in as its switch, drag or send-in (switches.ts), and a faint as the
+ * server's faint (faints.ts). `later`: issue `issue` plays it. `line`: Black 2 has no line for
+ * it, and nothing shows. */
 export type Outcome =
   | { readonly as: 'park' | 'game' | 'boundary' | 'play' }
   | { readonly as: 'later'; readonly issue: number }
@@ -32,18 +33,16 @@ export type EventOf<K extends ScriptEvent['kind']> = ScriptEvent extends infer E
 
 type Rule<K extends ScriptEvent['kind']> = (event: EventOf<K>, ctx: RuleContext) => Outcome
 
-/** The issues that play what does not play yet: switches and faints, the effects (status,
- * stats, weather, hazards, items, abilities), and a whole replay. */
-export const LATER_ISSUES = { switches: 108, effects: 109, whole: 110 } as const
+/** The issues that play what does not play yet: the effects (status, stats, weather, hazards,
+ * items, abilities), and a whole replay. */
+export const LATER_ISSUES = { effects: 109, whole: 110 } as const
 
 const PLAY = { as: 'play' } as const
-const SWITCHES = { as: 'later', issue: LATER_ISSUES.switches } as const
 const EFFECTS = { as: 'later', issue: LATER_ISSUES.effects } as const
 const WHOLE = { as: 'later', issue: LATER_ISSUES.whole } as const
 
 const park = (): Outcome => ({ as: 'park' })
 const play = (): Outcome => PLAY
-const switches = (): Outcome => SWITCHES
 const effects = (): Outcome => EFFECTS
 const whole = (): Outcome => WHOLE
 
@@ -56,8 +55,8 @@ const RULES = {
   teamSize: park,
   battleStart: park,
   turn: () => ({ as: 'boundary' }),
-  switchIn: (_, ctx) => (ctx.afterLeads ? SWITCHES : { as: 'game' }),
-  faint: switches,
+  switchIn: (_, ctx) => (ctx.afterLeads ? PLAY : { as: 'game' }),
+  faint: play,
   // Illusion's end: its look and the game's own disguise belong with the abilities.
   replace: effects,
   message: (event) => ({ as: 'line', detail: `Black 2 has no line for "${event.text}"` }),

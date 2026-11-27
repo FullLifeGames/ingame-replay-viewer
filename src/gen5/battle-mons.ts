@@ -33,7 +33,8 @@ function fieldOf(layout: StructLayout, field: string, what: string): FieldLayout
   return found
 }
 
-const offsetOf = (layout: StructLayout, field: string, what: string) =>
+/** The offset of `field` in `layout`; throws by name when the layout of `what` has none. */
+export const offsetOf = (layout: StructLayout, field: string, what: string) =>
   fieldOf(layout, field, what).offset
 
 /** The DS addresses where a server's step is `proc` (a Thumb function, so the word may carry
@@ -85,6 +86,30 @@ function partyOf(read: ReadRam, server: number, battle: BattleNumbers, clientId:
   return con + offsetOf(battle.pokeCon, 'parties', 'BtlPokeCon') + clientId * battle.party.size
 }
 
+/** Bytes a party slot takes: a pointer to its BattleMon. */
+const SLOT_BYTES = 4
+
+/** The address of party slot `i`, from the address of the first (`partySlotsAt`). */
+export const slotAddress = (first: number, i: number) => first + i * SLOT_BYTES
+
+/** The slots of `clientId`'s party in the clients' container, in party order: the DS address of
+ * the first (each slot a pointer to a BattleMon) and how many hold a Pokémon (a byte), checked
+ * against the slots' room. A send-in swaps two of these pointers (BattleParty_Swap). */
+export function partySlotsAt(
+  read: ReadRam,
+  server: number,
+  battle: BattleNumbers,
+  clientId: number,
+): { address: number; count: number } {
+  const party = partyOf(read, server, battle, clientId)
+  const count = read(party + offsetOf(battle.party, 'count', 'BattleParty'), 1)
+  const slots = fieldOf(battle.party, 'mons', 'BattleParty')
+  if (count * SLOT_BYTES > slots.size) {
+    throw new Error(`client ${String(clientId)}'s party counts more Pokémon than its slots`)
+  }
+  return { address: party + slots.offset, count }
+}
+
 /** A reader of the core of the Pokémon at `address`, checked to lie in main RAM; `what` names it
  * in the error. */
 function coreAt(read: ReadRam, address: number, battle: BattleNumbers, what: string) {
@@ -118,24 +143,18 @@ export function frontMon(
   return monAt(read, address, battle, `client ${String(clientId)}'s front Pokémon`)
 }
 
-/** Every Pokémon of `clientId`'s party in the clients' container, in party order: its count (a
- * byte), then each entry of its mons. */
+/** Every Pokémon of `clientId`'s party in the clients' container, in party order: each slot's
+ * Pokémon (`partySlotsAt`). */
 export function partyMons(
   read: ReadRam,
   server: number,
   battle: BattleNumbers,
   clientId: number,
 ): PartyMonReading[] {
-  const party = partyOf(read, server, battle, clientId)
-  const n = read(party + offsetOf(battle.party, 'count', 'BattleParty'), 1)
-  const slots = fieldOf(battle.party, 'mons', 'BattleParty')
-  const mons = party + slots.offset
+  const slots = partySlotsAt(read, server, battle, clientId)
   const client = `client ${String(clientId)}'s`
-  if (n * 4 > slots.size) {
-    throw new Error(`${client} party counts more Pokémon than its slots`)
-  }
-  return Array.from({ length: n }, (_, i) => {
-    const address = read(mons + i * 4, 4)
+  return Array.from({ length: slots.count }, (_, i) => {
+    const address = read(slotAddress(slots.address, i), SLOT_BYTES)
     const what = `${client} Pokémon ${String(i)}`
     const core = coreAt(read, address, battle, what)
     const mon: PartyMonReading = {

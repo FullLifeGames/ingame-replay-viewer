@@ -49,6 +49,6 @@ describe('textNumbers', () => {
     expect(text.standard.Bank0019_Text_ButFailed).toBe(4)
     expect(text.set.Bank0018_Text_RestoredLittleHpUsing).toBe(2)
     expect(Object.keys(text.standard)).toHaveLength(7)
-    expect(Object.keys(text.set)).toHaveLength(5)
+    expect(Object.keys(text.set)).toHaveLength(8)
   })
 })

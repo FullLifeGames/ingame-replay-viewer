@@ -5,6 +5,7 @@ import { openPkm } from '../src/gen5/pkm-cipher'
 import { readPkm } from '../src/gen5/pkm-fields'
 import { type PkmFormat, pkmFormat } from '../src/gen5/pkm-members'
 import { TEAM_PKM, TERMINATOR } from '../src/gen5/pkm.fixtures'
+import { HITS_TURN } from './gen5-moment-hits'
 import { replayTeam } from './gen5-moment-replay'
 import { momentTeam, TEAM, type Team, teamParties } from './gen5-moment-team'
 import { REPLAY_NUMBERS as NUMBERS } from '../src/gen5/backend/replay.fixtures'
@@ -109,11 +110,15 @@ describe('the moment team', () => {
 describe('momentTeam', () => {
   it('gives the hand team with the names given and no fallback', async () => {
     const team = await momentTeam({ from: 'hand', names: NAMES }, NUMBERS)
-    expect(team).toEqual({ ...teamParties(pkmFormat(NUMBERS), NAMES), names: NAMES, fallbacks: [] })
+    const parties = teamParties(pkmFormat(NUMBERS), NAMES)
+    expect(team).toEqual({ ...parties, names: NAMES, fallbacks: [], orders: [] })
   })
 
   it('loads a test replay’s teams and names through the module runner', async () => {
-    const team = await momentTeam({ from: 'replay', id: 'gen5ou-2718717830', hits: true }, NUMBERS)
-    expect(team).toEqual(replayTeam({ id: 'gen5ou-2718717830', hits: true }, NUMBERS))
+    const team = await momentTeam(
+      { from: 'replay', id: 'gen5ou-2718717830', turns: HITS_TURN },
+      NUMBERS,
+    )
+    expect(team).toEqual(replayTeam({ id: 'gen5ou-2718717830', turns: HITS_TURN }, NUMBERS))
   })
 })

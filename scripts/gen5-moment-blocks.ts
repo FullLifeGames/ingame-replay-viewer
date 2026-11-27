@@ -1,4 +1,4 @@
-// The blocks of the moment script's hits scene (#107, lane plan step 107-5): the plan that hands a
+// The blocks of the moment script's hand scenes (#107, #108): the plan that hands a
 // Gen 5 replay's blocks to the player's client, and the log lines that show what each block sends.
 // The plan holds the server and lets the player answer the action menu as the moment does
 // (gen5-moment-plan.ts, D8 of the cut, until #110 reads the server's start), then writes each
@@ -16,7 +16,7 @@ import { menuSteps } from './gen5-moment-plan.ts'
 import type { Battle } from './gen5-moment-read.ts'
 import { moveLineLabel, type Side, type TEXT_BANKS, textId, textLine } from './gen5-moment-scene.ts'
 
-/** The steps of the hits scene: the menu's answer, each block, then the mark `end`. */
+/** The steps of a hand scene: the menu's answer, each block, then the mark `end`. */
 export function blocksPlan(replay: Gen5Replay, setup: BlockSetup & { pin: string }): MacroStep[] {
   const blocks = replaySteps(replay, setup)
   return [...menuSteps(setup), ...blocks, { kind: 'mark', name: 'end' }]
@@ -60,18 +60,31 @@ export function blockLines(replay: Pick<Gen5Replay, 'blocks'>, text: BlockText):
   })
 }
 
-/** What the hits scene reads: the numbers, the battle read from RAM and the text banks. */
-interface HitsInput {
+/** The side of a mon ID: the side whose party, read at the action menu, holds it. A mon ID stays
+ * with its Pokémon through every send-in, so this holds after switches too. */
+export function sideOfMon(
+  parties: Record<Side, { readonly mons: readonly { readonly monId: number }[] }>,
+): (monId: number) => Side {
+  return (monId) => {
+    const holds = (side: Side) => parties[side].mons.some((mon) => mon.monId === monId)
+    if (holds('near')) return 'near'
+    if (holds('far')) return 'far'
+    throw new Error(`no party read at the action menu holds mon ID ${String(monId)}`)
+  }
+}
+
+/** What a hand scene reads: the numbers, the battle read from RAM and the text banks. */
+interface SceneInput {
   readonly numbers: Bw2Numbers
-  readonly battle: Pick<Battle, 'adapter' | 'near'>
+  readonly battle: Pick<Battle, 'adapter' | 'parties'>
   readonly banks: BlockText['banks']
 }
 
-/** The hits scene on the battle read: its steps, and its block lines for the log. */
-export function hitsScene(replay: Gen5Replay | undefined, input: HitsInput) {
-  if (replay === undefined) throw new Error("the hits scene needs the replay's blocks")
+/** A hand scene on the battle read: its steps, and its block lines for the log. */
+export function blocksScene(replay: Gen5Replay | undefined, input: SceneInput) {
+  if (replay === undefined) throw new Error("a hand scene needs the replay's blocks")
   const { numbers, battle, banks } = input
-  const sideOf = (monId: number): Side => (monId === battle.near.monId ? 'near' : 'far')
+  const sideOf = sideOfMon(battle.parties)
   const setup = { adapterNumbers: adapterNumbers(numbers), table: numbers, adapter: battle.adapter }
   const steps = blocksPlan(replay, { ...setup, pin: numbers.pokebw2.commit })
   return { steps, lines: blockLines(replay, { banks, sideOf }) }

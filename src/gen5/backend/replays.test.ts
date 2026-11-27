@@ -21,8 +21,9 @@ const REPLAYS = Object.entries(FIXTURES).map(([id, script]) => ({
 
 /** What shows an event without a block: the park (#106), the game itself, or a turn. */
 const SHOWN = new Set<ScriptEvent['kind']>(['player', 'teamSize', 'battleStart', 'turn'])
-/** The kinds whose bar moves silently while their line waits (D6). */
-const SILENT_BAR = new Set<ScriptEvent['kind']>(['damage', 'heal', 'setHp'])
+/** The kinds that play in a block while a part of them is listed: a bar that moves silently
+ * while its line waits (D6), and a switch-in that plays as a plain switch (`plain`). */
+const IN_PART = new Set<ScriptEvent['kind']>(['damage', 'heal', 'setHp', 'switchIn'])
 
 const key = (event: { line: number; event?: string; kind: string }) =>
   `${event.event ?? event.kind} ${String(event.line)}`
@@ -31,7 +32,7 @@ const key = (event: { line: number; event?: string; kind: string }) =>
 function listedOf(fallbacks: readonly Gen5Fallback[]): Map<string, number> {
   const listed = new Map<string, number>()
   for (const one of fallbacks) {
-    if (one.kind === 'later' || one.kind === 'line') {
+    if ('event' in one) {
       listed.set(key(one), (listed.get(key(one)) ?? 0) + 1)
     }
   }
@@ -51,14 +52,15 @@ function placesOf(script: BattleScript, replay: Gen5Replay) {
   }))
 }
 
-/** The not-shown list: per issue (`#108`…) or fallback kind (`line`), the events by kind. */
+/** The not-shown list, every fallback by issue (`#109`…) or by kind (`line`, `plain`, and the
+ * party's `form`, `character` and `moves`), then by event kind, or `party` for the party's. */
 function notShown(fallbacks: readonly Gen5Fallback[]) {
   const counts: Record<string, Record<string, number>> = {}
   for (const one of fallbacks) {
-    if (one.kind !== 'later' && one.kind !== 'line') continue
     const by = one.kind === 'later' ? one.detail.replace('plays with ', '') : one.kind
+    const what = 'event' in one ? one.event : 'party'
     const of = (counts[by] ??= {})
-    of[one.event] = (of[one.event] ?? 0) + 1
+    of[what] = (of[what] ?? 0) + 1
   }
   return counts
 }
@@ -74,10 +76,11 @@ describe('the Gen 5 OU test replays', () => {
       expect(places.filter((place) => place.listed > 1).map(({ event }) => key(event))).toEqual([])
       const count = (place: (typeof places)[number]) =>
         Number(place.shown) + Number(place.inBlock) + place.listed
-      // A silent bar (D6) is both: its bar moves in a block, and its line waits in the list.
-      const silentBar = (place: (typeof places)[number]) =>
-        SILENT_BAR.has(place.event.kind) && place.inBlock && place.listed === 1 && !place.shown
-      const misplaced = places.filter((place) => count(place) !== 1 && !silentBar(place))
+      // A silent bar (D6) or a plain switch is both: it plays in a block, and a part of it waits
+      // in the list.
+      const inPart = (place: (typeof places)[number]) =>
+        IN_PART.has(place.event.kind) && place.inBlock && place.listed === 1 && !place.shown
+      const misplaced = places.filter((place) => count(place) !== 1 && !inPart(place))
       expect(misplaced.map(({ event }) => key(event))).toEqual([])
       expect(replay.fallbacks.filter((one) => one.kind === 'line').map(key)).toEqual(
         script.events.filter((event) => event.kind === 'message').map(key),
@@ -97,14 +100,13 @@ describe('the Gen 5 OU test replays', () => {
     }
   })
 
-  // The list that #108 and #109 shrink.
+  // The list that #109 and #110 shrink.
   it('list what does not show yet by the issue that plays it and by event kind', () => {
     const lists = Object.fromEntries(
       REPLAYS.map(({ id, replay }) => [id, notShown(replay.fallbacks)]),
     )
     expect(lists).toEqual({
       'gen5ou-2718717830': {
-        '#108': { switchIn: 13, move: 24, heal: 3, damage: 10, faint: 3, miss: 1 },
         '#109': {
           weather: 15,
           singleTurn: 2,
@@ -119,11 +121,11 @@ describe('the Gen 5 OU test replays', () => {
           statChange: 11,
           heal: 1,
         },
-        '#110': { prepare: 1, anim: 1, damage: 1, win: 1 },
+        '#110': { prepare: 1, anim: 1, move: 1, damage: 1, win: 1 },
         line: { message: 1 },
+        form: { party: 1 },
       },
       'smogtours-gen5ou-862240': {
-        '#108': { switchIn: 15, move: 27, damage: 23, heal: 5, faint: 8, miss: 1 },
         '#109': {
           ability: 4,
           statChange: 16,
@@ -142,6 +144,7 @@ describe('the Gen 5 OU test replays', () => {
         },
         '#110': { win: 1 },
         line: { message: 1 },
+        form: { party: 2 },
       },
     })
   })

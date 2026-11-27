@@ -10,6 +10,7 @@ import {
   frontMon,
   type PartyMonReading,
   partyMons,
+  partySlotsAt,
 } from '../src/gen5/battle-mons.ts'
 import { nameOfNumber } from '../src/gen5/backend/names.ts'
 import type { WrittenSides } from '../src/gen5/backend/party-mon.ts'
@@ -19,14 +20,23 @@ import { MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import type { WrittenPkm } from '../src/gen5/pkm-fields.ts'
 import { log } from './gen5-page.ts'
 
+type Side = 'near' | 'far'
+
+/** A side's party as the battle copied it: its client, the DS address of its first slot, and
+ * its Pokémon in party order at the action menu. */
+export interface PartyReading {
+  client: number
+  slots: number
+  mons: readonly PartyMonReading[]
+}
+
 export interface Battle {
   adapter: number
   server: number
   near: BattleMonReading
   far: BattleMonReading
+  parties: Record<Side, PartyReading>
 }
-
-type Side = 'near' | 'far'
 
 const hex = (value: number) => `0x${value.toString(16)}`
 
@@ -91,8 +101,8 @@ function logParty(side: Side, party: readonly PartyMonReading[], noItem: number 
   })
 }
 
-/** From main RAM (`ram` from MAIN_RAM_START): the adapter, the one server and both front
- * Pokémon, with both parties logged against `written`, the direct entry's team. */
+/** From main RAM (`ram` from MAIN_RAM_START): the adapter, the one server, both front Pokémon
+ * and both parties, the parties logged against `written`, the direct entry's team. */
 export function readBattle(
   ram: Uint8Array,
   numbers: Bw2Numbers,
@@ -122,13 +132,13 @@ export function readBattle(
     )
     log(frontIdLine(side, mon.monId, monIds, clientOf(single, side)))
   }
-  for (const [side, team] of [
-    ['near', written?.player],
-    ['far', written?.opponent],
-  ] as const) {
-    const party = partyMons(read, server, numbers.battle, clientOf(single, side))
-    logParty(side, party, numbers.pkm.items.ITEM_NONE)
-    log(partyLine(side, party, team))
+  const partyOf = (side: Side, team: readonly WrittenPkm[] | undefined): PartyReading => {
+    const client = clientOf(single, side)
+    const mons = partyMons(read, server, numbers.battle, client)
+    logParty(side, mons, numbers.pkm.items.ITEM_NONE)
+    log(partyLine(side, mons, team))
+    return { client, slots: partySlotsAt(read, server, numbers.battle, client).address, mons }
   }
-  return { adapter, server, near, far }
+  const parties = { near: partyOf('near', written?.player), far: partyOf('far', written?.opponent) }
+  return { adapter, server, near, far, parties }
 }

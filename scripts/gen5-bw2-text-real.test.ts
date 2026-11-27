@@ -1,8 +1,9 @@
-// The lines and the flow's numbers that the Gen 5 backend sends (#107) on pokebw2's real numbers:
-// build/gen5/bw2.json, which scripts/gen5-bw2.ts generates from the pinned checkout. CI fetches the
-// pin and generates the file before the check, so there a missing file fails the guard; on a
-// machine without it the relations skip. CI's log is public, so every assertion compares names or
-// booleans: a failure names the label or the role and shows no number of pokebw2.
+// The lines and the flow's numbers that the Gen 5 backend sends (#107, #108) on pokebw2's real
+// numbers: build/gen5/bw2.json, which scripts/gen5-bw2.ts generates from the pinned checkout. CI
+// fetches the pin and generates the file before the check, so there a missing file fails the
+// guard; on a machine without it the relations skip. CI's log is public, so every assertion
+// compares names or booleans: a failure names the label or the role and shows no number of
+// pokebw2.
 import { existsSync, readFileSync } from 'node:fs'
 
 import { describe, expect, it } from 'vitest'
@@ -56,5 +57,21 @@ describe.skipIf(!existsSync(FILE))("the backend's lines and the flow's numbers",
   // Scene: a heal by Leftovers shows the heal effect at the Pokémon's position.
   it('give the heal effect as an integer', () => {
     expect(Number.isInteger(real().flow.recoverEffect), 'the heal effect an integer').toBe(true)
+  })
+
+  // Scene: a switch and a drag each recall the Pokémon with the effect the server passes on, and
+  // a drag hides it at once, so the two must differ (#108).
+  it('give the two recall effects as integers of their own', () => {
+    const { switchOut, drag } = real().flow.switchEffects
+    expect(
+      [switchOut, drag].every((effect) => Number.isInteger(effect)),
+      'each effect an integer',
+    ).toBe(true)
+    expect(switchOut !== drag, 'the two effects differ').toBe(true)
+  })
+
+  // Scene: a Pokémon that faints with HP left has its bar emptied with the server's flag.
+  it("give the faint's flag as an integer", () => {
+    expect(Number.isInteger(real().flow.faintGaugeFlag), "the faint's flag an integer").toBe(true)
   })
 })

@@ -241,12 +241,16 @@ export interface TextNumbers {
 }
 
 /** The numbers the server's flow puts as literals (scripts/gen5-bw2-flow.ts), which pokebw2 has
- * no name for (#107). */
+ * no name for (#107, #108). */
 export interface FlowNumbers {
   /** The effectiveness category of the hit flash's SC_DAMAGE_PLURAL, which picks the hit sound. */
   damageKinds: { plain: number; super: number; resisted: number }
   /** The effect SC_EFFECT_BY_POS shows at a Pokémon that heals. */
   recoverEffect: number
+  /** The effects SC_RECALL shows as a Pokémon leaves: by a switch, or by a drag (#108). */
+  switchEffects: { switchOut: number; drag: number }
+  /** The flag of SC_FAINT_HP_GAUGE for a Pokémon that faints with HP left (#108). */
+  faintGaugeFlag: number
 }
 
 /** The whole of build/gen5/bw2.json. */

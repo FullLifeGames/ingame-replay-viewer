@@ -1,8 +1,10 @@
-// The invented C that the flow reader's specs hand to it (#107): the functions it reads, in an
-// order of their own, each reduced to the shape the reader accepts, with numbers of our own. The
-// message IDs match the lines of TEXT_INPUT (gen5-bw2-text.fixtures.ts), and four functions also
-// put a message of the other command or kind as a decoy. The reader keeps the damage kinds and the
-// heal effect, so scripts/gen5-fixtures-real.test.ts compares those with the generated ones.
+// The invented C that the flow reader's specs hand to it (#107, #108): the functions it reads, in
+// an order of their own, each reduced to the shape the reader accepts, with numbers of our own and
+// each callee's parameters in an order of their own. The message IDs match the lines of
+// TEXT_INPUT (gen5-bw2-text.fixtures.ts), and four functions also put a message of the other
+// command or kind as a decoy. The reader keeps the damage kinds, the heal effect, the recall
+// effects and the faint's flag, so scripts/gen5-fixtures-real.test.ts compares those with the
+// generated ones.
 import type { FlowInput } from './gen5-bw2-flow.ts'
 
 export const FLOW_INPUT: FlowInput = {
@@ -26,6 +28,23 @@ void ServerControl_RecoverHPCore(BtlServerFlow *flow, BattleMon *mon, u16 amount
     }
 }
 
+void ServerDisplay_FaintPokemon(u32 flag, BtlServerFlow *flow, BattleMon *mon) {
+    BtlServerCmdQueue_Put(flow->queue, SC_FAINT_HP_GAUGE, GetMonID(mon), flag);
+}
+
+BOOL ServerControl_SwitchOut(BtlServerFlow *handler, BattleMon *mon) {
+    if (!IsFainted(mon)) {
+        ServerControl_SwitchOutCore(handler, 0x6e5, mon);
+    }
+    return TRUE;
+}
+
+BOOL ServerControl_CheckFainted(BtlServerFlow *flow, BattleMon *mon) {
+    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 5, SC_MSG_ARG_END);
+    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 7, monId, SC_MSG_ARG_END);
+    return TRUE;
+}
+
 void ServerDisplay_DoesntAffect(BtlServerFlow *flow, BattleMon *mon) {
     BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0, GetMonID(mon), SC_MSG_ARG_END);
 }
@@ -42,6 +61,18 @@ void ServerDisplay_Damage(BtlServerFlow *flow, u32 count, BattleMon **mons) {
     BtlServerCmdQueue_Put(flow->queue, SC_DAMAGE_PLURAL, (u8)count, (u8)kind, move);
 }
 
+void ServerControl_ForceSwitch(BtlServerFlow *flow, BattleMon *mon, BtlMonSet *targets) {
+    while ((target = BtlMonSet_GetNext(targets)) != NULL) {
+        if (ServerControl_ForceSwitchCore(flow, &failed, 0x6eb, target)) {
+            flow->result = 1;
+        }
+    }
+}
+
+void ServerControl_SwitchOutCore(BtlServerFlow *flow, u32 effect, BattleMon *mon) {
+    BtlServerCmdQueue_Put(flow->queue, SC_RECALL, pos, effect);
+}
+
 void ServerDisplay_MoveFailed(BtlServerFlow *flow, BattleMon *mon, u16 move) {
     BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 4, SC_MSG_ARG_END);
 }
@@ -54,6 +85,17 @@ void ServerDisplay_EffectivenessMessageMulti(BtlServerFlow *flow, BOOL multipleT
     } else if (notVeryEffective) {
         BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 3, SC_MSG_ARG_END);
     }
+}
+
+BOOL ServerControl_ForceSwitchCore(BtlServerFlow *flow, BOOL *failed, u16 effect,
+                                   BattleMon *target) {
+    ServerControl_SwitchOutCore(flow, effect, target);
+    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 5, newMonId, SC_MSG_ARG_END);
+    return TRUE;
+}
+
+void ServerControl_FaintPokemon(BtlServerFlow *flow, BattleMon *mon) {
+    ServerDisplay_FaintPokemon(2, flow, mon);
 }
 
 void ServerDisplay_MoveAvoided(BtlServerFlow *flow, BattleMon *mon, u16 move) {
