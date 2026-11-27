@@ -1,14 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import replay994086 from '../../test/fixtures/replays/smogtours-gen3ou-994086.json'
+import { countText, notShownHeading, rowText } from './not-shown-list'
 import {
   BUILDING_LINE,
   BUILT_LINE,
   CHECKING_LINE,
-  countText,
   dumpLine,
   endedLine,
-  notShownHeading,
   panelText,
   pickedLine,
   progressLine,
@@ -16,7 +15,6 @@ import {
   replayDetail,
   replaySummaryLine,
   restartLine,
-  rowText,
   runningLine,
   silenceText,
   STARTING_LINE,

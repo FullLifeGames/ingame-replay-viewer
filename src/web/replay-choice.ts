@@ -10,15 +10,8 @@ import { replayLabel } from './label'
 import { messageOf } from './message'
 import { replayJsonUrl } from './replay-input'
 import type { TestReplay } from './replays'
-import {
-  notShown,
-  notShownCounts,
-  type NotShownCount,
-  type NotShownRow,
-  type ReplayStream,
-  streamOfLoaded,
-  streamOfReplay,
-} from './stream'
+import { notShownCounts, type NotShownCount, type NotShownRow } from './not-shown-list'
+import { notShown, type ReplayStream, streamOfLoaded, streamOfReplay } from './stream'
 
 /** Where a picked replay came from: the example list, a link or ID, or a saved file. */
 export type ReplaySource = 'example' | 'link' | 'file'

@@ -2,8 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import JSON_OF from '../../../test/fixtures/replays/gen5ou-2718717830.json'
 import { REPLAY_NUMBERS } from '../../gen5/backend/replay.fixtures'
-import { countText, notShownHeading, rowParts } from '../status'
-import { notShownCounts } from '../stream'
+import { countText, notShownCounts, notShownHeading, rowParts } from '../not-shown-list'
 import { notShownList, notShownRows } from './not-shown'
 import { loadReplay } from './replay-load'
 

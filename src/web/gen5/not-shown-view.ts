@@ -2,7 +2,7 @@
 // the counts and the rows of what Black 2 does not show (not-shown.ts). The rows come from other
 // people's replays, so the view writes them as text, never as markup, and keeps each log line's
 // first field in a span that stays on one line, as the Gen 3 page does (#90).
-import type { RowParts } from '../status.ts'
+import type { RowParts } from '../not-shown-list.ts'
 import type { NotShownList } from './not-shown.ts'
 
 function find(selector: string): HTMLElement | null {

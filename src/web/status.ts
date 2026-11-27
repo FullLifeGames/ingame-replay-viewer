@@ -1,13 +1,11 @@
 // The page's own words: the status line after each step, the viewer's progress line under
-// "Details", the panel above the game with the side headings it shares with the team list, and
-// the texts of the "Not shown in the game" list. A failure's line comes from visitor.ts, and the
+// "Details", and the panel above the game with the side headings it shares with the team list.
+// The texts of the "Not shown in the game" list live in not-shown-list.ts. A failure's line comes from visitor.ts, and the
 // words of the step that failed (replay-choice.ts, session.ts) become its detail. A line names a
 // replay by its replay label (label.ts), as the example select does (#90).
 import type { Side } from '../script/types'
-import { plainText } from './markup'
 import type { ReplaySummary } from './replay-choice'
 import type { DumpSummary } from './session'
-import type { NotShownCount, NotShownRow } from './stream'
 import { soundLine } from './wasm/audio'
 import type { Silence } from './wasm/audio-opener'
 import type { RunStatus } from './wasm/protocol'
@@ -113,49 +111,6 @@ export const replayDetail = ({
   streamBytes,
 }: Pick<ReplaySummary, 'instructions' | 'streamBytes'>): string =>
   `${String(instructions)} instructions, ${streamText(streamBytes)}.`
-
-export const notShownHeading = (rows: number): string => `Not shown in the game (${String(rows)})`
-
-export const countText = ({ what, count }: NotShownCount): string => `${what} (${String(count)})`
-
-/** A "Not shown" row in three parts; the page keeps `kind` on one line (#90). */
-export interface RowParts {
-  readonly head: string
-  /** The log line's first field, such as "|-fieldstart", or '' for a line without one. */
-  readonly kind: string
-  readonly rest: string
-}
-
-/**
- * The longest first field a row keeps on one line, as long as the protocol's longest. A longer
- * one, which only someone else's replay holds, wraps with the rest: 24 wide glyphs pass a 390 px
- * phone's width (#90).
- */
-const LONGEST_KIND = 20
-
-/**
- * One row of the list in parts: its 1-based line and what happened, then the log line's first
- * field, then the rest of the log line and any detail, the log line and the detail without
- * Showdown's markup (#31). A first field longer than any of the protocol stays in the rest.
- */
-export function rowParts({ line, what, text, detail, standIn }: NotShownRow): RowParts {
-  const shown = standIn ? `${what}, a stand-in shows` : what
-  const logLine = plainText(text)
-  const field = /^\|[^|]*/.exec(logLine)?.[0] ?? ''
-  const kind = field.length <= LONGEST_KIND ? field : ''
-  const tail = detail === undefined ? '' : `; ${plainText(detail)}`
-  return {
-    head: `Line ${String(line)}, ${shown}${text === '' ? '' : ': '}`,
-    kind,
-    rest: `${logLine.slice(kind.length)}${tail}`,
-  }
-}
-
-/** One row of the list as one text: its parts joined. */
-export function rowText(row: NotShownRow): string {
-  const { head, kind, rest } = rowParts(row)
-  return `${head}${kind}${rest}`
-}
 
 const SIDE_WORDS: Readonly<Record<Side, string>> = { far: 'Far side', near: 'Near side' }
 
