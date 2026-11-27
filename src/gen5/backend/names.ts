@@ -3,7 +3,7 @@
 // @pkmn's Gen 5 data; scripts/gen5-names-real.test.ts holds each number to pokebw2's constant of
 // the same name under CI. Natures go by name (@pkmn numbers them in another order than the game),
 // from the generated list. Pure: no number of the game is held here.
-import { type Generation, Generations } from '@pkmn/data'
+import { type Generation, Generations, type Move, type Nature, type Specie } from '@pkmn/data'
 import { Dex } from '@pkmn/dex'
 
 import type { TeamMember } from '../../script/types.ts'
@@ -11,7 +11,8 @@ import type { PkmNumbers } from '../bw2-numbers.ts'
 import type { PkmGender } from '../pkm-fields.ts'
 
 type GenerationsDex = ConstructorParameters<typeof Generations>[0]
-const gen5: Generation = new Generations(Dex as GenerationsDex).get(5)
+/** @pkmn's Gen 5 data, the one instance the backend reads. */
+export const gen5: Generation = new Generations(Dex as GenerationsDex).get(5)
 
 /** The kinds of entry a name can be. */
 export type NameKind = 'species' | 'move' | 'item' | 'ability'
@@ -36,15 +37,24 @@ function need<T>(found: T | undefined, kind: NameKind | 'nature', name: string):
   return found
 }
 
-/** A species' base number, with the forme a name such as "Landorus-Therian" carries. */
-export function gen5Species(name: string): { num: number; forme?: string } {
+/** @pkmn's entry of a species' base form, such as Landorus for "Landorus-Therian". */
+export function baseSpecie(name: string): Specie {
   const specie = need(gen5.species.get(name), 'species', name)
-  const base = need(gen5.species.get(specie.baseSpecies), 'species', specie.baseSpecies)
-  return specie.forme ? { num: base.num, forme: specie.forme } : { num: base.num }
+  return need(gen5.species.get(specie.baseSpecies), 'species', specie.baseSpecies)
 }
 
+/** A species' base number, with the forme a name such as "Landorus-Therian" carries. */
+export function gen5Species(name: string): { num: number; forme?: string } {
+  const { forme } = need(gen5.species.get(name), 'species', name)
+  const { num } = baseSpecie(name)
+  return forme ? { num, forme } : { num }
+}
+
+/** @pkmn's entry of a move, for its PP. */
+export const moveEntry = (name: string): Move => need(gen5.moves.get(name), 'move', name)
+
 /** A move's number; every typed Hidden Power shares the one move's. */
-export const gen5Move = (name: string): number => need(gen5.moves.get(name), 'move', name).num
+export const gen5Move = (name: string): number => moveEntry(name).num
 
 export const gen5Item = (name: string): number => need(gen5.items.get(name), 'item', name).num
 
@@ -75,9 +85,12 @@ export function gameName(kind: NameKind, name: string): string {
   return renames.find(([showdown]) => showdown === name)?.[1] ?? name
 }
 
+/** @pkmn's entry of a nature, for the stats it raises and lowers. */
+export const natureEntry = (name: string): Nature => need(gen5.natures.get(name), 'nature', name)
+
 /** A nature's number in the generated list, by its constant NATURE_<name>. */
 export function gen5Nature(natures: PkmNumbers['natures'], name: string): number {
-  const nature = need(gen5.natures.get(name), 'nature', name)
+  const nature = natureEntry(name)
   const constant = `NATURE_${squashed(nature.name)}`
   const found = natures[constant]
   if (found === undefined) throw new Error(`the list of natures has no ${constant}`)
@@ -88,4 +101,32 @@ export function gen5Nature(natures: PkmNumbers['natures'], name: string): number
 export function pkmGender(gender: TeamMember['gender']): PkmGender {
   if (gender === 'M') return 'male'
   return gender === 'F' ? 'female' : 'none'
+}
+
+type Entry = Readonly<{ num: number; name: string }>
+
+const byNumber = (all: Iterable<Entry>) => {
+  const found = new Map<number, string>()
+  for (const one of all) if (!found.has(one.num)) found.set(one.num, one.name)
+  return found
+}
+
+const ENTRIES: Readonly<Record<NameKind, () => Iterable<Entry>>> = {
+  species: () => [...gen5.species].filter((one) => !one.forme),
+  move: () => gen5.moves,
+  item: () => gen5.items,
+  ability: () => gen5.abilities,
+}
+
+const names = new Map<NameKind, Map<number, string>>()
+
+/** The Showdown name of a number of the game, such as a species read from the battle's RAM: a
+ * species in its base form, a number @pkmn's Gen 5 lacks as nothing. */
+export function nameOfNumber(kind: NameKind, num: number): string | undefined {
+  let found = names.get(kind)
+  if (found === undefined) {
+    found = byNumber(ENTRIES[kind]())
+    names.set(kind, found)
+  }
+  return found.get(num)
 }

@@ -10,6 +10,7 @@ import {
   gen5Move,
   gen5Nature,
   gen5Species,
+  nameOfNumber,
   pkmGender,
 } from './names.ts'
 
@@ -120,5 +121,20 @@ describe('pkmGender', () => {
     expect(pkmGender('M')).toBe('male')
     expect(pkmGender('F')).toBe('female')
     expect(pkmGender(undefined)).toBe('none')
+  })
+})
+
+// Scene: the run reads a species number from the battle's RAM and logs it by name.
+describe('nameOfNumber', () => {
+  it('gives the Showdown name of a dex number, a species in its base form', () => {
+    expect(nameOfNumber('species', Dex.species.get('Landorus-Therian').num)).toBe('Landorus')
+    expect(nameOfNumber('move', gen5Move('Hidden Power Fire'))).toBe('Hidden Power')
+    expect(nameOfNumber('item', gen5Item('Leftovers'))).toBe('Leftovers')
+    expect(nameOfNumber('ability', gen5Ability('Static'))).toBe('Static')
+  })
+
+  it('gives nothing for a number Gen 5 lacks', () => {
+    expect(nameOfNumber('species', Dex.species.get('Xerneas').num)).toBeUndefined()
+    expect(nameOfNumber('species', -1)).toBeUndefined()
   })
 })

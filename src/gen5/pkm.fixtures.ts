@@ -191,6 +191,7 @@ export const TEAM_PKM: PkmNumbers = {
     ITEM_DRAGON_FANG: 761,
     ITEM_SILVER_POWDER: 769,
     ITEM_BLACK_GLASSES: 773,
+    ITEM_NONE: 11,
   },
   abilities: {
     ...PKM.abilities,
@@ -214,5 +215,6 @@ export const TEAM_PKM: PkmNumbers = {
     NATURE_JOLLY: 43,
     NATURE_ADAMANT: 44,
     NATURE_IMPISH: 45,
+    NATURE_HARDY: 46,
   },
 }
