@@ -8,7 +8,10 @@ import { existsSync, readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
+import { readSources } from './gen5-bw2.ts'
 import { CONSTANT_PREFIXES } from './gen5-bw2-battle.ts'
+import { monIdRule } from './gen5-bw2-mon-ids.ts'
+import { listedReader } from './gen5-bw2-source.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
 const FILE = GEN5_PATHS.bw2Json
@@ -55,6 +58,26 @@ describe.skipIf(!existsSync(FILE))(
       const { constants } = real().battle
       const other = (name: string) => !CONSTANT_PREFIXES.some((prefix) => name.startsWith(prefix))
       expect(Object.keys(constants).filter(other)).toEqual([])
+    })
+
+    // Scene: a server command names a Pokémon by its mon ID, the client's first plus its slot.
+    it("give each client of the battle a first mon ID, and every client's IDs a party, apart", () => {
+      const { battle, pkm } = real()
+      const { firstByClient, perClient } = battle.monIds
+      const sorted = [...firstByClient].sort((a, b) => a - b)
+      const apart = sorted.every(
+        (first, at) => at === 0 || first >= (sorted[at - 1] ?? 0) + perClient,
+      )
+      expect(apart, "the clients' ranges apart").toBe(true)
+      expect(perClient >= (pkm.constants.PARTY_SIZE ?? Infinity), 'a party in each range').toBe(
+        true,
+      )
+      const each = firstByClient.length >= battle.single.clientCount
+      expect(each, "a first mon ID for each of the single battle's clients").toBe(true)
+      const atPin = monIdRule(readSources(listedReader(GEN5_PATHS.pokebw2)).mainC)
+      expect(JSON.stringify(atPin) === JSON.stringify(battle.monIds), 'the rule at the pin').toBe(
+        true,
+      )
     })
   },
 )

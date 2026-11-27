@@ -14,8 +14,10 @@ struct BtlPokeCon { BOOL forServer; u16 round; BattleParty parties[2]; void *mai
 struct BtlMainModule { u16 id; void *server; Mystery rest[COUNT]; };`,
   // The setup puts the clients out of order, so a reader that assumed client = position fails, and
   // gives the battle a third client that no create call makes. The multi battle's setup before it,
-  // with an invented count, is a decoy for the reader.
-  mainC: `static BOOL BtlMain_SetupMulti(u32 *state, BtlMainModule *m) { m->clientCount = 5; }
+  // with an invented count, is a decoy for the reader. The first mon IDs of the three clients do
+  // not start at 0 and are out of order, and each client holds eight mon IDs.
+  mainC: `static const u8 sClientFirstMonIds[3] = { 14, 2, 26 };
+static BOOL BtlMain_SetupMulti(u32 *state, BtlMainModule *m) { m->clientCount = 5; }
 BOOL BtlMain_SetupAloneSingle(u32 *state, BtlMainModule *mainModule) {
     switch (*state) {
     case 0:
@@ -28,6 +30,23 @@ BOOL BtlMain_SetupAloneSingle(u32 *state, BtlMainModule *mainModule) {
         break;
     }
     return FALSE;
+}
+u8 MonIDToClientID(u8 id) {
+    u8 k;
+    u8 low;
+    u8 high;
+
+    for (k = 0; k < 3; k++) {
+        low = sClientFirstMonIds[k];
+        high = low + 7;
+        if (id >= low && id <= high) {
+            return k;
+        }
+    }
+    return 0;
+}
+u8 GetClientIDFromMonID(u8 id) {
+    return MonIDToClientID(id);
 }`,
   // The prototype puts `isAI` before `clientId`; client 1 is the player's, client 0 the AI's.
   clientH: 'BtlClient *BattleClient_Create(BtlMainModule *mainModule, u8 isAI, u16 clientId);',

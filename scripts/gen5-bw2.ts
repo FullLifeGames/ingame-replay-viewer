@@ -21,6 +21,7 @@ import {
   pickSymbols,
 } from './gen5-bw2-c.ts'
 import { battleNumbers } from './gen5-bw2-battle.ts'
+import { checkPartyRoom } from './gen5-bw2-mon-ids.ts'
 import { checkPlayerClient } from './gen5-bw2-clients.ts'
 import { BATTLE_OVERLAY, BOOT_LINKS, ENTRY_SOURCES, entryNumbers } from './gen5-bw2-entry.ts'
 import { ROUTE_MAP, routePlaces } from './gen5-bw2-field.ts'
@@ -184,6 +185,8 @@ function parse(sources: Sources): Bw2Numbers {
   checkAdapterLayout(adapter)
   const battle = battleNumbers(sources)
   checkPlayerClient(battle.single.clients, sources.setupC)
+  const pkm = pkmNumbers(sources)
+  checkPartyRoom(battle.monIds, pkm.constants.PARTY_SIZE ?? Infinity)
   return {
     pokebw2: { ...POKEBW2 },
     symbols: pickSymbols(ov167, SYMBOL_NAMES),
@@ -207,7 +210,7 @@ function parse(sources: Sources): Bw2Numbers {
       battleSymbols: sources.symbols,
       battleOverlay: BATTLE_OVERLAY,
     }),
-    pkm: pkmNumbers(sources),
+    pkm,
   }
 }
 

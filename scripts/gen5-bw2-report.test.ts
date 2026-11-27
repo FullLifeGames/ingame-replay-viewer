@@ -54,6 +54,7 @@ describe('quietLines', () => {
       waitSelectSeq: 29,
       single: { clientCount: 3, posClientIds: [2, 0, 1], clients: { player: 2, opponent: 1 } },
       constants: {},
+      monIds: { firstByClient: [9, 21, 33], perClient: 7 },
     },
     route: {
       hughTrigger: { x: 1, z: 31, width: 2 },

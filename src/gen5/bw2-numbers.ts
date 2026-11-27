@@ -89,6 +89,16 @@ export interface SingleBattle {
   clients: Sides
 }
 
+/** The rule from a client and a party slot to a mon ID (btl_main.c): the Pokémon in party slot n
+ * at the battle's start has the mon ID `firstByClient[client] + n`, and `GetClientIDFromMonID`
+ * gives the client back for each of its `perClient` IDs. */
+export interface MonIds {
+  /** Each client's first mon ID (sClientFirstMonIds), by client. */
+  firstByClient: number[]
+  /** The count of mon IDs a client holds, at least a party. */
+  perClient: number
+}
+
 /** The battle's structs that lead from the server to the Pokémon, some laid out only up to the
  * member the spike reads (`upTo`), and the server's step while it waits for the actions. */
 export interface BattleNumbers {
@@ -109,6 +119,8 @@ export interface BattleNumbers {
   /** The battle's constants by name (include/constants/battle.h): the weathers (`BTL_WEATHER_`),
    * a battle Pokémon's conditions (`CONDITION_`) and its stats and stat stages (`BATTLEMON_`). */
   constants: Record<string, number>
+  /** The mon IDs of each client. */
+  monIds: MonIds
 }
 
 /** A trigger of the map's events: the player steps on row `z` from column `x` on, across `width`

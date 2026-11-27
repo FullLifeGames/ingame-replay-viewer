@@ -29,6 +29,10 @@ describe('battleNumbers', () => {
     })
   })
 
+  it("gives each client's first mon ID and the count of mon IDs per client", () => {
+    expect(battleNumbers(SOURCES).monIds).toEqual({ firstByClient: [14, 2, 26], perClient: 8 })
+  })
+
   it("refuses a player's or an opponent's client outside the count", () => {
     const mainC = SOURCES.mainC.replace('Create(mainModule, 6, 0)', 'Create(mainModule, 6, 3)')
     const outside = mainC.replace('clients[0] =', 'clients[3] =')
