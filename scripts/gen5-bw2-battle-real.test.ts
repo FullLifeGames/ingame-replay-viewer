@@ -79,5 +79,16 @@ describe.skipIf(!existsSync(FILE))(
         true,
       )
     })
+
+    // Scene: the replay's battle may end in the player's loss, which must not black out (#110).
+    it('give the setup flag one bit, inside the setup flags member', () => {
+      const { constants, layouts } = real().entry
+      const flag = constants.BTL_SETUP_FLAG_NO_BLACKOUT ?? 0
+      const bit = Math.log2(flag)
+      expect(Number.isInteger(bit), 'a power of two').toBe(true)
+      const flags = layouts.BtlSetup?.fields.flags
+      const inside = flags !== undefined && flags.bit === undefined && bit < 8 * flags.size
+      expect(inside, 'inside BtlSetup.flags').toBe(true)
+    })
   },
 )

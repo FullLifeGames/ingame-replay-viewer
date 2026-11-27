@@ -92,8 +92,19 @@ describe('enumAround', () => {
     expect(enumAround(header, 'OTHER_B')).toEqual({ OTHER_A: 0, OTHER_B: 1 })
   })
 
+  // Scene: a flag of the battle's setup is a shift of two literals.
+  it('shifts one literal by another, and counts on from it', () => {
+    expect(enumAround('enum { A = 1 << 2, B, C = 0x3 << 0x4 };', 'B')).toEqual({
+      A: 4,
+      B: 5,
+      C: 0x30,
+    })
+  })
+
   it('throws on a value it would have to compute, and on a name in no enum', () => {
-    expect(() => enumAround('enum { A = 1 << 2, B };', 'B')).toThrow(/A = 1 << 2/)
+    expect(() => enumAround('enum { A = 1 << SHIFT, B };', 'B')).toThrow(/A = 1 << SHIFT/)
+    expect(() => enumAround('enum { A = 1 + 2, B };', 'B')).toThrow(/A = 1 \+ 2/)
+    expect(() => enumAround('enum { A = 1 << 31, B };', 'B')).toThrow(/A = 1 << 31/)
     expect(() => enumAround(header, 'SHAPE_FAKE')).toThrow(/SHAPE_FAKE/)
   })
 

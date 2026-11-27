@@ -54,6 +54,7 @@ describe('entryNumbers', () => {
       BTL_STYLE_SINGLE: 4,
       BTL_STYLE_DOUBLE: 9,
       SEQ_BGM_VS_TRAINER: 101,
+      BTL_SETUP_FLAG_NO_BLACKOUT: 0x20,
     })
   })
 
@@ -105,6 +106,11 @@ describe('entryNumbers', () => {
     expect(layouts.Config?.fields.textSpeed).toEqual({ offset: 0, size: 1, bit: 3, bits: 2 })
   })
 
+  // Scene: the park sets a flag of the setup, a member of a width of its own in a padding byte.
+  it("lays out the setup's flags member", () => {
+    expect(entryNumbers(INPUT).layouts.BtlSetup?.fields.flags).toEqual({ offset: 1, size: 1 })
+  })
+
   it('spans the battle overlay and the boot overlays from their link files', () => {
     const entry = entryNumbers(INPUT)
     expect(entry.battleOverlay).toEqual({ start: 0x02190000, end: 0x02190600 })
@@ -117,6 +123,8 @@ describe('entryNumbers', () => {
   it('throws on a member the entry needs that a struct lacks', () => {
     const setupH = INPUT.setupH.replace('Config *config;', '')
     expect(() => entryNumbers({ ...INPUT, setupH })).toThrow(/BtlSetup.*config/)
+    const flagless = INPUT.setupH.replace('u8 flags;', '')
+    expect(() => entryNumbers({ ...INPUT, setupH: flagless })).toThrow(/BtlSetup.*flags/)
   })
 
   it('throws when the battle overlay meets a boot overlay, naming both', () => {

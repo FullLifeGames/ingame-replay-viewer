@@ -87,12 +87,24 @@ export function pickSymbols(
   return picked
 }
 
+/** The largest value of a C enum on the game's compiler, an `int`. */
+const INT_MAX = 2 ** 31 - 1
+
+/** A literal, or a shift `<literal> << <literal>` that fits an int; else undefined. */
+function enumLiteral(text: string): number | undefined {
+  const parts = text.split('<<').map((part) => literal(part))
+  if (parts.length > 2 || parts.some((part) => part === undefined)) return undefined
+  const [base = 0, shift = 0] = parts as number[]
+  const value = base * 2 ** shift
+  return value <= INT_MAX ? value : undefined
+}
+
 function enumValues(entries: readonly string[]): Record<string, number> {
   const values: Record<string, number> = {}
   let next = 0
   for (const entry of entries) {
     const [name = '', value] = entry.split('=').map((part) => part.trim())
-    const explicit = value === undefined ? next : literal(value)
+    const explicit = value === undefined ? next : enumLiteral(value)
     if (explicit === undefined || !/^\w+$/.test(name)) {
       throw new Error(`cannot read the enum entry "${entry}" without computing it`)
     }
