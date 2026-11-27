@@ -1,13 +1,17 @@
-import type { IncomingMessage, ServerResponse } from 'node:http'
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
+import type { AddressInfo } from 'node:net'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { Script } from 'node:vm'
 
-import { describe, expect, it } from 'vitest'
+import { afterAll, describe, expect, it } from 'vitest'
 
 import { isFileLoadingAllowed, type Plugin, resolveConfig, type ViteDevServer } from 'vite'
 
 import { archiveName, SOURCES } from './gen5-manifest'
 import { GEN5_PATHS } from './gen5-paths'
-import { gen5ServerConfig, licencesMount, unpackerMount } from './gen5-serve'
+import { buildMount, gen5ServerConfig, licencesMount, unpackerMount } from './gen5-serve'
 import { UNPACKER_PATH } from '../src/gen5/unpacker'
 
 /** Runs `url` through the mount with an invented page; gives the answer, or 'next'. */
@@ -113,6 +117,56 @@ describe('unpackerMount', () => {
   })
 })
 
+// Scene: the dev server answers the two build files under /gen5-build/, since /@fs/ refuses
+// build/ (#111).
+describe('buildMount', () => {
+  const root = mkdtempSync(join(tmpdir(), 'gen5-build-mount-'))
+  const folders = { bw2Json: join(root, 'bw2.json'), routineJson: join(root, 'routine.json') }
+  writeFileSync(folders.bw2Json, '{"numbers":"invented"}')
+  writeFileSync(folders.routineJson, '{"routine":"invented"}')
+  const mounted = buildMount(folders)
+  const server = createServer((req, res) => {
+    mounted(req, res, () => {
+      res.writeHead(418)
+      res.end('next')
+    })
+  })
+  const listening = new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
+
+  afterAll(() => {
+    server.close()
+    rmSync(root, { recursive: true, force: true })
+  })
+
+  const get = async (path: string) => {
+    await listening
+    const port = (server.address() as AddressInfo).port
+    const response = await fetch(`http://127.0.0.1:${String(port)}${path}`)
+    return {
+      status: response.status,
+      type: response.headers.get('content-type'),
+      body: await response.text(),
+    }
+  }
+
+  it('answers both names with their files as JSON', async () => {
+    expect(await get('/gen5-build/bw2.json')).toEqual({
+      status: 200,
+      type: 'application/json',
+      body: '{"numbers":"invented"}',
+    })
+    expect(await get('/gen5-build/routine.json?v=1')).toMatchObject({
+      status: 200,
+      body: '{"routine":"invented"}',
+    })
+  })
+
+  it('answers 404 for another name under the prefix and passes every other path on', async () => {
+    expect(await get('/gen5-build/other.json')).toMatchObject({ status: 404 })
+    expect(await get('/bw2.json')).toEqual({ status: 418, type: null, body: 'next' })
+  })
+})
+
 type Middleware = ReturnType<typeof unpackerMount>
 
 /** The middlewares that the dev server's plugin adds, in their order. */
@@ -175,7 +229,7 @@ describe("the dev server's unpacker", () => {
 describe("the dev server's deny list", () => {
   const archives = SOURCES.map((source) => `${GEN5_PATHS.sources}/${archiveName(source)}`)
 
-  it('refuses the source archives, the bare repositories, the build and a save', async () => {
+  it('refuses the source archives, the bare repositories, the build, the build files and a save', async () => {
     const config = await resolveConfig(gen5ServerConfig(false), 'serve')
     const files = [
       ...archives,
@@ -183,6 +237,8 @@ describe("the dev server's deny list", () => {
       `${GEN5_PATHS.site}/data/version.json`,
       `${GEN5_PATHS.built}/licences.html`,
       `${GEN5_PATHS.saves}/route-20.sav`,
+      GEN5_PATHS.bw2Json,
+      GEN5_PATHS.routineJson,
     ]
     expect(files.filter((file) => isFileLoadingAllowed(config, file))).toEqual([])
     expect(isFileLoadingAllowed(config, `${GEN5_PATHS.page}/index.html`)).toBe(true)

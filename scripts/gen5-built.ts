@@ -3,8 +3,9 @@
 // that, so the page forgot the dump. This builds src/web/gen5/ into build/gen5/page/ and serves
 // it with Node's own server: no websocket, no dev client, every answer cross-origin isolated and
 // uncached, /emulatorjs/* from the fetched packages as far as scripts/gen5-manifest.ts serves
-// them, /source/* the archives it names, and /licences.html, which the build writes from the
-// pinned sources (#79). It binds to 127.0.0.1 unless --host.
+// them, /source/* the archives it names, /gen5-build/* the two files of build/gen5/ that the page
+// reads (#111), and /licences.html, which the build writes from the pinned sources (#79). It binds
+// to 127.0.0.1 unless --host.
 // Usage: node scripts/gen5-serve.ts --built [--host] [--port N]
 import { writeFileSync } from 'node:fs'
 import { createServer, type Server } from 'node:http'
