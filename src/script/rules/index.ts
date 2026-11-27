@@ -75,6 +75,11 @@ export function ruleFor(key: Protocol.ArgName): AnyRule | undefined {
   return RULES[key]
 }
 
+/** The detail of a line dropped for a keyword argument that no rule shows. */
+export function keywordDetail(name: string): string {
+  return `keyword argument [${name}]`
+}
+
 /** What a line carries beyond its rule, or undefined when the rule reads all of it. */
 export function unreadPart(rule: AnyRule, line: LogLine): string | undefined {
   const args: readonly unknown[] = line.args
@@ -83,7 +88,7 @@ export function unreadPart(rule: AnyRule, line: LogLine): string | undefined {
     return `positional argument ${JSON.stringify(arg)}`
   }
   const name = Object.keys(line.kwArgs).find((key) => !rule.reads.includes(key))
-  return name === undefined ? undefined : `keyword argument [${name}]`
+  return name === undefined ? undefined : keywordDetail(name)
 }
 
 /** What a rule reads of a line. */

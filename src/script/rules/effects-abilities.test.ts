@@ -1,5 +1,6 @@
 // Gen 5's ability lines that the item and activation rules read in a shape of their own (#117):
-// Frisk names no holder, and Mummy passes itself on to the attacker.
+// Frisk names no holder, and Mummy passes itself on to the attacker. Skill Swap's activation, whose
+// abilities no event holds, stays a dropped line in each of its shapes.
 import { describe, expect, it } from 'vitest'
 
 import { buildBattleScript } from '../build'
@@ -83,6 +84,21 @@ describe("Mummy's line", () => {
       '|-activate|p2a: Tyranitar|ability: Wandering Spirit|Arena Trap|Sand Stream|[of] p1a: Dugtrio'
 
     expect(gen5ScriptOf(line).dropped.at(-1)).toMatchObject({
+      line: NEXT,
+      reason: 'unsupported',
+      detail: 'keyword argument [ability]',
+    })
+  })
+})
+
+describe("Skill Swap's line", () => {
+  // Scene: a log names Skill Swap's activation without the abilities, as before #117.
+  it('keeps the activation without abilities a dropped line', () => {
+    const line = '|-activate|p1a: Dugtrio|move: Skill Swap|[of] p2a: Tyranitar'
+    const script = gen5ScriptOf(line)
+
+    expect(eventsAt(script, NEXT)).toEqual([])
+    expect(script.dropped.at(-1)).toMatchObject({
       line: NEXT,
       reason: 'unsupported',
       detail: 'keyword argument [ability]',

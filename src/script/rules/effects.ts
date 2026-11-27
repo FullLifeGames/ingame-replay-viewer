@@ -6,6 +6,7 @@ import type { EffectActivateEvent } from '../effect-events'
 import type { ScriptEvent } from '../events'
 import { causeOf, effectOf, flagsOf, foesInPlace, refIfAny, refOf, refOfPokemon } from '../refs'
 import type { PokemonRef } from '../types'
+import { keywordDetail } from './index'
 import type { RuleInput, Rules } from './index'
 
 type ItemInput = RuleInput<'|-item|'>
@@ -121,9 +122,10 @@ export const EFFECT_RULES = {
   '|-activate|': {
     arity: 3,
     reads: ['of', 'damage', 'consumed', 'ability', 'ability2'],
+    // Tested by the key, as `unreadPart` tests: Skill Swap's bare line sets it with no value.
     unsupported: (input) =>
-      input.kwArgs.ability !== undefined && replacedAbility(input) === undefined
-        ? 'keyword argument [ability]'
+      'ability' in input.kwArgs && replacedAbility(input) === undefined
+        ? keywordDetail('ability')
         : undefined,
     build: (input) => {
       const replaces = replacedAbility(input)
