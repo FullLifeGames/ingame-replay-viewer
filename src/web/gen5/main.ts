@@ -144,6 +144,7 @@ window.gen5 = {
     const game = manager()
     return game ? saveReport(game) : undefined
   },
+  replay: () => undefined,
   ...ram.hook,
   ...frames.calls,
 }
