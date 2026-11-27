@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { TickClock } from './clock'
+import type * as Protocol from './protocol'
 import {
   CONTROL,
   createShared,
@@ -12,6 +13,24 @@ import {
   writeStatus,
 } from './protocol'
 import { changeSpeed } from './speed-change'
+
+// The grant and the pace through spies, so a case reads the order of the two writes.
+vi.mock('./protocol', async (importOriginal) => {
+  const actual = await importOriginal<typeof Protocol>()
+  return { ...actual, grant: vi.fn(actual.grant), writePace: vi.fn(actual.writePace) }
+})
+
+/** The grant and pace writes of one change of `control` to `speed`, in the order they ran. */
+function writesOf(control: Int32Array, clock: TickClock, speed: Speed): string[] {
+  vi.mocked(grant).mockClear()
+  vi.mocked(writePace).mockClear()
+  changeSpeed(control, clock, speed, 5000)
+  const calls = [
+    ...vi.mocked(grant).mock.invocationCallOrder.map((at) => ({ at, write: 'grant' })),
+    ...vi.mocked(writePace).mock.invocationCallOrder.map((at) => ({ at, write: 'pace' })),
+  ]
+  return calls.sort((a, b) => a.at - b.at).map(({ write }) => write)
+}
 
 const progress = { done: 3, total: 34, turn: 1, error: 0, finished: false, playing: true }
 
@@ -72,5 +91,14 @@ describe('a speed change', () => {
       0, 1000, 0,
     ])
     expect(clock.paused).toBe(true)
+  })
+
+  it('grants before the pace when it leaves fast, and paces before the grant when it enters fast', () => {
+    // The worker stops at the frame of the switch before its sound turns on, and the sound is
+    // off before the worker runs uncapped.
+    const leaving = running('fast', 1000)
+    expect(writesOf(leaving.control, leaving.clock, '1x')).toEqual(['grant', 'pace'])
+    const entering = running('1x', 500)
+    expect(writesOf(entering.control, entering.clock, 'fast')).toEqual(['pace', 'grant'])
   })
 })
