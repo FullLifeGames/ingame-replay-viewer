@@ -6,7 +6,7 @@ import { GEN5_REPLAY_VERSION, type Gen5Replay } from '../src/gen5/backend/replay
 import { REPLAY_NUMBERS } from '../src/gen5/backend/replay.fixtures'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers'
 import type { MacroStep } from '../src/gen5/macro'
-import { blockLines, blocksPlan, blocksScene, sideOfMon } from './gen5-moment-blocks'
+import { blockLines, blocksScene, sideOfMon } from './gen5-moment-blocks'
 import { momentSteps } from './gen5-moment-plan'
 import type { Battle } from './gen5-moment-read'
 
@@ -60,11 +60,23 @@ const BANKS = {
 
 const named = (step: MacroStep) => ('name' in step ? `${step.kind} ${step.name}` : step.kind)
 
-// Scene: the scene run of #107 hands a replay's blocks to the player's client once the player
-// answered the action menu, as the moment does.
-describe('blocksPlan', () => {
-  it('holds and answers the menu as the moment does, then writes each block', () => {
-    const steps = blocksPlan(REPLAY, SETUP)
+// Scene: the scene runs of #107 and #108 hand a replay's blocks to the player's client once the
+// player answered the action menu, as the moment does, and hold the last scene as a whole replay
+// does (src/gen5/replay-plan.ts).
+describe('blocksScene', () => {
+  // Invented adapter command and state under their pokebw2 names, as ADAPTER_NUMBERS gives them.
+  const numbers = {
+    ...REPLAY_NUMBERS,
+    adapterCommands: { BTL_ACMD_SERVER_CMD: ADAPTER_NUMBERS.serverCmd },
+    adapterStates: { BTL_ADAPTER_STATE_IDLE: ADAPTER_NUMBERS.heldState },
+  } as unknown as Bw2Numbers
+  const party = (monId: number) => ({ mons: [{ monId }] })
+  const battle = { adapter: SETUP.adapter, parties: { near: party(5), far: party(FAR_MON) } }
+  const scene = (replay: Gen5Replay) =>
+    blocksScene(replay, { numbers, battle: battle as unknown as Battle, banks: BANKS })
+
+  it('holds and answers the menu as the moment does, writes each block, then holds the scene', () => {
+    const { steps } = scene(REPLAY)
     expect(steps.map(named)).toEqual([
       'write hold',
       'until answer-menu',
@@ -76,16 +88,27 @@ describe('blocksPlan', () => {
       'until b2',
       'mark b2-answered',
       'mark end',
+      'wait',
+      'mark last-scene',
     ])
     const moment = momentSteps({ ...SETUP, blocks: [] })
     expect(steps.slice(0, 3)).toEqual(moment.slice(0, 3))
   })
 
+  it('logs the block lines', () => {
+    expect(scene(REPLAY).lines[0]).toBe('b1: lines 12, 13; 3 commands')
+  })
+
   it('refuses a replay built on another pin, and one of another version', () => {
-    expect(() => blocksPlan({ ...REPLAY, pin: 'beef01' }, SETUP)).toThrow(
+    expect(() => scene({ ...REPLAY, pin: 'beef01' })).toThrow(
       'a replay built on pokebw2 beef01, the numbers are of c0ffee',
     )
-    expect(() => blocksPlan({ ...REPLAY, version: 1 }, SETUP)).toThrow('version 1')
+    expect(() => scene({ ...REPLAY, version: 1 })).toThrow('version 1')
+  })
+
+  it('refuses a run with no replay', () => {
+    const input = { numbers: {} as Bw2Numbers, battle: {} as Battle, banks: BANKS }
+    expect(() => blocksScene(undefined, input)).toThrow("a hand scene needs the replay's blocks")
   })
 })
 
@@ -116,12 +139,5 @@ describe('sideOfMon', () => {
 
   it('fails by name on a mon ID in neither party', () => {
     expect(() => sideOf(30)).toThrow('no party read at the action menu holds mon ID 30')
-  })
-})
-
-describe('blocksScene', () => {
-  it('refuses a run with no replay', () => {
-    const input = { numbers: {} as Bw2Numbers, battle: {} as Battle, banks: BANKS }
-    expect(() => blocksScene(undefined, input)).toThrow("a hand scene needs the replay's blocks")
   })
 })

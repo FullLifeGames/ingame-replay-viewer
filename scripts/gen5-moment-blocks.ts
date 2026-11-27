@@ -1,26 +1,18 @@
 // The blocks of the moment script's hand scenes (#107, #108): the plan that hands a
 // Gen 5 replay's blocks to the player's client, and the log lines that show what each block sends.
-// The plan holds the server and lets the player answer the action menu as the moment does
-// (gen5-moment-plan.ts, D8 of the cut, until #110 reads the server's start), then writes each
-// block once the client answered the one before (src/gen5/replay-plan.ts), which refuses a
-// replay of another version or another pokebw2 pin. The log names each block, its lines and its
-// commands, with the text of each line it shows from the checkout's text banks.
+// The plan is a whole replay's (src/gen5/replay-plan.ts, #110): it holds the server and lets the
+// player answer the action menu as the moment does (D8 of the cut), writes each block once the
+// client answered the one before, and holds the last scene; it refuses a replay of another
+// version or another pokebw2 pin. The log names each block, its lines and its commands, with the
+// text of each line it shows from the checkout's text banks.
 import { adapterNumbers } from '../src/gen5/adapter.ts'
 import { nameOfNumber } from '../src/gen5/backend/names.ts'
 import type { Gen5Replay } from '../src/gen5/backend/replay.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
-import type { MacroStep } from '../src/gen5/macro.ts'
-import { type BlockSetup, replaySteps } from '../src/gen5/replay-plan.ts'
+import { replayPlan } from '../src/gen5/replay-plan.ts'
 import type { ServerCommand } from '../src/gen5/server-cmd.ts'
-import { menuSteps } from './gen5-moment-plan.ts'
 import type { Battle } from './gen5-moment-read.ts'
 import { moveLineLabel, type Side, type TEXT_BANKS, textId, textLine } from './gen5-moment-scene.ts'
-
-/** The steps of a hand scene: the menu's answer, each block, then the mark `end`. */
-export function blocksPlan(replay: Gen5Replay, setup: BlockSetup & { pin: string }): MacroStep[] {
-  const blocks = replaySteps(replay, setup)
-  return [...menuSteps(setup), ...blocks, { kind: 'mark', name: 'end' }]
-}
 
 /** What the log reads a block's lines from: the text banks and each mon ID's side. */
 interface BlockText {
@@ -86,6 +78,6 @@ export function blocksScene(replay: Gen5Replay | undefined, input: SceneInput) {
   const { numbers, battle, banks } = input
   const sideOf = sideOfMon(battle.parties)
   const setup = { adapterNumbers: adapterNumbers(numbers), table: numbers, adapter: battle.adapter }
-  const steps = blocksPlan(replay, { ...setup, pin: numbers.pokebw2.commit })
+  const steps = replayPlan(replay, { ...setup, pin: numbers.pokebw2.commit })
   return { steps, lines: blockLines(replay, { banks, sideOf }) }
 }
