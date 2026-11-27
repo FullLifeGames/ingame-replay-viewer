@@ -1,4 +1,4 @@
-// The lines and the flow's numbers that the Gen 5 backend sends (#107, #108, #109) on pokebw2's
+// The lines and the flow's numbers that the Gen 5 backend sends (#107 to #110) on pokebw2's
 // real numbers: build/gen5/bw2.json, which scripts/gen5-bw2.ts generates from the pinned checkout.
 // CI fetches the pin and generates the file before the check, so there a missing file fails the
 // guard; on a machine without it the relations skip. CI's log is public, so every assertion
@@ -73,5 +73,10 @@ describe.skipIf(!existsSync(FILE))("the backend's lines and the flow's numbers",
   // Scene: a Pokémon that faints with HP left has its bar emptied with the server's flag.
   it("give the faint's flag as an integer", () => {
     expect(Number.isInteger(real().flow.faintGaugeFlag), "the faint's flag an integer").toBe(true)
+  })
+
+  // Scene: Solar Beam in sun fires in the turn it charges, with the release's look (#110).
+  it("give the charge's release index as an integer", () => {
+    expect(Number.isInteger(real().flow.chargeRelease), 'the release index an integer').toBe(true)
   })
 })

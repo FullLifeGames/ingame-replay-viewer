@@ -87,7 +87,7 @@ describe('effectCommands', () => {
     expect(drop?.at(-1)).toEqual({ command: 'SC_ABILITY_POPUP_OUT', args: [10] })
   })
 
-  // D13: a cause no module copies has no sequence, and the writer lists it with #110.
+  // D13: a cause no module copies has no sequence, and the writer lists it as unplayed (#110 D8).
   it.each([
     ['a heal by Black Sludge', '|-heal|p2a: Tyranitar|60/100|[from] item: Black Sludge'],
     [

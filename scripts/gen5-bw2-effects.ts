@@ -9,7 +9,7 @@
 // errors name the function, the role and the shape the reader expected, never the C they met, so
 // they show no number of pokebw2. The literals held to their names' values are in
 // gen5-bw2-effect-literals.ts.
-import type { EffectNumbers } from '../src/gen5/bw2-numbers.ts'
+import type { EffectNumbers } from '../src/gen5/bw2-flow-numbers.ts'
 import {
   bodyOf,
   closingBrace,

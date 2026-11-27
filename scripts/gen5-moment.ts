@@ -7,19 +7,19 @@
 // after the readings at the action menu: the moment is a single's with leads that know Tackle.
 // Then it reads the player's adapter, the server and both Pokémon from main RAM and plays the
 // steps of gen5-moment-plan.ts from a fixed frame after the mark battle: hold the server, answer
-// the action menu and write one block per moment. With --replay and --scene hits or switches it
-// writes the blocks of hand turns after the replay's start instead (gen5-moment-blocks.ts, #107,
-// #108), each logged with its commands and lines, and at each block's answer it checks both
-// parties' order in RAM against the backend's (gen5-moment-party.ts). It writes a frame per mark
-// under build/gen5/frames/ and the last mark's state under build/gen5/states/ (gitignored,
-// ADR 0002).
-// Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts [--scene known|unknown|hits|switches]
-// [--save <name>] [--entry direct|walk] [--battle single|double] [--player <name>]
-// [--opponent <name>] [--replay <id>] [--minutes 15].
+// the action menu and write one block per moment. With --replay and --scene hits, switches or
+// effects it writes the blocks of hand turns after the replay's start instead
+// (gen5-moment-blocks.ts, #107 to #109), each logged with its commands and lines, and at each
+// block's answer it checks both parties' order in RAM against the backend's
+// (gen5-moment-party.ts). It writes a frame per mark under build/gen5/frames/ and the last mark's
+// state under build/gen5/states/ (gitignored, ADR 0002).
+// Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts
+// [--scene known|unknown|hits|switches|effects] [--save <name>] [--entry direct|walk]
+// [--battle single|double] [--player <name>] [--opponent <name>] [--replay <id>] [--minutes 15].
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { chromium, type Page } from '@playwright/test'
+import type { Page } from '@playwright/test'
 
 import { adapterNumbers } from '../src/gen5/adapter.ts'
 import { battleRefs } from '../src/gen5/battle-check.ts'
@@ -29,8 +29,6 @@ import type { Gen5Replay } from '../src/gen5/backend/replay.ts'
 import type { RunPlan, RunReport } from '../src/gen5/hook.ts'
 import type { MacroStep } from '../src/gen5/macro.ts'
 import { MAIN_RAM_SIZE, MAIN_RAM_START } from '../src/gen5/main-ram.ts'
-import type { RamRef } from '../src/gen5/ram-check.ts'
-import type { RoutineBuild } from '../src/gen5/routine-order.ts'
 import {
   isHandScene,
   type MomentOptions,
@@ -46,20 +44,24 @@ import { type Battle, readBattle } from './gen5-moment-read.ts'
 import { momentTeam } from './gen5-moment-team.ts'
 import { markLines, writeLines } from './gen5-moment-log.ts'
 import { MOMENT_GAP, momentStart, momentSteps } from './gen5-moment-plan.ts'
-import { listedReader } from './gen5-bw2-source.ts'
 import {
-  moveLineLabel,
   sceneBlocks,
+  sceneLineLabel,
   type SceneName,
-  sceneMove,
-  TEXT_BANKS,
   textId,
   textLine,
 } from './gen5-moment-scene.ts'
-import { log, logSave, sampleLine, waitForStart } from './gen5-page.ts'
+import {
+  bootRun,
+  pickDump,
+  readNumbers,
+  readRoutine,
+  textBanks,
+  watchOf,
+  withGen5Page,
+} from './gen5-moment-session.ts'
+import { log, sampleLine } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
-import { logStorage, type RequestLog, watchRequests } from './gen5-requests.ts'
-import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve } from './gen5-shot.ts'
 
 const hex = (value: number) => `0x${value.toString(16)}`
 
@@ -69,28 +71,6 @@ type Team = Awaited<ReturnType<typeof momentTeam>>
 interface Session {
   options: MomentOptions
   team: Team | undefined
-}
-
-const readPokebw2 = listedReader(GEN5_PATHS.pokebw2)
-const bank = (name: keyof typeof TEXT_BANKS) => readPokebw2(TEXT_BANKS[name])
-
-function watchOf(numbers: Bw2Numbers, battle: Battle): RamRef[] {
-  const field = (
-    layout: { fields: Record<string, { offset: number } | undefined> },
-    name: string,
-  ) => layout.fields[name]?.offset ?? 0
-  const hp = field(numbers.battle.monCore, 'hp')
-  return [
-    ...battleRefs(numbers).watch,
-    {
-      name: 'server.proc',
-      address: battle.server + field(numbers.battle.server, 'proc'),
-      width: 4,
-    },
-    { name: 'server.seq', address: battle.server + field(numbers.battle.server, 'seq'), width: 4 },
-    { name: 'near.hp', address: battle.near.address + hp, width: 2 },
-    { name: 'far.hp', address: battle.far.address + hp, width: 2 },
-  ]
 }
 
 function readStateFile(base: string): StateFile {
@@ -112,19 +92,16 @@ async function startSession(page: Page, dump: string, numbers: Bw2Numbers, sessi
     refs: battleRefs(numbers),
     trainer: numbers.saveTrainer,
     entry: numbers.entry,
-    readRoutine: () => JSON.parse(readFileSync(GEN5_PATHS.routineJson, 'utf8')) as RoutineBuild,
+    readRoutine,
     readState: readStateFile,
     team,
   })
   for (const note of notes) log(`name cut: ${note}`)
-  const fromBoot = start.from === 'boot'
   log(`entry ${options.entry}: ${String(plan.steps.length)} steps from ${startLine(start)}`)
   for (const line of writeLines(plan.steps)) log(line)
-  if (fromBoot) await hook(page).queueRun(plan)
-  await page.setInputFiles('#dump', dump)
-  await waitForStart(page)
-  await logSave(page, 'at the start')
-  if (!fromBoot) await hook(page).queueRun(plan)
+  if (start.from === 'boot') return bootRun(page, dump, plan, { label, deadlineMs })
+  await pickDump(page, dump)
+  await hook(page).queueRun(plan)
   return follow(page, label, deadlineMs)
 }
 
@@ -141,23 +118,23 @@ async function sessionTeam(numbers: Bw2Numbers, options: MomentOptions) {
 
 /** The scene's blocks for the battle read, each logged with the move line it shows. */
 function sceneMoments(scene: SceneName, battle: Battle, numbers: Bw2Numbers) {
-  const std = textId(bank('standard'), 'Bank0019_Text_ItsSuperEffective')
+  const banks = textBanks()
+  const std = textId(banks.standard, 'Bank0019_Text_ItsSuperEffective')
   const blocks = sceneBlocks(scene, battle, numbers.battle.single, std)
   for (const { name, moment } of blocks) {
     const side = moment.attacker.monId === battle.near.monId ? 'near' : 'far'
-    const line = moveLineLabel(sceneMove(scene, side), side)
+    const line = sceneLineLabel(scene, side, banks.move)
     log(
-      `${name}: ${JSON.stringify(moment)}; ${line}: ${textLine(bank('move'), textId(bank('move'), line))}`,
+      `${name}: ${JSON.stringify(moment)}; ${line}: ${textLine(banks.move, textId(banks.move, line))}`,
     )
   }
-  log(`standard line ${String(std)}: ${textLine(bank('standard'), std)}`)
+  log(`standard line ${String(std)}: ${textLine(banks.standard, std)}`)
   return blocks
 }
 
 /** A hand scene's steps: the replay's blocks, each logged with its commands and lines. */
 function handSteps(team: Team | undefined, battle: Battle, numbers: Bw2Numbers): MacroStep[] {
-  const banks = { move: bank('move'), standard: bank('standard'), set: bank('set') }
-  const { steps, lines } = blocksScene(team?.replay, { numbers, battle, banks })
+  const { steps, lines } = blocksScene(team?.replay, { numbers, battle, banks: textBanks() })
   for (const line of lines) log(line)
   return steps
 }
@@ -262,25 +239,9 @@ async function main(): Promise<void> {
   const dump = process.env.GEN5_DUMP
   if (!dump) throw new Error('set GEN5_DUMP to the path of the Black 2 (USA) dump')
   log(`gen5-moment: ${JSON.stringify(options)}; ${sampleLine()}`)
-  const numbers = JSON.parse(readFileSync(GEN5_PATHS.bw2Json, 'utf8')) as Bw2Numbers
-  const served = await serve(false)
-  const origin = `http://${PAGE_HOST}:${String(served.port)}`
-  const browser = await chromium.launch({ args: CHROMIUM_ARGS })
-  let requests: RequestLog | undefined
-  try {
-    const page = await (await browser.newContext({ viewport: RUN_VIEWPORT })).newPage()
-    requests = watchRequests(page, origin, false)
-    await page.goto(`${origin}/${options.start.from === 'boot' ? options.start.query : ''}`)
-    process.exitCode = await play(page, dump, numbers, options)
-    await logSave(page, 'at the end')
-    if (!(await logStorage(page))) process.exitCode = 1
-  } finally {
-    await browser.close()
-    await served.close()
-    log(sampleLine())
-    if (requests) log(requests.summary())
-  }
-  if (requests.failed) process.exitCode = 1
+  const numbers = readNumbers()
+  const query = options.start.from === 'boot' ? options.start.query : ''
+  await withGen5Page(query, (page) => play(page, dump, numbers, options))
 }
 
 if (import.meta.main) await main()

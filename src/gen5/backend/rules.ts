@@ -1,21 +1,21 @@
 // The Gen 5 backend's rule for each kind of battle script event (#107): a table that tsc holds
 // complete, as Gen 3's HANDLERS (src/gen3/translate/index.ts), so a new kind in the battle script
 // fails the build until it has a rule here, and an event of a kind outside the table fails by
-// name. Each rule says what becomes of its event; the kinds that do not play yet name the issue
-// that plays them (lane plan §4). Every event before the first turn that would play is the game's
-// own: BtlServerFlow_StartBattle runs the leads' switch-in effects before the server holds (#109,
-// lane plan D3).
+// name. Each rule says what becomes of its event; the kinds that Black 2 does not play yet are
+// listed as unplayed, each a rest for the gate (#110, lane plan D8). Every event before the first
+// turn that would play is the game's own: BtlServerFlow_StartBattle runs the leads' switch-in
+// effects before the server holds (#109, lane plan D3).
 import type { ScriptEvent } from '../../script/events.ts'
-import { type Gen5Fallback, laterFallback, lineFallback } from './fallbacks.ts'
+import { type Gen5Fallback, lineFallback, unplayedFallback } from './fallbacks.ts'
 
 /** What becomes of an event. `park`: the park shows it (#106). `game`: the game shows it itself.
  * `boundary`: it parts the blocks. `play`: the writer plays it where its Pokémon stand in place
  * (moves.ts), a switch-in as its switch, drag or send-in (switches.ts), a faint as the server's
- * faint (faints.ts), and an effect by its module (effects.ts). `later`: issue `issue` plays it.
- * `line`: Black 2 has no line for it, and nothing shows. */
+ * faint (faints.ts), an effect by its module (effects.ts), and a charge skip (charge.ts).
+ * `unplayed`: Black 2 does not play it yet. `line`: Black 2 has no line for it, and nothing
+ * shows. */
 export type Outcome =
-  | { readonly as: 'park' | 'game' | 'boundary' | 'play' }
-  | { readonly as: 'later'; readonly issue: number }
+  | { readonly as: 'park' | 'game' | 'boundary' | 'play' | 'unplayed' }
   | { readonly as: 'line'; readonly detail: string }
 
 /** The event of one kind, also where one event type carries two kinds (`sideStart | sideEnd`). */
@@ -29,16 +29,15 @@ export type EventOf<K extends ScriptEvent['kind']> = ScriptEvent extends infer E
 
 type Rule<K extends ScriptEvent['kind']> = (event: EventOf<K>) => Outcome
 
-/** The issue that plays what does not play yet: a whole replay. */
-export const LATER_ISSUES = { whole: 110 } as const
-
 const PLAY = { as: 'play' } as const
-const WHOLE = { as: 'later', issue: LATER_ISSUES.whole } as const
 
 const park = (): Outcome => ({ as: 'park' })
 const play = (): Outcome => PLAY
-const whole = (): Outcome => WHOLE
+const unplayed = (): Outcome => ({ as: 'unplayed' })
 const line = (detail: string): Outcome => ({ as: 'line', detail })
+
+/** Lane plan D5: no command follows the last block, and the page names how the battle ended. */
+const LAST_SCENE = 'Black 2 holds the last scene; the page names'
 
 const RULES = {
   player: park,
@@ -50,21 +49,21 @@ const RULES = {
   // Lane plan D14: the game keeps the disguise's Pokémon in place (party-state.ts).
   replace: () => line('Black 2 shows the disguise throughout'),
   message: (event) => line(`Black 2 has no line for "${event.text}"`),
-  win: whole,
-  tie: whole,
+  win: (event) => line(`${LAST_SCENE} the winner, ${event.name}`),
+  tie: () => line(`${LAST_SCENE} the tie`),
   move: play,
-  prepare: whole,
-  anim: whole,
+  prepare: play,
+  anim: play,
   cant: play,
   miss: play,
-  ohko: whole,
-  noTarget: whole,
+  ohko: unplayed,
+  noTarget: unplayed,
   immune: play,
   fail: play,
   block: play,
   damage: play,
   heal: play,
-  setHp: whole,
+  setHp: unplayed,
   status: play,
   cureStatus: play,
   cureTeam: play,
@@ -74,13 +73,13 @@ const RULES = {
   negativeStatReset: play,
   crit: play,
   effectiveness: play,
-  hitCount: whole,
+  hitCount: unplayed,
   effectStart: play,
   effectEnd: play,
   effectActivate: play,
-  transform: whole,
-  formChange: whole,
-  terastallize: whole,
+  transform: unplayed,
+  formChange: unplayed,
+  terastallize: unplayed,
   singleTurn: play,
   singleMove: play,
   copyBoost: play,
@@ -123,12 +122,13 @@ export function outcomesOf(events: readonly ScriptEvent[]): Outcome[] {
   })
 }
 
-/** A fallback for each event that does not play yet or whose line Black 2 lacks, in event order. */
+/** A fallback for each event that Black 2 does not play yet or whose line it lacks, in event
+ * order. */
 export function ruleFallbacks(events: readonly ScriptEvent[]): Gen5Fallback[] {
   const outcomes = outcomesOf(events)
   return events.flatMap((event, i) => {
     const outcome = outcomes[i]
-    if (outcome?.as === 'later') return [laterFallback(event, outcome.issue)]
+    if (outcome?.as === 'unplayed') return [unplayedFallback(event)]
     if (outcome?.as === 'line') return [lineFallback(event, outcome.detail)]
     return []
   })

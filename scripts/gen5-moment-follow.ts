@@ -10,7 +10,7 @@ import type { Gen5Global, MarkRecord, RunPlan, RunReport } from '../src/gen5/hoo
 import { log } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
-const POLL_MS = 1000
+export const POLL_MS = 1000
 
 /** The page's hook; spelled out in each evaluate, since those run in the page, not here. */
 export const hook = (page: Page) => ({

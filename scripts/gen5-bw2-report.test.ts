@@ -104,6 +104,7 @@ describe('quietLines', () => {
       recoverEffect: 0x4d,
       switchEffects: { switchOut: 0x5b, drag: 0x5e },
       faintGaugeFlag: 3,
+      chargeRelease: 0x17,
     },
     effects: REPLAY_NUMBERS.effects,
   }
@@ -120,7 +121,7 @@ describe('quietLines', () => {
       'entry layouts Kite, Lamp',
       'pkm layouts PartyPkm, PkmBlockA, PkmBlockB; block table, cipher and shiny bound read',
       "text labels of the backend's lines found: standard 1 of 4, set 0 of 5",
-      "text labels of the backend's effect lines found: standard 0 of 2, set 1 of 37",
+      "text labels of the backend's effect lines found: standard 0 of 2, set 1 of 38",
       "line sources checked: each of the backend's lines is what its function puts",
     ])
   })
@@ -159,7 +160,7 @@ describe('quietLines', () => {
     }
     const ours = [
       "text labels of the backend's lines found: standard 0 of 4, set 0 of 5",
-      "text labels of the backend's effect lines found: standard 0 of 2, set 0 of 37",
+      "text labels of the backend's effect lines found: standard 0 of 2, set 0 of 38",
     ]
     const [pin, ...rest] = quietLines(sized)
     expect(pin).toBe('pokebw2 c0ffee')

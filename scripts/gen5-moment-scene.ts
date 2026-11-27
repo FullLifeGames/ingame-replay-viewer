@@ -43,11 +43,22 @@ export function sceneMove(scene: SceneName, side: Side): string {
   return SCENES[scene][side]
 }
 
-/** The label in the move bank of the line "X used Y!" for `side`'s Pokémon: the far side's
- * line names it as the foe's. */
-export function moveLineLabel(moveName: string, side: Side): string {
+/** The label in the move bank `moves` of the line "X used Y!" for `side`'s Pokémon, or none: the
+ * far side's line names it as the foe's. The bank spells some names apart from @pkmn by case
+ * (U-turn as UTurn), so the label is the one that equals the prefix and @pkmn's name without its
+ * spaces and marks, compared without case. A move the bank names in a word of its own gets none. */
+export function moveLineLabel(moveName: string, side: Side, moves: string): string | undefined {
   const name = dexMove(moveName).name.replace(/[^A-Za-z0-9]/g, '')
-  return `Bank0016_Text_${side === 'far' ? 'FoesUsed' : 'Used'}${name}`
+  const wanted = `Bank0016_Text_${side === 'far' ? 'FoesUsed' : 'Used'}${name}`.toLowerCase()
+  return labels(moves).find((label) => label.toLowerCase() === wanted)
+}
+
+/** The move label of `side`'s move in `scene`; a scene shows that line, so it fails without it. */
+export function sceneLineLabel(scene: SceneName, side: Side, moves: string): string {
+  const move = sceneMove(scene, side)
+  const label = moveLineLabel(move, side, moves)
+  if (label === undefined) throw new Error(`the text bank has no line label for ${move}`)
+  return label
 }
 
 export function sceneBlocks(
@@ -88,6 +99,9 @@ export function sceneBlocks(
 }
 
 const lines = (bank: string) => bank.split('\n')
+
+/** The label of each line of a text bank, the text before " = ". */
+const labels = (bank: string) => lines(bank).map((line) => line.split(' = ', 1)[0] ?? '')
 
 /** The message ID of `label` in a text bank of pokebw2's res/text: its line, counted from 0. */
 export function textId(bank: string, label: string): number {

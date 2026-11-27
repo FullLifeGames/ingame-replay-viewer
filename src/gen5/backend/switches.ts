@@ -6,7 +6,8 @@
 // ServerControl_AfterSwitchIn runs wait for #109. Pure: every number of the game comes in from
 // build/gen5/bw2.json.
 import type { Effect } from '../../script/types.ts'
-import type { FlowNumbers, TextNumbers } from '../bw2-numbers.ts'
+import type { FlowNumbers } from '../bw2-flow-numbers.ts'
+import type { TextNumbers } from '../bw2-numbers.ts'
 import type { ServerCommand } from '../server-cmd.ts'
 import type { BattleState, SendIn } from './battle-state.ts'
 import { type Gen5Fallback, plainFallback } from './fallbacks.ts'

@@ -2,7 +2,8 @@
 // src/battle/btl_server_flow.c puts it into the queue. The battle state marks the Pokémon fainted
 // after the sequence (moves.ts). Pure: every number of the game comes in from
 // build/gen5/bw2.json.
-import type { FlowNumbers, TextNumbers } from '../bw2-numbers.ts'
+import type { FlowNumbers } from '../bw2-flow-numbers.ts'
+import type { TextNumbers } from '../bw2-numbers.ts'
 import type { ServerCommand } from '../server-cmd.ts'
 import type { BattleState } from './battle-state.ts'
 import { GEN5_LINES, lineId } from './lines.ts'

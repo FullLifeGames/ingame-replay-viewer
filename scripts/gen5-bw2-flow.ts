@@ -1,14 +1,15 @@
 // The numbers the server's flow puts as literals (#107, #108), from pokebw2 at its pin: the damage
 // kinds of the hit flash, which ServerDisplay_Damage picks in an if chain and sends with
 // SC_DAMAGE_PLURAL; the heal effect ServerControl_RecoverHPCore shows with SC_EFFECT_BY_POS; the
-// recall effects ServerControl_SwitchOut and ServerControl_ForceSwitch pass on for SC_RECALL; and
-// the flag ServerControl_FaintPokemon passes on for SC_FAINT_HP_GAUGE. pokebw2 has no name for
+// recall effects ServerControl_SwitchOut and ServerControl_ForceSwitch pass on for SC_RECALL;
+// the flag ServerControl_FaintPokemon passes on for SC_FAINT_HP_GAUGE; and the index
+// ServerControl_CheckChargeTurn sets for a charged move's release (#110). pokebw2 has no name for
 // any of them (BtlvCore_PlayDamageSE says the set has none yet), so the reader takes each from its
 // function by shape, a passed one at the callee's parameter of its name, and throws on any other.
 // The errors name the function, the role and the shape the reader expected, never the C they met,
 // so they show no number of pokebw2. The C files that put the backend's lines are roles here too,
 // for the cross-check in gen5-bw2-lines.ts.
-import type { FlowNumbers } from '../src/gen5/bw2-numbers.ts'
+import type { FlowNumbers } from '../src/gen5/bw2-flow-numbers.ts'
 import { bodyOf, literal, stripComments } from './gen5-bw2-c.ts'
 
 /** The server's flow and the handlers of items, moves, abilities, side effects and conditions,
@@ -176,10 +177,24 @@ export const switchEffects = (flowC: string): FlowNumbers['switchEffects'] => ({
 export const faintGaugeFlag = (flowC: string): number =>
   passedLiteral(flowC, 'ServerControl_FaintPokemon', 'ServerDisplay_FaintPokemon', 'flag')
 
-/** The damage kinds, the heal effect, the recall effects and the faint's flag. */
+const CHARGE = 'ServerControl_CheckChargeTurn'
+
+/** The index ServerControl_CheckChargeTurn sets as the move's effect before the release, which
+ * ServerControl_PutMoveAnimation sends with SC_MOVE_ANIM as the charged move fires (#110). */
+export function chargeRelease(flowC: string): number {
+  const sets = [...bodyText(flowC, CHARGE).matchAll(/\bmoveEffect->index = ([^;]+);/g)]
+  if (sets.length !== 1) {
+    throw new Error(`${CHARGE} sets the release index (moveEffect->index = …;) not exactly once`)
+  }
+  return literalOf(sets[0]?.[1] ?? '', CHARGE, 'release index')
+}
+
+/** The damage kinds, the heal effect, the recall effects, the faint's flag and the charge's
+ * release index. */
 export const flowNumbers = (input: FlowInput): FlowNumbers => ({
   damageKinds: damageKinds(input.flowC),
   recoverEffect: recoverEffect(input.flowC),
   switchEffects: switchEffects(input.flowC),
   faintGaugeFlag: faintGaugeFlag(input.flowC),
+  chargeRelease: chargeRelease(input.flowC),
 })

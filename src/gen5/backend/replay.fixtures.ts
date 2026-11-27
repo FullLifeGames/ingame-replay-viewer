@@ -1,4 +1,4 @@
-// The invented numbers of the Gen 5 backend's specs (#106 to #109): the Pokémon format and
+// The invented numbers of the Gen 5 backend's specs (#106 to #110): the Pokémon format and
 // the entry of src/gen5's fixtures, a font of printable ASCII, a made-up pin, and the numbers the
 // blocks need. The server commands keep pokebw2's `SC_*` names with numbers above any the game
 // has; the formats carry names, codes and puts of their own, each argument in a halfword. The
@@ -173,6 +173,7 @@ export const REPLAY_NUMBERS: ReplayNumbers &
       Bank0018_Text_ProtectedItself: 0x4c67,
       Bank0018_Text_HadItsEnergyDrained: 0x4c6d,
       Bank0018_Text_SSubstituteFaded: 0x4c5d,
+      Bank0018_Text_AbsorbedLight: 0x4c6f,
     },
   },
   flow: {
@@ -180,6 +181,7 @@ export const REPLAY_NUMBERS: ReplayNumbers &
     recoverEffect: 0x6d3,
     switchEffects: { switchOut: 0x6d9, drag: 0x6df },
     faintGaugeFlag: 3,
+    chargeRelease: 0x1d,
   },
   effects: {
     addEffects: {

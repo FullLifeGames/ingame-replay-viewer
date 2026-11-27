@@ -5,6 +5,7 @@ import { ADAPTER_LAYOUT } from '../src/gen5/adapter.fixtures'
 import type { ServerCmdTable } from '../src/gen5/bw2-numbers'
 import type { MacroStep } from '../src/gen5/macro'
 import type { Moment } from '../src/gen5/moment'
+import { writesAfterHold } from '../src/gen5/plan-writes'
 import { MOMENT_GAP, momentStart, momentSteps } from './gen5-moment-plan'
 
 // Invented numbers in the shapes of bw2.json: offsets, command numbers, IDs and the address.
@@ -87,26 +88,13 @@ describe('momentSteps', () => {
   })
 })
 
-/** The adapter commands that the writes after the hold put into `cmd` or `sendCmd.cmd`. */
-function commandsAfterHold(plan: MacroStep[]): Set<number> {
-  const afterHold = plan.slice(plan.findIndex((step) => 'name' in step && step.name === 'hold') + 1)
-  const writes = afterHold.flatMap((step) => (step.kind === 'write' ? step.writes : []))
-  return new Set(
-    writes.flatMap((write) =>
-      write.kind === 'bytes' && (write.field === 'cmd' || write.field === 'sendCmd.cmd')
-        ? [write.bytes.reduceRight((value, byte) => value * 256 + byte, 0)]
-        : [],
-    ),
-  )
-}
-
 // Scene: the client never starts an action selection during a replay, so no trainer's hint line
 // shows (CheckTrainerHintMsg in pokebw2's btl_client.c); after the hold it gets server commands only.
 describe('momentSteps after the hold', () => {
   it('writes no action-selection command, only the server command', () => {
-    const commands = commandsAfterHold(steps)
+    const { commands } = writesAfterHold(steps)
     expect(commands).not.toContain(SELECT_ACTION)
-    expect([...commands]).toEqual([ADAPTER_NUMBERS.serverCmd])
+    expect(commands).toEqual([ADAPTER_NUMBERS.serverCmd])
   })
 })
 

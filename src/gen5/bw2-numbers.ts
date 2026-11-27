@@ -1,6 +1,7 @@
 // The numbers of Black 2 (USA) that the Gen 5 spike (#72) reads from a pinned pokebw2 checkout.
 // scripts/gen5-bw2.ts generates them into build/gen5/bw2.json at run time (D4); nothing of pokebw2
 // is committed, and the pure modules here take the numbers as input and hold none of the game's.
+import type { EffectNumbers, FlowNumbers } from './bw2-flow-numbers.ts'
 
 /** One symbol of the ds-decomp config: a function, data, bss or a label, at its retail address. */
 export interface Bw2Symbol {
@@ -238,44 +239,6 @@ export interface FontNumbers {
 export interface TextNumbers {
   standard: Record<string, number>
   set: Record<string, number>
-}
-
-/** The numbers the server's flow puts as literals (scripts/gen5-bw2-flow.ts), which pokebw2 has
- * no name for (#107, #108). */
-export interface FlowNumbers {
-  /** The effectiveness category of the hit flash's SC_DAMAGE_PLURAL, which picks the hit sound. */
-  damageKinds: { plain: number; super: number; resisted: number }
-  /** The effect SC_EFFECT_BY_POS shows at a Pokémon that heals. */
-  recoverEffect: number
-  /** The effects SC_RECALL shows as a Pokémon leaves: by a switch, or by a drag (#108). */
-  switchEffects: { switchOut: number; drag: number }
-  /** The flag of SC_FAINT_HP_GAUGE for a Pokémon that faints with HP left (#108). */
-  faintGaugeFlag: number
-}
-
-/** The numbers of the effects' sequences (scripts/gen5-bw2-effects.ts, #109), conditions and
- * abilities by pokebw2's names. */
-export interface EffectNumbers {
-  /** The effect shown at a Pokémon as a condition starts (ServerControl_AddCondition). */
-  addEffects: Record<string, number>
-  /** The effect shown at a Pokémon that poison or a burn hurts (ServerControl_ConditionDamage). */
-  damageEffects: Record<string, number>
-  /** SC_OP_SET_CONDITION's values: a status for good, bad poison, sleep at its most turns. */
-  conditionValues: { permanent: number; badlyPoisoned: number; sleep: number }
-  /** The icon SC_SET_GAUGE_STATUS shows for bad poison (ServerDisplay_AddCondition). */
-  badlyPoisonedGauge: number
-  /** SC_WEATHER_START's turns for a weather that lasts (BtlServerFlow_StartBattle). */
-  weatherTurns: number
-  /** A client's side is `client & sideMask` (GetClientSide). */
-  sideMask: number
-  /** Sand's and hail's effects: at each Pokémon hit, and once over the field after the hits. */
-  sandEffects: { hit: number; after: number }
-  /** SC_HIDE_MSG_WINDOW's argument as the turn's end starts (ServerControl_TurnCheck). */
-  hideWindow: number
-  /** The effect at Focus Punch's user before its turn (HandlerFocuspunch). */
-  focusEffect: number
-  /** The abilities whose handlers run as their Pokémon comes in (BTL_EVENT_MEMBER_IN). */
-  memberInAbilities: string[]
 }
 
 /** The whole of build/gen5/bw2.json. */

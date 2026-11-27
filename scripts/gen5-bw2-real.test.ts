@@ -168,10 +168,14 @@ describe.skipIf(!existsSync(FILE))('the Gen 5 code on the generated numbers', ()
     const read = listedReader(GEN5_PATHS.pokebw2)
     const has = (bank: string, label: string) => passes(() => textId(bank, label))
     const moves = read(TEXT_BANKS.move)
-    const labels = SCENES.flatMap((scene) =>
-      SIDES.flatMap((mover) => SIDES.map((side) => moveLineLabel(sceneMove(scene, mover), side))),
+    const missing = SCENES.flatMap((scene) =>
+      SIDES.flatMap((mover) =>
+        SIDES.filter(
+          (side) => moveLineLabel(sceneMove(scene, mover), side, moves) === undefined,
+        ).map((side) => `${scene} ${mover}'s move, ${side} side`),
+      ),
     )
-    expect(labels.filter((label) => !has(moves, label))).toEqual([])
+    expect(missing).toEqual([])
     const standard = 'Bank0019_Text_ItsSuperEffective'
     expect(has(read(TEXT_BANKS.standard), standard), standard).toBe(true)
   })

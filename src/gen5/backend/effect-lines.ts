@@ -1,6 +1,6 @@
-// The lines of Black 2's text banks that the Gen 5 backend sends for a battle's effects (#109):
-// statuses, stat stages, a weather's damage, Stealth Rock, held items, an ability and the moves'
-// own effects, each by its label in pokebw2's bank and with the C that puts or picks it. The
+// The lines of Black 2's text banks that the Gen 5 backend sends for a battle's effects (#109,
+// #110): statuses, stat stages, a weather's damage, Stealth Rock, held items, an ability and the
+// moves' own effects, each by its label in pokebw2's bank and with the C that puts or picks it. The
 // generator holds each label to the message IDs its function puts (scripts/gen5-bw2-lines.ts), as
 // for GEN5_LINES, and the backend finds the line's ID in bw2.json by its label (`lineId`). Each
 // label is the player's row; the game picks the wild or the foe's row itself.
@@ -92,8 +92,9 @@ const ITEM_AND_ABILITY_LINES = {
   }),
 } as const satisfies Record<string, Gen5Line>
 
-/** The moves' own effects: Protect and its block, Focus Punch, a drain, and Substitute's start,
- * hit and end (the hit and the end pass their line to ServerDisplay_SkyDropTargetAppear). */
+/** The moves' own effects: Protect and its block, Focus Punch, a drain, Substitute's start, hit
+ * and end (the hit and the end pass their line to ServerDisplay_SkyDropTargetAppear), and Solar
+ * Beam's charge, which its handler puts as the charge starts (#110). */
 const MOVE_LINES = {
   protected: setLine('ProtectedItself', moveString('HandlerProtect')),
   protectBlocked: setLine('ProtectedItself_2', flowSet('ServerControl_RemoveNoEffectTargets')),
@@ -102,6 +103,7 @@ const MOVE_LINES = {
   substitute: setLine('PutSubstitute', flowSet('ServerControl_Substitute')),
   substituteHit: setLine('SubstituteTookDamage', flowPicked('ServerControl_DamageSubstitute')),
   substituteFaded: setLine('SSubstituteFaded', flowPicked('ServerControl_BreakSubstitute')),
+  absorbedLight: setLine('AbsorbedLight', moveString('HandlerSolarBeamCharge')),
 } as const satisfies Record<string, Gen5Line>
 
 /** Every line of the effects, by our name. */
