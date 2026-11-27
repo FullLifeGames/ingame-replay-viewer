@@ -8,7 +8,7 @@
 // The errors name the function, the role and the shape the reader expected, never the C they met,
 // so they show no number of pokebw2. The C files that put the backend's lines are roles here too,
 // for the cross-check in gen5-bw2-lines.ts.
-import type { FlowNumbers } from '../src/gen5/bw2-numbers.ts'
+import type { FlowNumbers } from '../src/gen5/bw2-flow-numbers.ts'
 import { bodyOf, literal, stripComments } from './gen5-bw2-c.ts'
 
 /** The server's flow and the handlers of items, moves, abilities, side effects and conditions,

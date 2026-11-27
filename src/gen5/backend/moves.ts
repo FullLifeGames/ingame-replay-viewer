@@ -10,13 +10,8 @@
 // number of the game comes in from build/gen5/bw2.json.
 import type { BattleScript, ScriptEvent } from '../../script/events.ts'
 import type { PokemonRef } from '../../script/types.ts'
-import type {
-  BattleNumbers,
-  EffectNumbers,
-  FlowNumbers,
-  PkmNumbers,
-  TextNumbers,
-} from '../bw2-numbers.ts'
+import type { EffectNumbers, FlowNumbers } from '../bw2-flow-numbers.ts'
+import type { BattleNumbers, PkmNumbers, TextNumbers } from '../bw2-numbers.ts'
 import { PLAIN_TURN } from '../moment.ts'
 import type { ServerCommand } from '../server-cmd.ts'
 import { battleState, type BattleState } from './battle-state.ts'

@@ -6,13 +6,8 @@
 // script's events. Pure: every number of the game comes in from build/gen5/bw2.json.
 import type { ScriptEvent } from '../../script/events.ts'
 import type { HpFraction, PokemonRef } from '../../script/types.ts'
-import type {
-  BattleNumbers,
-  EffectNumbers,
-  FlowNumbers,
-  PkmNumbers,
-  TextNumbers,
-} from '../bw2-numbers.ts'
+import type { EffectNumbers, FlowNumbers } from '../bw2-flow-numbers.ts'
+import type { BattleNumbers, PkmNumbers, TextNumbers } from '../bw2-numbers.ts'
 import type { ServerCommand } from '../server-cmd.ts'
 import type { BattleState, InPlace } from './battle-state.ts'
 import type { Action } from './blocks.ts'

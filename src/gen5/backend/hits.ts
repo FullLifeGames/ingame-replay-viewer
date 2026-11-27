@@ -5,7 +5,8 @@
 // build/gen5/bw2.json.
 import type { Hit, ScriptEvent } from '../../script/events.ts'
 import type { Effect, HpFraction, PokemonRef } from '../../script/types.ts'
-import type { FlowNumbers, TextNumbers } from '../bw2-numbers.ts'
+import type { FlowNumbers } from '../bw2-flow-numbers.ts'
+import type { TextNumbers } from '../bw2-numbers.ts'
 import type { ServerCommand } from '../server-cmd.ts'
 import type { BattleState, InPlace } from './battle-state.ts'
 import { type Gen5Line, GEN5_LINES, lineId } from './lines.ts'
