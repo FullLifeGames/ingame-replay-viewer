@@ -1,13 +1,13 @@
-// The invented text banks that the text reader's specs hand to it (#107, #109): the labels the
-// backend names, in an order of their own between filler labels, and each bank's pad line last. The
-// text after each label is our own plain words, with none of the game text's tags. The reader keeps a
-// label's line index, so scripts/gen5-fixtures-real.test.ts compares those indices with the
+// The invented text banks that the text reader's specs hand to it (#107, #109, #110): the labels
+// the backend names, in an order of their own between filler labels, and each bank's pad line last.
+// The text after each label is our own plain words, with none of the game text's tags. The reader
+// keeps a label's line index, so scripts/gen5-fixtures-real.test.ts compares those indices with the
 // generated ones.
 import type { TextInput } from './gen5-bw2-text.ts'
 
 const bank = (lines: readonly string[]) => `${lines.join('\n')}\n`
 
-/** A standard bank of eleven labels and a set bank of fifty-five, each with filler labels between
+/** A standard bank of eleven labels and a set bank of fifty-eight, each with filler labels between
  * the backend's own. */
 export const TEXT_INPUT: TextInput = {
   standardBank: bank([
@@ -80,6 +80,9 @@ export const TEXT_INPUT: TextInput = {
     'Bank0018_Text_ParalyzedCantMove = The invented line of a Pokémon too stiff to move.',
     'Bank0018_Text_FillerSigma = A tenth invented line in between.',
     'Bank0018_Text_SStatusReturnedNormal = The invented line of a Pokémon back to normal.',
+    'Bank0018_Text_FillerTau = An eleventh invented line in between.',
+    'Bank0018_Text_AbsorbedLight = The invented line of a Pokémon that gathers sunlight.',
+    'Bank0018_Text_FillerUpsilon = A twelfth invented line in between.',
     '\\pad{5}',
   ]),
 }

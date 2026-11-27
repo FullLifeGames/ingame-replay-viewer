@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  chargeRelease,
   damageKinds,
   faintGaugeFlag,
   flowNumbers,
@@ -162,6 +163,38 @@ describe('faintGaugeFlag', () => {
   it('refuses a flag that is no literal', () => {
     expect(() => faintGaugeFlag(fainting(FAINT.replace('4', 'FALSE')))).toThrow(
       new Error('ServerControl_FaintPokemon: the flag is no number literal'),
+    )
+  })
+})
+
+// Invented: the charge check with the given lines where the release sets the move's effect.
+const charging = (release: string) =>
+  'u32 ServerControl_CheckChargeTurn(BtlServerFlow *flow, u16 move, BattleMon *mon) {\n' +
+  '    if (!ServerEvent_CheckChargeSkip(flow, mon, move)) {\n' +
+  `        return BTL_CHARGE_TURN_USED;\n    }\n${release}\n` +
+  '    return ServerEvent_ChargeRelease(flow, mon, move) ? BTL_CHARGE_RELEASED : 0;\n}\n'
+const RELEASE = '    flow->moveEffect->index = 9;'
+
+// Scene: Solar Beam in sun charges and fires in one turn; the release's look is the move
+// animation with the index the server sets for it (#110).
+describe('chargeRelease', () => {
+  it('reads the literal the charge check sets as the move effect index', () => {
+    expect(flowNumbers(FLOW_INPUT).chargeRelease).toBe(0x13)
+    expect(chargeRelease(charging(RELEASE))).toBe(9)
+  })
+
+  it('refuses a missing and a second assignment', () => {
+    const error = new Error(
+      'ServerControl_CheckChargeTurn sets the release index (moveEffect->index = …;) not exactly once',
+    )
+    expect(() => chargeRelease(charging('    flow->result = 0;'))).toThrow(error)
+    expect(() => chargeRelease(charging(`${RELEASE}\n${RELEASE}`))).toThrow(error)
+  })
+
+  // The error names the role alone, never the C it met.
+  it('refuses an index that is no literal', () => {
+    expect(() => chargeRelease(charging(RELEASE.replace('9', 'MOVE_EFFECT_RELEASE')))).toThrow(
+      new Error('ServerControl_CheckChargeTurn: the release index is no number literal'),
     )
   })
 })

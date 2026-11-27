@@ -4,8 +4,8 @@
 // each callee's parameters in an order of their own. The message IDs match the lines of
 // TEXT_INPUT (gen5-bw2-text.fixtures.ts), and some functions also put a message of the other
 // command or kind as a decoy. The reader keeps the damage kinds, the heal effect, the recall
-// effects and the faint's flag, so scripts/gen5-fixtures-real.test.ts compares those with the
-// generated ones.
+// effects, the faint's flag and the charge's release index (#110), so
+// scripts/gen5-fixtures-real.test.ts compares those with the generated ones.
 import type { FlowInput } from './gen5-bw2-flow.ts'
 
 export const FLOW_INPUT: FlowInput = {
@@ -188,6 +188,14 @@ void ServerControl_RemoveNoEffectTargets(BtlServerFlow *flow, BattleMon *mon) {
     BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 17, GetMonID(target), SC_MSG_ARG_END);
 }
 
+u32 ServerControl_CheckChargeTurn(BtlServerFlow *flow, u16 move, BtlMonSet *targets,
+                                  BattleMon *mon) {
+    u32 result;
+    flow->moveEffect->index = 0x13;
+    result = ServerEvent_ChargeRelease(flow, mon, targets, move);
+    return result ? BTL_CHARGE_RELEASED : BTL_CHARGE_RELEASE_FAILED;
+}
+
 u16 ServerControl_DamageSubstitute(BtlServerFlow *flow, BattleMon *target, u16 damage) {
     ServerDisplay_EffectivenessMessageMulti(flow, 1, &effectiveness, &target, FALSE);
     ServerDisplay_SkyDropTargetAppear(flow, target, 8);
@@ -238,6 +246,11 @@ static void HandlerKnockOff(BattleEventItem *item, BtlServerFlow *flow, u8 monId
 
 static void HandlerStealthRock(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     CommonCreateSideEffect(item, flow, monId, work, side, 4, cont, 10);
+}
+
+static void HandlerSolarBeamCharge(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    BattleHandler_StrSetup(&msg->string, 5, 3);
+    BattleHandler_StrSetup(&msg->string, 6, 56);
 }
 
 static void HandlerProtect(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {

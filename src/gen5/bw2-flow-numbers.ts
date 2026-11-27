@@ -3,7 +3,7 @@
 // build/gen5/bw2.json (#107 to #110). Bw2Numbers in bw2-numbers.ts holds both.
 
 /** The numbers the server's flow puts as literals (scripts/gen5-bw2-flow.ts), which pokebw2 has
- * no name for (#107, #108). */
+ * no name for (#107, #108, #110). */
 export interface FlowNumbers {
   /** The effectiveness category of the hit flash's SC_DAMAGE_PLURAL, which picks the hit sound. */
   damageKinds: { plain: number; super: number; resisted: number }
@@ -13,6 +13,8 @@ export interface FlowNumbers {
   switchEffects: { switchOut: number; drag: number }
   /** The flag of SC_FAINT_HP_GAUGE for a Pokémon that faints with HP left (#108). */
   faintGaugeFlag: number
+  /** The index SC_MOVE_ANIM shows as a charged move fires (ServerControl_CheckChargeTurn, #110). */
+  chargeRelease: number
 }
 
 /** The numbers of the effects' sequences (scripts/gen5-bw2-effects.ts, #109), conditions and

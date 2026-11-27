@@ -81,11 +81,13 @@ const EXPECTED: Record<string, [string, string, string, string]> = {
     'ServerControl_BreakSubstitute',
     PICKED,
   ],
+  absorbedLight: ['Bank0018_Text_AbsorbedLight', MOVES, 'HandlerSolarBeamCharge', STRING],
 }
 
 // Scene: a status, a stat stage, a weather's damage, a hazard, an item, an ability and a move's
 // effect each print the game's own line, put or picked by the server function or the handler the
-// backend copies (#109). The generator holds each label to that C.
+// backend copies (#109), and so does Solar Beam's charge in sun (#110). The generator holds each
+// label to that C.
 describe('GEN5_EFFECT_LINES', () => {
   it('names each line by its label, its bank and the C that puts or picks it', () => {
     const bankOf = (label: string) => (label.startsWith('Bank0019_') ? 'standard' : 'set')
