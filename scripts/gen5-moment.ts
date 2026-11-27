@@ -24,6 +24,7 @@ import { chromium, type Page } from '@playwright/test'
 import { adapterNumbers } from '../src/gen5/adapter.ts'
 import { battleRefs } from '../src/gen5/battle-check.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
+import type { PartyOrders } from '../src/gen5/backend/moves.ts'
 import type { Gen5Replay } from '../src/gen5/backend/replay.ts'
 import type { RunPlan, RunReport } from '../src/gen5/hook.ts'
 import type { MacroStep } from '../src/gen5/macro.ts'
@@ -202,11 +203,31 @@ function secondPlan(
   }
 }
 
-/** The party lines of a hand scene's run, each block's orders read from RAM against the state's
- * (gen5-moment-party.ts); false on a mismatch. A run with no replay's blocks checks nothing. */
-function partyChecked(replay: Gen5Replay | undefined, report: RunReport, battle: Battle): boolean {
-  if (replay === undefined) return true
-  const { lines, matches } = partyLines(replay.blocks, report.marks, battle.parties)
+/** A hand scene's replay with the party orders the writer keeps after each event; undefined
+ * for every other run. */
+function handScene(
+  options: MomentOptions,
+  team: Awaited<ReturnType<typeof sessionTeam>>,
+): { replay: Gen5Replay; orders: readonly PartyOrders[] } | undefined {
+  const replay = isHandScene(options.scene) ? team?.replay : undefined
+  return replay === undefined || team === undefined ? undefined : { replay, orders: team.orders }
+}
+
+/** The party lines of a hand scene's run, each block's orders read from RAM against the orders
+ * the writer keeps (gen5-moment-party.ts); false on a mismatch. A run with no hand scene checks
+ * nothing. */
+function partyChecked(
+  hand: ReturnType<typeof handScene>,
+  report: RunReport,
+  battle: Battle,
+): boolean {
+  if (hand === undefined) return true
+  const { lines, matches } = partyLines(
+    hand.replay.blocks,
+    report.marks,
+    battle.parties,
+    hand.orders,
+  )
   for (const line of lines) log(`party ${line}`)
   if (!matches) log("party: the client's party order differs from the state's")
   return matches
@@ -225,14 +246,14 @@ async function play(page: Page, dump: string, numbers: Bw2Numbers, options: Mome
   log(`adapter ${hex(battle.adapter)}, server ${hex(battle.server)}`)
   const steps = secondSteps(options, battle, numbers, team)
   if (steps === undefined) return 0
-  const replay = isHandScene(options.scene) ? team?.replay : undefined
-  const markRefs = replay === undefined ? [] : partyRefs(battle, numbers)
+  const hand = handScene(options, team)
+  const markRefs = hand === undefined ? [] : partyRefs(battle, numbers)
   const second = secondPlan(steps, first, { watch: watchOf(numbers, battle), markRefs })
   await hook(page).queueRun(second)
   const report = await follow(page, label, deadlineMs, first.marks.length)
   logReport(report)
   for (const line of markLines(report.marks)) log(line)
-  const party = partyChecked(replay, report, battle)
+  const party = partyChecked(hand, report, battle)
   return report.status === 'done' && party ? 0 : 1
 }
 

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 
 import { describe, expect, it } from 'vitest'
 
+import { writeScript } from '../src/gen5/backend/moves'
 import { sealParties } from '../src/gen5/backend/party-mon'
 import { buildGen5Replay } from '../src/gen5/backend/replay'
 import { pkmFormat } from '../src/gen5/pkm-members'
@@ -40,6 +41,7 @@ describe('replayTeam', () => {
     const team = replayTeam({ id: 'gen5ou-2718717830', turns: HITS_TURN }, NUMBERS)
     const hits = buildBattleScript(handLog(replayLog('gen5ou-2718717830'), HITS_TURN))
     expect(team.replay).toEqual(buildGen5Replay(hits, NUMBERS))
+    expect(team.orders).toEqual(writeScript(hits, NUMBERS).orders)
     expect(team.replay?.blocks.length).toBeGreaterThanOrEqual(3)
     const species = (of: typeof team) => of.written.player.map((mon) => mon.species)
     const full = replayTeam({ id: 'gen5ou-2718717830', turns: undefined }, NUMBERS)
