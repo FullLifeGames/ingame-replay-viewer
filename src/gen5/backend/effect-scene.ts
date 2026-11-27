@@ -1,14 +1,20 @@
 // What the sequences of a battle's effects take (#109): the battle state, the numbers, and where
 // the event stands. Each sequence is a function of the scene and one event that gives the commands
-// pokebw2's server puts for it, or undefined where it has none; status.ts, stats.ts and field.ts
-// hold them by kind. The turn's end runs as one action per event (blocks.ts), so a sequence that
-// looks at the events beside it reads the script's events. Pure: every number of the game comes in
-// from build/gen5/bw2.json.
+// pokebw2's server puts for it, or undefined where it has none; status.ts, stats.ts, field.ts,
+// items.ts, abilities.ts, substitute.ts and move-effects.ts hold them by kind. The turn's end runs
+// as one action per event (blocks.ts), so a sequence that looks at the events beside it reads the
+// script's events. Pure: every number of the game comes in from build/gen5/bw2.json.
 import type { ScriptEvent } from '../../script/events.ts'
 import type { HpFraction, PokemonRef } from '../../script/types.ts'
-import type { BattleNumbers, EffectNumbers, FlowNumbers, TextNumbers } from '../bw2-numbers.ts'
+import type {
+  BattleNumbers,
+  EffectNumbers,
+  FlowNumbers,
+  PkmNumbers,
+  TextNumbers,
+} from '../bw2-numbers.ts'
 import type { ServerCommand } from '../server-cmd.ts'
-import type { BattleState } from './battle-state.ts'
+import type { BattleState, InPlace } from './battle-state.ts'
 import type { Action } from './blocks.ts'
 import { type Gen5Line, lineId } from './lines.ts'
 import type { EventOf } from './rules.ts'
@@ -19,12 +25,13 @@ interface EffectSceneNumbers {
   readonly flow: FlowNumbers
   readonly effects: EffectNumbers
   readonly battle: Pick<BattleNumbers, 'constants' | 'single'>
+  readonly pkm: Pick<PkmNumbers, 'items'>
 }
 
 /** The battle state, the numbers, the event's action and its index there, and the script's
  * events with the event's index among them. */
 export interface EffectScene {
-  readonly state: Pick<BattleState, 'inPlace' | 'placed' | 'hpTo'>
+  readonly state: Pick<BattleState, 'inPlace' | 'placed' | 'hpOf' | 'hpTo'>
   readonly numbers: EffectSceneNumbers
   readonly action: Action
   readonly index: number
@@ -87,3 +94,25 @@ export function simpleHp(
   const op = scene.state.hpTo(who, hp)
   return [...(op === undefined ? [] : [op]), { command: 'SC_UPDATE_HP_GAUGE', args: [monId] }]
 }
+
+/** ServerControl_RecoverHPCore: the heal's effect at the Pokémon's position, then
+ * ServerDisplay_SimpleHP with its gauge. */
+export function recoverHp(
+  scene: EffectScene,
+  who: PokemonRef,
+  hp: HpFraction,
+  place: InPlace,
+): ServerCommand[] {
+  return [
+    { command: 'SC_EFFECT_BY_POS', args: [place.pos, scene.numbers.flow.recoverEffect] },
+    ...simpleHp(scene, who, hp, place.monId),
+  ]
+}
+
+/** `commands` inside the ability pop-up of the Pokémon `monId` (ServerDisplay_AbilityPopupAdd,
+ * ServerDisplay_AbilityPopupRemove). */
+export const inPopup = (monId: number, commands: readonly ServerCommand[]): ServerCommand[] => [
+  { command: 'SC_ABILITY_POPUP_IN', args: [monId] },
+  ...commands,
+  { command: 'SC_ABILITY_POPUP_OUT', args: [monId] },
+]

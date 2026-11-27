@@ -2,9 +2,9 @@
 // against Bob's Tyranitar, and the commands a module's sequences write for each of its events on
 // REPLAY_NUMBERS, with the battle state following the switch-ins and faints as the writer does.
 import { buildBattleScript } from '../../script/build.ts'
-import type { BattleScript } from '../../script/events.ts'
+import type { BattleScript, ScriptEvent } from '../../script/events.ts'
 import type { ServerCommand } from '../server-cmd.ts'
-import { battleState } from './battle-state.ts'
+import { type BattleState, battleState } from './battle-state.ts'
 import { actionsOf } from './blocks.ts'
 import { type EffectScene, sequenceCommands, type Sequences } from './effect-scene.ts'
 import { REPLAY_NUMBERS } from './replay.fixtures.ts'
@@ -42,6 +42,13 @@ export interface EffectWrite {
   readonly commands: ServerCommand[] | undefined
 }
 
+/** The game's HP follows an HP change that no sequence writes, as the writer's silent bar does
+ * (hits.ts), so the next sequence starts from the logged HP. */
+function followHp(state: BattleState, event: ScriptEvent): void {
+  const hp = event.kind === 'damage' || event.kind === 'heal' || event.kind === 'setHp'
+  if (hp && state.inPlace(event.who) !== undefined) state.hpTo(event.who, event.hp)
+}
+
 /** The commands `sequences` write for each event of `lines` after `|turn|1`. */
 export function effectWrites(sequences: Sequences, ...lines: string[]): EffectWrite[] {
   const script = effectScript(...lines)
@@ -59,9 +66,9 @@ export function effectWrites(sequences: Sequences, ...lines: string[]): EffectWr
         events: script.events,
         at,
       }
-      if (event.line >= FIRST) {
-        writes.push({ at: event.line - FIRST, commands: sequenceCommands(sequences, scene, event) })
-      }
+      const commands = sequenceCommands(sequences, scene, event)
+      if (commands === undefined) followHp(state, event)
+      if (event.line >= FIRST) writes.push({ at: event.line - FIRST, commands })
       if (event.kind === 'switchIn' && after[at] === true) state.sendIn(event)
       if (event.kind === 'faint') state.faint(event.who)
     }
