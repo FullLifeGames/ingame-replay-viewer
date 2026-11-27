@@ -24,7 +24,7 @@ const MASH_EVERY = 30
 const LAST_SCENE_FRAMES = 300
 
 /** Frames a block may take, and a frame of it every BLOCK_FRAMES_EVERY frames. */
-const BLOCK_LIMIT = 3000
+export const BLOCK_LIMIT = 3000
 const BLOCK_FRAMES_EVERY = 10
 
 /** Where the blocks go: the adapter's numbers, the command table and the player's adapter, read
