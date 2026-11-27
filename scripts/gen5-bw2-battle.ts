@@ -22,8 +22,9 @@ export interface BattleSources {
 }
 
 /** The prefixes of the battle's constants the backend names: the weathers, a battle Pokémon's
- * conditions (the side's and the field's start otherwise) and its stats and stat stages. */
-export const CONSTANT_PREFIXES = ['BTL_WEATHER_', 'CONDITION_', 'BATTLEMON_']
+ * conditions (the side's and the field's start otherwise), its stats and stat stages, and the
+ * type effectiveness a hit on a Substitute carries (ServerControl_DamageSubstitute). */
+export const CONSTANT_PREFIXES = ['BTL_WEATHER_', 'CONDITION_', 'BATTLEMON_', 'TYPE_EFFECTIVENESS_']
 
 const WAIT_SELECT = 'BTL_SERVER_ACTION_SEQ_WAIT_SELECT'
 const MON_CORE = 'BattleMonCore core'

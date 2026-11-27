@@ -50,14 +50,15 @@ u8 GetClientIDFromMonID(u8 id) {
 }`,
   // The prototype puts `isAI` before `clientId`; client 1 is the player's, client 0 the AI's.
   clientH: 'BtlClient *BattleClient_Create(BtlMainModule *mainModule, u8 isAI, u16 clientId);',
-  // The weathers, the Pokémon's conditions and its stats out of order, beside a side's and a field's
-  // condition that the anchored prefix leaves out.
+  // The weathers, the Pokémon's conditions, its stats and a type effectiveness out of order, beside
+  // a side's and a field's condition that the anchored prefix leaves out.
   battleH: `#define BTL_STYLE_SINGLE 3
 #define BTL_WEATHER_RAIN 0x21
 #define BTL_WEATHER_NONE 0x20
 #define SIDE_CONDITION_SPIKES 40
 #define BTL_WEATHER_SUN 0x24
 #define FIELD_CONDITION_TRICK_ROOM 41
+#define TYPE_EFFECTIVENESS_DOUBLE 0x2a
 #define CONDITION_BURN 17 // burnt
 #define CONDITION_SLEEP 9
 #define CONDITION_NONE 12

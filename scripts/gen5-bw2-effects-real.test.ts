@@ -8,7 +8,12 @@ import { existsSync, readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
-import { GEN5_STAGE, GEN5_STATUS, GEN5_WEATHER } from '../src/gen5/backend/effect-names.ts'
+import {
+  GEN5_EFFECTIVENESS,
+  GEN5_STAGE,
+  GEN5_STATUS,
+  GEN5_WEATHER,
+} from '../src/gen5/backend/effect-names.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
 const FILE = GEN5_PATHS.bw2Json
@@ -21,11 +26,12 @@ it.runIf(Boolean(process.env.CI))('finds build/gen5/bw2.json under CI', () => {
 let cached: Bw2Numbers | undefined
 const real = (): Bw2Numbers => (cached ??= JSON.parse(readFileSync(FILE, 'utf8')) as Bw2Numbers)
 
-/** Every name of the three records. */
+/** Every name of the four records. */
 const NAMES = [
   ...Object.values(GEN5_STATUS).map(({ condition }) => condition),
   ...Object.values(GEN5_WEATHER).filter((name) => name !== undefined),
   ...Object.values(GEN5_STAGE),
+  ...Object.values(GEN5_EFFECTIVENESS),
 ]
 
 /** The paths of every number under `value`, and whether each is an integer. */

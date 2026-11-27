@@ -1,11 +1,13 @@
-// The names Black 2 gives @pkmn's statuses, weathers and stat stages (#109, D7): pokebw2's
-// constant names, which are names and not numbers. No rule on @pkmn's names reaches them (`spa`
-// is `BATTLEMON_SP_ATTACK_STAGE`, `brn` is `CONDITION_BURN`), so one record per kind lists each,
-// as Gen 3's STATUS_ANIM does, and tsc holds each complete over @pkmn's type. The numbers come
-// from bw2.json's battle constants at run time; scripts/gen5-bw2-effects-real.test.ts finds every
-// name there under CI.
+// The names Black 2 gives @pkmn's statuses, weathers and stat stages and the log's effectiveness
+// (#109, D7): pokebw2's constant names, which are names and not numbers. No rule on @pkmn's names
+// reaches them (`spa` is `BATTLEMON_SP_ATTACK_STAGE`, `brn` is `CONDITION_BURN`), so one record
+// per kind lists each, as Gen 3's STATUS_ANIM does, and tsc holds each complete over @pkmn's
+// type. The numbers come from bw2.json's battle constants at run time;
+// scripts/gen5-bw2-effects-real.test.ts finds every name there under CI.
 import type { WeatherName } from '@pkmn/client'
 import type { BoostID, StatusName } from '@pkmn/data'
+
+import type { Hit } from '../../script/events.ts'
 
 /** A battle Pokémon's status as the game holds it: its condition, and for bad poison the mark the
  * game sets in the condition's value (MakeConditionBadlyPoisoned). */
@@ -50,6 +52,17 @@ export const GEN5_STAGE: Readonly<Record<BoostID, `BATTLEMON_${string}_STAGE`>> 
   spe: 'BATTLEMON_SPEED_STAGE',
   accuracy: 'BATTLEMON_ACCURACY_STAGE',
   evasion: 'BATTLEMON_EVASION_STAGE',
+}
+
+/** The type effectiveness a hit carries to SC_DAMAGE_EFFECT (ServerControl_DamageSubstitute) by
+ * the effectiveness the log names: a super effective hit as double, a resisted one as half; the
+ * log does not tell a quadruple or a quarter apart. */
+export const GEN5_EFFECTIVENESS: Readonly<
+  Record<NonNullable<Hit['effectiveness']> | 'plain', `TYPE_EFFECTIVENESS_${string}`>
+> = {
+  plain: 'TYPE_EFFECTIVENESS_NORMAL',
+  super: 'TYPE_EFFECTIVENESS_DOUBLE',
+  resisted: 'TYPE_EFFECTIVENESS_HALF',
 }
 
 /** The battle's constants by pokebw2's names (BattleNumbers.constants). */
