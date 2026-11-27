@@ -6,6 +6,9 @@ import type { ReplayEnd } from '../../gen5/backend/end.ts'
 import type { Gen5Block } from '../../gen5/backend/replay.ts'
 import { lineNumber } from '../../script/lines.ts'
 
+/** The picker's first option, which plays no replay (lane plan D5). */
+export const NO_REPLAY = 'None: start the game only'
+
 export const OUTSIDE_RUN = 'A run is already queued, so the page plays no replay.'
 
 export const SAVE_REFUSED =

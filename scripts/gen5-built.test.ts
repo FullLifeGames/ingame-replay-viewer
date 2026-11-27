@@ -61,6 +61,18 @@ describe('the spike page', () => {
     expect(input).not.toMatch(/accept/i)
   })
 
+  // Scene: the visitor picks a test replay before the dump, since the page queues its entry
+  // before the emulator starts (#111).
+  it('offers the test replays before the file input', () => {
+    const label = /<label for="replay">([^<]*)<\/label>/.exec(html)
+    expect(label?.[1]?.replace(/\s+/g, ' ')).toBe(
+      'Pick a test replay for Black 2 to play from power-on.',
+    )
+    const select = html.indexOf('<select id="replay">')
+    expect(select).toBeGreaterThan(-1)
+    expect(select).toBeLessThan(html.indexOf('<input id="dump"'))
+  })
+
   // Scene: the notice stands before the file input (#79, GPL-3.0 section 5(d)).
   it('shows the GPL notice before the file input and links the licences page', () => {
     const notice = /<section id="licence-notice">(.*?)<\/section>/s.exec(html)
