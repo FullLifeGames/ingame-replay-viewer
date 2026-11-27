@@ -14,6 +14,9 @@ import {
   GEN5_STATUS,
   GEN5_WEATHER,
 } from '../src/gen5/backend/effect-names.ts'
+import { readSources } from './gen5-bw2.ts'
+import { checkEffectLiterals } from './gen5-bw2-effects.ts'
+import { listedReader } from './gen5-bw2-source.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
 const FILE = GEN5_PATHS.bw2Json
@@ -85,5 +88,16 @@ describe.skipIf(!existsSync(FILE))("the effects' names and numbers on the genera
       ['ABILITY_DRIZZLE', 'ABILITY_INTIMIDATE'].filter((name) => !names.includes(name)),
     ).toEqual([])
     expect(names.filter((name) => pkm.abilities[name] === undefined)).toEqual([])
+  })
+
+  // Scene: Knock Off, a held item's use and Focus Punch send a name's number where their C writes a
+  // literal; the generator held each literal to its name, and the pin must still match. The check's
+  // error names the function and the role alone.
+  it('hold the literals of Knock Off, a held item, the effect at a position and Focus Punch to their names', () => {
+    const sources = readSources(listedReader(GEN5_PATHS.pokebw2))
+    const { pkm, effects } = real()
+    expect(() => {
+      checkEffectLiterals(sources, { items: pkm.items, hideWindow: effects.hideWindow })
+    }).not.toThrow()
   })
 })

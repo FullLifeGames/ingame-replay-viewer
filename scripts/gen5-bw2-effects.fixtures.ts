@@ -4,11 +4,14 @@
 // `common` struct holds its members in an order and widths of its own, and its condition types
 // count from a value of their own. A decoy case, a decoy handler table and a decoy literal stand
 // beside the read ones. scripts/gen5-fixtures-real.test.ts compares what the reader computes from
-// them, and the poison constant, with the generated numbers.
+// them, the poison constant and ITEM_NONE, with the generated numbers.
 import type { EffectInput } from './gen5-bw2-effects.ts'
 
 /** The battle's constants the reader adds to, by pokebw2's names. */
 export const EFFECTS_CONSTANTS = { CONDITION_POISON: 0x41 }
+
+/** The generated items that `checkEffectLiterals` holds the literals to: ITEM_NONE alone. */
+export const EFFECTS_ITEMS = { ITEM_NONE: 0x2f }
 
 export const EFFECTS_INPUT: EffectInput = {
   flowC: `// Invented
@@ -92,6 +95,23 @@ void ServerDisplay_AddCondition(BtlServerFlow *flow, BattleMon *mon, s32 conditi
         }
         BtlServerCmdQueue_Put(flow->queue, SC_SET_GAUGE_STATUS, monId, condition);
     }
+}
+
+void ServerControl_ChangeHeldItem(BtlServerFlow *flow, BOOL consume, BattleMon *mon, u16 item) {
+}
+
+BOOL ServerControl_UseHeldItem(BtlServerFlow *flow, BattleMon *mon) {
+    if (result) {
+        ServerControl_ChangeHeldItem(flow, TRUE, mon, 0x2f);
+    }
+    return result;
+}
+
+u8 BattleHandler_EffectAtPos(BtlServerFlow *handler, const BattleHandlerEffectAtPosParam *param) {
+    if (param->hideMessageWindow) {
+        BtlServerCmdQueue_Put(handler->queue, SC_HIDE_MSG_WINDOW, 3);
+    }
+    return TRUE;
 }
 
 BOOL BtlServerFlow_StartBattle(BtlServerFlow *flow) {
@@ -185,6 +205,14 @@ const BattleEventHandlerEntry *EventAddIntimidate(u32 *priority) {
 }
 `,
   movesC: `// Invented
+static void HandlerKnockOff(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    if (heldItem != 0x2f) {
+        param = BattleHandler_PushWork(flow, BTL_HANDLER_SET_ITEM, monId);
+        param->item = 0x2f;
+        BattleHandler_PopWork(flow, param);
+    }
+}
+
 static void HandlerFocuspunch(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 
 static void HandlerFocuspunch(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {

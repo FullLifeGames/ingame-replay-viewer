@@ -4,7 +4,8 @@
 // turns of bad poison and of sleep (D6); the icon of bad poison; the turns of a weather that lasts
 // (D5); the rule from a client to its side; sand's effects and where each goes out; the argument
 // that hides the message window as the turn's end starts (D9); Focus Punch's effect; and the
-// abilities whose handlers run as their Pokémon comes in (D4). pokebw2 has no name for the
+// abilities whose handlers run as their Pokémon comes in (D4); and four literals held to their
+// names' values (`checkEffectLiterals`). pokebw2 has no name for the
 // literals, so the reader takes each from its function by shape and throws on any other. The
 // errors name the function, the role and the shape the reader expected, never the C they met, so
 // they show no number of pokebw2.
@@ -237,6 +238,65 @@ export const effectNumbers = (
   ),
   memberInAbilities: memberInAbilities(input.abilitiesC),
 })
+
+/** The literals that stand where a name or a generated number stands elsewhere, each read at its
+ * call: the item HandlerKnockOff leaves and the one ServerControl_UseHeldItem passes to
+ * ServerControl_ChangeHeldItem (ITEM_NONE), BattleHandler_EffectAtPos' SC_HIDE_MSG_WINDOW
+ * argument, and HandlerFocuspunch's second position (BTL_POS_NONE). */
+export const effectLiterals = (input: Pick<EffectInput, 'flowC' | 'movesC'>) => ({
+  knockOffItem: oneLiteral(
+    input.movesC,
+    'HandlerKnockOff',
+    /\bparam->item = ([^;]+);/g,
+    'item it leaves',
+  ),
+  usedItem: passedLiteral(
+    input.flowC,
+    'ServerControl_UseHeldItem',
+    'ServerControl_ChangeHeldItem',
+    'item',
+  ),
+  effectAtPosHide: oneLiteral(
+    input.flowC,
+    'BattleHandler_EffectAtPos',
+    /BtlServerCmdQueue_Put\([^,]+, SC_HIDE_MSG_WINDOW, ([^,)]+)\)/g,
+    'argument of SC_HIDE_MSG_WINDOW',
+  ),
+  focusPunchPos: oneLiteral(
+    input.movesC,
+    'HandlerFocuspunch',
+    /\beffect->pos2 = ([^;]+);/g,
+    'second position',
+  ),
+})
+
+/** Throws by function and role where a literal of `effectLiterals` differs from its name's value:
+ * ITEM_NONE of the generated items, the turn's end's SC_HIDE_MSG_WINDOW argument, BTL_POS_NONE.
+ * The errors show no number. */
+export function checkEffectLiterals(
+  input: Pick<EffectInput, 'flowC' | 'movesC' | 'posH'>,
+  generated: { readonly items: Readonly<Record<string, number>>; readonly hideWindow: number },
+): void {
+  const read = effectLiterals(input)
+  const itemNone = generated.items.ITEM_NONE
+  if (itemNone === undefined) throw new Error('the generated items lack ITEM_NONE')
+  const pairs: [string, number, number][] = [
+    ['HandlerKnockOff: the item it leaves is not ITEM_NONE', read.knockOffItem, itemNone],
+    ['ServerControl_UseHeldItem: the item it passes is not ITEM_NONE', read.usedItem, itemNone],
+    [
+      "BattleHandler_EffectAtPos: SC_HIDE_MSG_WINDOW's argument is not ServerControl_TurnCheck's",
+      read.effectAtPosHide,
+      generated.hideWindow,
+    ],
+    [
+      'HandlerFocuspunch: the second position is not BTL_POS_NONE',
+      read.focusPunchPos,
+      defineValue(input.posH, 'BTL_POS_NONE'),
+    ],
+  ]
+  const wrong = pairs.find(([, value, expected]) => value !== expected)
+  if (wrong !== undefined) throw new Error(wrong[0])
+}
 
 function constantOf(constants: Readonly<Record<string, number>>, name: string): number {
   const value = constants[name]

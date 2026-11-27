@@ -16,7 +16,7 @@ import { ENTRY } from '../src/gen5/direct-entry.fixtures.ts'
 import { PKM, TEAM_PKM, TERMINATOR } from '../src/gen5/pkm.fixtures.ts'
 import { battleNumbers } from './gen5-bw2-battle.ts'
 import { effectNumbers } from './gen5-bw2-effects.ts'
-import { EFFECTS_CONSTANTS, EFFECTS_INPUT } from './gen5-bw2-effects.fixtures.ts'
+import { EFFECTS_CONSTANTS, EFFECTS_INPUT, EFFECTS_ITEMS } from './gen5-bw2-effects.fixtures.ts'
 import { flowNumbers } from './gen5-bw2-flow.ts'
 import { FLOW_INPUT } from './gen5-bw2-flow.fixtures.ts'
 import { BATTLE_SOURCES } from './gen5-bw2-battle.fixtures.ts'
@@ -101,6 +101,12 @@ const COMPARED = [
     name: 'EFFECTS_CONSTANTS',
     value: EFFECTS_CONSTANTS,
     path: ['battle', 'constants'],
+  },
+  {
+    module: 'scripts/gen5-bw2-effects.fixtures.ts',
+    name: 'EFFECTS_ITEMS',
+    value: EFFECTS_ITEMS,
+    path: ['pkm', 'items'],
   },
   ...(
     ['text', 'flow', 'effects', 'serverCommands', 'messages', 'queueSize', 'battle'] as const
