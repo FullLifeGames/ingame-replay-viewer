@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import { buildPaths } from './rom-paths.ts'
 import {
+  missingThatFails,
   parseShotArgs,
   planStreams,
   replayFile,
@@ -11,6 +12,8 @@ import {
   withEveryTestReplay,
 } from './rom-shot.ts'
 import { PROGRESS_HEADER_PATH, readProgressLayout } from './rom-shot-run.ts'
+import { missingScenes } from './rom-shot-scenes.ts'
+import { handMadeStream } from './rom-shot-stream.ts'
 
 describe('the arguments of rom:shots', () => {
   it('plays test replay 994052 when it gets no name', () => {
@@ -92,6 +95,13 @@ describe('the scenes a run must have', () => {
   it('are those the stream holds for another test replay', () => {
     expect(requiresEveryScene('994086')).toBe(false)
   })
+
+  it('leave out first-tera for the default runs, since neither holds a Terastallization (#89)', () => {
+    expect(missingThatFails('994052', ['first-tera'])).toEqual([])
+    expect(missingThatFails('hand-made', ['first-tera', 'first-move'])).toEqual(['first-move'])
+    expect(missingThatFails('994086', ['first-move'])).toEqual([])
+    expect(missingThatFails('hand-made', missingScenes(handMadeStream()))).toEqual([])
+  })
 })
 
 // planStreams builds every stream through Vite's module runner. The send-out plans took 6.1 s in a
@@ -119,7 +129,7 @@ describe.skipIf(!existsSync(buildPaths().tree))(
       const plans = await planStreams(['send-outs'], layout)
       const names = plans.map((plan) => plan.name)
       expect(names.slice(0, 2)).toEqual(['send-outs-1', 'send-outs-2'])
-      expect(names.slice(-2)).toEqual(['empty-slot', 'version-4'])
+      expect(names.slice(-2)).toEqual(['empty-slot', 'version-5'])
       expect(names.length).toBeGreaterThan(12)
       for (const plan of plans.slice(0, -2)) {
         expect(plan.expect).toBe('finished')

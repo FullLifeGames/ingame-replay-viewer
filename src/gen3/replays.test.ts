@@ -7,7 +7,7 @@ import type { Side } from '../script/types'
 import { REPLAYS, replayScript } from '../script/testing'
 import { crc32 } from '../patch/crc32'
 import { buildGen3Stream, type Gen3Stream } from './backend'
-import { animGap, type Fallback, mechanicGap, showsInPlace } from './fallbacks'
+import { type Fallback, mechanicGap, showsInPlace } from './fallbacks'
 import { decodeStream } from './stream/decode'
 import { itemOf } from './tables/lookup'
 import { itemGaps } from './tables/testing'
@@ -38,17 +38,14 @@ const charsetRead = (text: string) => decodeText(encodeText(text))
 /**
  * The mechanic fallbacks the test replays may take, each a look or a state the stream lacks:
  * Perish Song's first count, whose later counts print; Bide's first turn, which the expansion
- * shows as the move alone; Protosynthesis's end, which the expansion has no message for; and the
- * looks of a Terastallization and of snow, whose lines print (#88). A new one fails until it is
- * named here.
+ * shows as the move alone; and Protosynthesis's end, which the expansion has no message for. A
+ * new one fails until it is named here, and one that no test replay takes fails unless
+ * NAMED_AHEAD holds it.
  */
 const NAMED_MECHANICS: ReadonlySet<string> = new Set([
   mechanicGap('perish3', 'starting').detail,
   mechanicGap('Bide', 'starting').detail,
   mechanicGap('Protosynthesis', 'ending').detail,
-  mechanicGap('Terastallization', 'starting').detail,
-  mechanicGap('Snow', 'starting').detail,
-  mechanicGap('Snow', 'continuing').detail,
 ])
 
 /**
@@ -60,10 +57,20 @@ const NAMED_PHRASES: ReadonlySet<string> = new Set([phraseGap(PARTIAL_TRAP_SCENE
 
 /**
  * The move fallbacks a test replay may take, each a look of a move that the log names and the game
- * lacks, so the move plays its own animation: Ogerpon's Ivy Cudgel in its Water look (#88). A new
- * one fails until it is named here.
+ * lacks, so the move plays its own animation. None since #89: Ogerpon's Ivy Cudgel in its Water
+ * look plays as the game's own, by its type. A new one fails until it is named here.
  */
-const NAMED_LOOKS: ReadonlySet<string> = new Set([animGap('Ivy Cudgel Water', 'Ivy Cudgel').detail])
+const NAMED_LOOKS: ReadonlySet<string> = new Set<string>()
+
+/**
+ * The entries above that no test replay takes yet, named ahead for a replay to come: Bide's first
+ * turn (#60) and Gen 1's partial trap, which the content-gap test below takes. Bide's entry leaves
+ * this list once a test replay with Bide's first turn joins the fixtures.
+ */
+const NAMED_AHEAD: ReadonlySet<string> = new Set([
+  mechanicGap('Bide', 'starting').detail,
+  phraseGap(PARTIAL_TRAP_SCENE).detail,
+])
 
 /**
  * The item fallbacks a test replay may take: the items of its generation the expansion lacks
@@ -158,6 +165,16 @@ describe.each(replays)('the instruction stream of $id', ({ id, script, stream, t
       parties: { near: party('near'), far: party('far') },
       instructions,
     })
+  })
+})
+
+describe('the named lists', () => {
+  // A gap that the backend closes leaves its entry behind (D9): the lists shrink with the gaps.
+  it('name only fallbacks that a test replay takes, or those named ahead', () => {
+    const taken = new Set(replays.flatMap(({ stream }) => stream.fallbacks.map((f) => f.detail)))
+    const named = [...NAMED_MECHANICS, ...NAMED_PHRASES, ...NAMED_LOOKS]
+    const untaken = named.filter((detail) => !taken.has(detail))
+    expect(untaken.toSorted()).toEqual([...NAMED_AHEAD].toSorted())
   })
 })
 

@@ -1,4 +1,4 @@
-{"length":10245,"crc32":"ea4cb046","trainers":{"near":{"name":"Setsu","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"badcluelesswashed","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":1056,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Deoxys"},{"species":1100,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tornadus"},{"species":1417,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ogerpon"},{"species":472,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gliscor"},{"species":485,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Heatran"},{"species":980,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Weezing"}],"far":[{"species":472,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gliscor"},{"species":1396,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Ting-Lu"},{"species":1393,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Gholdengo"},{"species":1380,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Slither Wing"},{"species":1406,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Walking Wake"},{"species":1434,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Pecharunt"}]}}
+{"length":10274,"crc32":"a821b8df","trainers":{"near":{"name":"Setsu","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"badcluelesswashed","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":1056,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Deoxys"},{"species":1100,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Tornadus"},{"species":1417,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Ogerpon"},{"species":472,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gliscor"},{"species":485,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Heatran"},{"species":980,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Weezing"}],"far":[{"species":472,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Gliscor"},{"species":1396,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Ting-Lu"},{"species":1393,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Gholdengo"},{"species":1380,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Slither Wing"},{"species":1406,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Walking Wake"},{"species":1434,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Pecharunt"}]}}
 {"line":39,"op":"intro"}
 {"line":39,"op":"print","text":"You are challenged by badcluelesswashed!"}
 {"line":41,"op":"print","text":"badcluelesswashed sent out Ting-Lu!"}
@@ -21,11 +21,13 @@
 {"line":54,"op":"print","text":"badcluelesswashed sent out Pecharunt!"}
 {"line":54,"op":"switchIn","side":"far","slot":5,"hp":100,"status":"none"}
 {"line":55,"op":"print","text":"Ogerpon used Ivy Cudgel!"}
+{"line":55,"op":"moveType","type":12}
 {"line":55,"op":"move","user":"near","target":"far","move":832,"animTurn":0}
 {"line":56,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":56,"op":"hp","side":"far","hp":72}
 {"line":59,"op":"turn","number":3}
 {"line":62,"op":"print","text":"Ogerpon used Ivy Cudgel!"}
+{"line":62,"op":"moveType","type":12}
 {"line":62,"op":"move","user":"near","target":"far","move":832,"animTurn":0}
 {"line":64,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":64,"op":"hp","side":"far","hp":33}
@@ -216,6 +218,7 @@
 {"line":223,"op":"print","text":"badcluelesswashed sent out Slither Wing!"}
 {"line":223,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
 {"line":224,"op":"print","text":"Ogerpon used Ivy Cudgel!"}
+{"line":224,"op":"moveType","type":12}
 {"line":224,"op":"move","user":"near","target":"far","move":832,"animTurn":0}
 {"line":225,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":225,"op":"hp","side":"far","hp":53}
@@ -307,6 +310,7 @@
 {"line":303,"op":"print","text":"badcluelesswashed sent out Pecharunt!"}
 {"line":303,"op":"switchIn","side":"far","slot":5,"hp":83,"status":"none"}
 {"line":304,"op":"print","text":"Ogerpon used Ivy Cudgel!"}
+{"line":304,"op":"moveType","type":12}
 {"line":304,"op":"move","user":"near","target":"far","move":832,"animTurn":0}
 {"line":305,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":305,"op":"hp","side":"far","hp":54}
@@ -370,11 +374,13 @@
 {"line":356,"op":"print","text":"badcluelesswashed sent out Pecharunt!"}
 {"line":356,"op":"switchIn","side":"far","slot":5,"hp":54,"status":"none"}
 {"line":357,"op":"print","text":"Ogerpon used Ivy Cudgel!"}
+{"line":357,"op":"moveType","type":12}
 {"line":357,"op":"move","user":"near","target":"far","move":832,"animTurn":0}
 {"line":358,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":358,"op":"hp","side":"far","hp":24}
 {"line":361,"op":"turn","number":30}
 {"line":364,"op":"print","text":"Ogerpon used Ivy Cudgel!"}
+{"line":364,"op":"moveType","type":12}
 {"line":364,"op":"move","user":"near","target":"far","move":832,"animTurn":0}
 {"line":365,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":365,"op":"hp","side":"far","hp":0}
@@ -498,8 +504,10 @@
 {"line":468,"op":"turn","number":39}
 {"line":471,"op":"flushTextBox"}
 {"line":471,"op":"print","text":"The opposing Gliscor is storing energy!"}
+{"line":471,"op":"tera","side":"far","teraType":1}
 {"line":471,"op":"print","text":"The opposing Gliscor terastallized into the Normal type!"}
 {"line":472,"op":"print","text":"Ogerpon used Ivy Cudgel!"}
+{"line":472,"op":"moveType","type":12}
 {"line":472,"op":"move","user":"near","target":"far","move":832,"animTurn":0}
 {"line":473,"op":"hit","side":"far","effectiveness":"normal"}
 {"line":473,"op":"hp","side":"far","hp":51}
@@ -617,6 +625,7 @@
 {"line":577,"op":"turn","number":47}
 {"line":581,"op":"flushTextBox"}
 {"line":581,"op":"print","text":"Gliscor is storing energy!"}
+{"line":581,"op":"tera","side":"near","teraType":19}
 {"line":581,"op":"print","text":"Gliscor terastallized into the Fairy type!"}
 {"line":582,"op":"print","text":"The opposing Walking Wake used Draco Meteor!"}
 {"line":583,"op":"print","text":"It doesn't affect Gliscor…"}
@@ -628,19 +637,10 @@
 {"line":586,"op":"print","text":"The opposing Walking Wake fainted!"}
 {"line":589,"op":"print","text":"Setsu won the battle!"}
 {"line":589,"op":"end","outcome":"nearWon"}
-{"line":55,"fallback":"move","detail":"the game has no look for Ivy Cudgel Water; it plays Ivy Cudgel"}
-{"line":62,"fallback":"move","detail":"the game has no look for Ivy Cudgel Water; it plays Ivy Cudgel"}
 {"line":121,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}
 {"line":155,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}
-{"line":224,"fallback":"move","detail":"the game has no look for Ivy Cudgel Water; it plays Ivy Cudgel"}
 {"line":240,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}
-{"line":304,"fallback":"move","detail":"the game has no look for Ivy Cudgel Water; it plays Ivy Cudgel"}
-{"line":357,"fallback":"move","detail":"the game has no look for Ivy Cudgel Water; it plays Ivy Cudgel"}
-{"line":364,"fallback":"move","detail":"the game has no look for Ivy Cudgel Water; it plays Ivy Cudgel"}
 {"line":393,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}
 {"line":434,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}
 {"line":450,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}
-{"line":471,"fallback":"mechanic","detail":"no state in the stream for Terastallization starting"}
-{"line":472,"fallback":"move","detail":"the game has no look for Ivy Cudgel Water; it plays Ivy Cudgel"}
-{"line":581,"fallback":"mechanic","detail":"no state in the stream for Terastallization starting"}
 {"line":587,"fallback":"mechanic","detail":"no state in the stream for Protosynthesis ending"}

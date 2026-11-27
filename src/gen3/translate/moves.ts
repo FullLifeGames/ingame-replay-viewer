@@ -28,7 +28,7 @@ import type { PokemonRef } from '../../script/types'
 import { animGap } from '../fallbacks'
 import type { Instruction } from '../stream/instructions'
 import { chargeTurnOf } from '../tables/charge'
-import { moveOf } from '../tables/lookup'
+import { moveOf, typeOf } from '../tables/lookup'
 import { chargeLine } from '../text/phrases-charge'
 import {
   critical,
@@ -97,19 +97,36 @@ function didNothing(event: EventOf<'move'>, ctx: Context): boolean {
   return next?.kind === 'statLimit' && onlyLimits(event, eventsOfMove(ctx, event))
 }
 
+/** What the MOVE op plays: a move's animation, and the type its look reads, if the log names one. */
+interface Look {
+  readonly move: string
+  readonly type?: number
+}
+
 /**
- * The move whose animation the MOVE op plays: the move an `[anim]` names, else the move itself;
- * a look the game lacks (`Ivy Cudgel Water`, no move in @pkmn's Dex) plays the move's own and
- * notes it.
+ * The type a look of `name` names by its last word (`Ivy Cudgel Water`, `Tera Blast Fire`), as
+ * the game's number; undefined for a look that names no type (`Shell Side Arm Physical`).
  */
-function animatedMove({ move: name, anim: look, line }: EventOf<'move'>, ctx: Context): string {
-  if (look === undefined) return name
+function typeOfLook(look: string, name: string): number | undefined {
+  const word = look.slice(name.length + 1)
+  return look === `${name} ${word}` ? typeOf(word) : undefined
+}
+
+/**
+ * The move whose animation the MOVE op plays: the move an `[anim]` names, else the move itself.
+ * A look by type plays the move's own animation with that type (#89); another look the game lacks
+ * (no move in @pkmn's Dex) plays the move's own and notes it.
+ */
+function animatedMove({ move: name, anim: look, line }: EventOf<'move'>, ctx: Context): Look {
+  if (look === undefined) return { move: name }
   if (Dex.moves.get(look).exists) {
     ctx.note(line, moveOf(look).fallback)
-    return look
+    return { move: look }
   }
+  const type = typeOfLook(look, name)
+  if (type !== undefined) return { move: name, type }
   ctx.note(line, animGap(look, name))
-  return name
+  return { move: name }
 }
 
 /** Sleep Talk and a locked move (`calledBy`) change nothing: the game says "used" each time. */
@@ -123,7 +140,7 @@ export function move(event: EventOf<'move'>, ctx: Context): void {
   if (!(event.miss || event.still || event.notarget || didNothing(event, ctx))) {
     const animTurn = animTurnOf(event, events, ctx)
     showBeforeMove(event, animTurn, ctx)
-    played = playMove({ ...event, move: animatedMove(event, ctx) }, target ?? user, animTurn, ctx)
+    played = playMove({ ...event, ...animatedMove(event, ctx) }, target ?? user, animTurn, ctx)
   }
   afterHitTurn(event, played, events, ctx)
   startMove(events, played, ctx)
@@ -133,11 +150,17 @@ interface Played {
   readonly line: number
   readonly user: PokemonRef
   readonly move: string
+  /** The type the animation reads, written as MOVE_TYPE right before the MOVE (#89). */
+  readonly type?: number
 }
 
-/** The MOVE of `move` by its user at `target`'s side on the animation turn `animTurn`. */
+/**
+ * The MOVE of `move` by its user at `target`'s side on the animation turn `animTurn`, after the
+ * MOVE_TYPE of its look's type, if it has one. No MOVE and no TURN may come between the two:
+ * both clear the type.
+ */
 export function playMove(
-  { line, user, move: name }: Played,
+  { line, user, move: name, type }: Played,
   target: PokemonRef,
   animTurn: number,
   ctx: Context,
@@ -149,6 +172,7 @@ export function playMove(
     move: moveOf(name).number,
     animTurn,
   }
+  if (type !== undefined) ctx.emit(line, { op: 'moveType', type })
   ctx.emit(line, played)
   return played
 }

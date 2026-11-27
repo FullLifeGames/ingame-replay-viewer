@@ -7,6 +7,7 @@
 #include "constants/battle.h"
 #include "constants/battle_anim.h"
 #include "constants/moves.h"
+#include "constants/pokemon.h"
 #include "constants/species.h"
 
 // The animation turn (#65): the value a move animation reads to choose between its scripts
@@ -555,4 +556,73 @@ REPLAY_TEST("MOVE plays Swallow after three Stockpiles on turn 3")
     STREAM { PlayMoveOnAnimTurn(SPECIES_WOBBUFFET, MOVE_SWALLOW, 3); }
     SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_SWALLOW, nearMon); }
     THEN { EXPECT_EQ(ReplayTest_AnimMoveTurnAtOpStart(MOVE_OP + 1), 3); }
+}
+
+// MOVE_TYPE (#89): the type the next MOVE's animation reads, as the engine sets
+// gBattleStruct->dynamicMoveType before Ivy Cudgel's or Tera Blast's animation picks its look
+// (GetBattleMoveType). MOVE clears it once its animation has played, and TURN clears one that no
+// MOVE took. Ops 3 and 4 are MOVE_TYPE and the op after it.
+#define MOVE_TYPE_OP 3
+
+REPLAY_TEST("MOVE_TYPE gives the next MOVE its type and MOVE clears it")
+{
+    STREAM
+    {
+        ReplayStream_Mon(REPLAY_SIDE_NEAR, 0, SPECIES_OGERPON_WELLSPRING, 100);
+        ReplayStream_Intro();
+        ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_MoveType(TYPE_WATER);
+        ReplayStream_Move(REPLAY_SIDE_NEAR, REPLAY_SIDE_FAR, MOVE_IVY_CUDGEL);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_IVY_CUDGEL, nearMon); }
+    THEN
+    {
+        EXPECT_EQ(ReplayTest_MoveTypeAtOpStart(MOVE_TYPE_OP), TYPE_NONE);
+        EXPECT_EQ(ReplayTest_MoveTypeAtOpStart(MOVE_TYPE_OP + 1), TYPE_WATER);
+        EXPECT_EQ(ReplayTest_MoveTypeAtOpStart(MOVE_TYPE_OP + 2), TYPE_NONE);
+        EXPECT_EQ(gBattleStruct->dynamicMoveType, TYPE_NONE);
+    }
+}
+
+// Headless tests skip move animations, so this one plays them and reads the type on the frame
+// Ivy Cudgel's animation starts, before its script picks its look.
+REPLAY_TEST("MOVE's animation reads the type of the MOVE_TYPE before it")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        ReplayStream_Mon(REPLAY_SIDE_NEAR, 0, SPECIES_OGERPON_WELLSPRING, 100);
+        ReplayStream_Intro();
+        ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_MoveType(TYPE_WATER);
+        ReplayStream_Move(REPLAY_SIDE_NEAR, REPLAY_SIDE_FAR, MOVE_IVY_CUDGEL);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_IVY_CUDGEL, nearMon); }
+    THEN
+    {
+        FORCE_MOVE_ANIM(FALSE);
+        EXPECT_EQ(ReplayTest_MoveTypeAtMoveAnim(), TYPE_WATER);
+    }
+}
+
+REPLAY_TEST("TURN clears a MOVE_TYPE that no MOVE took")
+{
+    STREAM
+    {
+        ReplayStream_Intro();
+        ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_MoveType(TYPE_FIRE);
+        ReplayStream_Turn(2);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    THEN
+    {
+        EXPECT_EQ(ReplayTest_MoveTypeAtOpStart(MOVE_TYPE_OP + 1), TYPE_FIRE);
+        EXPECT_EQ(ReplayTest_MoveTypeAtOpStart(MOVE_TYPE_OP + 2), TYPE_NONE);
+    }
 }

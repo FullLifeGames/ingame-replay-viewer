@@ -1,7 +1,7 @@
 #ifndef GUARD_REPLAY_STREAM_H
 #define GUARD_REPLAY_STREAM_H
 
-// The instruction stream, version 3: the Gen 3 game backend writes it into the replay slot's
+// The instruction stream, version 4: the Gen 3 game backend writes it into the replay slot's
 // stream (replay_slot.h) and the ROM interpreter plays it. src/gen3/stream/format.ts holds the same
 // numbers; its spec checks that both files define the same REPLAY_* names with the same values.
 // Keep each value a plain number.
@@ -18,10 +18,10 @@
 // 4. Each side operand of the ops in REPLAY_ORDER_ON_FIELD_OPS names a side with a battler out;
 //    WITHDRAW and FAINT take it off. An ANIM of REPLAY_ORDER_FREE_ANIMS is free: the game plays
 //    the weather animations with no battler out, after a double KO.
-// 5. Every other op is free: PRINT, TURN, WEATHER, END, FLUSH_TEXT_BOX, and STATUS and ITEM,
-//    which name a party slot (Heal Bell reaches the whole party).
+// 5. Every other op is free: PRINT, TURN, WEATHER, END, FLUSH_TEXT_BOX, MOVE_TYPE, and STATUS
+//    and ITEM, which name a party slot (Heal Bell reaches the whole party).
 
-#define REPLAY_STREAM_VERSION        3
+#define REPLAY_STREAM_VERSION        4
 #define REPLAY_STREAM_HEADER_SIZE    0x10
 #define REPLAY_STREAM_SIDE_COUNT     2
 #define REPLAY_STREAM_PARTY_SIZE     6
@@ -91,6 +91,8 @@
 #define REPLAY_OP_FLUSH_TEXT_BOX 0x14 // no operands: empties the text box, as flushtextbox does
 #define REPLAY_OP_FORM_CHANGE    0x15 // side u8, species u16 (SPECIES_*, not SPECIES_NONE): the mon's form until it leaves the field
 #define REPLAY_OP_SHOW_MON       0x16 // side u8: shows the mon's sprite again, with no animation
+#define REPLAY_OP_TERA           0x17 // side u8, teraType u8 (TYPE_*, TYPE_NORMAL to NUMBER_OF_MON_TYPES - 1): the mon Terastallizes
+#define REPLAY_OP_MOVE_TYPE      0x18 // type u8 (TYPE_*, TYPE_NORMAL to NUMBER_OF_MON_TYPES - 1): the type the next MOVE's animation reads
 
 // The size byte of each op but PRINT.
 #define REPLAY_OP_END_SIZE            1
@@ -115,6 +117,8 @@
 #define REPLAY_OP_FLUSH_TEXT_BOX_SIZE 0
 #define REPLAY_OP_FORM_CHANGE_SIZE    3
 #define REPLAY_OP_SHOW_MON_SIZE       1
+#define REPLAY_OP_TERA_SIZE           2
+#define REPLAY_OP_MOVE_TYPE_SIZE      1
 
 // PRINT's size byte: one glyph and EOS at least.
 #define REPLAY_PRINT_MIN_SIZE 2
@@ -147,6 +151,7 @@
 #define REPLAY_WEATHER_SUN  2
 #define REPLAY_WEATHER_SAND 3
 #define REPLAY_WEATHER_HAIL 4
+#define REPLAY_WEATHER_SNOW 5
 
 // The order of enum Stat.
 #define REPLAY_STAT_ATK      1
@@ -187,13 +192,14 @@
 #define REPLAY_ANIM_STATUS_PRZ          15
 #define REPLAY_ANIM_STATUS_FRZ          16
 #define REPLAY_ANIM_SIMPLE_HEAL         17
+#define REPLAY_ANIM_SNOW_CONTINUES      18
 
 // The masks of the order rules, a bit per REPLAY_OP_* and REPLAY_ANIM_* number:
 // WITHDRAW, MOVE, HIT, HP, FAINT, STAT, ANIM, VOLATILE, ABILITY, ITEM_POP_UP, TRAP_TURN,
-// FORM_CHANGE and SHOW_MON, whose side operands name a side with a battler out, and the four
+// FORM_CHANGE, SHOW_MON and TERA, whose side operands name a side with a battler out, and the five
 // weather animations, which need none. replay_stream_check.c asserts each against the names.
-#define REPLAY_ORDER_ON_FIELD_OPS 0x6DB7A0
-#define REPLAY_ORDER_FREE_ANIMS   0xF0
+#define REPLAY_ORDER_ON_FIELD_OPS 0xEDB7A0
+#define REPLAY_ORDER_FREE_ANIMS   0x400F0
 
 struct ReplayStreamHeader
 {

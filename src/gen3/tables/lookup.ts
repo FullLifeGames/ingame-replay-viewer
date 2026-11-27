@@ -1,4 +1,4 @@
-// The expansion's numbers and display names for @pkmn's species, moves, abilities and items
+// The expansion's numbers and display names for @pkmn's species, moves, abilities, items and types
 // (plan §4). The tables come from the pinned sources through `npm run gen3:tables`; the name rule
 // that turns a @pkmn name into the expansion's constant lives here and nowhere else.
 import { Dex } from '@pkmn/dex'
@@ -9,8 +9,9 @@ import { genericMove } from './generic'
 import items from './items.json'
 import moves from './moves.json'
 import species from './species.json'
+import types from './types.json'
 
-export type Prefix = 'SPECIES' | 'MOVE' | 'ABILITY' | 'ITEM'
+export type Prefix = 'SPECIES' | 'MOVE' | 'ABILITY' | 'ITEM' | 'TYPE'
 
 /**
  * The expansion's constant for a @pkmn name: `Farfetch’d` is `SPECIES_FARFETCHD`, `Type: Null`
@@ -52,6 +53,7 @@ const TABLES: Readonly<Record<Prefix, Table>> = {
   MOVE: readTable('moves', moves),
   ABILITY: readTable('abilities', abilities),
   ITEM: readTable('items', items),
+  TYPE: readTable('types', types),
 }
 
 type FallbackKind = 'form' | 'move' | 'ability' | 'item'
@@ -142,4 +144,13 @@ export function abilityOf(name: string): Found {
 export function itemOf(name: string): Found {
   const known = Dex.items.get(name)
   return textOnly('ITEM', known.exists ? known.name : name, 'item', 'text only')
+}
+
+/**
+ * The expansion's TYPE_* number for a @pkmn type, Stellar included (#89). Undefined for a name
+ * @pkmn does not know as a type: the game's ??? (TYPE_MYSTERY) is none of @pkmn's.
+ */
+export function typeOf(name: string): number | undefined {
+  const known = Dex.types.get(name)
+  return known.exists ? rowOf('TYPE', known.name)?.number : undefined
 }

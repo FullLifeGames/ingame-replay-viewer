@@ -24,6 +24,7 @@
     "src/data/pokemon/species_info/gen_8_families.h": "eba507ea0e8d3f5101266335384bff7818dd3223bef0c909d36b25220910b798",
     "src/data/pokemon/species_info/gen_9_families.h": "652cb3d1bbf2968d2e91a8ff7cad7274b15ac8fce3708efc3158c261b23217c1",
     "src/data/pokemon/species_info/shared_dex_text.h": "ff7c0f217e101d85a400f7927099dab1ba62e80ff4b1291bcb223bf9ce196416",
-    "src/data/pokemon/species_info/shared_front_pic_anims.h": "d3ce7b87de47bba48d05fb37273c33a1c6ae66c108f980afd12012e3e799aa2a"
+    "src/data/pokemon/species_info/shared_front_pic_anims.h": "d3ce7b87de47bba48d05fb37273c33a1c6ae66c108f980afd12012e3e799aa2a",
+    "src/data/types_info.h": "42856d14d785c03d32319432cb117f90afd1d59a810e2b2fdeaf8fdbd8fca180"
   }
 }

@@ -63,6 +63,20 @@ const struct ReplayTestTrainerSprite *ReplayTest_TrainerSpriteAtOpStart(u32 op, 
 // the turn that MOVE's animation read.
 u32 ReplayTest_AnimMoveTurnAtOpStart(u32 op);
 
+// The type the move animations read (gBattleStruct->dynamicMoveType, TYPE_NONE for the move's
+// own) when the interpreter started op number op, recorded as the KO animation counter is.
+u32 ReplayTest_MoveTypeAtOpStart(u32 op);
+
+// Whether the Tera indicator of a side (REPLAY_SIDE_*) was visible when the interpreter started op
+// number op, recorded as the KO animation counter is.
+bool32 ReplayTest_IndicatorShownAtOpStart(u32 op, u32 side);
+
+// The type the first move animation of the stream reads (GetBattleMoveType(gCurrentMove)), taken
+// on the first frame it is active, before its script runs. TYPE_NONE if no move animation played.
+// Headless tests skip move animations, so a test that reads it calls FORCE_MOVE_ANIM(TRUE) in
+// STREAM.
+u32 ReplayTest_MoveTypeAtMoveAnim(void);
+
 // Called in STREAM: the interpreter plays the outro after END (REPLAY_OUTRO_THEN_EXIT), and THEN
 // runs once the outro has faded the screen to black.
 void ReplayTest_PlayOutro(void);
@@ -119,6 +133,10 @@ void ReplayStream_FlushTextBox(void);
 void ReplayStream_FormChange(u32 side, u32 species);
 // Shows the side's mon again, as the game shows a hidden Fly user whose hit turn plays no move.
 void ReplayStream_ShowMon(u32 side);
+// The side's mon Terastallizes into teraType (TYPE_*).
+void ReplayStream_Tera(u32 side, u32 teraType);
+// The next MOVE's animation plays as a move of type (TYPE_*), as Ivy Cudgel's and Tera Blast's do.
+void ReplayStream_MoveType(u32 type);
 void ReplayStream_Weather(u32 weather);
 void ReplayStream_Volatile(u32 side, u32 volatileId, bool32 on);
 // show: TRUE shows the ability pop-up, FALSE hides it.
