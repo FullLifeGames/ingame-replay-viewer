@@ -98,7 +98,12 @@ describe('quietLines', () => {
       standard: { Bank0019_Text_CriticalHit: 3, Bank0019_Text_FillerOne: 8 },
       set: { Bank0018_Text_FillerTwo: 5 },
     },
-    flow: { damageKinds: { plain: 8, super: 6, resisted: 9 }, recoverEffect: 0x4d },
+    flow: {
+      damageKinds: { plain: 8, super: 6, resisted: 9 },
+      recoverEffect: 0x4d,
+      switchEffects: { switchOut: 0x5b, drag: 0x5e },
+      faintGaugeFlag: 3,
+    },
   }
 
   it('gives the pin, the count of symbols and the checks, and no address, offset or value', () => {

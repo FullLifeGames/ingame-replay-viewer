@@ -5,7 +5,8 @@
 // opponent's with each side's setup index (#93), the direct entry's numbers and a Pokémon's data
 // format (#97), the battle's constants, the mon-ID rule, the setup flag and the characters of the
 // battle's fonts (#106), the labels of the battle's standard and set text banks, each line the
-// backend sends held to what its function puts, and the flow's damage kinds and heal effect (#107).
+// backend sends held to what its function puts, and the flow's damage kinds and heal effect (#107),
+// recall effects and faint flag (#108).
 // The checkout lives in .cache/gen5/pokebw2/ and the output in build/gen5/; nothing of pokebw2 is
 // committed.
 // Usage: node scripts/gen5-bw2.ts [--checkout <dir>] [--quiet] (fetches on the first run). With

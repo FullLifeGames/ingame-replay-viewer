@@ -76,7 +76,12 @@ export const REPLAY_NUMBERS: ReplayNumbers = {
       Bank0018_Text_DoesntAffect: 0x4bb9,
     },
   },
-  flow: { damageKinds: { resisted: 12, super: 17, plain: 15 }, recoverEffect: 0x6d3 },
+  flow: {
+    damageKinds: { resisted: 12, super: 17, plain: 15 },
+    recoverEffect: 0x6d3,
+    switchEffects: { switchOut: 0x6d9, drag: 0x6df },
+    faintGaugeFlag: 3,
+  },
   battle: {
     single: { clientCount: 4, posClientIds: [3, 2], clients: { player: 3, opponent: 2 } },
     monIds: { firstByClient: [30, 20, 10, 40], perClient: 9 },
