@@ -9,7 +9,8 @@
 // steps of gen5-moment-plan.ts from a fixed frame after the mark battle: hold the server, answer
 // the action menu and write one block per moment. With --replay and --scene hits or switches it
 // writes the blocks of hand turns after the replay's start instead (gen5-moment-blocks.ts, #107,
-// #108), each logged with its commands and lines. It writes a frame per mark
+// #108), each logged with its commands and lines, and at each block's answer it checks both
+// parties' order in RAM against the backend's (gen5-moment-party.ts). It writes a frame per mark
 // under build/gen5/frames/ and the last mark's state under build/gen5/states/ (gitignored,
 // ADR 0002).
 // Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts [--scene known|unknown|hits|switches]
@@ -23,6 +24,7 @@ import { chromium, type Page } from '@playwright/test'
 import { adapterNumbers } from '../src/gen5/adapter.ts'
 import { battleRefs } from '../src/gen5/battle-check.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
+import type { Gen5Replay } from '../src/gen5/backend/replay.ts'
 import type { RunPlan, RunReport } from '../src/gen5/hook.ts'
 import type { MacroStep } from '../src/gen5/macro.ts'
 import { MAIN_RAM_SIZE, MAIN_RAM_START } from '../src/gen5/main-ram.ts'
@@ -38,6 +40,7 @@ import {
 import { blocksScene } from './gen5-moment-blocks.ts'
 import { sessionPlan } from './gen5-moment-direct.ts'
 import { follow, hook, logReport } from './gen5-moment-follow.ts'
+import { partyLines, partyRefs } from './gen5-moment-party.ts'
 import { type Battle, readBattle } from './gen5-moment-read.ts'
 import { momentTeam } from './gen5-moment-team.ts'
 import { markLines, writeLines } from './gen5-moment-log.ts'
@@ -199,6 +202,16 @@ function secondPlan(
   }
 }
 
+/** The party lines of a hand scene's run, each block's orders read from RAM against the state's
+ * (gen5-moment-party.ts); false on a mismatch. A run with no replay's blocks checks nothing. */
+function partyChecked(replay: Gen5Replay | undefined, report: RunReport, battle: Battle): boolean {
+  if (replay === undefined) return true
+  const { lines, matches } = partyLines(replay.blocks, report.marks, battle.parties)
+  for (const line of lines) log(`party ${line}`)
+  if (!matches) log("party: the client's party order differs from the state's")
+  return matches
+}
+
 async function play(page: Page, dump: string, numbers: Bw2Numbers, options: MomentOptions) {
   const { label, deadlineMs } = options
   const team = await sessionTeam(numbers, options)
@@ -212,12 +225,15 @@ async function play(page: Page, dump: string, numbers: Bw2Numbers, options: Mome
   log(`adapter ${hex(battle.adapter)}, server ${hex(battle.server)}`)
   const steps = secondSteps(options, battle, numbers, team)
   if (steps === undefined) return 0
-  const second = secondPlan(steps, first, { watch: watchOf(numbers, battle) })
+  const replay = isHandScene(options.scene) ? team?.replay : undefined
+  const markRefs = replay === undefined ? [] : partyRefs(battle, numbers)
+  const second = secondPlan(steps, first, { watch: watchOf(numbers, battle), markRefs })
   await hook(page).queueRun(second)
   const report = await follow(page, label, deadlineMs, first.marks.length)
   logReport(report)
   for (const line of markLines(report.marks)) log(line)
-  return report.status === 'done' ? 0 : 1
+  const party = partyChecked(replay, report, battle)
+  return report.status === 'done' && party ? 0 : 1
 }
 
 async function main(): Promise<void> {
