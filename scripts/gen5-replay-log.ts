@@ -60,7 +60,7 @@ export function endLines(end: ReplayEnd): string[] {
   return [`end: ${result.name} won (${side}${at})`, ...messages]
 }
 
-/** A line per issue or kind of the not-shown list, each event kind with its count. */
+/** A line per kind of the not-shown list, each event kind with its count. */
 export function notShownLines(list: NotShown): string[] {
   const groups = Object.entries(list)
   if (groups.length === 0) return ['not shown: nothing']

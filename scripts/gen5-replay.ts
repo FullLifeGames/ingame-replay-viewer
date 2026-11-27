@@ -8,7 +8,8 @@
 // (gen5-moment-party.ts), the battle's end, the not-shown list and the run's summary. The marks
 // go to build/gen5/runs/<label>.json, and --against compares them with an earlier run's; the
 // frames go under build/gen5/frames/ (gitignored, ADR 0002). Exit 1 on a failed or unfinished
-// run, a party that differs from the backend's, a hash still pending or a mark that differs.
+// run, a party that differs from the backend's, a hash still pending, a mark that differs, a
+// request the page must not make or storage left behind (gen5-moment-session.ts' withGen5Page).
 // Usage: GEN5_DUMP=<path> node scripts/gen5-replay.ts --replay <id> [--run 1] [--every 30]
 // [--blocks <n>] [--against <marks file>] [--minutes 90].
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
