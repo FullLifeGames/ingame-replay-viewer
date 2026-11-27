@@ -9,7 +9,8 @@
 // names and size comment. A typedef of a function pointer is a pointer, a typedef of a scalar is
 // that scalar, `const` changes nothing, and an array's length may be a define of the source.
 // Members of any other shape (unions, anonymous structs, unknown types) throw, unless the layout
-// stops before them: a member's offset depends only on the members before it.
+// stops before them: a member's offset depends only on the members before it. One struct inside a
+// union is laid out by its body text alone (memberLayout, #109).
 import type { FieldLayout, StructLayout } from '../src/gen5/bw2-numbers.ts'
 import { closingBrace, defineValue, literal, stripComments } from './gen5-bw2-c.ts'
 
@@ -116,19 +117,26 @@ function placeMember(cursor: Cursor, code: string, member: string): string {
   return name
 }
 
-function membersOf(code: string, name: string): string[] {
-  return structBody(code, name)
+/** The members of a struct's body text, each with its white space as single blanks. */
+const splitMembers = (body: string) =>
+  body
     .split(';')
     .map((member) => member.trim().replace(/\s+/g, ' '))
     .filter((member) => member !== '')
-}
+
+const membersOf = (code: string, name: string) => splitMembers(structBody(code, name))
 
 function layoutOf(code: string, name: string, upTo?: string): StructLayout {
-  const cursor: Cursor = { bit: 0, align: 1, fields: {} }
   const members = membersOf(code, name)
   if (upTo !== undefined && !members.some((member) => MEMBER.exec(member)?.[3] === upTo)) {
     throw new Error(`the struct ${name} has no member ${upTo}`)
   }
+  return placeAll(code, members, upTo)
+}
+
+/** Lays out `members` in order as one struct, up to and with `upTo` if given. */
+function placeAll(code: string, members: readonly string[], upTo?: string): StructLayout {
+  const cursor: Cursor = { bit: 0, align: 1, fields: {} }
   for (const member of members) {
     if (placeMember(cursor, code, member) !== upTo) continue
     return { size: Math.ceil(cursor.bit / 8), align: cursor.align, fields: cursor.fields, upTo }
@@ -141,6 +149,12 @@ function layoutOf(code: string, name: string, upTo?: string): StructLayout {
  * only the members up to and with that one (`size` then ends with it). */
 export function structLayout(source: string, name: string, upTo?: string): StructLayout {
   return layoutOf(stripComments(source), name, upTo)
+}
+
+/** The layout of a struct's body text `body` (the members between its braces), such as one
+ * struct inside a union, which `structLayout` refuses; types and defines come from `source`. */
+export function memberLayout(source: string, body: string): StructLayout {
+  return placeAll(stripComments(source), splitMembers(stripComments(body)))
 }
 
 /** The layout of the struct `name`; throws naming the struct and each of `members` it lacks. */

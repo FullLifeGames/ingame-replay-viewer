@@ -49,18 +49,20 @@ describe('a move that plays', () => {
     ).toEqual(['SC_MOVE_MSG 10', 'SC_MSG_SET 40'])
   })
 
-  // Showdown logs Detect's block as Protect's. The block's own line waits for #109.
-  it.each(['Protect', 'Quick Guard', 'Wide Guard'])(
-    'leaves the animation out when %s blocks the move',
-    (protection) => {
-      expect(
-        written(
-          '|move|p2a: Tyranitar|Rock Slide|p1a: Dugtrio',
-          `|-activate|p1a: Dugtrio|move: ${protection}`,
-        ).commands,
-      ).toEqual(['SC_MOVE_MSG 10'])
-    },
-  )
+  // Showdown logs Detect's block as Protect's. Protect's block plays its line (#109); the guards'
+  // lines wait for #110.
+  it.each([
+    ['Protect', ['SC_MOVE_MSG 10', 'SC_MSG_SET 40']],
+    ['Quick Guard', ['SC_MOVE_MSG 10']],
+    ['Wide Guard', ['SC_MOVE_MSG 10']],
+  ])('leaves the animation out when %s blocks the move', (protection, commands) => {
+    expect(
+      written(
+        '|move|p2a: Tyranitar|Rock Slide|p1a: Dugtrio',
+        `|-activate|p1a: Dugtrio|move: ${protection}`,
+      ).commands,
+    ).toEqual(commands)
+  })
 
   // Mist acts on the stat change, after the server chose the targets: no removal takes it.
   it('keeps the animation before a block by an effect that is no protection', () => {
@@ -74,7 +76,7 @@ describe('a move that plays', () => {
 // Scene: a move called by another, a multi-hit move, a charge turn and a look of its own wait
 // whole for the issue that plays them; the bars of the hits still move.
 describe('an action that waits whole', () => {
-  it('lists a called move and its hit with #109, and moves the bar silently', () => {
+  it('lists a called move and its hit with #110, and moves the bar silently', () => {
     expect(
       written(
         '|move|p1a: Dugtrio|Earthquake|p2a: Tyranitar|[from]move: Sleep Talk',
@@ -82,7 +84,7 @@ describe('an action that waits whole', () => {
       ),
     ).toEqual({
       commands: ['SC_OP_SUBTRACT_HP 10', 'SC_UPDATE_HP_GAUGE 10'],
-      fallbacks: ['damage 2 plays with #109'],
+      fallbacks: ['move 1 plays with #110', 'damage 2 plays with #110'],
     })
   })
 
@@ -170,7 +172,7 @@ const BACK_AND_FORTH = [
 // event that plays and names a Pokémon the game does not hold in place fails by name (lane plan
 // D1).
 describe('the Pokémon a switch-in sends in', () => {
-  it('plays its Leftovers heal under its own mon ID, and moves its bar in its switch-in’s action', () => {
+  it('plays its Leftovers heal under its own mon ID, and its Stealth Rock hit in its switch-in’s action', () => {
     expect(
       written(
         '|switch|p2a: Skarmory|Skarmory, M|100/100',
@@ -188,6 +190,7 @@ describe('the Pokémon a switch-in sends in', () => {
         'SC_SEND_OUT 2',
         'SC_OP_SUBTRACT_HP 11',
         'SC_UPDATE_HP_GAUGE 11',
+        'SC_MSG_SET 11',
         'SC_USE_HELD_ITEM 11',
         'SC_EFFECT_BY_POS 1',
         'SC_OP_ADD_HP 11',
@@ -241,5 +244,69 @@ describe('the Pokémon a switch-in sends in', () => {
     expect(() => writeScript(script, NUMBERS)).toThrow(
       new Error(`line ${String(NEXT + 6)}: the log sends in Skarmory, which fainted`),
     )
+  })
+})
+
+// Scene: a Substitute's start (lane plan D10). The game takes the HP first and the log after the
+// start, so the start writes the drop and shows its line; the drop then writes nothing.
+describe('a Substitute that plays', () => {
+  it('shows its drop’s line in the start’s write, and the drop writes no command', () => {
+    const { actions } = writeScript(
+      scriptOf(
+        '|turn|1',
+        '|move|p1a: Dugtrio|Substitute|p1a: Dugtrio',
+        '|-start|p1a: Dugtrio|Substitute',
+        '|-damage|p1a: Dugtrio|75/100',
+      ),
+      NUMBERS,
+    )
+    const writes = actions.flat()
+    const start = writes.find((write) => write.line === NEXT + 2)
+    expect(start?.shows).toEqual([NEXT + 3])
+    expect(start?.commands.map((one) => one.command)).toContain('SC_SUBSTITUTE_CREATE')
+    expect(writes.find((write) => write.line === NEXT + 3)?.commands).toEqual([])
+  })
+})
+
+// Scene: the turn's end (lane plan D9). ServerControl_TurnCheck hides the message window before
+// the weather, so the line of the turn's last move goes before the first residual block.
+describe('the residual lines of a turn', () => {
+  it('open with SC_HIDE_MSG_WINDOW once per turn, in the first residual block', () => {
+    const residual = (dugtrio: number, tyranitar: number) => [
+      '|',
+      `|-heal|p2a: Tyranitar|${String(tyranitar)}/100|[from] item: Leftovers`,
+      `|-heal|p1a: Dugtrio|${String(dugtrio)}/100|[from] item: Leftovers`,
+      '|upkeep',
+    ]
+    const { actions } = writeScript(
+      scriptOf(
+        '|turn|1',
+        '|move|p2a: Tyranitar|Rock Slide|p1a: Dugtrio',
+        '|-damage|p1a: Dugtrio|50/100',
+        '|move|p1a: Dugtrio|Earthquake|p2a: Tyranitar',
+        '|-damage|p2a: Tyranitar|60/100',
+        ...residual(56, 66),
+        '|turn|2',
+        ...residual(62, 72),
+        '|turn|3',
+      ),
+      NUMBERS,
+    )
+    const hide = { command: 'SC_HIDE_MSG_WINDOW', args: [NUMBERS.effects.hideWindow] }
+    const opens = actions
+      .flat()
+      .filter((write) => write.commands.length > 0)
+      .map((write) => [write.line - NEXT, write.commands[0]?.command === 'SC_HIDE_MSG_WINDOW'])
+    expect(opens).toEqual([
+      [1, false],
+      [2, false],
+      [3, false],
+      [4, false],
+      [6, true],
+      [7, false],
+      [11, true],
+      [12, false],
+    ])
+    expect(actions.flat().find((write) => write.line === NEXT + 6)?.commands[0]).toEqual(hide)
   })
 })

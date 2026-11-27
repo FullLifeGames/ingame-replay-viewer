@@ -2,25 +2,21 @@
 // complete, as Gen 3's HANDLERS (src/gen3/translate/index.ts), so a new kind in the battle script
 // fails the build until it has a rule here, and an event of a kind outside the table fails by
 // name. Each rule says what becomes of its event; the kinds that do not play yet name the issue
-// that plays them (lane plan §4).
+// that plays them (lane plan §4). Every event before the first turn that would play is the game's
+// own: BtlServerFlow_StartBattle runs the leads' switch-in effects before the server holds (#109,
+// lane plan D3).
 import type { ScriptEvent } from '../../script/events.ts'
-import type { Effect } from '../../script/types.ts'
 import { type Gen5Fallback, laterFallback, lineFallback } from './fallbacks.ts'
 
 /** What becomes of an event. `park`: the park shows it (#106). `game`: the game shows it itself.
  * `boundary`: it parts the blocks. `play`: the writer plays it where its Pokémon stand in place
- * (moves.ts), a switch-in as its switch, drag or send-in (switches.ts), and a faint as the
- * server's faint (faints.ts). `later`: issue `issue` plays it. `line`: Black 2 has no line for
- * it, and nothing shows. */
+ * (moves.ts), a switch-in as its switch, drag or send-in (switches.ts), a faint as the server's
+ * faint (faints.ts), and an effect by its module (effects.ts). `later`: issue `issue` plays it.
+ * `line`: Black 2 has no line for it, and nothing shows. */
 export type Outcome =
   | { readonly as: 'park' | 'game' | 'boundary' | 'play' }
   | { readonly as: 'later'; readonly issue: number }
   | { readonly as: 'line'; readonly detail: string }
-
-/** Where an event stands: `afterLeads` once the first turn began. */
-interface RuleContext {
-  readonly afterLeads: boolean
-}
 
 /** The event of one kind, also where one event type carries two kinds (`sideStart | sideEnd`). */
 export type EventOf<K extends ScriptEvent['kind']> = ScriptEvent extends infer E
@@ -31,79 +27,74 @@ export type EventOf<K extends ScriptEvent['kind']> = ScriptEvent extends infer E
     : never
   : never
 
-type Rule<K extends ScriptEvent['kind']> = (event: EventOf<K>, ctx: RuleContext) => Outcome
+type Rule<K extends ScriptEvent['kind']> = (event: EventOf<K>) => Outcome
 
-/** The issues that play what does not play yet: the effects (status, stats, weather, hazards,
- * items, abilities), and a whole replay. */
-export const LATER_ISSUES = { effects: 109, whole: 110 } as const
+/** The issue that plays what does not play yet: a whole replay. */
+export const LATER_ISSUES = { whole: 110 } as const
 
 const PLAY = { as: 'play' } as const
-const EFFECTS = { as: 'later', issue: LATER_ISSUES.effects } as const
 const WHOLE = { as: 'later', issue: LATER_ISSUES.whole } as const
 
 const park = (): Outcome => ({ as: 'park' })
 const play = (): Outcome => PLAY
-const effects = (): Outcome => EFFECTS
 const whole = (): Outcome => WHOLE
-
-/** Leftovers: the one cause of a heal that plays (hits.ts). */
-export const isLeftovers = (cause: Effect | undefined) =>
-  cause?.kind === 'item' && cause.name === 'Leftovers'
+const line = (detail: string): Outcome => ({ as: 'line', detail })
 
 const RULES = {
   player: park,
   teamSize: park,
   battleStart: park,
   turn: () => ({ as: 'boundary' }),
-  switchIn: (_, ctx) => (ctx.afterLeads ? PLAY : { as: 'game' }),
+  switchIn: play,
   faint: play,
-  // Illusion's end: its look and the game's own disguise belong with the abilities.
-  replace: effects,
-  message: (event) => ({ as: 'line', detail: `Black 2 has no line for "${event.text}"` }),
+  // Lane plan D14: the game keeps the disguise's Pokémon in place (party-state.ts).
+  replace: () => line('Black 2 shows the disguise throughout'),
+  message: (event) => line(`Black 2 has no line for "${event.text}"`),
   win: whole,
   tie: whole,
-  move: (event) => (event.calledBy === undefined ? PLAY : EFFECTS),
+  move: play,
   prepare: whole,
   anim: whole,
-  cant: effects,
+  cant: play,
   miss: play,
   ohko: whole,
   noTarget: whole,
-  immune: (event) => (event.cause === undefined && event.effect === undefined ? PLAY : EFFECTS),
-  fail: (event) => {
-    const plain = [event.cause, event.effect, event.stat, event.weak].every((x) => x === undefined)
-    return plain ? PLAY : EFFECTS
-  },
-  block: effects,
-  damage: (event) => (event.cause === undefined ? PLAY : EFFECTS),
-  heal: (event) => (isLeftovers(event.cause) ? PLAY : EFFECTS),
+  immune: play,
+  fail: play,
+  block: play,
+  damage: play,
+  heal: play,
   setHp: whole,
-  status: effects,
-  cureStatus: effects,
-  cureTeam: effects,
-  statChange: effects,
-  statLimit: effects,
-  statReset: effects,
-  negativeStatReset: effects,
-  crit: effects,
-  effectiveness: effects,
+  status: play,
+  cureStatus: play,
+  cureTeam: play,
+  statChange: play,
+  statLimit: play,
+  statReset: play,
+  negativeStatReset: play,
+  crit: play,
+  effectiveness: play,
   hitCount: whole,
-  effectStart: effects,
-  effectEnd: effects,
-  effectActivate: effects,
+  effectStart: play,
+  effectEnd: play,
+  effectActivate: play,
   transform: whole,
   formChange: whole,
   terastallize: whole,
-  singleTurn: effects,
-  singleMove: effects,
-  copyBoost: effects,
-  weather: effects,
-  sideStart: effects,
-  sideEnd: effects,
-  fieldActivate: effects,
-  item: effects,
-  itemEnd: effects,
-  ability: effects,
+  singleTurn: play,
+  singleMove: play,
+  copyBoost: play,
+  // Lane plan D2: ServerControl_TurnCheckWeather puts no line for a weather's turn.
+  weather: (event) =>
+    event.phase === 'upkeep'
+      ? line(`Black 2 shows nothing for a turn of ${event.weather.toLowerCase()}`)
+      : PLAY,
+  sideStart: play,
+  sideEnd: play,
+  fieldActivate: play,
+  item: play,
+  itemEnd: play,
+  ability: play,
 } satisfies { readonly [K in ScriptEvent['kind']]: Rule<K> }
 
 /** The rule of `event`'s kind; throws by name for a kind with none. */
@@ -123,10 +114,13 @@ export function afterLeads(events: readonly ScriptEvent[]): boolean[] {
   return events.map((_, i) => first !== -1 && i > first)
 }
 
-/** What becomes of each event, by its rule. */
+/** What becomes of each event, by its rule; before the first turn the game plays it itself. */
 export function outcomesOf(events: readonly ScriptEvent[]): Outcome[] {
   const after = afterLeads(events)
-  return events.map((event, i) => ruleOf(event)(event, { afterLeads: after[i] ?? false }))
+  return events.map((event, i) => {
+    const outcome = ruleOf(event)(event)
+    return outcome.as === 'play' && after[i] !== true ? { as: 'game' } : outcome
+  })
 }
 
 /** A fallback for each event that does not play yet or whose line Black 2 lacks, in event order. */

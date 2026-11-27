@@ -54,7 +54,7 @@ describe.skipIf(!existsSync(FILE))(
       expect(shared.map(([group]) => group)).toEqual([])
     })
 
-    it("hold only the three prefixes, so no side's or field's condition", () => {
+    it("hold only the four prefixes, so no side's or field's condition", () => {
       const { constants } = real().battle
       const other = (name: string) => !CONSTANT_PREFIXES.some((prefix) => name.startsWith(prefix))
       expect(Object.keys(constants).filter(other)).toEqual([])

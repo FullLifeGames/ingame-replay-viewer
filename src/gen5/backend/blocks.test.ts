@@ -111,6 +111,18 @@ describe('blocksOf', () => {
     expect(blocksOf(silent, ROOM)).toEqual([])
   })
 
+  // Lane plan D10: a Substitute's start writes its HP drop, so the drop's line shows in its block.
+  it('adds the lines a write shows besides its own to its block', () => {
+    const written: Written[][] = [
+      [
+        { line: 7, commands: [gauge], shows: [8] },
+        { line: 8, commands: [] },
+        { line: 9, commands: [gauge] },
+      ],
+    ]
+    expect(blocksOf(written, ROOM).map((block) => block.lines)).toEqual([[7, 8, 9]])
+  })
+
   // Scene: an action that the client's queue cannot hold in one block.
   it('splits an action between commands past the room', () => {
     const blocks = blocksOf(writtenOf(actionsOf(TURN)), { ...ROOM, room: 12 })

@@ -12,6 +12,10 @@ export function literal(text: string): number | undefined {
   return NUMBER.test(bare) ? Number(bare) : undefined
 }
 
+/** Every C integer literal in `text`, as written, in order (a minus sign stays outside). */
+export const literalsIn = (text: string): string[] =>
+  text.match(/\b(?:0x[0-9a-f]+|\d+)[ul]*\b/gi) ?? []
+
 /** The source without `//` and block comments. */
 export function stripComments(source: string): string {
   return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')

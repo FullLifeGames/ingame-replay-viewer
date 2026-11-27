@@ -19,8 +19,16 @@ const REPLAYS = Object.entries(FIXTURES).map(([id, script]) => ({
   replay: buildGen5Replay(script, NUMBERS),
 }))
 
-/** What shows an event without a block: the park (#106), the game itself, or a turn. */
+/** What shows an event without a block: the park (#106) or a turn; the game shows every event
+ * before the first turn itself (lane plan D3). */
 const SHOWN = new Set<ScriptEvent['kind']>(['player', 'teamSize', 'battleStart', 'turn'])
+
+/** The events whose line Black 2 lacks: a message of the simulator, a weather's turn (D2) and the
+ * end of a disguise (D14). */
+const lacksLine = (event: ScriptEvent) =>
+  event.kind === 'message' ||
+  event.kind === 'replace' ||
+  (event.kind === 'weather' && event.phase === 'upkeep')
 /** The kinds that play in a block while a part of them is listed: a bar that moves silently
  * while its line waits (D6), and a switch-in that plays as a plain switch (`plain`). */
 const IN_PART = new Set<ScriptEvent['kind']>(['damage', 'heal', 'setHp', 'switchIn'])
@@ -46,13 +54,13 @@ function placesOf(script: BattleScript, replay: Gen5Replay) {
   const firstTurn = script.events.findIndex((event) => event.kind === 'turn')
   return script.events.map((event, i) => ({
     event,
-    shown: SHOWN.has(event.kind) || (event.kind === 'switchIn' && i < firstTurn),
+    shown: SHOWN.has(event.kind) || i < firstTurn,
     inBlock: inBlocks.has(event.line),
     listed: listed.get(key(event)) ?? 0,
   }))
 }
 
-/** The not-shown list, every fallback by issue (`#109`…) or by kind (`line`, `plain`, and the
+/** The not-shown list, every fallback by issue (`#110`) or by kind (`line`, `plain`, and the
  * party's `form`, `character` and `moves`), then by event kind, or `party` for the party's. */
 function notShown(fallbacks: readonly Gen5Fallback[]) {
   const counts: Record<string, Record<string, number>> = {}
@@ -83,7 +91,7 @@ describe('the Gen 5 OU test replays', () => {
       const misplaced = places.filter((place) => count(place) !== 1 && !inPart(place))
       expect(misplaced.map(({ event }) => key(event))).toEqual([])
       expect(replay.fallbacks.filter((one) => one.kind === 'line').map(key)).toEqual(
-        script.events.filter((event) => event.kind === 'message').map(key),
+        script.events.filter(lacksLine).map(key),
       )
     }
   })
@@ -100,50 +108,20 @@ describe('the Gen 5 OU test replays', () => {
     }
   })
 
-  // The list that #109 and #110 shrink.
+  // The list that #110 shrinks.
   it('list what does not show yet by the issue that plays it and by event kind', () => {
     const lists = Object.fromEntries(
       REPLAYS.map(({ id, replay }) => [id, notShown(replay.fallbacks)]),
     )
     expect(lists).toEqual({
       'gen5ou-2718717830': {
-        '#109': {
-          weather: 15,
-          singleTurn: 2,
-          block: 1,
-          status: 3,
-          damage: 19,
-          sideStart: 3,
-          cureStatus: 1,
-          itemEnd: 1,
-          item: 1,
-          sideEnd: 1,
-          statChange: 11,
-          heal: 1,
-        },
         '#110': { prepare: 1, anim: 1, move: 1, damage: 1, win: 1 },
-        line: { message: 1 },
+        line: { message: 1, weather: 10 },
         form: { party: 1 },
       },
       'smogtours-gen5ou-862240': {
-        '#109': {
-          ability: 4,
-          statChange: 16,
-          status: 2,
-          effectStart: 1,
-          cant: 4,
-          heal: 10,
-          effectEnd: 1,
-          singleTurn: 1,
-          itemEnd: 4,
-          weather: 16,
-          sideStart: 2,
-          damage: 11,
-          effectActivate: 1,
-          item: 1,
-        },
         '#110': { win: 1 },
-        line: { message: 1 },
+        line: { message: 1, weather: 15 },
         form: { party: 2 },
       },
     })

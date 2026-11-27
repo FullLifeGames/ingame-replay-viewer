@@ -63,11 +63,12 @@ describe('outcomesOf the intro and the turns', () => {
   })
 })
 
-// Scene: the kinds that later issues play, by the lane plan's not-yet map.
+// Scene: the kinds that play, and those a later issue plays, by the lane plan's not-yet map.
 describe('outcomesOf the kinds that play later', () => {
   it('plays a move, its hit, a miss, a failure, an immunity and a Leftovers heal', () => {
     expect(
       outcomesFrom(
+        '|turn|1',
         '|move|p1a: Dugtrio|Earthquake|p2a: Tyranitar',
         '|-damage|p2a: Tyranitar|60/100',
         '|move|p2a: Tyranitar|Rock Slide|p1a: Dugtrio|[miss]',
@@ -79,6 +80,7 @@ describe('outcomesOf the kinds that play later', () => {
         '|-heal|p2a: Tyranitar|66/100|[from] item: Leftovers',
       ),
     ).toEqual([
+      'turn boundary',
       'move play',
       'damage play',
       'move play',
@@ -91,9 +93,10 @@ describe('outcomesOf the kinds that play later', () => {
     ])
   })
 
-  it('lists caused lines, heals of a move, status, weather, hazards, loose lines and called moves with #109', () => {
+  it('plays caused lines, heals of a move, status, weather, hazards, loose lines and called moves', () => {
     expect(
       outcomesFrom(
+        '|turn|1',
         '|-damage|p2a: Tyranitar|88/100|[from] Stealth Rock',
         '|-heal|p1a: Dugtrio|50/100|[from] drain|[of] p2a: Tyranitar',
         '|-heal|p1a: Dugtrio|60/100',
@@ -105,24 +108,61 @@ describe('outcomesOf the kinds that play later', () => {
         '|move|p1a: Dugtrio|Earthquake|p2a: Tyranitar|[from]move: Sleep Talk',
         '|-immune|p2a: Tyranitar|[from] ability: Levitate',
         '|-fail|p2a: Tyranitar|par',
+        '|-weather|Sandstorm|[upkeep]',
+        '|-weather|none',
       ),
     ).toEqual([
-      'damage later #109',
-      'heal later #109',
-      'heal later #109',
-      'status later #109',
-      'weather later #109',
-      'sideStart later #109',
-      'crit later #109',
-      'cant later #109',
-      'move later #109',
-      'immune later #109',
-      'fail later #109',
+      'turn boundary',
+      'damage play',
+      'heal play',
+      'heal play',
+      'status play',
+      'weather play',
+      'sideStart play',
+      'crit play',
+      'cant play',
+      'move play',
+      'immune play',
+      'fail play',
+      'weather line',
+      'weather play',
     ])
   })
 
-  // Illusion's look and the game's own disguise belong with the abilities (lane plan D8).
-  it("lists Illusion's end with #109", () => {
+  // Lane plan D2: ServerControl_TurnCheckWeather puts nothing for a turn of rain or sun, and the
+  // sand's turn line no battle C puts.
+  it('lists a weather’s turn as a line Black 2 lacks', () => {
+    const script = scriptOf(
+      '|-weather|Sandstorm|[from] ability: Sand Stream|[of] p2a: Tyranitar',
+      '|turn|1',
+      '|-weather|Sandstorm|[upkeep]',
+    )
+    expect(ruleFallbacks(script.events)).toEqual([
+      {
+        line: NEXT + 2,
+        kind: 'line',
+        event: 'weather',
+        detail: 'Black 2 shows nothing for a turn of sand',
+      },
+    ])
+  })
+
+  // Lane plan D3: BtlServerFlow_StartBattle runs the leads' switch-in effects before the server
+  // holds, so the game shows them itself; the same lines after a switch-in play.
+  it('leaves the leads’ effects before the first turn to the game, and plays them after it', () => {
+    const intimidate = ['|-ability|p2a: Tyranitar|Intimidate|boost', '|-unboost|p1a: Dugtrio|atk|1']
+    expect(outcomesFrom(...intimidate, '|turn|1', ...intimidate)).toEqual([
+      'ability game',
+      'statChange game',
+      'turn boundary',
+      'ability play',
+      'statChange play',
+    ])
+  })
+
+  // Lane plan D14: the game keeps the disguise's Pokémon in place (party-state.ts), so the end of
+  // Illusion has no look of its own here.
+  it("lists Illusion's end as a line and plays the effect's end", () => {
     expect(
       outcomesFrom(
         '|turn|1',
@@ -130,26 +170,31 @@ describe('outcomesOf the kinds that play later', () => {
         '|replace|p1a: Zoroark|Zoroark, M',
         '|-end|p1a: Zoroark|Illusion',
       ),
-    ).toEqual(['turn boundary', 'damage play', 'replace later #109', 'effectEnd later #109'])
+    ).toEqual(['turn boundary', 'damage play', 'replace line', 'effectEnd play'])
   })
 
   it('lists the kinds no issue names with #110', () => {
     expect(
       outcomesFrom(
+        '|turn|1',
         '|move|p1a: Dugtrio|Solar Beam||[still]',
         '|-prepare|p1a: Dugtrio|Solar Beam',
         '|win|Alice',
       ),
-    ).toEqual(['move play', 'prepare later #110', 'win later #110'])
+    ).toEqual(['turn boundary', 'move play', 'prepare later #110', 'win later #110'])
   })
 })
 
 // Scene: the replay lists each event that does not play yet beside the dropped lines.
 describe('ruleFallbacks', () => {
   it('names the kind and the issue of each later event and the text of each missing line', () => {
-    const script = scriptOf('|turn|1', '|-status|p2a: Tyranitar|brn', '|message|Bob forfeited.')
+    const script = scriptOf(
+      '|turn|1',
+      '|-prepare|p2a: Tyranitar|Solar Beam',
+      '|message|Bob forfeited.',
+    )
     expect(ruleFallbacks(script.events)).toEqual([
-      { line: NEXT + 1, kind: 'later', event: 'status', detail: 'plays with #109' },
+      { line: NEXT + 1, kind: 'later', event: 'prepare', detail: 'plays with #110' },
       {
         line: NEXT + 2,
         kind: 'line',

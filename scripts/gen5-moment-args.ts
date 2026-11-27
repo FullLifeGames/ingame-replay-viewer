@@ -6,10 +6,10 @@
 // (src/gen5/continue-route.ts) plays to the trainer's action menu, where the moment starts; with
 // no save it starts as the spike's did, from the state s5-battle under build/gen5/states/. With
 // --replay <id> the direct entry writes a test replay's teams and trainer names (#106), and with
-// --scene hits or switches beside it the run plays hand turns after the replay's start as blocks
-// (#107, #108).
-// Usage: --scene known|unknown|hits|switches, --save <name>, --entry direct|walk, --battle single|double,
-// --player <name>, --opponent <name>, --replay <id>, --minutes <n>.
+// --scene hits, switches or effects beside it the run plays hand turns after the replay's start as
+// blocks (#107, #108, #109).
+// Usage: --scene known|unknown|hits|switches|effects, --save <name>, --entry direct|walk,
+// --battle single|double, --player <name>, --opponent <name>, --replay <id>, --minutes <n>.
 import { parseArgs } from 'node:util'
 
 import type { ActorPlace } from '../src/gen5/bw2-numbers.ts'
@@ -19,6 +19,7 @@ import type { ParkNames, ParkSides } from '../src/gen5/direct-park.ts'
 import type { RamCheck, RamRef } from '../src/gen5/ram-check.ts'
 import { isSaveName, SAVE_NAME_RULE } from '../src/gen5/save-file.ts'
 import { HITS_TURN } from './gen5-moment-hits.ts'
+import { EFFECTS_TURNS } from './gen5-moment-effects.ts'
 import type { SceneName } from './gen5-moment-scene.ts'
 import { SWITCHES_TURNS } from './gen5-moment-switches.ts'
 
@@ -37,7 +38,7 @@ type MomentEntry = 'walk' | 'direct'
 type MomentBattle = ParkSides['style']
 
 /** The scenes that play hand turns after a test replay's start, each with its turns. */
-const HAND_TURNS = { hits: HITS_TURN, switches: SWITCHES_TURNS } as const
+const HAND_TURNS = { hits: HITS_TURN, switches: SWITCHES_TURNS, effects: EFFECTS_TURNS } as const
 
 /** A scene of hand turns after a test replay's start. */
 type HandScene = keyof typeof HAND_TURNS
@@ -171,7 +172,7 @@ export function readMomentOptions(args: string[], now: number): MomentOptions {
   })
   const { scene } = values
   if (!isScene(scene))
-    throw new Error(`--scene takes known, unknown, hits or switches, not "${scene}".`)
+    throw new Error(`--scene takes known, unknown, hits, switches or effects, not "${scene}".`)
   const minutes = Number(values.minutes)
   if (!(minutes > 0)) throw new Error(`--minutes takes a positive number, not "${values.minutes}".`)
   const entry = entryOf(values.entry)
