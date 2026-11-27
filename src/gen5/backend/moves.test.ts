@@ -46,6 +46,27 @@ describe('a move that plays', () => {
         .commands,
     ).toEqual(['SC_MOVE_MSG 10', 'SC_MSG_SET 40'])
   })
+
+  // Showdown logs Detect's block as Protect's. The block's own line waits for #109.
+  it.each(['Protect', 'Quick Guard', 'Wide Guard'])(
+    'leaves the animation out when %s blocks the move',
+    (protection) => {
+      expect(
+        written(
+          '|move|p2a: Tyranitar|Rock Slide|p1a: Dugtrio',
+          `|-activate|p1a: Dugtrio|move: ${protection}`,
+        ).commands,
+      ).toEqual(['SC_MOVE_MSG 10'])
+    },
+  )
+
+  // Mist acts on the stat change, after the server chose the targets: no removal takes it.
+  it('keeps the animation before a block by an effect that is no protection', () => {
+    expect(
+      written('|move|p2a: Tyranitar|Growl|p1a: Dugtrio', '|-activate|p1a: Dugtrio|move: Mist')
+        .commands,
+    ).toEqual(['SC_MOVE_MSG 10', 'SC_MOVE_ANIM 1'])
+  })
 })
 
 // Scene: a move called by another, a multi-hit move, a charge turn and a look of its own wait

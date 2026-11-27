@@ -13,7 +13,7 @@ import { battleState, type BattleState } from './battle-state.ts'
 import { type Action, actionsOf, type Written } from './blocks.ts'
 import { type Gen5Fallback, laterFallback } from './fallbacks.ts'
 import { hitCommands, type PlayedMove, silentBar } from './hits.ts'
-import { gen5Move } from './names.ts'
+import { gen5, gen5Move } from './names.ts'
 import { LATER_ISSUES, type Outcome, outcomesOf } from './rules.ts'
 
 /** The numbers the writer takes. */
@@ -79,16 +79,32 @@ function playedOf(action: Action, state: BattleState): Played {
   return { action, move: { user, target, targetRef, move: gen5Move(first.move) }, waits: undefined }
 }
 
+/** The kinds of event after a move that mean the server took its target out. */
+const NO_TARGET_LEFT: ReadonlySet<ScriptEvent['kind']> = new Set(['miss', 'immune', 'fail'])
+
+/** A block by Protect, Detect or another protection Gen 5 has: the moves @pkmn's Gen 5 data
+ * marks as stalling moves. The script reads Showdown's `-activate|…|move: Protect` as a block,
+ * and Detect's under Protect's name; Endure, the one other stalling move, blocks nothing. */
+function isProtection(event: ScriptEvent): boolean {
+  return (
+    event.kind === 'block' &&
+    event.effect.kind === 'move' &&
+    gen5.moves.get(event.effect.name)?.stallingMove === true
+  )
+}
+
 /** ServerControl_Fight's SC_MOVE_MSG, then the SC_MOVE_ANIM that ServerControl_ExecuteMove
  * reserves and ServerControl_PutMoveAnimation fills. It stays empty for a move with no
- * animation, a miss, and a move whose first event after it is a miss, an immunity or a failure
- * (ServerControl_RemoveMissedTargets, ServerControl_CheckMoveEffectiveness). */
+ * animation, a miss, and a move whose first event after it shows that the server took its one
+ * target out: a miss (ServerControl_RemoveHiddenTargets, ServerControl_RemoveMissedTargets), an
+ * immunity (ServerControl_CheckMoveEffectiveness), a protection's block
+ * (ServerControl_RemoveNoEffectTargets) or a failure (no target left). */
 function moveCommands(action: Action, move: PlayedMove): ServerCommand[] {
   const [first, next] = action
   const message = { command: 'SC_MOVE_MSG', args: [move.user.monId, move.move] }
   const quiet =
     (first?.kind === 'move' && (first.still === true || first.miss === true)) ||
-    (next !== undefined && ['miss', 'immune', 'fail'].includes(next.kind))
+    (next !== undefined && (NO_TARGET_LEFT.has(next.kind) || isProtection(next)))
   if (quiet) return [message]
   const args = [move.user.pos, move.target.pos, move.move, PLAIN_TURN]
   return [message, { command: 'SC_MOVE_ANIM', args }]
