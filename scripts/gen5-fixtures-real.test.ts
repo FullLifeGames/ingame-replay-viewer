@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { ADAPTER_LAYOUT } from '../src/gen5/adapter.fixtures.ts'
+import { REPLAY_NUMBERS } from '../src/gen5/backend/replay.fixtures.ts'
 import { ENTRY } from '../src/gen5/direct-entry.fixtures.ts'
 import { PKM, TEAM_PKM, TERMINATOR } from '../src/gen5/pkm.fixtures.ts'
 import { battleNumbers } from './gen5-bw2-battle.ts'
@@ -30,7 +31,7 @@ import { TEXT_INPUT } from './gen5-bw2-text.fixtures.ts'
 const FILE = GEN5_PATHS.bw2Json
 
 /** The folders whose `*.fixtures.ts` modules the guard walks. */
-const FOLDERS = ['src/gen5/', 'scripts/']
+const FOLDERS = ['src/gen5/', 'src/gen5/backend/', 'scripts/']
 
 /** Each fixture under pokebw2's names: its module, its export, and where the generated file keeps
  * the numbers of the same names. A fixture of C texts is compared by what its reader computes
@@ -87,6 +88,14 @@ const COMPARED = [
     value: flowNumbers(FLOW_INPUT),
     path: ['flow'],
   },
+  ...(['text', 'flow', 'serverCommands', 'messages', 'queueSize', 'battle'] as const).map(
+    (key) => ({
+      module: 'src/gen5/backend/replay.fixtures.ts',
+      name: `REPLAY_NUMBERS.${key}`,
+      value: REPLAY_NUMBERS[key],
+      path: [key],
+    }),
+  ),
 ]
 
 /** The fixture modules that hold no number of pokebw2: the archives' fixtures. `ROUTINE` beside

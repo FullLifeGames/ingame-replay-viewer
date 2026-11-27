@@ -1,14 +1,13 @@
 import { Dex } from '@pkmn/dex'
 import { describe, expect, it } from 'vitest'
 
-import type { ReplayNumbers } from '../src/gen5/backend/replay'
-import { ENTRY } from '../src/gen5/direct-entry.fixtures'
 import { openPkm } from '../src/gen5/pkm-cipher'
 import { readPkm } from '../src/gen5/pkm-fields'
 import { type PkmFormat, pkmFormat } from '../src/gen5/pkm-members'
 import { TEAM_PKM, TERMINATOR } from '../src/gen5/pkm.fixtures'
 import { replayTeam } from './gen5-moment-replay'
 import { momentTeam, TEAM, type Team, teamParties } from './gen5-moment-team'
+import { REPLAY_NUMBERS as NUMBERS } from '../src/gen5/backend/replay.fixtures'
 
 // Every number of the format is invented (src/gen5/pkm.fixtures.ts): a nickname holds seven
 // characters, and the lists hold the team's natures. Species, moves, items and abilities take
@@ -105,15 +104,6 @@ describe('the moment team', () => {
     expect(written.opponent.find((one) => one.nicknamed)?.name).toBe('Axel')
   })
 })
-
-/** The invented numbers of a replay's team: the format and entry of the fixtures, a font of
- * printable ASCII, a made-up pin. */
-const NUMBERS: ReplayNumbers = {
-  pkm: TEAM_PKM,
-  entry: ENTRY,
-  font: { chars: Array.from({ length: 95 }, (_, i) => String.fromCharCode(32 + i)).join('') },
-  pokebw2: { repository: 'https://example.invalid/pokebw2.git', commit: 'c0ffee' },
-}
 
 // Scene: the run writes the hand team with the names given, or a test replay's teams and names.
 describe('momentTeam', () => {

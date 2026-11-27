@@ -41,14 +41,20 @@ function fieldOf(layout: StructLayout, name: string): FieldLayout {
   return field
 }
 
+/** The bytes a block of server commands may take: the smaller of the adapter's `sendCmd.data`
+ * and the client's queue, into which the client copies the block. */
+export function blockRoom(numbers: Pick<AdapterNumbers, 'layout' | 'queueSize'>): number {
+  return Math.min(fieldOf(numbers.layout, 'sendCmd.data').size, numbers.queueSize)
+}
+
 /** Throws unless the block holds a command and fits both the adapter and the client's queue. */
-function checkBlock(length: number, dataSize: number, queueSize: number): void {
+function checkBlock(length: number, numbers: AdapterNumbers): void {
   if (length === 0) throw new RangeError('The block is empty; it holds no command.')
-  const has = `The block has ${String(length)} bytes`
-  if (length > dataSize) throw new RangeError(`${has}; sendCmd.data holds ${String(dataSize)}.`)
-  if (length > queueSize) {
-    throw new RangeError(`${has}; the client's queue holds ${String(queueSize)}.`)
-  }
+  const room = blockRoom(numbers)
+  if (length <= room) return
+  const holder =
+    room < fieldOf(numbers.layout, 'sendCmd.data').size ? "the client's queue" : 'sendCmd.data'
+  throw new RangeError(`The block has ${String(length)} bytes; ${holder} holds ${String(room)}.`)
 }
 
 /** The writes that hand the client an adapter command with `data`, which may be empty: data,
@@ -90,7 +96,7 @@ export function adapterWrites(
   adapterAddress: number,
   block: Uint8Array,
 ): MemoryWrite[] {
-  checkBlock(block.length, fieldOf(numbers.layout, 'sendCmd.data').size, numbers.queueSize)
+  checkBlock(block.length, numbers)
   return commandWrites(numbers, adapterAddress, numbers.serverCmd, block)
 }
 
