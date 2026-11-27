@@ -10,7 +10,7 @@ import type { HpFraction, PokemonRef } from '../../script/types.ts'
 import { singleBattlePos } from '../battle-mons.ts'
 import type { BattleNumbers } from '../bw2-numbers.ts'
 import type { ServerCommand } from '../server-cmd.ts'
-import { clientOf, monIdOf, partyOrder, partySlot } from './slots.ts'
+import { clientOf, monIdOf, partyOrder, partySlot, refKey } from './slots.ts'
 
 /** A Pokémon in one of the battle's places: the mon ID and the position the commands name. */
 export interface InPlace {
@@ -37,7 +37,6 @@ export function battleState(
 ): BattleState {
   const order = partyOrder(script)
   const hp = new Map<string, number>()
-  const keyOf = (ref: PokemonRef) => `${ref.side} ${String(ref.index)}`
   const monIdOfRef = (ref: PokemonRef) =>
     monIdOf(battle.monIds, clientOf(battle.single, ref.side), partySlot(order, ref))
   return {
@@ -47,9 +46,9 @@ export function battleState(
       return { monId: monIdOfRef(ref), pos }
     },
     hpTo(ref, after) {
-      const from = hp.get(keyOf(ref)) ?? HP_SCALE
+      const from = hp.get(refKey(ref)) ?? HP_SCALE
       const to = scaleHp(after)
-      hp.set(keyOf(ref), to)
+      hp.set(refKey(ref), to)
       if (to === from) return undefined
       const command = to < from ? 'SC_OP_SUBTRACT_HP' : 'SC_OP_ADD_HP'
       return { command, args: [monIdOfRef(ref), Math.abs(from - to)] }

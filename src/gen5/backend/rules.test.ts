@@ -18,17 +18,17 @@ function outcomesFrom(...lines: string[]): string[] {
   })
 }
 
-// Scene: the battle script gains an event kind, such as lane b's coming `replace`, before the
-// Gen 5 backend has a rule for it.
+// Scene: the battle script gains an event kind before the Gen 5 backend has a rule for it. The
+// kind is one no lane adds, so the case holds once every coming kind has its rule.
 describe('ruleOf', () => {
   it('fails by name on an event kind with no Gen 5 rule', () => {
-    const replace = { kind: 'replace', line: NEXT } as unknown as ScriptEvent
-    expect(() => ruleOf(replace)).toThrow(
-      `no Gen 5 rule for the event kind replace (line ${String(NEXT)})`,
+    const unknown = { kind: 'notAKind', line: NEXT } as unknown as ScriptEvent
+    expect(() => ruleOf(unknown)).toThrow(
+      `no Gen 5 rule for the event kind notAKind (line ${String(NEXT)})`,
     )
     const { events } = scriptOf('|turn|1')
-    expect(() => outcomesOf([...events, replace])).toThrow(
-      'no Gen 5 rule for the event kind replace',
+    expect(() => outcomesOf([...events, unknown])).toThrow(
+      'no Gen 5 rule for the event kind notAKind',
     )
   })
 })

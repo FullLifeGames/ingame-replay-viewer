@@ -10,7 +10,7 @@ import type { ServerCommand } from '../server-cmd.ts'
 import type { BattleState, InPlace } from './battle-state.ts'
 import { type Gen5Line, GEN5_LINES, lineId } from './lines.ts'
 import { gen5Item } from './names.ts'
-import { isLeftovers } from './rules.ts'
+import { type EventOf, isLeftovers } from './rules.ts'
 
 /** A move that plays: its user and its target in place, and its number. */
 export interface PlayedMove {
@@ -28,8 +28,7 @@ export interface HitScene {
   readonly move: PlayedMove | undefined
 }
 
-type EventOf<K extends ScriptEvent['kind']> = Extract<ScriptEvent, { kind: K }>
-
+// Two refs to one Pokémon. Its shared home would be src/script/, which #107 leaves as it is.
 const sameRef = (a: PokemonRef, b: PokemonRef | undefined) =>
   a.side === b?.side && a.index === b.index
 

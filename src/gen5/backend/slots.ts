@@ -24,6 +24,9 @@ export function partyOrder(
   return { near: order('near'), far: order('far') }
 }
 
+/** The key of a battle script's Pokémon, the same for each ref to it: its side and team index. */
+export const refKey = (ref: PokemonRef): string => `${ref.side} ${String(ref.index)}`
+
 /** The party slot of a Pokémon in the party order of `partyOrder`. */
 export function partySlot(
   order: Readonly<Record<Side, readonly number[]>>,

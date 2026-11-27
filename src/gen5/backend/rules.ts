@@ -22,7 +22,7 @@ interface RuleContext {
 }
 
 /** The event of one kind, also where one event type carries two kinds (`sideStart | sideEnd`). */
-type EventOf<K extends ScriptEvent['kind']> = ScriptEvent extends infer E
+export type EventOf<K extends ScriptEvent['kind']> = ScriptEvent extends infer E
   ? E extends { readonly kind: infer Kinds }
     ? K extends Kinds
       ? E
