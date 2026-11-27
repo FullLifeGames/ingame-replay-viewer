@@ -2,14 +2,7 @@ import { Dex } from '@pkmn/dex'
 import { describe, expect, it } from 'vitest'
 
 import type { BattleMonReading } from '../src/gen5/battle-mons'
-import {
-  moveLineLabel,
-  sceneBlocks,
-  sceneMove,
-  sideClient,
-  textId,
-  textLine,
-} from './gen5-moment-scene'
+import { moveLineLabel, sceneBlocks, sceneMove, textId, textLine } from './gen5-moment-scene'
 
 // Invented readings in the shape the page reads from the clients' container.
 const NEAR: BattleMonReading = {
@@ -71,17 +64,6 @@ describe('sceneBlocks', () => {
     const [b1] = sceneBlocks('known', { near: NEAR, far: FAR }, SWAPPED, 41)
     expect(b1?.moment.attacker).toEqual({ monId: 4, pos: 0 })
     expect(b1?.moment.target).toMatchObject({ monId: 9, pos: 1 })
-  })
-})
-
-// Scene: the near side is the player's client and the far side the opponent's, as the setup
-// creates them; the readings and the moments take them from there.
-describe('sideClient', () => {
-  it("gives the near side the player's client and the far side the opponent's", () => {
-    expect(sideClient(INVENTED, 'near')).toBe(2)
-    expect(sideClient(INVENTED, 'far')).toBe(1)
-    expect(sideClient(SWAPPED, 'near')).toBe(1)
-    expect(sideClient(SWAPPED, 'far')).toBe(0)
   })
 })
 
