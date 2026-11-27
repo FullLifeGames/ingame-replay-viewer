@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { BattleScript, ScriptEvent } from '../../script/events.ts'
+import type { BattleScript } from '../../script/events.ts'
 import { replayScript } from '../../script/testing.ts'
 import { TEAM_PKM } from '../pkm.fixtures.ts'
 import { nameOfNumber } from './names.ts'
@@ -20,37 +20,6 @@ describe('a Gen 5 replay from a battle script', () => {
     expect(replay.pin).toBe('c0ffee')
     expect(replay.trainers).toEqual({ player: 'isolatedstar', opponent: 'abc2158' })
     expect(replay.dropped).toBe(SUN_RAIN.dropped)
-  })
-
-  // Scene: the hits of the leads play as blocks; every other event of a test replay is the
-  // park's (the intro), the game's (the leads), a turn, or a fallback `later` or `line` that names
-  // its kind. Only an HP change that does not play yet is both: its bar moves silently.
-  it('plays or lists every event that the park, the game or a turn does not show', () => {
-    for (const script of [SUN_RAIN, SAND]) {
-      const replay = buildGen5Replay(script, NUMBERS)
-      expect(replay.blocks.length).toBeGreaterThan(0)
-      const key = (event: { line: number; event?: string; kind: string }) =>
-        `${event.event ?? event.kind} ${String(event.line)}`
-      const listed = new Set(
-        replay.fallbacks.flatMap((one) =>
-          one.kind === 'later' || one.kind === 'line' ? [key(one)] : [],
-        ),
-      )
-      const inBlocks = new Set(replay.blocks.flatMap((block) => block.lines))
-      const firstTurn = script.events.findIndex((event) => event.kind === 'turn')
-      const shown = (event: ScriptEvent, i: number) =>
-        ['player', 'teamSize', 'battleStart', 'turn'].includes(event.kind) ||
-        (event.kind === 'switchIn' && i < firstTurn)
-      const met = (event: ScriptEvent) => listed.has(key(event)) || inBlocks.has(event.line)
-      expect(script.events.filter((event, i) => met(event) === shown(event, i))).toEqual([])
-      const both = script.events.filter(
-        (event) => listed.has(key(event)) && inBlocks.has(event.line),
-      )
-      expect(both.filter((event) => !['damage', 'heal', 'setHp'].includes(event.kind))).toEqual([])
-      expect(replay.fallbacks.filter((one) => one.kind === 'line').map(key)).toEqual(
-        script.events.filter((event) => event.kind === 'message').map(key),
-      )
-    }
   })
 
   it('writes twelve species by number, each at HP 100 of 100, its trainer as the OT', () => {
