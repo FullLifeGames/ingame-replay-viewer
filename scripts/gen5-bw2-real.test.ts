@@ -295,6 +295,7 @@ describe.skipIf(!existsSync(FILE))('the Gen 5 code on the generated numbers', ()
       'BTL_STYLE_SINGLE',
       'BTL_STYLE_DOUBLE',
       'SEQ_BGM_VS_TRAINER',
+      'BTL_SETUP_FLAG_NO_BLACKOUT',
     ]
     expect(Object.keys(constants).sort()).toEqual([...names].sort())
     const signs = names.filter((name) => (constants[name] ?? 0) < 0 !== (name === 'OVERLAY_NONE'))

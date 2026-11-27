@@ -13,7 +13,11 @@ import { buildRoutine, compileOnce, GCC } from './gen5-routine.ts'
 
 const hasCompiler = spawnSync(GCC, ['--version']).status === 0
 
-describe.skipIf(!hasCompiler)('buildRoutine', () => {
+// Building the routine twice takes 3.4 s alone and took 5.7 s beside another check, past vitest's
+// 5 s default (#106). The limit is twice its worst loaded time or more.
+const TWO_BUILDS_LIMIT = 30_000
+
+describe.skipIf(!hasCompiler)('buildRoutine', { timeout: TWO_BUILDS_LIMIT }, () => {
   it('builds code with no relocation, the same on both runs, its functions inside it', () => {
     const build = buildRoutine()
     expect(build.size).toBe(build.bytes.length)

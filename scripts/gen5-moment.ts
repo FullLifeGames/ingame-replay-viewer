@@ -1,17 +1,17 @@
 // The S6 run of the Gen 5 spike (#72), its run from the shipped save (#78) and the direct start
 // (#97): one battle moment driven from outside. It starts the session as gen5-moment-args.ts
 // says, as one plan: by default through our routine from boot, with a save or none, the park
-// writing the team of gen5-moment-team.ts (gen5-moment-direct.ts); with --entry walk from boot
-// with a save the page fetches from /saves/ and the continue route to the trainer's action menu,
-// or from the spike's battle state. A double's run ends after the readings at the action menu:
-// the moment is a single's. Then it reads the player's adapter, the server and both Pokémon from
+// writing the team of gen5-moment-team.ts or with --replay a test replay's (gen5-moment-direct.ts);
+// with --entry walk from boot with a save the page fetches from /saves/ and the continue route to
+// the trainer's action menu, or from the spike's battle state. A double's run and a replay's end
+// after the readings at the action menu: the moment is a single's with leads that know Tackle. Then it reads the player's adapter, the server and both Pokémon from
 // main RAM and plays the steps of gen5-moment-plan.ts from a fixed frame after the mark battle:
 // hold the server, answer the action menu and write one block per moment. It writes a frame per
 // mark under build/gen5/frames/ and the last mark's state under build/gen5/states/ (gitignored,
 // ADR 0002).
 // Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts [--scene known|unknown] [--save <name>]
 // [--entry direct|walk] [--battle single|double] [--player <name>] [--opponent <name>]
-// [--minutes 15].
+// [--replay <id>] [--minutes 15].
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -22,7 +22,6 @@ import { battleRefs } from '../src/gen5/battle-check.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import type { Gen5Global, MarkRecord, RunPlan, RunReport } from '../src/gen5/hook.ts'
 import { MAIN_RAM_SIZE, MAIN_RAM_START } from '../src/gen5/main-ram.ts'
-import { pkmFormat } from '../src/gen5/pkm-members.ts'
 import type { RamRef } from '../src/gen5/ram-check.ts'
 import type { RoutineBuild } from '../src/gen5/routine-order.ts'
 import {
@@ -33,7 +32,7 @@ import {
 } from './gen5-moment-args.ts'
 import { sessionPlan } from './gen5-moment-direct.ts'
 import { type Battle, readBattle } from './gen5-moment-read.ts'
-import { teamParties } from './gen5-moment-team.ts'
+import { momentTeam } from './gen5-moment-team.ts'
 import { markLines, writeLines } from './gen5-moment-log.ts'
 import { MOMENT_GAP, momentStart, momentSteps } from './gen5-moment-plan.ts'
 import { listedReader } from './gen5-bw2-source.ts'
@@ -74,7 +73,7 @@ const hook = (page: Page) => ({
     }),
 })
 
-type Team = ReturnType<typeof teamParties>
+type Team = Awaited<ReturnType<typeof momentTeam>>
 
 /** The session's options and the direct entry's team. */
 interface Session {
@@ -166,7 +165,7 @@ async function startSession(page: Page, dump: string, numbers: Bw2Numbers, sessi
     entry: numbers.entry,
     readRoutine: () => JSON.parse(readFileSync(GEN5_PATHS.routineJson, 'utf8')) as RoutineBuild,
     readState: readStateFile,
-    parties: team?.parties,
+    team,
   })
   for (const note of notes) log(`name cut: ${note}`)
   const fromBoot = start.from === 'boot'
@@ -180,10 +179,13 @@ async function startSession(page: Page, dump: string, numbers: Bw2Numbers, sessi
   return follow(page, label, deadlineMs)
 }
 
-/** The direct entry's team, its cut names logged; the walk writes none. */
-function sessionTeam(numbers: Bw2Numbers, options: MomentOptions): Team | undefined {
+/** The direct entry's team, its fallbacks and cut names logged; the walk writes none. */
+async function sessionTeam(numbers: Bw2Numbers, options: MomentOptions) {
   if (options.entry !== 'direct') return undefined
-  const team = teamParties(pkmFormat(numbers), options.names)
+  const team = await momentTeam(options.team, numbers)
+  for (const { line, kind, detail } of team.fallbacks) {
+    log(`team: line ${String(line)}, ${kind}: ${detail}`)
+  }
   for (const note of team.notes) log(`team: ${note}`)
   return team
 }
@@ -205,7 +207,7 @@ function sceneMoments(scene: SceneName, battle: Battle, numbers: Bw2Numbers) {
 
 async function play(page: Page, dump: string, numbers: Bw2Numbers, options: MomentOptions) {
   const { scene, label, deadlineMs } = options
-  const team = sessionTeam(numbers, options)
+  const team = await sessionTeam(numbers, options)
   const first = await startSession(page, dump, numbers, { options, team })
   logReport(first)
   if (first.status !== 'done') return 1
@@ -214,8 +216,9 @@ async function play(page: Page, dump: string, numbers: Bw2Numbers, options: Mome
   const ram = new Uint8Array(Buffer.from(base64, 'base64'))
   const battle = readBattle(ram, numbers, team?.written)
   log(`adapter ${hex(battle.adapter)}, server ${hex(battle.server)}`)
-  if (options.battle === 'double') {
-    log("double: the moment is a single's; the run ends at the action menu")
+  const atMenu = options.team.from === 'replay' ? 'replay' : options.battle
+  if (atMenu !== 'single') {
+    log(`${atMenu}: the run ends at the action menu`)
     return 0
   }
   const blocks = sceneMoments(scene, battle, numbers)

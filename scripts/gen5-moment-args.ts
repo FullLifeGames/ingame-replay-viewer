@@ -4,9 +4,10 @@
 // no save at all, and --battle double plays a double. With --entry walk the session walks as #78
 // did: from --save <name> the page fetches the save from /saves/, and the continue route
 // (src/gen5/continue-route.ts) plays to the trainer's action menu, where the moment starts; with
-// no save it starts as the spike's did, from the state s5-battle under build/gen5/states/.
+// no save it starts as the spike's did, from the state s5-battle under build/gen5/states/. With
+// --replay <id> the direct entry writes a test replay's teams and trainer names (#106).
 // Usage: --scene known|unknown, --save <name>, --entry direct|walk, --battle single|double,
-// --player <name>, --opponent <name>, --minutes <n>.
+// --player <name>, --opponent <name>, --replay <id>, --minutes <n>.
 import { parseArgs } from 'node:util'
 
 import type { ActorPlace } from '../src/gen5/bw2-numbers.ts'
@@ -31,13 +32,17 @@ type MomentEntry = 'walk' | 'direct'
 /** The direct entry's battle style. */
 type MomentBattle = ParkSides['style']
 
+/** What the direct entry writes: the hand team of gen5-moment-team.ts with the names given, or
+ * the teams and trainer names of the test replay `id` (test/fixtures/replays/). */
+export type MomentTeam = { from: 'hand'; names: ParkNames } | { from: 'replay'; id: string }
+
 export interface MomentOptions {
   scene: SceneName
   start: MomentStart
   entry: MomentEntry
   battle: MomentBattle
-  /** The names the direct entry writes for both sides. */
-  names: ParkNames
+  /** The team the direct entry writes, and its names. */
+  team: MomentTeam
   /** The prefix of the run's frames and states. */
   label: string
   deadlineMs: number
@@ -80,12 +85,46 @@ function startOf(save: string | undefined, entry: MomentEntry): MomentStart {
   return { from: 'boot', save, query: `?save=${save}` }
 }
 
-/** The prefix of the run's frames: the save or nosave, or s6 from the state, then the entry, the
- * scene and a double's mark. */
-function labelOf(start: MomentStart, entry: MomentEntry, scene: SceneName, battle: MomentBattle) {
+/** A test replay's id: lower-case letters and digits with single hyphens between them. */
+const REPLAY_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+/** The hand team with the names given or their defaults, or the replay, which brings its own
+ * names and plays a single of the direct entry. */
+function teamOf(
+  values: {
+    replay?: string | undefined
+    player?: string | undefined
+    opponent?: string | undefined
+  },
+  entry: MomentEntry,
+  battle: MomentBattle,
+): MomentTeam {
+  const { replay: id, player, opponent } = values
+  if (id === undefined) {
+    return { from: 'hand', names: { player: player ?? 'Viewer', opponent: opponent ?? 'Showdown' } }
+  }
+  if (entry !== 'direct') {
+    throw new Error("--replay is for --entry direct alone: the walk meets the save's trainer.")
+  }
+  if (battle === 'double') throw new Error('--replay plays a single.')
+  if (player !== undefined || opponent !== undefined) {
+    throw new Error(
+      '--player and --opponent are refused with --replay: the names come from the replay.',
+    )
+  }
+  if (!REPLAY_ID.test(id)) {
+    const rule = 'lower-case letters and digits with single hyphens between them'
+    throw new Error(`--replay takes a test replay's id, ${rule}, not "${id}".`)
+  }
+  return { from: 'replay', id }
+}
+
+/** The prefix of the run's frames: the save or nosave, or s6 from the state, then the entry, and
+ * the replay's id or the scene and a double's mark. */
+function labelOf(start: MomentStart, entry: MomentEntry, scene: SceneName, team: MomentTeam) {
   const from = start.from === 'boot' ? (start.save ?? 'nosave') : 's6'
   const via = entry === 'direct' ? '-direct' : ''
-  return `${from}${via}-${scene}${battle === 'double' ? '-double' : ''}`
+  return team.from === 'replay' ? `${from}${via}-${team.id}` : `${from}${via}-${scene}`
 }
 
 export function readMomentOptions(args: string[], now: number): MomentOptions {
@@ -97,8 +136,9 @@ export function readMomentOptions(args: string[], now: number): MomentOptions {
       minutes: { type: 'string', default: '15' },
       entry: { type: 'string', default: 'direct' },
       battle: { type: 'string' },
-      player: { type: 'string', default: 'Viewer' },
-      opponent: { type: 'string', default: 'Showdown' },
+      player: { type: 'string' },
+      opponent: { type: 'string' },
+      replay: { type: 'string' },
     },
   })
   const { scene } = values
@@ -108,9 +148,9 @@ export function readMomentOptions(args: string[], now: number): MomentOptions {
   const entry = entryOf(values.entry)
   const start = startOf(values.save, entry)
   const battle = battleOf(values.battle, entry)
-  const names = { player: values.player, opponent: values.opponent }
-  const label = labelOf(start, entry, scene, battle)
-  return { scene, start, entry, battle, names, label, deadlineMs: now + minutes * 60_000 }
+  const team = teamOf(values, entry, battle)
+  const label = `${labelOf(start, entry, scene, team)}${battle === 'double' ? '-double' : ''}`
+  return { scene, start, entry, battle, team, label, deadlineMs: now + minutes * 60_000 }
 }
 
 /** Where the session starts, for the log. */
