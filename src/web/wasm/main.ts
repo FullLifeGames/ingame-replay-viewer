@@ -40,7 +40,7 @@ import {
   spaceToggles,
   togglePause,
 } from './pause'
-import { grant, readStatus, type Speed, writePace } from './protocol'
+import { grant, readStatus, type Speed } from './protocol'
 import {
   type Built,
   buildModule,
@@ -54,6 +54,7 @@ import {
   watchRun,
 } from './run'
 import { Runs } from './runs'
+import { changeSpeed as changeRunSpeed } from './speed-change'
 import { pressStart } from './start-press'
 import { findWasmView, type WasmView } from './view'
 
@@ -182,8 +183,7 @@ function createViewer(view: WasmView) {
   const changeSpeed = (speed: Speed) => {
     const run = runs.current
     if (run === undefined) return
-    run.clock.change(speed, performance.now(), readStatus(run.control).frame)
-    writePace(run.control, speed)
+    changeRunSpeed(run.control, run.clock, speed, performance.now())
   }
   drawLoop(view, runs, changeSpeed)
 

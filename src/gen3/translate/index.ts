@@ -37,7 +37,7 @@ import {
 } from './moves'
 import { negativeStatReset, statChange, statLimit, statReset } from './stats'
 import { cant, cureStatus, cureTeam, status } from './status'
-import { faint, switchIn } from './switches'
+import { faint, replace, switchIn } from './switches'
 import { tablesOf } from './tables'
 
 type Handler<K extends ScriptEvent['kind']> = (event: EventOf<K>, ctx: Context) => void
@@ -48,6 +48,7 @@ const HANDLERS = {
   battleStart,
   turn,
   switchIn,
+  replace,
   faint,
   message,
   win,

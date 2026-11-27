@@ -2,7 +2,9 @@
 // Pokémon back and sends the new one; Roar (`BattleScript_RoarSuccessSwitch`) and Baton Pass
 // (`BattleScript_EffectBatonPass`) return it without a word; a faint plays before its line.
 // Destiny Bond's attacker hears the held line and drains its bar before it faints; a target that
-// a multi-hit move's last hit knocks out hears the move's last lines after its own.
+// a multi-hit move's last hit knocks out hears the move's last lines after its own. Illusion's end
+// swaps the real Pokémon in without a word; the `-end` after it says the game's line.
+import { illusionGap } from '../fallbacks'
 import { fainted } from '../text/phrases'
 import { draggedOut, sentOut, withdrawn } from '../text/phrases-field'
 import type { Context, EventOf } from './context'
@@ -32,6 +34,19 @@ export function switchIn(event: SwitchInEvent, ctx: Context): void {
     ctx.emit(line, { op: 'switchIn', ...entering })
   }
   ctx.enter(who)
+}
+
+/**
+ * Illusion's end (#98, D5): the disguise goes back and the real Pokémon comes in at the disguise's
+ * HP and status, with neither switch line. The game morphs the sprite in place instead.
+ */
+export function replace(event: EventOf<'replace'>, ctx: Context): void {
+  const { who, replaces, line } = event
+  ctx.emit(line, { op: 'withdraw', side: ctx.activeSide(replaces) })
+  const status = event.status ?? 'none'
+  ctx.emit(line, { op: 'switchIn', side: who.side, slot: who.index, hp: scaleHp(event.hp), status })
+  ctx.enter(who)
+  ctx.note(line, illusionGap())
 }
 
 /**

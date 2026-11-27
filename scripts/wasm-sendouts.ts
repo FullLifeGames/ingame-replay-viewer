@@ -3,9 +3,10 @@
 // function of each back set. A far send-out plays the species' front animation (`.frontAnimId`,
 // DoMonFrontSpriteAnimation in src/pokemon.c); a near one plays a function of the species' back set
 // (`.backAnimId`), and the mon's nature picks which of the set's three
-// (LaunchAnimationTaskForBackSprite in src/pokemon_animation.c). The stream sets no nature, so a
-// back set counts as reached, the function inside it is the one the drawn nature picks, and the
-// streams do not play every back function.
+// (LaunchAnimationTaskForBackSprite in src/pokemon_animation.c). The stream sets no nature. The ROM
+// draws each personality from a generator of its own with a fixed seed (#103), so each mon's nature
+// is fixed and the same in both engines. A back set counts as reached, the function inside it is
+// the one that fixed nature picks, and the streams do not play every back function.
 //
 // A team holds six mons, and a battle sends out no species its team lacks, so the streams are
 // several battles: each sends out six far species, one after the other by WITHDRAW and SWITCH_IN,

@@ -221,6 +221,24 @@ describe('sides and the field', () => {
     expect(streamOfLog(...lines).fallbacks.filter(({ line }) => line >= NEXT)).toEqual([])
   })
 
+  // Toxic Spikes in Gen 4 and 5 logs (#105): set, taken up by a Poison-type Pokémon that comes in
+  // (`[of]` alone), set again and blown away by Rapid Spin (`[from]` and `[of]`).
+  it("says Toxic Spikes set, absorbed and blown away in the game's words", () => {
+    const lines = [
+      '|-sidestart|p2: Bob|move: Toxic Spikes',
+      '|-sideend|p2: Bob|move: Toxic Spikes|[of] p2a: Tyranitar',
+      '|-sidestart|p2: Bob|move: Toxic Spikes',
+      '|-sideend|p2: Bob|move: Toxic Spikes|[from] move: Rapid Spin|[of] p2a: Tyranitar',
+    ]
+    expect(sceneOf(...lines).map(plain)).toEqual([
+      'Toxic spikes were scattered on the ground all around the opposing side!',
+      'The toxic spikes disappeared from the ground around the opposing side!',
+      'Toxic spikes were scattered on the ground all around the opposing side!',
+      'The opposing Tyranitar blew away Toxic Spikes!',
+    ])
+    expect(streamOfLog(...lines).fallbacks.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
+
   // Showdown's Gen 3 Mist is a side condition (`data/moves.ts` `mist`); the game says
   // gText_PkmnShroudedInMist with the user as B_ATK (`BattleScript_EffectMist`).
   it("says Mist's start on a side by its user, as the game does", () => {

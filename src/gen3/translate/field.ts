@@ -76,8 +76,8 @@ export function sideStart({ side, condition, line }: EventOf<'sideStart'>, ctx: 
 }
 
 export function sideEnd(event: EventOf<'sideEnd'>, ctx: Context): void {
-  const { side, condition, source, line } = event
-  ctx.print(line, sideEnded(side, condition, source && ctx.mon(source)))
+  const { side, condition, source, cause, line } = event
+  ctx.print(line, sideEnded(side, condition, source && ctx.mon(source), cause))
 }
 
 export function fieldActivate({ effect, line }: EventOf<'fieldActivate'>, ctx: Context): void {

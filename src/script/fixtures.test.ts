@@ -53,13 +53,14 @@ describe('the test replays', () => {
   // from the ladder with HP in percent (#86), and two Gen 5 OU replays that open with Team
   // Preview, one from a Smogon tournament and one from the ladder (#87), and two Gen 9 OU replays
   // with Terastallization, one from a Smogon tournament with Ivy Cudgel's looks and one from the
-  // ladder with snow (#88).
-  it('are ten tournament replays and seven from the ladder', () => {
+  // ladder with snow (#88), and two Gen 9 random battles from the ladder in which Zoroark's
+  // Illusion ends, once on a hit it survives and once on a knock-out (#98).
+  it('are ten tournament replays and nine from the ladder', () => {
     expect(replays.filter(({ file }) => file.startsWith('smogtours-'))).toHaveLength(10)
-    expect(replays).toHaveLength(17)
+    expect(replays).toHaveLength(19)
   })
 
-  it('hold seven Gen 3 OU, one Gen 3 random battle, one Gen 1, two each of Gen 2, 4, 5 and 9', () => {
+  it('hold seven Gen 3 OU, one Gen 1, two each of Gen 2, 4, 5 and 9 OU, and three random battles', () => {
     const formats = replays.map(({ file }) => formatOf(file))
     expect(formats.filter((format) => format === 'gen3ou')).toHaveLength(7)
     expect(formats.filter((format) => format === 'gen3randombattle')).toHaveLength(1)
@@ -68,6 +69,7 @@ describe('the test replays', () => {
     expect(formats.filter((format) => format === 'gen4ou')).toHaveLength(2)
     expect(formats.filter((format) => format === 'gen5ou')).toHaveLength(2)
     expect(formats.filter((format) => format === 'gen9ou')).toHaveLength(2)
+    expect(formats.filter((format) => format === 'gen9randombattle')).toHaveLength(2)
   })
 
   it.each(replays)(
@@ -94,6 +96,7 @@ describe('formatOf', () => {
     ['smogtours-gen5ou-862240', 'gen5ou'],
     ['smogtours-gen9ou-886489', 'gen9ou'],
     ['gen9ou-2719598518', 'gen9ou'],
+    ['gen9randombattle-2719775756', 'gen9randombattle'],
   ])('reads the format of %s as %s', (id, format) => {
     expect(formatOf(id)).toBe(format)
   })

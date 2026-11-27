@@ -121,6 +121,18 @@ describe('outcomesOf the kinds that play later', () => {
     ])
   })
 
+  // Illusion's look and the game's own disguise belong with the abilities (lane plan D8).
+  it("lists Illusion's end with #109", () => {
+    expect(
+      outcomesFrom(
+        '|turn|1',
+        '|-damage|p1a: Dugtrio|40/100',
+        '|replace|p1a: Zoroark|Zoroark, M',
+        '|-end|p1a: Zoroark|Illusion',
+      ),
+    ).toEqual(['turn boundary', 'damage play', 'replace later #109', 'effectEnd later #109'])
+  })
+
   it('lists the kinds no issue names with #110', () => {
     expect(
       outcomesFrom(
