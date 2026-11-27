@@ -26,7 +26,8 @@ import {
   pickSymbols,
 } from './gen5-bw2-c.ts'
 import { battleNumbers } from './gen5-bw2-battle.ts'
-import { checkEffectLiterals, EFFECT_SOURCES, effectNumbers } from './gen5-bw2-effects.ts'
+import { checkEffectLiterals } from './gen5-bw2-effect-literals.ts'
+import { EFFECT_SOURCES, effectNumbers } from './gen5-bw2-effects.ts'
 import { checkPartyRoom } from './gen5-bw2-mon-ids.ts'
 import { checkPlayerClient } from './gen5-bw2-clients.ts'
 import { BATTLE_OVERLAY, BOOT_LINKS, ENTRY_SOURCES, entryNumbers } from './gen5-bw2-entry.ts'
@@ -204,7 +205,12 @@ function parse(sources: Sources): Bw2Numbers {
   const text = textNumbers(sources)
   checkBackendLines(sources, text)
   const effects = effectNumbers(sources, battle.constants)
-  checkEffectLiterals(sources, { items: pkm.items, hideWindow: effects.hideWindow })
+  checkEffectLiterals(sources, {
+    items: pkm.items,
+    constants: battle.constants,
+    hideWindow: effects.hideWindow,
+    addEffects: effects.addEffects,
+  })
   return {
     pokebw2: { ...POKEBW2 },
     symbols: pickSymbols(ov167, SYMBOL_NAMES),

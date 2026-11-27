@@ -15,7 +15,7 @@ import {
   GEN5_WEATHER,
 } from '../src/gen5/backend/effect-names.ts'
 import { readSources } from './gen5-bw2.ts'
-import { checkEffectLiterals } from './gen5-bw2-effects.ts'
+import { CANT_CONDITIONS, checkEffectLiterals, effectLiterals } from './gen5-bw2-effect-literals.ts'
 import { listedReader } from './gen5-bw2-source.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
@@ -90,14 +90,37 @@ describe.skipIf(!existsSync(FILE))("the effects' names and numbers on the genera
     expect(names.filter((name) => pkm.abilities[name] === undefined)).toEqual([])
   })
 
-  // Scene: Knock Off, a held item's use and Focus Punch send a name's number where their C writes a
-  // literal; the generator held each literal to its name, and the pin must still match. The check's
-  // error names the function and the role alone.
-  it('hold the literals of Knock Off, a held item, the effect at a position and Focus Punch to their names', () => {
+  // Scene: Knock Off, a held item's use, Focus Punch, a cure and a stopped move send a name's
+  // number where their C writes a literal; the generator held each literal to its name, and the pin
+  // must still match. The check's error names the function and the role alone.
+  it('hold the literals of Knock Off, a held item, the effect at a position, Focus Punch, the cures and the stopped moves to their names', () => {
     const sources = readSources(listedReader(GEN5_PATHS.pokebw2))
-    const { pkm, effects } = real()
+    const { pkm, effects, battle } = real()
     expect(() => {
-      checkEffectLiterals(sources, { items: pkm.items, hideWindow: effects.hideWindow })
+      checkEffectLiterals(sources, {
+        items: pkm.items,
+        constants: battle.constants,
+        hideWindow: effects.hideWindow,
+        addEffects: effects.addEffects,
+      })
     }).not.toThrow()
+  })
+
+  // Scene: a cure clears the icon to CONDITION_NONE, and a sleep, a paralysis or a freeze that
+  // stops a move plays the effect its condition plays as it starts (the review's U3 and U4). The
+  // list names each literal that differs, by function and condition.
+  it('find the cure icons at CONDITION_NONE and each stopped move at its condition’s effect', () => {
+    const read = effectLiterals(readSources(listedReader(GEN5_PATHS.pokebw2)))
+    const { battle, effects } = real()
+    const none = battle.constants.CONDITION_NONE
+    const held: [string, boolean][] = [
+      ['ServerControl_CureStatus', read.cureStatusIcon === none],
+      ['ServerControl_CureCondition', read.cureConditionIcon === none],
+      ...CANT_CONDITIONS.map((condition): [string, boolean] => [
+        `ServerControl_MoveFail ${condition}`,
+        read.cantEffects[condition] === effects.addEffects[condition],
+      ]),
+    ]
+    expect(held.filter(([, same]) => !same).map(([name]) => name)).toEqual([])
   })
 })

@@ -112,7 +112,7 @@ describe('a cure', () => {
     ]
     expect(writtenAt(writes(...lines), 2)).toEqual([
       cmd('SC_OP_CURE_CONDITION', TYRANITAR.monId),
-      cmd('SC_SET_GAUGE_STATUS', TYRANITAR.monId, 0),
+      cmd('SC_SET_GAUGE_STATUS', TYRANITAR.monId, constant('CONDITION_NONE')),
     ])
   })
 
@@ -125,7 +125,7 @@ describe('a cure', () => {
     ]
     expect(writtenAt(writes(...lines), 2)).toEqual([
       cmd('SC_OP_CURE_CONDITION', DUGTRIO.monId),
-      cmd('SC_SET_GAUGE_STATUS', DUGTRIO.monId, 0),
+      cmd('SC_SET_GAUGE_STATUS', DUGTRIO.monId, constant('CONDITION_NONE')),
       set('wokeUp', DUGTRIO.monId),
     ])
   })

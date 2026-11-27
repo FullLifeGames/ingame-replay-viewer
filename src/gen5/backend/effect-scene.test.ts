@@ -55,6 +55,6 @@ describe('the specs’ helpers', () => {
   })
 
   it('name a constant that REPLAY_NUMBERS lacks', () => {
-    expect(() => constant('CONDITION_NONE')).toThrow('REPLAY_NUMBERS has no CONDITION_NONE')
+    expect(() => constant('CONDITION_TAUNT')).toThrow('REPLAY_NUMBERS has no CONDITION_TAUNT')
   })
 })

@@ -7,10 +7,11 @@
 // them, the poison constant and ITEM_NONE, with the generated numbers.
 import type { EffectInput } from './gen5-bw2-effects.ts'
 
-/** The battle's constants the reader adds to, by pokebw2's names. */
-export const EFFECTS_CONSTANTS = { CONDITION_POISON: 0x41 }
+/** The battle's constants the reader adds to and `checkEffectLiterals` holds the cure icons to,
+ * by pokebw2's names. */
+export const EFFECTS_CONSTANTS = { CONDITION_POISON: 0x41, CONDITION_NONE: 0x40 }
 
-/** The generated items that `checkEffectLiterals` holds the literals to: ITEM_NONE alone. */
+/** The generated items that `checkEffectLiterals` holds two literals to: ITEM_NONE alone. */
 export const EFFECTS_ITEMS = { ITEM_NONE: 0x2f }
 
 export const EFFECTS_INPUT: EffectInput = {
@@ -98,6 +99,64 @@ void ServerDisplay_AddCondition(BtlServerFlow *flow, BattleMon *mon, s32 conditi
 }
 
 void ServerControl_ChangeHeldItem(BtlServerFlow *flow, BOOL consume, BattleMon *mon, u16 item) {
+}
+
+void ServerControl_MoveFail(BtlServerFlow *flow, BattleMon *mon, u16 move, s32 cause) {
+    if (cause == 0x25) {
+        ServerControl_ConfusionDamage(flow, mon);
+    } else {
+        ServerDisplay_MoveFailMessage(flow, mon, move, cause);
+        switch (cause) {
+        case 0x24:
+            ServerDisplay_AddEffectAtPosition(flow, mon, 0x7a8);
+            break;
+        case 0x26: {
+            ServerDisplay_AddEffectAtPosition(flow, mon, 0x7ac);
+            break;
+        }
+        case 0x21:
+            ServerDisplay_AddEffectAtPosition(flow, mon, 0x7a2);
+            break;
+        case 0x23:
+            ServerDisplay_AddEffectAtPosition(flow, mon, 0x7a4);
+            break;
+        }
+    }
+}
+
+void ServerControl_CureCondition(BtlServerFlow *flow, BattleMon *mon, s32 condition, BattleCondition *prev) {
+    if (condition < 7) {
+        BtlServerCmdQueue_Put(flow->queue, SC_OP_CURE_CONDITION, monId);
+        if (GetBattlePos(&flow->posPoke, monId) != BTL_POS_NONE) {
+            BtlServerCmdQueue_Put(flow->queue, SC_SET_GAUGE_STATUS, monId, 0x40);
+        }
+    }
+}
+
+BOOL ServerControl_CheckMoveFail(BtlServerFlow *flow, BattleMon *mon, u16 move, u8 flag) {
+    do {
+        if (status == CONDITION_FREEZE && !thawedByMove) {
+            cause = 0x23;
+            break;
+        }
+        if (status == CONDITION_SLEEP && !ServerEvent_CanUseMoveAsleep(flow, mon, move, CONDITION_SLEEP)) {
+            cause = 0x21;
+            break;
+        }
+        if (status == CONDITION_PARALYSIS && RollEffectChance(chance)) {
+            cause = 0x24;
+            break;
+        }
+    } while (0);
+    if (status == CONDITION_SLEEP) {
+        ServerDisplay_AddEffectAtPosition(flow, mon, 0x7a2);
+    }
+    return FALSE;
+}
+
+void ServerControl_CureStatus(BtlServerFlow *flow, BattleMon *mon, u32 status, BOOL flag) {
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_CURE_CONDITION, monId);
+    BtlServerCmdQueue_Put(flow->queue, SC_SET_GAUGE_STATUS, monId, 0x40);
 }
 
 BOOL ServerControl_UseHeldItem(BtlServerFlow *flow, BattleMon *mon) {

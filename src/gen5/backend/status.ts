@@ -21,10 +21,6 @@ import type { Gen5Line } from './lines.ts'
 import { gen5, gen5Item } from './names.ts'
 import type { EventOf } from './rules.ts'
 
-/** The icon SC_SET_GAUGE_STATUS clears to: the literal ServerControl_CureStatus and
- * ServerControl_CureCondition put. */
-const NO_STATUS_ICON = 0
-
 /** The line GetConditionAddMessage picks for each status. */
 const ADD_LINES: Readonly<Record<StatusName, Gen5Line>> = {
   brn: LINES.burned,
@@ -103,15 +99,17 @@ function statusCommands(scene: EffectScene, event: EventOf<'status'>) {
 const cureLine = (status: StatusName): Gen5Line =>
   status === 'slp' ? LINES.wokeUp : status === 'frz' ? LINES.thawed : LINES.statusCured
 
-/** A cure: SC_OP_CURE_CONDITION and the icon cleared, for a Pokémon in place. In silence, as
- * Natural Cure's through BattleHandler_CureCondition and ServerControl_CureCondition, the two
- * alone; with the status's own line, ServerControl_CureStatus's line after them. */
+/** A cure: SC_OP_CURE_CONDITION and the icon cleared to CONDITION_NONE, which
+ * ServerControl_CureStatus and ServerControl_CureCondition write as a literal (the generator holds
+ * both to the name), for a Pokémon in place. In silence, as Natural Cure's through
+ * BattleHandler_CureCondition and ServerControl_CureCondition, the two alone; with the status's
+ * own line, ServerControl_CureStatus's line after them. */
 function cureCommands(scene: EffectScene, event: EventOf<'cureStatus'>) {
   const who = scene.state.inPlace(event.who)
   if (who === undefined || (event.silent !== true && event.msg !== true)) return undefined
   const ops: ServerCommand[] = [
     { command: 'SC_OP_CURE_CONDITION', args: [who.monId] },
-    { command: 'SC_SET_GAUGE_STATUS', args: [who.monId, NO_STATUS_ICON] },
+    { command: 'SC_SET_GAUGE_STATUS', args: [who.monId, battleConstant(scene, 'CONDITION_NONE')] },
   ]
   return event.silent === true ? ops : [...ops, message(scene, cureLine(event.status), [who.monId])]
 }
