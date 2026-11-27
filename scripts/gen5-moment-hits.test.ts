@@ -55,6 +55,7 @@ describe('the hits turn as blocks', () => {
     expect([...new Set(groups.flat())]).toEqual(['hit', 'miss', 'heal'])
   })
 
+  // The turn's end opens with the hidden message window, as ServerControl_TurnCheck puts it (#109).
   it('sends the hit’s flash and both lines, the miss line and the Leftovers heal', () => {
     expect(replay.blocks.flatMap((block) => block.commands.map((one) => one.command))).toEqual([
       'SC_MOVE_MSG',
@@ -65,6 +66,7 @@ describe('the hits turn as blocks', () => {
       'SC_MSG_STD',
       'SC_MOVE_MSG',
       'SC_MSG_SET',
+      'SC_HIDE_MSG_WINDOW',
       'SC_USE_HELD_ITEM',
       'SC_EFFECT_BY_POS',
       'SC_OP_ADD_HP',

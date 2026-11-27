@@ -3,14 +3,14 @@
 // the silent bar of an HP change that does not play yet (lane plan D1, D6). Each line comes from
 // the text banks by its label (lines.ts). Pure: every number of the game comes in from
 // build/gen5/bw2.json.
-import type { ScriptEvent } from '../../script/events.ts'
-import type { HpFraction, PokemonRef } from '../../script/types.ts'
+import type { Hit, ScriptEvent } from '../../script/events.ts'
+import type { Effect, HpFraction, PokemonRef } from '../../script/types.ts'
 import type { FlowNumbers, TextNumbers } from '../bw2-numbers.ts'
 import type { ServerCommand } from '../server-cmd.ts'
 import type { BattleState, InPlace } from './battle-state.ts'
 import { type Gen5Line, GEN5_LINES, lineId } from './lines.ts'
-import { gen5Item } from './names.ts'
-import { type EventOf, isLeftovers } from './rules.ts'
+import { causeId, gen5Item } from './names.ts'
+import type { EventOf } from './rules.ts'
 
 /** A move that plays: its user and its target in place, and its number. */
 export interface PlayedMove {
@@ -32,9 +32,9 @@ export interface HitScene {
 const sameRef = (a: PokemonRef, b: PokemonRef | undefined) =>
   a.side === b?.side && a.index === b.index
 
-const std = (scene: HitScene, line: Gen5Line): ServerCommand => ({
+const std = (text: TextNumbers, line: Gen5Line): ServerCommand => ({
   command: 'SC_MSG_STD',
-  message: lineId(scene.numbers.text, line),
+  message: lineId(text, line),
   args: [],
 })
 
@@ -63,13 +63,22 @@ function hit(scene: HitScene, event: EventOf<'damage'>, move: PlayedMove): Serve
     args: [1, damageKinds[kind], move.move],
     bytes: [move.target.monId],
   }
-  const effective =
-    event.effectiveness === undefined
-      ? []
-      : [std(scene, GEN5_LINES[kind === 'super' ? 'superEffective' : 'notVeryEffective'])]
-  const critical = event.crit === true ? [std(scene, GEN5_LINES.critical)] : []
-  return [...hpOp(scene, event.who, event.hp), flash, ...effective, ...critical]
+  return [...hpOp(scene, event.who, event.hp), flash, ...hitLines(scene.numbers.text, event)]
 }
+
+/** The lines after a hit on one target: the effectiveness line
+ * (ServerDisplay_EffectivenessMessageMulti), then the critical hit's line
+ * (ServerDisplay_CriticalHitMessage); a hit on a Substitute shows them too. */
+export function hitLines(text: TextNumbers, hit: Hit): ServerCommand[] {
+  const { effectiveness } = hit
+  const effective =
+    effectiveness === undefined
+      ? []
+      : [std(text, GEN5_LINES[effectiveness === 'super' ? 'superEffective' : 'notVeryEffective'])]
+  return [...effective, ...(hit.crit === true ? [std(text, GEN5_LINES.critical)] : [])]
+}
+
+const isLeftovers = (cause: Effect | undefined) => causeId('item', cause) === 'leftovers'
 
 /** ServerControl_UseHeldItem reserves SC_USE_HELD_ITEM; HandlerLeftoversUse asks for the heal,
  * ServerControl_RecoverHPCore shows its effect at the Pokémon's position and moves the bar
@@ -112,7 +121,7 @@ const SEQUENCES: { readonly [K in 'damage' | 'miss' | 'immune' | 'fail' | 'heal'
       : undefined
   },
   // ServerDisplay_MoveFailed.
-  fail: (scene) => scene.move && [std(scene, GEN5_LINES.failed)],
+  fail: (scene) => scene.move && [std(scene.numbers.text, GEN5_LINES.failed)],
   heal: (scene, event) => {
     const who = scene.state.inPlace(event.who)
     return who && isLeftovers(event.cause) ? leftovers(scene, event, who) : undefined

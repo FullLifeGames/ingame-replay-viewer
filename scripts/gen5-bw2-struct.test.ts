@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { firstMember, structLayout } from './gen5-bw2-struct'
+import { firstMember, memberLayout, structLayout } from './gen5-bw2-struct'
 
 // Invented structs for the spec: a function-pointer typedef, a nested struct with an array and
 // padding, a pointer, bit-fields in a halfword that the cursor has to move up to, and a cut one.
@@ -164,5 +164,30 @@ describe("structLayout on the direct entry's shapes", () => {
   it('throws on an array sized by a name that no define gives', () => {
     const odd = ENTRY_SOURCE.replace('#define SEAT_COUNT 3', '')
     expect(() => structLayout(odd, 'Coach')).toThrow(/SEAT_COUNT/)
+  })
+})
+
+// Scene: a battle condition is a union of structs, and the reader lays out one of them by its body.
+describe('memberLayout', () => {
+  it("lays out one struct of a union by its body's members", () => {
+    const body = '\n    u32 spare : 4;\n    u32 lane : 9; // kept\n    Lamp lamp;\n'
+    expect(memberLayout(SOURCE, body)).toEqual({
+      size: 0x10,
+      align: 4,
+      fields: {
+        spare: { offset: 0, size: 4, bit: 0, bits: 4 },
+        lane: { offset: 0, size: 4, bit: 4, bits: 9 },
+        lamp: { offset: 4, size: 0x0c },
+        'lamp.glow': { offset: 4, size: 4 },
+        'lamp.tilt': { offset: 8, size: 6 },
+        'lamp.hue': { offset: 0x0e, size: 1 },
+      },
+    })
+  })
+
+  it('still refuses a union inside the body', () => {
+    expect(() => memberLayout(SOURCE, 'union { u32 raw; } inner;')).toThrow(
+      'cannot lay out the member "union { u32 raw"',
+    )
   })
 })

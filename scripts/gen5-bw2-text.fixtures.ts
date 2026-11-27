@@ -1,14 +1,14 @@
-// The invented text banks that the text reader's specs hand to it (#107): the labels the backend
-// names, in an order of their own between filler labels, and each bank's pad line last. The text
-// after each label is our own plain words, with none of the game text's tags. The reader keeps a
+// The invented text banks that the text reader's specs hand to it (#107, #109): the labels the
+// backend names, in an order of their own between filler labels, and each bank's pad line last. The
+// text after each label is our own plain words, with none of the game text's tags. The reader keeps a
 // label's line index, so scripts/gen5-fixtures-real.test.ts compares those indices with the
 // generated ones.
 import type { TextInput } from './gen5-bw2-text.ts'
 
 const bank = (lines: readonly string[]) => `${lines.join('\n')}\n`
 
-/** A standard bank of seven labels and a set bank of eight, each with filler labels between the
- * backend's own. */
+/** A standard bank of eleven labels and a set bank of fifty-five, each with filler labels between
+ * the backend's own. */
 export const TEXT_INPUT: TextInput = {
   standardBank: bank([
     'Bank0019_Text_FillerAlpha = An invented line.',
@@ -18,6 +18,10 @@ export const TEXT_INPUT: TextInput = {
     'Bank0019_Text_ButFailed = An invented line for a move that\\ndid nothing.',
     'Bank0019_Text_FillerGamma = A third invented line.',
     'Bank0019_Text_ItsSuperEffective = An invented line for a strong hit.',
+    'Bank0019_Text_FillerEta = A fourth invented line.',
+    'Bank0019_Text_PointedStonesDisappearedFrom = The invented line of a side swept clean.',
+    'Bank0019_Text_FillerTheta = A fifth invented line.',
+    'Bank0019_Text_PointedStonesFloatAir = The invented line of stones around a side.',
     '\\pad{9}',
   ]),
   setBank: bank([
@@ -29,6 +33,53 @@ export const TEXT_INPUT: TextInput = {
     'Bank0018_Text_DraggedOut = The invented line of a Pokémon pulled in.',
     'Bank0018_Text_FillerZeta = A last invented line.',
     'Bank0018_Text_Fainted = The invented line of a Pokémon that falls.',
+    'Bank0018_Text_SubstituteTookDamage = The doll takes the hit in an invented line.',
+    'Bank0018_Text_FillerIota = An invented line in between.',
+    'Bank0018_Text_HurtByItsBurn = The invented line of a burn that stings.',
+    'Bank0018_Text_Burned = The invented line of a Pokémon set alight.',
+    'Bank0018_Text_SAirBalloonPopped = The invented line of a balloon gone.',
+    'Bank0018_Text_FillerKappa = Another invented line in between.',
+    'Bank0018_Text_FastAsleep = The invented line of a Pokémon that sleeps on.',
+    'Bank0018_Text_SAttackFell = The invented line of a stat that drops.',
+    'Bank0018_Text_KnockedOffS = The invented line of an item knocked away.',
+    'Bank0018_Text_ProtectedItself_2 = The invented line of a guard that holds.',
+    'Bank0018_Text_FillerLambda = A third invented line in between.',
+    'Bank0018_Text_FellAsleep = The invented line of a Pokémon that dozes off.',
+    'Bank0018_Text_PointedStonesDugInto = The invented line of stones that cut.',
+    'Bank0018_Text_LostSomeItsHp = The invented line of an orb that costs health.',
+    'Bank0018_Text_ThawedOut = The invented line of ice that melts.',
+    'Bank0018_Text_FillerMu = A fourth invented line in between.',
+    'Bank0018_Text_SAttackWontGo_2 = The invented line of a stat at its floor.',
+    'Bank0018_Text_BadlyPoisonedBy = The invented line of an orb that poisons.',
+    'Bank0018_Text_PutSubstitute = The invented line of a doll set up.',
+    'Bank0018_Text_FrozenSolid = The invented line of a Pokémon iced over.',
+    'Bank0018_Text_FillerNu = A fifth invented line in between.',
+    'Bank0018_Text_HadItsEnergyDrained = The invented line of a drained target.',
+    'Bank0018_Text_SLetMoveFirst = The invented line of a berry that hurries.',
+    'Bank0018_Text_Poisoned = The invented line of a Pokémon poisoned.',
+    'Bank0018_Text_FlinchedCouldntMove = The invented line of a Pokémon that flinches.',
+    'Bank0018_Text_FillerXi = A sixth invented line in between.',
+    'Bank0018_Text_SAttackRose = The invented line of a stat that climbs.',
+    'Bank0018_Text_TighteningItsFocus = The invented line of a Pokémon that focuses.',
+    'Bank0018_Text_WokeUp = The invented line of a Pokémon that wakes.',
+    'Bank0018_Text_BuffetedByHail = The invented line of hail that hurts.',
+    'Bank0018_Text_FillerOmicron = A seventh invented line in between.',
+    'Bank0018_Text_ParalyzedMayUnableMove = The invented line of a Pokémon gone stiff.',
+    'Bank0018_Text_SSubstituteFaded = The invented line of a doll that fades.',
+    'Bank0018_Text_Hurt_2 = The invented line of barbs that prick.',
+    'Bank0018_Text_FrozenSolid_2 = The invented line of a Pokémon stuck in ice.',
+    'Bank0018_Text_FillerPi = An eighth invented line in between.',
+    'Bank0018_Text_RestoredItsHealthUsing = The invented line of a berry that heals.',
+    'Bank0018_Text_SAttackWontGo = The invented line of a stat at its ceiling.',
+    'Bank0018_Text_BadlyPoisoned = The invented line of a Pokémon badly poisoned.',
+    'Bank0018_Text_ProtectedItself = The invented line of a Pokémon that braces.',
+    'Bank0018_Text_FillerRho = A ninth invented line in between.',
+    'Bank0018_Text_HurtByPoison = The invented line of poison that hurts.',
+    'Bank0018_Text_FloatsAirItsAir = The invented line of a balloon that lifts.',
+    'Bank0018_Text_BuffetedBySandstorm = The invented line of sand that hurts.',
+    'Bank0018_Text_ParalyzedCantMove = The invented line of a Pokémon too stiff to move.',
+    'Bank0018_Text_FillerSigma = A tenth invented line in between.',
+    'Bank0018_Text_SStatusReturnedNormal = The invented line of a Pokémon back to normal.',
     '\\pad{5}',
   ]),
 }

@@ -1,4 +1,4 @@
-// The fallbacks of the Gen 5 backend (#106, #107, #108): what the game shows in place of content
+// The fallbacks of the Gen 5 backend (#106 to #109): what the game shows in place of content
 // it lacks or cannot hold, and each event that does not play yet or plays only in part. The backend
 // lists each one with its log line beside the battle script's dropped lines, as the Gen 3 backend
 // does (src/gen3/fallbacks.ts).
@@ -7,11 +7,12 @@ import type { ScriptEvent } from '../../script/events.ts'
 /**
  * `form`: a forme the party writes as form 0, the species' base form. `character`: a character
  * of a name that the battle's font lacks, which shows as "?". `moves`: a move the log reveals past
- * the four a Pokémon holds.
+ * the four a Pokémon holds. `game`: what the game shows that the log does not, as a lead's
+ * written ability that acts as it comes in (#109, lane plan D4).
  */
 interface TeamFallback {
   readonly line: number
-  readonly kind: 'form' | 'character' | 'moves'
+  readonly kind: 'form' | 'character' | 'moves' | 'game'
   readonly detail: string
 }
 

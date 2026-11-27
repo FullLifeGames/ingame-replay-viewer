@@ -253,6 +253,31 @@ export interface FlowNumbers {
   faintGaugeFlag: number
 }
 
+/** The numbers of the effects' sequences (scripts/gen5-bw2-effects.ts, #109), conditions and
+ * abilities by pokebw2's names. */
+export interface EffectNumbers {
+  /** The effect shown at a Pokémon as a condition starts (ServerControl_AddCondition). */
+  addEffects: Record<string, number>
+  /** The effect shown at a Pokémon that poison or a burn hurts (ServerControl_ConditionDamage). */
+  damageEffects: Record<string, number>
+  /** SC_OP_SET_CONDITION's values: a status for good, bad poison, sleep at its most turns. */
+  conditionValues: { permanent: number; badlyPoisoned: number; sleep: number }
+  /** The icon SC_SET_GAUGE_STATUS shows for bad poison (ServerDisplay_AddCondition). */
+  badlyPoisonedGauge: number
+  /** SC_WEATHER_START's turns for a weather that lasts (BtlServerFlow_StartBattle). */
+  weatherTurns: number
+  /** A client's side is `client & sideMask` (GetClientSide). */
+  sideMask: number
+  /** Sand's and hail's effects: at each Pokémon hit, and once over the field after the hits. */
+  sandEffects: { hit: number; after: number }
+  /** SC_HIDE_MSG_WINDOW's argument as the turn's end starts (ServerControl_TurnCheck). */
+  hideWindow: number
+  /** The effect at Focus Punch's user before its turn (HandlerFocuspunch). */
+  focusEffect: number
+  /** The abilities whose handlers run as their Pokémon comes in (BTL_EVENT_MEMBER_IN). */
+  memberInAbilities: string[]
+}
+
 /** The whole of build/gen5/bw2.json. */
 export interface Bw2Numbers extends ServerCmdTable {
   pokebw2: { repository: string; commit: string }
@@ -272,4 +297,5 @@ export interface Bw2Numbers extends ServerCmdTable {
   font: FontNumbers
   text: TextNumbers
   flow: FlowNumbers
+  effects: EffectNumbers
 }
