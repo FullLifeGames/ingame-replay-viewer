@@ -279,3 +279,17 @@ describe('move results', () => {
     ])
   })
 })
+
+describe('a charge turn that names its target (#105, D10)', () => {
+  it("says Sky Drop's line with the Pokémon it takes, and lists nothing", () => {
+    const result = streamOfLog(
+      '|move|p2a: Tyranitar|Sky Drop|p1a: Dugtrio|[still]',
+      '|-prepare|p2a: Tyranitar|Sky Drop|p1a: Dugtrio',
+    )
+    const said = result.instructions
+      .filter(({ line }) => line >= NEXT)
+      .map((p) => plain(p.instruction))
+    expect(said).toContain('The opposing Tyranitar took Dugtrio into the sky!')
+    expect(result.fallbacks.filter(({ line }) => line >= NEXT)).toEqual([])
+  })
+})

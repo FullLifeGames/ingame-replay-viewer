@@ -23,6 +23,16 @@ void Replay_ReturnMonToBall(u32 side)
     MarkBattlerForControllerExec(battler);
 }
 
+// The stream plays the battle log's disguise by its party slot, and the end of the disguise as a
+// WITHDRAW and a SWITCH_IN of the real mon. The game's own Illusion would pick a disguise of its
+// own, the last alive party member (SetIllusionMon), the first time a sprite, a healthbox or a
+// message asks for it (GetIllusionMonPtr). So the mon that enters has it off before its
+// animation reads it, as after B_ANIM_ILLUSION_OFF.
+void Replay_KeepIllusionOff(u32 battler)
+{
+    gBattleStruct->illusion[battler].state = ILLUSION_OFF;
+}
+
 // WITHDRAW: the mon goes back into its ball.
 bool32 Replay_OpWithdraw(const volatile u8 *operands, u32 step)
 {
@@ -56,6 +66,7 @@ bool32 Replay_OpSwitchIn(const volatile u8 *operands, u32 step)
         gCurrentMove = MOVE_NONE;
     SwitchInClearSetData(battler, &old.volatiles);
     gCurrentMove = MOVE_NONE;
+    Replay_KeepIllusionOff(battler);
     BtlController_EmitSwitchInAnim(battler, B_COMM_TO_CONTROLLER, slot, FALSE, batonPass);
     MarkBattlerForControllerExec(battler);
     return FALSE;

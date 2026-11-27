@@ -83,7 +83,6 @@ export const NAMED_KINDS: Readonly<Partial<Record<Protocol.ArgName, NamedKind>>>
 
   // Newer generations.
   '|detailschange|': newer('a permanent forme change'),
-  '|replace|': newer('the end of a disguise as another team member'),
   '|-swapboost|': newer('stat stages swapped between two Pokémon'),
   '|-invertboost|': newer('stat stages inverted'),
   '|-clearboost|': newer("one Pokémon's stat stages cleared by a move"),

@@ -1,6 +1,6 @@
 // Items whose lines Gen 4 logs brought: Custap Berry's `[consumed]` after the berry is eaten
-// (`BattleScript_CustapBerryActivation`), Quick Claw's activation, and the Air Balloon's two
-// lines (`BattleScript_AirBalloonMsgInRet`, `BattleScript_AirBalloonMsgPop`).
+// (`BattleScript_CustapBerryActivation`), Quick Claw's activation (its line alone, #105), and the
+// Air Balloon's two lines (`BattleScript_AirBalloonMsgInRet`, `BattleScript_AirBalloonMsgPop`).
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
@@ -39,12 +39,13 @@ describe('Custap Berry', () => {
   })
 })
 
-describe('Quick Claw (D8)', () => {
-  it('keeps our wording and its fallback', () => {
+describe('Quick Claw (#105, D9)', () => {
+  it('says the holder acts faster in the line alone, with no pop-up, no animation, no fallback', () => {
     const result = streamOfLog('|-activate|p2a: Tyranitar|item: Quick Claw')
-    expect(fallbacksFrom(result, NEXT)).toMatchObject([
-      { kind: 'phrase', detail: 'no game message for Quick Claw acting' },
+    expect(sceneFrom(result, NEXT)).toEqual([
+      'The opposing Tyranitar can act faster than normal, thanks to its Quick Claw!',
     ])
+    expect(fallbacksFrom(result, NEXT)).toEqual([])
   })
 })
 

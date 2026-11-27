@@ -397,6 +397,7 @@ static bool32 Op_SendOut(const volatile u8 *operands, u32 step)
     if (step != 0)
         return TRUE;
     Replay_PutMonOnField(battler, operands[1], Replay_ReadU16(operands + 2), operands[4]);
+    Replay_KeepIllusionOff(battler);
     BtlController_EmitIntroTrainerBallThrow(battler, B_COMM_TO_CONTROLLER);
     MarkBattlerForControllerExec(battler);
     return FALSE;

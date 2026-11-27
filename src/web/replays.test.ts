@@ -5,7 +5,7 @@ import { replayLabel } from './label'
 import { FIRST_REPLAY, TEST_REPLAYS } from './replays'
 
 describe('TEST_REPLAYS', () => {
-  it('lists the seventeen test replays, 994052 first', () => {
+  it('lists the nineteen test replays, 994052 first', () => {
     expect(FIRST_REPLAY).toBe('smogtours-gen3ou-994052')
     expect(TEST_REPLAYS.map(({ id }) => id)).toEqual([
       'smogtours-gen3ou-994052',
@@ -16,6 +16,8 @@ describe('TEST_REPLAYS', () => {
       'gen4ou-2719079523',
       'gen5ou-2718717830',
       'gen9ou-2719598518',
+      'gen9randombattle-2719775756',
+      'gen9randombattle-2719812975',
       'smogtours-gen1ou-995161',
       'smogtours-gen2ou-993907',
       'smogtours-gen3ou-994086',
@@ -48,6 +50,8 @@ describe('the labels of the example replays', () => {
       'Gen 4 OU: beanstockg vs Model Magneton (2719079523)',
       'Gen 5 OU: isolatedstar vs abc2158 (2718717830)',
       'Gen 9 OU: hat_fm vs Snurke (2719598518)',
+      'Gen 9 Random Battle: yourmomisaduck vs mmesmerizer (2719775756)',
+      'Gen 9 Random Battle: yiurfhasa+ vs aroki 5.0 (2719812975)',
       'Gen 1 OU: DADDY TAUROS vs koalacancee (995161)',
       'Gen 2 OU: dark premonitions vs tylerkehne (993907)',
       'Gen 3 OU: dataexpunged vs Halbert Simpson (994086)',

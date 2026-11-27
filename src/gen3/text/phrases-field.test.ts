@@ -119,7 +119,7 @@ describe('sides and the field (P1)', () => {
   ])('words %s ending', (condition, text) => {
     const { event, mon } = sceneOf('sideEnd', `|-sideend|p2: Bob|${condition}`)
     const source = event.source && mon(event.source)
-    expect(sideEnded(event.side, event.condition, source)).toEqual({ text })
+    expect(sideEnded(event.side, event.condition, source, event.cause)).toEqual({ text })
   })
 
   it('words Stealth Rock set on a side, the way Spikes reads', () => {
@@ -142,14 +142,47 @@ describe('sides and the field (P1)', () => {
   ])('words %s ending with its source or without one (D3)', (condition, text) => {
     const { event, mon } = sceneOf('sideEnd', `|-sideend|p2: Bob|${condition}`)
     const source = event.source && mon(event.source)
-    expect(sideEnded(event.side, event.condition, source)).toEqual({ text })
+    expect(sideEnded(event.side, event.condition, source, event.cause)).toEqual({ text })
   })
 
-  it('gives side conditions without a message our wording and a fallback', () => {
-    const started = sceneOf('sideStart', '|-sidestart|p2: Bob|move: Toxic Spikes').event
+  it.each([
+    ['p1: Alice', 'Toxic spikes were scattered on the ground all around your side!'],
+    ['p2: Bob', 'Toxic spikes were scattered on the ground all around the\u00a0opposing side!'],
+  ])('words Toxic Spikes set on %s (STRINGID_POISONSPIKESSCATTERED)', (side, text) => {
+    const { event } = sceneOf('sideStart', `|-sidestart|${side}|move: Toxic Spikes`)
+    expect(sideStarted(event.side, event.condition)).toEqual({ text })
+  })
+
+  it.each([
+    [
+      'absorbed by a Pokémon of the side (STRINGID_TOXICSPIKESABSORBED)',
+      'move: Toxic Spikes|[of] p2a: Tyranitar',
+      'The toxic spikes disappeared from the ground around the\u00a0opposing side!',
+    ],
+    [
+      'blown away by Rapid Spin (STRINGID_PKMNBLEWAWAYTOXICSPIKES)',
+      'move: Toxic Spikes|[from] move: Rapid Spin|[of] p2a: Tyranitar',
+      'The opposing Tyranitar blew away Toxic Spikes!',
+    ],
+  ])('words Toxic Spikes %s', (_, condition, text) => {
+    const { event, mon } = sceneOf('sideEnd', `|-sideend|p2: Bob|${condition}`)
+    const source = event.source && mon(event.source)
+    expect(sideEnded(event.side, event.condition, source, event.cause)).toEqual({ text })
+  })
+
+  it('keeps a fallback for Toxic Spikes ending with neither a cause nor a source', () => {
+    const { event } = sceneOf('sideEnd', '|-sideend|p2: Bob|move: Toxic Spikes')
+    expect(sideEnded(event.side, event.condition, undefined, undefined).fallback).toEqual({
+      kind: 'phrase',
+      detail: 'no game message for Toxic Spikes ending on a side',
+    })
+  })
+
+  it('gives side conditions without a rule our wording and a fallback', () => {
+    const started = sceneOf('sideStart', '|-sidestart|p2: Bob|move: Tailwind').event
     expect(sideStarted(started.side, started.condition).fallback).toMatchObject({ kind: 'phrase' })
     const ended = sceneOf('sideEnd', '|-sideend|p2: Bob|Spikes').event
-    expect(sideEnded(ended.side, ended.condition, undefined)).toEqual({
+    expect(sideEnded(ended.side, ended.condition, undefined, undefined)).toEqual({
       text: "The\u00a0opposing side's Spikes wore off!",
       fallback: { kind: 'phrase', detail: 'no game message for Spikes ending on a side' },
     })

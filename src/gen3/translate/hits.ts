@@ -15,7 +15,7 @@ import type { ScriptEvent } from '../../script/events'
 import type { PokemonRef, Side } from '../../script/types'
 import type { Instruction } from '../stream/instructions'
 import { critical, effective, hitCount as countLine } from '../text/phrases'
-import { type Context, type EventOf, sameMon } from './context'
+import { type Context, type EventOf, type HitStage, sameMon } from './context'
 
 type Struck = EventOf<'damage' | 'effectEnd' | 'effectActivate'>
 
@@ -59,12 +59,26 @@ function nextHit(line: number, move: Instruction | undefined, ctx: Context): voi
   if (move !== undefined) ctx.emit(line, move)
 }
 
-/** The lines after a hit: a critical hit, then the effectiveness, which a multi-hit move holds. */
+/**
+ * The lines after a hit: a critical hit, an item's result (Focus Sash), the effectiveness, which a
+ * multi-hit move holds, then an item's line as the move ends (a berry that weakened the hit).
+ */
 export function hitLines(event: Struck, ctx: Context): void {
   if (event.crit) ctx.print(event.line, critical())
-  if (event.effectiveness === undefined) return
-  if (ctx.multiHit === undefined) ctx.print(event.line, effective(event.effectiveness))
-  else ctx.multiHit.effectiveness = event.effectiveness
+  sayHeld(event.who, 'result', ctx)
+  if (event.effectiveness !== undefined) {
+    if (ctx.multiHit === undefined) ctx.print(event.line, effective(event.effectiveness))
+    else ctx.multiHit.effectiveness = event.effectiveness
+  }
+  sayHeld(event.who, 'moveEnd', ctx)
+}
+
+/** The instructions an item held for the hit on `who` at `stage`, if it held any. */
+function sayHeld(who: PokemonRef | undefined, stage: HitStage, ctx: Context): void {
+  const held = ctx.afterHit
+  if (held?.stage !== stage || !sameMon(who, held.who)) return
+  ctx.afterHit = undefined
+  for (const { line, instruction } of held.placed) ctx.emit(line, instruction)
 }
 
 /** The held effectiveness and the count line, or both held for the faint of the target. */
