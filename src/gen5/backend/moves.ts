@@ -1,9 +1,10 @@
-// What each action of a battle script writes into Black 2's battle (#107, lane plan D5, D6, D11):
-// a move whose user and target stand in place sends its line and its animation, as
-// ServerControl_Fight and ServerControl_ExecuteMove do, and each event after it plays by its
-// rule (hits.ts). An event of a Pokémon not in place waits for #108, and an action with a called
-// move, several hits, a charge turn or a look of its own waits whole. Pure: every number of the
-// game comes in from build/gen5/bw2.json.
+// What each action of a battle script writes into Black 2's battle (#107, #108, lane plans D5,
+// D6, D11 and D1): a move sends its line and its animation, as ServerControl_Fight and
+// ServerControl_ExecuteMove do, and each event after it plays by its rule (hits.ts). The places
+// follow each switch-in after the leads and each faint, in event order (battle-state.ts), and an
+// event that plays and names a Pokémon not in place fails by name. An action with a called move,
+// several hits, a charge turn or a look of its own waits whole. Pure: every number of the game
+// comes in from build/gen5/bw2.json.
 import type { BattleScript, ScriptEvent } from '../../script/events.ts'
 import type { PokemonRef } from '../../script/types.ts'
 import type { BattleNumbers, FlowNumbers, TextNumbers } from '../bw2-numbers.ts'
@@ -14,7 +15,7 @@ import { type Action, actionsOf, type Written } from './blocks.ts'
 import { type Gen5Fallback, laterFallback } from './fallbacks.ts'
 import { hitCommands, type PlayedMove, silentBar } from './hits.ts'
 import { gen5, gen5Move } from './names.ts'
-import { LATER_ISSUES, type Outcome, outcomesOf } from './rules.ts'
+import { afterLeads, LATER_ISSUES, type Outcome, outcomesOf } from './rules.ts'
 
 /** The numbers the writer takes. */
 export interface WriteNumbers {
@@ -30,7 +31,7 @@ export interface ScriptWrite {
   readonly fallbacks: Gen5Fallback[]
 }
 
-const { switches: SWITCHES, effects: EFFECTS, whole: WHOLE } = LATER_ISSUES
+const { effects: EFFECTS, whole: WHOLE } = LATER_ISSUES
 
 interface Scene {
   readonly state: BattleState
@@ -64,18 +65,15 @@ interface Played {
   readonly waits: number | undefined
 }
 
-/** `action` with the move that opens it, when that plays: no wait of the whole action, and its
- * user and target in place. A move of a Pokémon not in place waits for #108 with its events. */
+/** `action` with the move that opens it, when that plays: no wait of the whole action. Its user
+ * and target must stand in place. */
 function playedOf(action: Action, state: BattleState): Played {
   const [first] = action
   const held = heldBy(action)
   if (first?.kind !== 'move' || held !== undefined) return { action, move: undefined, waits: held }
   const targetRef = first.target ?? first.user
-  const user = state.inPlace(first.user)
-  const target = state.inPlace(targetRef)
-  if (user === undefined || target === undefined) {
-    return { action, move: undefined, waits: SWITCHES }
-  }
+  const user = state.placed(first.user, first.line)
+  const target = state.placed(targetRef, first.line)
   return { action, move: { user, target, targetRef, move: gen5Move(first.move) }, waits: undefined }
 }
 
@@ -115,15 +113,19 @@ function eventCommands(scene: Scene, played: Played, event: ScriptEvent): Server
   const { action, move } = played
   const hits = { state: scene.state, numbers: scene.numbers, move }
   if (scene.outcomes.get(event)?.as !== 'play') return silentBar(hits, event)
-  if (!refsOf(event).every((ref) => scene.state.inPlace(ref) !== undefined)) {
-    scene.fallbacks.push(laterFallback(event, SWITCHES))
-    return []
-  }
+  for (const ref of refsOf(event)) scene.state.placed(ref, event.line)
   const commands =
     event.kind === 'move' ? move && moveCommands(action, move) : hitCommands(hits, event)
   if (commands !== undefined) return commands
   scene.fallbacks.push(laterFallback(event, played.waits ?? WHOLE))
   return silentBar(hits, event)
+}
+
+/** The state after `event`: a switch-in after the leads swaps the party, a faint takes the HP to
+ * 0. */
+function follow(state: BattleState, event: ScriptEvent, afterTheLeads: boolean): void {
+  if (event.kind === 'switchIn' && afterTheLeads) state.sendIn(event)
+  if (event.kind === 'faint') state.faint(event.who)
 }
 
 /** The commands of each action of `script`, in replay order, from the battle's start. */
@@ -132,6 +134,8 @@ export function writeScript(
   numbers: WriteNumbers,
 ): ScriptWrite {
   const outcomes = outcomesOf(script.events)
+  const leads = afterLeads(script.events)
+  const after = new Map(script.events.map((event, i) => [event, leads[i] ?? false]))
   const scene: Scene = {
     state: battleState(script, numbers.battle),
     numbers,
@@ -140,10 +144,11 @@ export function writeScript(
   }
   const actions = actionsOf(script).map((action) => {
     const played = playedOf(action, scene.state)
-    return action.map((event) => ({
-      line: event.line,
-      commands: eventCommands(scene, played, event),
-    }))
+    return action.map((event) => {
+      const commands = eventCommands(scene, played, event)
+      follow(scene.state, event, after.get(event) ?? false)
+      return { line: event.line, commands }
+    })
   })
   return { actions, fallbacks: scene.fallbacks }
 }

@@ -104,7 +104,7 @@ describe('the Gen 5 OU test replays', () => {
     )
     expect(lists).toEqual({
       'gen5ou-2718717830': {
-        '#108': { switchIn: 13, move: 24, heal: 3, damage: 10, faint: 3, miss: 1 },
+        '#108': { switchIn: 13, faint: 3 },
         '#109': {
           weather: 15,
           singleTurn: 2,
@@ -119,11 +119,11 @@ describe('the Gen 5 OU test replays', () => {
           statChange: 11,
           heal: 1,
         },
-        '#110': { prepare: 1, anim: 1, damage: 1, win: 1 },
+        '#110': { prepare: 1, anim: 1, move: 1, damage: 1, win: 1 },
         line: { message: 1 },
       },
       'smogtours-gen5ou-862240': {
-        '#108': { switchIn: 15, move: 27, damage: 23, heal: 5, faint: 8, miss: 1 },
+        '#108': { switchIn: 15, faint: 8 },
         '#109': {
           ability: 4,
           statChange: 16,

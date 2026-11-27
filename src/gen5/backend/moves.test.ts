@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
+import type { ScriptEvent } from '../../script/events.ts'
 import { NEXT, scriptOf } from '../../script/testing.ts'
+import type { PokemonRef } from '../../script/types.ts'
 import { writeScript } from './moves.ts'
 import { gen5Move } from './names.ts'
 import { REPLAY_NUMBERS as NUMBERS } from './replay.fixtures.ts'
@@ -141,14 +143,97 @@ describe('an event that plays elsewhere', () => {
       ).fallbacks,
     ).toEqual(['immune 2 plays with #110', 'miss 4 plays with #110'])
   })
+})
 
-  it('lists the Leftovers heal of a Pokémon not in place with #108 and moves no bar', () => {
+/** The script of the short log `|turn|1` and `lines`, with the event of log line `NEXT + at`
+ * changed by hand into a line the log cannot hold. */
+function handCast(
+  at: number,
+  change: Partial<Record<'who' | 'user', PokemonRef>>,
+  ...lines: string[]
+) {
+  const script = scriptOf('|turn|1', ...lines)
+  const events = script.events.map((event): ScriptEvent =>
+    event.line === NEXT + at ? { ...event, ...change } : event,
+  )
+  return { ...script, events }
+}
+
+/** Bob sends in Skarmory, team index 1 of his side and so mon ID 11, then Tyranitar again. */
+const BACK_AND_FORTH = [
+  '|switch|p2a: Skarmory|Skarmory, M|100/100',
+  '|turn|2',
+  '|switch|p2a: Tyranitar|Tyranitar, M|100/100',
+]
+
+// Scene: the places follow each switch-in after the leads and each faint, in event order; an
+// event that plays and names a Pokémon the game does not hold in place fails by name (lane plan
+// D1).
+describe('the Pokémon a switch-in sends in', () => {
+  it('plays its Leftovers heal under its own mon ID, and moves its bar in its switch-in’s action', () => {
     expect(
       written(
-        '|switch|p2a: Skarmory|Skarmory, M|50/100',
+        '|switch|p2a: Skarmory|Skarmory, M|100/100',
+        '|-damage|p2a: Skarmory|50/100|[from] Stealth Rock',
+        '|turn|2',
         '|-heal|p2a: Skarmory|56/100|[from] item: Leftovers',
-        '|-heal|p2a: Skarmory|60/100|[from] drain|[of] p1a: Dugtrio',
       ),
-    ).toEqual({ commands: [], fallbacks: ['heal 2 plays with #108'] })
+    ).toEqual({
+      commands: [
+        'SC_OP_SUBTRACT_HP 11',
+        'SC_UPDATE_HP_GAUGE 11',
+        'SC_USE_HELD_ITEM 11',
+        'SC_EFFECT_BY_POS 1',
+        'SC_OP_ADD_HP 11',
+        'SC_UPDATE_HP_GAUGE 11',
+        'SC_MSG_SET 11',
+      ],
+      fallbacks: [],
+    })
+  })
+
+  it('refuses by name the Leftovers heal of a Pokémon the game holds on the bench', () => {
+    const script = handCast(
+      4,
+      { who: { side: 'far', index: 1 } },
+      ...BACK_AND_FORTH,
+      '|-heal|p2a: Tyranitar|100/100|[from] item: Leftovers',
+    )
+    expect(() => writeScript(script, NUMBERS)).toThrow(
+      new Error(
+        `line ${String(NEXT + 4)}: the log names Skarmory, which the game does not hold in place`,
+      ),
+    )
+  })
+
+  it('refuses by name a move of a Pokémon the game holds on the bench', () => {
+    const script = handCast(
+      4,
+      { user: { side: 'far', index: 1 } },
+      ...BACK_AND_FORTH,
+      '|move|p2a: Tyranitar|Rock Slide|p1a: Dugtrio',
+    )
+    expect(() => writeScript(script, NUMBERS)).toThrow(
+      new Error(
+        `line ${String(NEXT + 4)}: the log names Skarmory, which the game does not hold in place`,
+      ),
+    )
+  })
+
+  // The script reads a fainted Pokémon sent in again as a new team member: a hand-cast line.
+  it('refuses by name a Pokémon sent in again after it fainted', () => {
+    const script = handCast(
+      6,
+      { who: { side: 'far', index: 1 } },
+      '|switch|p2a: Skarmory|Skarmory, M|100/100',
+      '|-damage|p2a: Skarmory|0 fnt',
+      '|faint|p2a: Skarmory',
+      '|switch|p2a: Tyranitar|Tyranitar, M|100/100',
+      '|turn|2',
+      '|switch|p2a: Gengar|Gengar, M|100/100',
+    )
+    expect(() => writeScript(script, NUMBERS)).toThrow(
+      new Error(`line ${String(NEXT + 6)}: the log sends in Skarmory, which fainted`),
+    )
   })
 })
