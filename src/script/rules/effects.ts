@@ -4,9 +4,9 @@
 import { ScriptError } from '../errors'
 import type { EffectActivateEvent } from '../effect-events'
 import type { ScriptEvent } from '../events'
+import { keywordDetail } from '../drops'
 import { causeOf, effectOf, flagsOf, foesInPlace, refIfAny, refOf, refOfPokemon } from '../refs'
 import type { PokemonRef } from '../types'
-import { keywordDetail } from './index'
 import type { RuleInput, Rules } from './index'
 
 type ItemInput = RuleInput<'|-item|'>

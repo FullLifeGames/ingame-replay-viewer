@@ -6,6 +6,7 @@ import type { Battle, Pokemon, WeatherName } from '@pkmn/client'
 import type { BoostID } from '@pkmn/data'
 import type { Protocol } from '@pkmn/protocol'
 
+import { keywordDetail } from '../drops'
 import type { LogLine } from '../lines'
 import type { ScriptEvent } from '../events'
 import type { Side } from '../types'
@@ -73,11 +74,6 @@ const RULES: Readonly<Partial<Record<string, AnyRule>>> = {
 /** The rule for a protocol key, if the battle script shows that kind of line. */
 export function ruleFor(key: Protocol.ArgName): AnyRule | undefined {
   return RULES[key]
-}
-
-/** The detail of a line dropped for a keyword argument that no rule shows. */
-export function keywordDetail(name: string): string {
-  return `keyword argument [${name}]`
 }
 
 /** What a line carries beyond its rule, or undefined when the rule reads all of it. */
