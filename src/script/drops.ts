@@ -93,3 +93,8 @@ export function dropReasonOf(line: LogLine, started: boolean): DropReason | unde
 export function dropReasonOfKind(key: Protocol.ArgName): DropReason | undefined {
   return REASONS[key]
 }
+
+/** The detail of a line dropped for a keyword argument that no rule shows. */
+export function keywordDetail(name: string): string {
+  return `keyword argument [${name}]`
+}
