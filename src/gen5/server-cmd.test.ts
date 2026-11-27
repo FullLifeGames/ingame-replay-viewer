@@ -160,3 +160,34 @@ describe('packCommands', () => {
     expect(() => pack({ command: 'CMD_SAY', message: 0x10000, args: [] })).toThrow(/message/)
   })
 })
+
+// Scene: the server sends a hit's flash with each target's mon ID as one byte after the
+// command's arguments (BtlServerCmdQueue_PutByte), and the client reads them in that order.
+describe('packCommands with trailing bytes', () => {
+  it('writes each trailing byte after the arguments, in order', () => {
+    expect(pack({ command: 'CMD_SIX', args: [1, 2, 3], bytes: [0x0d, 0xfe] })).toEqual([
+      0x01, 0x23, 1, 2, 3, 0x0d, 0xfe,
+    ])
+    expect(
+      pack(
+        { command: 'CMD_HP_DOWN', args: [1, 60], bytes: [] },
+        { command: 'CMD_GAUGE', args: [1] },
+      ),
+    ).toEqual([0x01, 0x07, 0x01, 0x00, 0x3c, 0x01, 0x51, 0x01])
+  })
+
+  it('throws by name on a trailing byte past 255, never cutting it', () => {
+    expect(() => pack({ command: 'CMD_SIX', args: [1, 2, 3], bytes: [4, 256] })).toThrow(
+      /CMD_SIX.*byte 1.*256/,
+    )
+    expect(() => pack({ command: 'CMD_GAUGE', args: [1], bytes: [-1] })).toThrow(
+      /CMD_GAUGE.*byte 0/,
+    )
+  })
+
+  it('refuses trailing bytes on a message command', () => {
+    expect(() => pack({ command: 'CMD_SAY', message: 1, args: [], bytes: [2] })).toThrow(
+      /CMD_SAY.*trailing bytes/,
+    )
+  })
+})
