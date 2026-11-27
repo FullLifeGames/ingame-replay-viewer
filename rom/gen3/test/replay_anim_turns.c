@@ -586,6 +586,29 @@ REPLAY_TEST("MOVE_TYPE gives the next MOVE its type and MOVE clears it")
     }
 }
 
+// Headless tests skip move animations, so this one plays them and reads the type on the frame
+// Ivy Cudgel's animation starts, before its script picks its look.
+REPLAY_TEST("MOVE's animation reads the type of the MOVE_TYPE before it")
+{
+    STREAM
+    {
+        FORCE_MOVE_ANIM(TRUE);
+        ReplayStream_Mon(REPLAY_SIDE_NEAR, 0, SPECIES_OGERPON_WELLSPRING, 100);
+        ReplayStream_Intro();
+        ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_MoveType(TYPE_WATER);
+        ReplayStream_Move(REPLAY_SIDE_NEAR, REPLAY_SIDE_FAR, MOVE_IVY_CUDGEL);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE { ANIMATION(ANIM_TYPE_MOVE, MOVE_IVY_CUDGEL, nearMon); }
+    THEN
+    {
+        FORCE_MOVE_ANIM(FALSE);
+        EXPECT_EQ(ReplayTest_MoveTypeAtMoveAnim(), TYPE_WATER);
+    }
+}
+
 REPLAY_TEST("TURN clears a MOVE_TYPE that no MOVE took")
 {
     STREAM

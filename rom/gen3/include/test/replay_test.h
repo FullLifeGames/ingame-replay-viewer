@@ -71,6 +71,12 @@ u32 ReplayTest_MoveTypeAtOpStart(u32 op);
 // number op, recorded as the KO animation counter is.
 bool32 ReplayTest_IndicatorShownAtOpStart(u32 op, u32 side);
 
+// The type the first move animation of the stream reads (GetBattleMoveType(gCurrentMove)), taken
+// on the first frame it is active, before its script runs. TYPE_NONE if no move animation played.
+// Headless tests skip move animations, so a test that reads it calls FORCE_MOVE_ANIM(TRUE) in
+// STREAM.
+u32 ReplayTest_MoveTypeAtMoveAnim(void);
+
 // Called in STREAM: the interpreter plays the outro after END (REPLAY_OUTRO_THEN_EXIT), and THEN
 // runs once the outro has faded the screen to black.
 void ReplayTest_PlayOutro(void);

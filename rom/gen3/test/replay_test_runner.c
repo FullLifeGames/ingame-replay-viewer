@@ -4,6 +4,7 @@
 #include "battle_controllers.h"
 #include "battle_gfx_sfx_util.h"
 #include "battle_main.h"
+#include "battle_util.h"
 #include "battle_util2.h"
 #include "m4a.h"
 #include "main.h"
@@ -32,6 +33,8 @@ static EWRAM_DATA u8 sKOAnimsAtOpStart[REPLAY_TEST_RECORDED_OPS] = {0};
 static EWRAM_DATA u8 sAnimMoveTurnsAtOpStart[REPLAY_TEST_RECORDED_OPS] = {0};
 static EWRAM_DATA u8 sMoveTypesAtOpStart[REPLAY_TEST_RECORDED_OPS] = {0};
 static EWRAM_DATA bool8 sIndicatorsShownAtOpStart[REPLAY_TEST_RECORDED_OPS][REPLAY_STREAM_SIDE_COUNT] = {0};
+static EWRAM_DATA bool8 sMoveAnimRecorded = FALSE;
+static EWRAM_DATA u8 sMoveTypeAtMoveAnim = TYPE_NONE;
 static EWRAM_DATA struct ReplayTestTrainerSprite sTrainerSpritesAtOpStart[REPLAY_TEST_RECORDED_OPS][REPLAY_STREAM_SIDE_COUNT] = {0};
 static EWRAM_DATA bool8 sPlayOutro = FALSE;
 static EWRAM_DATA bool8 sHoldB = FALSE;
@@ -56,6 +59,8 @@ static void ReplayTest_SetUp(void *data)
     memset(sAnimMoveTurnsAtOpStart, 0, sizeof(sAnimMoveTurnsAtOpStart));
     memset(sMoveTypesAtOpStart, 0, sizeof(sMoveTypesAtOpStart));
     memset(sIndicatorsShownAtOpStart, 0, sizeof(sIndicatorsShownAtOpStart));
+    sMoveAnimRecorded = FALSE;
+    sMoveTypeAtMoveAnim = TYPE_NONE;
     memset(sTrainerSpritesAtOpStart, 0, sizeof(sTrainerSpritesAtOpStart));
     sPlayOutro = FALSE;
     sHoldB = FALSE;
@@ -151,12 +156,25 @@ void ReplayTest_HoldB(void)
     sHoldB = TRUE;
 }
 
+// The interpreter calls ReplayTest_AtFrame from the battle's main function, which runs before the
+// controllers (BattleMainCB1). Controller_DoMoveAnimation launches the animation on one frame and
+// runs its script from the next, so the first frame that sees it active comes before its first
+// command, and the type it reads here is the type that jumpifmovetypeequal reads.
+static void RecordMoveTypeAtMoveAnim(void)
+{
+    if (sMoveAnimRecorded || !gAnimScriptActive || gAnimMoveIndex == MOVE_NONE)
+        return;
+    sMoveAnimRecorded = TRUE;
+    sMoveTypeAtMoveAnim = GetBattleMoveType(gCurrentMove);
+}
+
 // ReadKeys sets gMain.heldKeys from KEYINPUT at the start of each frame, before callback1 runs
 // the battle's main function, so a key added here is held when BattleMainCB2 reads it. A battle
 // left before END (BattleMainCB2 on a held B) has CB2_QuitRecordedBattle as its callback2 while
 // its fade runs, and THEN would never run.
 void ReplayTest_AtFrame(void)
 {
+    RecordMoveTypeAtMoveAnim();
     if (gMain.callback2 == CB2_QuitRecordedBattle)
         Test_ExitWithResult(TEST_RESULT_FAIL, SourceLine(0), "%s:%d: the battle left before END, at op %d of %d", gTestRunnerState.test->filename, SourceLine(0), gReplayProgress.done, gReplayProgress.total);
     if (sHoldB)
@@ -224,6 +242,11 @@ bool32 ReplayTest_IndicatorShownAtOpStart(u32 op, u32 side)
 {
     CheckRecordedOp(op);
     return sIndicatorsShownAtOpStart[op][side];
+}
+
+u32 ReplayTest_MoveTypeAtMoveAnim(void)
+{
+    return sMoveTypeAtMoveAnim;
 }
 
 const struct ReplayTestTrainerSprite *ReplayTest_TrainerSpriteAtOpStart(u32 op, u32 side)
