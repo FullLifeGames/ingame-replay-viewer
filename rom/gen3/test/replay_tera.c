@@ -19,7 +19,10 @@
 // read, so it stays with the mon when it leaves the field and comes back. Headless tests skip the
 // animations (LaunchBattleAnimation), so they read the unfaded palette.
 
-// Wobbuffet near and far on the field, a second Wobbuffet behind the near one.
+// Wobbuffet near and far on the field, a second Wobbuffet behind the near one. StartBattle writes
+// ops 0 to 2, so the op after it is op 3.
+#define TERA_OP 3
+
 static void StartBattle(void)
 {
     ReplayStream_Mon(REPLAY_SIDE_NEAR, 1, SPECIES_WOBBUFFET, 100);
@@ -154,6 +157,7 @@ REPLAY_TEST("A Terastallized mon switched out and back keeps its tint and its in
     }
 }
 
+// The gimmick stays with the party slot that left (slot 0), so the slot that comes in has none.
 REPLAY_TEST("The mon that comes in for a Terastallized mon has neither its tint nor its indicator")
 {
     u32 battler = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
@@ -166,14 +170,17 @@ REPLAY_TEST("The mon that comes in for a Terastallized mon has neither its tint 
         ReplayStream_SwitchIn(REPLAY_SIDE_NEAR, 1, 100, REPLAY_STATUS_NONE);
         ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
     }
+    SCENE { ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_TERA_ACTIVATE, nearMon); }
     THEN
     {
+        EXPECT_EQ(gBattleStruct->gimmick.activeGimmick[B_TRAINER_PLAYER][0], GIMMICK_TERA);
         EXPECT_EQ(GetActiveGimmick(battler), GIMMICK_NONE);
         EXPECT(GetIndicator(battler)->invisible);
         EXPECT(IsPaletteBlended(battler, 0, RGB_BLACK));
     }
 }
 
+// The indicator shows when the FAINT starts, two ops after the TERA, and the faint hides it.
 REPLAY_TEST("A Terastallized mon that faints hides its indicator")
 {
     u32 battler = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
@@ -186,8 +193,10 @@ REPLAY_TEST("A Terastallized mon that faints hides its indicator")
         ReplayStream_Faint(REPLAY_SIDE_FAR);
         ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
     }
+    SCENE { ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_TERA_ACTIVATE, farMon); }
     THEN
     {
+        EXPECT(ReplayTest_IndicatorShownAtOpStart(TERA_OP + 2, REPLAY_SIDE_FAR));
         EXPECT(gSprites[gHealthboxSpriteIds[battler]].invisible);
         EXPECT(GetIndicator(battler)->invisible);
     }

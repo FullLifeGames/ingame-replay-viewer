@@ -67,6 +67,10 @@ u32 ReplayTest_AnimMoveTurnAtOpStart(u32 op);
 // own) when the interpreter started op number op, recorded as the KO animation counter is.
 u32 ReplayTest_MoveTypeAtOpStart(u32 op);
 
+// Whether the Tera indicator of a side (REPLAY_SIDE_*) was visible when the interpreter started op
+// number op, recorded as the KO animation counter is.
+bool32 ReplayTest_IndicatorShownAtOpStart(u32 op, u32 side);
+
 // Called in STREAM: the interpreter plays the outro after END (REPLAY_OUTRO_THEN_EXIT), and THEN
 // runs once the outro has faded the screen to black.
 void ReplayTest_PlayOutro(void);

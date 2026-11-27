@@ -31,6 +31,7 @@ static EWRAM_DATA u16 sCheckedProgress = 0;
 static EWRAM_DATA u8 sKOAnimsAtOpStart[REPLAY_TEST_RECORDED_OPS] = {0};
 static EWRAM_DATA u8 sAnimMoveTurnsAtOpStart[REPLAY_TEST_RECORDED_OPS] = {0};
 static EWRAM_DATA u8 sMoveTypesAtOpStart[REPLAY_TEST_RECORDED_OPS] = {0};
+static EWRAM_DATA bool8 sIndicatorsShownAtOpStart[REPLAY_TEST_RECORDED_OPS][REPLAY_STREAM_SIDE_COUNT] = {0};
 static EWRAM_DATA struct ReplayTestTrainerSprite sTrainerSpritesAtOpStart[REPLAY_TEST_RECORDED_OPS][REPLAY_STREAM_SIDE_COUNT] = {0};
 static EWRAM_DATA bool8 sPlayOutro = FALSE;
 static EWRAM_DATA bool8 sHoldB = FALSE;
@@ -54,6 +55,7 @@ static void ReplayTest_SetUp(void *data)
     memset(sKOAnimsAtOpStart, 0, sizeof(sKOAnimsAtOpStart));
     memset(sAnimMoveTurnsAtOpStart, 0, sizeof(sAnimMoveTurnsAtOpStart));
     memset(sMoveTypesAtOpStart, 0, sizeof(sMoveTypesAtOpStart));
+    memset(sIndicatorsShownAtOpStart, 0, sizeof(sIndicatorsShownAtOpStart));
     memset(sTrainerSpritesAtOpStart, 0, sizeof(sTrainerSpritesAtOpStart));
     sPlayOutro = FALSE;
     sHoldB = FALSE;
@@ -120,6 +122,14 @@ static void RecordTrainerSprites(struct ReplayTestTrainerSprite *recorded)
     }
 }
 
+static void RecordIndicators(bool8 *shown)
+{
+    u32 side;
+
+    for (side = 0; side < REPLAY_STREAM_SIDE_COUNT; side++)
+        shown[side] = !gSprites[gBattleStruct->gimmick.indicatorSpriteId[Replay_GetBattler(side)]].invisible;
+}
+
 void ReplayTest_AtOpStart(u32 op)
 {
     if (op >= REPLAY_TEST_RECORDED_OPS)
@@ -127,6 +137,7 @@ void ReplayTest_AtOpStart(u32 op)
     sKOAnimsAtOpStart[op] = gBattleStruct->battlerKOAnimsRunning;
     sAnimMoveTurnsAtOpStart[op] = gAnimMoveTurn;
     sMoveTypesAtOpStart[op] = gBattleStruct->dynamicMoveType;
+    RecordIndicators(sIndicatorsShownAtOpStart[op]);
     RecordTrainerSprites(sTrainerSpritesAtOpStart[op]);
 }
 
@@ -207,6 +218,12 @@ u32 ReplayTest_MoveTypeAtOpStart(u32 op)
 {
     CheckRecordedOp(op);
     return sMoveTypesAtOpStart[op];
+}
+
+bool32 ReplayTest_IndicatorShownAtOpStart(u32 op, u32 side)
+{
+    CheckRecordedOp(op);
+    return sIndicatorsShownAtOpStart[op][side];
 }
 
 const struct ReplayTestTrainerSprite *ReplayTest_TrainerSpriteAtOpStart(u32 op, u32 side)
