@@ -6,10 +6,12 @@
 // the trainer's action menu, or from the spike's battle state. A double's run and a replay's end
 // after the readings at the action menu: the moment is a single's with leads that know Tackle. Then it reads the player's adapter, the server and both Pokémon from
 // main RAM and plays the steps of gen5-moment-plan.ts from a fixed frame after the mark battle:
-// hold the server, answer the action menu and write one block per moment. It writes a frame per
+// hold the server, answer the action menu and write one block per moment. With --replay and
+// --scene hits it writes the blocks of a hand turn of the replay's leads instead
+// (gen5-moment-blocks.ts, #107), each logged with its commands and lines. It writes a frame per
 // mark under build/gen5/frames/ and the last mark's state under build/gen5/states/ (gitignored,
 // ADR 0002).
-// Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts [--scene known|unknown] [--save <name>]
+// Usage: GEN5_DUMP=<path> node scripts/gen5-moment.ts [--scene known|unknown|hits] [--save <name>]
 // [--entry direct|walk] [--battle single|double] [--player <name>] [--opponent <name>]
 // [--replay <id>] [--minutes 15].
 import { readFileSync, writeFileSync } from 'node:fs'
@@ -21,6 +23,7 @@ import { adapterNumbers } from '../src/gen5/adapter.ts'
 import { battleRefs } from '../src/gen5/battle-check.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import type { Gen5Global, MarkRecord, RunPlan, RunReport } from '../src/gen5/hook.ts'
+import type { MacroStep } from '../src/gen5/macro.ts'
 import { MAIN_RAM_SIZE, MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import type { RamRef } from '../src/gen5/ram-check.ts'
 import type { RoutineBuild } from '../src/gen5/routine-order.ts'
@@ -30,6 +33,7 @@ import {
   startLine,
   type StateFile,
 } from './gen5-moment-args.ts'
+import { hitsScene } from './gen5-moment-blocks.ts'
 import { sessionPlan } from './gen5-moment-direct.ts'
 import { type Battle, readBattle } from './gen5-moment-read.ts'
 import { momentTeam } from './gen5-moment-team.ts'
@@ -205,8 +209,34 @@ function sceneMoments(scene: SceneName, battle: Battle, numbers: Bw2Numbers) {
   return blocks
 }
 
+/** The hits scene's steps: the replay's blocks, each logged with its commands and lines. */
+function hitsSteps(team: Team | undefined, battle: Battle, numbers: Bw2Numbers): MacroStep[] {
+  const banks = { move: bank('move'), standard: bank('standard'), set: bank('set') }
+  const { steps, lines } = hitsScene(team?.replay, { numbers, battle, banks })
+  for (const line of lines) log(line)
+  return steps
+}
+
+/** The second run's steps: the hits scene's blocks or the moment's; none for a double or a
+ * replay with no scene, whose run ends at the action menu. */
+function secondSteps(options: MomentOptions, battle: Battle, numbers: Bw2Numbers, team?: Team) {
+  const { scene } = options
+  if (scene === 'hits') return hitsSteps(team, battle, numbers)
+  const atMenu = options.team.from === 'replay' ? 'replay' : options.battle
+  if (atMenu !== 'single') {
+    log(`${atMenu}: the run ends at the action menu`)
+    return undefined
+  }
+  return momentSteps({
+    adapterNumbers: adapterNumbers(numbers),
+    table: numbers,
+    adapter: battle.adapter,
+    blocks: sceneMoments(scene, battle, numbers),
+  })
+}
+
 async function play(page: Page, dump: string, numbers: Bw2Numbers, options: MomentOptions) {
-  const { scene, label, deadlineMs } = options
+  const { label, deadlineMs } = options
   const team = await sessionTeam(numbers, options)
   const first = await startSession(page, dump, numbers, { options, team })
   logReport(first)
@@ -216,18 +246,8 @@ async function play(page: Page, dump: string, numbers: Bw2Numbers, options: Mome
   const ram = new Uint8Array(Buffer.from(base64, 'base64'))
   const battle = readBattle(ram, numbers, team?.written)
   log(`adapter ${hex(battle.adapter)}, server ${hex(battle.server)}`)
-  const atMenu = options.team.from === 'replay' ? 'replay' : options.battle
-  if (atMenu !== 'single') {
-    log(`${atMenu}: the run ends at the action menu`)
-    return 0
-  }
-  const blocks = sceneMoments(scene, battle, numbers)
-  const steps = momentSteps({
-    adapterNumbers: adapterNumbers(numbers),
-    table: numbers,
-    adapter: battle.adapter,
-    blocks,
-  })
+  const steps = secondSteps(options, battle, numbers, team)
+  if (steps === undefined) return 0
   for (const line of writeLines(steps)) log(line)
   const startAt = momentStart(first.marks)
   log(

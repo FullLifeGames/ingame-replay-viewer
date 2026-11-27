@@ -32,6 +32,12 @@ export const POKEBW2_FILES: readonly string[] = [
   'src/field/script/trainer_script.c',
   'res/text/system/0016.txt',
   'res/text/system/0019.txt',
+  // The battle's set text bank, beside the standard one above (#107).
+  'res/text/system/0018.txt',
+  // The server's flow and the item handlers, for the damage kinds, the heal effect and the C that
+  // puts each of the backend's lines (#107).
+  'src/battle/btl_server_flow.c',
+  'src/battle/handler/item_handlers.c',
   // The direct entry's (#97): symbols, link files, the boot, the structs and the constants.
   'config/b2_us/arm9/symbols.txt',
   'config/b2_us/arm9/overlays/ov162/symbols.txt',

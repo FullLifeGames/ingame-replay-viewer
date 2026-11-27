@@ -2,19 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import type { BattleScript } from '../../script/events.ts'
 import { replayScript } from '../../script/testing.ts'
-import { ENTRY } from '../direct-entry.fixtures.ts'
 import { TEAM_PKM } from '../pkm.fixtures.ts'
 import { nameOfNumber } from './names.ts'
-import { buildGen5Replay, GEN5_REPLAY_VERSION, type ReplayNumbers } from './replay.ts'
-
-// The invented numbers of these specs: the Pokémon format and the entry of src/gen5's fixtures, a
-// font of printable ASCII, and a made-up pin.
-const NUMBERS: ReplayNumbers = {
-  pkm: TEAM_PKM,
-  entry: ENTRY,
-  font: { chars: Array.from({ length: 95 }, (_, i) => String.fromCharCode(32 + i)).join('') },
-  pokebw2: { repository: 'https://example.invalid/pokebw2.git', commit: 'c0ffee' },
-}
+import { buildGen5Replay, GEN5_REPLAY_VERSION } from './replay.ts'
+import { REPLAY_NUMBERS as NUMBERS } from './replay.fixtures.ts'
 
 // Built once, outside the specs' time limit.
 const SUN_RAIN = replayScript('gen5ou-2718717830')
@@ -22,12 +13,12 @@ const SAND = replayScript('smogtours-gen5ou-862240')
 
 // Scene: the run takes a test replay's trainers and teams into Black 2's battle at its start.
 describe('a Gen 5 replay from a battle script', () => {
-  it('carries its version, the pin, the trainers and the dropped lines', () => {
+  it('carries version 2, the pin, the trainers and the dropped lines', () => {
     const replay = buildGen5Replay(SUN_RAIN, NUMBERS)
+    expect(GEN5_REPLAY_VERSION).toBe(2)
     expect(replay.version).toBe(GEN5_REPLAY_VERSION)
     expect(replay.pin).toBe('c0ffee')
     expect(replay.trainers).toEqual({ player: 'isolatedstar', opponent: 'abc2158' })
-    expect(replay.blocks).toEqual([])
     expect(replay.dropped).toBe(SUN_RAIN.dropped)
   })
 

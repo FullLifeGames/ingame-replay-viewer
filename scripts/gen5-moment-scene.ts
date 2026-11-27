@@ -5,6 +5,7 @@
 // in Gen 5 the game's move numbers are the dex numbers.
 import { Dex } from '@pkmn/dex'
 
+import { clientOf } from '../src/gen5/backend/slots.ts'
 import { type BattleMonReading, singleBattlePos } from '../src/gen5/battle-mons.ts'
 import type { SingleBattle } from '../src/gen5/bw2-numbers.ts'
 import type { Moment } from '../src/gen5/moment.ts'
@@ -14,11 +15,12 @@ export type SceneName = 'known' | 'unknown'
 /** A replay side: the near one at the bottom of the screen, the far one at the top. */
 export type Side = 'near' | 'far'
 
-/** The text banks of pokebw2 that the run reads its lines from: the move lines and the
- * standard lines. */
+/** The text banks of pokebw2 that the run reads its lines from: the move lines, the standard
+ * lines and the set lines. */
 export const TEXT_BANKS = {
   move: 'res/text/system/0016.txt',
   standard: 'res/text/system/0019.txt',
+  set: 'res/text/system/0018.txt',
 }
 
 /** Per scene: the near Pokémon's move and the far HP after it, the far one's move and the near
@@ -35,12 +37,6 @@ function dexMove(name: string) {
 }
 
 const moveNumber = (name: string) => dexMove(name).num
-
-/** The battle client of `side`: the near side is the player's client and the far side the
- * opponent's, as the single battle's setup creates them (build/gen5/bw2.json). */
-export function sideClient(single: SingleBattle, side: Side): number {
-  return side === 'near' ? single.clients.player : single.clients.opponent
-}
 
 /** The move that `side`'s Pokémon uses in `scene`. */
 export function sceneMove(scene: SceneName, side: Side): string {
@@ -63,7 +59,7 @@ export function sceneBlocks(
   const plan = SCENES[scene]
   const side = (mon: BattleMonReading, of: Side) => ({
     monId: mon.monId,
-    pos: singleBattlePos(single, sideClient(single, of)),
+    pos: singleBattlePos(single, clientOf(single, of)),
   })
   const near = side(mons.near, 'near')
   const far = side(mons.far, 'far')
