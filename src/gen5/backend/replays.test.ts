@@ -51,7 +51,7 @@ function placesOf(script: BattleScript, replay: Gen5Replay) {
   }))
 }
 
-/** The not-shown list: per issue (`#108`…) or fallback kind (`line`), the events by kind. */
+/** The not-shown list: per issue (`#109`…) or fallback kind (`line`), the events by kind. */
 function notShown(fallbacks: readonly Gen5Fallback[]) {
   const counts: Record<string, Record<string, number>> = {}
   for (const one of fallbacks) {
@@ -97,14 +97,13 @@ describe('the Gen 5 OU test replays', () => {
     }
   })
 
-  // The list that #108 and #109 shrink.
+  // The list that #109 and #110 shrink.
   it('list what does not show yet by the issue that plays it and by event kind', () => {
     const lists = Object.fromEntries(
       REPLAYS.map(({ id, replay }) => [id, notShown(replay.fallbacks)]),
     )
     expect(lists).toEqual({
       'gen5ou-2718717830': {
-        '#108': { faint: 3 },
         '#109': {
           weather: 15,
           singleTurn: 2,
@@ -123,7 +122,6 @@ describe('the Gen 5 OU test replays', () => {
         line: { message: 1 },
       },
       'smogtours-gen5ou-862240': {
-        '#108': { faint: 8 },
         '#109': {
           ability: 4,
           statChange: 16,
