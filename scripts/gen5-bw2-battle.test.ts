@@ -29,6 +29,10 @@ describe('battleNumbers', () => {
     })
   })
 
+  it("gives each client's first mon ID and the count of mon IDs per client", () => {
+    expect(battleNumbers(SOURCES).monIds).toEqual({ firstByClient: [14, 2, 26], perClient: 8 })
+  })
+
   it("refuses a player's or an opponent's client outside the count", () => {
     const mainC = SOURCES.mainC.replace('Create(mainModule, 6, 0)', 'Create(mainModule, 6, 3)')
     const outside = mainC.replace('clients[0] =', 'clients[3] =')
@@ -50,6 +54,32 @@ describe('battleNumbers', () => {
     )
     expect(() => battleNumbers(mainC('posClientIds[1]', 'posClientIds[3]'))).toThrow(/skips/)
     expect(() => battleNumbers(mainC('clientCount = 3', 'clientCount = THREE'))).toThrow(/THREE/)
+  })
+
+  // Scene: the backend names the weather, the condition and the stat it writes by pokebw2's name.
+  it("reads the weathers, the Pokémon's conditions and its stats, and no side's or field's condition", () => {
+    expect(battleNumbers(SOURCES).constants).toEqual({
+      BTL_WEATHER_RAIN: 0x21,
+      BTL_WEATHER_NONE: 0x20,
+      BTL_WEATHER_SUN: 0x24,
+      CONDITION_BURN: 17,
+      CONDITION_SLEEP: 9,
+      CONDITION_NONE: 12,
+      BATTLEMON_SPEED_STAGE: 30,
+      BATTLEMON_HP: 26,
+      BATTLEMON_ATTACK: 27,
+    })
+  })
+
+  it('refuses a battle header without one of the prefixes or with a computed condition', () => {
+    const battleH = (from: string | RegExp, to: string) => ({
+      ...SOURCES,
+      battleH: SOURCES.battleH.replace(from, to),
+    })
+    expect(() => battleNumbers(battleH(/^#define BTL_WEATHER_.*$/gm, ''))).toThrow(/BTL_WEATHER_/)
+    expect(() => battleNumbers(battleH('CONDITION_SLEEP 9', 'CONDITION_SLEEP (1 << 3)'))).toThrow(
+      /CONDITION_SLEEP/,
+    )
   })
 
   it('refuses a BattleMon whose first member is not its core, whose offsets it borrows', () => {

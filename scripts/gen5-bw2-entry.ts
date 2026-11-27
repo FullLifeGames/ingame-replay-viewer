@@ -112,6 +112,7 @@ const LAYOUTS: Readonly<
     from: ['setupH', 'regulationH', 'pmsH', 'mathH'],
     members: [
       'battleStyle',
+      'flags',
       'fieldSituation.bgm',
       'party',
       'playerInfo',
@@ -136,6 +137,10 @@ const BUFFER_MAKERS = ['TrainerBattleSetup_Create']
 const TRAINER_CLASS = 'TRAINER_CLASS_YOUNGSTER'
 /** The music a regular trainer class battles to, which the park writes (plan E-6, decision 8). */
 const TRAINER_TRACK = 'SEQ_BGM_VS_TRAINER'
+
+/** The setup flag of a trainer battle that the player may lose without blacking out
+ * (BtlSetup.flags); nothing writes it before #110. */
+const NO_BLACKOUT = 'BTL_SETUP_FLAG_NO_BLACKOUT'
 
 /** The address a call through a register takes: a Thumb function's with bit 0 set, an ARM
  * function's as it is. Throws on anything else, and on an address out of step with its set. */
@@ -208,6 +213,7 @@ function entryConstants(input: EntryInput): Record<string, number> {
     BTL_STYLE_SINGLE: defineValue(input.battleH, 'BTL_STYLE_SINGLE'),
     BTL_STYLE_DOUBLE: defineValue(input.battleH, 'BTL_STYLE_DOUBLE'),
     [TRAINER_TRACK]: named(listConstants(input.soundList), TRAINER_TRACK),
+    [NO_BLACKOUT]: named(enumAround(input.setupH, NO_BLACKOUT), NO_BLACKOUT),
   }
 }
 

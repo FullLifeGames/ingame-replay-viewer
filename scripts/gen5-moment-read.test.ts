@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import type { PartyMonReading } from '../src/gen5/battle-mons'
+import type { MonIds } from '../src/gen5/bw2-numbers'
 import type { WrittenPkm } from '../src/gen5/pkm-fields'
-import { partyLine } from './gen5-moment-read'
+import { frontIdLine, partyLine } from './gen5-moment-read'
 
 // Every number here is invented: three Pokémon as the park wrote them and as the battle read them.
 
@@ -41,5 +42,22 @@ describe('partyLine', () => {
 
   it('counts the party read when nothing was written, as on the walk', () => {
     expect(partyLine('near', READ, undefined)).toBe('near party: 3 read')
+  })
+})
+
+/** Invented mon IDs: client 0 starts at 10, client 1 at 30, eight to a client. */
+const MON_IDS: MonIds = { firstByClient: [10, 30], perClient: 8 }
+
+// Scene: each front Pokémon at the action menu is the lead of its party, slot 0, under the mon ID
+// the rule of GetClientIDFromMonID gives it.
+describe('frontIdLine', () => {
+  it("says a front Pokémon holds the mon ID of its client's slot 0", () => {
+    expect(frontIdLine('far', 30, MON_IDS, 1)).toBe('far front: mon ID 30, as monIdOf gives slot 0')
+  })
+
+  it("names a mon ID other than slot 0's", () => {
+    expect(frontIdLine('near', 12, MON_IDS, 0)).toBe(
+      'near front: mon ID 12, but monIdOf gives 10 for slot 0',
+    )
   })
 })

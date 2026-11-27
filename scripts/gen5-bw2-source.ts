@@ -69,6 +69,9 @@ export const POKEBW2_FILES: readonly string[] = [
   'generated/items.txt',
   'generated/abilities.txt',
   'generated/natures.txt',
+  // The characters the battle view's two fonts draw (#106).
+  'res/fonts/font/00/font.json',
+  'res/fonts/font/02/font.json',
 ]
 
 /** Reads one file of pokebw2 by its path inside the checkout. */

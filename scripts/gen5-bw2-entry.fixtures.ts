@@ -33,7 +33,12 @@ export const ENTRY_INPUT: EntryInput = {
   strbufC: 'struct StrBuf { u32 stamp; u16 size; u8 tag; u16 length; u16 chars[3]; };',
   setupH: `struct BtlFieldSituation { u16 winBgm; u16 bgm; };
 struct BtlSetupTrainer { u16 badge; StrBuf *name; u8 trainerClass; };
-struct BtlSetup { u8 mode; BtlFieldSituation fieldSituation; GameData *gameData;
+enum {
+    BTL_SETUP_FLAG_KITE = 1 << 2,
+    BTL_SETUP_FLAG_NO_BLACKOUT = 1 << 5, // the flag the park sets
+    BTL_SETUP_FLAG_LAMP,
+};
+struct BtlSetup { u8 mode; u8 flags; BtlFieldSituation fieldSituation; GameData *gameData;
     PokeParty *party[5]; u32 battleStyle; PlayerInfo *playerInfo[5]; Config *config;
     BtlSetupTrainer *trainers[5]; MATHRandContext32 rand; };`,
   regulationH: '',

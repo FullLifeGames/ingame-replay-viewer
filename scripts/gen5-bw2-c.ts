@@ -87,12 +87,24 @@ export function pickSymbols(
   return picked
 }
 
+/** The largest value of a C enum on the game's compiler, an `int`. */
+const INT_MAX = 2 ** 31 - 1
+
+/** A literal, or a shift `<literal> << <literal>` that fits an int; else undefined. */
+function enumLiteral(text: string): number | undefined {
+  const parts = text.split('<<').map((part) => literal(part))
+  if (parts.length > 2 || parts.some((part) => part === undefined)) return undefined
+  const [base = 0, shift = 0] = parts as number[]
+  const value = base * 2 ** shift
+  return value <= INT_MAX ? value : undefined
+}
+
 function enumValues(entries: readonly string[]): Record<string, number> {
   const values: Record<string, number> = {}
   let next = 0
   for (const entry of entries) {
     const [name = '', value] = entry.split('=').map((part) => part.trim())
-    const explicit = value === undefined ? next : literal(value)
+    const explicit = value === undefined ? next : enumLiteral(value)
     if (explicit === undefined || !/^\w+$/.test(name)) {
       throw new Error(`cannot read the enum entry "${entry}" without computing it`)
     }
@@ -122,6 +134,21 @@ export function defineValue(source: string, name: string): number {
   const value = match?.[1] === undefined ? undefined : literal(match[1])
   if (value === undefined) throw new Error(`no #define ${name} with a plain number`)
   return value
+}
+
+/** Every `#define <prefix>… <literal>` by name; the name must start with the prefix, so
+ * `CONDITION_` leaves `SIDE_CONDITION_` out. Throws by name on a define of the prefix whose value
+ * is no plain number, and when the source has none. */
+export function definesByPrefix(source: string, prefix: string): Record<string, number> {
+  const found: Record<string, number> = {}
+  const lines = new RegExp(`^[ \\t]*#define[ \\t]+(${prefix}\\w*)(.*)$`, 'gm')
+  for (const [, name = '', text = ''] of stripComments(source).matchAll(lines)) {
+    const value = literal(text)
+    if (value === undefined) throw new Error(`#define ${name} carries no plain number`)
+    found[name] = value
+  }
+  if (Object.keys(found).length === 0) throw new Error(`no #define of the prefix ${prefix}`)
+  return found
 }
 
 export interface FormatTable {

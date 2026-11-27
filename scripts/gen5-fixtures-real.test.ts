@@ -17,6 +17,8 @@ import { battleNumbers } from './gen5-bw2-battle.ts'
 import { BATTLE_SOURCES } from './gen5-bw2-battle.fixtures.ts'
 import { entryNumbers } from './gen5-bw2-entry.ts'
 import { ENTRY_INPUT } from './gen5-bw2-entry.fixtures.ts'
+import { fontNumbers } from './gen5-bw2-font.ts'
+import { FONT_INPUT } from './gen5-bw2-font.fixtures.ts'
 import { pkmNumbers } from './gen5-bw2-pkm.ts'
 import { PKM_INPUT } from './gen5-bw2-pkm.fixtures.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
@@ -62,6 +64,12 @@ const COMPARED = [
     name: 'BATTLE_SOURCES',
     value: battleNumbers(BATTLE_SOURCES),
     path: ['battle'],
+  },
+  {
+    module: 'scripts/gen5-bw2-font.fixtures.ts',
+    name: 'FONT_INPUT',
+    value: fontNumbers(FONT_INPUT),
+    path: ['font'],
   },
 ]
 

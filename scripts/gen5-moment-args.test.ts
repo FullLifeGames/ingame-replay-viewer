@@ -31,7 +31,7 @@ describe('readMomentOptions', () => {
       start: { from: 'boot', query: '' },
       entry: 'direct',
       battle: 'single',
-      names: { player: 'Viewer', opponent: 'Showdown' },
+      team: { from: 'hand', names: { player: 'Viewer', opponent: 'Showdown' } },
       label: 'nosave-direct-known',
       deadlineMs: NOW + 15 * 60_000,
     })
@@ -52,7 +52,7 @@ describe('readMomentOptions', () => {
       start: { from: 'boot', save: 'route-20', query: '?save=route-20' },
       entry: 'walk',
       battle: 'single',
-      names: { player: 'Viewer', opponent: 'Showdown' },
+      team: { from: 'hand', names: { player: 'Viewer', opponent: 'Showdown' } },
       label: 'route-20-known',
       deadlineMs: NOW + 15 * 60_000,
     })
@@ -85,7 +85,7 @@ describe('readMomentOptions', () => {
     expect(readMomentOptions(args, NOW)).toMatchObject({
       start: { from: 'boot', save: 'route-20' },
       entry: 'direct',
-      names: { player: 'Ann', opponent: 'Bo' },
+      team: { from: 'hand', names: { player: 'Ann', opponent: 'Bo' } },
       label: 'route-20-direct-known',
     })
   })
@@ -126,6 +126,40 @@ describe('readMomentOptions', () => {
     expect(() => readMomentOptions([...walking, '--battle', 'double'], NOW)).toThrow(walk)
     expect(() => readMomentOptions(['--entry', 'walk', '--battle', 'single'], NOW)).toThrow(walk)
     expect(readMomentOptions(['--battle', 'double'], NOW)).toMatchObject({ battle: 'double' })
+  })
+
+  // Scene: the run takes a test replay's teams and trainer names into the direct start (#106).
+  it('takes a test replay by its id for the direct entry, the id in the label', () => {
+    const options = readMomentOptions(['--replay', 'gen5ou-2718717830'], NOW)
+    expect(options).toMatchObject({
+      start: { from: 'boot', query: '' },
+      entry: 'direct',
+      battle: 'single',
+      team: { from: 'replay', id: 'gen5ou-2718717830' },
+      label: 'nosave-direct-gen5ou-2718717830',
+    })
+    const saved = readMomentOptions(
+      ['--replay', 'smogtours-gen5ou-862240', '--save', 'route-20'],
+      NOW,
+    )
+    expect(saved.label).toBe('route-20-direct-smogtours-gen5ou-862240')
+  })
+
+  it('refuses --replay for the walk, in a double, beside a name and with an id that climbs', () => {
+    const replay = ['--replay', 'gen5ou-2718717830']
+    expect(() => readMomentOptions([...replay, '--entry', 'walk'], NOW)).toThrow(
+      "--replay is for --entry direct alone: the walk meets the save's trainer.",
+    )
+    expect(() => readMomentOptions([...replay, '--battle', 'double'], NOW)).toThrow(
+      '--replay plays a single.',
+    )
+    const names =
+      '--player and --opponent are refused with --replay: the names come from the replay.'
+    expect(() => readMomentOptions([...replay, '--opponent', 'Bo'], NOW)).toThrow(names)
+    expect(() => readMomentOptions([...replay, '--player', 'Ann'], NOW)).toThrow(names)
+    expect(() => readMomentOptions(['--replay', '../gen5ou'], NOW)).toThrow(
+      '--replay takes a test replay\'s id, lower-case letters and digits with single hyphens between them, not "../gen5ou".',
+    )
   })
 
   it('says where the session starts', () => {

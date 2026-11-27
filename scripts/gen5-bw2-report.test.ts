@@ -53,6 +53,8 @@ describe('quietLines', () => {
       monCore: LAYOUT,
       waitSelectSeq: 29,
       single: { clientCount: 3, posClientIds: [2, 0, 1], clients: { player: 2, opponent: 1 } },
+      constants: {},
+      monIds: { firstByClient: [9, 21, 33], perClient: 7 },
     },
     route: {
       hughTrigger: { x: 1, z: 31, width: 2 },
@@ -91,6 +93,7 @@ describe('quietLines', () => {
       abilities: { ABILITY_STURDY_ROOTS: 4 },
       natures: { NATURE_CALM: 5 },
     },
+    font: { chars: 'Za' },
   }
 
   it('gives the pin, the count of symbols and the checks, and no address, offset or value', () => {

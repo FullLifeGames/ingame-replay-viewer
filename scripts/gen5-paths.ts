@@ -31,4 +31,6 @@ export const GEN5_PATHS = {
   /** The direct entry's routine: our C source, and what scripts/gen5-routine.ts builds from it. */
   routineSource: `${REPO}/rom/gen5/routine.c`,
   routineJson: `${REPO}/build/gen5/routine.json`,
+  /** The test replays, as Showdown's replay JSON, that the moment script can play (#106). */
+  replays: `${REPO}/test/fixtures/replays`,
 }

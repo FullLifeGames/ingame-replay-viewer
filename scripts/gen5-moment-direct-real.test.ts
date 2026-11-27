@@ -8,6 +8,7 @@ import { existsSync, readFileSync } from 'node:fs'
 
 import { describe, expect, it } from 'vitest'
 
+import { baseSpecie } from '../src/gen5/backend/names.ts'
 import { battleRefs } from '../src/gen5/battle-check.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { takeover } from '../src/gen5/direct-takeover.ts'
@@ -19,7 +20,7 @@ import type { RoutineBuild } from '../src/gen5/routine-order.ts'
 import { ROUTINE_PIECES } from '../src/gen5/routine-layout.ts'
 import { readMomentOptions } from './gen5-moment-args.ts'
 import { sessionPlan } from './gen5-moment-direct.ts'
-import { dexSpecies, TEAM, type TeamMon, teamParties, unresolved } from './gen5-moment-team.ts'
+import { TEAM, type TeamMon, teamParties } from './gen5-moment-team.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
 const FILES = [GEN5_PATHS.bw2Json, GEN5_PATHS.routineJson]
@@ -37,7 +38,6 @@ const named = (steps: readonly MacroStep[]) =>
   steps.map((step) => ('name' in step ? `${step.kind} ${step.name}` : step.kind))
 
 const SIDES = ['player', 'opponent'] as const
-const plain = (name: string) => name.toLowerCase().replace(/[^a-z0-9]/g, '')
 
 /** The team's Pokémon by side and slot, with what `bad` finds wrong in each. */
 const slotsWhere = (bad: (mon: TeamMon, side: (typeof SIDES)[number], i: number) => boolean) =>
@@ -45,19 +45,20 @@ const slotsWhere = (bad: (mon: TeamMon, side: (typeof SIDES)[number], i: number)
     TEAM[side].flatMap((mon, i) => (bad(mon, side, i) ? [`${side} ${String(i)}`] : [])),
   )
 
-/** Whether @pkmn gives the species of `number` the gender written. */
-function genderFits(mon: TeamMon, number: number | undefined): boolean {
-  const gender = number === undefined ? undefined : dexSpecies(number)?.gender
-  if (gender === 'N') return mon.gender === 'none'
-  if (gender === 'M' || gender === 'F') return mon.gender === (gender === 'M' ? 'male' : 'female')
-  return mon.gender !== 'none'
+/** Whether @pkmn gives the species the gender written. */
+function genderFits(mon: TeamMon): boolean {
+  const { gender } = baseSpecie(mon.species)
+  if (gender === 'N') return mon.gender === undefined
+  if (gender === 'M' || gender === 'F') return mon.gender === gender
+  return mon.gender !== undefined
 }
 
 describe.skipIf(!FILES.every((file) => existsSync(file)))(
   'the direct entry on the real files',
   () => {
     const options = readMomentOptions(['--entry', 'direct'], 0)
-    const team = () => teamParties(pkmFormat(real().numbers), options.names)
+    const names = { player: 'Viewer', opponent: 'Showdown' }
+    const team = () => teamParties(pkmFormat(real().numbers), names)
     const input = () => ({
       refs: battleRefs(real().numbers),
       trainer: real().numbers.saveTrainer,
@@ -66,7 +67,7 @@ describe.skipIf(!FILES.every((file) => existsSync(file)))(
       readState: () => {
         throw new Error('no state')
       },
-      parties: team().parties,
+      team: { parties: team().parties, names },
     })
 
     it('build one plan: the takeover right after its window, park, then go before gone', () => {
@@ -88,15 +89,10 @@ describe.skipIf(!FILES.every((file) => existsSync(file)))(
     })
 
     it('resolve every name of the team, each species with a gender and ability @pkmn gives it', () => {
-      const { pkm } = real().numbers
-      expect(unresolved(pkm), 'names the lists lack').toEqual([])
-      const species = (mon: TeamMon) => pkm.species[mon.species]
-      expect(slotsWhere((mon) => !genderFits(mon, species(mon)))).toEqual([])
-      const abilityMissed = (mon: TeamMon) => {
-        const dex = dexSpecies(species(mon) ?? -1)
-        const own = Object.values(dex?.abilities ?? {}).map(plain)
-        return !own.includes(plain(mon.ability.replace(/^ABILITY_/, '')))
-      }
+      expect(() => team(), 'every name maps on the real format').not.toThrow()
+      expect(slotsWhere((mon) => !genderFits(mon))).toEqual([])
+      const abilityMissed = (mon: TeamMon) =>
+        !Object.values(baseSpecie(mon.species).abilities).includes(mon.ability)
       expect(slotsWhere(abilityMissed)).toEqual([])
     })
 

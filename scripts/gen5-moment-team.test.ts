@@ -1,39 +1,71 @@
 import { Dex } from '@pkmn/dex'
 import { describe, expect, it } from 'vitest'
 
+import type { ReplayNumbers } from '../src/gen5/backend/replay'
+import { ENTRY } from '../src/gen5/direct-entry.fixtures'
 import { openPkm } from '../src/gen5/pkm-cipher'
 import { readPkm } from '../src/gen5/pkm-fields'
-import type { PkmFormat } from '../src/gen5/pkm-members'
+import { type PkmFormat, pkmFormat } from '../src/gen5/pkm-members'
 import { TEAM_PKM, TERMINATOR } from '../src/gen5/pkm.fixtures'
-import { TEAM, teamParties, unresolved } from './gen5-moment-team'
+import { replayTeam } from './gen5-moment-replay'
+import { momentTeam, TEAM, type Team, teamParties } from './gen5-moment-team'
 
-// Every number here is invented (src/gen5/pkm.fixtures.ts): a format whose nickname holds seven
-// characters and whose lists give each of the team's names a number of its own.
+// Every number of the format is invented (src/gen5/pkm.fixtures.ts): a nickname holds seven
+// characters, and the lists hold the team's natures. Species, moves, items and abilities take
+// @pkmn's dex numbers, which in Gen 5 the game shares.
 
 const FORMAT: PkmFormat = { pkm: TEAM_PKM, terminator: TERMINATOR }
 const NAMES = { player: 'Ann', opponent: 'Bo' }
 const SIDES = ['player', 'opponent'] as const
 
-const without = (list: 'species' | 'moves', name: string): PkmFormat => {
-  const rest = Object.fromEntries(Object.entries(TEAM_PKM[list]).filter(([key]) => key !== name))
-  return { ...FORMAT, pkm: { ...TEAM_PKM, [list]: rest } }
+/** The team with its far lead's entry changed. */
+const withFarLead = (change: Partial<Team['opponent'][number]>): Team => {
+  const [lead, ...rest] = TEAM.opponent
+  if (lead === undefined) throw new Error('no far lead')
+  return { ...TEAM, opponent: [{ ...lead, ...change }, ...rest] }
 }
 
-// Scene: a run without a save writes six Pokémon a side, named by pokebw2's constants, as the
+// Scene: a run without a save writes six Pokémon a side, named by Showdown's names, as the
 // battle's party copies take them.
 describe('the moment team', () => {
-  it('resolves every name of the team in the lists', () => {
-    expect(unresolved(TEAM_PKM)).toEqual([])
-    expect(unresolved(without('species', 'SPECIES_SNIVY').pkm)).toEqual(['SPECIES_SNIVY'])
-    expect(() => teamParties(without('moves', 'MOVE_LEER'), NAMES)).toThrow(
-      'the Pokémon format has no MOVE_LEER',
+  it('names the same twelve Pokémon by Showdown’s names', () => {
+    expect(TEAM.player.map((mon) => mon.species)).toEqual([
+      'Oshawott',
+      'Pikachu',
+      'Rotom',
+      'Lucario',
+      'Gyarados',
+      'Ferrothorn',
+    ])
+    expect(TEAM.opponent.map((mon) => mon.species)).toEqual([
+      'Snivy',
+      'Excadrill',
+      'Chandelure',
+      'Haxorus',
+      'Volcarona',
+      'Bisharp',
+    ])
+    expect(TEAM.player[0]).toMatchObject({
+      nature: 'Modest',
+      ability: 'Torrent',
+      item: 'Oran Berry',
+      moves: ['Tackle', 'Water Gun', 'Tail Whip', 'Hydro Pump'],
+    })
+  })
+
+  it('fails by name on a species, a move or an item with no Gen 5 entry', () => {
+    const parties = (team: Team) => () => teamParties(FORMAT, NAMES, team)
+    expect(parties(withFarLead({ species: 'Sprigatito' }))).toThrow('no Gen 5 species Sprigatito')
+    expect(parties(withFarLead({ moves: ['Tackle', 'Moonblast'] }))).toThrow(
+      'no Gen 5 move Moonblast',
     )
+    expect(parties(withFarLead({ item: 'Assault Vest' }))).toThrow('no Gen 5 item Assault Vest')
   })
 
   it('leads with two Pokémon other than the save’s Tepig that both know Tackle', () => {
     const leads = SIDES.map((side) => TEAM[side][0])
-    expect(leads.map((lead) => lead?.species)).not.toContain('SPECIES_TEPIG')
-    expect(leads.every((lead) => lead?.moves.includes('MOVE_TACKLE'))).toBe(true)
+    expect(leads.map((lead) => lead?.species)).not.toContain('Tepig')
+    expect(leads.every((lead) => lead?.moves.includes('Tackle'))).toBe(true)
   })
 
   it('seals six a side, each opening with a right checksum to the species and moves written', () => {
@@ -44,31 +76,24 @@ describe('the moment team', () => {
       expect(opened.every((one) => one.checksumRight)).toBe(true)
       const read = opened.map((one) => readPkm(one.plain, FORMAT))
       expect(read.map((one) => one.species)).toEqual(
-        TEAM[side].map((mon) => TEAM_PKM.species[mon.species]),
+        TEAM[side].map((mon) => Dex.species.get(mon.species).num),
       )
       expect(read.map((one) => one.moves.map((slot) => slot.move))).toEqual(
-        TEAM[side].map((mon) => mon.moves.map((move) => TEAM_PKM.moves[move])),
+        TEAM[side].map((mon) => mon.moves.map((move) => Dex.moves.get(move).num)),
       )
       expect(new Set(read.map((one) => one.personality)).size).toBe(6)
       expect(read.some((one) => one.shiny)).toBe(false)
       expect(read.map((one) => one.ot.name)).toEqual(Array(6).fill(NAMES[side]))
-      expect(written[side].map((one) => [one.form, one.exp, one.hp === one.maxHp])).toEqual(
-        Array(6).fill([0, 0, true]),
-      )
+      const kept = written[side].map((one) => [one.form, one.exp, one.level, one.hp === one.maxHp])
+      expect(kept).toEqual(Array(6).fill([0, 0, 50, true]))
     }
   })
 
-  it('takes PP and stats from @pkmn by the game’s numbers', () => {
+  it('keeps the HP that @pkmn calculates', () => {
     const [lead] = teamParties(FORMAT, NAMES).written.player
-    const tackle = Dex.forGen(5)
-      .moves.all()
-      .find((move) => move.num === TEAM_PKM.moves.MOVE_TACKLE)
-    expect(lead?.moves[0]).toEqual({ move: TEAM_PKM.moves.MOVE_TACKLE, pp: tackle?.pp, ppUps: 0 })
-    const species = Dex.forGen(5)
-      .species.all()
-      .find((one) => one.num === TEAM_PKM.species.SPECIES_OSHAWOTT)
+    const species = Dex.forGen(5).species.get('Oshawott')
     // The Gen 5 formula at level 50 with full IVs and no EVs: base + 75 for HP.
-    expect(lead?.maxHp).toBe((species?.baseStats.hp ?? 0) + 75)
+    expect(lead?.maxHp).toBe(species.baseStats.hp + 75)
   })
 
   it('cuts the long nickname to its room and keeps the short one', () => {
@@ -78,5 +103,27 @@ describe('the moment team', () => {
     )
     expect(notes.filter((note) => note.includes('"Axel"'))).toEqual([])
     expect(written.opponent.find((one) => one.nicknamed)?.name).toBe('Axel')
+  })
+})
+
+/** The invented numbers of a replay's team: the format and entry of the fixtures, a font of
+ * printable ASCII, a made-up pin. */
+const NUMBERS: ReplayNumbers = {
+  pkm: TEAM_PKM,
+  entry: ENTRY,
+  font: { chars: Array.from({ length: 95 }, (_, i) => String.fromCharCode(32 + i)).join('') },
+  pokebw2: { repository: 'https://example.invalid/pokebw2.git', commit: 'c0ffee' },
+}
+
+// Scene: the run writes the hand team with the names given, or a test replay's teams and names.
+describe('momentTeam', () => {
+  it('gives the hand team with the names given and no fallback', async () => {
+    const team = await momentTeam({ from: 'hand', names: NAMES }, NUMBERS)
+    expect(team).toEqual({ ...teamParties(pkmFormat(NUMBERS), NAMES), names: NAMES, fallbacks: [] })
+  })
+
+  it('loads a test replay’s teams and names through the module runner', async () => {
+    const team = await momentTeam({ from: 'replay', id: 'gen5ou-2718717830' }, NUMBERS)
+    expect(team).toEqual(replayTeam('gen5ou-2718717830', NUMBERS))
   })
 })
