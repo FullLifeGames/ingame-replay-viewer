@@ -7,7 +7,7 @@ import type { Side } from '../script/types'
 import { REPLAYS, replayScript } from '../script/testing'
 import { crc32 } from '../patch/crc32'
 import { buildGen3Stream, type Gen3Stream } from './backend'
-import { animGap, type Fallback, mechanicGap, showsInPlace } from './fallbacks'
+import { type Fallback, mechanicGap, showsInPlace } from './fallbacks'
 import { decodeStream } from './stream/decode'
 import { itemOf } from './tables/lookup'
 import { itemGaps } from './tables/testing'
@@ -57,10 +57,10 @@ const NAMED_PHRASES: ReadonlySet<string> = new Set([phraseGap(PARTIAL_TRAP_SCENE
 
 /**
  * The move fallbacks a test replay may take, each a look of a move that the log names and the game
- * lacks, so the move plays its own animation: Ogerpon's Ivy Cudgel in its Water look (#88). A new
- * one fails until it is named here.
+ * lacks, so the move plays its own animation. None since #89: Ogerpon's Ivy Cudgel in its Water
+ * look plays as the game's own, by its type. A new one fails until it is named here.
  */
-const NAMED_LOOKS: ReadonlySet<string> = new Set([animGap('Ivy Cudgel Water', 'Ivy Cudgel').detail])
+const NAMED_LOOKS: ReadonlySet<string> = new Set<string>()
 
 /**
  * The entries above that no test replay takes yet, named ahead for a replay to come: Bide's first

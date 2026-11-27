@@ -31,8 +31,9 @@ export function teraTypeGap(type: string): MechanicFallback {
 }
 
 /**
- * A look of `move` that the log names (`[anim] Ivy Cudgel Water`) and the game lacks: the MOVE op
- * carries the move alone, so the game plays the move's own animation.
+ * A look of `move` that the log names (`[anim] Shell Side Arm Physical`) and the game lacks: the
+ * MOVE op carries the move alone, so the game plays the move's own animation. A look by type
+ * (`[anim] Ivy Cudgel Water`) is none: its MOVE_TYPE gives the game the type (#89).
  */
 export function animGap(look: string, move: string): NonNullable<Found['fallback']> {
   return { kind: 'move', detail: `the game has no look for ${look}; it plays ${move}` }
