@@ -226,6 +226,13 @@ export interface PkmNumbers {
   natures: Record<string, number>
 }
 
+/** The characters the battle's fonts draw (scripts/gen5-bw2-font.ts): the game draws "?" for any
+ * other. */
+export interface FontNumbers {
+  /** Every character both battle fonts draw, in the order of their codes. */
+  chars: string
+}
+
 /** The whole of build/gen5/bw2.json. */
 export interface Bw2Numbers extends ServerCmdTable {
   pokebw2: { repository: string; commit: string }
@@ -242,4 +249,5 @@ export interface Bw2Numbers extends ServerCmdTable {
   saveTrainer: ActorPlace
   entry: EntryNumbers
   pkm: PkmNumbers
+  font: FontNumbers
 }

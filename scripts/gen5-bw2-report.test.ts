@@ -93,6 +93,7 @@ describe('quietLines', () => {
       abilities: { ABILITY_STURDY_ROOTS: 4 },
       natures: { NATURE_CALM: 5 },
     },
+    font: { chars: 'Za' },
   }
 
   it('gives the pin, the count of symbols and the checks, and no address, offset or value', () => {

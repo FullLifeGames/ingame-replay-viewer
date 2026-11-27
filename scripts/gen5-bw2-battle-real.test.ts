@@ -90,5 +90,14 @@ describe.skipIf(!existsSync(FILE))(
       const inside = flags !== undefined && flags.bit === undefined && bit < 8 * flags.size
       expect(inside, 'inside BtlSetup.flags').toBe(true)
     })
+
+    // Scene: a replay's names are mostly ASCII, and each of those characters must not turn to "?".
+    it('give the characters of both battle fonts every letter and digit of ASCII', () => {
+      const { chars } = real().font
+      const ascii = Array.from({ length: 0x80 }, (_, code) => String.fromCharCode(code)).filter(
+        (char) => /[A-Za-z0-9]/.test(char),
+      )
+      expect(ascii.filter((char) => !chars.includes(char))).toEqual([])
+    })
   },
 )
