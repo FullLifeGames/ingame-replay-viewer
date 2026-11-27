@@ -231,7 +231,8 @@ export function prepare(event: EventOf<'prepare'>, ctx: Context): void {
     playMove(event, event.target ?? user, CHARGE_TURN, ctx)
   }
   const say = () => {
-    ctx.print(line, chargeLine(ctx.mon(user), event.move, charge?.stringId))
+    const target = event.target && ctx.mon(event.target)
+    ctx.print(line, chargeLine(ctx.mon(user), event.move, charge?.stringId, target))
   }
   if (charge?.animationFirst === true) {
     play()

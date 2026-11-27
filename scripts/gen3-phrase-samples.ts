@@ -157,4 +157,5 @@ export const SAMPLES: Readonly<Record<string, Sample>> = {
   'items.berryWeakened': withValue('B_LAST_ITEM', nb('Chople Berry'), FAR),
   'items.whiteHerb': withValue('B_LAST_ITEM', nb('White Herb'), FAR),
   'items.actsFaster': withValue('B_BUFF1', nb('Custap Berry'), FAR),
+  'charge.tookTarget': { args: [FAR, NEAR], fill: { B_DEF_NAME_WITH_PREFIX2: 'Dugtrio' } },
 }
