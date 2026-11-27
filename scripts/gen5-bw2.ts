@@ -6,7 +6,8 @@
 // format (#97), the battle's constants, the mon-ID rule, the setup flag and the characters of the
 // battle's fonts (#106), the labels of the battle's standard and set text banks, each line the
 // backend sends held to what its function puts, and the flow's damage kinds and heal effect (#107),
-// recall effects and faint flag (#108), and the numbers of the effects' sequences (#109).
+// recall effects and faint flag (#108), and the numbers of the effects' sequences and the lines of
+// the effects (#109).
 // The checkout lives in .cache/gen5/pokebw2/ and the output in build/gen5/; nothing of pokebw2 is
 // committed.
 // Usage: node scripts/gen5-bw2.ts [--checkout <dir>] [--quiet] (fetches on the first run). With
@@ -24,14 +25,13 @@ import {
   parseSymbols,
   pickSymbols,
 } from './gen5-bw2-c.ts'
-import { GEN5_LINES } from '../src/gen5/backend/lines.ts'
 import { battleNumbers } from './gen5-bw2-battle.ts'
 import { EFFECT_SOURCES, effectNumbers } from './gen5-bw2-effects.ts'
 import { checkPartyRoom } from './gen5-bw2-mon-ids.ts'
 import { checkPlayerClient } from './gen5-bw2-clients.ts'
 import { BATTLE_OVERLAY, BOOT_LINKS, ENTRY_SOURCES, entryNumbers } from './gen5-bw2-entry.ts'
 import { FLOW_SOURCES, flowNumbers } from './gen5-bw2-flow.ts'
-import { checkLineSources } from './gen5-bw2-lines.ts'
+import { checkBackendLines } from './gen5-bw2-lines.ts'
 import { FONT_SOURCES, fontNumbers } from './gen5-bw2-font.ts'
 import { ROUTE_MAP, routePlaces } from './gen5-bw2-field.ts'
 import { PKM_SOURCES, pkmNumbers } from './gen5-bw2-pkm.ts'
@@ -202,7 +202,7 @@ function parse(sources: Sources): Bw2Numbers {
   const pkm = pkmNumbers(sources)
   checkPartyRoom(battle.monIds, pkm.constants.PARTY_SIZE ?? Infinity)
   const text = textNumbers(sources)
-  checkLineSources(sources, text, GEN5_LINES)
+  checkBackendLines(sources, text)
   return {
     pokebw2: { ...POKEBW2 },
     symbols: pickSymbols(ov167, SYMBOL_NAMES),

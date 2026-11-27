@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import type { TextNumbers } from '../src/gen5/bw2-numbers'
+import { GEN5_EFFECT_LINES } from '../src/gen5/backend/effect-lines'
 import { GEN5_LINES } from '../src/gen5/backend/lines'
 import { FLOW_INPUT } from './gen5-bw2-flow.fixtures'
-import { checkLineSources, putIds } from './gen5-bw2-lines'
+import { checkBackendLines, checkLineSources, LINE_TABLES, putIds } from './gen5-bw2-lines'
 import { TEXT_INPUT } from './gen5-bw2-text.fixtures'
 import { textNumbers } from './gen5-bw2-text'
 
@@ -121,5 +122,56 @@ describe('checkLineSources', () => {
     expect(() => {
       checkLineSources(FLOW_INPUT, lacking, GEN5_LINES)
     }).toThrow(new Error('the set bank has no Bank0018_Text_AvoidedAttack'))
+  })
+})
+
+// Scene: a status, a side's line or a substitute's hit sends the line its picker holds; a pin that
+// moves one fails the generator by its label and the picker's name (#109).
+describe('checkLineSources on the effect lines', () => {
+  const text = textNumbers(TEXT_INPUT)
+
+  it('passes when every label is what its function puts or picks', () => {
+    expect(() => {
+      checkLineSources(FLOW_INPUT, text, GEN5_EFFECT_LINES)
+    }).not.toThrow()
+  })
+
+  it("names a picker without the label's ID", () => {
+    const moved: TextNumbers = { ...text, set: { ...text.set, Bank0018_Text_Burned: 8 } }
+    expect(() => {
+      checkLineSources(FLOW_INPUT, moved, GEN5_EFFECT_LINES)
+    }).toThrow(new Error('Bank0018_Text_Burned is not what GetConditionAddMessage puts'))
+  })
+
+  it('names a standard line its picker lacks', () => {
+    const moved: TextNumbers = {
+      ...text,
+      standard: { ...text.standard, Bank0019_Text_PointedStonesFloatAir: 7 },
+    }
+    expect(() => {
+      checkLineSources(FLOW_INPUT, moved, GEN5_EFFECT_LINES)
+    }).toThrow(new Error('Bank0019_Text_PointedStonesFloatAir is not what HandlerStealthRock puts'))
+  })
+})
+
+// Scene: the generator holds both of the backend's tables to the C, the lines of hits, faints and
+// drags and the lines of the effects.
+describe('checkBackendLines', () => {
+  const text = textNumbers(TEXT_INPUT)
+
+  it('holds the lines and the effect lines', () => {
+    expect(LINE_TABLES).toEqual({ lines: GEN5_LINES, 'effect lines': GEN5_EFFECT_LINES })
+    expect(() => {
+      checkBackendLines(FLOW_INPUT, text)
+    }).not.toThrow()
+  })
+
+  it('names a label of the effect lines its bank lacks', () => {
+    const set = Object.fromEntries(
+      Object.entries(text.set).filter(([label]) => label !== 'Bank0018_Text_SSubstituteFaded'),
+    )
+    expect(() => {
+      checkBackendLines(FLOW_INPUT, { ...text, set })
+    }).toThrow(new Error('the set bank has no Bank0018_Text_SSubstituteFaded'))
   })
 })

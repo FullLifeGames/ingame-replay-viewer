@@ -97,7 +97,7 @@ describe('quietLines', () => {
     font: { chars: 'Za' },
     text: {
       standard: { Bank0019_Text_CriticalHit: 3, Bank0019_Text_FillerOne: 8 },
-      set: { Bank0018_Text_FillerTwo: 5 },
+      set: { Bank0018_Text_FillerTwo: 5, Bank0018_Text_Burned: 6 },
     },
     flow: {
       damageKinds: { plain: 8, super: 6, resisted: 9 },
@@ -120,6 +120,7 @@ describe('quietLines', () => {
       'entry layouts Kite, Lamp',
       'pkm layouts PartyPkm, PkmBlockA, PkmBlockB; block table, cipher and shiny bound read',
       "text labels of the backend's lines found: standard 1 of 4, set 0 of 5",
+      "text labels of the backend's effect lines found: standard 0 of 2, set 1 of 37",
       "line sources checked: each of the backend's lines is what its function puts",
     ])
   })
@@ -156,13 +157,16 @@ describe('quietLines', () => {
       pkm: { ...numbers.pkm, species: names('SPECIES', 8, 0), moves: names('MOVE', 9, 0) },
       text: { standard: names('Bank0019_Text_Filler', 10, 0), set: names('Bank0018_Text', 11, 0) },
     }
-    const ours = "text labels of the backend's lines found: standard 0 of 4, set 0 of 5"
+    const ours = [
+      "text labels of the backend's lines found: standard 0 of 4, set 0 of 5",
+      "text labels of the backend's effect lines found: standard 0 of 2, set 0 of 37",
+    ]
     const [pin, ...rest] = quietLines(sized)
     expect(pin).toBe('pokebw2 c0ffee')
-    expect(rest).toContain(ours)
-    expect(rest.filter((line) => ![ours, 'symbols 2'].includes(line) && /\d/.test(line))).toEqual(
-      [],
-    )
+    expect(rest).toEqual(expect.arrayContaining(ours))
+    expect(
+      rest.filter((line) => ![...ours, 'symbols 2'].includes(line) && /\d/.test(line)),
+    ).toEqual([])
   })
 
   it('says so when every symbol lies in main RAM', () => {

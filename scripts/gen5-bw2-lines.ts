@@ -3,7 +3,8 @@
 // line stops the generator by the line's label. The C files a line can live in are the roles of
 // FLOW_SOURCES. The errors name the label, the function and the put, never the C they met, so they
 // show no number of pokebw2.
-import type { Gen5Line } from '../src/gen5/backend/lines.ts'
+import { GEN5_EFFECT_LINES } from '../src/gen5/backend/effect-lines.ts'
+import { type Gen5Line, GEN5_LINES } from '../src/gen5/backend/lines.ts'
 import type { TextNumbers } from '../src/gen5/bw2-numbers.ts'
 import { enumAround, literal, literalsIn } from './gen5-bw2-c.ts'
 import { bodyText, FLOW_SOURCES, type FlowInput, literalOf } from './gen5-bw2-flow.ts'
@@ -64,4 +65,13 @@ export function checkLineSources(
       throw new Error(`${line.label} is not what ${line.source.function} puts`)
     }
   }
+}
+
+/** The backend's tables of lines, by what the report calls them: the lines of hits, faints and
+ * drags (#107, #108), and the lines of the effects (#109). */
+export const LINE_TABLES = { lines: GEN5_LINES, 'effect lines': GEN5_EFFECT_LINES }
+
+/** Holds every line of every table to its C, or throws by label (D9). */
+export function checkBackendLines(input: FlowInput, text: TextNumbers): void {
+  for (const lines of Object.values(LINE_TABLES)) checkLineSources(input, text, lines)
 }
