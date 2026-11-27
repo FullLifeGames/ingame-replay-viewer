@@ -140,3 +140,51 @@ The issue text for the next gate:
 >
 > - From the diagnosis of #94 (`docs/sound-skip.md`).
 > - Size: a small fix, one builder step: about 15 lines of code, one spec and one step in the browser test.
+
+## The fix (#104)
+
+A speed change now grants the new speed's frames at once (`changeSpeed` in `src/web/wasm/speed-change.ts`, which END and the speed radio share). Leaving fast, it writes the grant before the pace, so the worker stops at the frame of the switch before its sound turns on; entering fast, it writes the pace before it lifts the grant.
+
+The build machine, with 6 shared cores, ran the base (c890e22, the commit before the fix) and the fix (fe4df39) in turn, each from its own production build, on hand-made with the mark at END. Another workload on the machine kept the 1-minute load average between 8.5 and 11.6 through every run, so no run was quiet. Each row names the 1-minute load the script printed at the end of its case.
+
+The draw after END held 200 ms (`--speeds fast,1x --stall 200`), phase "at", base and fix three times each, in the order base, fix:
+
+| Run    | Speed | Load  | ms    | Frames | Written | Skipped | Overruns | Underruns | Step max | Gap max |
+| ------ | ----- | ----- | ----- | ------ | ------- | ------- | -------- | --------- | -------- | ------- |
+| base 1 | fast  | 10.22 | 2,000 | 119    | 166,144 | 119,094 | 0        | 1         | 109      | 208 ms  |
+| base 1 | 1x    | 8.91  | 1,998 | 119    | 167,552 | 8,558   | 0        | 1         | 5        | 211 ms  |
+| fix 1  | fast  | 9.32  | 1,996 | 118    | 166,144 | 8,440   | 0        | 0         | 8        | 205 ms  |
+| fix 1  | 1x    | 8.51  | 1,997 | 120    | 168,960 | 9,290   | 0        | 1         | 6        | 207 ms  |
+| base 2 | fast  | 8.88  | 1,997 | 118    | 166,144 | 83,160  | 0        | 1         | 77       | 207 ms  |
+| base 2 | 1x    | 9.23  | 2,000 | 120    | 168,960 | 9,722   | 0        | 1         | 5        | 210 ms  |
+| fix 2  | fast  | 9.60  | 1,999 | 119    | 167,552 | 8,932   | 0        | 0         | 5        | 205 ms  |
+| fix 2  | 1x    | 8.89  | 1,999 | 119    | 167,552 | 8,858   | 0        | 1         | 8        | 209 ms  |
+| base 3 | fast  | 11.64 | 1,999 | 118    | 166,144 | 63,448  | 0        | 1         | 63       | 205 ms  |
+| base 3 | 1x    | 8.83  | 1,997 | 119    | 167,552 | 9,290   | 0        | 1         | 5        | 210 ms  |
+| fix 3  | fast  | 9.51  | 1,997 | 118    | 166,144 | 8,614   | 0        | 0         | 8        | 210 ms  |
+| fix 3  | 1x    | 9.72  | 1,999 | 120    | 168,960 | 10,266  | 0        | 1         | 5        | 210 ms  |
+
+The held gap itself, from END's draw to the first draw after the hold (the third pair, read from `--samples`):
+
+| Run    | Speed | Frame at END | Frame after | Step | ms    | Written | Skipped |
+| ------ | ----- | ------------ | ----------- | ---- | ----- | ------- | ------- |
+| base 3 | fast  | 2,919        | 2,982       | 63   | 204.7 | 90,112  | 63,448  |
+| fix 3  | fast  | 2,918        | 2,919       | 1    | 210.4 | 1,408   | 0       |
+| base 3 | 1x    | 2,916        | 2,917       | 1    | 209.8 | 1,408   | 0       |
+| fix 3  | 1x    | 2,916        | 2,917       | 1    | 210.0 | 1,408   | 0       |
+
+No hold (`--speeds fast`), phase "at", and the underruns of the phase "after" beside it, in the order base, fix, base, fix:
+
+| Run    | Load  | ms    | Frames | Written | Skipped | Overruns | Underruns | Step max | Gap max | Underruns after |
+| ------ | ----- | ----- | ------ | ------- | ------- | -------- | --------- | -------- | ------- | --------------- |
+| base 1 | 9.38  | 1,998 | 119    | 167,552 | 0       | 0        | 1         | 7        | 23 ms   | 0               |
+| fix 1  | 9.54  | 1,983 | 118    | 166,144 | 0       | 0        | 0         | 1        | 26 ms   | 0               |
+| base 2 | 10.10 | 1,998 | 119    | 167,552 | 0       | 0        | 1         | 7        | 30 ms   | 0               |
+| fix 2  | 9.08  | 1,999 | 119    | 167,552 | 0       | 0        | 0         | 1        | 22 ms   | 1               |
+
+What the figures show against #104's criteria:
+
+- **The held gap holds.** With the fix the game advances 1 frame at fast while the draw after END waits 210 ms, as at 1x; the base ran 63 frames there and skipped 63,448 samples at once.
+- **The step max over the 2 s window** stays at 5 to 8 with the fix at fast, and at 5 to 8 at 1x in base and fix alike. These are the frames the 1x clock owes after the hold and pays in the next draws (`clock.ts`, `OWED_SECONDS`), which #104 leaves out on purpose. In the fix's third run the step after the hold went 1, 1, 8, 3, then 1 per draw.
+- **The skips hold.** The fix skips 8,440, 8,932 and 8,614 at fast, within the 1x runs' range of 8,558 to 10,266; the base's burst of 63,448 to 119,094 is gone. In its second run the fix skipped 74 samples more at fast (8,932) than at 1x (8,858) in the same browser.
+- **The underruns stay open.** Without a hold the fix counts no underrun in the 2 s after END at fast, where the base counts 1 in each run. The criterion asks for a quiet machine, and no run was quiet. The fix's second run counted 1 underrun later, in the phase "after".
