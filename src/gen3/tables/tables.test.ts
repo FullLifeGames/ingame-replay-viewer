@@ -12,7 +12,7 @@ import meta from './meta.json'
 import { gens, itemGaps, names } from './testing'
 import types from './types.json'
 
-const GENS = [1, 2, 3, 4, 5, 9] as const
+const GENS = [1, 2, 3, 4, 5, 6, 9] as const
 
 /** The species the expansion lacks, by generation: Rockruff-Dusk shows Rockruff (D11). */
 const SPECIES_GAPS: Readonly<Partial<Record<number, readonly string[]>>> = { 9: ['Rockruff-Dusk'] }
