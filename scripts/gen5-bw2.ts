@@ -7,7 +7,8 @@
 // battle's fonts (#106), the labels of the battle's standard and set text banks, each line the
 // backend sends held to what its function puts, and the flow's damage kinds and heal effect (#107),
 // recall effects and faint flag (#108), the numbers of the effects' sequences and the lines of the
-// effects (#109), and the battle view's text box, where a line Black 2 lacks prints (#118).
+// effects (#109), the battle view's text box, where a line Black 2 lacks prints (#118), and the
+// places of the battle's gauge that hide the near box's HP numbers (#137).
 // The checkout lives in .cache/gen5/pokebw2/ and the output in build/gen5/; nothing of pokebw2 is
 // committed.
 // Usage: node scripts/gen5-bw2.ts [--checkout <dir>] [--quiet] (fetches on the first run). With
@@ -38,6 +39,7 @@ import { checkPartyRoom } from './gen5-bw2-mon-ids.ts'
 import { checkPlayerClient } from './gen5-bw2-clients.ts'
 import { BATTLE_OVERLAY, BOOT_LINKS, ENTRY_SOURCES, entryNumbers } from './gen5-bw2-entry.ts'
 import { FLOW_SOURCES, flowNumbers } from './gen5-bw2-flow.ts'
+import { GAUGE_SOURCES, gaugeNumbers } from './gen5-bw2-gauge.ts'
 import { checkBackendLines } from './gen5-bw2-lines.ts'
 import { FONT_SOURCES, fontNumbers } from './gen5-bw2-font.ts'
 import { ROUTE_MAP, routePlaces } from './gen5-bw2-field.ts'
@@ -183,6 +185,7 @@ const SOURCES = {
   ...FLOW_SOURCES,
   ...EFFECT_SOURCES,
   ...TEXT_BOX_SOURCES,
+  ...GAUGE_SOURCES,
 }
 
 type Sources = Record<keyof typeof SOURCES, string> & { bootLinks: Record<string, string> }
@@ -250,6 +253,7 @@ function parse(sources: Sources): Bw2Numbers {
     flow: flowNumbers(sources),
     effects,
     textBox: textBoxNumbers({ ...sources, standard: text.standard, chars: font.chars }),
+    gauge: gaugeNumbers(sources),
   }
 }
 

@@ -92,6 +92,7 @@ const RULES = {
   transform: unplayed,
   formChange: unplayed,
   terastallize: unplayed,
+  megaEvolve: unplayed,
   singleTurn: play,
   singleMove: play,
   copyBoost: play,

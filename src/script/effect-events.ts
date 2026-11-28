@@ -82,6 +82,18 @@ export interface TerastallizeEvent {
   readonly type: TypeName
 }
 
+/**
+ * `who` Mega Evolves into `species`, the forme the log names, by `item`, the stone (#125).
+ * Rayquaza needs none.
+ */
+export interface MegaEvolveEvent {
+  readonly kind: 'megaEvolve'
+  readonly line: number
+  readonly who: PokemonRef
+  readonly species: string
+  readonly item?: string
+}
+
 /** An effect that lasts the turn: Protect, Endure, Focus Punch's focus. */
 export interface SingleTurnEvent {
   readonly kind: 'singleTurn'

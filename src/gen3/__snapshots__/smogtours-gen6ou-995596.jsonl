@@ -1,0 +1,383 @@
+{"length":5938,"crc32":"0d56524c","trainers":{"near":{"name":"White Atoq","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"ManOfMany","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":65,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Alakazam"},{"species":545,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Scolipede"},{"species":642,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Thundurus"},{"species":445,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Garchomp"},{"species":380,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Latias"},{"species":625,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Bisharp"}],"far":[{"species":3,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Venusaur"},{"species":461,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Weavile"},{"species":490,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Manaphy"},{"species":113,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Chansey"},{"species":530,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Excadrill"},{"species":145,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zapdos"}]}}
+{"line":42,"op":"intro"}
+{"line":42,"op":"print","text":"You are challenged by ManOfMany!"}
+{"line":44,"op":"print","text":"ManOfMany sent out Zapdos!"}
+{"line":44,"op":"sendOut","side":"far","slot":5,"hp":100,"status":"none"}
+{"line":43,"op":"print","text":"Go! Scolipede!"}
+{"line":43,"op":"sendOut","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":45,"op":"turn","number":1}
+{"line":48,"op":"print","text":"Scolipede used Poison Jab!"}
+{"line":48,"op":"move","user":"near","target":"far","move":398,"animTurn":0}
+{"line":49,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":49,"op":"hp","side":"far","hp":72}
+{"line":50,"op":"anim","side":"far","anim":"statusPsn"}
+{"line":50,"op":"print","text":"The opposing Zapdos was poisoned!"}
+{"line":50,"op":"status","side":"far","slot":5,"status":"psn"}
+{"line":51,"op":"hp","side":"near","hp":84}
+{"line":51,"op":"print","text":"Scolipede was hurt by the Rocky Helmet!"}
+{"line":52,"op":"print","text":"The opposing Zapdos used Discharge!"}
+{"line":52,"op":"move","user":"far","target":"near","move":435,"animTurn":0}
+{"line":53,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":53,"op":"hp","side":"near","hp":31}
+{"line":55,"op":"print","text":"The opposing Zapdos was hurt by its poisoning!"}
+{"line":55,"op":"anim","side":"far","anim":"statusPsn"}
+{"line":55,"op":"hp","side":"far","hp":60}
+{"line":56,"op":"ability","side":"near","ability":3,"show":true}
+{"line":57,"op":"stat","side":"near","stat":"spe","stages":1,"arrows":"one"}
+{"line":57,"op":"print","text":"Scolipede's Speed rose!"}
+{"line":56,"op":"ability","side":"near","ability":3,"show":false}
+{"line":59,"op":"turn","number":2}
+{"line":62,"op":"print","text":"Scolipede, come back!"}
+{"line":62,"op":"withdraw","side":"near"}
+{"line":62,"op":"print","text":"Go! Garchomp!"}
+{"line":62,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":63,"op":"print","text":"The opposing Zapdos used Roost!"}
+{"line":63,"op":"move","user":"far","target":"far","move":355,"animTurn":0}
+{"line":64,"op":"hp","side":"far","hp":100}
+{"line":64,"op":"print","text":"The opposing Zapdos's HP was restored."}
+{"line":67,"op":"print","text":"The opposing Zapdos was hurt by its poisoning!"}
+{"line":67,"op":"anim","side":"far","anim":"statusPsn"}
+{"line":67,"op":"hp","side":"far","hp":88}
+{"line":69,"op":"turn","number":3}
+{"line":72,"op":"print","text":"Garchomp used Stealth Rock!"}
+{"line":72,"op":"move","user":"near","target":"far","move":446,"animTurn":0}
+{"line":73,"op":"print","text":"Pointed stones float in the air on the opposing side!"}
+{"line":74,"op":"print","text":"The opposing Zapdos used Hidden Power!"}
+{"line":74,"op":"move","user":"far","target":"near","move":237,"animTurn":0}
+{"line":76,"op":"hit","side":"near","effectiveness":"super"}
+{"line":76,"op":"hp","side":"near","hp":43}
+{"line":76,"op":"print","text":"It's super effective!"}
+{"line":78,"op":"print","text":"The opposing Zapdos was hurt by its poisoning!"}
+{"line":78,"op":"anim","side":"far","anim":"statusPsn"}
+{"line":78,"op":"hp","side":"far","hp":76}
+{"line":80,"op":"turn","number":4}
+{"line":83,"op":"print","text":"ManOfMany withdrew Zapdos!"}
+{"line":83,"op":"withdraw","side":"far"}
+{"line":83,"op":"print","text":"ManOfMany sent out Venusaur!"}
+{"line":83,"op":"switchIn","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":84,"op":"hp","side":"far","hp":88}
+{"line":84,"op":"print","text":"Pointed stones dug into the opposing Venusaur!"}
+{"line":85,"op":"print","text":"Garchomp used Rock Tomb!"}
+{"line":85,"op":"move","user":"near","target":"far","move":317,"animTurn":0}
+{"line":86,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":86,"op":"hp","side":"far","hp":67}
+{"line":87,"op":"stat","side":"far","stat":"spe","stages":-1,"arrows":"one"}
+{"line":87,"op":"print","text":"The opposing Venusaur's Speed fell!"}
+{"line":90,"op":"turn","number":5}
+{"line":95,"op":"print","text":"Garchomp, come back!"}
+{"line":95,"op":"withdraw","side":"near"}
+{"line":95,"op":"print","text":"Go! Alakazam!"}
+{"line":95,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":97,"op":"flushTextBox"}
+{"line":97,"op":"print","text":"The opposing Venusaur's Venusaurite is reacting to ManOfMany's Mega Ring!"}
+{"line":97,"op":"formChange","side":"far","species":906}
+{"line":97,"op":"print","text":"The opposing Venusaur has Mega Evolved into Mega Venusaur!"}
+{"line":98,"op":"print","text":"The opposing Venusaur used Leech Seed!"}
+{"line":98,"op":"move","user":"far","target":"near","move":73,"animTurn":0}
+{"line":99,"op":"print","text":"Alakazam was seeded!"}
+{"line":102,"op":"turn","number":6}
+{"line":106,"op":"print","text":"ManOfMany withdrew Venusaur!"}
+{"line":106,"op":"withdraw","side":"far"}
+{"line":106,"op":"print","text":"ManOfMany sent out Chansey!"}
+{"line":106,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":107,"op":"hp","side":"far","hp":88}
+{"line":107,"op":"print","text":"Pointed stones dug into the opposing Chansey!"}
+{"line":108,"op":"print","text":"Alakazam used Psychic!"}
+{"line":108,"op":"move","user":"near","target":"far","move":94,"animTurn":0}
+{"line":109,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":109,"op":"hp","side":"far","hp":75}
+{"line":112,"op":"turn","number":7}
+{"line":115,"op":"print","text":"Alakazam, come back!"}
+{"line":115,"op":"withdraw","side":"near"}
+{"line":115,"op":"print","text":"Go! Bisharp!"}
+{"line":115,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
+{"line":116,"op":"print","text":"The opposing Chansey used Stealth Rock!"}
+{"line":116,"op":"move","user":"far","target":"near","move":446,"animTurn":0}
+{"line":117,"op":"print","text":"Pointed stones float in the air on your side!"}
+{"line":120,"op":"turn","number":8}
+{"line":126,"op":"print","text":"ManOfMany withdrew Chansey!"}
+{"line":126,"op":"withdraw","side":"far"}
+{"line":126,"op":"print","text":"ManOfMany sent out Zapdos!"}
+{"line":126,"op":"switchIn","side":"far","slot":5,"hp":76,"status":"psn"}
+{"line":127,"op":"hp","side":"far","hp":51}
+{"line":127,"op":"print","text":"Pointed stones dug into the opposing Zapdos!"}
+{"line":128,"op":"print","text":"Bisharp used Knock Off!"}
+{"line":128,"op":"move","user":"near","target":"far","move":282,"animTurn":0}
+{"line":129,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":129,"op":"hp","side":"far","hp":12}
+{"line":130,"op":"hp","side":"near","hp":84}
+{"line":130,"op":"print","text":"Bisharp was hurt by the Rocky Helmet!"}
+{"line":131,"op":"print","text":"Bisharp knocked off the opposing Zapdos's Rocky Helmet!"}
+{"line":131,"op":"item","side":"far","slot":5,"item":0}
+{"line":133,"op":"print","text":"The opposing Zapdos was hurt by its poisoning!"}
+{"line":133,"op":"anim","side":"far","anim":"statusPsn"}
+{"line":133,"op":"hp","side":"far","hp":0}
+{"line":134,"op":"faint","side":"far"}
+{"line":134,"op":"print","text":"The opposing Zapdos fainted!"}
+{"line":140,"op":"print","text":"ManOfMany sent out Excadrill!"}
+{"line":140,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":141,"op":"hp","side":"far","hp":98}
+{"line":141,"op":"print","text":"Pointed stones dug into the opposing Excadrill!"}
+{"line":142,"op":"ability","side":"far","ability":104,"show":true}
+{"line":142,"op":"ability","side":"far","ability":104,"show":false}
+{"line":143,"op":"turn","number":9}
+{"line":147,"op":"print","text":"Bisharp, come back!"}
+{"line":147,"op":"withdraw","side":"near"}
+{"line":147,"op":"print","text":"Go! Scolipede!"}
+{"line":147,"op":"switchIn","side":"near","slot":1,"hp":31,"status":"none"}
+{"line":148,"op":"hp","side":"near","hp":6}
+{"line":148,"op":"print","text":"Pointed stones dug into Scolipede!"}
+{"line":149,"op":"print","text":"The opposing Excadrill used Earthquake!"}
+{"line":149,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
+{"line":150,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":150,"op":"hp","side":"near","hp":0}
+{"line":151,"op":"faint","side":"near"}
+{"line":151,"op":"print","text":"Scolipede fainted!"}
+{"line":153,"op":"itemPopUp","side":"far","item":472}
+{"line":153,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":153,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":153,"op":"hp","side":"far","hp":100}
+{"line":157,"op":"print","text":"Go! Thundurus!"}
+{"line":157,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":158,"op":"hp","side":"near","hp":76}
+{"line":158,"op":"print","text":"Pointed stones dug into Thundurus!"}
+{"line":159,"op":"turn","number":10}
+{"line":163,"op":"print","text":"Thundurus used Nasty Plot!"}
+{"line":163,"op":"move","user":"near","target":"near","move":417,"animTurn":0}
+{"line":164,"op":"stat","side":"near","stat":"spa","stages":2,"arrows":"one"}
+{"line":164,"op":"print","text":"Thundurus's Sp. Atk rose sharply!"}
+{"line":165,"op":"print","text":"The opposing Excadrill used Rapid Spin!"}
+{"line":165,"op":"move","user":"far","target":"near","move":229,"animTurn":0}
+{"line":166,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":166,"op":"hp","side":"near","hp":66}
+{"line":167,"op":"print","text":"The opposing Excadrill blew away Stealth Rock!"}
+{"line":169,"op":"itemPopUp","side":"near","item":472}
+{"line":169,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":169,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":169,"op":"hp","side":"near","hp":72}
+{"line":171,"op":"turn","number":11}
+{"line":174,"op":"print","text":"ManOfMany withdrew Excadrill!"}
+{"line":174,"op":"withdraw","side":"far"}
+{"line":174,"op":"print","text":"ManOfMany sent out Venusaur!"}
+{"line":174,"op":"switchIn","side":"far","slot":0,"hp":67,"status":"none"}
+{"line":175,"op":"print","text":"Thundurus used Nasty Plot!"}
+{"line":175,"op":"move","user":"near","target":"near","move":417,"animTurn":0}
+{"line":176,"op":"stat","side":"near","stat":"spa","stages":2,"arrows":"one"}
+{"line":176,"op":"print","text":"Thundurus's Sp. Atk rose sharply!"}
+{"line":178,"op":"itemPopUp","side":"near","item":472}
+{"line":178,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":178,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":178,"op":"hp","side":"near","hp":78}
+{"line":180,"op":"turn","number":12}
+{"line":184,"op":"print","text":"Thundurus used Thunderbolt!"}
+{"line":184,"op":"move","user":"near","target":"far","move":85,"animTurn":0}
+{"line":186,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":186,"op":"hp","side":"far","hp":16}
+{"line":186,"op":"print","text":"It's not very effective…"}
+{"line":187,"op":"print","text":"The opposing Venusaur used Sludge Bomb!"}
+{"line":187,"op":"move","user":"far","target":"near","move":188,"animTurn":0}
+{"line":188,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":188,"op":"hp","side":"near","hp":12}
+{"line":190,"op":"itemPopUp","side":"near","item":472}
+{"line":190,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":190,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":190,"op":"hp","side":"near","hp":18}
+{"line":192,"op":"turn","number":13}
+{"line":195,"op":"print","text":"Thundurus used Hidden Power!"}
+{"line":195,"op":"move","user":"near","target":"far","move":237,"animTurn":0}
+{"line":197,"op":"hit","side":"far","effectiveness":"super"}
+{"line":197,"op":"hp","side":"far","hp":0}
+{"line":197,"op":"print","text":"It's super effective!"}
+{"line":198,"op":"faint","side":"far"}
+{"line":198,"op":"print","text":"The opposing Venusaur fainted!"}
+{"line":201,"op":"itemPopUp","side":"near","item":472}
+{"line":201,"op":"anim","side":"near","anim":"heldItemEffect"}
+{"line":201,"op":"anim","side":"near","anim":"simpleHeal"}
+{"line":201,"op":"hp","side":"near","hp":24}
+{"line":207,"op":"print","text":"ManOfMany sent out Weavile!"}
+{"line":207,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":208,"op":"ability","side":"far","ability":46,"show":true}
+{"line":208,"op":"print","text":"The opposing Weavile is exerting its pressure!"}
+{"line":208,"op":"ability","side":"far","ability":46,"show":false}
+{"line":209,"op":"turn","number":14}
+{"line":212,"op":"print","text":"Thundurus, come back!"}
+{"line":212,"op":"withdraw","side":"near"}
+{"line":212,"op":"print","text":"Go! Bisharp!"}
+{"line":212,"op":"switchIn","side":"near","slot":5,"hp":84,"status":"none"}
+{"line":213,"op":"hp","side":"near","hp":78}
+{"line":213,"op":"print","text":"Pointed stones dug into Bisharp!"}
+{"line":214,"op":"print","text":"The opposing Weavile used Knock Off!"}
+{"line":214,"op":"move","user":"far","target":"near","move":282,"animTurn":0}
+{"line":216,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":216,"op":"hp","side":"near","hp":31}
+{"line":216,"op":"print","text":"It's not very effective…"}
+{"line":217,"op":"print","text":"The opposing Weavile knocked off Bisharp's Shuca Berry!"}
+{"line":217,"op":"item","side":"near","slot":5,"item":0}
+{"line":220,"op":"turn","number":15}
+{"line":225,"op":"print","text":"ManOfMany withdrew Weavile!"}
+{"line":225,"op":"withdraw","side":"far"}
+{"line":225,"op":"print","text":"ManOfMany sent out Manaphy!"}
+{"line":225,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":226,"op":"print","text":"Bisharp used Iron Head!"}
+{"line":226,"op":"move","user":"near","target":"far","move":442,"animTurn":0}
+{"line":228,"op":"hit","side":"far","effectiveness":"resisted"}
+{"line":228,"op":"hp","side":"far","hp":81}
+{"line":228,"op":"print","text":"It's not very effective…"}
+{"line":230,"op":"itemPopUp","side":"far","item":472}
+{"line":230,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":230,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":230,"op":"hp","side":"far","hp":87}
+{"line":232,"op":"turn","number":16}
+{"line":236,"op":"print","text":"Bisharp, come back!"}
+{"line":236,"op":"withdraw","side":"near"}
+{"line":236,"op":"print","text":"Go! Latias!"}
+{"line":236,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":237,"op":"hp","side":"near","hp":88}
+{"line":237,"op":"print","text":"Pointed stones dug into Latias!"}
+{"line":238,"op":"print","text":"The opposing Manaphy used Scald!"}
+{"line":238,"op":"move","user":"far","target":"near","move":503,"animTurn":0}
+{"line":241,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":241,"op":"hp","side":"near","hp":65}
+{"line":241,"op":"print","text":"A critical hit!"}
+{"line":241,"op":"print","text":"It's not very effective…"}
+{"line":243,"op":"itemPopUp","side":"far","item":472}
+{"line":243,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":243,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":243,"op":"hp","side":"far","hp":93}
+{"line":245,"op":"turn","number":17}
+{"line":249,"op":"print","text":"Latias used Defog!"}
+{"line":249,"op":"move","user":"near","target":"far","move":432,"animTurn":0}
+{"line":250,"op":"stat","side":"far","stat":"evasion","stages":-1,"arrows":"one"}
+{"line":250,"op":"print","text":"The opposing Manaphy's evasiveness fell!"}
+{"line":251,"op":"print","text":"Latias blew away Stealth Rock!"}
+{"line":252,"op":"print","text":"The opposing Manaphy used Tail Glow!"}
+{"line":252,"op":"move","user":"far","target":"far","move":294,"animTurn":0}
+{"line":253,"op":"stat","side":"far","stat":"spa","stages":3,"arrows":"one"}
+{"line":253,"op":"print","text":"The opposing Manaphy's Sp. Atk rose drastically!"}
+{"line":255,"op":"itemPopUp","side":"far","item":472}
+{"line":255,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":255,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":255,"op":"hp","side":"far","hp":99}
+{"line":257,"op":"turn","number":18}
+{"line":261,"op":"print","text":"Latias, come back!"}
+{"line":261,"op":"withdraw","side":"near"}
+{"line":261,"op":"print","text":"Go! Garchomp!"}
+{"line":261,"op":"switchIn","side":"near","slot":3,"hp":43,"status":"none"}
+{"line":262,"op":"print","text":"The opposing Manaphy used Scald!"}
+{"line":262,"op":"move","user":"far","target":"near","move":503,"animTurn":0}
+{"line":263,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":263,"op":"hp","side":"near","hp":0}
+{"line":264,"op":"faint","side":"near"}
+{"line":264,"op":"print","text":"Garchomp fainted!"}
+{"line":266,"op":"itemPopUp","side":"far","item":472}
+{"line":266,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":266,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":266,"op":"hp","side":"far","hp":100}
+{"line":270,"op":"print","text":"Go! Thundurus!"}
+{"line":270,"op":"switchIn","side":"near","slot":2,"hp":24,"status":"none"}
+{"line":271,"op":"turn","number":19}
+{"line":275,"op":"print","text":"Thundurus used Thunderbolt!"}
+{"line":275,"op":"move","user":"near","target":"far","move":85,"animTurn":0}
+{"line":277,"op":"hit","side":"far","effectiveness":"super"}
+{"line":277,"op":"hp","side":"far","hp":32}
+{"line":277,"op":"print","text":"It's super effective!"}
+{"line":278,"op":"print","text":"The opposing Manaphy used Scald!"}
+{"line":278,"op":"move","user":"far","target":"near","move":503,"animTurn":0}
+{"line":279,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":279,"op":"hp","side":"near","hp":0}
+{"line":280,"op":"faint","side":"near"}
+{"line":280,"op":"print","text":"Thundurus fainted!"}
+{"line":282,"op":"itemPopUp","side":"far","item":472}
+{"line":282,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":282,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":282,"op":"hp","side":"far","hp":38}
+{"line":286,"op":"print","text":"Go! Alakazam!"}
+{"line":286,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":287,"op":"turn","number":20}
+{"line":292,"op":"flushTextBox"}
+{"line":292,"op":"print","text":"Alakazam's Alakazite is reacting to White Atoq's Mega Ring!"}
+{"line":292,"op":"formChange","side":"near","species":912}
+{"line":292,"op":"print","text":"Alakazam has Mega Evolved into Mega Alakazam!"}
+{"line":293,"op":"ability","side":"near","ability":93,"show":true}
+{"line":293,"op":"ability","side":"near","ability":93,"show":false}
+{"line":294,"op":"print","text":"Alakazam used Psychic!"}
+{"line":294,"op":"move","user":"near","target":"far","move":94,"animTurn":0}
+{"line":295,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":295,"op":"hp","side":"far","hp":0}
+{"line":296,"op":"faint","side":"far"}
+{"line":296,"op":"print","text":"The opposing Manaphy fainted!"}
+{"line":301,"op":"print","text":"ManOfMany sent out Chansey!"}
+{"line":301,"op":"switchIn","side":"far","slot":3,"hp":75,"status":"none"}
+{"line":302,"op":"turn","number":21}
+{"line":307,"op":"print","text":"Alakazam used Focus Blast!"}
+{"line":308,"op":"print","text":"The opposing Chansey avoided the attack!"}
+{"line":309,"op":"print","text":"The opposing Chansey used Seismic Toss!"}
+{"line":309,"op":"move","user":"far","target":"near","move":69,"animTurn":0}
+{"line":310,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":310,"op":"hp","side":"near","hp":61}
+{"line":313,"op":"turn","number":22}
+{"line":316,"op":"print","text":"Alakazam used Focus Blast!"}
+{"line":317,"op":"print","text":"The opposing Chansey avoided the attack!"}
+{"line":318,"op":"print","text":"The opposing Chansey used Thunder Wave!"}
+{"line":318,"op":"move","user":"far","target":"near","move":86,"animTurn":0}
+{"line":319,"op":"anim","side":"near","anim":"statusPrz"}
+{"line":319,"op":"print","text":"Alakazam is paralyzed, so it may be unable to move!"}
+{"line":319,"op":"status","side":"near","slot":0,"status":"par"}
+{"line":322,"op":"turn","number":23}
+{"line":326,"op":"print","text":"Alakazam, come back!"}
+{"line":326,"op":"withdraw","side":"near"}
+{"line":326,"op":"print","text":"Go! Latias!"}
+{"line":326,"op":"switchIn","side":"near","slot":4,"hp":65,"status":"none"}
+{"line":327,"op":"print","text":"The opposing Chansey used Seismic Toss!"}
+{"line":327,"op":"move","user":"far","target":"near","move":69,"animTurn":0}
+{"line":328,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":328,"op":"hp","side":"near","hp":36}
+{"line":331,"op":"turn","number":24}
+{"line":336,"op":"print","text":"ManOfMany withdrew Chansey!"}
+{"line":336,"op":"withdraw","side":"far"}
+{"line":336,"op":"print","text":"ManOfMany sent out Excadrill!"}
+{"line":336,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":337,"op":"ability","side":"far","ability":104,"show":true}
+{"line":337,"op":"ability","side":"far","ability":104,"show":false}
+{"line":338,"op":"print","text":"Latias used Healing Wish!"}
+{"line":338,"op":"move","user":"near","target":"near","move":361,"animTurn":0}
+{"line":339,"op":"faint","side":"near"}
+{"line":339,"op":"print","text":"Latias fainted!"}
+{"line":344,"op":"print","text":"Go! Alakazam!"}
+{"line":344,"op":"switchIn","side":"near","slot":0,"hp":61,"status":"par"}
+{"line":345,"op":"hp","side":"near","hp":100}
+{"line":345,"op":"print","text":"Alakazam's HP was restored."}
+{"line":346,"op":"ability","side":"near","ability":104,"show":true}
+{"line":346,"op":"ability","side":"near","ability":104,"show":false}
+{"line":347,"op":"ability","side":"near","ability":104,"show":true}
+{"line":347,"op":"ability","side":"near","ability":104,"show":false}
+{"line":348,"op":"turn","number":25}
+{"line":352,"op":"print","text":"Alakazam used Focus Blast!"}
+{"line":353,"op":"print","text":"The opposing Excadrill avoided the attack!"}
+{"line":354,"op":"print","text":"The opposing Excadrill used Earthquake!"}
+{"line":354,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
+{"line":355,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":355,"op":"hp","side":"near","hp":19}
+{"line":358,"op":"turn","number":26}
+{"line":367,"op":"print","text":"Alakazam used Focus Blast!"}
+{"line":367,"op":"move","user":"near","target":"far","move":411,"animTurn":0}
+{"line":369,"op":"hit","side":"far","effectiveness":"super"}
+{"line":369,"op":"hp","side":"far","hp":14}
+{"line":369,"op":"print","text":"It's super effective!"}
+{"line":370,"op":"print","text":"The opposing Excadrill used Earthquake!"}
+{"line":370,"op":"move","user":"far","target":"near","move":89,"animTurn":0}
+{"line":371,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":371,"op":"hp","side":"near","hp":0}
+{"line":372,"op":"faint","side":"near"}
+{"line":372,"op":"print","text":"Alakazam fainted!"}
+{"line":375,"op":"itemPopUp","side":"far","item":472}
+{"line":375,"op":"anim","side":"far","anim":"heldItemEffect"}
+{"line":375,"op":"anim","side":"far","anim":"simpleHeal"}
+{"line":375,"op":"hp","side":"far","hp":20}
+{"line":377,"op":"print","text":"White Atoq forfeited."}
+{"line":379,"op":"print","text":"ManOfMany won the battle!"}
+{"line":379,"op":"end","outcome":"farWon"}
+{"line":97,"fallback":"mechanic","detail":"no state in the stream for Mega Evolution starting"}
+{"line":174,"fallback":"mechanic","detail":"Venusaur-Mega comes back in its form before Mega Evolution"}
+{"line":292,"fallback":"mechanic","detail":"no state in the stream for Mega Evolution starting"}
+{"line":344,"fallback":"mechanic","detail":"Alakazam-Mega comes back in its form before Mega Evolution"}

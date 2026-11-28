@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { ActorPlace } from '../src/gen5/bw2-numbers'
 import { ENTRY, ROUTINE } from '../src/gen5/direct-entry.fixtures'
+import { GAUGE } from '../src/gen5/hp-numbers.fixtures'
 import type { MacroStep } from '../src/gen5/macro'
 import type { RamCheck, RamRef } from '../src/gen5/ram-check'
 import { firstRun, readMomentOptions } from './gen5-moment-args'
@@ -28,7 +29,7 @@ const noRoutine = () => {
 const PKM = new Uint8Array(0x60).fill(5)
 const parties = { player: [PKM, PKM], opponent: [PKM] }
 const team = { parties, names: { player: 'Viewer', opponent: 'Showdown' } }
-const input = { refs: REFS, trainer: TRAINER, entry: ENTRY, readState: noState, team }
+const input = { refs: REFS, trainer: TRAINER, entry: ENTRY, gauge: GAUGE, readState: noState, team }
 const lastMark = (steps: readonly MacroStep[]) =>
   steps.flatMap((step) => (step.kind === 'mark' ? [step.name] : [])).at(-1)
 
@@ -36,13 +37,14 @@ const lastMark = (steps: readonly MacroStep[]) =>
 describe('sessionPlan', () => {
   it('plays the walk as one plan, the continue route, and reads no routine', () => {
     const options = readMomentOptions(['--entry', 'walk', '--save', 'route-20'], NOW)
-    const { plan, notes } = sessionPlan(options, {
+    const { plan, notes, hpNumbers } = sessionPlan(options, {
       ...input,
       readRoutine: noRoutine,
       team: undefined,
     })
     expect(plan).toEqual(firstRun(options.start, REFS, TRAINER, noState))
     expect(notes).toEqual([])
+    expect(hpNumbers).toBe('HP numbers: shown')
   })
 
   it('plays the direct entry as one plan, from power-on through the park to the action menu', () => {
@@ -105,5 +107,25 @@ describe('sessionPlan', () => {
     expect(notes).toEqual([
       'opponent.name: "Bartholomew" cut to "Bartholo", the 8 characters it holds',
     ])
+  })
+
+  // Scene: the moment script's direct entry hides the near box's HP numbers (#137) unless the
+  // scene asks to show them.
+  it('hides the HP numbers right after mark battle-start, and with shown adds no step', () => {
+    const named = (steps: readonly MacroStep[]) =>
+      steps.map((step) => ('name' in step ? `${step.kind} ${step.name}` : step.kind))
+    const hidden = sessionPlan(readMomentOptions([], NOW), { ...input, readRoutine: () => ROUTINE })
+    const at = named(hidden.plan.steps).indexOf('mark battle-start')
+    expect(named(hidden.plan.steps).slice(at, at + 3)).toEqual([
+      'mark battle-start',
+      'until gauges',
+      'write hide-numbers',
+    ])
+    expect(hidden.hpNumbers).toBe('HP numbers: hidden in the near box')
+    const options = readMomentOptions(['--hp-numbers', 'shown'], NOW)
+    const shown = sessionPlan(options, { ...input, readRoutine: () => ROUTINE })
+    expect(named(shown.plan.steps)).not.toContain('until gauges')
+    expect(shown.plan.steps).toHaveLength(hidden.plan.steps.length - 2)
+    expect(shown.hpNumbers).toBe('HP numbers: shown')
   })
 })

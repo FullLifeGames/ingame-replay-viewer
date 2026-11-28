@@ -1,5 +1,5 @@
 // Rules for the lines about one Pokémon: switches, drags, Illusion's end, faints, HP, status, stat
-// stages, forms and Terastallization.
+// stages, forms, Terastallization and Mega Evolution.
 
 import type { Pokemon } from '@pkmn/client'
 import type { BoostID } from '@pkmn/data'
@@ -160,6 +160,18 @@ function formChange({ line, args, kwArgs, battle }: RuleInput<'|-formechange|'>)
   ]
 }
 
+/**
+ * A Mega Evolution (#125). The `detailschange` line before it set the client's `speciesForme` to
+ * the Mega forme; the line's species is the base one. Rayquaza's line names no stone.
+ */
+function megaEvolve({ line, args, battle }: RuleInput<'|-mega|'>): ScriptEvent[] {
+  const [, ident, , item] = args
+  const pokemon = pokemonOf(battle, ident, line)
+  const who = refOfPokemon(pokemon, line)
+  const stone = item ? { item } : {}
+  return [{ kind: 'megaEvolve', line, who, species: pokemon.speciesForme, ...stone }]
+}
+
 export const POKEMON_RULES = {
   '|switch|': { arity: 3, reads: ['from'], build: switchIn },
   '|drag|': { arity: 3, reads: [], build: switchIn },
@@ -234,6 +246,7 @@ export const POKEMON_RULES = {
       { kind: 'terastallize', line, who: refOf(battle, ident, line), type },
     ],
   },
+  '|-mega|': { arity: 3, reads: [], build: megaEvolve },
   // Haze: the line names no Pokémon; the client resets the stages of every active one.
   '|-clearallboost|': { arity: 0, reads: [], build: ({ line }) => [{ kind: 'statReset', line }] },
 } satisfies Rules

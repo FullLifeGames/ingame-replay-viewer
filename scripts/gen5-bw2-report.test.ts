@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import { BW2_NUMBERS_VERSION, type Bw2Numbers, type StructLayout } from '../src/gen5/bw2-numbers'
 import { REPLAY_NUMBERS } from '../src/gen5/backend/replay.fixtures'
+import { gaugeNumbers } from './gen5-bw2-gauge'
+import { GAUGE_INPUT, ODD_READ_GAUGE } from './gen5-bw2-gauge.fixtures'
 import { outsideMainRam, quietLines } from './gen5-bw2-report'
 import { textBoxNumbers } from './gen5-bw2-textbox'
 import { TEXT_BOX_INPUT } from './gen5-bw2-textbox.fixtures'
@@ -111,9 +113,12 @@ describe('quietLines', () => {
     },
     effects: REPLAY_NUMBERS.effects,
     textBox: textBoxNumbers(TEXT_BOX_INPUT),
+    gauge: gaugeNumbers(GAUGE_INPUT),
   }
   const TEXT_BOX_LINE =
     'text box places found: 11, sWork in main RAM, an advance for each character, carrier Bank0019_Text_ButNothingHappened'
+  const GAUGE_LINE =
+    'gauge places found: 4 layouts, 6 constants, sBtlvEffect in main RAM, objMode in one byte'
 
   it('gives the pin, the count of symbols and the checks, and no address, offset or value', () => {
     expect(quietLines(numbers)).toEqual([
@@ -130,6 +135,7 @@ describe('quietLines', () => {
       "text labels of the backend's effect lines found: standard 0 of 2, set 1 of 38",
       "line sources checked: each of the backend's lines is what its function puts",
       TEXT_BOX_LINE,
+      GAUGE_LINE,
     ])
   })
 
@@ -141,8 +147,25 @@ describe('quietLines', () => {
       stringWork: symbol('sWork', 0x01ff8040),
       advances: { Z: 13 },
     }
-    expect(quietLines({ ...numbers, textBox }).at(-1)).toBe(
+    expect(quietLines({ ...numbers, textBox }).at(-2)).toBe(
       'text box places found: 11, sWork outside main RAM, characters without an advance, carrier Bank0019_Text_ButNothingHappened',
+    )
+  })
+
+  // Scene: the gauge's places (#137) reach the public log as counts of our keys and truth values.
+  it("says where the gauge's root lies and whether objMode crosses a byte", () => {
+    const { gauge } = numbers
+    const ClActor = {
+      ...gauge.layouts.ClActor,
+      fields: { ...gauge.layouts.ClActor.fields, ...ODD_READ_GAUGE.layouts.ClActor.fields },
+    }
+    const odd = {
+      ...gauge,
+      effect: symbol('sBtlvEffect', 0x01ff8200),
+      layouts: { ...gauge.layouts, ClActor },
+    }
+    expect(quietLines({ ...numbers, gauge: odd }).at(-1)).toBe(
+      'gauge places found: 4 layouts, 6 constants, sBtlvEffect outside main RAM, objMode across bytes',
     )
   })
 
@@ -187,7 +210,8 @@ describe('quietLines', () => {
     expect(rest).toEqual(expect.arrayContaining(ours))
     expect(
       rest.filter(
-        (line) => ![...ours, 'symbols 2', TEXT_BOX_LINE].includes(line) && /\d/.test(line),
+        (line) =>
+          ![...ours, 'symbols 2', TEXT_BOX_LINE, GAUGE_LINE].includes(line) && /\d/.test(line),
       ),
     ).toEqual([])
   })

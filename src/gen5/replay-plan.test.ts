@@ -7,6 +7,7 @@ import { GEN5_REPLAY_VERSION, type Gen5Replay } from './backend/replay.ts'
 import { REPLAY_NUMBERS } from './backend/replay.fixtures.ts'
 import { directEntry } from './direct-entry.ts'
 import { ENTRY, ROUTINE } from './direct-entry.fixtures.ts'
+import { GAUGE } from './hp-numbers.fixtures.ts'
 import type { MacroStep } from './macro.ts'
 import { pkmFormat } from './pkm-members.ts'
 import { writesAfterHold } from './plan-writes.ts'
@@ -208,15 +209,17 @@ describe('replayEntry', () => {
   // The entry's party layouts taken from the format's fixture, which the sealed Pokémon fit.
   const entry = { ...ENTRY, layouts: { ...ENTRY.layouts, ...format.pkm.layouts } }
   const sealed = sealParties(replay.parties, format)
-  const input = { entry, routine: ROUTINE, format, checks, pin: 'c0ffee' }
+  const input = { entry, routine: ROUTINE, format, checks, pin: 'c0ffee', gauge: GAUGE }
 
-  it('writes the sealed parties and both names as the direct entry does', () => {
-    const sides = { names: replay.trainers, parties: sealed.parties, style: 'single' } as const
+  it('writes the sealed parties and both names and hides the HP numbers as the direct entry does', () => {
+    const names = replay.trainers
+    const sides = { names, parties: sealed.parties, style: 'single', hpNumbers: GAUGE } as const
     const direct = directEntry(entry, ROUTINE, sides, checks)
     const planned = replayEntry(replay, input)
     expect(planned.steps).toEqual(direct.steps)
     expect(planned.watch).toEqual(direct.watch)
     expect(planned.notes).toEqual([...sealed.notes, ...direct.notes])
+    expect(planned.hpNumbers).toBe('HP numbers: hidden in the near box')
   })
 
   it('refuses another version or pin before any step', () => {

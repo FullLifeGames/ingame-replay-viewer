@@ -1,0 +1,376 @@
+{"gen":6,"format":"[Gen 6] OU","teams":{"near":[{"species":"Alakazam","name":"Alakazam","gender":"M","level":100,"shiny":false},{"species":"Scolipede","name":"Scolipede","gender":"M","level":100,"shiny":false},{"species":"Thundurus","name":"Thundurus","gender":"M","level":100,"shiny":false},{"species":"Garchomp","name":"Garchomp","gender":"M","level":100,"shiny":false},{"species":"Latias","name":"Latias","gender":"F","level":100,"shiny":false},{"species":"Bisharp","name":"Bisharp","gender":"F","level":100,"shiny":false}],"far":[{"species":"Venusaur","name":"Venusaur","gender":"M","level":100,"shiny":false},{"species":"Weavile","name":"Weavile","gender":"M","level":100,"shiny":false},{"species":"Manaphy","name":"Manaphy","level":100,"shiny":false},{"species":"Chansey","name":"Chansey","gender":"F","level":100,"shiny":false},{"species":"Excadrill","name":"Excadrill","gender":"M","level":100,"shiny":false},{"species":"Zapdos","name":"Zapdos","level":100,"shiny":false}]},"preview":{"near":[{"species":"Alakazam","gender":"M","level":100},{"species":"Scolipede","gender":"M","level":100},{"species":"Thundurus","gender":"M","level":100},{"species":"Garchomp","gender":"M","level":100},{"species":"Latias","gender":"F","level":100},{"species":"Bisharp","gender":"F","level":100}],"far":[{"species":"Venusaur","gender":"M","level":100},{"species":"Weavile","gender":"M","level":100},{"species":"Manaphy","level":100},{"species":"Chansey","gender":"F","level":100},{"species":"Excadrill","gender":"M","level":100},{"species":"Zapdos","level":100}]}}
+{"line":0,"text":"|inactive|Battle timer is ON: inactive players will automatically lose when time's up.","reason":"timer"}
+{"line":1,"text":"|t:|1795484946","reason":"timestamp"}
+{"line":2,"text":"|gametype|singles","reason":"metadata"}
+{"kind":"player","line":3,"side":"near","name":"White Atoq","avatar":"#bwwciiperu"}
+{"kind":"player","line":4,"side":"far","name":"ManOfMany","avatar":"102"}
+{"line":5,"text":"|gen|6","reason":"metadata"}
+{"line":6,"text":"|tier|[Gen 6] OU","reason":"metadata"}
+{"line":7,"text":"|rule|HP Percentage Mod: HP is shown in percentages","reason":"rule"}
+{"line":8,"text":"|rule|Endless Battle Clause: Forcing endless battles is banned","reason":"rule"}
+{"line":9,"text":"|rule|Sleep Clause Mod: Limit one foe put to sleep","reason":"rule"}
+{"line":10,"text":"|rule|Species Clause: Limit one of each Pokemon","reason":"rule"}
+{"line":11,"text":"|rule|OHKO Clause: OHKO moves are banned","reason":"rule"}
+{"line":12,"text":"|rule|Evasion Items Clause: Evasion items are banned","reason":"rule"}
+{"line":13,"text":"|rule|Evasion Moves Clause: Evasion moves are banned","reason":"rule"}
+{"line":14,"text":"|rule|Evasion Abilities Clause: Evasion abilities are banned","reason":"rule"}
+{"line":15,"text":"|clearpoke","reason":"preview"}
+{"line":16,"text":"|poke|p1|Alakazam, M|item","reason":"preview"}
+{"line":17,"text":"|poke|p1|Scolipede, M|item","reason":"preview"}
+{"line":18,"text":"|poke|p1|Thundurus, M|item","reason":"preview"}
+{"line":19,"text":"|poke|p1|Garchomp, M|item","reason":"preview"}
+{"line":20,"text":"|poke|p1|Latias, F|item","reason":"preview"}
+{"line":21,"text":"|poke|p1|Bisharp, F|item","reason":"preview"}
+{"line":22,"text":"|poke|p2|Venusaur, M|item","reason":"preview"}
+{"line":23,"text":"|poke|p2|Weavile, M|item","reason":"preview"}
+{"line":24,"text":"|poke|p2|Manaphy|item","reason":"preview"}
+{"line":25,"text":"|poke|p2|Chansey, F|item","reason":"preview"}
+{"line":26,"text":"|poke|p2|Excadrill, M|item","reason":"preview"}
+{"line":27,"text":"|poke|p2|Zapdos|item","reason":"preview"}
+{"line":28,"text":"|teampreview","reason":"preview"}
+{"line":29,"text":"|inactive|White Atoq also wants the timer to be on.","reason":"timer"}
+{"line":30,"text":"|c|☆White Atoq|hf","reason":"chat"}
+{"line":31,"text":"|c|☆ManOfMany|hf","reason":"chat"}
+{"line":32,"text":"|inactive|White Atoq has 270 seconds left.","reason":"timer"}
+{"line":33,"text":"|inactive|ManOfMany has 270 seconds left.","reason":"timer"}
+{"line":34,"text":"|inactive|White Atoq has 240 seconds left.","reason":"timer"}
+{"line":35,"text":"|inactive|White Atoq has 210 seconds left.","reason":"timer"}
+{"line":36,"text":"|inactive|White Atoq has 180 seconds left.","reason":"timer"}
+{"line":37,"text":"|inactive|White Atoq has 150 seconds left.","reason":"timer"}
+{"line":38,"text":"|","reason":"spacer"}
+{"line":39,"text":"|t:|1795485126","reason":"timestamp"}
+{"kind":"teamSize","line":40,"side":"near","size":6}
+{"kind":"teamSize","line":41,"side":"far","size":6}
+{"kind":"battleStart","line":42}
+{"kind":"switchIn","line":43,"who":{"side":"near","index":1},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"switchIn","line":44,"who":{"side":"far","index":5},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"turn","line":45,"number":1}
+{"line":46,"text":"|","reason":"spacer"}
+{"line":47,"text":"|t:|1795485140","reason":"timestamp"}
+{"kind":"move","line":48,"user":{"side":"near","index":1},"move":"Poison Jab","target":{"side":"far","index":5}}
+{"kind":"damage","line":49,"who":{"side":"far","index":5},"hp":{"hp":72,"max":100}}
+{"kind":"status","line":50,"who":{"side":"far","index":5},"status":"psn"}
+{"kind":"damage","line":51,"who":{"side":"near","index":1},"hp":{"hp":84,"max":100},"cause":{"name":"Rocky Helmet","kind":"item"},"source":{"side":"far","index":5}}
+{"kind":"move","line":52,"user":{"side":"far","index":5},"move":"Discharge","target":{"side":"near","index":1}}
+{"kind":"damage","line":53,"who":{"side":"near","index":1},"hp":{"hp":31,"max":100}}
+{"line":54,"text":"|","reason":"spacer"}
+{"kind":"damage","line":55,"who":{"side":"far","index":5},"hp":{"hp":60,"max":100},"status":"psn","cause":{"name":"psn"}}
+{"kind":"ability","line":56,"who":{"side":"near","index":1},"ability":"Speed Boost","detail":"boost"}
+{"kind":"statChange","line":57,"who":{"side":"near","index":1},"stat":"spe","stages":1}
+{"line":58,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":59,"number":2}
+{"line":60,"text":"|","reason":"spacer"}
+{"line":61,"text":"|t:|1795485153","reason":"timestamp"}
+{"kind":"switchIn","line":62,"who":{"side":"near","index":3},"replaces":{"side":"near","index":1},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":63,"user":{"side":"far","index":5},"move":"Roost","target":{"side":"far","index":5}}
+{"kind":"heal","line":64,"who":{"side":"far","index":5},"hp":{"hp":100,"max":100},"status":"psn"}
+{"line":65,"text":"|-singleturn|p2a: Zapdos|move: Roost","reason":"state"}
+{"line":66,"text":"|","reason":"spacer"}
+{"kind":"damage","line":67,"who":{"side":"far","index":5},"hp":{"hp":88,"max":100},"status":"psn","cause":{"name":"psn"}}
+{"line":68,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":69,"number":3}
+{"line":70,"text":"|","reason":"spacer"}
+{"line":71,"text":"|t:|1795485166","reason":"timestamp"}
+{"kind":"move","line":72,"user":{"side":"near","index":3},"move":"Stealth Rock","target":{"side":"far","index":5}}
+{"kind":"sideStart","line":73,"side":"far","condition":{"name":"Stealth Rock","kind":"move"}}
+{"kind":"move","line":74,"user":{"side":"far","index":5},"move":"Hidden Power","target":{"side":"near","index":3}}
+{"kind":"damage","line":76,"who":{"side":"near","index":3},"hp":{"hp":43,"max":100},"effectiveness":"super","folded":[75]}
+{"line":77,"text":"|","reason":"spacer"}
+{"kind":"damage","line":78,"who":{"side":"far","index":5},"hp":{"hp":76,"max":100},"status":"psn","cause":{"name":"psn"}}
+{"line":79,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":80,"number":4}
+{"line":81,"text":"|","reason":"spacer"}
+{"line":82,"text":"|t:|1795485185","reason":"timestamp"}
+{"kind":"switchIn","line":83,"who":{"side":"far","index":0},"replaces":{"side":"far","index":5},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":84,"who":{"side":"far","index":0},"hp":{"hp":88,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":85,"user":{"side":"near","index":3},"move":"Rock Tomb","target":{"side":"far","index":0}}
+{"kind":"damage","line":86,"who":{"side":"far","index":0},"hp":{"hp":67,"max":100}}
+{"kind":"statChange","line":87,"who":{"side":"far","index":0},"stat":"spe","stages":-1}
+{"line":88,"text":"|","reason":"spacer"}
+{"line":89,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":90,"number":5}
+{"line":91,"text":"|inactive|White Atoq has 180 seconds left.","reason":"timer"}
+{"line":92,"text":"|inactive|ManOfMany has 270 seconds left.","reason":"timer"}
+{"line":93,"text":"|","reason":"spacer"}
+{"line":94,"text":"|t:|1795485231","reason":"timestamp"}
+{"kind":"switchIn","line":95,"who":{"side":"near","index":0},"replaces":{"side":"near","index":3},"dragged":false,"hp":{"hp":100,"max":100}}
+{"line":96,"text":"|detailschange|p2a: Venusaur|Venusaur-Mega, M","reason":"state"}
+{"kind":"megaEvolve","line":97,"who":{"side":"far","index":0},"species":"Venusaur-Mega","item":"Venusaurite"}
+{"kind":"move","line":98,"user":{"side":"far","index":0},"move":"Leech Seed","target":{"side":"near","index":0}}
+{"kind":"effectStart","line":99,"who":{"side":"near","index":0},"effect":{"name":"Leech Seed","kind":"move"}}
+{"line":100,"text":"|","reason":"spacer"}
+{"line":101,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":102,"number":6}
+{"line":103,"text":"|inactive|ManOfMany has 270 seconds left.","reason":"timer"}
+{"line":104,"text":"|","reason":"spacer"}
+{"line":105,"text":"|t:|1795485253","reason":"timestamp"}
+{"kind":"switchIn","line":106,"who":{"side":"far","index":3},"replaces":{"side":"far","index":0},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":107,"who":{"side":"far","index":3},"hp":{"hp":88,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":108,"user":{"side":"near","index":0},"move":"Psychic","target":{"side":"far","index":3}}
+{"kind":"damage","line":109,"who":{"side":"far","index":3},"hp":{"hp":75,"max":100}}
+{"line":110,"text":"|","reason":"spacer"}
+{"line":111,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":112,"number":7}
+{"line":113,"text":"|","reason":"spacer"}
+{"line":114,"text":"|t:|1795485259","reason":"timestamp"}
+{"kind":"switchIn","line":115,"who":{"side":"near","index":5},"replaces":{"side":"near","index":0},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":116,"user":{"side":"far","index":3},"move":"Stealth Rock","target":{"side":"near","index":5}}
+{"kind":"sideStart","line":117,"side":"near","condition":{"name":"Stealth Rock","kind":"move"}}
+{"line":118,"text":"|","reason":"spacer"}
+{"line":119,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":120,"number":8}
+{"line":121,"text":"|inactive|ManOfMany has 270 seconds left.","reason":"timer"}
+{"line":122,"text":"|inactive|White Atoq has 150 seconds left.","reason":"timer"}
+{"line":123,"text":"|inactive|ManOfMany has 240 seconds left.","reason":"timer"}
+{"line":124,"text":"|","reason":"spacer"}
+{"line":125,"text":"|t:|1795485301","reason":"timestamp"}
+{"kind":"switchIn","line":126,"who":{"side":"far","index":5},"replaces":{"side":"far","index":3},"dragged":false,"hp":{"hp":76,"max":100},"status":"psn"}
+{"kind":"damage","line":127,"who":{"side":"far","index":5},"hp":{"hp":51,"max":100},"status":"psn","cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":128,"user":{"side":"near","index":5},"move":"Knock Off","target":{"side":"far","index":5}}
+{"kind":"damage","line":129,"who":{"side":"far","index":5},"hp":{"hp":12,"max":100},"status":"psn"}
+{"kind":"damage","line":130,"who":{"side":"near","index":5},"hp":{"hp":84,"max":100},"cause":{"name":"Rocky Helmet","kind":"item"},"source":{"side":"far","index":5}}
+{"kind":"itemEnd","line":131,"who":{"side":"far","index":5},"item":"Rocky Helmet","cause":{"name":"Knock Off","kind":"move"},"source":{"side":"near","index":5}}
+{"line":132,"text":"|","reason":"spacer"}
+{"kind":"damage","line":133,"who":{"side":"far","index":5},"hp":{"hp":0,"max":100},"cause":{"name":"psn"}}
+{"kind":"faint","line":134,"who":{"side":"far","index":5}}
+{"line":135,"text":"|upkeep","reason":"upkeep"}
+{"line":136,"text":"|inactive|ManOfMany has 240 seconds left.","reason":"timer"}
+{"line":137,"text":"|inactive|ManOfMany has 210 seconds left.","reason":"timer"}
+{"line":138,"text":"|","reason":"spacer"}
+{"line":139,"text":"|t:|1795485342","reason":"timestamp"}
+{"kind":"switchIn","line":140,"who":{"side":"far","index":4},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":141,"who":{"side":"far","index":4},"hp":{"hp":98,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"ability","line":142,"who":{"side":"far","index":4},"ability":"Mold Breaker"}
+{"kind":"turn","line":143,"number":9}
+{"line":144,"text":"|inactive|White Atoq has 150 seconds left.","reason":"timer"}
+{"line":145,"text":"|","reason":"spacer"}
+{"line":146,"text":"|t:|1795485357","reason":"timestamp"}
+{"kind":"switchIn","line":147,"who":{"side":"near","index":1},"replaces":{"side":"near","index":5},"dragged":false,"hp":{"hp":31,"max":100}}
+{"kind":"damage","line":148,"who":{"side":"near","index":1},"hp":{"hp":6,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":149,"user":{"side":"far","index":4},"move":"Earthquake","target":{"side":"near","index":1}}
+{"kind":"damage","line":150,"who":{"side":"near","index":1},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":151,"who":{"side":"near","index":1}}
+{"line":152,"text":"|","reason":"spacer"}
+{"kind":"heal","line":153,"who":{"side":"far","index":4},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":154,"text":"|upkeep","reason":"upkeep"}
+{"line":155,"text":"|","reason":"spacer"}
+{"line":156,"text":"|t:|1795485361","reason":"timestamp"}
+{"kind":"switchIn","line":157,"who":{"side":"near","index":2},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":158,"who":{"side":"near","index":2},"hp":{"hp":76,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"turn","line":159,"number":10}
+{"line":160,"text":"|inactive|White Atoq has 150 seconds left.","reason":"timer"}
+{"line":161,"text":"|","reason":"spacer"}
+{"line":162,"text":"|t:|1795485380","reason":"timestamp"}
+{"kind":"move","line":163,"user":{"side":"near","index":2},"move":"Nasty Plot","target":{"side":"near","index":2}}
+{"kind":"statChange","line":164,"who":{"side":"near","index":2},"stat":"spa","stages":2}
+{"kind":"move","line":165,"user":{"side":"far","index":4},"move":"Rapid Spin","target":{"side":"near","index":2}}
+{"kind":"damage","line":166,"who":{"side":"near","index":2},"hp":{"hp":66,"max":100}}
+{"kind":"sideEnd","line":167,"side":"far","condition":{"name":"Stealth Rock"},"cause":{"name":"Rapid Spin","kind":"move"},"source":{"side":"far","index":4}}
+{"line":168,"text":"|","reason":"spacer"}
+{"kind":"heal","line":169,"who":{"side":"near","index":2},"hp":{"hp":72,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":170,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":171,"number":11}
+{"line":172,"text":"|","reason":"spacer"}
+{"line":173,"text":"|t:|1795485392","reason":"timestamp"}
+{"kind":"switchIn","line":174,"who":{"side":"far","index":0},"replaces":{"side":"far","index":4},"dragged":false,"hp":{"hp":67,"max":100}}
+{"kind":"move","line":175,"user":{"side":"near","index":2},"move":"Nasty Plot","target":{"side":"near","index":2}}
+{"kind":"statChange","line":176,"who":{"side":"near","index":2},"stat":"spa","stages":2}
+{"line":177,"text":"|","reason":"spacer"}
+{"kind":"heal","line":178,"who":{"side":"near","index":2},"hp":{"hp":78,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":179,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":180,"number":12}
+{"line":181,"text":"|inactive|White Atoq has 150 seconds left.","reason":"timer"}
+{"line":182,"text":"|","reason":"spacer"}
+{"line":183,"text":"|t:|1795485405","reason":"timestamp"}
+{"kind":"move","line":184,"user":{"side":"near","index":2},"move":"Thunderbolt","target":{"side":"far","index":0}}
+{"kind":"damage","line":186,"who":{"side":"far","index":0},"hp":{"hp":16,"max":100},"effectiveness":"resisted","folded":[185]}
+{"kind":"move","line":187,"user":{"side":"far","index":0},"move":"Sludge Bomb","target":{"side":"near","index":2}}
+{"kind":"damage","line":188,"who":{"side":"near","index":2},"hp":{"hp":12,"max":100}}
+{"line":189,"text":"|","reason":"spacer"}
+{"kind":"heal","line":190,"who":{"side":"near","index":2},"hp":{"hp":18,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":191,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":192,"number":13}
+{"line":193,"text":"|","reason":"spacer"}
+{"line":194,"text":"|t:|1795485415","reason":"timestamp"}
+{"kind":"move","line":195,"user":{"side":"near","index":2},"move":"Hidden Power","target":{"side":"far","index":0}}
+{"kind":"damage","line":197,"who":{"side":"far","index":0},"hp":{"hp":0,"max":100},"effectiveness":"super","folded":[196]}
+{"kind":"faint","line":198,"who":{"side":"far","index":0}}
+{"line":199,"text":"|detailschange|p2: Venusaur|Venusaur, M|[silent]","reason":"state"}
+{"line":200,"text":"|","reason":"spacer"}
+{"kind":"heal","line":201,"who":{"side":"near","index":2},"hp":{"hp":24,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":202,"text":"|upkeep","reason":"upkeep"}
+{"line":203,"text":"|inactive|ManOfMany has 210 seconds left.","reason":"timer"}
+{"line":204,"text":"|inactive|ManOfMany has 180 seconds left.","reason":"timer"}
+{"line":205,"text":"|","reason":"spacer"}
+{"line":206,"text":"|t:|1795485481","reason":"timestamp"}
+{"kind":"switchIn","line":207,"who":{"side":"far","index":1},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"ability","line":208,"who":{"side":"far","index":1},"ability":"Pressure"}
+{"kind":"turn","line":209,"number":14}
+{"line":210,"text":"|","reason":"spacer"}
+{"line":211,"text":"|t:|1795485488","reason":"timestamp"}
+{"kind":"switchIn","line":212,"who":{"side":"near","index":5},"replaces":{"side":"near","index":2},"dragged":false,"hp":{"hp":84,"max":100}}
+{"kind":"damage","line":213,"who":{"side":"near","index":5},"hp":{"hp":78,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":214,"user":{"side":"far","index":1},"move":"Knock Off","target":{"side":"near","index":5}}
+{"kind":"damage","line":216,"who":{"side":"near","index":5},"hp":{"hp":31,"max":100},"effectiveness":"resisted","folded":[215]}
+{"kind":"itemEnd","line":217,"who":{"side":"near","index":5},"item":"Shuca Berry","cause":{"name":"Knock Off","kind":"move"},"source":{"side":"far","index":1}}
+{"line":218,"text":"|","reason":"spacer"}
+{"line":219,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":220,"number":15}
+{"line":221,"text":"|inactive|ManOfMany has 180 seconds left.","reason":"timer"}
+{"line":222,"text":"|inactive|ManOfMany has 150 seconds left.","reason":"timer"}
+{"line":223,"text":"|","reason":"spacer"}
+{"line":224,"text":"|t:|1795485527","reason":"timestamp"}
+{"kind":"switchIn","line":225,"who":{"side":"far","index":2},"replaces":{"side":"far","index":1},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"move","line":226,"user":{"side":"near","index":5},"move":"Iron Head","target":{"side":"far","index":2}}
+{"kind":"damage","line":228,"who":{"side":"far","index":2},"hp":{"hp":81,"max":100},"effectiveness":"resisted","folded":[227]}
+{"line":229,"text":"|","reason":"spacer"}
+{"kind":"heal","line":230,"who":{"side":"far","index":2},"hp":{"hp":87,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":231,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":232,"number":16}
+{"line":233,"text":"|inactive|ManOfMany has 150 seconds left.","reason":"timer"}
+{"line":234,"text":"|","reason":"spacer"}
+{"line":235,"text":"|t:|1795485537","reason":"timestamp"}
+{"kind":"switchIn","line":236,"who":{"side":"near","index":4},"replaces":{"side":"near","index":5},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"damage","line":237,"who":{"side":"near","index":4},"hp":{"hp":88,"max":100},"cause":{"name":"Stealth Rock"}}
+{"kind":"move","line":238,"user":{"side":"far","index":2},"move":"Scald","target":{"side":"near","index":4}}
+{"kind":"damage","line":241,"who":{"side":"near","index":4},"hp":{"hp":65,"max":100},"crit":true,"effectiveness":"resisted","folded":[239,240]}
+{"line":242,"text":"|","reason":"spacer"}
+{"kind":"heal","line":243,"who":{"side":"far","index":2},"hp":{"hp":93,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":244,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":245,"number":17}
+{"line":246,"text":"|inactive|ManOfMany has 150 seconds left.","reason":"timer"}
+{"line":247,"text":"|","reason":"spacer"}
+{"line":248,"text":"|t:|1795485557","reason":"timestamp"}
+{"kind":"move","line":249,"user":{"side":"near","index":4},"move":"Defog","target":{"side":"far","index":2}}
+{"kind":"statChange","line":250,"who":{"side":"far","index":2},"stat":"evasion","stages":-1}
+{"kind":"sideEnd","line":251,"side":"near","condition":{"name":"Stealth Rock"},"cause":{"name":"Defog","kind":"move"},"source":{"side":"near","index":4}}
+{"kind":"move","line":252,"user":{"side":"far","index":2},"move":"Tail Glow","target":{"side":"far","index":2}}
+{"kind":"statChange","line":253,"who":{"side":"far","index":2},"stat":"spa","stages":3}
+{"line":254,"text":"|","reason":"spacer"}
+{"kind":"heal","line":255,"who":{"side":"far","index":2},"hp":{"hp":99,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":256,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":257,"number":18}
+{"line":258,"text":"|inactive|ManOfMany has 150 seconds left.","reason":"timer"}
+{"line":259,"text":"|","reason":"spacer"}
+{"line":260,"text":"|t:|1795485571","reason":"timestamp"}
+{"kind":"switchIn","line":261,"who":{"side":"near","index":3},"replaces":{"side":"near","index":4},"dragged":false,"hp":{"hp":43,"max":100}}
+{"kind":"move","line":262,"user":{"side":"far","index":2},"move":"Scald","target":{"side":"near","index":3}}
+{"kind":"damage","line":263,"who":{"side":"near","index":3},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":264,"who":{"side":"near","index":3}}
+{"line":265,"text":"|","reason":"spacer"}
+{"kind":"heal","line":266,"who":{"side":"far","index":2},"hp":{"hp":100,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":267,"text":"|upkeep","reason":"upkeep"}
+{"line":268,"text":"|","reason":"spacer"}
+{"line":269,"text":"|t:|1795485586","reason":"timestamp"}
+{"kind":"switchIn","line":270,"who":{"side":"near","index":2},"dragged":false,"hp":{"hp":24,"max":100}}
+{"kind":"turn","line":271,"number":19}
+{"line":272,"text":"|inactive|ManOfMany has 150 seconds left.","reason":"timer"}
+{"line":273,"text":"|","reason":"spacer"}
+{"line":274,"text":"|t:|1795485614","reason":"timestamp"}
+{"kind":"move","line":275,"user":{"side":"near","index":2},"move":"Thunderbolt","target":{"side":"far","index":2}}
+{"kind":"damage","line":277,"who":{"side":"far","index":2},"hp":{"hp":32,"max":100},"effectiveness":"super","folded":[276]}
+{"kind":"move","line":278,"user":{"side":"far","index":2},"move":"Scald","target":{"side":"near","index":2}}
+{"kind":"damage","line":279,"who":{"side":"near","index":2},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":280,"who":{"side":"near","index":2}}
+{"line":281,"text":"|","reason":"spacer"}
+{"kind":"heal","line":282,"who":{"side":"far","index":2},"hp":{"hp":38,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":283,"text":"|upkeep","reason":"upkeep"}
+{"line":284,"text":"|","reason":"spacer"}
+{"line":285,"text":"|t:|1795485620","reason":"timestamp"}
+{"kind":"switchIn","line":286,"who":{"side":"near","index":0},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"turn","line":287,"number":20}
+{"line":288,"text":"|inactive|ManOfMany has 120 seconds left.","reason":"timer"}
+{"line":289,"text":"|","reason":"spacer"}
+{"line":290,"text":"|t:|1795485656","reason":"timestamp"}
+{"line":291,"text":"|detailschange|p1a: Alakazam|Alakazam-Mega, M","reason":"state"}
+{"kind":"megaEvolve","line":292,"who":{"side":"near","index":0},"species":"Alakazam-Mega","item":"Alakazite"}
+{"kind":"ability","line":293,"who":{"side":"near","index":0},"ability":"Hydration","detail":"Trace","cause":{"name":"Trace","kind":"ability"},"source":{"side":"far","index":2}}
+{"kind":"move","line":294,"user":{"side":"near","index":0},"move":"Psychic","target":{"side":"far","index":2}}
+{"kind":"damage","line":295,"who":{"side":"far","index":2},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":296,"who":{"side":"far","index":2}}
+{"line":297,"text":"|","reason":"spacer"}
+{"line":298,"text":"|upkeep","reason":"upkeep"}
+{"line":299,"text":"|","reason":"spacer"}
+{"line":300,"text":"|t:|1795485682","reason":"timestamp"}
+{"kind":"switchIn","line":301,"who":{"side":"far","index":3},"dragged":false,"hp":{"hp":75,"max":100}}
+{"kind":"turn","line":302,"number":21}
+{"line":303,"text":"|inactive|White Atoq has 180 seconds left.","reason":"timer"}
+{"line":304,"text":"|inactive|White Atoq has 150 seconds left.","reason":"timer"}
+{"line":305,"text":"|","reason":"spacer"}
+{"line":306,"text":"|t:|1795485727","reason":"timestamp"}
+{"kind":"move","line":307,"user":{"side":"near","index":0},"move":"Focus Blast","target":{"side":"far","index":3},"miss":true}
+{"kind":"miss","line":308,"user":{"side":"near","index":0},"target":{"side":"far","index":3}}
+{"kind":"move","line":309,"user":{"side":"far","index":3},"move":"Seismic Toss","target":{"side":"near","index":0}}
+{"kind":"damage","line":310,"who":{"side":"near","index":0},"hp":{"hp":61,"max":100}}
+{"line":311,"text":"|","reason":"spacer"}
+{"line":312,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":313,"number":22}
+{"line":314,"text":"|","reason":"spacer"}
+{"line":315,"text":"|t:|1795485743","reason":"timestamp"}
+{"kind":"move","line":316,"user":{"side":"near","index":0},"move":"Focus Blast","target":{"side":"far","index":3},"miss":true}
+{"kind":"miss","line":317,"user":{"side":"near","index":0},"target":{"side":"far","index":3}}
+{"kind":"move","line":318,"user":{"side":"far","index":3},"move":"Thunder Wave","target":{"side":"near","index":0}}
+{"kind":"status","line":319,"who":{"side":"near","index":0},"status":"par"}
+{"line":320,"text":"|","reason":"spacer"}
+{"line":321,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":322,"number":23}
+{"line":323,"text":"|inactive|White Atoq has 150 seconds left.","reason":"timer"}
+{"line":324,"text":"|","reason":"spacer"}
+{"line":325,"text":"|t:|1795485761","reason":"timestamp"}
+{"kind":"switchIn","line":326,"who":{"side":"near","index":4},"replaces":{"side":"near","index":0},"dragged":false,"hp":{"hp":65,"max":100}}
+{"kind":"move","line":327,"user":{"side":"far","index":3},"move":"Seismic Toss","target":{"side":"near","index":4}}
+{"kind":"damage","line":328,"who":{"side":"near","index":4},"hp":{"hp":36,"max":100}}
+{"line":329,"text":"|","reason":"spacer"}
+{"line":330,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":331,"number":24}
+{"line":332,"text":"|inactive|White Atoq has 150 seconds left.","reason":"timer"}
+{"line":333,"text":"|inactive|ManOfMany has 90 seconds left.","reason":"timer"}
+{"line":334,"text":"|","reason":"spacer"}
+{"line":335,"text":"|t:|1795485789","reason":"timestamp"}
+{"kind":"switchIn","line":336,"who":{"side":"far","index":4},"replaces":{"side":"far","index":3},"dragged":false,"hp":{"hp":100,"max":100}}
+{"kind":"ability","line":337,"who":{"side":"far","index":4},"ability":"Mold Breaker"}
+{"kind":"move","line":338,"user":{"side":"near","index":4},"move":"Healing Wish","target":{"side":"near","index":4}}
+{"kind":"faint","line":339,"who":{"side":"near","index":4}}
+{"line":340,"text":"|","reason":"spacer"}
+{"line":341,"text":"|upkeep","reason":"upkeep"}
+{"line":342,"text":"|","reason":"spacer"}
+{"line":343,"text":"|t:|1795485791","reason":"timestamp"}
+{"kind":"switchIn","line":344,"who":{"side":"near","index":0},"dragged":false,"hp":{"hp":61,"max":100},"status":"par"}
+{"kind":"heal","line":345,"who":{"side":"near","index":0},"hp":{"hp":100,"max":100},"cause":{"name":"Healing Wish","kind":"move"}}
+{"kind":"ability","line":346,"who":{"side":"near","index":0},"ability":"Mold Breaker","detail":"Trace","cause":{"name":"Trace","kind":"ability"},"source":{"side":"far","index":4}}
+{"kind":"ability","line":347,"who":{"side":"near","index":0},"ability":"Mold Breaker"}
+{"kind":"turn","line":348,"number":25}
+{"line":349,"text":"|inactive|ManOfMany has 90 seconds left.","reason":"timer"}
+{"line":350,"text":"|","reason":"spacer"}
+{"line":351,"text":"|t:|1795485813","reason":"timestamp"}
+{"kind":"move","line":352,"user":{"side":"near","index":0},"move":"Focus Blast","target":{"side":"far","index":4},"miss":true}
+{"kind":"miss","line":353,"user":{"side":"near","index":0},"target":{"side":"far","index":4}}
+{"kind":"move","line":354,"user":{"side":"far","index":4},"move":"Earthquake","target":{"side":"near","index":0}}
+{"kind":"damage","line":355,"who":{"side":"near","index":0},"hp":{"hp":19,"max":100}}
+{"line":356,"text":"|","reason":"spacer"}
+{"line":357,"text":"|upkeep","reason":"upkeep"}
+{"kind":"turn","line":358,"number":26}
+{"line":359,"text":"|c|☆ManOfMany|sorry","reason":"chat"}
+{"line":360,"text":"|c|☆White Atoq|its my fault","reason":"chat"}
+{"line":361,"text":"|c|☆White Atoq|for playing this game","reason":"chat"}
+{"line":362,"text":"|inactive|White Atoq has 150 seconds left.","reason":"timer"}
+{"line":363,"text":"|c|☆White Atoq|+ using focus blast","reason":"chat"}
+{"line":364,"text":"|c|☆ManOfMany|focus miss :/","reason":"chat"}
+{"line":365,"text":"|","reason":"spacer"}
+{"line":366,"text":"|t:|1795485841","reason":"timestamp"}
+{"kind":"move","line":367,"user":{"side":"near","index":0},"move":"Focus Blast","target":{"side":"far","index":4}}
+{"kind":"damage","line":369,"who":{"side":"far","index":4},"hp":{"hp":14,"max":100},"effectiveness":"super","folded":[368]}
+{"kind":"move","line":370,"user":{"side":"far","index":4},"move":"Earthquake","target":{"side":"near","index":0}}
+{"kind":"damage","line":371,"who":{"side":"near","index":0},"hp":{"hp":0,"max":100}}
+{"kind":"faint","line":372,"who":{"side":"near","index":0}}
+{"line":373,"text":"|detailschange|p1: Alakazam|Alakazam, M|[silent]","reason":"state"}
+{"line":374,"text":"|","reason":"spacer"}
+{"kind":"heal","line":375,"who":{"side":"far","index":4},"hp":{"hp":20,"max":100},"cause":{"name":"Leftovers","kind":"item"}}
+{"line":376,"text":"|upkeep","reason":"upkeep"}
+{"kind":"message","line":377,"text":"White Atoq forfeited."}
+{"line":378,"text":"|","reason":"spacer"}
+{"kind":"win","line":379,"side":"far","name":"ManOfMany"}
+{"line":380,"text":"|c|☆White Atoq|gg ","reason":"chat"}
+{"line":381,"text":"|c|☆ManOfMany|gg","reason":"chat"}
+{"line":382,"text":"|player|p1|","reason":"room"}
+{"line":383,"text":"|player|p2|","reason":"room"}

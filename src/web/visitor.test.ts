@@ -54,8 +54,8 @@ const HTML_PAGE = '<!DOCTYPE html>\n<html><body>Not here</body></html>'
 const GEN8 = readReplay({ ...replay994052, log: replay994052.log.replace('|gen|3\n', '|gen|8\n') })
 
 describe('visitorLine for the replay', () => {
-  it('names every generation the backend plays (#86, #88)', () => {
-    expect(PLAYED_FORMATS).toBe('Gen 1 to 5 and Gen 9 singles')
+  it('names every generation the backend plays (#86, #88, #125)', () => {
+    expect(PLAYED_FORMATS).toBe('Gen 1 to 6 and Gen 9 singles')
   })
 
   it('gives a log that starts with |gen|8 the generation line, from the typed refusal', () => {

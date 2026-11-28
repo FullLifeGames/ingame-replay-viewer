@@ -1,0 +1,392 @@
+{"length":6187,"crc32":"219fe8a6","trainers":{"near":{"name":"Johnald714","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"primary trout","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":655,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Delphox"},{"species":6,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Charizard"},{"species":59,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Arcanine"},{"species":157,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Typhlosion"},{"species":392,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Infernape"},{"species":500,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Emboar"}],"far":[{"species":308,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Medicham"},{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"},{"species":1102,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Landorus"},{"species":1065,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Rotom"},{"species":380,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Latias"},{"species":212,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Scizor"}]}}
+{"line":36,"op":"intro"}
+{"line":36,"op":"print","text":"You are challenged by primary trout!"}
+{"line":38,"op":"print","text":"primary trout sent out Medicham!"}
+{"line":38,"op":"sendOut","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":37,"op":"print","text":"Go! Infernape!"}
+{"line":37,"op":"sendOut","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":39,"op":"turn","number":1}
+{"line":43,"op":"print","text":"Infernape, come back!"}
+{"line":43,"op":"withdraw","side":"near"}
+{"line":43,"op":"print","text":"Go! Arcanine!"}
+{"line":43,"op":"switchIn","side":"near","slot":2,"hp":100,"status":"none"}
+{"line":44,"op":"ability","side":"near","ability":22,"show":true}
+{"line":45,"op":"stat","side":"far","stat":"atk","stages":-1,"arrows":"one"}
+{"line":45,"op":"print","text":"The opposing Medicham's Attack fell!"}
+{"line":44,"op":"ability","side":"near","ability":22,"show":false}
+{"line":47,"op":"flushTextBox"}
+{"line":47,"op":"print","text":"The opposing Medicham's Medichamite is reacting to primary trout's Mega Ring!"}
+{"line":47,"op":"formChange","side":"far","species":934}
+{"line":47,"op":"print","text":"The opposing Medicham has Mega Evolved into Mega Medicham!"}
+{"line":48,"op":"print","text":"The opposing Medicham used Fake Out!"}
+{"line":48,"op":"move","user":"far","target":"near","move":252,"animTurn":0}
+{"line":49,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":49,"op":"hp","side":"near","hp":83}
+{"line":52,"op":"turn","number":2}
+{"line":55,"op":"print","text":"primary trout withdrew Medicham!"}
+{"line":55,"op":"withdraw","side":"far"}
+{"line":55,"op":"print","text":"primary trout sent out Rotom!"}
+{"line":55,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":56,"op":"print","text":"Arcanine, come back!"}
+{"line":56,"op":"withdraw","side":"near"}
+{"line":56,"op":"print","text":"Go! Infernape!"}
+{"line":56,"op":"switchIn","side":"near","slot":4,"hp":100,"status":"none"}
+{"line":59,"op":"turn","number":3}
+{"line":62,"op":"print","text":"Infernape used Stealth Rock!"}
+{"line":62,"op":"move","user":"near","target":"far","move":446,"animTurn":0}
+{"line":63,"op":"print","text":"Pointed stones float in the air on the opposing side!"}
+{"line":64,"op":"print","text":"The opposing Rotom used Volt Switch!"}
+{"line":64,"op":"move","user":"far","target":"near","move":521,"animTurn":0}
+{"line":66,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":66,"op":"hp","side":"near","hp":50}
+{"line":66,"op":"print","text":"A critical hit!"}
+{"line":69,"op":"withdraw","side":"far"}
+{"line":69,"op":"print","text":"primary trout sent out Latias!"}
+{"line":69,"op":"switchIn","side":"far","slot":4,"hp":100,"status":"none"}
+{"line":70,"op":"hp","side":"far","hp":88}
+{"line":70,"op":"print","text":"Pointed stones dug into the opposing Latias!"}
+{"line":73,"op":"turn","number":4}
+{"line":76,"op":"print","text":"The opposing Latias used Psyshock!"}
+{"line":76,"op":"move","user":"far","target":"near","move":473,"animTurn":0}
+{"line":78,"op":"hit","side":"near","effectiveness":"super"}
+{"line":78,"op":"hp","side":"near","hp":0}
+{"line":78,"op":"print","text":"It's super effective!"}
+{"line":79,"op":"faint","side":"near"}
+{"line":79,"op":"print","text":"Infernape fainted!"}
+{"line":80,"op":"hp","side":"far","hp":79}
+{"line":80,"op":"print","text":"The opposing Latias was hurt by the Life Orb!"}
+{"line":91,"op":"print","text":"Go! Delphox!"}
+{"line":91,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
+{"line":92,"op":"turn","number":5}
+{"line":95,"op":"print","text":"The opposing Latias used Defog!"}
+{"line":95,"op":"move","user":"far","target":"near","move":432,"animTurn":0}
+{"line":96,"op":"stat","side":"near","stat":"evasion","stages":-1,"arrows":"one"}
+{"line":96,"op":"print","text":"Delphox's evasiveness fell!"}
+{"line":97,"op":"print","text":"The opposing Latias blew away Stealth Rock!"}
+{"line":98,"op":"print","text":"Delphox used Calm Mind!"}
+{"line":98,"op":"move","user":"near","target":"near","move":347,"animTurn":0}
+{"line":99,"op":"stat","side":"near","stat":"spa","stages":1,"arrows":"several"}
+{"line":99,"op":"print","text":"Delphox's Sp. Atk rose!"}
+{"line":100,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
+{"line":100,"op":"print","text":"Delphox's Sp. Def rose!"}
+{"line":103,"op":"turn","number":6}
+{"line":106,"op":"print","text":"The opposing Latias used Draco Meteor!"}
+{"line":106,"op":"move","user":"far","target":"near","move":434,"animTurn":0}
+{"line":107,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":107,"op":"hp","side":"near","hp":45}
+{"line":108,"op":"stat","side":"far","stat":"spa","stages":-2,"arrows":"one"}
+{"line":108,"op":"print","text":"The opposing Latias's Sp. Atk harshly fell!"}
+{"line":109,"op":"hp","side":"far","hp":69}
+{"line":109,"op":"print","text":"The opposing Latias was hurt by the Life Orb!"}
+{"line":110,"op":"print","text":"Delphox used Calm Mind!"}
+{"line":110,"op":"move","user":"near","target":"near","move":347,"animTurn":0}
+{"line":111,"op":"stat","side":"near","stat":"spa","stages":1,"arrows":"several"}
+{"line":111,"op":"print","text":"Delphox's Sp. Atk rose!"}
+{"line":112,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
+{"line":112,"op":"print","text":"Delphox's Sp. Def rose!"}
+{"line":115,"op":"turn","number":7}
+{"line":118,"op":"print","text":"primary trout withdrew Latias!"}
+{"line":118,"op":"withdraw","side":"far"}
+{"line":118,"op":"print","text":"primary trout sent out Tyranitar!"}
+{"line":118,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":119,"op":"ability","side":"far","ability":45,"show":true}
+{"line":119,"op":"weather","weather":"sand"}
+{"line":119,"op":"print","text":"A sandstorm kicked up!"}
+{"line":119,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":119,"op":"ability","side":"far","ability":45,"show":false}
+{"line":120,"op":"print","text":"Delphox used Calm Mind!"}
+{"line":120,"op":"move","user":"near","target":"near","move":347,"animTurn":0}
+{"line":121,"op":"stat","side":"near","stat":"spa","stages":1,"arrows":"several"}
+{"line":121,"op":"print","text":"Delphox's Sp. Atk rose!"}
+{"line":122,"op":"stat","side":"near","stat":"spd","stages":1,"arrows":"none"}
+{"line":122,"op":"print","text":"Delphox's Sp. Def rose!"}
+{"line":124,"op":"print","text":"The sandstorm is raging."}
+{"line":124,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":125,"op":"print","text":"Delphox is buffeted by the sandstorm!"}
+{"line":125,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":125,"op":"hp","side":"near","hp":39}
+{"line":127,"op":"turn","number":8}
+{"line":130,"op":"print","text":"primary trout withdrew Tyranitar!"}
+{"line":130,"op":"withdraw","side":"far"}
+{"line":130,"op":"print","text":"primary trout sent out Latias!"}
+{"line":130,"op":"switchIn","side":"far","slot":4,"hp":69,"status":"none"}
+{"line":131,"op":"print","text":"Delphox used Dazzling Gleam!"}
+{"line":131,"op":"move","user":"near","target":"far","move":605,"animTurn":0}
+{"line":133,"op":"hit","side":"far","effectiveness":"super"}
+{"line":133,"op":"hp","side":"far","hp":0}
+{"line":133,"op":"print","text":"It's super effective!"}
+{"line":134,"op":"faint","side":"far"}
+{"line":134,"op":"print","text":"The opposing Latias fainted!"}
+{"line":136,"op":"print","text":"The sandstorm is raging."}
+{"line":136,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":137,"op":"print","text":"Delphox is buffeted by the sandstorm!"}
+{"line":137,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":137,"op":"hp","side":"near","hp":33}
+{"line":141,"op":"print","text":"primary trout sent out Landorus!"}
+{"line":141,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":142,"op":"ability","side":"far","ability":22,"show":true}
+{"line":143,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"one"}
+{"line":143,"op":"print","text":"Delphox's Attack fell!"}
+{"line":142,"op":"ability","side":"far","ability":22,"show":false}
+{"line":144,"op":"turn","number":9}
+{"line":147,"op":"print","text":"The opposing Landorus used Knock Off!"}
+{"line":147,"op":"move","user":"far","target":"near","move":282,"animTurn":0}
+{"line":149,"op":"hit","side":"near","effectiveness":"super"}
+{"line":149,"op":"hp","side":"near","hp":0}
+{"line":149,"op":"print","text":"It's super effective!"}
+{"line":150,"op":"print","text":"The opposing Landorus knocked off Delphox's Salac Berry!"}
+{"line":150,"op":"item","side":"near","slot":0,"item":0}
+{"line":151,"op":"faint","side":"near"}
+{"line":151,"op":"print","text":"Delphox fainted!"}
+{"line":153,"op":"print","text":"The sandstorm is raging."}
+{"line":153,"op":"anim","side":"far","anim":"sandstormContinues"}
+{"line":157,"op":"print","text":"Go! Charizard!"}
+{"line":157,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":158,"op":"turn","number":10}
+{"line":161,"op":"print","text":"primary trout withdrew Landorus!"}
+{"line":161,"op":"withdraw","side":"far"}
+{"line":161,"op":"print","text":"primary trout sent out Rotom!"}
+{"line":161,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
+{"line":163,"op":"flushTextBox"}
+{"line":163,"op":"print","text":"Charizard's Charizardite Y is reacting to Johnald714's Mega Ring!"}
+{"line":163,"op":"formChange","side":"near","species":908}
+{"line":163,"op":"print","text":"Charizard has Mega Evolved into Mega Charizard!"}
+{"line":164,"op":"ability","side":"near","ability":70,"show":true}
+{"line":164,"op":"weather","weather":"sun"}
+{"line":164,"op":"print","text":"The sunlight turned harsh!"}
+{"line":164,"op":"anim","side":"near","anim":"sunContinues"}
+{"line":164,"op":"ability","side":"near","ability":70,"show":false}
+{"line":165,"op":"print","text":"Charizard used Solar Beam!"}
+{"line":166,"op":"print","text":"Charizard absorbed light!"}
+{"line":166,"op":"move","user":"near","target":"near","move":76,"animTurn":0}
+{"line":167,"op":"move","user":"near","target":"far","move":76,"animTurn":1}
+{"line":170,"op":"hit","side":"far","effectiveness":"super"}
+{"line":170,"op":"hp","side":"far","hp":0}
+{"line":170,"op":"print","text":"A critical hit!"}
+{"line":170,"op":"print","text":"It's super effective!"}
+{"line":171,"op":"faint","side":"far"}
+{"line":171,"op":"print","text":"The opposing Rotom fainted!"}
+{"line":173,"op":"print","text":"The sunlight is strong."}
+{"line":173,"op":"anim","side":"near","anim":"sunContinues"}
+{"line":177,"op":"print","text":"primary trout sent out Tyranitar!"}
+{"line":177,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":178,"op":"ability","side":"far","ability":45,"show":true}
+{"line":178,"op":"weather","weather":"sand"}
+{"line":178,"op":"print","text":"A sandstorm kicked up!"}
+{"line":178,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":178,"op":"ability","side":"far","ability":45,"show":false}
+{"line":179,"op":"turn","number":11}
+{"line":182,"op":"print","text":"Charizard, come back!"}
+{"line":182,"op":"withdraw","side":"near"}
+{"line":182,"op":"print","text":"Go! Emboar!"}
+{"line":182,"op":"switchIn","side":"near","slot":5,"hp":100,"status":"none"}
+{"line":183,"op":"print","text":"The opposing Tyranitar used Stone Edge!"}
+{"line":183,"op":"move","user":"far","target":"near","move":444,"animTurn":0}
+{"line":184,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":184,"op":"hp","side":"near","hp":46}
+{"line":186,"op":"print","text":"The sandstorm is raging."}
+{"line":186,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":187,"op":"print","text":"Emboar is buffeted by the sandstorm!"}
+{"line":187,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":187,"op":"hp","side":"near","hp":40}
+{"line":189,"op":"turn","number":12}
+{"line":192,"op":"print","text":"Emboar, come back!"}
+{"line":192,"op":"withdraw","side":"near"}
+{"line":192,"op":"print","text":"Go! Charizard!"}
+{"line":192,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":193,"op":"ability","side":"near","ability":70,"show":true}
+{"line":193,"op":"weather","weather":"sun"}
+{"line":193,"op":"print","text":"The sunlight turned harsh!"}
+{"line":193,"op":"anim","side":"near","anim":"sunContinues"}
+{"line":193,"op":"ability","side":"near","ability":70,"show":false}
+{"line":194,"op":"print","text":"primary trout withdrew Tyranitar!"}
+{"line":194,"op":"withdraw","side":"far"}
+{"line":194,"op":"print","text":"primary trout sent out Medicham!"}
+{"line":194,"op":"switchIn","side":"far","slot":0,"hp":100,"status":"none"}
+{"line":196,"op":"print","text":"The sunlight is strong."}
+{"line":196,"op":"anim","side":"near","anim":"sunContinues"}
+{"line":198,"op":"turn","number":13}
+{"line":201,"op":"print","text":"Charizard, come back!"}
+{"line":201,"op":"withdraw","side":"near"}
+{"line":201,"op":"print","text":"Go! Arcanine!"}
+{"line":201,"op":"switchIn","side":"near","slot":2,"hp":83,"status":"none"}
+{"line":202,"op":"ability","side":"near","ability":22,"show":true}
+{"line":203,"op":"stat","side":"far","stat":"atk","stages":-1,"arrows":"one"}
+{"line":203,"op":"print","text":"The opposing Medicham's Attack fell!"}
+{"line":202,"op":"ability","side":"near","ability":22,"show":false}
+{"line":204,"op":"print","text":"The opposing Medicham used Fake Out!"}
+{"line":204,"op":"move","user":"far","target":"near","move":252,"animTurn":0}
+{"line":205,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":205,"op":"hp","side":"near","hp":66}
+{"line":207,"op":"print","text":"The sunlight is strong."}
+{"line":207,"op":"anim","side":"near","anim":"sunContinues"}
+{"line":209,"op":"turn","number":14}
+{"line":212,"op":"print","text":"Arcanine used Extreme Speed!"}
+{"line":212,"op":"move","user":"near","target":"far","move":245,"animTurn":0}
+{"line":213,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":213,"op":"hp","side":"far","hp":56}
+{"line":214,"op":"print","text":"The opposing Medicham used High Jump Kick!"}
+{"line":214,"op":"move","user":"far","target":"near","move":136,"animTurn":0}
+{"line":215,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":215,"op":"hp","side":"near","hp":0}
+{"line":216,"op":"faint","side":"near"}
+{"line":216,"op":"print","text":"Arcanine fainted!"}
+{"line":218,"op":"print","text":"The sunlight is strong."}
+{"line":218,"op":"anim","side":"far","anim":"sunContinues"}
+{"line":222,"op":"print","text":"Go! Charizard!"}
+{"line":222,"op":"switchIn","side":"near","slot":1,"hp":100,"status":"none"}
+{"line":223,"op":"turn","number":15}
+{"line":226,"op":"print","text":"primary trout withdrew Medicham!"}
+{"line":226,"op":"withdraw","side":"far"}
+{"line":226,"op":"print","text":"primary trout sent out Tyranitar!"}
+{"line":226,"op":"switchIn","side":"far","slot":1,"hp":100,"status":"none"}
+{"line":227,"op":"ability","side":"far","ability":45,"show":true}
+{"line":227,"op":"weather","weather":"sand"}
+{"line":227,"op":"print","text":"A sandstorm kicked up!"}
+{"line":227,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":227,"op":"ability","side":"far","ability":45,"show":false}
+{"line":228,"op":"print","text":"Charizard used Focus Blast!"}
+{"line":228,"op":"move","user":"near","target":"far","move":411,"animTurn":0}
+{"line":230,"op":"itemPopUp","side":"far","item":555}
+{"line":230,"op":"anim","side":"far","anim":"heldItemBerry"}
+{"line":230,"op":"item","side":"far","slot":1,"item":0}
+{"line":232,"op":"hit","side":"far","effectiveness":"super"}
+{"line":232,"op":"hp","side":"far","hp":49}
+{"line":232,"op":"print","text":"It's super effective!"}
+{"line":231,"op":"print","text":"The opposing Tyranitar's Chople Berry lessened the damage it took!"}
+{"line":234,"op":"print","text":"The sandstorm is raging."}
+{"line":234,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":235,"op":"print","text":"Charizard is buffeted by the sandstorm!"}
+{"line":235,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":235,"op":"hp","side":"near","hp":94}
+{"line":237,"op":"turn","number":16}
+{"line":241,"op":"print","text":"primary trout withdrew Tyranitar!"}
+{"line":241,"op":"withdraw","side":"far"}
+{"line":241,"op":"print","text":"primary trout sent out Scizor!"}
+{"line":241,"op":"switchIn","side":"far","slot":5,"hp":100,"status":"none"}
+{"line":242,"op":"print","text":"Charizard used Focus Blast!"}
+{"line":242,"op":"move","user":"near","target":"far","move":411,"animTurn":0}
+{"line":243,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":243,"op":"hp","side":"far","hp":48}
+{"line":244,"op":"stat","side":"far","stat":"spd","stages":-1,"arrows":"one"}
+{"line":244,"op":"print","text":"The opposing Scizor's Sp. Def fell!"}
+{"line":246,"op":"print","text":"The sandstorm is raging."}
+{"line":246,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":247,"op":"print","text":"Charizard is buffeted by the sandstorm!"}
+{"line":247,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":247,"op":"hp","side":"near","hp":88}
+{"line":249,"op":"turn","number":17}
+{"line":252,"op":"print","text":"The opposing Scizor used Bullet Punch!"}
+{"line":252,"op":"move","user":"far","target":"near","move":418,"animTurn":0}
+{"line":254,"op":"hit","side":"near","effectiveness":"resisted"}
+{"line":254,"op":"hp","side":"near","hp":52}
+{"line":254,"op":"print","text":"It's not very effective…"}
+{"line":255,"op":"print","text":"Charizard used Fire Blast!"}
+{"line":255,"op":"move","user":"near","target":"far","move":126,"animTurn":0}
+{"line":257,"op":"hit","side":"far","effectiveness":"super"}
+{"line":257,"op":"hp","side":"far","hp":0}
+{"line":257,"op":"print","text":"It's super effective!"}
+{"line":258,"op":"faint","side":"far"}
+{"line":258,"op":"print","text":"The opposing Scizor fainted!"}
+{"line":260,"op":"print","text":"The sandstorm is raging."}
+{"line":260,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":261,"op":"print","text":"Charizard is buffeted by the sandstorm!"}
+{"line":261,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":261,"op":"hp","side":"near","hp":46}
+{"line":265,"op":"print","text":"primary trout sent out Landorus!"}
+{"line":265,"op":"switchIn","side":"far","slot":2,"hp":100,"status":"none"}
+{"line":266,"op":"ability","side":"far","ability":22,"show":true}
+{"line":267,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"one"}
+{"line":267,"op":"print","text":"Charizard's Attack fell!"}
+{"line":266,"op":"ability","side":"far","ability":22,"show":false}
+{"line":268,"op":"turn","number":18}
+{"line":271,"op":"print","text":"The opposing Landorus used Stone Edge!"}
+{"line":271,"op":"move","user":"far","target":"near","move":444,"animTurn":0}
+{"line":273,"op":"hit","side":"near","effectiveness":"super"}
+{"line":273,"op":"hp","side":"near","hp":0}
+{"line":273,"op":"print","text":"It's super effective!"}
+{"line":274,"op":"faint","side":"near"}
+{"line":274,"op":"print","text":"Charizard fainted!"}
+{"line":277,"op":"print","text":"The sandstorm is raging."}
+{"line":277,"op":"anim","side":"far","anim":"sandstormContinues"}
+{"line":281,"op":"print","text":"Go! Typhlosion!"}
+{"line":281,"op":"switchIn","side":"near","slot":3,"hp":100,"status":"none"}
+{"line":282,"op":"turn","number":19}
+{"line":285,"op":"print","text":"Typhlosion used Eruption!"}
+{"line":285,"op":"move","user":"near","target":"far","move":284,"animTurn":0}
+{"line":287,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":287,"op":"hp","side":"far","hp":0}
+{"line":287,"op":"print","text":"A critical hit!"}
+{"line":288,"op":"faint","side":"far"}
+{"line":288,"op":"print","text":"The opposing Landorus fainted!"}
+{"line":290,"op":"weather","weather":"none"}
+{"line":290,"op":"print","text":"The sandstorm subsided."}
+{"line":294,"op":"print","text":"primary trout sent out Tyranitar!"}
+{"line":294,"op":"switchIn","side":"far","slot":1,"hp":49,"status":"none"}
+{"line":295,"op":"ability","side":"far","ability":45,"show":true}
+{"line":295,"op":"weather","weather":"sand"}
+{"line":295,"op":"print","text":"A sandstorm kicked up!"}
+{"line":295,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":295,"op":"ability","side":"far","ability":45,"show":false}
+{"line":296,"op":"turn","number":20}
+{"line":299,"op":"print","text":"Typhlosion, come back!"}
+{"line":300,"op":"print","text":"The opposing Tyranitar used Pursuit!"}
+{"line":300,"op":"move","user":"far","target":"near","move":228,"animTurn":0}
+{"line":301,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":301,"op":"hp","side":"near","hp":54}
+{"line":302,"op":"withdraw","side":"near"}
+{"line":302,"op":"print","text":"Go! Emboar!"}
+{"line":302,"op":"switchIn","side":"near","slot":5,"hp":40,"status":"none"}
+{"line":304,"op":"print","text":"The sandstorm is raging."}
+{"line":304,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":305,"op":"print","text":"Emboar is buffeted by the sandstorm!"}
+{"line":305,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":305,"op":"hp","side":"near","hp":33}
+{"line":307,"op":"turn","number":21}
+{"line":310,"op":"print","text":"Emboar used Superpower!"}
+{"line":310,"op":"move","user":"near","target":"far","move":276,"animTurn":0}
+{"line":312,"op":"hit","side":"far","effectiveness":"super"}
+{"line":312,"op":"hp","side":"far","hp":0}
+{"line":312,"op":"print","text":"It's super effective!"}
+{"line":313,"op":"stat","side":"near","stat":"atk","stages":-1,"arrows":"several"}
+{"line":313,"op":"print","text":"Emboar's Attack fell!"}
+{"line":314,"op":"stat","side":"near","stat":"def","stages":-1,"arrows":"none"}
+{"line":314,"op":"print","text":"Emboar's Defense fell!"}
+{"line":315,"op":"faint","side":"far"}
+{"line":315,"op":"print","text":"The opposing Tyranitar fainted!"}
+{"line":317,"op":"print","text":"The sandstorm is raging."}
+{"line":317,"op":"anim","side":"near","anim":"sandstormContinues"}
+{"line":318,"op":"print","text":"Emboar is buffeted by the sandstorm!"}
+{"line":318,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":318,"op":"hp","side":"near","hp":27}
+{"line":322,"op":"print","text":"primary trout sent out Medicham!"}
+{"line":322,"op":"switchIn","side":"far","slot":0,"hp":56,"status":"none"}
+{"line":323,"op":"turn","number":22}
+{"line":326,"op":"print","text":"The opposing Medicham used Fake Out!"}
+{"line":326,"op":"move","user":"far","target":"near","move":252,"animTurn":0}
+{"line":327,"op":"hit","side":"near","effectiveness":"normal"}
+{"line":327,"op":"hp","side":"near","hp":0}
+{"line":328,"op":"faint","side":"near"}
+{"line":328,"op":"print","text":"Emboar fainted!"}
+{"line":330,"op":"print","text":"The sandstorm is raging."}
+{"line":330,"op":"anim","side":"far","anim":"sandstormContinues"}
+{"line":331,"op":"print","text":"The opposing Medicham is buffeted by the sandstorm!"}
+{"line":331,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":331,"op":"hp","side":"far","hp":50}
+{"line":335,"op":"print","text":"Go! Typhlosion!"}
+{"line":335,"op":"switchIn","side":"near","slot":3,"hp":54,"status":"none"}
+{"line":336,"op":"turn","number":23}
+{"line":339,"op":"print","text":"Typhlosion used Fire Blast!"}
+{"line":339,"op":"move","user":"near","target":"far","move":126,"animTurn":0}
+{"line":340,"op":"hit","side":"far","effectiveness":"normal"}
+{"line":340,"op":"hp","side":"far","hp":0}
+{"line":341,"op":"faint","side":"far"}
+{"line":341,"op":"print","text":"The opposing Medicham fainted!"}
+{"line":344,"op":"print","text":"Johnald714 won the battle!"}
+{"line":344,"op":"end","outcome":"nearWon"}
+{"line":47,"fallback":"mechanic","detail":"no state in the stream for Mega Evolution starting"}
+{"line":163,"fallback":"mechanic","detail":"no state in the stream for Mega Evolution starting"}
+{"line":192,"fallback":"mechanic","detail":"Charizard-Mega-Y comes back in its form before Mega Evolution"}
+{"line":194,"fallback":"mechanic","detail":"Medicham-Mega comes back in its form before Mega Evolution"}
+{"line":222,"fallback":"mechanic","detail":"Charizard-Mega-Y comes back in its form before Mega Evolution"}
+{"line":322,"fallback":"mechanic","detail":"Medicham-Mega comes back in its form before Mega Evolution"}

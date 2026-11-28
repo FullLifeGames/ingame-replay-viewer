@@ -6,6 +6,7 @@ import { toID } from '@pkmn/dex'
 import type { Effect } from '../../script/types'
 import {
   held,
+  itemName,
   type Mon,
   moveName,
   nameAtStart,
@@ -98,6 +99,20 @@ export const EFFECT_TEMPLATES = {
   storingEnergy: tagged('STRINGID_PKMNSTORINGENERGY', start('is storing energy!')),
   terastallized: tagged('STRINGID_PKMNTERASTALLIZEDINTO', (who: Mon, type: string) => {
     return `${nameAtStart(who)} terastallized into the ${type} type!`
+  }),
+  // `BattleScript_MegaEvolution` says the first line, changes the form, then the second, with
+  // B_BUFF1 the new species' name. B_ATK_TRAINER_NAME is the player of the Pokémon's side.
+  megaReacting: tagged(
+    'STRINGID_MEGAEVOREACTING',
+    (who: Mon, item: string, trainer: string) =>
+      `${ownerAtStart(who)} ${item} is reacting to ${trainer}'s Mega Ring!`,
+  ),
+  megaEvolved: tagged('STRINGID_MEGAEVOEVOLVED', (who: Mon, species: string) => {
+    return `${nameAtStart(who)} has Mega Evolved into Mega ${species}!`
+  }),
+  // `BattleScript_WishMegaEvolution` says it in place of the first line, for Rayquaza.
+  megaWish: tagged('STRINGID_FERVENTWISHREACHED', (trainer: string, who: Mon) => {
+    return `${trainer}'s fervent wish has reached ${nameInside(who)}!`
   }),
   unleashedEnergy: tagged('STRINGID_PKMNUNLEASHEDENERGY', start('unleashed its energy!')),
   // `BattleScript_RageIsBuilding` says it after a hit raises the Attack of a Pokémon in a rage
@@ -288,4 +303,20 @@ export const formChanged = (who: Mon) => E.formChanged.render(who)
 export const terastallizing = (who: Mon, type: string): readonly [string, string] => [
   E.storingEnergy.render(who),
   E.terastallized.render(who, type),
+]
+
+/**
+ * The two lines of `who`'s Mega Evolution into `species` by `item`, held by `trainer`'s side, in
+ * the order the game says them. With no stone (Rayquaza) the wish takes the first line's place.
+ */
+export const megaEvolving = (
+  who: Mon,
+  item: string | undefined,
+  trainer: string,
+  species: string,
+): readonly [string, string] => [
+  item === undefined
+    ? E.megaWish.render(trainer, who)
+    : E.megaReacting.render(who, itemName(item), trainer),
+  E.megaEvolved.render(who, speciesName(species)),
 ]

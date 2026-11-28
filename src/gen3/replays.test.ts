@@ -7,7 +7,7 @@ import type { Side } from '../script/types'
 import { REPLAYS, replayScript } from '../script/testing'
 import { crc32 } from '../patch/crc32'
 import { buildGen3Stream, type Gen3Stream } from './backend'
-import { type Fallback, illusionGap, mechanicGap, showsInPlace } from './fallbacks'
+import { type Fallback, illusionGap, mechanicGap, megaReturnGap, showsInPlace } from './fallbacks'
 import { decodeStream } from './stream/decode'
 import { itemOf } from './tables/lookup'
 import { itemGaps } from './tables/testing'
@@ -39,15 +39,20 @@ const charsetRead = (text: string) => decodeText(encodeText(text))
  * The mechanic fallbacks the test replays may take, each a look or a state the stream lacks:
  * Perish Song's first count, whose later counts print; Bide's first turn, which the expansion
  * shows as the move alone; Protosynthesis's end, which the expansion has no message for; and
- * Illusion's end, which the stream plays as a switch (#98), in both Gen 9 random battles. A new
- * one fails until it is named here, and one that no test replay takes fails unless NAMED_AHEAD
- * holds it.
+ * Illusion's end, which the stream plays as a switch (#98), in both Gen 9 random battles; and in
+ * both Gen 6 OU replays the Mega's own look, and each of the four Megas coming back in its form
+ * before Mega Evolution (#125), which #126 takes away. A new one fails until it is named here, and
+ * one that no test replay takes fails unless NAMED_AHEAD holds it.
  */
 const NAMED_MECHANICS: ReadonlySet<string> = new Set([
   mechanicGap('perish3', 'starting').detail,
   mechanicGap('Bide', 'starting').detail,
   mechanicGap('Protosynthesis', 'ending').detail,
   illusionGap().detail,
+  mechanicGap('Mega Evolution', 'starting').detail,
+  ...['Venusaur-Mega', 'Alakazam-Mega', 'Charizard-Mega-Y', 'Medicham-Mega'].map(
+    (species) => megaReturnGap(species).detail,
+  ),
 ])
 
 /**

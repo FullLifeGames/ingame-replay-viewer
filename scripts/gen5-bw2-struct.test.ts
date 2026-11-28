@@ -167,6 +167,70 @@ describe("structLayout on the direct entry's shapes", () => {
   })
 })
 
+// Invented typedef enums in the shape of NitroSystem's image proxies: one untagged, one tagged with
+// a shifted value, and one whose last member counts the others and sizes an array.
+const ENUM_SOURCE = `
+typedef enum {
+    SHADE_DIM,
+    SHADE_BRIGHT,
+} Shade;
+
+typedef enum GlowTag {
+    GLOW_SOFT = 1 << 2,
+} Glow;
+
+typedef enum {
+    SHELF_TOP,
+    SHELF_MID,
+    SHELF_LOW,
+    SHELF_COUNT
+} ShelfKind;
+
+struct Lantern {
+    u8 wick;
+    Shade shade;
+    Glow glow;
+    u16 tail;
+};
+
+typedef struct {
+    u8 label;
+    u16 books[SHELF_COUNT];
+} Bookcase;
+`
+
+// Scene: NitroSystem's image attributes are SDK enums, and every offset of ClActor after imgProxy
+// depends on their size; one of its locations sizes an array by an enum's last member (#137).
+describe('structLayout on enums', () => {
+  it('lays out a member of a typedef enum as a word', () => {
+    expect(structLayout(ENUM_SOURCE, 'Lantern')).toEqual({
+      size: 16,
+      align: 4,
+      fields: {
+        wick: { offset: 0, size: 1 },
+        shade: { offset: 4, size: 4 },
+        glow: { offset: 8, size: 4 },
+        tail: { offset: 12, size: 2 },
+      },
+    })
+  })
+
+  it("takes an enum member as an array's length", () => {
+    expect(structLayout(ENUM_SOURCE, 'Bookcase')).toEqual({
+      size: 8,
+      align: 2,
+      fields: { label: { offset: 0, size: 1 }, books: { offset: 2, size: 6 } },
+    })
+  })
+
+  it('throws by name on a length that is no literal, define or enum member', () => {
+    const odd = ENUM_SOURCE.replace('books[SHELF_COUNT]', 'books[SHELF_GONE]')
+    expect(() => structLayout(odd, 'Bookcase')).toThrow(
+      'the array length SHELF_GONE is no literal, define or enum member',
+    )
+  })
+})
+
 // Scene: a battle condition is a union of structs, and the reader lays out one of them by its body.
 describe('memberLayout', () => {
   it("lays out one struct of a union by its body's members", () => {

@@ -12,7 +12,8 @@ type Named = typeof NAMED_KINDS
 const KINDS = Object.keys(Protocol.ARGS) as Protocol.ArgName[]
 
 // `dropReasonOf` decides `||` by its text. `|player|` and `|-singleturn|` (Roost's) have a rule
-// and drop by their line too; the rule is their place.
+// and drop by their line too; the rule is their place. `|detailschange|` drops a Mega's lines by
+// their line too; the named list is its place.
 const BY_LINE: readonly Protocol.ArgName[] = ['||']
 
 function placesOf(kind: Protocol.ArgName, named: Named = NAMED_KINDS): string[] {
@@ -62,6 +63,12 @@ describe('the kind census', () => {
   it('gives Terastallization a rule and takes it off the named list (#88)', () => {
     expect(ruleFor('|-terastallize|')).toBeDefined()
     expect(NAMED_KINDS['|-terastallize|']).toBeUndefined()
+  })
+
+  it('gives Mega Evolution a rule and keeps the other forme changes on the named list (#125)', () => {
+    expect(ruleFor('|-mega|')).toBeDefined()
+    expect(NAMED_KINDS['|-mega|']).toBeUndefined()
+    expect(NAMED_KINDS['|detailschange|']?.reason).toMatch(/other than Mega Evolution/)
   })
 
   it('gives every named kind a reason', () => {

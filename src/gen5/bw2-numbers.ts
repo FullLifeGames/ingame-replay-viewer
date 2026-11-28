@@ -2,6 +2,7 @@
 // scripts/gen5-bw2.ts generates them into build/gen5/bw2.json at run time (D4); nothing of pokebw2
 // is committed, and the pure modules here take the numbers as input and hold none of the game's.
 import type { EffectNumbers, FlowNumbers } from './bw2-flow-numbers.ts'
+import type { GaugeNumbers } from './bw2-gauge-numbers.ts'
 
 /** One symbol of the ds-decomp config: a function, data, bss or a label, at its retail address. */
 export interface Bw2Symbol {
@@ -269,8 +270,9 @@ export interface TextBoxNumbers {
 
 /** The version of build/gen5/bw2.json's shape: scripts/gen5-bw2.ts writes it, and numbersOf
  * (src/gen5/build-files.ts) refuses a file of another version or of none. Raise it whenever a key
- * joins, leaves or changes. 2 since the text box joined (#118); the files before it carry none. */
-export const BW2_NUMBERS_VERSION = 2
+ * joins, leaves or changes. 2 since the text box joined (#118), 3 since the gauge did (#137); the
+ * files before the text box carry none. */
+export const BW2_NUMBERS_VERSION = 3
 
 /** The whole of build/gen5/bw2.json. */
 export interface Bw2Numbers extends ServerCmdTable {
@@ -295,4 +297,5 @@ export interface Bw2Numbers extends ServerCmdTable {
   flow: FlowNumbers
   effects: EffectNumbers
   textBox: TextBoxNumbers
+  gauge: GaugeNumbers
 }

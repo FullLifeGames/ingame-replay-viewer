@@ -6,13 +6,15 @@ import { describe, expect, it } from 'vitest'
 
 import build from '../../../rom/gen3/build.json'
 import { REPLAYS, replayScript } from '../../script/testing'
+import { PLAYED_GENS } from '../backend'
 import { abilityOf, constantOf, itemOf, moveOf, speciesOf, typeOf } from './lookup'
 import type { Found } from './lookup'
 import meta from './meta.json'
 import { gens, itemGaps, names } from './testing'
 import types from './types.json'
 
-const GENS = [1, 2, 3, 4, 5, 9] as const
+/** The generations the gate plays, so the tables follow it. */
+const GENS = PLAYED_GENS
 
 /** The species the expansion lacks, by generation: Rockruff-Dusk shows Rockruff (D11). */
 const SPECIES_GAPS: Readonly<Partial<Record<number, readonly string[]>>> = { 9: ['Rockruff-Dusk'] }

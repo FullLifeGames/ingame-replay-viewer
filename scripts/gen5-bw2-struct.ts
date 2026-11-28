@@ -6,13 +6,14 @@
 // little-endian target, and starts a new container when it would cross one, and an unnamed one
 // only takes its bits. One rule is the game's compiler's own (MWCC, #97): a 64-bit scalar sits at
 // a multiple of 4, not of 8, as pokebw2's TimeSigSave and FestMissionConfig show by their padding
-// names and size comment. A typedef of a function pointer is a pointer, a typedef of a scalar is
-// that scalar, `const` changes nothing, and an array's length may be a define of the source.
+// names and size comment. So is a second (#137): a typedef enum is a word, as MWCC gives an enum
+// an int. A typedef of a function pointer is a pointer, a typedef of a scalar is that scalar,
+// `const` changes nothing, and an array's length may be a define or an enum member of the source.
 // Members of any other shape (unions, anonymous structs, unknown types) throw, unless the layout
 // stops before them: a member's offset depends only on the members before it. One struct inside a
 // union is laid out by its body text alone (memberLayout, #109).
 import type { FieldLayout, StructLayout } from '../src/gen5/bw2-numbers.ts'
-import { closingBrace, defineValue, literal, stripComments } from './gen5-bw2-c.ts'
+import { closingBrace, defineValue, enumAround, literal, stripComments } from './gen5-bw2-c.ts'
 
 /** Sizes of the scalar types the battle structs use (pokebw2 include/types.h, ARM9). */
 const SCALARS: Readonly<Record<string, number>> = {
@@ -87,18 +88,35 @@ const isFunctionPointer = (code: string, type: string) =>
 const scalarTypedef = (code: string, type: string) =>
   new RegExp(`\\btypedef\\s+(\\w+)\\s+${type}\\s*;`).exec(code)?.[1]
 
+/** True when `type` is a typedef of an enum, `typedef enum [tag] { ... } type;`. */
+const isEnumTypedef = (code: string, type: string) =>
+  new RegExp(`\\btypedef\\s+enum\\s*\\w*\\s*\\{[^}]*\\}\\s*${type}\\s*;`).test(code)
+
 function unitOf(code: string, type: string, pointer: boolean): StructLayout {
   if (pointer || isFunctionPointer(code, type)) return { size: POINTER, align: POINTER, fields: {} }
+  if (isEnumTypedef(code, type)) return { size: WORD, align: WORD, fields: {} }
   const scalar = SCALARS[type] ?? SCALARS[scalarTypedef(code, type) ?? '']
   if (scalar === undefined) return layoutOf(code, type)
   return { size: scalar, align: Math.min(scalar, WORD), fields: {} }
 }
 
-/** The element count of `[a][b]...`, each a literal or a define of the source. */
+/** One dimension: a literal, a `#define` of the source, or a member of one of its enums. */
+function countOf(code: string, text: string): number {
+  const name = text.trim()
+  const plain = literal(name)
+  if (plain !== undefined) return plain
+  if (new RegExp(`^\\s*#define\\s+${name}\\b`, 'm').test(code)) return defineValue(code, name)
+  if (!new RegExp(`\\benum\\b[^{;]*\\{[^}]*\\b${name}\\b`).test(code)) {
+    throw new Error(`the array length ${name} is no literal, define or enum member`)
+  }
+  return enumAround(code, name)[name] ?? 0
+}
+
+/** The element count of `[a][b]...`, each by countOf. */
 function lengthOf(code: string, dimensions: string): number {
-  const counts = [...dimensions.matchAll(/\[([^\]]+)\]/g)].map(([, count = '']) => {
-    return literal(count) ?? defineValue(code, count.trim())
-  })
+  const counts = [...dimensions.matchAll(/\[([^\]]+)\]/g)].map(([, count = '']) =>
+    countOf(code, count),
+  )
   return counts.reduce((product, count) => product * count, 1)
 }
 
@@ -157,13 +175,15 @@ export function memberLayout(source: string, body: string): StructLayout {
   return placeAll(stripComments(source), splitMembers(stripComments(body)))
 }
 
-/** The layout of the struct `name`; throws naming the struct and each of `members` it lacks. */
+/** The layout of the struct `name`, up to and with `upTo` if given; throws naming the struct and
+ * each of `members` it lacks. */
 export function checkedLayout(
   source: string,
   name: string,
   members: readonly string[],
+  upTo?: string,
 ): StructLayout {
-  const layout = structLayout(source, name)
+  const layout = structLayout(source, name, upTo)
   const missing = members.filter((member) => layout.fields[member] === undefined)
   if (missing.length > 0) throw new Error(`${name} lacks ${missing.join(', ')}`)
   return layout
