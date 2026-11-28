@@ -4,6 +4,7 @@
 // after the mark battle (src/gen5/replay-run.ts); at the play's end it says how the battle ended,
 // or where the play stopped. A run queued from outside wins (lane plan D14), a save in the address
 // is refused (D15), and a waiting block marks its first frame alone unless `?every=` asks (D8).
+// A refusal fails the progress too, so a script that reads window.gen5.replay() learns why.
 // The hook, RAM, the status line, the build files and the timer come in as parameters.
 import type { Bw2Numbers } from '../../gen5/bw2-numbers.ts'
 import type { Gen5Hook, ReplayProgress, RunPlan, RunReport } from '../../gen5/hook.ts'
@@ -52,6 +53,15 @@ function everyOf(search: string): number | undefined | { problem: string } {
   return /^[1-9]\d*$/.test(value) ? Number(value) : { problem: everyRefused(value) }
 }
 
+/** The address's frame count, or why a replay does not start from this address. */
+function addressOf(search: string): { every: number | undefined } | { problem: string } {
+  if (saveName(search) !== undefined || saveQueryProblem(search) !== undefined) {
+    return { problem: SAVE_REFUSED }
+  }
+  const every = everyOf(search)
+  return typeof every === 'object' ? every : { every }
+}
+
 /** What a play needs once the replay is loaded. */
 interface Loaded extends LoadedReplay {
   choice: ReplayChoice
@@ -86,16 +96,14 @@ class ReplayPlayer {
 
   /** True when the emulator may start: with the entry queued, or with a run from outside. */
   async start(choice: ReplayChoice, search: string): Promise<boolean> {
-    const every = everyOf(search)
-    if (saveName(search) !== undefined || saveQueryProblem(search) !== undefined) {
-      return this.stop(SAVE_REFUSED)
-    }
-    if (typeof every === 'object') return this.stop(every.problem)
-    if (this.deps.hook.runReport().status === 'queued') {
+    const address = addressOf(search)
+    if (!('problem' in address) && this.deps.hook.runReport().status === 'queued') {
       this.deps.say(OUTSIDE_RUN)
       return true
     }
     this.progress = { phase: 'loading', replay: choice.id, block: 0, blocks: 0 }
+    if ('problem' in address) return this.stop(address.problem)
+    const { every } = address
     this.deps.say(loadingLine(choice.label))
     const files = await this.deps.buildFiles()
     if ('problem' in files) return this.stop(files.problem)

@@ -6,7 +6,7 @@ import { POKEBW2 } from '../../gen5/pokebw2-pin'
 
 const NUMBERS = { pokebw2: { ...POKEBW2 } }
 
-type Answer = { status: number; body: string } | 'unreachable'
+type Answer = { status: number; body: string } | 'unreachable' | 'cut off'
 
 /** A server that answers each path from `answers` (a 404 for any other), logging what the page
  * asked for. */
@@ -16,6 +16,12 @@ function server(answers: Record<string, Answer>) {
     asked.push(args)
     const answer = answers[String(args[0])] ?? { status: 404, body: '' }
     if (answer === 'unreachable') return Promise.reject(new TypeError('Failed to fetch'))
+    if (answer === 'cut off') {
+      return Promise.resolve({
+        status: 200,
+        text: () => Promise.reject(new TypeError('network error')),
+      })
+    }
     return Promise.resolve({ status: answer.status, text: () => Promise.resolve(answer.body) })
   }
   return { asked, fetcher }
@@ -75,6 +81,14 @@ describe('fetchBuildFiles', () => {
     const { fetcher } = server({ ...BOTH, '/gen5-build/routine.json': 'unreachable' })
     expect(await fetchBuildFiles(fetcher)).toEqual({
       problem: 'The page could not reach its server for build/gen5/routine.json.',
+    })
+  })
+
+  // Scene: the server answers 200 and the connection breaks while the page reads the body.
+  it('says the server could not be reached when the body fails to read', async () => {
+    const { fetcher } = server({ ...BOTH, '/gen5-build/bw2.json': 'cut off' })
+    expect(await fetchBuildFiles(fetcher)).toEqual({
+      problem: 'The page could not reach its server for build/gen5/bw2.json.',
     })
   })
 

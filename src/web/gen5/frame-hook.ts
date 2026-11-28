@@ -120,10 +120,24 @@ class FrameDriver {
     this.ended = true
   }
 
-  /** Each listener hears the run's end; a run one of them queues starts on a later frame. */
+  /** Each listener hears the run's end; a run one of them queues starts on a later frame. A
+   * listener that throws stops neither the others nor the frame callback: once all have heard
+   * the end, the report fails with the first throw and a run queued meanwhile is dropped, as the
+   * chain of runs is broken. */
   private tell(): void {
     this.ended = false
-    for (const listener of this.listeners) listener(this.report)
+    let thrown: string | undefined
+    for (const listener of this.listeners) {
+      try {
+        listener(this.report)
+      } catch (error) {
+        thrown ??= `a run-end listener threw: ${String(error)}`
+      }
+    }
+    if (thrown === undefined) return
+    this.queued = undefined
+    this.report.status = 'failed'
+    this.report.failed = thrown
   }
 
   private onFrame(g: FrameGame, page: number, skipped: number): void {

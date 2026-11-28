@@ -128,6 +128,31 @@ describe('onRunEnd', () => {
     ])
   })
 
+  // Scene: a listener of the page throws at a run's end; the others still hear it, the frame
+  // callback returns, and the report says which listener broke the chain.
+  it('hears the end in every listener when one throws, and fails the report', () => {
+    const { hook, heard, iterate } = setup()
+    hook.onRunEnd(() => {
+      throw new Error('boom')
+    })
+    const after: string[] = []
+    hook.onRunEnd((report) => {
+      after.push(report.status)
+      hook.calls.queueRun(plan([{ kind: 'mark', name: 'play' }]))
+    })
+    hook.calls.queueRun(plan([begin]))
+    expect(() => {
+      iterate(4)
+    }).not.toThrow()
+    expect(heard).toEqual([{ status: 'done', frame: 0 }])
+    expect(after).toEqual(['done'])
+    expect(hook.calls.runReport()).toMatchObject({
+      status: 'failed',
+      failed: 'a run-end listener threw: Error: boom',
+    })
+    expect(hook.calls.runReport().marks.map(({ name }) => name)).toEqual(['begin'])
+  })
+
   it('counts the steps of a queued run from 0', () => {
     const { hook, iterate } = setup()
     hook.calls.queueRun(plan([{ kind: 'wait', frames: 3 }, begin]))

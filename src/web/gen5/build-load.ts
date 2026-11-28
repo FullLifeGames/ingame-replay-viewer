@@ -15,20 +15,21 @@ import type { RoutineBuild } from '../../gen5/routine-order.ts'
 
 type Fetcher = (url: string) => Promise<{ status: number; text(): Promise<string> }>
 
-/** The build file's JSON from the server by a plain GET, or the sentence why there is none. */
+/** The build file's JSON from the server by a plain GET, or the sentence why there is none. A
+ * fetch or a body read that fails means the server could not be reached. */
 async function fetchJson(
   file: BuildFile,
   fetcher: Fetcher,
 ): Promise<{ json: unknown } | { problem: string }> {
-  let answer: Awaited<ReturnType<Fetcher>>
+  let text: string
   try {
-    answer = await fetcher(buildFileUrl(file))
+    const answer = await fetcher(buildFileUrl(file))
+    const problem = buildFileProblem(file, answer.status)
+    if (problem !== undefined) return { problem }
+    text = await answer.text()
   } catch {
     return { problem: buildFileUnreachable(file) }
   }
-  const problem = buildFileProblem(file, answer.status)
-  if (problem !== undefined) return { problem }
-  const text = await answer.text()
   try {
     return { json: JSON.parse(text) as unknown }
   } catch (error) {

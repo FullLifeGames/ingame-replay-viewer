@@ -24,6 +24,7 @@ import { fixClock, wrapRuntime } from './core-runtime.ts'
 import { frameHook } from './frame-hook.ts'
 import { notShownList, notShownRows } from './not-shown.ts'
 import { showEnd, showNotShown } from './not-shown-view.ts'
+import { guardPick } from './pick-guard.ts'
 import { ramHook, readFacts } from './ram-hook.ts'
 import { replayPlayer } from './replay-player.ts'
 import { GEN5_REPLAYS, replayOptions } from './replays.ts'
@@ -239,7 +240,7 @@ async function onPick(picker: HTMLInputElement): Promise<void> {
   startEmulator(file)
 }
 
-input?.addEventListener('change', () => void onPick(input))
+input?.addEventListener('change', () => void guardPick(() => onPick(input), say))
 wireControls(settings, window.gen5)
 
 // The loop holds the page's thread for two seconds, so it runs once, before a dump is picked.

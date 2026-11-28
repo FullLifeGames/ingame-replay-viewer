@@ -115,6 +115,9 @@ const stepOf = (plan: RunPlan | undefined, kind: string, name: string) =>
 
 // Scene: the visitor picks a test replay and the dump; the page queues the direct entry before
 // the emulator starts, so the entry plays from boot's first frame.
+/** The progress of a replay refused before anything loaded, so window.gen5.replay() reads why. */
+const refused = (failed: string) => ({ phase: 'failed', replay: ID, block: 0, blocks: 0, failed })
+
 describe('replayPlayer.start', () => {
   it('queues the entry before the emulator starts', async () => {
     const { player, plans, said } = setup()
@@ -149,6 +152,7 @@ describe('replayPlayer.start', () => {
       await expect(player.start(CHOICE, search)).resolves.toBe(false)
       expect(plans).toEqual([])
       expect(said).toEqual([SAVE_REFUSED])
+      expect(player.progress()).toEqual(refused(SAVE_REFUSED))
     }
   })
 
@@ -157,6 +161,7 @@ describe('replayPlayer.start', () => {
     await expect(player.start(CHOICE, '?every=0')).resolves.toBe(false)
     expect(plans).toEqual([])
     expect(said).toEqual([everyRefused('0')])
+    expect(player.progress()).toEqual(refused(everyRefused('0')))
   })
 
   it('says why the build files are missing and does not start', async () => {
