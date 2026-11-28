@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs'
 import { chromium, type Page } from '@playwright/test'
 
 import { battleRefs } from '../src/gen5/battle-check.ts'
+import { checkedNumbers } from '../src/gen5/build-files.ts'
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import type { RunPlan } from '../src/gen5/hook.ts'
 import type { RamRef } from '../src/gen5/ram-check.ts'
@@ -20,8 +21,10 @@ import { GEN5_PATHS } from './gen5-paths.ts'
 import { logStorage, type RequestLog, watchRequests } from './gen5-requests.ts'
 import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve } from './gen5-shot-browser.ts'
 
-/** The numbers scripts/gen5-bw2.ts generated from the pinned pokebw2 checkout. */
-export const readNumbers = () => JSON.parse(readFileSync(GEN5_PATHS.bw2Json, 'utf8')) as Bw2Numbers
+/** The numbers scripts/gen5-bw2.ts generated from the pinned pokebw2 checkout, through the page's
+ * check of the pin and the version. */
+export const readNumbers = (): Bw2Numbers =>
+  checkedNumbers(JSON.parse(readFileSync(GEN5_PATHS.bw2Json, 'utf8')))
 
 /** The direct entry's routine as scripts/gen5-routine.ts built it. */
 export const readRoutine = () =>

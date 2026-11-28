@@ -2,9 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import { fetchBuildFiles } from './build-load'
 import { ROUTINE } from '../../gen5/direct-entry.fixtures'
+import { BW2_NUMBERS_VERSION } from '../../gen5/bw2-numbers'
 import { POKEBW2 } from '../../gen5/pokebw2-pin'
 
-const NUMBERS = { pokebw2: { ...POKEBW2 } }
+const NUMBERS = { version: BW2_NUMBERS_VERSION, pokebw2: { ...POKEBW2 } }
 
 type Answer = { status: number; body: string } | 'unreachable' | 'cut off'
 

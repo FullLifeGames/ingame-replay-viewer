@@ -303,9 +303,13 @@ The number Black 2's battle gives each Pokémon in it, by its side and its party
 _Avoid_: battle index, position
 
 **Gen 5 block**:
-The game's server commands for one action of a Gen 5 replay, or for one line at a turn's end, with the log lines they show. The page hands a block to the player's battle client once the client has answered the block before. A block too big for the client's room splits between two commands.
+The game's server commands for one action of a Gen 5 replay, for one line at a turn's end, or for one page of a printed line, with the log lines they show. The page hands a block to the player's battle client once the client has answered the block before. A block too big for the client's room splits between two commands.
 _Avoid_: packet, batch, moment (a moment is the spike's block of one move)
 
 **Gen 5 fallback**:
-A Gen 5 replay's note of a content gap, with its log line: a forme the game draws as its base form, a character of a name that the battle's font lacks and shows as "?", or a move past the four a Pokémon holds. An event that Black 2 does not play yet is one too (`unplayed`), until an issue plays it. So is a line Black 2 has no message for, which shows nothing, and a switch that plays as a plain one (`plain`): a drag after a move other than Roar or Whirlwind, which shows Roar's look, and a Baton Pass, whose stat stages the game does not carry over. So is what the game shows that the log does not (`game`): a lead's written ability that acts as it comes in while the log never shows it. The run lists each one.
+A Gen 5 replay's note of a content gap, with its log line: a forme the game draws as its base form, a character of a name or a printed line that the battle's font lacks and shows as "?", or a move past the four a Pokémon holds. An event that Black 2 does not play yet is one too (`unplayed`), until an issue plays it. So is a line Black 2 has no message for and the viewer does not print, which shows nothing, and a switch that plays as a plain one (`plain`): a drag after a move other than Roar or Whirlwind, which shows Roar's look, and a Baton Pass, whose stat stages the game does not carry over. So is what the game shows that the log does not (`game`): a lead's written ability that acts as it comes in while the log never shows it. The run lists each one.
 _Avoid_: warning, cut (a name cut to its room is a note, not a fallback)
+
+**Printed line**:
+A line of the battle log that Black 2 has no message for and that the viewer prints in the game's own text box, in the game's font and at its pace: a forfeit or another note of the simulator, the winner, a tie. It shows in the game and so is no Gen 5 fallback.
+_Avoid_: injected line, fake message

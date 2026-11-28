@@ -22,6 +22,7 @@ import { routeSlice } from '../src/gen5/macro.ts'
 import { newGameRoute, PLAYER_X, PLAYER_Z } from '../src/gen5/route.ts'
 import { SAVE_SLOT_BEFORE_POKEMON, saveGame } from '../src/gen5/save-menu.ts'
 import { FIELD_X, FIELD_Z, trainerRoute } from '../src/gen5/trainer-route.ts'
+import { readNumbers } from './gen5-moment-session.ts'
 import { log, logSave, sampleLine, waitForStart } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { readRouteOptions, type RouteOptions, stateBase } from './gen5-route-options.ts'
@@ -119,7 +120,7 @@ async function play(page: Page, dump: string, plan: RunPlan, options: RouteOptio
 async function run(dump: string, options: RouteOptions): Promise<number> {
   mkdirSync(GEN5_PATHS.frames, { recursive: true })
   mkdirSync(GEN5_PATHS.states, { recursive: true })
-  const numbers = JSON.parse(readFileSync(GEN5_PATHS.bw2Json, 'utf8')) as Bw2Numbers
+  const numbers = readNumbers()
   const plan = readPlan(options, battleRefs(numbers), numbers)
   log(
     `route ${options.route}: ${String(plan.steps.length)} steps from ${stateBase(options) ?? 'boot'}`,

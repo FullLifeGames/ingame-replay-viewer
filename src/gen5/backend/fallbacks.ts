@@ -6,9 +6,9 @@ import type { ScriptEvent } from '../../script/events.ts'
 
 /**
  * `form`: a forme the party writes as form 0, the species' base form. `character`: a character
- * of a name that the battle's font lacks, which shows as "?". `moves`: a move the log reveals past
- * the four a Pokémon holds. `game`: what the game shows that the log does not, as a lead's
- * written ability that acts as it comes in (#109, lane plan D4).
+ * of a name or a printed line that the battle's font lacks, which shows as "?". `moves`: a move
+ * the log reveals past the four a Pokémon holds. `game`: what the game shows that the log does
+ * not, as a lead's written ability that acts as it comes in (#109, lane plan D4).
  */
 interface TeamFallback {
   readonly line: number
@@ -17,9 +17,10 @@ interface TeamFallback {
 }
 
 /** `unplayed`: an event that Black 2 does not play yet (#110, lane plan D8). `line`: a line that
- * Black 2 has no message for, so nothing shows for it. `plain`: a switch-in that plays as a plain
- * switch or drag, and `detail` names what of it does not show. `event` is the battle script's
- * kind of the event. */
+ * Black 2 has no message for and that neither prints nor plays, so nothing shows for it; a
+ * message of the simulator, a winner and a tie print in the text box instead (#118), and an
+ * empty message is a `line`. `plain`: a switch-in that plays as a plain switch or drag, and
+ * `detail` names what of it does not show. `event` is the battle script's kind of the event. */
 interface EventFallback {
   readonly line: number
   readonly kind: 'unplayed' | 'line' | 'plain'

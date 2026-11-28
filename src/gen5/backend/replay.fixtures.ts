@@ -10,6 +10,7 @@ import { ADAPTER_LAYOUT } from '../adapter.fixtures.ts'
 import type { ArgFormat, BattleNumbers, Bw2Numbers } from '../bw2-numbers.ts'
 import { ENTRY } from '../direct-entry.fixtures.ts'
 import { TEAM_PKM } from '../pkm.fixtures.ts'
+import { TEXT_BOX_CARRIER } from '../text-box.ts'
 import type { ReplayNumbers } from './replay.ts'
 
 /** A format of `argCount` arguments, each written as a halfword. */
@@ -22,13 +23,18 @@ const halves = (code: number, argCount: number): ArgFormat => ({
   })),
 })
 
+/** The printable ASCII characters, the invented font's. */
+const ASCII = Array.from({ length: 95 }, (_, i) => String.fromCharCode(32 + i))
+
 /** The replay's numbers with the effects' and the battle's constants (#109), which the backend
- * picks once its sequences are wired. */
+ * picks once its sequences are wired, and the text box (#118). */
 export const REPLAY_NUMBERS: ReplayNumbers &
-  Pick<Bw2Numbers, 'effects'> & { readonly battle: Pick<BattleNumbers, 'constants'> } = {
+  Pick<Bw2Numbers, 'effects' | 'textBox'> & {
+    readonly battle: Pick<BattleNumbers, 'constants'>
+  } = {
   pkm: TEAM_PKM,
   entry: ENTRY,
-  font: { chars: Array.from({ length: 95 }, (_, i) => String.fromCharCode(32 + i)).join('') },
+  font: { chars: ASCII.join('') },
   pokebw2: { repository: 'https://example.invalid/pokebw2.git', commit: 'c0ffee' },
   serverCommands: {
     SC_MSG_SET: 0x6a52,
@@ -128,6 +134,7 @@ export const REPLAY_NUMBERS: ReplayNumbers &
   text: {
     standard: {
       Bank0019_Text_ButFailed: 0x4b85,
+      Bank0019_Text_ButNothingHappened: 0x4b9d,
       Bank0019_Text_CriticalHit: 0x4b8b,
       Bank0019_Text_ItsNotVeryEffective: 0x4b91,
       Bank0019_Text_ItsSuperEffective: 0x4b97,
@@ -224,5 +231,29 @@ export const REPLAY_NUMBERS: ReplayNumbers &
       TYPE_EFFECTIVENESS_DOUBLE: 0x5f,
       TYPE_EFFECTIVENESS_NORMAL: 0x5d,
     },
+  },
+  // A text box of its own: the buffer's members in an order and widths of their own, every
+  // character 8 pixels wide but the space, a window of 31 such characters and three lines a page.
+  textBox: {
+    stringWork: { name: 'sWork', kind: 'bss', address: 0x0229a3c0, module: 'ov167' },
+    mainModule: 52,
+    viewCore: 68,
+    strbuf: 76,
+    strBuf: {
+      size: 20,
+      align: 4,
+      fields: {
+        length: { offset: 0, size: 4 },
+        magic: { offset: 8, size: 4 },
+        size: { offset: 12, size: 4 },
+        chars: { offset: 16, size: 2 },
+      },
+    },
+    constants: { STRBUF_MAGIC: 0x2468ace1, CHAR_EOM: 0xfffa, CHAR_NEWLINE: 0xfff8 },
+    room: 0xb4,
+    windowWidth: 248,
+    pageLines: 3,
+    advances: Object.fromEntries(ASCII.map((char) => [char, char === ' ' ? 2 : 8])),
+    carrier: TEXT_BOX_CARRIER,
   },
 }

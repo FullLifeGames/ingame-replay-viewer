@@ -79,7 +79,7 @@ export const GEN5_LINES = {
 } as const satisfies Record<string, Gen5Line>
 
 /** The message ID of a line: its index in its bank, by its label. */
-export function lineId(text: TextNumbers, line: Gen5Line): number {
+export function lineId(text: TextNumbers, line: Pick<Gen5Line, 'bank' | 'label'>): number {
   const id = text[line.bank][line.label]
   if (id === undefined) throw new Error(`bw2.json has no ${line.label}`)
   return id

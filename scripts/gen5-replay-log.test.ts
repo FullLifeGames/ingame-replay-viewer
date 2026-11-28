@@ -47,10 +47,25 @@ describe('blockReport', () => {
       'b3: no answer mark; lines 6: |faint|p1a: Politoed',
     ])
   })
+
+  // Scene: a printed block sends the carrier, so its text in the box is our page (#118): the log
+  // names the page as the replay holds it, never the RAM a mark read.
+  it('names the page a printed block writes into the text box', () => {
+    const lines = [...LINES, '|-message|isolatedstar forfeited.', '|win|abc2158']
+    const blocks = [
+      { name: 'b4', lines: [7], print: 'isolatedstar forfeited.' },
+      { name: 'b5', lines: [8], print: 'abc2158 won\nthe battle!' },
+    ]
+    const marks = [mark('hp-before', 4611), mark('b4-answered', 4711), mark('b5-answered', 4831)]
+    expect(blockReport(blocks, marks, lines)).toEqual([
+      'b4: answered at frame 4711, 100 frames of 3000; lines 7: |-message|isolatedstar forfeited.; prints "isolatedstar forfeited."',
+      'b5: answered at frame 4831, 120 frames of 3000; lines 8: |win|abc2158; prints "abc2158 won" / "the battle!"',
+    ])
+  })
 })
 
-// Scene: a replay that ends on a forfeit: the game holds the last scene, and the log names the
-// winner and the line the game has no message for.
+// Scene: a replay that ends on a forfeit: the forfeit prints in the text box (#118), the game
+// holds the last scene, and the log names the winner and each message after the last turn.
 describe('endLines', () => {
   it('names the winner and each message after the last turn', () => {
     const end = {
@@ -59,7 +74,7 @@ describe('endLines', () => {
     } as const
     expect(endLines(end)).toEqual([
       'end: abc2158 won (the far side, line 9)',
-      'end: not in the game: "isolatedstar forfeited." (line 7)',
+      'end: printed in the text box: "isolatedstar forfeited." (line 7)',
     ])
   })
 

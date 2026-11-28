@@ -2,7 +2,8 @@
 // fonts 0 and 2 of the font archive (BtlvCore's init in btlv_core.c), and the game draws "?" for a
 // character a font lacks (res/fonts/font.schema.json). Each glyph names its character, or its code
 // where the character does not print. Part of build/gen5/bw2.json as a string, which holds no
-// number of pokebw2; the errors name the font and the glyph's text and show no number.
+// number of pokebw2; the text box's key (gen5-bw2-textbox.ts) takes font 0's advances from here
+// too (#118). The errors name the font and the glyph's text and show no number.
 import type { FontNumbers } from '../src/gen5/bw2-numbers.ts'
 
 /** The two fonts the battle view draws with, by role. */
@@ -17,6 +18,7 @@ export type FontInput = Record<keyof typeof FONT_SOURCES, string>
 interface Glyph {
   char?: unknown
   code?: unknown
+  advance?: unknown
 }
 
 const CODE = /^U\+[0-9A-F]{4}$/
@@ -43,11 +45,30 @@ function glyphChar(glyph: Glyph, font: string): string {
   return drawn
 }
 
-/** The characters a font's glyphs draw. */
-export function fontChars(json: string, font: string): Set<string> {
+/** A font's glyphs; throws by the font's role when it lists none. */
+function glyphsOf(json: string, font: string): Glyph[] {
   const { glyphs } = JSON.parse(json) as { glyphs?: unknown }
   if (!Array.isArray(glyphs)) throw new Error(`${font} has no glyphs`)
-  return new Set((glyphs as Glyph[]).map((glyph) => glyphChar(glyph, font)))
+  return glyphs as Glyph[]
+}
+
+/** The characters a font's glyphs draw. */
+export function fontChars(json: string, font: string): Set<string> {
+  return new Set(glyphsOf(json, font).map((glyph) => glyphChar(glyph, font)))
+}
+
+/** Each character a font draws with the pixels its glyph moves the pen on (#118); throws by the
+ * font's role on a glyph with no advance. */
+export function fontAdvances(json: string, font: string): Map<string, number> {
+  return new Map(
+    glyphsOf(json, font).map((glyph) => {
+      const char = glyphChar(glyph, font)
+      if (typeof glyph.advance !== 'number') {
+        throw new Error(`${font}: the glyph ${JSON.stringify(char)} has no advance`)
+      }
+      return [char, glyph.advance]
+    }),
+  )
 }
 
 /** The characters both battle fonts draw, in the order of their codes. */
