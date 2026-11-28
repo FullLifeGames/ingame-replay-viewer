@@ -112,8 +112,6 @@ export class Context {
   afterHit: HeldForHit | undefined
   /** The Pokémon that a charge turn hid, by side; only `hidden.ts` writes it. */
   readonly hidden: Record<Side, Hidden | undefined> = { near: undefined, far: undefined }
-  /** The Mega forme of each team member that Mega Evolved, by side and index (#125). */
-  readonly megas: Record<Side, Map<number, string>> = { near: new Map(), far: new Map() }
   /** The index in `script.events` of the event in hand; the walk sets it. */
   at = 0
   /** The Pokémon whose move the log shows last; its own HP loss is no hit. */

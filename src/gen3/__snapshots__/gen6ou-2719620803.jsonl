@@ -1,4 +1,4 @@
-{"length":6187,"crc32":"d7d962fb","trainers":{"near":{"name":"Johnald714","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"primary trout","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":655,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Delphox"},{"species":6,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Charizard"},{"species":59,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Arcanine"},{"species":157,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Typhlosion"},{"species":392,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Infernape"},{"species":500,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Emboar"}],"far":[{"species":308,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Medicham"},{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"},{"species":1102,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Landorus"},{"species":1065,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Rotom"},{"species":380,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Latias"},{"species":212,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Scizor"}]}}
+{"length":6187,"crc32":"1c6de72f","trainers":{"near":{"name":"Johnald714","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"primary trout","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":655,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Delphox"},{"species":6,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Charizard"},{"species":59,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Arcanine"},{"species":157,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Typhlosion"},{"species":392,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Infernape"},{"species":500,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Emboar"}],"far":[{"species":308,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Medicham"},{"species":248,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Tyranitar"},{"species":1102,"maxHp":100,"level":100,"gender":"male","shiny":true,"nickname":"Landorus"},{"species":1065,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Rotom"},{"species":380,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Latias"},{"species":212,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Scizor"}]}}
 {"line":36,"op":"intro"}
 {"line":36,"op":"print","text":"You are challenged by primary trout!"}
 {"line":38,"op":"print","text":"primary trout sent out Medicham!"}
@@ -16,7 +16,7 @@
 {"line":44,"op":"ability","side":"near","ability":22,"show":false}
 {"line":47,"op":"flushTextBox"}
 {"line":47,"op":"print","text":"The opposing Medicham's Medichamite is reacting to primary trout's Mega Ring!"}
-{"line":47,"op":"formChange","side":"far","species":934}
+{"line":47,"op":"megaEvolve","side":"far","species":934}
 {"line":47,"op":"print","text":"The opposing Medicham has Mega Evolved into Mega Medicham!"}
 {"line":48,"op":"print","text":"The opposing Medicham used Fake Out!"}
 {"line":48,"op":"move","user":"far","target":"near","move":252,"animTurn":0}
@@ -149,7 +149,7 @@
 {"line":161,"op":"switchIn","side":"far","slot":3,"hp":100,"status":"none"}
 {"line":163,"op":"flushTextBox"}
 {"line":163,"op":"print","text":"Charizard's Charizardite Y is reacting to Johnald714's Mega Ring!"}
-{"line":163,"op":"formChange","side":"near","species":908}
+{"line":163,"op":"megaEvolve","side":"near","species":908}
 {"line":163,"op":"print","text":"Charizard has Mega Evolved into Mega Charizard!"}
 {"line":164,"op":"ability","side":"near","ability":70,"show":true}
 {"line":164,"op":"weather","weather":"sun"}
@@ -384,9 +384,3 @@
 {"line":341,"op":"print","text":"The opposing Medicham fainted!"}
 {"line":344,"op":"print","text":"Johnald714 won the battle!"}
 {"line":344,"op":"end","outcome":"nearWon"}
-{"line":47,"fallback":"mechanic","detail":"no state in the stream for Mega Evolution starting"}
-{"line":163,"fallback":"mechanic","detail":"no state in the stream for Mega Evolution starting"}
-{"line":192,"fallback":"mechanic","detail":"Charizard-Mega-Y comes back in its form before Mega Evolution"}
-{"line":194,"fallback":"mechanic","detail":"Medicham-Mega comes back in its form before Mega Evolution"}
-{"line":222,"fallback":"mechanic","detail":"Charizard-Mega-Y comes back in its form before Mega Evolution"}
-{"line":322,"fallback":"mechanic","detail":"Medicham-Mega comes back in its form before Mega Evolution"}

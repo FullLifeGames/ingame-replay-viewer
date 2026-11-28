@@ -1,4 +1,4 @@
-{"length":5938,"crc32":"b518671e","trainers":{"near":{"name":"White Atoq","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"ManOfMany","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":65,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Alakazam"},{"species":545,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Scolipede"},{"species":642,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Thundurus"},{"species":445,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Garchomp"},{"species":380,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Latias"},{"species":625,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Bisharp"}],"far":[{"species":3,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Venusaur"},{"species":461,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Weavile"},{"species":490,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Manaphy"},{"species":113,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Chansey"},{"species":530,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Excadrill"},{"species":145,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zapdos"}]}}
+{"length":5938,"crc32":"d06b425b","trainers":{"near":{"name":"White Atoq","trainerPic":1,"teamSize":6,"revealed":6},"far":{"name":"ManOfMany","trainerPic":2,"teamSize":6,"revealed":6}},"parties":{"near":[{"species":65,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Alakazam"},{"species":545,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Scolipede"},{"species":642,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Thundurus"},{"species":445,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Garchomp"},{"species":380,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Latias"},{"species":625,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Bisharp"}],"far":[{"species":3,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Venusaur"},{"species":461,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Weavile"},{"species":490,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Manaphy"},{"species":113,"maxHp":100,"level":100,"gender":"female","shiny":false,"nickname":"Chansey"},{"species":530,"maxHp":100,"level":100,"gender":"male","shiny":false,"nickname":"Excadrill"},{"species":145,"maxHp":100,"level":100,"gender":"none","shiny":false,"nickname":"Zapdos"}]}}
 {"line":42,"op":"intro"}
 {"line":42,"op":"print","text":"You are challenged by ManOfMany!"}
 {"line":44,"op":"print","text":"ManOfMany sent out Zapdos!"}
@@ -70,7 +70,7 @@
 {"line":95,"op":"switchIn","side":"near","slot":0,"hp":100,"status":"none"}
 {"line":97,"op":"flushTextBox"}
 {"line":97,"op":"print","text":"The opposing Venusaur's Venusaurite is reacting to ManOfMany's Mega Ring!"}
-{"line":97,"op":"formChange","side":"far","species":906}
+{"line":97,"op":"megaEvolve","side":"far","species":906}
 {"line":97,"op":"print","text":"The opposing Venusaur has Mega Evolved into Mega Venusaur!"}
 {"line":98,"op":"print","text":"The opposing Venusaur used Leech Seed!"}
 {"line":98,"op":"move","user":"far","target":"near","move":73,"animTurn":0}
@@ -296,7 +296,7 @@
 {"line":287,"op":"turn","number":20}
 {"line":292,"op":"flushTextBox"}
 {"line":292,"op":"print","text":"Alakazam's Alakazite is reacting to White Atoq's Mega Ring!"}
-{"line":292,"op":"formChange","side":"near","species":912}
+{"line":292,"op":"megaEvolve","side":"near","species":912}
 {"line":292,"op":"print","text":"Alakazam has Mega Evolved into Mega Alakazam!"}
 {"line":293,"op":"ability","side":"near","ability":93,"show":true}
 {"line":293,"op":"ability","side":"near","ability":93,"show":false}
@@ -377,7 +377,3 @@
 {"line":377,"op":"print","text":"White Atoq forfeited."}
 {"line":379,"op":"print","text":"ManOfMany won the battle!"}
 {"line":379,"op":"end","outcome":"farWon"}
-{"line":97,"fallback":"mechanic","detail":"no state in the stream for Mega Evolution starting"}
-{"line":174,"fallback":"mechanic","detail":"Venusaur-Mega comes back in its form before Mega Evolution"}
-{"line":292,"fallback":"mechanic","detail":"no state in the stream for Mega Evolution starting"}
-{"line":344,"fallback":"mechanic","detail":"Alakazam-Mega comes back in its form before Mega Evolution"}

@@ -1,13 +1,18 @@
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
-import { mechanicGap, megaReturnGap, teraTypeGap } from '../fallbacks'
+import { teraTypeGap } from '../fallbacks'
 import { speciesOf } from '../tables/lookup'
 import { plain, popUp, streamOfLog } from '../testing'
 
 const CASTFORM_IN = '|switch|p2a: Castform|Castform|100/100'
 const formChange = (name: string) => ({
   op: 'formChange',
+  side: 'far',
+  species: speciesOf(name).number,
+})
+const megaEvolve = (name: string) => ({
+  op: 'megaEvolve',
   side: 'far',
   species: speciesOf(name).number,
 })
@@ -141,25 +146,24 @@ describe('a Terastallization (#88, #89)', () => {
   })
 })
 
-describe('a Mega Evolution (#125)', () => {
-  // `BattleScript_MegaEvolution`: flushtextbox, STRINGID_MEGAEVOREACTING, the form change, then
-  // STRINGID_MEGAEVOEVOLVED. The Mega animation and mark follow with #126: a named gap.
-  const LOOK = { line: NEXT + 2, ...mechanicGap('Mega Evolution', 'starting') }
+describe('a Mega Evolution (#125, #126)', () => {
+  // `BattleScript_MegaEvolution`: flushtextbox, STRINGID_MEGAEVOREACTING, the Mega Evolution with
+  // its animation and mark (MEGA_EVOLVE), then STRINGID_MEGAEVOEVOLVED.
   const megaOf = (ident: string, details: string, base: string, stone: string) => [
     `|switch|${ident}|${base}|100/100`,
     `|detailschange|${ident}|${details}`,
     `|-mega|${ident}|${base}|${stone}`,
   ]
 
-  it('empties the text box, says the stone reacts, changes the far form, then says so', () => {
+  it('empties the text box, says the stone reacts, Mega Evolves the far Pokémon, then says so', () => {
     const lines = megaOf('p2a: Venusaur', 'Venusaur-Mega, M', 'Venusaur', 'Venusaurite')
     expect(sceneFrom(NEXT + 2, ...lines)).toEqual([
       { op: 'flushTextBox' },
       "The opposing Venusaur's Venusaurite is reacting to Bob's Mega Ring!",
-      formChange('Venusaur-Mega'),
+      megaEvolve('Venusaur-Mega'),
       'The opposing Venusaur has Mega Evolved into Mega Venusaur!',
     ])
-    expect(fallbacksOf(...lines)).toEqual([LOOK])
+    expect(fallbacksOf(...lines)).toEqual([])
   })
 
   it('names our own Pokémon without "The opposing" and our player\'s Mega Ring', () => {
@@ -167,10 +171,11 @@ describe('a Mega Evolution (#125)', () => {
     expect(sceneFrom(NEXT + 2, ...lines)).toEqual([
       { op: 'flushTextBox' },
       "Alakazam's Alakazite is reacting to Alice's Mega Ring!",
-      { op: 'formChange', side: 'near', species: speciesOf('Alakazam-Mega').number },
+      { op: 'megaEvolve', side: 'near', species: speciesOf('Alakazam-Mega').number },
       'Alakazam has Mega Evolved into Mega Alakazam!',
     ])
-    expect(formChange('Alakazam-Mega').species).not.toBe(speciesOf('Alakazam').number)
+    expect(fallbacksOf(...lines)).toEqual([])
+    expect(megaEvolve('Alakazam-Mega').species).not.toBe(speciesOf('Alakazam').number)
   })
 
   it("says Rayquaza's fervent wish in place of a stone", () => {
@@ -178,12 +183,12 @@ describe('a Mega Evolution (#125)', () => {
     expect(sceneFrom(NEXT + 2, ...lines)).toEqual([
       { op: 'flushTextBox' },
       "Bob's fervent wish has reached the opposing Rayquaza!",
-      formChange('Rayquaza-Mega'),
+      megaEvolve('Rayquaza-Mega'),
       'The opposing Rayquaza has Mega Evolved into Mega Rayquaza!',
     ])
   })
 
-  it('says both lines of a forme the expansion lacks and names it, with no form change', () => {
+  it('says both lines of a forme the expansion lacks and names the form alone, with no op', () => {
     const lines = [
       '|detailschange|p2a: Tyranitar|Rockruff-Dusk, M',
       '|-mega|p2a: Tyranitar|Tyranitar|Tyranitarite',
@@ -194,25 +199,12 @@ describe('a Mega Evolution (#125)', () => {
       'The opposing Tyranitar has Mega Evolved into Mega Rockruff!',
     ])
     const noted = fallbacksOf(...lines).filter(({ line }) => line === NEXT + 1)
-    expect(noted.map(({ kind }) => kind)).toEqual(['form', 'mechanic'])
-  })
-
-  it('names no comeback gap for a forme the expansion lacks', () => {
-    // The switch back writes the forme, as a log does: with "Tyranitar, M" the client would take
-    // it for a new team member, and the spec would pass without the guard.
-    const lines = [
-      '|detailschange|p2a: Tyranitar|Rockruff-Dusk, M',
-      '|-mega|p2a: Tyranitar|Tyranitar|Tyranitarite',
-      '|switch|p2a: Venusaur|Venusaur, M|100/100',
-      '|switch|p2a: Tyranitar|Rockruff-Dusk, M|80/100',
-    ]
-    expect(fallbacksOf(...lines).filter(({ line }) => line > NEXT + 1)).toEqual([])
+    expect(noted.map(({ kind }) => kind)).toEqual(['form'])
   })
 })
 
-describe('a Mega that comes back (#125, D5)', () => {
-  // The switch-in takes the species of the team table, so a Mega comes back in its form before
-  // Mega Evolution until #126 keeps the form: a named gap at each comeback.
+describe('a Mega that comes back (#126)', () => {
+  // The ROM keeps the species of a party slot that Mega Evolved, so a comeback is the switch alone.
   const VENUSAUR_IN = '|switch|p2a: Venusaur|Venusaur, M|100/100'
   const away = '|switch|p2a: Tyranitar|Tyranitar, M|100/100'
   const mega = [
@@ -222,25 +214,20 @@ describe('a Mega that comes back (#125, D5)', () => {
   ]
   const back = '|switch|p2a: Venusaur|Venusaur-Mega, M|80/100'
 
-  it('names the gap at each switch-in after the Mega Evolution', () => {
+  it('names no gap and plays neither a form change nor a Mega Evolution at a comeback', () => {
     const lines = [...mega, away, back, away, back]
-    const comebacks = fallbacksOf(...lines).filter(({ line }) => line > NEXT + 2)
-    expect(comebacks).toEqual([
-      { line: NEXT + 4, ...megaReturnGap('Venusaur-Mega') },
-      { line: NEXT + 6, ...megaReturnGap('Venusaur-Mega') },
-    ])
+    expect(fallbacksOf(...lines)).toEqual([])
+    const ops = sceneFrom(NEXT + 3, ...lines).flatMap((step) =>
+      typeof step === 'string' ? [] : [step.op],
+    )
+    expect(ops).toContain('switchIn')
+    expect(ops).not.toContain('formChange')
+    expect(ops).not.toContain('megaEvolve')
   })
 
   it('names none for a Pokémon that never Mega Evolved, nor for a Castform after Forecast', () => {
     const forecast = '|-formechange|p2a: Castform|Castform-Sunny|[msg]|[from] ability: Forecast'
     const lines = [VENUSAUR_IN, away, VENUSAUR_IN, CASTFORM_IN, '|-weather|SunnyDay', forecast]
     expect(fallbacksOf(...lines, away, CASTFORM_IN)).toEqual([])
-  })
-
-  it('says the Mega forme in the gap', () => {
-    expect(megaReturnGap('Venusaur-Mega')).toEqual({
-      kind: 'mechanic',
-      detail: 'Venusaur-Mega comes back in its form before Mega Evolution',
-    })
   })
 })

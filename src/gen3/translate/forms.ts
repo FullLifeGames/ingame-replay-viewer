@@ -11,17 +11,16 @@
 // leaves the tint and the type's mark, then "X terastallized into the T type!". A type the game
 // lacks keeps both lines and names a mechanic fallback.
 //
-// A Mega Evolution (#125) plays `BattleScript_MegaEvolution`: flushtextbox, "X's stone is
-// reacting to P's Mega Ring!", the form change, then "X has Mega Evolved into Mega S!". Rayquaza
-// takes `BattleScript_WishMegaEvolution`, whose wish line comes first in place of the stone's.
-// The change is FORM_CHANGE, the scene Castform's Forecast plays; the Mega animation and mark
-// follow with #126 and name a mechanic fallback. A forme the game lacks keeps both lines. A Mega
-// that comes back in shows its form before Mega Evolution, since the ROM's switch-in takes the
-// species of the team table: each comeback names a mechanic fallback until #126 keeps the form.
+// A Mega Evolution (#125, #126) plays `BattleScript_MegaEvolution`: flushtextbox, "X's stone is
+// reacting to P's Mega Ring!", MEGA_EVOLVE, then "X has Mega Evolved into Mega S!". Rayquaza takes
+// `BattleScript_WishMegaEvolution`, whose wish line comes first in place of the stone's. The form
+// change and the Mega mark are MEGA_EVOLVE, which plays the game's Mega animation; a Mega that
+// comes back keeps its form, since the ROM keeps the species of a party slot that Mega Evolved. A
+// forme the game lacks keeps both lines and names the form fallback.
 import { toID } from '@pkmn/dex'
 
 import type { Effect } from '../../script/types'
-import { mechanicGap, megaReturnGap, teraTypeGap } from '../fallbacks'
+import { teraTypeGap } from '../fallbacks'
 import { speciesOf, typeOf } from '../tables/lookup'
 import { formChanged, megaEvolving, terastallizing } from '../text/phrases-effects'
 import type { Context, EventOf } from './context'
@@ -70,15 +69,7 @@ export function megaEvolve(event: EventOf<'megaEvolve'>, ctx: Context): void {
   ctx.print(line, reacting)
   ctx.note(line, found.fallback)
   if (found.fallback === undefined) {
-    ctx.emit(line, { op: 'formChange', side: ctx.activeSide(who), species: found.number })
-    ctx.megas[who.side].set(who.index, species)
+    ctx.emit(line, { op: 'megaEvolve', side: ctx.activeSide(who), species: found.number })
   }
   ctx.print(line, evolved)
-  ctx.note(line, mechanicGap('Mega Evolution', 'starting'))
-}
-
-/** A switch-in of a team member that Mega Evolved: it shows the form before (#125, D5). */
-export function megaComeback({ who, line }: EventOf<'switchIn'>, ctx: Context): void {
-  const species = ctx.megas[who.side].get(who.index)
-  if (species !== undefined) ctx.note(line, megaReturnGap(species))
 }

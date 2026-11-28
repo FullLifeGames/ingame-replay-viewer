@@ -39,14 +39,6 @@ export function illusionGap(): MechanicFallback {
 }
 
 /**
- * A Mega forme `species` that comes back in (#125): the switch-in takes the species of the team
- * table, so the game shows the form before Mega Evolution until #126 keeps the form.
- */
-export function megaReturnGap(species: string): MechanicFallback {
-  return { kind: 'mechanic', detail: `${species} comes back in its form before Mega Evolution` }
-}
-
-/**
  * A look of `move` that the log names (`[anim] Shell Side Arm Physical`) and the game lacks: the
  * MOVE op carries the move alone, so the game plays the move's own animation. A look by type
  * (`[anim] Ivy Cudgel Water`) is none: its MOVE_TYPE gives the game the type (#89).

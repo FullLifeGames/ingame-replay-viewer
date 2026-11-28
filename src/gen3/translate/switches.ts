@@ -3,14 +3,12 @@
 // (`BattleScript_EffectBatonPass`) return it without a word; a faint plays before its line.
 // Destiny Bond's attacker hears the held line and drains its bar before it faints; a target that
 // a multi-hit move's last hit knocks out hears the move's last lines after its own. Illusion's end
-// swaps the real Pokémon in without a word; the `-end` after it says the game's line. A Mega
-// that comes back names its gap by the rule of `forms.ts`.
+// swaps the real Pokémon in without a word; the `-end` after it says the game's line.
 import { illusionGap } from '../fallbacks'
 import { fainted } from '../text/phrases'
 import { draggedOut, sentOut, withdrawn } from '../text/phrases-field'
 import type { Context, EventOf } from './context'
 import { pursuedBefore, takeDown } from './effects'
-import { megaComeback } from './forms'
 import { afterFaint } from './hits'
 import { endIntro, sendOutLead } from './intro'
 import { scaleHp } from '../../script/hp-scale'
@@ -36,7 +34,6 @@ export function switchIn(event: SwitchInEvent, ctx: Context): void {
     ctx.emit(line, { op: 'switchIn', ...entering })
   }
   ctx.enter(who)
-  megaComeback(event, ctx)
 }
 
 /**
