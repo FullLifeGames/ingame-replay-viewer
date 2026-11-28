@@ -19,6 +19,7 @@ import { REPLAY_NUMBERS } from '../src/gen5/backend/replay.fixtures.ts'
 import { ENTRY } from '../src/gen5/direct-entry.fixtures.ts'
 import { GAUGE, ODD_GAUGE } from '../src/gen5/hp-numbers.fixtures.ts'
 import { PKM, TEAM_PKM, TERMINATOR } from '../src/gen5/pkm.fixtures.ts'
+import { PLACES, TRAINER } from '../src/gen5/route.fixtures.ts'
 import { battleNumbers } from './gen5-bw2-battle.ts'
 import { effectNumbers } from './gen5-bw2-effects.ts'
 import { EFFECTS_CONSTANTS, EFFECTS_INPUT, EFFECTS_ITEMS } from './gen5-bw2-effects.fixtures.ts'
@@ -78,6 +79,13 @@ const COMPARED = [
     name: 'CHECK_NUMBERS',
     value: CHECK_NUMBERS,
     path: [],
+  },
+  { module: 'src/gen5/route.fixtures.ts', name: 'PLACES', value: PLACES, path: ['route'] },
+  {
+    module: 'src/gen5/route.fixtures.ts',
+    name: 'TRAINER',
+    value: TRAINER,
+    path: ['saveTrainer'],
   },
   { module: 'src/gen5/hp-numbers.fixtures.ts', name: 'GAUGE', value: GAUGE, path: ['gauge'] },
   {

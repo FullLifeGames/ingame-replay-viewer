@@ -1,21 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import type { ActorPlace, RoutePlaces } from './bw2-numbers'
 import type { MacroStep } from './macro'
 import { PLAYER_Z } from './route'
 import { fastText, OPTIONS_SLOT_WITH_POKEDEX, SAVE_SLOT_WITH_POKEDEX, saveGame } from './save-menu'
 import { FIELD_X, trainerRoute } from './trainer-route'
-
-/** Invented places of the map's events, far from any real town's. */
-const PLACES: RoutePlaces = {
-  hughTrigger: { x: 10, z: 100, width: 5 },
-  battleTrigger: { x: 10, z: 102, width: 5 },
-  outlookTrigger: { x: 10, z: 105, width: 5 },
-  bianca: { x: 12, z: 90 },
-}
-
-/** An invented tile of the save's trainer, far from any real route's. */
-const TRAINER: ActorPlace = { x: 30, z: 300 }
+import { PLACES, TRAINER } from './route.fixtures'
 
 const markNames = (steps: readonly MacroStep[]) =>
   steps.flatMap((step) => (step.kind === 'mark' ? [step.name] : []))

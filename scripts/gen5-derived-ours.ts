@@ -7,6 +7,8 @@ import type { OursDerived } from './gen5-derived.ts'
 const ROUTINE_RUNS = ['takeover(ENTRY)', 'park(ENTRY)', 'directEntry(ENTRY, GAUGE)']
 const COUNTS = ['partyChecks(ENTRY)', 'park(ENTRY)', 'directEntry(ENTRY, GAUGE)']
 
+const ROUTES = ['newGameRoute(PLACES)', 'continueRoute(TRAINER)', 'trainerRoute(PLACES, TRAINER)']
+
 /** The derived numbers that our code fixes, equal on both sides whatever pokebw2 holds. */
 export const OURS_DERIVED: readonly OursDerived[] = [
   {
@@ -51,6 +53,19 @@ export const OURS_DERIVED: readonly OursDerived[] = [
     key: 'value',
     reason: "the write that hands a block over clears returned, as BtlAdapter_SetCmd's last step",
   },
+  {
+    derivations: ROUTES,
+    check: /^(player|field) [xz]$/,
+    key: 'address',
+    reason: "the player's tile, read at addresses of the routes' own (route.ts, trainer-route.ts)",
+  },
+  ...['oneOf', 'atMost'].map((key) => ({
+    derivations: ROUTES,
+    step: /^(lookout-row|plaza|stairs-foot|lookout-top|gate-column|gate-road)$/,
+    check: /^player [xz]$/,
+    key,
+    reason: "a row or a column of the routes' own, read from RAM on the way, not generated",
+  })),
   {
     derivations: ['partyRefs(PARTY_NUMBERS)'],
     check: /^(near|far)\.slot\d+$/,

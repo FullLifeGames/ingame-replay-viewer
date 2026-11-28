@@ -10,6 +10,7 @@ import { printedCommand } from '../src/gen5/backend/printed.ts'
 import { GEN5_REPLAY_VERSION, type Gen5Replay } from '../src/gen5/backend/replay.ts'
 import { REPLAY_NUMBERS } from '../src/gen5/backend/replay.fixtures.ts'
 import { battleRefs } from '../src/gen5/battle-check.ts'
+import { continueRoute } from '../src/gen5/continue-route.ts'
 import { CHECK_NUMBERS } from '../src/gen5/battle-check.fixtures.ts'
 import type { GaugeNumbers } from '../src/gen5/bw2-gauge-numbers.ts'
 import type {
@@ -28,7 +29,10 @@ import { GAUGE } from '../src/gen5/hp-numbers.fixtures.ts'
 import { blockPlaces } from '../src/gen5/pkm-cipher.ts'
 import { PKM, ROW_0_PID, ROW_2_PID } from '../src/gen5/pkm.fixtures.ts'
 import { replayPlan } from '../src/gen5/replay-plan.ts'
+import { newGameRoute } from '../src/gen5/route.ts'
+import { PLACES, TRAINER } from '../src/gen5/route.fixtures.ts'
 import { armWrites, formattedCheck, pageWrites, textBox } from '../src/gen5/text-box.ts'
+import { trainerRoute } from '../src/gen5/trainer-route.ts'
 import { partyRefs } from './gen5-moment-party.ts'
 import { PARTY_NUMBERS } from './gen5-moment-party.fixtures.ts'
 
@@ -192,6 +196,24 @@ export const DERIVED: readonly Derivation[] = [
     functions: [file('scripts/gen5-moment-party.ts', 'partyRefs')],
     ours: () => partyRefs({ parties: PARTY_START }, PARTY_NUMBERS),
     real: (numbers) => partyRefs({ parties: PARTY_START }, numbers),
+  },
+  {
+    name: 'newGameRoute(PLACES)',
+    functions: [file(`${GEN5}route.ts`, 'newGameRoute')],
+    ours: () => newGameRoute(PLACES, []),
+    real: (numbers) => newGameRoute(numbers.route, []),
+  },
+  {
+    name: 'continueRoute(TRAINER)',
+    functions: [file(`${GEN5}continue-route.ts`, 'continueRoute')],
+    ours: () => continueRoute(TRAINER, []),
+    real: (numbers) => continueRoute(numbers.saveTrainer, []),
+  },
+  {
+    name: 'trainerRoute(PLACES, TRAINER)',
+    functions: [file(`${GEN5}trainer-route.ts`, 'trainerRoute')],
+    ours: () => trainerRoute(PLACES, TRAINER),
+    real: (numbers) => trainerRoute(numbers.route, numbers.saveTrainer),
   },
 ]
 

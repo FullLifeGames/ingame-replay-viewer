@@ -64,6 +64,28 @@ describe('the derivations on invented numbers', () => {
     expect(derivedNames('other', outputs, ours)).toHaveLength(3)
   })
 
+  // Scene: a route reads the player's row in many steps, once against a row of its own.
+  it('skips a value of our own by its step, where one check stands in several steps', () => {
+    const route = (row: number) =>
+      ['plaza', 'trigger'].map((name) => ({
+        kind: 'until',
+        name,
+        checks: [{ name: 'player z', oneOf: [row] }],
+      }))
+    const ours: OursDerived[] = [
+      {
+        derivations: ['route'],
+        step: /^plaza$/,
+        check: /^player z$/,
+        key: 'oneOf',
+        reason: 'ours',
+      },
+    ]
+    expect(derivedNames('route', { ours: route(7), real: route(7) }, ours)).toEqual([
+      'route <trigger / player z>.1.checks.0.oneOf.0',
+    ])
+  })
+
   // Scene: every struct starts at 0, so a hop into a first member names nothing.
   it('skips a 0 under a hop, and counts no number outside a role key', () => {
     const outputs = { ours: { count: 4, hops: [0, 8] }, real: { count: 4, hops: [0, 9] } }

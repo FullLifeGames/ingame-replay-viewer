@@ -1,17 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import { battleEntry, TO_TITLE } from './battle-entry'
-import type { RoutePlaces } from './bw2-numbers'
 import { type MacroStep, routeSlice } from './macro'
 import { newGameRoute, PLAYER_X, PLAYER_Z } from './route'
-
-/** Invented places of the map's events, far from any real town's. */
-const PLACES: RoutePlaces = {
-  hughTrigger: { x: 10, z: 100, width: 5 },
-  battleTrigger: { x: 10, z: 102, width: 5 },
-  outlookTrigger: { x: 10, z: 105, width: 5 },
-  bianca: { x: 12, z: 90 },
-}
+import { PLACES } from './route.fixtures'
 
 const marks = () =>
   newGameRoute(PLACES, []).flatMap((step) => (step.kind === 'mark' ? [step.name] : []))

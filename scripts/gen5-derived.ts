@@ -33,25 +33,30 @@ const OUR_KEYS = new Set(['width', 'mainRamPointer', 'bytes'])
 /** The keys under which a 0 is where every struct starts. */
 const START_KEYS = new Set(['hops', 'offset'])
 
-/** A derived number equal on both sides by construction: the derivation, the check by its name,
- * the role key and the reason. */
+/** A derived number equal on both sides by construction: the derivation, the check by its name
+ * and, where one check's name stands in several steps, the step by its name, the role key and the
+ * reason. */
 export interface OursDerived {
   readonly derivations: readonly string[]
+  readonly step?: RegExp
   readonly check: RegExp
   readonly key: string
   readonly reason: string
 }
 
-/** A number found equal: its check, the role key above it and its path. */
+/** A number found equal: its step and check by name, the role key above it and its path. */
 interface Equal {
+  readonly step: string
   readonly check: string
   readonly key: string
   readonly path: string
 }
 
-/** Where the walk stands: the path, the check's name, the role key above, if any. */
+/** Where the walk stands: the path, the outermost and the innermost name above, the role key
+ * above, if any. */
 interface Place {
   readonly path: string
+  readonly step: string
   readonly check: string
   readonly key: string | undefined
 }
@@ -77,7 +82,8 @@ function equalsIn(ours: unknown, real: unknown, place: Place, roles: Set<string>
   const other = plain(real)
   if (typeof value === 'number') {
     if (!counts(value, place.key) || value !== other) return []
-    return [{ check: place.check, key: place.key ?? '', path: place.path }]
+    const { step, check, path } = place
+    return [{ step, check, key: place.key ?? '', path }]
   }
   if (Array.isArray(value)) {
     const list: unknown[] = Array.isArray(other) ? other : []
@@ -86,10 +92,12 @@ function equalsIn(ours: unknown, real: unknown, place: Place, roles: Set<string>
   }
   if (!isObject(value)) return []
   const check = labelOf(value, place.check)
+  const step = place.step === '' ? check : place.step
   return Object.keys(value)
     .filter((key) => !OUR_KEYS.has(key))
     .flatMap((key) => {
-      const inner = { path: `${place.path}.${key}`, check, key: roles.has(key) ? key : place.key }
+      const role = roles.has(key) ? key : place.key
+      const inner = { path: `${place.path}.${key}`, step, check, key: role }
       return equalsIn(value[key], isObject(other) ? other[key] : undefined, inner, roles)
     })
 }
@@ -97,13 +105,19 @@ function equalsIn(ours: unknown, real: unknown, place: Place, roles: Set<string>
 /** Whether `ours` names an equal number of the derivation `name`. */
 const isOurs = (equal: Equal, name: string, ours: readonly OursDerived[]) =>
   ours.some(
-    ({ derivations, check, key }) =>
-      derivations.includes(name) && check.test(equal.check) && key === equal.key,
+    ({ derivations, step, check, key }) =>
+      derivations.includes(name) &&
+      (step?.test(equal.step) ?? true) &&
+      check.test(equal.check) &&
+      key === equal.key,
   )
+
+/** A number's label: its check, after its step when the two differ. */
+const labelIn = ({ step, check }: Equal) => (step === check ? check : `${step} / ${check}`)
 
 /** Every number of the derivation `name` that equals the real derivation's at the same path under
  * a role key or one of `keys`, a row's keys of offsets, but those in `ours`; each as
- * `name <check> path`. */
+ * `name <step / check> path`. */
 export function derivedNames(
   name: string,
   outputs: { ours: unknown; real: unknown },
@@ -111,7 +125,8 @@ export function derivedNames(
   keys: readonly string[] = [],
 ): string[] {
   const roles = new Set([...ROLE_KEYS, ...keys])
-  return equalsIn(outputs.ours, outputs.real, { path: '', check: '', key: undefined }, roles)
+  const root = { path: '', step: '', check: '', key: undefined }
+  return equalsIn(outputs.ours, outputs.real, root, roles)
     .filter((equal) => !isOurs(equal, name, ours))
-    .map(({ check, path }) => `${name} <${check}>${path}`)
+    .map((equal) => `${name} <${labelIn(equal)}>${equal.path}`)
 }
