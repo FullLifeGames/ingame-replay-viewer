@@ -4,7 +4,8 @@
 // rules (scripts/gen5-numbers-compare.ts), where a value from 0 to 3 counts like a large one and
 // the header says why. The literals come from the TypeScript compiler, so the scene specs run on
 // every machine; the walk over the specs skips without the generated file and fails under CI
-// without it. CI's log is public, so a failure names the file, the line and the member path.
+// without it. CI's log is public, so a failure names the file, the line and the member path. On
+// the same program it holds the derivation table complete (scripts/gen5-derived-complete.ts).
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -12,6 +13,8 @@ import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { BW2_NUMBERS_VERSION } from '../src/gen5/bw2-numbers.ts'
+import { codeFiles, derivingFunctions, NOT_DERIVED } from './gen5-derived-complete.ts'
+import { DERIVED } from './gen5-derived-table.ts'
 import {
   type LiteralFinding,
   literalFindings,
@@ -124,11 +127,26 @@ const SCENES = {
   ],
 }
 
+/** A code module of the scenes: two functions that derive a plan from the numbers, and two that
+ * take no numbers or give no plan. */
+const DERIVING = [
+  `import type { EntryNumbers } from '${NUMBERS_TYPES}'`,
+  `import type { MacroStep } from '${join(GEN5_PATHS.repo, 'src/gen5/macro.ts')}'`,
+  `import type { RamCheck } from '${join(GEN5_PATHS.repo, 'src/gen5/ram-check.ts')}'`,
+  `export const checks = (entry: EntryNumbers): RamCheck[] => [{ name: 'a', address: entry.setupIndices.player, width: 4 }]`,
+  `export function steps(input: { entry: EntryNumbers }): { steps: MacroStep[] } { return { steps: [{ kind: 'wait', frames: input.entry.setupIndices.player }] } }`,
+  `export const count = (entry: EntryNumbers): number => entry.setupIndices.player`,
+  `export const plain = (address: number): RamCheck[] => [{ name: 'b', address, width: 4 }]`,
+  '',
+]
+
 const IMPORT = `import type { ArgPut, BattleNumbers, Bw2Numbers, Bw2Symbol, EntryNumbers, ServerCmdTable, Sides, SingleBattle } from '${NUMBERS_TYPES}'`
 
 describe('the typed-literal check on invented specs', () => {
   const folder = mkdtempSync(join(tmpdir(), 'gen5-literals-'))
+  const code = join(folder, 'deriving.ts')
   let literals: TypedLiteral[] = []
+  let deriving: string[] = []
 
   beforeAll(() => {
     const files = Object.entries(SCENES).map(([name, lines]) => {
@@ -136,7 +154,10 @@ describe('the typed-literal check on invented specs', () => {
       writeFileSync(file, [IMPORT, ...lines, ''].join('\n'))
       return file
     })
-    literals = typedLiterals(literalProgram(files), files)
+    writeFileSync(code, DERIVING.join('\n'))
+    const program = literalProgram([...files, code])
+    literals = typedLiterals(program, files)
+    deriving = derivingFunctions(program, [code]).map((name) => name.split(' ').at(-1) ?? '')
   }, PROGRAM_LIMIT)
   afterAll(() => {
     rmSync(folder, { recursive: true, force: true })
@@ -195,14 +216,22 @@ describe('the typed-literal check on invented specs', () => {
       '9 BattleNumbers.monCore.fields.monId',
     ])
   })
+  // Scene: a new function that derives a check from the numbers must not slip past the table.
+  it('finds each exported function that takes the numbers and gives a plan', () => {
+    expect([...deriving].sort()).toEqual(['checks', 'steps'])
+  })
 })
 
 describe.skipIf(!existsSync(FILE))('the typed literals of the specs on the real numbers', () => {
   const files = specFiles()
+  const code = codeFiles()
   let literals: TypedLiteral[] = []
+  let deriving: string[] = []
 
   beforeAll(() => {
-    literals = typedLiterals(literalProgram(files), files)
+    const program = literalProgram([...files, ...code])
+    literals = typedLiterals(program, files)
+    deriving = derivingFunctions(program, code)
   }, PROGRAM_LIMIT)
 
   // Scene: a walk that reads no spec would pass on anything.
@@ -214,5 +243,15 @@ describe.skipIf(!existsSync(FILE))('the typed literals of the specs on the real 
   it('finds no typed literal in the specs that equals the generated file', () => {
     const real: unknown = JSON.parse(readFileSync(FILE, 'utf8'))
     expect(literalFindings(literals, real).map(shown)).toEqual([])
+  })
+
+  // Scene: a derive function that stands nowhere would pass the derivations' check unseen.
+  it('finds every function that derives a plan from the numbers in the table or by reason', () => {
+    const listed = new Set([
+      ...DERIVED.flatMap(({ functions }) => functions),
+      ...Object.keys(NOT_DERIVED),
+    ])
+    expect(deriving.filter((name) => !listed.has(name))).toEqual([])
+    expect(Object.keys(NOT_DERIVED).filter((name) => !deriving.includes(name))).toEqual([])
   })
 })

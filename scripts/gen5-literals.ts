@@ -69,7 +69,7 @@ export interface LiteralFinding {
 }
 
 /** The declaration of the numbers type that a type is, or undefined. */
-function numbersDeclaration(type: ts.Type): ts.Declaration | undefined {
+export function numbersDeclaration(type: ts.Type): ts.Declaration | undefined {
   if (type.isUnion()) return type.types.map(numbersDeclaration).find(Boolean)
   for (const symbol of [type.aliasSymbol, type.getSymbol()]) {
     const declaration = symbol?.declarations?.[0]
@@ -81,7 +81,7 @@ function numbersDeclaration(type: ts.Type): ts.Declaration | undefined {
 }
 
 /** A type's parts: each property's type by name, `*` for a record's or an array's values. */
-function partsOf(type: ts.Type, checker: ts.TypeChecker): [string, ts.Type][] {
+export function partsOf(type: ts.Type, checker: ts.TypeChecker): [string, ts.Type][] {
   if (checker.isArrayType(type)) {
     const [element] = checker.getTypeArguments(type as ts.TypeReference)
     return element ? [['*', element]] : []
