@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { fileFor, savesFileFor, siteFileFor, sitePathOf, sourceFileFor } from './gen5-files'
+import {
+  buildFileFor,
+  fileFor,
+  savesFileFor,
+  siteFileFor,
+  sitePathOf,
+  sourceFileFor,
+} from './gen5-files'
 import { archiveName, COMPONENTS } from './gen5-manifest'
 
 const ARCHIVE = archiveName(COMPONENTS.melonds.source)
@@ -10,7 +17,11 @@ describe('fileFor', () => {
   const site = '/repo/.cache/gen5/emulatorjs/site'
   const saves = '/repo/src/web/gen5/saves'
   const sources = '/repo/.cache/gen5/sources'
-  const folders = { built: page, site, saves, sources }
+  const build = {
+    bw2Json: '/repo/build/gen5/bw2.json',
+    routineJson: '/repo/build/gen5/routine.json',
+  }
+  const folders = { built: page, site, saves, sources, ...build }
 
   it('serves the page folder, with index.html at /', () => {
     expect(fileFor('/', folders)).toBe(`${page}/index.html`)
@@ -55,6 +66,13 @@ describe('fileFor', () => {
       expect(siteFileFor(url, site), url).toBeUndefined()
       expect(fileFor(url, folders)?.startsWith(site) ?? false, url).toBe(false)
     }
+  })
+
+  // Scene: the page fetches the two build files from outside the built folder (#111).
+  it('serves /gen5-build/ from the two build files before the built folder', () => {
+    expect(fileFor('/gen5-build/bw2.json', folders)).toBe(build.bw2Json)
+    expect(fileFor('/gen5-build/routine.json?v=1', folders)).toBe(build.routineJson)
+    expect(fileFor('/gen5-build/index.html', folders)).toBeUndefined()
   })
 
   it('refuses a malformed escape and a NUL byte', () => {
@@ -147,5 +165,38 @@ describe('sourceFileFor', () => {
       `/emulatorjs/${ARCHIVE}`,
     ])
       expect(sourceFileFor(url, sources), url).toBeUndefined()
+  })
+})
+
+// Scene: the page asks for the numbers and the routine that the build machine makes; the server
+// answers those two files and nothing else under the prefix (#111).
+describe('buildFileFor', () => {
+  const folders = {
+    bw2Json: '/repo/build/gen5/bw2.json',
+    routineJson: '/repo/build/gen5/routine.json',
+  }
+
+  it('maps both names to their files, with or without a query', () => {
+    expect(buildFileFor('/gen5-build/bw2.json', folders)).toBe(folders.bw2Json)
+    expect(buildFileFor('/gen5-build/bw2.json?v=1', folders)).toBe(folders.bw2Json)
+    expect(buildFileFor('/gen5-build/routine.json', folders)).toBe(folders.routineJson)
+    expect(buildFileFor('/gen5-build/routine.json?v=1', folders)).toBe(folders.routineJson)
+  })
+
+  it('refuses the bare prefix, another name, a climb, another case and a double slash', () => {
+    for (const url of [
+      '/gen5-build/',
+      '/gen5-build/other.json',
+      '/gen5-build/../bw2.json',
+      '/gen5-build/%2e%2e/bw2.json',
+      '/gen5-build/%2E%2E%2Fbw2.json',
+      '/gen5-build/sub/bw2.json',
+      '/GEN5-BUILD/bw2.json',
+      '/gen5-build/BW2.JSON',
+      '/gen5-build//bw2.json',
+      '/bw2.json',
+      '/gen5-build/%E0%A4%A',
+    ])
+      expect(buildFileFor(url, folders), url).toBeUndefined()
   })
 })

@@ -17,7 +17,8 @@ import {
   TARGET,
   world,
 } from './session-testing'
-import { notShown, notShownCounts, streamOfReplay } from './stream'
+import { notShownCounts } from './not-shown-list'
+import { notShown, streamOfReplay } from './stream'
 
 describe('a session on a fresh page', () => {
   it('asks for the dump when Start comes first', async () => {

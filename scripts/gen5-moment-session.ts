@@ -18,7 +18,7 @@ import { TEXT_BANKS } from './gen5-moment-scene.ts'
 import { log, logSave, sampleLine, waitForStart } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { logStorage, type RequestLog, watchRequests } from './gen5-requests.ts'
-import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve } from './gen5-shot.ts'
+import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve } from './gen5-shot-browser.ts'
 
 /** The numbers scripts/gen5-bw2.ts generated from the pinned pokebw2 checkout. */
 export const readNumbers = () => JSON.parse(readFileSync(GEN5_PATHS.bw2Json, 'utf8')) as Bw2Numbers

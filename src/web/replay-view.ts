@@ -1,13 +1,13 @@
 // The replay controls both pages share (#52): the "Example replay" select, the form "Replay link
 // or ID" and the "Not shown in the game" list under the game. A pick or a Load fills the list
-// before Start; the texts come from status.ts, the flow's rules from replay-choice.ts, and what a
-// settled pick shows from pick-lines.ts. The viewer alone reads a replay file (#56). Both pages
-// write their status line here (#59): a failure's visitor line, its module's words under
-// "Details", and the report link under it.
+// before Start; the texts come from status.ts and not-shown-list.ts, the flow's rules from
+// replay-choice.ts, and what a settled pick shows from pick-lines.ts. The viewer alone reads a
+// replay file (#56). Both pages write their status line here (#59): a failure's visitor line, its
+// module's words under "Details", and the report link under it.
 import type { ReplayChoice, ReplayPlace, ReplaySummary } from './replay-choice'
 import { FIRST_REPLAY, TEST_REPLAYS } from './replays'
 import { reportLink } from './report-link'
-import type { NotShownRow } from './stream'
+import { countText, notShownHeading, type NotShownRow, rowParts } from './not-shown-list'
 import {
   loadedFrom,
   pickedFrom,
@@ -17,14 +17,7 @@ import {
   showPick,
   type Then,
 } from './pick-lines'
-import {
-  countText,
-  notShownHeading,
-  replayDetail,
-  replaySummaryLine,
-  rowParts,
-  type StatusLine,
-} from './status'
+import { replayDetail, replaySummaryLine, type StatusLine } from './status'
 import { detailShown, type VisitorLine, visitorLine } from './visitor'
 
 /** The element `#id` of `page`, which must be a `type`. */

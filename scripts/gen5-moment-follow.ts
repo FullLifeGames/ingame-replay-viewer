@@ -1,7 +1,9 @@
 // The moment script's view of the page (#72, #97, #107): the page's hook, and the run's report
 // followed until it ends, each new mark's frame and state written under build/gen5/frames/ and
-// build/gen5/states/ (gitignored, ADR 0002), and the report logged.
-import { writeFileSync } from 'node:fs'
+// build/gen5/states/ (gitignored, ADR 0002), and the report logged. A whole replay's run waits for
+// its marks' hashes and writes its marks file to build/gen5/runs/ (#110), as scripts/gen5-replay.ts
+// and the shot scene of the page's own replay (gen5-shot-replay.ts, #111) do.
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import type { Page } from '@playwright/test'
@@ -9,6 +11,8 @@ import type { Page } from '@playwright/test'
 import type { Gen5Global, MarkRecord, RunPlan, RunReport } from '../src/gen5/hook.ts'
 import { log } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
+import { HASH_POLLS, marksVerdict } from './gen5-replay-exit.ts'
+import { marksOf, pendingMarks, type RunMark } from './gen5-replay-marks.ts'
 
 export const POLL_MS = 1000
 
@@ -71,4 +75,32 @@ export function logReport(report: RunReport): void {
   if (report.failed !== undefined) log(`failed: ${report.failed}`)
   if (report.loadCheck !== undefined) log(`load check: ${report.loadCheck}`)
   for (const line of report.watch) log(`watch ${line}`)
+}
+
+/** The page's report again each POLL_MS while a mark's hash is pending, HASH_POLLS times at
+ * most. */
+export async function hashed(page: Page, report: RunReport): Promise<RunReport> {
+  let current = report
+  for (let poll = 0; poll < HASH_POLLS && pendingMarks(marksOf(current)).length > 0; poll += 1) {
+    await new Promise((resolve) => setTimeout(resolve, POLL_MS))
+    current = await hook(page).runReport()
+  }
+  return current
+}
+
+/** Writes the run's marks file as build/gen5/runs/<label>.json and compares it with an earlier
+ * run's marks, the lines logged; false on a hash still pending or a mark that differs. */
+export function marksChecked(
+  label: string,
+  report: RunReport,
+  against: readonly RunMark[] | undefined,
+): boolean {
+  const marks = marksOf(report)
+  mkdirSync(GEN5_PATHS.runs, { recursive: true })
+  const file = { label, status: report.status, marks }
+  writeFileSync(join(GEN5_PATHS.runs, `${label}.json`), `${JSON.stringify(file, null, 1)}\n`)
+  log(`marks: ${String(marks.length)} written to build/gen5/runs/${label}.json`)
+  const { agree, lines } = marksVerdict(marks, against)
+  for (const line of lines) log(line)
+  return agree
 }

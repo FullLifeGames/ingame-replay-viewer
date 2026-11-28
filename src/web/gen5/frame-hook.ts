@@ -3,7 +3,8 @@
 // mark, logs the watched RAM values and gives the emulated frame that drives the page's fixed clock
 // (src/gen5/clock.ts). core-runtime.ts hands the call to the core. RetroArch runs at most one core
 // frame per iteration; the core's frame counter tells which iterations ran one, and the hook counts
-// the frames it did not see.
+// the frames it did not see. Listeners hear each run end, which lets the page queue a replay's
+// play once its entry ended.
 import type { Gen5Hook, MarkRecord, RunPlan, RunReport } from '../../gen5/hook.ts'
 import {
   type Button,
@@ -27,6 +28,9 @@ export interface FrameGame {
 }
 
 type FrameHookCalls = Pick<Gen5Hook, 'queueRun' | 'runReport' | 'takeMark'>
+
+/** Hears each run end, done or failed, with the report, after the frame it ended on. */
+type RunEndListener = (report: RunReport) => void
 
 /** Watch lines kept; the log needs the battle's start, not a flood. */
 const WATCH_LINES = 400
@@ -66,6 +70,7 @@ class FrameDriver {
     jumps: 0,
   }
   readonly captures = new Map<string, Capture>()
+  readonly listeners: RunEndListener[] = []
   queued: RunPlan | undefined
   frame = 0
   /** Emulated frame minus the page's frame counter; kept after a run ends, for the clock. */
@@ -77,6 +82,8 @@ class FrameDriver {
   private run: Run | undefined
   private lastPage: number | undefined
   private readonly read: ReadRam
+  /** Set when a run ended on this frame; the listeners hear it once the frame is counted. */
+  private ended = false
 
   private readonly game: () => FrameGame | undefined
   private readonly ram: () => MainRam
@@ -99,11 +106,38 @@ class FrameDriver {
     try {
       this.onFrame(g, page, skipped)
     } catch (error) {
-      this.report.status = 'failed'
-      this.report.failed = `the frame hook threw: ${String(error)}`
+      this.fail(`the frame hook threw: ${String(error)}`)
       this.run = undefined
     }
+    if (this.ended) this.tell()
     return true
+  }
+
+  /** Marks the run failed; the listeners hear it at the frame's end. */
+  private fail(failed: string): void {
+    this.report.status = 'failed'
+    this.report.failed = failed
+    this.ended = true
+  }
+
+  /** Each listener hears the run's end; a run one of them queues starts on a later frame. A
+   * listener that throws stops neither the others nor the frame callback: once all have heard
+   * the end, the report fails with the first throw and a run queued meanwhile is dropped, as the
+   * chain of runs is broken. */
+  private tell(): void {
+    this.ended = false
+    let thrown: string | undefined
+    for (const listener of this.listeners) {
+      try {
+        listener(this.report)
+      } catch (error) {
+        thrown ??= `a run-end listener threw: ${String(error)}`
+      }
+    }
+    if (thrown === undefined) return
+    this.queued = undefined
+    this.report.status = 'failed'
+    this.report.failed = thrown
   }
 
   private onFrame(g: FrameGame, page: number, skipped: number): void {
@@ -134,8 +168,9 @@ class FrameDriver {
     const frame = page + this.offset
     if (frame > startAt) {
       this.queued = undefined
-      this.report.status = 'failed'
-      this.report.failed = `the run was to start at frame ${String(startAt)}, and the hook first saw frame ${String(frame)}`
+      this.fail(
+        `the run was to start at frame ${String(startAt)}, and the hook first saw frame ${String(frame)}`,
+      )
     }
     return frame === startAt
   }
@@ -230,6 +265,7 @@ class FrameDriver {
       this.capture(g, 'failed', page)
     }
     this.report.status = failed === undefined ? 'done' : 'failed'
+    this.ended = true
     this.run = undefined
   }
 
@@ -284,12 +320,18 @@ class FrameDriver {
 export function frameHook(
   game: () => FrameGame | undefined,
   ram: () => MainRam,
-): { calls: FrameHookCalls; preMainLoop: () => boolean; frame: () => number } {
+): {
+  calls: FrameHookCalls
+  preMainLoop: () => boolean
+  frame: () => number
+  onRunEnd: (listener: RunEndListener) => void
+} {
   const driver = new FrameDriver(game, ram)
   const calls: FrameHookCalls = {
     queueRun: (plan) => {
       driver.queued = plan
       driver.report.status = 'queued'
+      driver.report.step = 0
     },
     runReport: () => driver.report,
     takeMark: async (name) => {
@@ -299,5 +341,12 @@ export function frameHook(
       return { state: toBase64(taken.state), shot: toBase64(await taken.shot) }
     },
   }
-  return { calls, preMainLoop: () => driver.preMainLoop(), frame: () => driver.frame }
+  return {
+    calls,
+    preMainLoop: () => driver.preMainLoop(),
+    frame: () => driver.frame,
+    onRunEnd: (listener) => {
+      driver.listeners.push(listener)
+    },
+  }
 }

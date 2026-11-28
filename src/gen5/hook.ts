@@ -80,6 +80,20 @@ export interface SaveReport {
   file?: { base64: string; sha256: string; bytes: number }
 }
 
+/** Where the page's play of a test replay stands (#111). */
+export interface ReplayProgress {
+  /** Loading the build files and the replay, the direct entry, the blocks, the last scene, or a
+   * stop on the way. */
+  phase: 'loading' | 'entry' | 'play' | 'ended' | 'failed'
+  /** The test replay's ID. */
+  replay: string
+  /** The blocks begun so far, and the replay's blocks. */
+  block: number
+  blocks: number
+  /** The sentence the page said when the play stopped. */
+  failed?: string
+}
+
 export interface Gen5Hook {
   /** The page's status line. */
   status: () => string
@@ -124,6 +138,8 @@ export interface Gen5Hook {
   queueSave: (base64: string) => void
   /** The save once the core wrote save RAM to its file; undefined before the game runs. */
   takeSave: () => Promise<SaveReport | undefined>
+  /** The play of the test replay picked on the page; undefined when none was picked. */
+  replay: () => ReplayProgress | undefined
 }
 
 /** libretro's joypad index of Start (RETRO_DEVICE_ID_JOYPAD_START in libretro.h). */

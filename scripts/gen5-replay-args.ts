@@ -8,8 +8,9 @@ import { parseArgs } from 'node:util'
 
 import { type MomentTeam, readMomentOptions } from './gen5-moment-args.ts'
 
-/** Frames between two frames of a block while it waits, by default (lane plan D10). */
-const EVERY = 30
+/** Frames between two frames of a block while it waits, by default (lane plan D10); the shot
+ * scene of the page's own replay asks the page for the same, so the two runs' marks compare. */
+export const EVERY = 30
 
 export interface ReplayOptions {
   team: Extract<MomentTeam, { from: 'replay' }>

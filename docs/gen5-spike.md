@@ -12,7 +12,7 @@ The proof covers one battle and one kind of moment: a move's line, its animation
 
 - `src/gen5/`: plain TypeScript that imports no DOM, no browser API and no Node module (17 files, 15 specs). It reads and checks the DS header (`nds-header.ts`), finds DS main RAM in the emulator's heap (`main-ram.ts`), plays input macros with RAM checks and a fixed clock (`macro.ts`, `route.ts`, `ram-check.ts`, `clock.ts`), packs server commands into an adapter block (`server-cmd.ts`, `adapter.ts`), finds the battle's Pokémon in RAM (`battle-mons.ts`) and builds one moment (`moment.ts`). No lint zone holds it yet (see "Open questions").
 - `src/web/gen5/`: the Gen 5 page. It takes the dump through a file input, refuses anything but Black 2 (USA) version 0 with a sentence that names what it found, loads EmulatorJS, and gives the scripts a hook on `window` for frames, RAM and macros. A speed line, a device line and a "Copy figures" button serve the user's own check. The frame driver and the byte codecs have specs (S8).
-- `scripts/gen5-*`: the fetch of EmulatorJS's pinned npm packages with their integrity check (`gen5-fetch.ts`), the page's servers (`gen5-serve.ts`, static with `--built`), the Chromium runs with frames, a request log and a memory log (`gen5-shot.ts`, `gen5-route.ts`, `gen5-moment.ts`), and the generator of pokebw2's numbers (`gen5-bw2*.ts`).
+- `scripts/gen5-*`: the fetch of EmulatorJS's pinned npm packages with their integrity check (`gen5-fetch.ts`), the page's servers (`gen5-serve.ts`, static with `--built`; since #111 both also answer the generated `bw2.json` and the built `routine.json` from `build/gen5/` under `/gen5-build/`, so the page plays a test replay by itself), the Chromium runs with frames, a request log and a memory log (`gen5-shot.ts`, `gen5-route.ts`, `gen5-moment.ts`), and the generator of pokebw2's numbers (`gen5-bw2*.ts`).
 - The fetched emulator, the pokebw2 checkout, the generated `build/gen5/bw2.json`, the states and the frames sit in the gitignored `.cache/gen5/` and `build/gen5/`. The spike committed no ROM, no part of one, no state, no save file and no file of pokebw2. It left the Gen 3 code, its ROM files and the viewer's pages as they were; the shared files it changed are `knip.json` (one entry line) and `AGENTS.md` (one line in the project list).
 
 ## The emulator (question 1)
@@ -160,7 +160,7 @@ The direct entry's other numbers come the same way, by `scripts/gen5-bw2-entry.t
 
 ### What the direct entry leaves open
 
-- The visitor's page does not start it yet: `scripts/gen5-moment.ts` drives it from outside.
+- `scripts/gen5-moment.ts` and `scripts/gen5-replay.ts` drive it from outside, and since #111 the page also starts it for a picked test replay (`docs/gen5-backend.md`, "The page plays a replay"). A replay link or an uploaded file does not start it yet.
 - A replay's own turns reach it since #110: `scripts/gen5-replay.ts` plays a test replay from power-on to its last scene (`docs/gen5-backend.md`). Every Pokémon is form 0.
 - With an experience of 0 the near box draws its EXP bar empty.
 - The opening's samples, one every 30 frames, show the throw and no frame of the "Go!" line.
@@ -317,7 +317,7 @@ Since #110 the backend plays both Gen 5 OU test replays start to finish. `docs/g
 - The EXP bar: a replay carries no experience, so the bar draws empty; the backend decides whether to fill it or leave it.
 - A double's moment: the direct entry reaches a double's action menu, and `src/gen5/moment.ts` plays a single's moment alone.
 - The music: the park writes the trainer battle's track, and no run has listened to it.
-- The direct entry on the visitor's page: today `scripts/gen5-moment.ts` drives it from outside.
+- The direct entry on the visitor's page: since #111 the page starts it for a picked test replay, and a replay link or an uploaded file still waits for it.
 - The walk's removal: `--entry walk`, the continue route, the trainer route and the save before Terrell, once nothing needs them (the save still backs the format's real spec).
 - A pace for the blocks: a block took 4.5 to 8.1 s at the DS's rate, and the page waits for `returned` before the next.
 

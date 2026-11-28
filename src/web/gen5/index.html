@@ -29,6 +29,35 @@
         width: min(512px, 100%);
         aspect-ratio: 2 / 3;
       }
+      #beside h2 {
+        margin: 0.5em 0;
+      }
+      /* A row of the list wraps anywhere but inside its log line's first field, as on the Gen 3
+         page (#90). */
+      #replay-end,
+      #not-shown-rows li {
+        overflow-wrap: anywhere;
+      }
+      #not-shown-rows .log-kind {
+        white-space: nowrap;
+      }
+      /* From 56rem up the list stands beside the game, as high as the game, with a scroll of its
+         own; on a narrower screen it stands under the game (#111). */
+      @media (min-width: 56rem) {
+        #stage {
+          display: grid;
+          grid-template-columns: min(512px, 100%) minmax(18rem, 1fr);
+          gap: 1rem;
+          align-items: start;
+        }
+        #beside {
+          max-height: 768px;
+          overflow-y: auto;
+        }
+        #beside h2 {
+          margin-top: 0;
+        }
+      }
     </style>
   </head>
   <body>
@@ -43,6 +72,10 @@
         notices and the source archives.
       </p>
     </section>
+    <p>
+      <label for="replay">Pick a test replay for Black 2 to play from power-on.</label>
+      <select id="replay"></select>
+    </p>
     <p>
       <label for="dump">Pick your Black 2 (USA) dump. It stays in this browser.</label>
       <input id="dump" type="file" />
@@ -68,7 +101,15 @@
     <p id="device">Measuring this device for two seconds.</p>
     <p id="speed"></p>
     <p><output id="figures"></output></p>
-    <div id="game"></div>
+    <div id="stage">
+      <div id="game"></div>
+      <section id="beside" hidden>
+        <p id="replay-end" hidden></p>
+        <h2 id="not-shown">Not shown in the game (0)</h2>
+        <ul id="not-shown-counts"></ul>
+        <ol id="not-shown-rows"></ol>
+      </section>
+    </div>
     <script type="module" src="./main.ts"></script>
   </body>
 </html>

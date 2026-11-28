@@ -7,7 +7,8 @@ import { Gen3Error } from '../gen3/errors'
 import { showsInPlace } from '../gen3/fallbacks'
 import { buildBattleScript } from '../script/build'
 import { readReplay, ReplayError } from '../script/replay'
-import { notShown, notShownCounts, streamOfLoaded, streamOfReplay } from './stream'
+import { notShownCounts } from './not-shown-list'
+import { notShown, streamOfLoaded, streamOfReplay } from './stream'
 
 const lines = (log: string) => log.split('\n')
 
