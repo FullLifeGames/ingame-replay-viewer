@@ -92,6 +92,7 @@ export const EACH_OP: readonly Instruction[] = [
   { op: 'showMon', side: 'far' },
   { op: 'tera', side: 'far', teraType: 20 },
   { op: 'moveType', type: 1 },
+  { op: 'megaEvolve', side: 'far', species: 906 },
   { op: 'faint', side: 'near' },
   { op: 'flushTextBox' },
   { op: 'end', outcome: 'farWon' },
@@ -125,6 +126,7 @@ const faint = (side: Side): Instruction => ({ op: 'faint', side })
 const formChange = (side: Side): Instruction => ({ op: 'formChange', side, species: 1051 })
 const showMon = (side: Side): Instruction => ({ op: 'showMon', side })
 const tera = (side: Side): Instruction => ({ op: 'tera', side, teraType: 19 })
+const megaEvolve = (side: Side): Instruction => ({ op: 'megaEvolve', side, species: 906 })
 
 export interface OrderCase {
   /** The name of its TEST in replay_refuse_order.c, after "Replay: order: ". */
@@ -211,6 +213,16 @@ export const ORDER_CASES: readonly OrderCase[] = [
     name: 'a TERA on a fainted side is refused',
     instructions: [...LEADS, faint('far'), tera('far')],
     refused: /^tera at 4 names the far side, which has no battler out$/,
+  },
+  {
+    name: 'a MEGA_EVOLVE before any SEND_OUT is refused',
+    instructions: [intro, megaEvolve('near')],
+    refused: /^megaEvolve at 1 names the near side, which has no battler out$/,
+  },
+  {
+    name: 'a MEGA_EVOLVE on a fainted side is refused',
+    instructions: [...LEADS, faint('far'), megaEvolve('far')],
+    refused: /^megaEvolve at 4 names the far side, which has no battler out$/,
   },
   {
     name: 'a double KO in sand, the sand upkeep and both switch-ins pass',

@@ -49,10 +49,10 @@ describe('decodeStream', () => {
     expect(decodeStream(slot.subarray(8, 8 + bytes.length))).toEqual(streamOf([END]))
   })
 
-  it('refuses versions 1, 2, 3 and 5 (F7)', () => {
-    for (const version of [1, 2, 3, 5]) {
+  it('refuses versions 1, 2, 3, 4 and 6 (F7)', () => {
+    for (const version of [1, 2, 3, 4, 6]) {
       expect(patched([END], 0, [version])).toThrow(
-        `stream version ${String(version)} is unknown; this reads version 4`,
+        `stream version ${String(version)} is unknown; this reads version 5`,
       )
     }
   })
@@ -93,8 +93,12 @@ describe('decodeStream', () => {
     expect(patched([turn, END], at, [1])).toThrow(Gen3Error)
   })
 
-  it('refuses an unknown op, the one after the last op of version 4', () => {
-    expect(patched([END], STREAM.tablesEnd, [0x19])).toThrow(/op 25/)
+  it('refuses an unknown op, the one after the last op of version 5', () => {
+    expect(patched([END], STREAM.tablesEnd, [0x1a])).toThrow(/op 26/)
+  })
+
+  it('holds one instruction of each op in EACH_OP', () => {
+    expect(new Set(EACH_OP.map(({ op }) => op))).toEqual(new Set(Object.keys(OP)))
   })
 
   it('reads back a TERA and a MOVE_TYPE and refuses a type outside TYPE_NORMAL to the last', () => {
@@ -117,7 +121,7 @@ describe('decodeStream', () => {
     }
   })
 
-  it('refuses a header whose sizes or offsets are not those of version 4', () => {
+  it('refuses a header whose sizes or offsets are not those of version 5', () => {
     const cases: [number, number][] = [
       [STREAM_OFFSET.headerSize, 0x20],
       [STREAM_OFFSET.trainerSize, 25],
@@ -258,11 +262,13 @@ describe('decodeStream', () => {
     const ability: Instruction = { op: 'ability', side: 'near', ability: 1, show: true }
     const item: Instruction = { op: 'item', side: 'far', slot: 0, item: 1 }
     const change: Instruction = { op: 'formChange', side: 'near', species: 1 }
+    const mega: Instruction = { op: 'megaEvolve', side: 'far', species: 1 }
     const cases: [Instruction, number, number, RegExp][] = [
       [move, 2, counts.MOVES_COUNT_ALL, /move move 935/],
       [ability, 1, counts.ABILITIES_COUNT, /ability ability 320/],
       [item, 2, counts.ITEMS_COUNT, /item item 874/],
       [change, 1, counts.NUM_SPECIES, /formChange species 1573/],
+      [mega, 1, counts.NUM_SPECIES, /megaEvolve species 1573/],
     ]
     for (const [instruction, at, count, message] of cases) {
       expect(patched([...LEADS, instruction, END], operands + at, u16(count))).toThrow(message)
@@ -272,6 +278,7 @@ describe('decodeStream', () => {
       })
     }
     expect(patched([...LEADS, change, END], operands + 1, u16(0))).toThrow(/species 0 /)
+    expect(patched([...LEADS, mega, END], operands + 1, u16(0))).toThrow(/megaEvolve species 0 /)
   })
 
   it('refuses a name without EOS and a byte outside the charset', () => {

@@ -249,6 +249,12 @@ void ReplayStream_FormChange(u32 side, u32 species)
     ReplayStream_Op(REPLAY_OP_FORM_CHANGE, REPLAY_OP_FORM_CHANGE_SIZE, operands);
 }
 
+void ReplayStream_MegaEvolve(u32 side, u32 species)
+{
+    const u8 operands[REPLAY_OP_MEGA_EVOLVE_SIZE] = { side, species, species >> 8 };
+    ReplayStream_Op(REPLAY_OP_MEGA_EVOLVE, REPLAY_OP_MEGA_EVOLVE_SIZE, operands);
+}
+
 void ReplayStream_ShowMon(u32 side)
 {
     const u8 operands[REPLAY_OP_SHOW_MON_SIZE] = { side };

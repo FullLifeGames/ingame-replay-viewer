@@ -21,9 +21,9 @@ const u16 = (bytes: Uint8Array, at: number) => (bytes[at] ?? 0) | ((bytes[at + 1
 const u32 = (bytes: Uint8Array, at: number) => u16(bytes, at) + u16(bytes, at + 2) * 0x10000
 
 describe('encodeStream', () => {
-  it('starts a stream of END alone with version 4 and header size 16 (F1)', () => {
+  it('starts a stream of END alone with version 5 and header size 16 (F1)', () => {
     const bytes = encodeStream(streamOf([END]))
-    expect([...bytes.subarray(0, 4)]).toEqual([0x04, 0x00, 0x10, 0x00])
+    expect([...bytes.subarray(0, 4)]).toEqual([0x05, 0x00, 0x10, 0x00])
     expect([bytes[4], bytes[5], u16(bytes, 6)]).toEqual([24, 24, 0])
     expect([u32(bytes, 8), u32(bytes, 12)]).toEqual([STREAM.tablesEnd, 3])
     expect([...bytes.subarray(STREAM.tablesEnd)]).toEqual([0x00, 0x01, 0x00])
@@ -202,6 +202,11 @@ describe('encodeInstruction', () => {
     expect(encodeInstruction(change)).toEqual([0x15, 3, 1, 0x1b, 0x04])
   })
 
+  it('encodes MEGA_EVOLVE as the side and a two-byte species, as FORM_CHANGE orders them', () => {
+    const mega: Instruction = { op: 'megaEvolve', side: 'far', species: 906 }
+    expect(encodeInstruction(mega)).toEqual([0x19, 3, 1, 0x8a, 0x03])
+  })
+
   it('encodes SHOW_MON as the side alone', () => {
     expect(encodeInstruction({ op: 'showMon', side: 'far' })).toEqual([0x16, 1, 1])
   })
@@ -226,12 +231,15 @@ describe('encodeInstruction', () => {
     }
   })
 
-  it('takes FORM_CHANGE species 1 to NUM_SPECIES - 1 and refuses 0 and NUM_SPECIES', () => {
+  it('takes the species 1 to NUM_SPECIES - 1 of FORM_CHANGE and MEGA_EVOLVE and refuses 0 and NUM_SPECIES', () => {
     const change = (species: number): Instruction => ({ op: 'formChange', side: 'near', species })
-    expect(encodeInstruction(change(1))).toHaveLength(5)
-    expect(encodeInstruction(change(counts.NUM_SPECIES - 1))).toHaveLength(5)
-    expect(() => encodeInstruction(change(0))).toThrow(Gen3Error)
-    expect(() => encodeInstruction(change(counts.NUM_SPECIES))).toThrow(Gen3Error)
+    const mega = (species: number): Instruction => ({ op: 'megaEvolve', side: 'near', species })
+    for (const make of [change, mega]) {
+      expect(encodeInstruction(make(1))).toHaveLength(5)
+      expect(encodeInstruction(make(counts.NUM_SPECIES - 1))).toHaveLength(5)
+      expect(() => encodeInstruction(make(0))).toThrow(Gen3Error)
+      expect(() => encodeInstruction(make(counts.NUM_SPECIES))).toThrow(Gen3Error)
+    }
   })
 
   it('takes the last item and move of the expansion and refuses the next', () => {

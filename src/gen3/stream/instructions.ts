@@ -92,6 +92,10 @@ interface Operands {
   tera: OnSide & { readonly teraType: number }
   /** The type, the game's `TYPE_*`, that the next MOVE's animation reads for its look. */
   moveType: { readonly type: number }
+  /**
+   * The side's mon Mega Evolves into `species`; the form and the mark stay with its party slot.
+   */
+  megaEvolve: OnSide & { readonly species: number }
 }
 
 export type Instruction = { [K in Op]: { readonly op: K } & Operands[K] }[Op]
@@ -222,6 +226,10 @@ export const LAYOUT: { readonly [K in FixedOp]: Fields<Operands[K]> } = {
     ['teraType', type],
   ],
   moveType: [['type', type]],
+  megaEvolve: [
+    ['side', side],
+    ['species', species],
+  ],
 }
 
 /** A trainer's fields; their offsets are TRAINER_OFFSET's under the same names. */

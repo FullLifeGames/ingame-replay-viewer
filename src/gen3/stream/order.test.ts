@@ -86,6 +86,7 @@ describe('ORDER', () => {
       'formChange',
       'showMon',
       'tera',
+      'megaEvolve',
     ]
     expect(ORDER.onFieldOps).toBe(bits(ops.map((op) => OP[op])))
   })

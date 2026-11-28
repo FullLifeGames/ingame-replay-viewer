@@ -14,8 +14,8 @@
 #include "constants/battle_anim.h"
 #include "constants/pokemon.h"
 
-// The ops of a mon's state (#6, #19, #65, #89): STATUS, STAT, ITEM, ITEM_POP_UP, FORM_CHANGE and
-// TERA. Both parties are local in a recorded battle, so each writes the party mon itself; the
+// The ops of a mon's state (#6, #19, #65, #89, #126): STATUS, STAT, ITEM, ITEM_POP_UP, FORM_CHANGE,
+// TERA and MEGA_EVOLVE. Both parties are local in a recorded battle, so each writes the party mon itself; the
 // battle mon changes only while that party mon is on the field.
 
 static bool32 IsOnField(u32 battler, u32 slot)
@@ -131,15 +131,31 @@ bool32 Replay_OpItemPopUp(const volatile u8 *operands, u32 step)
     }
 }
 
+// The first half of a form change: the party mon and the battle mon take the species before the
+// animation, as in the engine (TryBattleFormChange, then BS_HandleFormChange's
+// REQUEST_SPECIES_BATTLE), because B_ANIM_FORM_CHANGE and B_ANIM_MEGA_EVOLUTION draw the party
+// mon's species (AnimTask_TransformMon, AnimTask_HideSwapSprite, HandleSpeciesGfxDataChange).
+static void SetFormSpecies(u32 battler, u32 species)
+{
+    SetMonData(GetBattlerMon(battler), MON_DATA_SPECIES, &species);
+    gBattleMons[battler].species = species;
+}
+
+// The second half, after the animation: the healthbox and the far mon's shadow follow the species,
+// as BS_HandleFormChange's second case does. transformSpecies is set as
+// HandleSpeciesGfxDataChange leaves it, also where a headless test skips the animation.
+static void ShowFormSpecies(u32 battler, u32 species)
+{
+    gBattleSpritesDataPtr->battlerData[battler].transformSpecies = species;
+    UpdateHealthboxAttribute(gHealthboxSpriteIds[battler], GetBattlerMon(battler), HEALTHBOX_ALL);
+    if (!IsOnPlayerSide(battler))
+        SetBattlerShadowSpriteCallback(battler, species);
+}
+
 // FORM_CHANGE: the side's mon takes another form, as BattleScript_BattlerFormChangeWithString
 // changes it between the ability pop-up and STRINGID_PKMNTRANSFORMED, which come as ABILITY and
-// PRINT. The party mon and the battle mon take the species first, as in the engine
-// (TryBattleFormChange, then BS_HandleFormChange's REQUEST_SPECIES_BATTLE), because
-// B_ANIM_FORM_CHANGE draws the party mon's species (AnimTask_TransformMon,
-// HandleSpeciesGfxDataChange). After the animation the healthbox and the far mon's shadow follow
-// the species, as BS_HandleFormChange's second case does. transformSpecies is set as
-// HandleSpeciesGfxDataChange leaves it, also where a headless test skips the animation. A switch
-// brings the form of the team table back (Replay_PutMonOnField).
+// PRINT, with B_ANIM_FORM_CHANGE between the two halves. A switch brings the form of the team
+// table back (Replay_PutMonOnField).
 bool32 Replay_OpFormChange(const volatile u8 *operands, u32 step)
 {
     u32 battler = Replay_GetBattler(operands[0]);
@@ -147,16 +163,12 @@ bool32 Replay_OpFormChange(const volatile u8 *operands, u32 step)
 
     if (step == 0)
     {
-        SetMonData(GetBattlerMon(battler), MON_DATA_SPECIES, &species);
-        gBattleMons[battler].species = species;
+        SetFormSpecies(battler, species);
         BtlController_EmitBattleAnimation(battler, B_COMM_TO_CONTROLLER, B_ANIM_FORM_CHANGE, 0);
         MarkBattlerForControllerExec(battler);
         return FALSE;
     }
-    gBattleSpritesDataPtr->battlerData[battler].transformSpecies = species;
-    UpdateHealthboxAttribute(gHealthboxSpriteIds[battler], GetBattlerMon(battler), HEALTHBOX_ALL);
-    if (!IsOnPlayerSide(battler))
-        SetBattlerShadowSpriteCallback(battler, species);
+    ShowFormSpecies(battler, species);
     return TRUE;
 }
 
@@ -193,4 +205,31 @@ bool32 Replay_OpTera(const volatile u8 *operands, u32 step)
     default:
         return TRUE;
     }
+}
+
+// MEGA_EVOLVE: the side's mon Mega Evolves, as BattleScript_MegaEvolution plays it between
+// STRINGID_MEGAEVOREACTING and STRINGID_MEGAEVOEVOLVED, which come as PRINT. The mon takes the Mega
+// species and its party slot the gimmick, the state ActivateMegaEvolution sets before its battle
+// script; ActivateMegaEvolution itself needs the held stone and a running battle script. The game
+// loads the indicator palettes at the first turn's events (LoadIndicatorSpritesGfx), so
+// MEGA_EVOLVE loads them as TERA does. Then come B_ANIM_MEGA_EVOLUTION, between the two halves of
+// a form change, and the healthbox redraw, which shows the Mega mark in place of "Lv"
+// (UpdateLvlInHealthbox). Behind a substitute the animation plays nothing, as in the game
+// (TryHandleLaunchBattleTableAnimation).
+bool32 Replay_OpMegaEvolve(const volatile u8 *operands, u32 step)
+{
+    u32 battler = Replay_GetBattler(operands[0]);
+    u32 species = Replay_ReadU16(operands + 1);
+
+    if (step == 0)
+    {
+        SetFormSpecies(battler, species);
+        SetActiveGimmick(battler, GIMMICK_MEGA);
+        LoadIndicatorSpritesGfx();
+        BtlController_EmitBattleAnimation(battler, B_COMM_TO_CONTROLLER, B_ANIM_MEGA_EVOLUTION, 0);
+        MarkBattlerForControllerExec(battler);
+        return FALSE;
+    }
+    ShowFormSpecies(battler, species);
+    return TRUE;
 }

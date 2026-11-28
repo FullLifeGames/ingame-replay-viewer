@@ -129,7 +129,7 @@ describe.skipIf(!existsSync(buildPaths().tree))(
       const plans = await planStreams(['send-outs'], layout)
       const names = plans.map((plan) => plan.name)
       expect(names.slice(0, 2)).toEqual(['send-outs-1', 'send-outs-2'])
-      expect(names.slice(-2)).toEqual(['empty-slot', 'version-5'])
+      expect(names.slice(-2)).toEqual(['empty-slot', 'version-6'])
       expect(names.length).toBeGreaterThan(12)
       for (const plan of plans.slice(0, -2)) {
         expect(plan.expect).toBe('finished')

@@ -67,8 +67,8 @@ u32 ReplayTest_AnimMoveTurnAtOpStart(u32 op);
 // own) when the interpreter started op number op, recorded as the KO animation counter is.
 u32 ReplayTest_MoveTypeAtOpStart(u32 op);
 
-// Whether the Tera indicator of a side (REPLAY_SIDE_*) was visible when the interpreter started op
-// number op, recorded as the KO animation counter is.
+// Whether the gimmick indicator of a side (REPLAY_SIDE_*), Tera's type or the Mega mark, was
+// visible when the interpreter started op number op, recorded as the KO animation counter is.
 bool32 ReplayTest_IndicatorShownAtOpStart(u32 op, u32 side);
 
 // The type the first move animation of the stream reads (GetBattleMoveType(gCurrentMove)), taken
@@ -131,6 +131,8 @@ void ReplayStream_TrapTurn(u32 side, u32 move);
 void ReplayStream_FlushTextBox(void);
 // species is the form the side's mon takes, such as SPECIES_CASTFORM_SUNNY.
 void ReplayStream_FormChange(u32 side, u32 species);
+// The side's mon Mega Evolves into species, such as SPECIES_VENUSAUR_MEGA.
+void ReplayStream_MegaEvolve(u32 side, u32 species);
 // Shows the side's mon again, as the game shows a hidden Fly user whose hit turn plays no move.
 void ReplayStream_ShowMon(u32 side);
 // The side's mon Terastallizes into teraType (TYPE_*).

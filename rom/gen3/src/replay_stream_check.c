@@ -88,9 +88,10 @@ static const struct ReplayOpFormat sOpFormats[] =
     [REPLAY_OP_SHOW_MON]       = { REPLAY_OP_SHOW_MON_SIZE,       { OPERAND_SIDE } },
     [REPLAY_OP_TERA]           = { REPLAY_OP_TERA_SIZE,           { OPERAND_SIDE, OPERAND_TYPE } },
     [REPLAY_OP_MOVE_TYPE]      = { REPLAY_OP_MOVE_TYPE_SIZE,      { OPERAND_TYPE } },
+    [REPLAY_OP_MEGA_EVOLVE]    = { REPLAY_OP_MEGA_EVOLVE_SIZE,    { OPERAND_SIDE, OPERAND_SPECIES } },
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sOpFormats) == REPLAY_OP_MOVE_TYPE + 1, ReplayOpFormatsCoverTheFormat);
+STATIC_ASSERT(ARRAY_COUNT(sOpFormats) == REPLAY_OP_MEGA_EVOLVE + 1, ReplayOpFormatsCoverTheFormat);
 
 // The values each kind allows. The stream's own enums are numbered without gaps. A type is one of
 // the game's, TYPE_MYSTERY and TYPE_STELLAR included.
@@ -306,7 +307,7 @@ enum ReplayPresence
 // The masks hold a bit per op and per animation, and each names its ops as format.ts does.
 STATIC_ASSERT(ARRAY_COUNT(sOpFormats) <= 32, ReplayOrderOpsFitTheMask);
 STATIC_ASSERT(REPLAY_ANIM_SNOW_CONTINUES < 32, ReplayOrderAnimsFitTheMask);
-STATIC_ASSERT(REPLAY_ORDER_ON_FIELD_OPS == ((1 << REPLAY_OP_WITHDRAW) | (1 << REPLAY_OP_MOVE) | (1 << REPLAY_OP_HIT) | (1 << REPLAY_OP_HP) | (1 << REPLAY_OP_FAINT) | (1 << REPLAY_OP_STAT) | (1 << REPLAY_OP_ANIM) | (1 << REPLAY_OP_VOLATILE) | (1 << REPLAY_OP_ABILITY) | (1 << REPLAY_OP_ITEM_POP_UP) | (1 << REPLAY_OP_TRAP_TURN) | (1 << REPLAY_OP_FORM_CHANGE) | (1 << REPLAY_OP_SHOW_MON) | (1 << REPLAY_OP_TERA)), ReplayOrderOnFieldOps);
+STATIC_ASSERT(REPLAY_ORDER_ON_FIELD_OPS == ((1 << REPLAY_OP_WITHDRAW) | (1 << REPLAY_OP_MOVE) | (1 << REPLAY_OP_HIT) | (1 << REPLAY_OP_HP) | (1 << REPLAY_OP_FAINT) | (1 << REPLAY_OP_STAT) | (1 << REPLAY_OP_ANIM) | (1 << REPLAY_OP_VOLATILE) | (1 << REPLAY_OP_ABILITY) | (1 << REPLAY_OP_ITEM_POP_UP) | (1 << REPLAY_OP_TRAP_TURN) | (1 << REPLAY_OP_FORM_CHANGE) | (1 << REPLAY_OP_SHOW_MON) | (1 << REPLAY_OP_TERA) | (1 << REPLAY_OP_MEGA_EVOLVE)), ReplayOrderOnFieldOps);
 STATIC_ASSERT(REPLAY_ORDER_FREE_ANIMS == ((1 << REPLAY_ANIM_RAIN_CONTINUES) | (1 << REPLAY_ANIM_SUN_CONTINUES) | (1 << REPLAY_ANIM_SANDSTORM_CONTINUES) | (1 << REPLAY_ANIM_HAIL_CONTINUES) | (1 << REPLAY_ANIM_SNOW_CONTINUES)), ReplayOrderFreeAnims);
 
 static bool32 IsInMask(u32 mask, u32 bit)

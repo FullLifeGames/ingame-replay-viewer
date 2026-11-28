@@ -178,6 +178,27 @@ TEST("Replay: order: a TERA on a fainted side is refused")
     EXPECT_EQ(Validate(), REPLAY_ERROR_ORDER);
 }
 
+TEST("Replay: order: a MEGA_EVOLVE before any SEND_OUT is refused")
+{
+    ReplayStream_Begin();
+    ReplayStream_Intro();
+    ReplayStream_MegaEvolve(REPLAY_SIDE_NEAR, SPECIES_VENUSAUR_MEGA);
+    ReplayStream_End(REPLAY_OUTCOME_TIE);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_ORDER);
+}
+
+TEST("Replay: order: a MEGA_EVOLVE on a fainted side is refused")
+{
+    ReplayStream_Begin();
+    ReplayStream_Intro();
+    ReplayStream_SendOut(REPLAY_SIDE_NEAR, 0, 100, REPLAY_STATUS_NONE);
+    ReplayStream_SendOut(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+    ReplayStream_Faint(REPLAY_SIDE_FAR);
+    ReplayStream_MegaEvolve(REPLAY_SIDE_FAR, SPECIES_VENUSAUR_MEGA);
+    ReplayStream_End(REPLAY_OUTCOME_TIE);
+    EXPECT_EQ(Validate(), REPLAY_ERROR_ORDER);
+}
+
 // Explosion in sand: both battlers faint, the game still plays the sandstorm at the end of the
 // turn, then both sides send in their next mon.
 TEST("Replay: order: a double KO in sand, the sand upkeep and both switch-ins pass")

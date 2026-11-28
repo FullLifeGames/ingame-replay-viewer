@@ -157,6 +157,22 @@ TEST("Replay: a FORM_CHANGE of another size is refused")
     EXPECT_EQ(CHECK_OP(REPLAY_OP_FORM_CHANGE, REPLAY_SIDE_FAR, SPECIES_CASTFORM_SUNNY & 0xFF), REPLAY_ERROR_SIZE);
 }
 
+// MEGA_EVOLVE's species is a mon, as FORM_CHANGE's is; the backend sends the Mega that the
+// lookup found, so the range is the only check.
+TEST("Replay: a MEGA_EVOLVE to no species or past the expansion's own is refused")
+{
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_MEGA_EVOLVE, REPLAY_SIDE_FAR, U16(SPECIES_NONE)), REPLAY_ERROR_OPERAND);
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_MEGA_EVOLVE, REPLAY_SIDE_FAR, U16(NUM_SPECIES)), REPLAY_ERROR_OPERAND);
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_MEGA_EVOLVE, 2, U16(SPECIES_VENUSAUR_MEGA)), REPLAY_ERROR_OPERAND);
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_MEGA_EVOLVE, REPLAY_SIDE_FAR, U16(SPECIES_VENUSAUR_MEGA)), REPLAY_ERROR_NONE);
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_MEGA_EVOLVE, REPLAY_SIDE_NEAR, U16(NUM_SPECIES - 1)), REPLAY_ERROR_NONE);
+}
+
+TEST("Replay: a MEGA_EVOLVE of another size is refused")
+{
+    EXPECT_EQ(CHECK_OP(REPLAY_OP_MEGA_EVOLVE, REPLAY_SIDE_FAR, SPECIES_VENUSAUR_MEGA & 0xFF), REPLAY_ERROR_SIZE);
+}
+
 // TERA's and MOVE_TYPE's type is one of the game's: TYPE_NONE and the numbers from
 // NUMBER_OF_MON_TYPES up are none. TYPE_MYSTERY lies inside the range.
 TEST("Replay: a TERA to no type or past the game's own is refused")
