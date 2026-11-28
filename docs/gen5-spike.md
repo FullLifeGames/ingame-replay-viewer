@@ -160,7 +160,7 @@ The direct entry's other numbers come the same way, by `scripts/gen5-bw2-entry.t
 
 ### What the direct entry leaves open
 
-- The visitor's page does not start it yet: `scripts/gen5-moment.ts` drives it from outside.
+- `scripts/gen5-moment.ts` and `scripts/gen5-replay.ts` drive it from outside, and since #111 the page also starts it for a picked test replay (`docs/gen5-backend.md`, "The page plays a replay"). A replay link or an uploaded file does not start it yet.
 - A replay's own turns reach it since #110: `scripts/gen5-replay.ts` plays a test replay from power-on to its last scene (`docs/gen5-backend.md`). Every Pokémon is form 0.
 - With an experience of 0 the near box draws its EXP bar empty.
 - The opening's samples, one every 30 frames, show the throw and no frame of the "Go!" line.
@@ -317,7 +317,7 @@ Since #110 the backend plays both Gen 5 OU test replays start to finish. `docs/g
 - The EXP bar: a replay carries no experience, so the bar draws empty; the backend decides whether to fill it or leave it.
 - A double's moment: the direct entry reaches a double's action menu, and `src/gen5/moment.ts` plays a single's moment alone.
 - The music: the park writes the trainer battle's track, and no run has listened to it.
-- The direct entry on the visitor's page: today `scripts/gen5-moment.ts` drives it from outside.
+- The direct entry on the visitor's page: since #111 the page starts it for a picked test replay, and a replay link or an uploaded file still waits for it.
 - The walk's removal: `--entry walk`, the continue route, the trainer route and the save before Terrell, once nothing needs them (the save still backs the format's real spec).
 - A pace for the blocks: a block took 4.5 to 8.1 s at the DS's rate, and the page waits for `returned` before the next.
 

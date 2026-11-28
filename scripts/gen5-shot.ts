@@ -13,7 +13,6 @@
 // fails the run. --page-shot saves the page at a phone's 360 px width before the pick. --save
 // <file> loads that save when the game starts (a save of the build machine, never served).
 import { mkdirSync, readFileSync } from 'node:fs'
-import type { AddressInfo } from 'node:net'
 import { parseArgs } from 'node:util'
 
 import { chromium, type Page } from '@playwright/test'
@@ -31,7 +30,6 @@ import {
 } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { loadAverage, sampleMemory } from './gen5-proc.ts'
-import { BUILT_PORT, buildGen5Page, startBuiltServer } from './gen5-built.ts'
 import { logStorage, type RequestLog, watchRequests } from './gen5-requests.ts'
 import {
   chooseReplay,
@@ -41,22 +39,17 @@ import {
   replayShotOf,
 } from './gen5-shot-replay.ts'
 import { pacingScene, speedScene } from './gen5-speed.ts'
-import { startGen5Server } from './gen5-serve.ts'
+import {
+  CHROMIUM_ARGS,
+  PAGE_HOST,
+  PHONE_VIEWPORT,
+  RUN_VIEWPORT,
+  serve,
+} from './gen5-shot-browser.ts'
 
-/** A *.localhost name is a secure context and resolves to loopback, but it is not the name
- * "localhost" or "127.0.0.1", on which EmulatorJS asks its CDN for a newer version. */
-export const PAGE_HOST = 'gen5.localhost'
 const FRAME_EVERY_S = 15
 /** The S2 scene presses Start here unless --start-at-frame says otherwise. */
 const SPEED_START_FRAME = 1900
-
-// Headless Chromium has no GPU; EmulatorJS draws with WebGL through SwiftShader.
-// The page's host name maps to the server's loopback address only.
-export const CHROMIUM_ARGS = [
-  '--enable-unsafe-swiftshader',
-  '--use-angle=swiftshader',
-  `--host-resolver-rules=MAP ${PAGE_HOST} 127.0.0.1`,
-]
 
 interface Sample extends PaceSample {
   pssMb: number
@@ -78,15 +71,6 @@ interface ShotOptions {
   save: string | undefined
   /** The test replay the page plays by itself in the scene "replay" (#111). */
   replay: ReplayShot | undefined
-}
-
-/** A phone's width in CSS pixels, for the page screenshot before the pick. */
-export const PHONE_VIEWPORT = { width: 360, height: 800 }
-export const RUN_VIEWPORT = { width: 640, height: 960 }
-
-export interface Served {
-  port: number
-  close: () => Promise<void>
 }
 
 /** Frames per second over 10-second windows and over the whole run. */
@@ -152,26 +136,6 @@ async function playScene(page: Page, options: ShotOptions): Promise<0 | 1> {
   logPace(samples)
   log(`peak PSS ${String(Math.max(...samples.map((s) => s.pssMb)))} MB`)
   return 0
-}
-
-export async function serve(built: boolean): Promise<Served> {
-  if (built) {
-    await buildGen5Page()
-    const server = await startBuiltServer({ host: false, port: BUILT_PORT })
-    log(`serving the built page on port ${String(BUILT_PORT)}`)
-    const close = () =>
-      new Promise<void>((resolve) => {
-        server.close(() => {
-          resolve()
-        })
-        server.closeAllConnections()
-      })
-    return { port: (server.address() as AddressInfo).port, close }
-  }
-  const server = await startGen5Server()
-  const address = server.httpServer?.address()
-  if (!address || typeof address === 'string') throw new Error('gen5-shot: the server has no port')
-  return { port: address.port, close: () => server.close() }
 }
 
 /** The page at a phone's width before the pick, as the user sees it there. */

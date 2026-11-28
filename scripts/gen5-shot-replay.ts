@@ -28,7 +28,7 @@ import { GEN5_PATHS } from './gen5-paths.ts'
 import { EVERY } from './gen5-replay-args.ts'
 import { marksFile } from './gen5-replay-exit.ts'
 import { blockReport, endLines, runSummary } from './gen5-replay-log.ts'
-import { PHONE_VIEWPORT, RUN_VIEWPORT } from './gen5-shot.ts'
+import { PHONE_VIEWPORT, RUN_VIEWPORT } from './gen5-shot-browser.ts'
 
 /** What the scene plays: the test replay, an earlier run's marks file, and when it gives up. */
 export interface ReplayShot {
