@@ -9,6 +9,7 @@ import type { Side } from '../src/script/types.ts'
 import { ballScene } from './rom-shot-balls.ts'
 import { SCREEN } from './rom-shot-probes.ts'
 import type { Check, Region } from './rom-shot-probes.ts'
+import { megaScene, megaSpriteScene } from './rom-shot-mega.ts'
 import { teraScene } from './rom-shot-tera.ts'
 import { weatherScene } from './rom-shot-weather.ts'
 
@@ -272,6 +273,8 @@ const SCENES: readonly (readonly [string, (input: Input) => Scene | undefined])[
   ['level', levelScene],
   ['weather-start', (input) => weatherScene(input.stream)],
   ['first-tera', (input) => teraScene(input.stream)],
+  ['first-mega', (input) => megaScene(input.stream)],
+  ['first-mega-sprite', (input) => megaSpriteScene(input.stream)],
   ['first-move', moveScene],
   ['first-hp', hpScene],
   ['first-status', statusScene],

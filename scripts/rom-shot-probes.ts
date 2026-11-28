@@ -66,6 +66,13 @@ export const SCREEN = {
     near: { x: 126, y: 72, width: 114, height: 32 },
     far: { x: 12, y: 14, width: 128, height: 32 },
   },
+  // The mon's 64x64 sprite on each side, centred on sBattlerCoords: (72, 80) near and (176, 40) far
+  // (U/src/battle_anim_mons.c:40-41). Read from the pinned coordinates; 126-4 measures them on
+  // frames of both Gen 6 picks.
+  mon: {
+    near: { x: 40, y: 48, width: 64, height: 64 },
+    far: { x: 144, y: 8, width: 64, height: 64 },
+  },
   screen: { x: 0, y: 0, width: 240, height: 160 },
   // The sky of the battle background, where a weather's animation shows over the whole screen
   // (#22): above the far healthbox, whose corner is at y 14, and left of the far mon, a 64x64
@@ -83,6 +90,7 @@ export const SCREEN = {
   farHpBar: HpBar
   farLevel: { end: number; y: number; height: number; lvWidth: number; digitWidth: number }
   healthbox: Record<Side, Region>
+  mon: Record<Side, Region>
   message: Region
   screen: Region
   sky: Region

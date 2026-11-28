@@ -7,6 +7,8 @@ import { SCREEN } from './rom-shot-probes.ts'
 import { missingScenes, scenesOf, shotArgs } from './rom-shot-scenes.ts'
 import { handMadeStream } from './rom-shot-stream.ts'
 
+// The hand-made battle holds no Terastallization and no Mega Evolution (#89, #126).
+const HAND_MADE_LACKS = ['first-tera', 'first-mega', 'first-mega-sprite']
 const scenesFor = (instructions: readonly Instruction[]) => scenesOf(streamOf(instructions))
 const named = (instructions: readonly Instruction[], name: string) =>
   scenesFor(instructions).find((scene) => scene.name === name)
@@ -28,7 +30,7 @@ describe('the scene points of a decoded instruction list (S6)', () => {
       'win',
       'outro',
     ])
-    expect(missingScenes(handMadeStream())).toEqual(['first-tera'])
+    expect(missingScenes(handMadeStream())).toEqual(HAND_MADE_LACKS)
   })
 
   it('names each scene a stream lacks', () => {
@@ -39,6 +41,8 @@ describe('the scene points of a decoded instruction list (S6)', () => {
       'level',
       'weather-start',
       'first-tera',
+      'first-mega',
+      'first-mega-sprite',
       'first-move',
       'first-hp',
       'first-status',

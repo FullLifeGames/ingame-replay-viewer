@@ -96,8 +96,11 @@ describe('the scenes a run must have', () => {
     expect(requiresEveryScene('994086')).toBe(false)
   })
 
-  it('leave out first-tera for the default runs, since neither holds a Terastallization (#89)', () => {
+  it('leave out first-tera and the Mega scenes for the default runs, which hold neither (#89, #126)', () => {
     expect(missingThatFails('994052', ['first-tera'])).toEqual([])
+    expect(missingThatFails('994052', ['first-tera', 'first-mega', 'first-mega-sprite'])).toEqual(
+      [],
+    )
     expect(missingThatFails('hand-made', ['first-tera', 'first-move'])).toEqual(['first-move'])
     expect(missingThatFails('994086', ['first-move'])).toEqual([])
     expect(missingThatFails('hand-made', missingScenes(handMadeStream()))).toEqual([])

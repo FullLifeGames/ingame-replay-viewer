@@ -68,9 +68,9 @@ export function requiresEveryScene(name: string): boolean {
   return name === DEFAULT_REPLAY || name === HAND_MADE
 }
 
-// Neither default run holds a Terastallization: 994052 is a Gen 3 battle, and the hand-made battle
-// keeps the frames of the module's baseline (#89).
-const NOT_IN_DEFAULT_RUNS: readonly string[] = ['first-tera']
+// Neither default run holds a Terastallization or a Mega Evolution: 994052 is a Gen 3 battle, and
+// the hand-made battle keeps the frames of the module's baseline (#89, #126).
+const NOT_IN_DEFAULT_RUNS: readonly string[] = ['first-tera', 'first-mega', 'first-mega-sprite']
 
 /** The scenes a run lacks that fail it: for a default run, every one but those it cannot hold. */
 export function missingThatFails(name: string, missing: readonly string[]): string[] {
