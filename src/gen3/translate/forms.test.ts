@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
-import { mechanicGap, teraTypeGap } from '../fallbacks'
+import { mechanicGap, megaReturnGap, teraTypeGap } from '../fallbacks'
 import { speciesOf } from '../tables/lookup'
 import { plain, popUp, streamOfLog } from '../testing'
 
@@ -195,5 +195,40 @@ describe('a Mega Evolution (#125)', () => {
     ])
     const noted = fallbacksOf(...lines).filter(({ line }) => line === NEXT + 1)
     expect(noted.map(({ kind }) => kind)).toEqual(['form', 'mechanic'])
+  })
+})
+
+describe('a Mega that comes back (#125, D5)', () => {
+  // The switch-in takes the species of the team table, so a Mega comes back in its form before
+  // Mega Evolution until #126 keeps the form: a named gap at each comeback.
+  const VENUSAUR_IN = '|switch|p2a: Venusaur|Venusaur, M|100/100'
+  const away = '|switch|p2a: Tyranitar|Tyranitar, M|100/100'
+  const mega = [
+    VENUSAUR_IN,
+    '|detailschange|p2a: Venusaur|Venusaur-Mega, M',
+    '|-mega|p2a: Venusaur|Venusaur|Venusaurite',
+  ]
+  const back = '|switch|p2a: Venusaur|Venusaur-Mega, M|80/100'
+
+  it('names the gap at each switch-in after the Mega Evolution', () => {
+    const lines = [...mega, away, back, away, back]
+    const comebacks = fallbacksOf(...lines).filter(({ line }) => line > NEXT + 2)
+    expect(comebacks).toEqual([
+      { line: NEXT + 4, ...megaReturnGap('Venusaur-Mega') },
+      { line: NEXT + 6, ...megaReturnGap('Venusaur-Mega') },
+    ])
+  })
+
+  it('names none for a Pokémon that never Mega Evolved, nor for a Castform after Forecast', () => {
+    const forecast = '|-formechange|p2a: Castform|Castform-Sunny|[msg]|[from] ability: Forecast'
+    const lines = [VENUSAUR_IN, away, VENUSAUR_IN, CASTFORM_IN, '|-weather|SunnyDay', forecast]
+    expect(fallbacksOf(...lines, away, CASTFORM_IN)).toEqual([])
+  })
+
+  it('says the Mega forme in the gap', () => {
+    expect(megaReturnGap('Venusaur-Mega')).toEqual({
+      kind: 'mechanic',
+      detail: 'Venusaur-Mega comes back in its form before Mega Evolution',
+    })
   })
 })
