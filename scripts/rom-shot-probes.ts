@@ -67,8 +67,10 @@ export const SCREEN = {
     far: { x: 12, y: 14, width: 128, height: 32 },
   },
   // The mon's 64x64 sprite on each side, centred on sBattlerCoords: (72, 80) near and (176, 40) far
-  // (U/src/battle_anim_mons.c:40-41). Read from the pinned coordinates; 126-4 measures them on
-  // frames of both Gen 6 picks.
+  // (U/src/battle_anim_mons.c:40-41). Measured on mGBA's frames of both Gen 6 test replays (#126):
+  // against the frame with the side's mon withdrawn, Mega Venusaur and Mega Medicham fill x 144 to
+  // 207 and y 8 to 71 between them, Mega Alakazam and Mega Charizard Y x 40 to 103 and y 48 to 111,
+  // and every pixel the Mega Evolution changes lies inside these regions.
   mon: {
     near: { x: 40, y: 48, width: 64, height: 64 },
     far: { x: 144, y: 8, width: 64, height: 64 },

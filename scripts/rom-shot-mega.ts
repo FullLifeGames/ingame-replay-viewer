@@ -17,9 +17,13 @@ function firstMega(stream: Stream): { at: number; side: Side } | undefined {
   return mega?.op === 'megaEvolve' ? { at, side: mega.side } : undefined
 }
 
-// The frame before MEGA_EVOLVE and the frame after it. A frame inside the op could show the
+// The frame before MEGA_EVOLVE and the second frame after it. A frame inside the op could show the
 // animation, which hides both healthboxes for its whole length (LaunchBattleAnimation,
-// U/src/battle_anim.c:387, shown again at :1080); the frame after the op shows what lasts.
+// U/src/battle_anim.c:387, shown again at :1080). On the first frame after the op the healthbox
+// redraw is still under way while the screen is drawn: mGBA's frame of both Gen 6 picks lacks
+// the name or the level's first digit. The next frame shows what lasts.
+const SETTLED = 1
+
 function megaCheck(stream: Stream, name: string, region: (side: Side) => Region) {
   const mega = firstMega(stream)
   if (mega === undefined) return undefined
@@ -28,7 +32,7 @@ function megaCheck(stream: Stream, name: string, region: (side: Side) => Region)
     name,
     shots: [
       { name: before, done: mega.at, frames: 0 },
-      { name, done: mega.at + 1, frames: 0 },
+      { name, done: mega.at + 1, frames: SETTLED },
     ],
     check: { probe: 'differs', before, after: name, region: region(mega.side) },
   } satisfies Scene

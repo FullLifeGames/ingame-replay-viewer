@@ -36,17 +36,17 @@ const scenes = (instructions: readonly Instruction[]) => {
 }
 
 describe('the first Mega Evolution, on the screen (#126)', () => {
-  it('shoots the frame before the first MEGA_EVOLVE and the frame after it, twice', () => {
+  it('shoots the frame before the first MEGA_EVOLVE and the second frame after it, twice', () => {
     const [box, sprite] = scenes(megaEvolving('far'))
     expect(box?.name).toBe('first-mega')
     expect(box?.shots).toEqual([
       { name: 'first-mega-before', done: 5, frames: 0 },
-      { name: 'first-mega', done: 6, frames: 0 },
+      { name: 'first-mega', done: 6, frames: 1 },
     ])
     expect(sprite?.name).toBe('first-mega-sprite')
     expect(sprite?.shots).toEqual([
       { name: 'first-mega-sprite-before', done: 5, frames: 0 },
-      { name: 'first-mega-sprite', done: 6, frames: 0 },
+      { name: 'first-mega-sprite', done: 6, frames: 1 },
     ])
   })
 
