@@ -12,8 +12,7 @@
 // request the page must not make or storage left behind (gen5-moment-session.ts' withGen5Page).
 // Usage: GEN5_DUMP=<path> node scripts/gen5-replay.ts --replay <id> [--run 1] [--every 30]
 // [--blocks <n>] [--against <marks file>] [--minutes 90].
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { readFileSync } from 'node:fs'
 
 import type { Page } from '@playwright/test'
 
@@ -27,7 +26,7 @@ import { MAIN_RAM_SIZE, MAIN_RAM_START } from '../src/gen5/main-ram.ts'
 import { pkmFormat } from '../src/gen5/pkm-members.ts'
 import { replayEntry, replayPlan } from '../src/gen5/replay-plan.ts'
 import { blockLines, sideOfMon } from './gen5-moment-blocks.ts'
-import { follow, hook, logReport, POLL_MS } from './gen5-moment-follow.ts'
+import { follow, hashed, hook, logReport, marksChecked } from './gen5-moment-follow.ts'
 import { markLines, writeLines } from './gen5-moment-log.ts'
 import { partyLines, partyRefs } from './gen5-moment-party.ts'
 import { MOMENT_GAP, momentStart } from './gen5-moment-plan.ts'
@@ -42,11 +41,10 @@ import {
 } from './gen5-moment-session.ts'
 import { momentTeam } from './gen5-moment-team.ts'
 import { log, sampleLine } from './gen5-page.ts'
-import { GEN5_PATHS } from './gen5-paths.ts'
 import { type ReplayOptions, readReplayOptions } from './gen5-replay-args.ts'
 import { blockReport, endLines, notShownLines, runSummary } from './gen5-replay-log.ts'
-import { HASH_POLLS, marksFile, marksVerdict, runExit } from './gen5-replay-exit.ts'
-import { marksOf, pendingMarks, type RunMark } from './gen5-replay-marks.ts'
+import { marksFile, runExit } from './gen5-replay-exit.ts'
+import type { RunMark } from './gen5-replay-marks.ts'
 
 const hex = (value: number) => `0x${value.toString(16)}`
 
@@ -125,17 +123,6 @@ function playPlan(run: Run, battle: Battle, replay: Gen5Replay, first: RunReport
   return { steps, startFrame: 0, startAt, ...refs, stateMarks: [] }
 }
 
-/** The page's report again each POLL_MS while a mark's hash is pending, HASH_POLLS times at
- * most. */
-async function hashed(page: Page, report: RunReport): Promise<RunReport> {
-  let current = report
-  for (let poll = 0; poll < HASH_POLLS && pendingMarks(marksOf(current)).length > 0; poll += 1) {
-    await new Promise((resolve) => setTimeout(resolve, POLL_MS))
-    current = await hook(page).runReport()
-  }
-  return current
-}
-
 /** The marks, the blocks, the parties, the end and the not-shown list, logged; false when a
  * party differs from the backend's. */
 function logPlay(report: RunReport, battle: Battle, team: Team, replay: Gen5Replay): boolean {
@@ -147,20 +134,6 @@ function logPlay(report: RunReport, battle: Battle, team: Team, replay: Gen5Repl
   if (team.end !== undefined) for (const line of endLines(team.end)) log(line)
   for (const line of notShownLines(notShown(team.fallbacks))) log(line)
   return party.matches
-}
-
-/** Writes the run's marks file and compares it with the earlier run's; false on a hash still
- * pending or a mark that differs. */
-function marksChecked(run: Run, report: RunReport): boolean {
-  const { label } = run.options
-  const marks = marksOf(report)
-  mkdirSync(GEN5_PATHS.runs, { recursive: true })
-  const file = { label, status: report.status, marks }
-  writeFileSync(join(GEN5_PATHS.runs, `${label}.json`), `${JSON.stringify(file, null, 1)}\n`)
-  log(`marks: ${String(marks.length)} written to build/gen5/runs/${label}.json`)
-  const { agree, lines } = marksVerdict(marks, run.against)
-  for (const line of lines) log(line)
-  return agree
 }
 
 async function play(page: Page, run: Run): Promise<number> {
@@ -179,7 +152,7 @@ async function play(page: Page, run: Run): Promise<number> {
   const report = await hashed(page, followed)
   logReport(report)
   const party = logPlay(report, battle, team, replay)
-  const marks = marksChecked(run, report)
+  const marks = marksChecked(options.label, report, run.against)
   log(runSummary(replay.blocks, report.marks, Date.now() - began))
   return runExit({ status: report.status, party, marks })
 }

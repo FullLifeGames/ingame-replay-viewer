@@ -27,7 +27,7 @@ import { GEN5_PATHS } from './gen5-paths.ts'
 import { readRouteOptions, type RouteOptions, stateBase } from './gen5-route-options.ts'
 import { follow, logEnd, type StateMeta, takeStableSave } from './gen5-route-run.ts'
 import { logStorage, type RequestLog, watchRequests } from './gen5-requests.ts'
-import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve } from './gen5-shot.ts'
+import { CHROMIUM_ARGS, PAGE_HOST, RUN_VIEWPORT, serve } from './gen5-shot-browser.ts'
 
 type BattleRefs = ReturnType<typeof battleRefs>
 

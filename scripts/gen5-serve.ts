@@ -2,7 +2,8 @@
 // shot script, with /emulatorjs/* served from the fetched packages in .cache/gen5/emulatorjs/site/
 // (scripts/gen5-fetch.ts), /saves/* from src/web/gen5/saves/ alone and /source/* from the source
 // archives in .cache/gen5/sources/ (scripts/gen5-sources.ts), /licences.html made from them
-// (scripts/gen5-licences-read.ts), and the page's unpacker bundled into one classic script
+// (scripts/gen5-licences-read.ts), /gen5-build/* the two files of build/gen5/ that the page reads
+// (src/gen5/build-files.ts, #111), and the page's unpacker bundled into one classic script
 // (scripts/gen5-built.ts, #79). With --built it builds the page and serves the build instead,
 // for the user's own check (scripts/gen5-built.ts). Every answer is cross-origin isolated, which
 // the core's thread build needs. Both bind to 127.0.0.1 unless the command line says --host.
@@ -20,8 +21,11 @@ import {
   startBuiltServer,
 } from './gen5-built.ts'
 import { UNPACKER_PATH } from '../src/gen5/unpacker.ts'
+import { BUILD_PREFIX } from '../src/gen5/build-files.ts'
 import { SAVES_PREFIX } from '../src/gen5/save-file.ts'
 import {
+  type BuildFolders,
+  buildFileFor,
   ISOLATION,
   LICENCES_PAGE,
   savesFileFor,
@@ -105,13 +109,18 @@ export const licencesMount = (page: () => string): Middleware =>
 export const unpackerMount = (script: () => Promise<string>): Middleware =>
   madeMount(UNPACKER_PATH, 'text/javascript', script)
 
-/** The five mounts answer before Vite's own middlewares. */
+/** Answers the two build files the page reads from `folders` (#111); /@fs/ refuses build/. */
+export const buildMount = (folders: BuildFolders = GEN5_PATHS): Middleware =>
+  mount(BUILD_PREFIX, (url) => buildFileFor(url, folders))
+
+/** The six mounts answer before Vite's own middlewares. */
 const emulatorjsMount: Plugin = {
   name: 'gen5-emulatorjs',
   configureServer(server) {
     server.middlewares.use(mount(SITE_PREFIX, (url) => siteFileFor(url, GEN5_PATHS.site)))
     server.middlewares.use(mount(SAVES_PREFIX, (url) => savesFileFor(url, GEN5_PATHS.saves)))
     server.middlewares.use(mount(SOURCE_PREFIX, (url) => sourceFileFor(url, GEN5_PATHS.sources)))
+    server.middlewares.use(buildMount())
     server.middlewares.use(licencesMount(() => licencesHtml(readLicencesInput(GEN5_PATHS.sources))))
     server.middlewares.use(unpackerMount(bundleUnpacker))
   },

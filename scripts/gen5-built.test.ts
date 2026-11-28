@@ -1,4 +1,12 @@
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import type { Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { tmpdir } from 'node:os'
@@ -53,6 +61,18 @@ describe('the spike page', () => {
     expect(input).not.toMatch(/accept/i)
   })
 
+  // Scene: the visitor picks a test replay before the dump, since the page queues its entry
+  // before the emulator starts (#111).
+  it('offers the test replays before the file input', () => {
+    const label = /<label for="replay">([^<]*)<\/label>/.exec(html)
+    expect(label?.[1]?.replace(/\s+/g, ' ')).toBe(
+      'Pick a test replay for Black 2 to play from power-on.',
+    )
+    const select = html.indexOf('<select id="replay">')
+    expect(select).toBeGreaterThan(-1)
+    expect(select).toBeLessThan(html.indexOf('<input id="dump"'))
+  })
+
   // Scene: the notice stands before the file input (#79, GPL-3.0 section 5(d)).
   it('shows the GPL notice before the file input and links the licences page', () => {
     const notice = /<section id="licence-notice">(.*?)<\/section>/s.exec(html)
@@ -71,6 +91,19 @@ describe('the spike page', () => {
     }
   })
 
+  // Scene: a test replay loads; its list of what Black 2 does not show stands beside the game
+  // from 56rem up and under it on a phone (#111, lane plan D9).
+  it('holds the list after the game inside the stage, hidden until a replay loads', () => {
+    const stage = /<div id="stage">(.*?)\n {4}<\/div>/s.exec(html)?.[1] ?? ''
+    const game = stage.indexOf('<div id="game"></div>')
+    const beside = /<section id="beside" hidden>(.*?)<\/section>/s.exec(stage)
+    expect(game).toBeGreaterThan(-1)
+    expect(beside?.index).toBeGreaterThan(game)
+    const ids = [...(beside?.[1] ?? '').matchAll(/id="([^"]+)"/g)].map((id) => id[1])
+    expect(ids).toEqual(['replay-end', 'not-shown', 'not-shown-counts', 'not-shown-rows'])
+    expect(html).toMatch(/@media \(min-width: 56rem\) \{\s*#stage \{\s*display: grid;/)
+  })
+
   it('shows the speed cap, the core switch, the copy button and the phone note', () => {
     for (const id of ['uncapped', 'core-switch', 'vsync-switch', 'copy', 'figures', 'phone-note']) {
       expect(html).toContain(`id="${id}"`)
@@ -86,6 +119,8 @@ describe('startBuiltServer', () => {
     site: join(root, 'site'),
     saves: join(root, 'saves'),
     sources: join(root, 'sources'),
+    bw2Json: join(root, 'build', 'bw2.json'),
+    routineJson: join(root, 'build', 'routine.json'),
   }
   const archive = archiveName(COMPONENTS.melonds.source)
   let server: Server | undefined
@@ -103,6 +138,9 @@ describe('startBuiltServer', () => {
       mkdirSync(join(root, file, '..'), { recursive: true })
       writeFileSync(join(root, file), 'x')
     }
+    mkdirSync(join(root, 'build'))
+    writeFileSync(folders.bw2Json, '{"numbers":"invented"}')
+    writeFileSync(folders.routineJson, '{"routine":"invented"}')
     writeLicencesPage(folders.built, {
       build: { commit: '1'.repeat(40), date: '2026-11-25', dirty: false },
       components: COMPONENTS,
@@ -122,9 +160,9 @@ describe('startBuiltServer', () => {
     rmSync(root, { recursive: true, force: true })
   })
 
+  const base = () => `http://127.0.0.1:${String((server?.address() as AddressInfo).port)}`
   const answer = async (path: string): Promise<Response> => {
-    const address = server?.address() as AddressInfo
-    const response = await fetch(`http://127.0.0.1:${String(address.port)}${path}`)
+    const response = await fetch(`${base()}${path}`)
     await response.arrayBuffer()
     return response
   }
@@ -142,9 +180,7 @@ describe('startBuiltServer', () => {
   })
 
   it('names the size of an archive, so a HEAD answers it', async () => {
-    const address = server?.address() as AddressInfo
-    const url = `http://127.0.0.1:${String(address.port)}/source/${archive}`
-    const response = await fetch(url, { method: 'HEAD' })
+    const response = await fetch(`${base()}/source/${archive}`, { method: 'HEAD' })
     expect(response.status).toBe(200)
     expect(response.headers.get('content-length')).toBe('1')
   })
@@ -161,11 +197,48 @@ describe('startBuiltServer', () => {
     expect(await status('/emulatorjs/data/compression/extract7z.js')).toBe(404)
   })
 
+  // Scene: the page fetches the numbers and the routine from build/gen5/, outside page/ (#111).
+  it('answers both build files from outside the built page as JSON', async () => {
+    for (const [path, file] of [
+      ['/gen5-build/bw2.json', folders.bw2Json],
+      ['/gen5-build/routine.json', folders.routineJson],
+    ] as const) {
+      const response = await fetch(`${base()}${path}`)
+      expect(response.status, path).toBe(200)
+      expect(response.headers.get('content-type'), path).toBe('application/json')
+      expect(await response.text(), path).toBe(readFileSync(file, 'utf8'))
+    }
+  })
+
+  it('answers 404 for both build files at the root, where the built page holds neither', async () => {
+    expect(await status('/bw2.json')).toBe(404)
+    expect(await status('/routine.json')).toBe(404)
+    expect(await status('/gen5-build/other.json')).toBe(404)
+  })
+
   it('answers an archive the manifest names as gzip, and 404 for another name', async () => {
     const response = await answer(`/source/${archive}`)
     expect(response.status).toBe(200)
     expect(response.headers.get('content-type')).toBe('application/gzip')
     expect(await status('/source/other.tar.gz')).toBe(404)
+  })
+})
+
+// Scene: Vite copies a public/ folder and bundles every import into build/gen5/page/; neither may
+// carry a build file into the page's output (#111).
+describe("the page's build output", () => {
+  const sources = readdirSync(GEN5_PATHS.page, { recursive: true, encoding: 'utf8' }).filter(
+    (file) => file.endsWith('.ts'),
+  )
+
+  it('holds neither build file: no page module imports from build/ and there is no public/', () => {
+    expect(sources).toContain('main.ts')
+    const importsBuild = /(?:\bfrom\s*|\bimport\s*\(\s*)['"`][^'"`]*\bbuild\//
+    const importing = sources.filter((file) =>
+      importsBuild.test(readFileSync(join(GEN5_PATHS.page, file), 'utf8')),
+    )
+    expect(importing).toEqual([])
+    expect(existsSync(join(GEN5_PATHS.page, 'public'))).toBe(false)
   })
 })
 

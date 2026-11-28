@@ -1,14 +1,16 @@
 // What both Gen 5 spike servers (#72) answer with: the cross-origin isolation headers, the file
 // types, and the rule that maps a request path to a file inside one folder and never outside it.
 // Saves (#78) answer from the saves folder alone, by a name src/gen5/save-file.ts allows, the
-// fetched site (#79) only the files scripts/gen5-manifest.ts lists as served, and /source/ only
-// the archives it names (scripts/gen5-sources.ts places them).
+// fetched site (#79) only the files scripts/gen5-manifest.ts lists as served, /source/ only
+// the archives it names (scripts/gen5-sources.ts places them), and /gen5-build/ the two files of
+// build/gen5/ that the page reads (src/gen5/build-files.ts, #111).
 // scripts/gen5-serve.ts (Vite, for the shot script) and scripts/gen5-built.ts (the built page,
 // for the user's own check) import it.
 import { createReadStream, statSync } from 'node:fs'
 import type { ServerResponse } from 'node:http'
 import { extname, isAbsolute, join, normalize } from 'node:path'
 
+import { BUILD_FILES, BUILD_PREFIX } from '../src/gen5/build-files.ts'
 import { isSaveName, SAVES_PREFIX } from '../src/gen5/save-file.ts'
 import { archiveName, isServedSitePath, isSourceArchive, type Source } from './gen5-manifest.ts'
 
@@ -98,8 +100,24 @@ export function sourceFileFor(url: string, sources: string): string | undefined 
   return isSourceArchive(name) ? join(sources, name) : undefined
 }
 
+/** The two build files the page reads (src/gen5/build-files.ts), made on the build machine. */
+export interface BuildFolders {
+  bw2Json: string
+  routineJson: string
+}
+
+/** The numbers' file for `/gen5-build/bw2.json`, the routine's for `/gen5-build/routine.json`;
+ * undefined for any other path. */
+export function buildFileFor(url: string, folders: BuildFolders): string | undefined {
+  const path = decodedPath(url)
+  if (path?.startsWith(BUILD_PREFIX) !== true) return undefined
+  const name = path.slice(BUILD_PREFIX.length)
+  if (name === BUILD_FILES.numbers) return folders.bw2Json
+  return name === BUILD_FILES.routine ? folders.routineJson : undefined
+}
+
 /** The folders the built server answers from. */
-export interface ServedFolders {
+export interface ServedFolders extends BuildFolders {
   built: string
   site: string
   saves: string
@@ -107,13 +125,15 @@ export interface ServedFolders {
 }
 
 /** The built page's file for a request: SITE_PREFIX from the fetched site, SAVES_PREFIX from the
- * saves, SOURCE_PREFIX from the source archives, the rest from the built page. */
+ * saves, SOURCE_PREFIX from the source archives, BUILD_PREFIX from the build files, the rest from
+ * the built page. */
 export function fileFor(url: string, folders: ServedFolders): string | undefined {
   const path = decodedPath(url)
   if (path === undefined) return undefined
   if (path.startsWith(SITE_PREFIX)) return siteFileFor(url, folders.site)
   if (path.startsWith(SAVES_PREFIX)) return savesFileFor(url, folders.saves)
   if (path.startsWith(SOURCE_PREFIX)) return sourceFileFor(url, folders.sources)
+  if (path.startsWith(BUILD_PREFIX)) return buildFileFor(url, folders)
   return inFolder(folders.built, path.replace(/^\/+/, ''))
 }
 

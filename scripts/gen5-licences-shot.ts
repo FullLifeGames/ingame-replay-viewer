@@ -16,7 +16,7 @@ import { archiveName, COMPONENTS, type ComponentId } from './gen5-manifest.ts'
 import { log } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { watchRequests } from './gen5-requests.ts'
-import { CHROMIUM_ARGS, PAGE_HOST, serve } from './gen5-shot.ts'
+import { CHROMIUM_ARGS, PAGE_HOST, serve } from './gen5-shot-browser.ts'
 
 const PHONE = { width: 360, height: 800 }
 const LABEL = 's79-3'

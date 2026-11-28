@@ -3,14 +3,16 @@
 // count per second, Chromium's memory and every request the page made. A request that leaves the
 // machine, or one with a body, fails the run (scripts/gen5-requests.ts). Frames land in
 // build/gen5/frames/ (gitignored, ADR 0002).
-// Usage: GEN5_DUMP=<path> node scripts/gen5-shot.ts [--scene boot|speed|pacing] [--seconds 90]
-// [--start-at-frame <n>] [--threads] [--built] [--label s1] [--page-shot <name>] [--save <file>].
-// The scenes "speed" and "pacing" run scripts/gen5-speed.ts. --built serves the built page
+// Usage: GEN5_DUMP=<path> node scripts/gen5-shot.ts [--scene boot|speed|pacing|replay]
+// [--seconds 90] [--start-at-frame <n>] [--threads] [--built] [--label s1] [--page-shot <name>]
+// [--save <file>] [--replay <id>] [--against <marks file>] [--minutes 90].
+// The scenes "speed" and "pacing" run scripts/gen5-speed.ts. The scene "replay" picks the test
+// replay --replay <id> in the page, which plays it by itself, and compares its marks with the
+// --against run's within --minutes (scripts/gen5-shot-replay.ts, #111). --built serves the built page
 // (scripts/gen5-built.ts) instead of Vite's dev server, and a websocket or a Vite client request
 // fails the run. --page-shot saves the page at a phone's 360 px width before the pick. --save
 // <file> loads that save when the game starts (a save of the build machine, never served).
 import { mkdirSync, readFileSync } from 'node:fs'
-import type { AddressInfo } from 'node:net'
 import { parseArgs } from 'node:util'
 
 import { chromium, type Page } from '@playwright/test'
@@ -28,25 +30,26 @@ import {
 } from './gen5-page.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { loadAverage, sampleMemory } from './gen5-proc.ts'
-import { BUILT_PORT, buildGen5Page, startBuiltServer } from './gen5-built.ts'
 import { logStorage, type RequestLog, watchRequests } from './gen5-requests.ts'
+import {
+  chooseReplay,
+  pageQuery,
+  type ReplayShot,
+  replayScene,
+  replayShotOf,
+} from './gen5-shot-replay.ts'
 import { pacingScene, speedScene } from './gen5-speed.ts'
-import { startGen5Server } from './gen5-serve.ts'
+import {
+  CHROMIUM_ARGS,
+  PAGE_HOST,
+  PHONE_VIEWPORT,
+  RUN_VIEWPORT,
+  serve,
+} from './gen5-shot-browser.ts'
 
-/** A *.localhost name is a secure context and resolves to loopback, but it is not the name
- * "localhost" or "127.0.0.1", on which EmulatorJS asks its CDN for a newer version. */
-export const PAGE_HOST = 'gen5.localhost'
 const FRAME_EVERY_S = 15
 /** The S2 scene presses Start here unless --start-at-frame says otherwise. */
 const SPEED_START_FRAME = 1900
-
-// Headless Chromium has no GPU; EmulatorJS draws with WebGL through SwiftShader.
-// The page's host name maps to the server's loopback address only.
-export const CHROMIUM_ARGS = [
-  '--enable-unsafe-swiftshader',
-  '--use-angle=swiftshader',
-  `--host-resolver-rules=MAP ${PAGE_HOST} 127.0.0.1`,
-]
 
 interface Sample extends PaceSample {
   pssMb: number
@@ -66,15 +69,8 @@ interface ShotOptions {
   pageShot: string | undefined
   /** A save file of the build machine that the page loads when the game starts (#78). */
   save: string | undefined
-}
-
-/** A phone's width in CSS pixels, for the page screenshot before the pick. */
-const PHONE_VIEWPORT = { width: 360, height: 800 }
-export const RUN_VIEWPORT = { width: 640, height: 960 }
-
-export interface Served {
-  port: number
-  close: () => Promise<void>
+  /** The test replay the page plays by itself in the scene "replay" (#111). */
+  replay: ReplayShot | undefined
 }
 
 /** Frames per second over 10-second windows and over the whole run. */
@@ -122,41 +118,24 @@ async function logCalibration(page: Page): Promise<void> {
   )
 }
 
-async function playScene(page: Page, options: ShotOptions): Promise<void> {
+/** The scene's exit code: the replay scene's verdict, 0 for the others. */
+async function playScene(page: Page, options: ShotOptions): Promise<0 | 1> {
   const core = await page.evaluate(() => (globalThis as unknown as Gen5Global).gen5.core())
   log(`core build: ${core}`)
+  if (options.replay !== undefined) return replayScene(page, options.replay, options.label)
   if (options.scene === 'speed') {
     await speedScene(page, core, options.startAtFrame ?? SPEED_START_FRAME)
-    return
+    return 0
   }
   if (options.scene === 'pacing') {
     await pacingScene(page, core, options.startAtFrame ?? SPEED_START_FRAME)
-    return
+    return 0
   }
   const samples = await measure(page, options)
   await saveFrame(page, `${options.label}-title`)
   logPace(samples)
   log(`peak PSS ${String(Math.max(...samples.map((s) => s.pssMb)))} MB`)
-}
-
-export async function serve(built: boolean): Promise<Served> {
-  if (built) {
-    await buildGen5Page()
-    const server = await startBuiltServer({ host: false, port: BUILT_PORT })
-    log(`serving the built page on port ${String(BUILT_PORT)}`)
-    const close = () =>
-      new Promise<void>((resolve) => {
-        server.close(() => {
-          resolve()
-        })
-        server.closeAllConnections()
-      })
-    return { port: (server.address() as AddressInfo).port, close }
-  }
-  const server = await startGen5Server()
-  const address = server.httpServer?.address()
-  if (!address || typeof address === 'string') throw new Error('gen5-shot: the server has no port')
-  return { port: address.port, close: () => server.close() }
+  return 0
 }
 
 /** The page at a phone's width before the pick, as the user sees it there. */
@@ -185,9 +164,10 @@ async function copyFigures(page: Page): Promise<void> {
   log(`copy button: ${await page.locator('#copy').innerText()}`)
 }
 
-async function drive(page: Page, dump: string, options: ShotOptions): Promise<void> {
+async function drive(page: Page, dump: string, options: ShotOptions): Promise<0 | 1> {
   await logCalibration(page)
   if (options.pageShot !== undefined) await pageShot(page, options.pageShot)
+  if (options.replay !== undefined) await chooseReplay(page, options.replay.team.id, options.label)
   if (options.save !== undefined) {
     const base64 = readFileSync(options.save).toString('base64')
     await page.evaluate((bytes) => {
@@ -202,12 +182,13 @@ async function drive(page: Page, dump: string, options: ShotOptions): Promise<vo
   log(
     `core options: ${await page.evaluate(() => (globalThis as unknown as Gen5Global).gen5.coreOptions())}`,
   )
-  await playScene(page, options)
+  const scene = await playScene(page, options)
   await logSave(page, 'at the end')
   await copyFigures(page)
   log(
     `${sampleLine()}; status: ${await page.evaluate(() => (globalThis as unknown as Gen5Global).gen5.status())}`,
   )
+  return scene
 }
 
 async function run(dump: string, options: ShotOptions): Promise<number> {
@@ -217,6 +198,7 @@ async function run(dump: string, options: ShotOptions): Promise<number> {
   const browser = await chromium.launch({ args: CHROMIUM_ARGS })
   let requests: RequestLog | undefined
   let storageClean: boolean
+  let scene: 0 | 1
   try {
     const context = await browser.newContext({
       viewport: RUN_VIEWPORT,
@@ -224,15 +206,16 @@ async function run(dump: string, options: ShotOptions): Promise<number> {
     })
     const page = await context.newPage()
     requests = watchRequests(page, origin, options.built)
-    await page.goto(`${origin}/${options.threads ? '?threads=1' : ''}`)
-    await drive(page, dump, options)
+    const query = pageQuery({ threads: options.threads, replay: options.replay !== undefined })
+    await page.goto(`${origin}/${query}`)
+    scene = await drive(page, dump, options)
     storageClean = await logStorage(page)
   } finally {
     await browser.close()
     await served.close()
     if (requests) log(requests.summary())
   }
-  return requests.failed || !storageClean ? 1 : 0
+  return requests.failed || !storageClean || scene !== 0 ? 1 : 0
 }
 
 async function main(): Promise<void> {
@@ -246,8 +229,12 @@ async function main(): Promise<void> {
       label: { type: 'string', default: 's1' },
       'page-shot': { type: 'string' },
       save: { type: 'string' },
+      replay: { type: 'string' },
+      against: { type: 'string' },
+      minutes: { type: 'string', default: '90' },
     },
   })
+  const replay = replayShotOf(values, Date.now())
   const dump = process.env.GEN5_DUMP
   if (!dump) throw new Error('set GEN5_DUMP to the path of the Black 2 (USA) dump')
   log(
@@ -263,6 +250,7 @@ async function main(): Promise<void> {
     label: values.label,
     pageShot: values['page-shot'],
     save: values.save,
+    replay,
   })
 }
 

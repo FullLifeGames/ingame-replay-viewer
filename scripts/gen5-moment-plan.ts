@@ -9,20 +9,11 @@ import type { MacroStep } from '../src/gen5/macro.ts'
 import { momentCommands, type Moment } from '../src/gen5/moment.ts'
 import { type BlockSetup, blockSteps, menuSteps } from '../src/gen5/replay-plan.ts'
 
-/** Frames from the session's mark `battle` to the moment's start: room for the script's reading
- * of the battle. E-5's runs queued the moment about 35 frames after the mark on the build machine;
- * ten seconds at the DS's pace leave room for a faster core. */
-export const MOMENT_GAP = 600
+// The gap and the play's start live with the page's runs; the moment scripts keep their imports.
+export { MOMENT_GAP, momentStart } from '../src/gen5/replay-run.ts'
 
 export interface MomentSetup extends BlockSetup {
   blocks: { name: string; moment: Moment }[]
-}
-
-/** The frame the moment's plan starts at: MOMENT_GAP frames after the session's mark `battle`,
- * or undefined for a session with no such mark. */
-export function momentStart(marks: readonly { name: string; frame: number }[]): number | undefined {
-  const battle = marks.findLast((mark) => mark.name === 'battle')
-  return battle === undefined ? undefined : battle.frame + MOMENT_GAP
 }
 
 export function momentSteps(setup: MomentSetup): MacroStep[] {

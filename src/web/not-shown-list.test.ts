@@ -1,7 +1,7 @@
 import { Protocol } from '@pkmn/protocol'
 import { describe, expect, it } from 'vitest'
 
-import { rowParts, rowText } from './status'
+import { rowParts, rowText } from './not-shown-list'
 
 const TRICK_ROOM = {
   line: 18,

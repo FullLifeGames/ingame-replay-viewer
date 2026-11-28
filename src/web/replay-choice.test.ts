@@ -16,7 +16,8 @@ import {
 } from './replay-choice'
 import { reportLink } from './report-link'
 import { REPLAY_994052, REPLAY_994086, SHOWDOWN_994176, STREAM_994052 } from './session-testing'
-import { notShown, notShownCounts, streamOfReplay } from './stream'
+import { notShownCounts } from './not-shown-list'
+import { notShown, streamOfReplay } from './stream'
 
 /** A promise and the calls that settle it, for picks that overlap. */
 function deferred<T>() {

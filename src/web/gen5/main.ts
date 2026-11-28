@@ -7,7 +7,9 @@
 // worker, which window.EJS_paths names for its 7z unpacker (src/gen5/unpacker.ts, #79). With
 // `?save=<name>` the page fetches that save from its own server and loads it before the game
 // starts; the save folder lives in memory alone, never in IndexedDB (save-load.ts). `window.gen5`
-// is the hook that the scripts read.
+// is the hook that the scripts read. The picker above the dump offers the Gen 5 test replays and
+// opens on none; a picked replay plays by itself from power-on (replay-player.ts, #111), and the
+// list beside the game shows what Black 2 does not show of it from the pick to the end line.
 import { figuresLine } from '../../gen5/figures.ts'
 import type { Calibration, Gen5Hook, SaveReport } from '../../gen5/hook.ts'
 import type { MainRamFacts } from '../../gen5/main-ram.ts'
@@ -15,11 +17,17 @@ import { checkBlack2, HEADER_SIZE } from '../../gen5/nds-header.ts'
 import { emulatorOptions, pageSettings } from '../../gen5/pacing.ts'
 import { CONTENT_NAME, saveName, saveQueryProblem } from '../../gen5/save-file.ts'
 import { emulatorPaths } from '../../gen5/unpacker.ts'
+import { fetchBuildFiles } from './build-load.ts'
 import { wireControls } from './controls.ts'
 import { fromBase64, sha256, toBase64 } from './codec.ts'
 import { fixClock, wrapRuntime } from './core-runtime.ts'
 import { frameHook } from './frame-hook.ts'
+import { notShownList, notShownRows } from './not-shown.ts'
+import { showEnd, showNotShown } from './not-shown-view.ts'
+import { guardPick } from './pick-guard.ts'
 import { ramHook, readFacts } from './ram-hook.ts'
+import { replayPlayer } from './replay-player.ts'
+import { GEN5_REPLAYS, replayOptions } from './replays.ts'
 import {
   fetchSave,
   lockSaveButtons,
@@ -59,6 +67,7 @@ declare global {
 
 const statusLine = document.querySelector<HTMLElement>('#status')
 const input = document.querySelector<HTMLInputElement>('#dump')
+const replayPicker = document.querySelector<HTMLSelectElement>('#replay')
 const settings = pageSettings(location.search)
 const pacing = { capped: true, vsync: settings.vsync }
 let rates: Rates = { fps5: undefined, fps60: undefined }
@@ -87,6 +96,21 @@ const frames = frameHook(manager, ram.ram)
 wrapRuntime(frames.preMainLoop)
 wrapGameManager(window, () => save)
 fixClock(frames.frame)
+
+const player = replayPlayer({
+  hook: { ...frames.calls, onRunEnd: frames.onRunEnd },
+  read32: (address) => ram.ram().read32(address),
+  say,
+  buildFiles: () => fetchBuildFiles((url) => fetch(url)),
+  repeat: (tick) => {
+    const timer = setInterval(tick, 1000)
+    return () => {
+      clearInterval(timer)
+    }
+  },
+  ended: showEnd,
+})
+for (const { value, text } of replayOptions()) replayPicker?.add(new Option(text, value))
 
 async function saveReport(game: GameManager): Promise<SaveReport> {
   const { path, mount, bytes } = takeSave(game)
@@ -144,6 +168,7 @@ window.gen5 = {
     const game = manager()
     return game ? saveReport(game) : undefined
   },
+  replay: () => player.progress(),
   ...ram.hook,
   ...frames.calls,
 }
@@ -203,14 +228,19 @@ async function onPick(picker: HTMLInputElement): Promise<void> {
     say(check.reason)
     return
   }
+  const replay = GEN5_REPLAYS.find(({ id }) => id === replayPicker?.value)
+  if (replay !== undefined && !(await player.start(replay, location.search))) return
+  const loaded = player.loaded()
+  if (loaded) showNotShown(notShownList(notShownRows(loaded.replay, loaded.lines)))
   if (!(await fetchAddressSave())) return
   facts = await readFacts(file, check.header, headerBytes)
   picker.disabled = true
+  if (replayPicker) replayPicker.disabled = true
   say(`Found ${check.header.title} (${check.header.gameCode}). Starting the emulator.`)
   startEmulator(file)
 }
 
-input?.addEventListener('change', () => void onPick(input))
+input?.addEventListener('change', () => void guardPick(() => onPick(input), say))
 wireControls(settings, window.gen5)
 
 // The loop holds the page's thread for two seconds, so it runs once, before a dump is picked.
