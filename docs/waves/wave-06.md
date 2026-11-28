@@ -370,15 +370,27 @@ The user's answers during the wave:
 - Six answers of 26.11.2026, each the recommendation: `gen5-cut` a (#106 to #111 filed and built in order); `ivy-cudgel-look` a (89-T); `frame-gap-remedy` a (#103); `illusion` a (#98 approved and built); `m3-rests` a (#105); `sound-skip-fix` a (#104).
 - Four answers of 27.11.2026: `gen5-battle-end` a, the game holds the last scene and the page says who won (not the recommended c, so no issue for the game's own end); `gen5-missing-lines` a, the first milestone lists the lines under the game and printing them becomes #118; `frisk-mummy-lines` a (#117); `gen5-hp-numbers` with no choice and the note: "I feel like c is the cleanest option, having 100 as percentage, but stating HP is very confusing. Guessing HP is also not very good though, so just hide it similar to Showdown is probably the best option, or the other option would be to HP => % and then have the 100/100. A spike is probably warrented for this to be pushed to my gate." Filed as the spike #119.
 
-Open on the page: `gen5-hp-hide` (since 27.11.2026, with #119's pictures): a keep 54/100, b hide the numbers (recommended; it approves the build as a new issue), c hide them with a switch on the page. Every Pokémon keeps 100 HP until the answer.
+The gate's eight answers of 28.11.2026, each the recommendation (W6-172):
 
-The gate's questions, on the page since 28.11.2026 with their pictures, each with a recommendation: `wave7-cut` (a, one generation at a time), `m3-gen6-8` (a, file the six Gen 6 to 8 issues), `gen5-next` (b, Gen 1 to 4 replays, forms and the trainer's class; the visitor's page parked), `proposals-pages` (a, the status lines, the list in plain words, the checks under load), `proposals-gen3` (b, the stand-in lines, the pop-ups with #40 and the specs; the move looks and the cases no replay holds parked), `proposals-gen5` (a, the tool cleanup, the closer blocks and a census) and `device-checks` (a, one checklist page).
+- `wave7-cut` a: one generation at a time on each lane.
+- `m3-gen6-8` a: the six Gen 6 to 8 issues, #125, #126, #131, #132, #135 and #136.
+- `gen5-hp-hide` b: hide the numbers, as #137.
+- `gen5-next` b with the note "+ more backgrounds": #139 (Gen 1 to 4 replays in Black 2), #140 (forms), #143 (the trainer's class), the visitor's Gen 5 page parked as #145 until the deploy. The note became #144, more battle backgrounds in Black 2 (W6-173).
+- `proposals-pages` a: #129 (the status lines), #133 (the list in plain words) and #130 (the checks under load).
+- `proposals-gen3` b: #127 (the stand-in lines), #134 (the pop-ups, which absorbed #40) and #128 (the specs); the move looks parked as #146, the cases no replay holds as #147.
+- `proposals-gen5` a: #138 (the Gen 5 tooling, with the typed-literal check of W6-170), #142 (closer blocks) and #141 (a census).
+- `device-checks` a: one checklist on the review page, a card per check (W6-174).
 
-Still waiting for the user from waves 4 and 5: the phone runs for #47 and #49, the device checks of #56 to #59, two saved files for #56, #59's report link, and the speed figures for the Gen 5 page.
+Still waiting for the user from waves 4 and 5, now on that checklist: the phone runs for #47 and #49, the device checks of #56 to #59, two saved files for #56, #59's report link, and the speed figures for the Gen 5 page.
 
 ## The next wave
 
-For the integrator to complete at the gate. #118 closed with #124. The answer to `gen5-hp-hide` decides whether the HP build follows as an issue. The Gen 5 cut keeps proposals behind its first milestone (forms, Gen 1 to 4 formats on Gen 5, the EXP bar, the walk's removal, sound, the visitor's page, a double's moment, the trainer's class), and the rests below can each start a proposal.
+Wave 7 follows cut A of the gate plan, each lane on its milestone one generation at a time.
+
+- Lane b, Gen 3 (milestone 3): #125 (Gen 6 OU with Mega Evolution as the game's lines), #126 (Mega Evolution's look), then a stage of small fixes (#127, #128, #129, #130), then #131 and #132 (Gen 7 and Z-Moves), then #133 and #134, then #135 and #136 (Gen 8 and Dynamax).
+- Lane a, Gen 5 (milestone 6): #137 (the HP numbers hidden), #138 (the tooling), #139 (Gen 1 to 4 replays), #140 (forms), #141 (the census) and what it finds, #142 (closer blocks), #143 (the trainer's class), #144 (backgrounds).
+- Milestone 8's candidate, Boundless Black 2, had no public source, patch format or licence on its release day; the integrator looks again at wave 7's gate (D1 of the gate plan).
+- #129 and #133 touch the lines a refusal leaves under the controls: the gate's shot of a refused Gen 6 replay still showed the example's names and "Press Start to play it." under the refusal.
 
 ## Rests
 
@@ -460,6 +472,7 @@ Wave 5's rests that stayed keep their triggers in `wave-05.md`; #90 to #94 took 
 
 - 25 rests the timeline named were dropped as settled: the frame gap's remedy and the send-outs' gender sign (#103); Illusion's failure and Illusion in Gen 9 (#98); the six Gen 4 and 5 stand-in lines (#105); the sound skip's fix (#104); Frisk's and Mummy's lines (#117); the two clients' hand constants (#93); four specs near their time limit (92-1) and the routine spec's limit (106-1); the worker's report line (E-5); the frame hook at its ceiling (E-5b's split); the "Go!" line's frame (110-5's runs); the licences shot's core rows and two marks on one frame (fix round B); the spec texts in the real order (fix round A); the leads' own switch-in abilities, the miss line during Leftovers and the status a Pokémon comes back with (#109); the win line's name and the game's own end (`gen5-battle-end` a); the page playing the walk itself and the wait before the first moment (#97, #111); a type change to two types (W6-101's fix round); the weather turns in the game's box, which stay on the list (`gen5-print-weather` a, W6-156).
 - The heavy-check lock is shared with another project on the build machine, which held most of its memory at times. earlyoom ended two Gen 5 emulator runs on 25.11.2026; since then a wrapper waits for 3,300 MB before a check and 4,700 MB before an emulator run. Several checks lost one spec to vitest's 5 s limit under that load and passed on the rerun; #92 named the limits.
+- Five rests dropped at the gate with their reasons (the gate plan's D6): the engines' frame differences no viewer sees, files near the line ceiling (the lint fails there by itself), CI's missing expansion tree (the snapshots hold the words), the late pictures of development runs, and one settled point of #118's review (no frame between the format and the write).
 - On 26.11.2026 at about 16:50 every running agent stopped on the account's spend limit, and the machine restarted at 01:17 on 27.11. Nothing ran in between; 89-5's module run had lost one stream to its time budget under load, and it passed alone.
 - Thirteen stage pull requests merged without a question under W6-70; #83, #84, #95 and #96 merged on the user's answers. AGENTS.md still says a merge into `master` needs the user's okay, since the user gave the ruling "for now".
 - The fixture rule tightened four times (W6-85, W6-98, W6-100, W6-102). The earlier fixture commits with real small offsets are in `master`'s history since #102; the tree holds none, and `scripts/gen5-fixtures-real.test.ts` fails on a new one.
