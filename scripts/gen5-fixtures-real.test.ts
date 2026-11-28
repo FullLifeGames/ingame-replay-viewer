@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { ADAPTER_LAYOUT } from '../src/gen5/adapter.fixtures.ts'
+import { BATTLE, ONE_CLIENT_TWICE, SWAPPED_SINGLE } from '../src/gen5/battle-mons.fixtures.ts'
 import { REPLAY_NUMBERS } from '../src/gen5/backend/replay.fixtures.ts'
 import { ENTRY } from '../src/gen5/direct-entry.fixtures.ts'
 import { GAUGE, ODD_GAUGE } from '../src/gen5/hp-numbers.fixtures.ts'
@@ -32,6 +33,7 @@ import { gaugeNumbers } from './gen5-bw2-gauge.ts'
 import { GAUGE_INPUT, ODD_READ_GAUGE } from './gen5-bw2-gauge.fixtures.ts'
 import { pkmNumbers } from './gen5-bw2-pkm.ts'
 import { PKM_INPUT } from './gen5-bw2-pkm.fixtures.ts'
+import { REPORT_NUMBERS, REPORT_OUTSIDE } from './gen5-bw2-report.fixtures.ts'
 import { at, namesAt } from './gen5-numbers-compare.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { textNumbers } from './gen5-bw2-text.ts'
@@ -57,6 +59,18 @@ const COMPARED = [
     path: ['entry', 'constants', 'CHAR_EOM'],
   },
   { module: 'src/gen5/direct-entry.fixtures.ts', name: 'ENTRY', value: ENTRY, path: ['entry'] },
+  { module: 'src/gen5/battle-mons.fixtures.ts', name: 'BATTLE', value: BATTLE, path: ['battle'] },
+  ...(
+    [
+      ['SWAPPED_SINGLE', SWAPPED_SINGLE],
+      ['ONE_CLIENT_TWICE', ONE_CLIENT_TWICE],
+    ] as const
+  ).map(([name, value]) => ({
+    module: 'src/gen5/battle-mons.fixtures.ts',
+    name,
+    value,
+    path: ['battle', 'single'],
+  })),
   { module: 'src/gen5/hp-numbers.fixtures.ts', name: 'GAUGE', value: GAUGE, path: ['gauge'] },
   {
     module: 'src/gen5/hp-numbers.fixtures.ts',
@@ -112,6 +126,17 @@ const COMPARED = [
     value: TEXT_BOX_NUMBERS,
     path: ['textBox'],
   },
+  ...(
+    [
+      ['REPORT_NUMBERS', REPORT_NUMBERS],
+      ['REPORT_OUTSIDE', REPORT_OUTSIDE],
+    ] as const
+  ).map(([name, value]) => ({
+    module: 'scripts/gen5-bw2-report.fixtures.ts',
+    name,
+    value,
+    path: [],
+  })),
   {
     module: 'scripts/gen5-bw2-gauge.fixtures.ts',
     name: 'GAUGE_INPUT',

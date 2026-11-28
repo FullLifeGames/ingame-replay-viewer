@@ -8,63 +8,11 @@ import {
   singleBattlePos,
   slotAddress,
 } from './battle-mons'
-import type { BattleNumbers } from './bw2-numbers'
+import { BATTLE, ONE_CLIENT_TWICE, SWAPPED_SINGLE } from './battle-mons.fixtures'
 import type { ReadRam } from './ram-check'
 
-// Invented layouts and addresses: the members the page follows, at offsets and in orders of their
-// own, a step function at an address no game uses, and an invented single battle of three clients.
-const BATTLE: BattleNumbers = {
-  server: {
-    size: 0x20,
-    align: 4,
-    upTo: 'pokeCon',
-    fields: {
-      seq: { offset: 0x08, size: 4 },
-      proc: { offset: 0x0c, size: 4 },
-      mainModule: { offset: 0x18, size: 4 },
-      pokeCon: { offset: 0x1c, size: 4 },
-    },
-  },
-  mainModule: {
-    size: 0x14,
-    align: 4,
-    upTo: 'server',
-    fields: { server: { offset: 0x10, size: 4 } },
-  },
-  pokeCon: {
-    size: 0x90,
-    align: 4,
-    fields: {
-      forServer: { offset: 0x00, size: 4 },
-      parties: { offset: 0x04, size: 0x80 },
-      'parties.mons': { offset: 0x08, size: 0x18 },
-      mainModule: { offset: 0x8c, size: 4 },
-    },
-  },
-  party: {
-    size: 0x20,
-    align: 4,
-    fields: { count: { offset: 0x00, size: 1 }, mons: { offset: 0x04, size: 0x18 } },
-  },
-  monCore: {
-    size: 0x1f,
-    align: 4,
-    upTo: 'monId',
-    fields: {
-      species: { offset: 0x02, size: 2 },
-      hp: { offset: 0x04, size: 2 },
-      maxHP: { offset: 0x06, size: 2 },
-      heldItem: { offset: 0x0a, size: 2 },
-      baseAbility: { offset: 0x0e, size: 2 },
-      level: { offset: 0x1c, size: 1 },
-      monId: { offset: 0x1e, size: 1 },
-    },
-  },
-  waitSelectSeq: 7,
-  single: { clientCount: 3, posClientIds: [2, 0, 1], clients: { player: 2, opponent: 0 } },
-  constants: {},
-  monIds: { firstByClient: [9, 21, 33], perClient: 7 },
-}
+// Invented addresses: the battle's structs in a RAM of their own, and a step function at an
+// address no game uses.
 const BASE = 0x02000000
 const PROC = 0x021357a0
 const SERVER = 0x02000100
@@ -93,12 +41,12 @@ function memory() {
   put(CLIENT_CON + 0x8c, MODULE, 4)
   put(SERVER_CON + 0x8c, MODULE, 4)
   put(SERVER_CON, 1, 4)
-  put(CLIENT_CON + 0x04 + 0x04, NEAR, 4)
-  put(CLIENT_CON + 0x04 + 0x20 + 0x04, FAR, 4)
-  put(CLIENT_CON + 0x04, 3, 1)
-  put(CLIENT_CON + 0x04 + 0x04 + 4, SECOND, 4)
-  put(CLIENT_CON + 0x04 + 0x04 + 8, THIRD, 4)
-  put(CLIENT_CON + 0x04 + 0x20, 1, 1)
+  put(CLIENT_CON + 0x0c + 0x04, NEAR, 4)
+  put(CLIENT_CON + 0x0c + 0x20 + 0x04, FAR, 4)
+  put(CLIENT_CON + 0x0c, 3, 1)
+  put(CLIENT_CON + 0x0c + 0x04 + 4, SECOND, 4)
+  put(CLIENT_CON + 0x0c + 0x04 + 8, THIRD, 4)
+  put(CLIENT_CON + 0x0c + 0x20, 1, 1)
   for (const [mon, species, hp, maxHp, level, monId, item, ability] of [
     [NEAR, 25, 33, 40, 17, 4, 210, 9],
     [FAR, 133, 30, 30, 18, 9, 0, 50],
@@ -183,12 +131,12 @@ describe('partyMons', () => {
 
   it('refuses a count above the slots, and a Pokémon outside main RAM', () => {
     const many = memory()
-    many.put(CLIENT_CON + 0x04, 7, 1)
+    many.put(CLIENT_CON + 0x0c, 7, 1)
     expect(() => partyMons(many.read, SERVER, BATTLE, 0)).toThrow(
       "client 0's party counts more Pokémon than its slots",
     )
     const outside = memory()
-    outside.put(CLIENT_CON + 0x04 + 0x04 + 8, 0x0100, 4)
+    outside.put(CLIENT_CON + 0x0c + 0x04 + 8, 0x0100, 4)
     expect(() => partyMons(outside.read, SERVER, BATTLE, 0)).toThrow(
       /Pokémon 2 at 0x100 lies outside/,
     )
@@ -201,11 +149,11 @@ describe('partySlotsAt', () => {
   it("gives the address of the party's first slot and how many hold a Pokémon", () => {
     const { read } = memory()
     expect(partySlotsAt(read, SERVER, BATTLE, 0)).toEqual({
-      address: CLIENT_CON + 0x04 + 0x04,
+      address: CLIENT_CON + 0x0c + 0x04,
       count: 3,
     })
     expect(partySlotsAt(read, SERVER, BATTLE, 1)).toEqual({
-      address: CLIENT_CON + 0x04 + 0x20 + 0x04,
+      address: CLIENT_CON + 0x0c + 0x20 + 0x04,
       count: 1,
     })
   })
@@ -222,19 +170,17 @@ describe('partySlotsAt', () => {
 
 // Scene: the moment's positions follow the single battle's setup, not the client ID. Both setups
 // are invented: in the three clients' one, client 0 stands at position 1, client 1 at 2 and
-// client 2 at 0; the other holds two clients in swapped order.
+// client 2 at 0; the other holds three clients with the first two swapped.
 describe('singleBattlePos', () => {
-  const swapped = { clientCount: 2, posClientIds: [1, 0], clients: { player: 1, opponent: 0 } }
-
   it("puts each client's Pokémon at the position its setup gives it", () => {
     expect([0, 1, 2].map((client) => singleBattlePos(BATTLE.single, client))).toEqual([1, 2, 0])
-    expect([0, 1].map((client) => singleBattlePos(swapped, client))).toEqual([1, 0])
+    expect([0, 1, 2].map((client) => singleBattlePos(SWAPPED_SINGLE, client))).toEqual([1, 0, 2])
   })
 
   it('refuses a client outside the count', () => {
-    expect(() => singleBattlePos(swapped, 2)).toThrow(/client 2/)
-    expect(() => singleBattlePos(swapped, -1)).toThrow(/client -1/)
-    expect(() => singleBattlePos(swapped, 0.5)).toThrow(/client 0.5/)
-    expect(() => singleBattlePos({ ...swapped, posClientIds: [1, 1] }, 0)).toThrow(/client 0/)
+    expect(() => singleBattlePos(SWAPPED_SINGLE, 3)).toThrow(/client 3/)
+    expect(() => singleBattlePos(SWAPPED_SINGLE, -1)).toThrow(/client -1/)
+    expect(() => singleBattlePos(SWAPPED_SINGLE, 0.5)).toThrow(/client 0.5/)
+    expect(() => singleBattlePos(ONE_CLIENT_TWICE, 0)).toThrow(/client 0/)
   })
 })
