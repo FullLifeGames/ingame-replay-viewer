@@ -13,6 +13,7 @@ import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { ADAPTER_LAYOUT } from '../src/gen5/adapter.fixtures.ts'
 import { REPLAY_NUMBERS } from '../src/gen5/backend/replay.fixtures.ts'
 import { ENTRY } from '../src/gen5/direct-entry.fixtures.ts'
+import { GAUGE, ODD_GAUGE } from '../src/gen5/hp-numbers.fixtures.ts'
 import { PKM, TEAM_PKM, TERMINATOR } from '../src/gen5/pkm.fixtures.ts'
 import { battleNumbers } from './gen5-bw2-battle.ts'
 import { effectNumbers } from './gen5-bw2-effects.ts'
@@ -25,6 +26,8 @@ import { entryNumbers } from './gen5-bw2-entry.ts'
 import { ENTRY_INPUT } from './gen5-bw2-entry.fixtures.ts'
 import { fontNumbers } from './gen5-bw2-font.ts'
 import { FONT_INPUT } from './gen5-bw2-font.fixtures.ts'
+import { gaugeNumbers } from './gen5-bw2-gauge.ts'
+import { GAUGE_INPUT, ODD_READ_GAUGE } from './gen5-bw2-gauge.fixtures.ts'
 import { pkmNumbers } from './gen5-bw2-pkm.ts'
 import { PKM_INPUT } from './gen5-bw2-pkm.fixtures.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
@@ -51,6 +54,13 @@ const COMPARED = [
     path: ['entry', 'constants', 'CHAR_EOM'],
   },
   { module: 'src/gen5/direct-entry.fixtures.ts', name: 'ENTRY', value: ENTRY, path: ['entry'] },
+  { module: 'src/gen5/hp-numbers.fixtures.ts', name: 'GAUGE', value: GAUGE, path: ['gauge'] },
+  {
+    module: 'src/gen5/hp-numbers.fixtures.ts',
+    name: 'ODD_GAUGE',
+    value: ODD_GAUGE,
+    path: ['gauge'],
+  },
   {
     module: 'src/gen5/adapter.fixtures.ts',
     name: 'ADAPTER_LAYOUT',
@@ -100,6 +110,18 @@ const COMPARED = [
     path: ['textBox'],
   },
   {
+    module: 'scripts/gen5-bw2-gauge.fixtures.ts',
+    name: 'GAUGE_INPUT',
+    value: gaugeNumbers(GAUGE_INPUT),
+    path: ['gauge'],
+  },
+  {
+    module: 'scripts/gen5-bw2-gauge.fixtures.ts',
+    name: 'ODD_READ_GAUGE',
+    value: ODD_READ_GAUGE,
+    path: ['gauge'],
+  },
+  {
     module: 'scripts/gen5-bw2-flow.fixtures.ts',
     name: 'FLOW_INPUT',
     value: flowNumbers(FLOW_INPUT),
@@ -139,6 +161,7 @@ const COMPARED = [
       'queueSize',
       'battle',
       'textBox',
+      'gauge',
     ] as const
   ).map((key) => ({
     module: 'src/gen5/backend/replay.fixtures.ts',

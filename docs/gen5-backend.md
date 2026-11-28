@@ -21,6 +21,7 @@ The game runs unmodified (ADR 0007). The page writes into the emulator's memory;
 `src/gen5/replay-plan.ts` turns a replay into the page's frame steps in two plans. Both refuse a replay of another version or another pin before any step.
 
 - **The entry.** `replayEntry` seals both parties and writes them with both trainers' names through the direct entry (`src/gen5/direct-entry.ts`), from power-on to the first action menu.
+- **The HP numbers.** After the mark `battle-start`, the entry waits until the gauges exist and hides the near box's HP numbers with two bit writes (`src/gen5/hp-numbers.ts`, #137). A replay's near box shows the name, the level, the HP bar, the EXP bar and the status icon, with no numbers, as on Showdown. The run's log says "HP numbers: hidden in the near box".
 - **The read.** At the action menu the run script reads main RAM once: the player's adapter and both parties as the game holds them. The second plan starts 600 frames after the mark `battle`, at a fixed frame, so the read costs no frame and two runs start alike.
 - **The hold and the menu.** `replayPlan` first writes the hold: the adapter's state stays idle, which the server never counts as a reply, so it waits for the player's action for good and sends nothing of its own. The player answers the first action menu by A, and the mark `hp-before` follows.
 - **The blocks.** For each block the plan writes the block into the adapter, waits until the client has answered it (`returned`), at most 3,000 frames, and marks `<block>-answered`. A frame of the screen is taken every few frames while a block waits (30 in the run script). No write after the hold asks for the player's action, so the client shows no menu and no trainer's hint line until the end. A block wider than the client's queue fails by its name and its script lines before any step. A printed block takes two more waits and a write of its page (the next section).
@@ -118,3 +119,15 @@ Three runs with the printed lines on 28 November 2026, each from power-on, each 
 - The not-shown lists hold the weather's turns and the forms alone and equal the replay spec's. Both parties held the backend's order at every answer, and no hash stayed pending.
 - The page run compared its marks with run 3's: all 978 agree by frame and by the hash of main RAM. The page listed 135 rows, two fewer than before, with no row for the forfeit or the win, each equal to the row the page's modules give for the replay built in Node.
 - The frames (each forfeit and each winner's line in the box, each last scene, and the page at the last scene with its list) stay on the build machine.
+
+Three runs with the HP numbers hidden on 28 November 2026, each from power-on, each alone:
+
+| Run                                                 | Blocks answered | Frames from `hp-before` to `last-scene` | Wall time |
+| --------------------------------------------------- | --------------- | --------------------------------------- | --------- |
+| `gen5ou-2718717830`, the moment script's hits scene | 3 of 3          | 1,302                                   | 4.4 min   |
+| `gen5ou-2718717830`, run 11, the first 30 blocks    | 30 of 30        | 11,832                                  | 15.2 min  |
+| `smogtours-gen5ou-862240`, run 11, the first 36     | 36 of 36        | 15,233                                  | 17.2 min  |
+
+- In every frame that shows the near box, the box holds no HP numbers and no slash, and keeps the name, the sex sign, the level, the HP bar, the EXP bar and the status icon. That holds through the opening's ability pop-up, a critical hit, the heals by Leftovers, three send-ins, Ferrothorn's burn icon, Starmie's faint at an empty bar and Tyranitar's send-in after it. The far box looks as before.
+- Both parties held the backend's order at every block's answer.
+- The frames stay on the build machine.

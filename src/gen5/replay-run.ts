@@ -48,6 +48,7 @@ export function entryRun(
     format: pkmFormat(numbers),
     checks: refs.checks,
     pin: numbers.pokebw2.commit,
+    gauge: numbers.gauge,
   })
   const watch = [...entry.watch, ...refs.watch]
   return { plan: { steps: entry.steps, startFrame: 0, watch, stateMarks: [] }, notes: entry.notes }

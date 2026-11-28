@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { directEntry } from './direct-entry'
 import { ENTRY, ROUTINE } from './direct-entry.fixtures'
 import { takeover } from './direct-takeover'
+import { numbersSteps } from './hp-numbers'
+import { GAUGE } from './hp-numbers.fixtures'
 import type { MacroStep } from './macro'
 import type { RamCheck } from './ram-check'
 
@@ -99,5 +101,36 @@ describe('directEntry', () => {
     expect(long.notes).toEqual([
       'opponent.name: "Bartholomew" cut to "Bartholo", the 8 characters it holds',
     ])
+  })
+
+  it('says the HP numbers stay shown when no gauge is given', () => {
+    expect(directEntry(ENTRY, ROUTINE, SIDES, BATTLE).hpNumbers).toBe('HP numbers: shown')
+  })
+
+  // Scene: the hide waits for the gauges once the battle runs and writes before the near
+  // send-in; the frames before the mark and every step after the two stay as they were.
+  it('with hidden numbers puts until gauges and write hide-numbers right after mark battle-start and leaves every other step equal', () => {
+    const hidden = directEntry(ENTRY, ROUTINE, { ...SIDES, hpNumbers: GAUGE }, BATTLE)
+    const mark = at('mark battle-start') + 1
+    const mash = untilOf('battle-start')?.mash
+    expect(hidden.steps).toEqual([
+      ...steps.slice(0, mark),
+      ...numbersSteps(GAUGE, 'single', mash).steps,
+      ...steps.slice(mark),
+    ])
+    expect(hidden.steps[mark]).toMatchObject({ kind: 'until', name: 'gauges', mash })
+    expect(hidden.steps[mark + 1]).toMatchObject({ kind: 'write', name: 'hide-numbers' })
+    expect(hidden.watch).toEqual(watch)
+    expect(hidden.hpNumbers).toBe('HP numbers: hidden in the near box')
+  })
+
+  it("keeps a double's steps and says its near boxes keep the numbers", () => {
+    const double = { ...SIDES, style: 'double' } as const
+    const shown = directEntry(ENTRY, ROUTINE, double, BATTLE)
+    const asked = directEntry(ENTRY, ROUTINE, { ...double, hpNumbers: GAUGE }, BATTLE)
+    expect(asked.steps).toEqual(shown.steps)
+    expect(asked.hpNumbers).toBe(
+      "HP numbers: shown; a double's near boxes keep them (#137 hides a single's)",
+    )
   })
 })

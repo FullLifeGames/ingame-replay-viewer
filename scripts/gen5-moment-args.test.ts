@@ -35,6 +35,7 @@ describe('readMomentOptions', () => {
       entry: 'direct',
       battle: 'single',
       team: { from: 'hand', names: { player: 'Viewer', opponent: 'Showdown' } },
+      hpNumbers: 'hidden',
       label: 'nosave-direct-known',
       deadlineMs: NOW + 15 * 60_000,
     })
@@ -56,6 +57,7 @@ describe('readMomentOptions', () => {
       entry: 'walk',
       battle: 'single',
       team: { from: 'hand', names: { player: 'Viewer', opponent: 'Showdown' } },
+      hpNumbers: 'shown',
       label: 'route-20-known',
       deadlineMs: NOW + 15 * 60_000,
     })
@@ -114,6 +116,24 @@ describe('readMomentOptions', () => {
     })
     const saved = readMomentOptions([...args, '--save', 'route-20'], NOW)
     expect(saved).toMatchObject({ battle: 'double', label: 'route-20-direct-unknown-double' })
+  })
+
+  // Scene: the direct entry hides the near box's HP numbers (#137); a scene can still show them.
+  it('hides the HP numbers by default and shows them with --hp-numbers shown, in the label too', () => {
+    expect(readMomentOptions(['--hp-numbers', 'hidden'], NOW)).toMatchObject({
+      hpNumbers: 'hidden',
+      label: 'nosave-direct-known',
+    })
+    expect(readMomentOptions(['--hp-numbers', 'shown', '--scene', 'unknown'], NOW)).toMatchObject({
+      hpNumbers: 'shown',
+      label: 'nosave-direct-unknown-hp-shown',
+    })
+    expect(() => readMomentOptions(['--hp-numbers', 'gone'], NOW)).toThrow(
+      '--hp-numbers takes hidden or shown, not "gone".',
+    )
+    expect(() => readMomentOptions(['--entry', 'walk', '--hp-numbers', 'shown'], NOW)).toThrow(
+      "--hp-numbers is for --entry direct alone: the walk's battle shows them.",
+    )
   })
 
   it('refuses an entry it does not know, a style it does not know and --battle for the walk', () => {

@@ -63,6 +63,7 @@ describe.skipIf(!FILES.every((file) => existsSync(file)))(
       refs: battleRefs(real().numbers),
       trainer: real().numbers.saveTrainer,
       entry: real().numbers.entry,
+      gauge: real().numbers.gauge,
       readRoutine: () => real().routine,
       readState: () => {
         throw new Error('no state')
@@ -83,6 +84,12 @@ describe.skipIf(!FILES.every((file) => existsSync(file)))(
         'until go-region',
         'write go',
         'until gone',
+      ])
+      const start = steps.indexOf('mark battle-start')
+      expect(steps.slice(start, start + 3)).toEqual([
+        'mark battle-start',
+        'until gauges',
+        'write hide-numbers',
       ])
       expect(steps.at(-1)).toBe('mark battle')
       expect(notes, 'the default names fit').toEqual([])

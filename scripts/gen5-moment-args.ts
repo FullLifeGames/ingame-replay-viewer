@@ -7,9 +7,11 @@
 // no save it starts as the spike's did, from the state s5-battle under build/gen5/states/. With
 // --replay <id> the direct entry writes a test replay's teams and trainer names (#106), and with
 // --scene hits, switches or effects beside it the run plays hand turns after the replay's start as
-// blocks (#107, #108, #109).
+// blocks (#107, #108, #109). The direct entry hides the near box's HP numbers (#137) unless
+// --hp-numbers shown asks to show them.
 // Usage: --scene known|unknown|hits|switches|effects, --save <name>, --entry direct|walk,
-// --battle single|double, --player <name>, --opponent <name>, --replay <id>, --minutes <n>.
+// --battle single|double, --player <name>, --opponent <name>, --replay <id>,
+// --hp-numbers hidden|shown, --minutes <n>.
 import { parseArgs } from 'node:util'
 
 import type { ActorPlace } from '../src/gen5/bw2-numbers.ts'
@@ -37,6 +39,9 @@ type MomentEntry = 'walk' | 'direct'
 /** The direct entry's battle style. */
 type MomentBattle = ParkSides['style']
 
+/** Whether the direct entry hides the near box's HP numbers. */
+type MomentHpNumbers = 'hidden' | 'shown'
+
 /** The scenes that play hand turns after a test replay's start, each with its turns. */
 const HAND_TURNS = { hits: HITS_TURN, switches: SWITCHES_TURNS, effects: EFFECTS_TURNS } as const
 
@@ -60,6 +65,8 @@ export interface MomentOptions {
   battle: MomentBattle
   /** The team the direct entry writes, and its names. */
   team: MomentTeam
+  /** Whether the direct entry hides the near box's HP numbers; the walk shows them. */
+  hpNumbers: MomentHpNumbers
   /** The prefix of the run's frames and states. */
   label: string
   deadlineMs: number
@@ -94,6 +101,18 @@ function battleOf(battle: string | undefined, entry: MomentEntry): MomentBattle 
   }
   if (!isBattle(battle)) throw new Error(`--battle takes single or double, not "${battle}".`)
   return battle
+}
+
+/** Hidden by default for the direct entry, which alone writes them: the walk shows them. */
+function hpNumbersOf(given: string | undefined, entry: MomentEntry): MomentHpNumbers {
+  if (given === undefined) return entry === 'direct' ? 'hidden' : 'shown'
+  if (entry === 'walk') {
+    throw new Error("--hp-numbers is for --entry direct alone: the walk's battle shows them.")
+  }
+  if (given !== 'hidden' && given !== 'shown') {
+    throw new Error(`--hp-numbers takes hidden or shown, not "${given}".`)
+  }
+  return given
 }
 
 /** With no save the walk starts from the spike's state, and the direct entry boots with none. */
@@ -156,6 +175,10 @@ function labelOf(start: MomentStart, entry: MomentEntry, scene: MomentScene, tea
   return `${from}${via}-${team.id}${isHandScene(scene) ? `-${scene}` : ''}`
 }
 
+/** The label's ends: a double's mark, and the direct entry's numbers shown by choice. */
+const marksOf = (battle: MomentBattle, entry: MomentEntry, hpNumbers: MomentHpNumbers) =>
+  `${battle === 'double' ? '-double' : ''}${entry === 'direct' && hpNumbers === 'shown' ? '-hp-shown' : ''}`
+
 export function readMomentOptions(args: string[], now: number): MomentOptions {
   const { values } = parseArgs({
     args,
@@ -168,6 +191,7 @@ export function readMomentOptions(args: string[], now: number): MomentOptions {
       player: { type: 'string' },
       opponent: { type: 'string' },
       replay: { type: 'string' },
+      'hp-numbers': { type: 'string' },
     },
   })
   const { scene } = values
@@ -179,8 +203,9 @@ export function readMomentOptions(args: string[], now: number): MomentOptions {
   const start = startOf(values.save, entry)
   const battle = battleOf(values.battle, entry)
   const team = teamOf({ ...values, scene }, entry, battle)
-  const label = `${labelOf(start, entry, scene, team)}${battle === 'double' ? '-double' : ''}`
-  return { scene, start, entry, battle, team, label, deadlineMs: now + minutes * 60_000 }
+  const hpNumbers = hpNumbersOf(values['hp-numbers'], entry)
+  const label = `${labelOf(start, entry, scene, team)}${marksOf(battle, entry, hpNumbers)}`
+  return { scene, start, entry, battle, team, hpNumbers, label, deadlineMs: now + minutes * 60_000 }
 }
 
 /** Where the session starts, for the log. */

@@ -7,6 +7,7 @@ import { REPLAY_NUMBERS } from './backend/replay.fixtures.ts'
 import { battleRefs } from './battle-check.ts'
 import type { Bw2Numbers } from './bw2-numbers.ts'
 import { ENTRY, ROUTINE } from './direct-entry.fixtures.ts'
+import { GAUGE } from './hp-numbers.fixtures.ts'
 import { type MacroStep, macroPlayer } from './macro.ts'
 import { pkmFormat } from './pkm-members.ts'
 import { BLOCK_LIMIT, replayEntry, replayPlan } from './replay-plan.ts'
@@ -98,6 +99,7 @@ describe('entryRun', () => {
       format: FORMAT,
       checks: refs.checks,
       pin: NUMBERS.pokebw2.commit,
+      gauge: GAUGE,
     })
     const { plan, notes } = entryRun(REPLAY, NUMBERS, ROUTINE)
     expect(plan).toEqual({

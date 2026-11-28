@@ -88,15 +88,17 @@ function readStateFile(base: string): StateFile {
 async function startSession(page: Page, dump: string, numbers: Bw2Numbers, session: Session) {
   const { options, team } = session
   const { start, label, deadlineMs } = options
-  const { plan, notes } = sessionPlan(options, {
+  const { plan, notes, hpNumbers } = sessionPlan(options, {
     refs: battleRefs(numbers),
     trainer: numbers.saveTrainer,
     entry: numbers.entry,
+    gauge: numbers.gauge,
     readRoutine,
     readState: readStateFile,
     team,
   })
   for (const note of notes) log(`name cut: ${note}`)
+  log(hpNumbers)
   log(`entry ${options.entry}: ${String(plan.steps.length)} steps from ${startLine(start)}`)
   for (const line of writeLines(plan.steps)) log(line)
   if (start.from === 'boot') return bootRun(page, dump, plan, { label, deadlineMs })

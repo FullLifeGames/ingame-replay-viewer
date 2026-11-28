@@ -9,6 +9,7 @@
 import { ADAPTER_LAYOUT } from '../adapter.fixtures.ts'
 import type { ArgFormat, BattleNumbers, Bw2Numbers } from '../bw2-numbers.ts'
 import { ENTRY } from '../direct-entry.fixtures.ts'
+import { GAUGE } from '../hp-numbers.fixtures.ts'
 import { TEAM_PKM } from '../pkm.fixtures.ts'
 import { TEXT_BOX_CARRIER } from '../text-box.ts'
 import type { ReplayNumbers } from './replay.ts'
@@ -27,9 +28,9 @@ const halves = (code: number, argCount: number): ArgFormat => ({
 const ASCII = Array.from({ length: 95 }, (_, i) => String.fromCharCode(32 + i))
 
 /** The replay's numbers with the effects' and the battle's constants (#109), which the backend
- * picks once its sequences are wired, and the text box (#118). */
+ * picks once its sequences are wired, the text box (#118) and the gauge (#137). */
 export const REPLAY_NUMBERS: ReplayNumbers &
-  Pick<Bw2Numbers, 'effects' | 'textBox'> & {
+  Pick<Bw2Numbers, 'effects' | 'textBox' | 'gauge'> & {
     readonly battle: Pick<BattleNumbers, 'constants'>
   } = {
   pkm: TEAM_PKM,
@@ -256,4 +257,6 @@ export const REPLAY_NUMBERS: ReplayNumbers &
     advances: Object.fromEntries(ASCII.map((char) => [char, char === ' ' ? 2 : 8])),
     carrier: TEXT_BOX_CARRIER,
   },
+  // The gauge of the HP numbers' hide (#137).
+  gauge: GAUGE,
 }

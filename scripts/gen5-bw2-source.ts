@@ -94,6 +94,16 @@ export const POKEBW2_FILES: readonly string[] = [
   'include/battle/btlv.h',
   'src/battle/btlv_scu.c',
   'include/gfl/bmpwin.h',
+  // The battle's gauge (#137): the effects' symbols and work, the gauges, the sprite positions,
+  // the cell actor and NitroSystem's renderer, OAM modes and fixed point.
+  'config/b2_us/arm9/overlays/ov168/symbols.txt',
+  'src/moveeffect/btlv_effect.c',
+  'src/battle/graphic/btlv_gauge.c',
+  'include/battle/graphic/btlv_mcss.h',
+  'include/gfl/clact.h',
+  'lib/nnsys/include/nnsys/g2d.h',
+  'lib/nitro/include/nitro/gx.h',
+  'lib/nitro/include/nitro/fx.h',
 ]
 
 /** Reads one file of pokebw2 by its path inside the checkout. */

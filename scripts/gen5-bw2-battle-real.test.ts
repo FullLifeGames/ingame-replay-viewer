@@ -1,5 +1,5 @@
-// The battle's constants and rules that the Gen 5 backend names (#106) on pokebw2's real numbers:
-// build/gen5/bw2.json, which scripts/gen5-bw2.ts generates from the pinned checkout. CI fetches the
+// The battle's constants and rules that the Gen 5 backend names (#106), and the gauge's places
+// that hide the near box's HP numbers (#137), on pokebw2's real numbers: build/gen5/bw2.json, which scripts/gen5-bw2.ts generates from the pinned checkout. CI fetches the
 // pin and generates the file before the check, so there a missing file fails the guard; on a
 // machine without it the relations skip. CI's log is public, so every assertion compares names or
 // booleans: a failure names the role and shows no number of pokebw2.
@@ -8,8 +8,10 @@ import { existsSync, readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
+import { numbersSteps } from '../src/gen5/hp-numbers.ts'
 import { readSources } from './gen5-bw2.ts'
 import { CONSTANT_PREFIXES } from './gen5-bw2-battle.ts'
+import { gaugeRelations } from './gen5-bw2-gauge.ts'
 import { monIdRule } from './gen5-bw2-mon-ids.ts'
 import { listedReader } from './gen5-bw2-source.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
@@ -98,6 +100,26 @@ describe.skipIf(!existsSync(FILE))(
         (char) => /[A-Za-z0-9]/.test(char),
       )
       expect(ascii.filter((char) => !chars.includes(char))).toEqual([])
+    })
+
+    // Scene: the hide of the near box's HP numbers (#137) follows sBtlvEffect to one actor of the
+    // gauge, so each layout on the way must agree with the source's own comments.
+    it("hold the gauge's chain, layouts and flags to their relations", () => {
+      const sources = readSources(listedReader(GEN5_PATHS.pokebw2))
+      expect(gaugeRelations(real().gauge, sources)).toEqual([])
+    })
+
+    // Scene: the plan writes the hide through these numbers, so it must build on them; the error
+    // stays out of the log, as it may name a place.
+    it('build the hide of the near HP numbers on the real numbers', () => {
+      const builds = () => {
+        try {
+          return numbersSteps(real().gauge, 'single', undefined).steps.length === 2
+        } catch {
+          return false
+        }
+      }
+      expect(builds(), 'until gauges and write hide-numbers build').toBe(true)
     })
   },
 )

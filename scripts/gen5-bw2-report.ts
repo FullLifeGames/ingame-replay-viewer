@@ -1,6 +1,8 @@
 // The report of the pokebw2 generator (gen5-bw2.ts): the full one with every number it read, for a
 // run on the build machine, and the quiet one for CI's public log, with no number of pokebw2.
 import type { Gen5Line } from '../src/gen5/backend/lines.ts'
+import { inOneByte } from '../src/gen5/bits-write.ts'
+import type { GaugeNumbers } from '../src/gen5/bw2-gauge-numbers.ts'
 import type {
   Bw2Numbers,
   Bw2Symbol,
@@ -117,6 +119,16 @@ function textBoxCheck(textBox: TextBoxNumbers, chars: string): string {
   return `text box places found: ${count(textBox)}, sWork ${root}, ${advances}, carrier ${textBox.carrier}`
 }
 
+/** The gauge's places by name (#137), which the generator has read or thrown: how many layouts
+ * and values, where its root lies and whether objMode lies in one byte. Counts of our own keys and
+ * truth values alone. */
+function gaugeCheck(gauge: GaugeNumbers): string {
+  const root = inMainRam(gauge.effect.address) ? 'in main RAM' : 'outside main RAM'
+  const mode = inOneByte(gauge.layouts.ClActor.fields.objMode) ? 'in one byte' : 'across bytes'
+  const counts = `${count(gauge.layouts)} layouts, ${count(gauge.constants)} constants`
+  return `gauge places found: ${counts}, sBtlvEffect ${root}, objMode ${mode}`
+}
+
 /** The report for a public log: the pin, the count of the symbols it looked up by our own names,
  * and the two checks, and no number of pokebw2: no address, offset, value or size. Each of
  * pokebw2's lists runs from 0, so a list's size would give away its last entry's number. */
@@ -132,6 +144,7 @@ export function quietLines(numbers: Bw2Numbers): string[] {
     ...textChecks(numbers.text),
     LINES_CHECKED,
     textBoxCheck(numbers.textBox, numbers.font.chars),
+    gaugeCheck(numbers.gauge),
   ]
 }
 
@@ -207,6 +220,7 @@ export function fullLines(numbers: Bw2Numbers): string[] {
     LINES_CHECKED,
     `flow ${JSON.stringify(numbers.flow)}`,
     `text box ${JSON.stringify(numbers.textBox)}`,
+    `gauge ${JSON.stringify(numbers.gauge)}`,
   ]
 }
 

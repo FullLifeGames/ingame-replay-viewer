@@ -81,8 +81,10 @@ function entryPlan(numbers: Bw2Numbers, replay: Gen5Replay): RunPlan {
     format: pkmFormat(numbers),
     checks: refs.checks,
     pin: numbers.pokebw2.commit,
+    gauge: numbers.gauge,
   })
   for (const note of entry.notes) log(`name cut: ${note}`)
+  log(entry.hpNumbers)
   log(`entry direct: ${String(entry.steps.length)} steps from boot with no save`)
   for (const line of writeLines(entry.steps)) log(line)
   return {

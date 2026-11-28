@@ -6,7 +6,8 @@
 // regular trainer's track (plan E-6, decisions 4, 5 and 8). Pure: the numbers come in from
 // build/gen5/bw2.json.
 import { battleEntry, type EntryLimits, type EntryPace } from './battle-entry.ts'
-import type { EntryNumbers, FieldLayout } from './bw2-numbers.ts'
+import { bitsWrite } from './bits-write.ts'
+import type { EntryNumbers } from './bw2-numbers.ts'
 import { partyChecks, partyCounts, type PartySides, partyWrites } from './direct-party.ts'
 import { checkNow, stageRef, type Takeover } from './direct-takeover.ts'
 import { entryConstant, entryField } from './entry-field.ts'
@@ -52,19 +53,6 @@ const LIMITS: EntryLimits = { start: 120, battle: 1000 }
 /** A on a quick beat through the opening, with a frame every 30 frames on the way to the adapter
  * and through the opening, whose intro shows the written names. */
 const PACE: EntryPace = { markEvery: 30, every: 4, throughOpening: true, openingMarkEvery: 30 }
-
-/** The writes of a bit-field's value, inside the one byte that holds its bits. */
-function bitsWrite(field: string, chain: SetupChain, at: FieldLayout, value: number): MemoryWrite {
-  const { bit, bits } = at
-  if (bit === undefined || bits === undefined || (bit % 8) + bits > 8) {
-    throw new Error(`${field} is no bit-field in one byte`)
-  }
-  const shift = bit % 8
-  const last = chain.hops.slice(-1).map((hop) => hop + Math.floor(bit / 8))
-  const hops = [...chain.hops.slice(0, -1), ...last]
-  const mask = (2 ** bits - 1) * 2 ** shift
-  return { kind: 'bits', field, address: chain.address, hops, mask, value: value * 2 ** shift }
-}
 
 /** A member of the opponent's name, the StrBuf behind the opponent's element of trainers. */
 function opponentStrBuf(entry: EntryNumbers, layout: RoutineLayout, member: string): SetupChain {

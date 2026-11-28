@@ -10,6 +10,7 @@
 import { type AdapterNumbers, adapterWrites, holdWrites } from './adapter.ts'
 import { sealParties } from './backend/party-mon.ts'
 import { type Gen5Block, GEN5_REPLAY_VERSION, type Gen5Replay } from './backend/replay.ts'
+import type { GaugeNumbers } from './bw2-gauge-numbers.ts'
 import type { EntryNumbers, ServerCmdTable, TextBoxNumbers } from './bw2-numbers.ts'
 import { type DirectEntry, directEntry } from './direct-entry.ts'
 import { mark, type MacroStep, wait } from './macro.ts'
@@ -179,21 +180,24 @@ export function replayPlan(replay: Gen5Replay, setup: ReplaySetup): MacroStep[] 
 }
 
 /** What the direct entry is built from: the entry's numbers, the routine's build, the Pokémon
- * format, the battle's checks and the pokebw2 commit of the numbers. */
+ * format, the battle's checks, the pokebw2 commit of the numbers and the gauge's numbers. */
 interface EntryInput {
   entry: EntryNumbers
   routine: RoutineBuild
   format: PkmFormat
   checks: readonly RamCheck[]
   pin: string
+  gauge: GaugeNumbers
 }
 
 /** The direct entry from power-on to the action menu with the replay's parties sealed and its
- * trainer names, once the replay is checked; its notes start with the names cut in a Pokémon. */
+ * trainer names, and the near box's HP numbers hidden (a replay is a single), once the replay is
+ * checked; its notes start with the names cut in a Pokémon. */
 export function replayEntry(replay: Gen5Replay, input: EntryInput): DirectEntry {
   checkReplay(replay, input.pin)
   const { parties, notes } = sealParties(replay.parties, input.format)
-  const sides = { names: replay.trainers, parties, style: 'single' } as const
+  const hpNumbers = input.gauge
+  const sides = { names: replay.trainers, parties, style: 'single', hpNumbers } as const
   const direct = directEntry(input.entry, input.routine, sides, input.checks)
   return { ...direct, notes: [...notes, ...direct.notes] }
 }
