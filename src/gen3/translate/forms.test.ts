@@ -196,6 +196,18 @@ describe('a Mega Evolution (#125)', () => {
     const noted = fallbacksOf(...lines).filter(({ line }) => line === NEXT + 1)
     expect(noted.map(({ kind }) => kind)).toEqual(['form', 'mechanic'])
   })
+
+  it('names no comeback gap for a forme the expansion lacks', () => {
+    // The switch back writes the forme, as a log does: with "Tyranitar, M" the client would take
+    // it for a new team member, and the spec would pass without the guard.
+    const lines = [
+      '|detailschange|p2a: Tyranitar|Rockruff-Dusk, M',
+      '|-mega|p2a: Tyranitar|Tyranitar|Tyranitarite',
+      '|switch|p2a: Venusaur|Venusaur, M|100/100',
+      '|switch|p2a: Tyranitar|Rockruff-Dusk, M|80/100',
+    ]
+    expect(fallbacksOf(...lines).filter(({ line }) => line > NEXT + 1)).toEqual([])
+  })
 })
 
 describe('a Mega that comes back (#125, D5)', () => {
