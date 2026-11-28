@@ -100,8 +100,8 @@ describe('park', () => {
     expect(watch).toEqual([
       { name: 'stage', address: STAGE, width: 4 },
       { name: 'setup', address: SETUP, width: 4 },
-      { name: 'player.party', address: SETUP, hops: [0x24], width: 4 },
-      { name: 'opponent.party', address: SETUP, hops: [0x20], width: 4 },
+      { name: 'player.party', address: SETUP, hops: [0x20], width: 4 },
+      { name: 'opponent.party', address: SETUP, hops: [0x1c], width: 4 },
     ])
   })
 
@@ -127,16 +127,16 @@ describe('park', () => {
     const of = (field: string) => writes.find((write) => write.field === field)
     expect(of('opponent.name')).toMatchObject({
       address: SETUP,
-      hops: [0x44, 0x08, 10],
+      hops: [0x50, 0x08, 10],
       bytes: [0x42, 0, 0x6f, 0, 0xfe, 0xff],
     })
-    expect(of('opponent.name length')).toMatchObject({ hops: [0x44, 0x08, 4], bytes: [2, 0] })
+    expect(of('opponent.name length')).toMatchObject({ hops: [0x50, 0x08, 4], bytes: [2, 0] })
     expect(of('opponent.trainerClass')).toMatchObject({
-      hops: [0x44, 0x10],
+      hops: [0x50, 0x10],
       bytes: [0x21, 0, 0, 0],
     })
     expect(of('player.name')).toMatchObject({
-      hops: [0x34, 0],
+      hops: [0x44, 0],
       bytes: [0x41, 0, 0x6e, 0, 0x6e, 0, 0xfe, 0xff],
     })
     expect(of('config.textSpeed')).toEqual({
@@ -160,10 +160,10 @@ describe('park', () => {
       'opponent.party.capacity',
       'opponent.party.count',
     ])
-    expect(checks[1]).toMatchObject({ hops: [0x44, 0x08, 6], width: 2, oneOf: [9] })
-    expect(checks[2]).toMatchObject({ hops: [0x24, 8], oneOf: [5] })
-    expect(checks[3]).toMatchObject({ hops: [0x20, 8], oneOf: [5] })
-    expect(checks[4]).toMatchObject({ hops: [0x20, 0], oneOf: [0] })
+    expect(checks[1]).toMatchObject({ hops: [0x50, 0x08, 6], width: 2, oneOf: [9] })
+    expect(checks[2]).toMatchObject({ hops: [0x20, 8], oneOf: [5] })
+    expect(checks[3]).toMatchObject({ hops: [0x1c, 8], oneOf: [5] })
+    expect(checks[4]).toMatchObject({ hops: [0x1c, 0], oneOf: [0] })
   })
 
   // Scene: a run without a save. The game's party is empty, so the setup's copy of it is too.
@@ -216,8 +216,8 @@ describe('park', () => {
     expect(checks).toEqual([
       { name: 'battleStyle', address: SETUP, hops: [0x0c], width: 4, oneOf: [4] },
       { name: 'fieldSituation.bgm', address: SETUP, hops: [0x0a], width: 2, oneOf: [0x3a7] },
-      { name: 'player.party.count', address: SETUP, hops: [0x24, 0], width: 4, oneOf: [2] },
-      { name: 'opponent.party.count', address: SETUP, hops: [0x20, 0], width: 4, oneOf: [1] },
+      { name: 'player.party.count', address: SETUP, hops: [0x20, 0], width: 4, oneOf: [2] },
+      { name: 'opponent.party.count', address: SETUP, hops: [0x1c, 0], width: 4, oneOf: [1] },
     ])
   })
 
@@ -283,9 +283,9 @@ function setupMemory(): {
     return value
   }
   put(SETUP, le(SETUP_AT))
-  put(SETUP_AT + 0x24, le(PLAYER_PARTY))
-  put(SETUP_AT + 0x20, le(OPPONENT_PARTY))
-  put(SETUP_AT + 0x44, le(TRAINER))
+  put(SETUP_AT + 0x20, le(PLAYER_PARTY))
+  put(SETUP_AT + 0x1c, le(OPPONENT_PARTY))
+  put(SETUP_AT + 0x50, le(TRAINER))
   put(TRAINER + 0x08, le(STRBUF))
   put(STRBUF + 6, [9, 0])
   for (const party of [PLAYER_PARTY, OPPONENT_PARTY]) put(party + 8, le(5))

@@ -10,6 +10,7 @@ export const CHECK_NUMBERS = {
     sCommMode: { name: 'sCommMode', kind: 'bss', address: 0x02100000, module: 'ov1' },
   },
   adapterCommands: { BTL_ACMD_SELECT_ACTION: 6, BTL_ACMD_SERVER_CMD: 0x0b },
+  adapterStates: { BTL_ADAPTER_STATE_IDLE: 2 },
   queueSize: 1200,
   adapter: {
     size: 0x30,

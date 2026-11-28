@@ -10,7 +10,7 @@ import {
   pkmLayout,
   sealPkm,
 } from './pkm-cipher'
-import { PKM } from './pkm.fixtures'
+import { PKM, ROW_0_PID, ROW_2_PID } from './pkm.fixtures'
 
 // Every number here is invented for the spec, as is the whole format of pkm.fixtures.ts: a
 // Pokémon of 156 bytes, the checksum at 0, the flag bits at 2, the content buffer at 4 with four
@@ -24,10 +24,6 @@ const CHUNK = 28
 const CONTENT_END = CONTENT + 4 * CHUNK
 const PARTY = 120
 const SIZE = 156
-
-/** A PID whose selector value is 0 (the logical order), and one whose value is 2. */
-const ROW_0 = 0x0000_0123
-const ROW_2 = 0x1234_0812
 
 /** Invented plain bytes under `pid`: every byte differs from its neighbours, the checksum is 0. */
 function plainUnder(pid: number): Uint8Array {
@@ -58,13 +54,13 @@ function referenceRun(bytes: Uint8Array, seed: number, step: PkmNumbers['cipher'
 // Scene: the game keeps a Pokémon's four blocks in an order its PID picks.
 describe('blockPlaces', () => {
   it("puts each block at the offset of the PID's row, so row 2 puts block B first", () => {
-    expect(blockPlaces(ROW_2, PKM)).toEqual({
+    expect(blockPlaces(ROW_2_PID, PKM)).toEqual({
       PkmBlockA: 2 * CHUNK,
       PkmBlockB: 0,
       PkmBlockC: CHUNK,
       PkmBlockD: 3 * CHUNK,
     })
-    expect(blockPlaces(ROW_0, PKM)).toEqual({
+    expect(blockPlaces(ROW_0_PID, PKM)).toEqual({
       PkmBlockA: 0,
       PkmBlockB: CHUNK,
       PkmBlockC: 2 * CHUNK,
@@ -74,13 +70,13 @@ describe('blockPlaces', () => {
 
   it('throws naming the table when the selector gives a row it lacks', () => {
     const short = { ...PKM, blockOffsets: PKM.blockOffsets.slice(0, 2) }
-    expect(() => blockPlaces(ROW_2, short)).toThrow(/block table has no row/)
+    expect(() => blockPlaces(ROW_2_PID, short)).toThrow(/block table has no row/)
   })
 
   it('throws naming the block the table gives no column', () => {
     const { PkmBlockD: _d, ...columns } = PKM.blockColumns
     expect(_d).toBe(2)
-    expect(() => blockPlaces(ROW_0, { ...PKM, blockColumns: columns })).toThrow(/PkmBlockD/)
+    expect(() => blockPlaces(ROW_0_PID, { ...PKM, blockColumns: columns })).toThrow(/PkmBlockD/)
   })
 })
 
@@ -127,7 +123,7 @@ describe('halfwordSum', () => {
 // Scene: the game seals the box part under the checksum and the party part under the PID.
 describe('sealPkm', () => {
   it('places the blocks by the PID, sums, then ciphers each part under its key', () => {
-    const plain = plainUnder(ROW_2)
+    const plain = plainUnder(ROW_2_PID)
     const sealed = sealPkm(plain, PKM)
     const content = plain.subarray(CONTENT, CONTENT_END)
     const checksum = halfwordSum(content)
@@ -143,13 +139,13 @@ describe('sealPkm', () => {
       ...cipherHalfwords(placed, checksum, PKM.cipher),
     ])
     expect([...sealed.subarray(PARTY)]).toEqual([
-      ...cipherHalfwords(plain.subarray(PARTY), ROW_2, PKM.cipher),
+      ...cipherHalfwords(plain.subarray(PARTY), ROW_2_PID, PKM.cipher),
     ])
   })
 
   it('keeps the checksum and the box part under two PIDs of one row, and changes the party part', () => {
     const other = 0x5a5a_0123
-    const one = sealPkm(plainUnder(ROW_0), PKM)
+    const one = sealPkm(plainUnder(ROW_0_PID), PKM)
     const two = sealPkm(plainUnder(other), PKM)
     expect(u16(one, CHECKSUM)).toBe(u16(two, CHECKSUM))
     expect([...one.subarray(CONTENT, CONTENT_END)]).toEqual([...two.subarray(CONTENT, CONTENT_END)])
@@ -165,7 +161,7 @@ describe('sealPkm', () => {
 // Scene: opening reverses the seal and says whether the checksum is right.
 describe('openPkm', () => {
   it('gives the plain bytes back with the sum in the checksum, and the checksum right', () => {
-    const plain = plainUnder(ROW_2)
+    const plain = plainUnder(ROW_2_PID)
     const opened = openPkm(sealPkm(plain, PKM), PKM)
     expect(opened.checksumRight).toBe(true)
     new DataView(plain.buffer).setUint16(
@@ -192,13 +188,13 @@ describe('openPkm', () => {
   })
 
   it('says the checksum is wrong when one byte of the box part flips', () => {
-    const sealed = sealPkm(plainUnder(ROW_0), PKM)
+    const sealed = sealPkm(plainUnder(ROW_0_PID), PKM)
     sealed[CONTENT + 5] = (sealed[CONTENT + 5] ?? 0) ^ 0x10
     expect(openPkm(sealed, PKM).checksumRight).toBe(false)
   })
 
   it('leaves the sealed bytes as they were', () => {
-    const sealed = sealPkm(plainUnder(ROW_0), PKM)
+    const sealed = sealPkm(plainUnder(ROW_0_PID), PKM)
     const copy = Uint8Array.from(sealed)
     openPkm(sealed, PKM)
     expect([...sealed]).toEqual([...copy])

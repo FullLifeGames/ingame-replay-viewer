@@ -111,6 +111,11 @@ export const PKM: PkmNumbers = {
   natures: { NATURE_CALM: 3, NATURE_BOLD: 4 },
 }
 
+/** A PID whose selector value under PKM is 0 (the logical order), and one whose value is 2. Ours,
+ * not pokebw2's: the derivation table runs them on the real format too. */
+export const ROW_0_PID = 0x0000_0123
+export const ROW_2_PID = 0x1234_0812
+
 /** The invented string terminator. */
 export const TERMINATOR = 0xfff0
 

@@ -5,9 +5,10 @@ import { partyChecks, partyCounts, partyWrites } from './direct-party'
 import { takeover } from './direct-takeover'
 
 // Every address, offset, size and constant here is invented (direct-entry.fixtures.ts): the
-// setup's party pointers at 0x24 for the player (index 1) and 0x20 for the opponent (index 0),
-// PokeParty's count at 0, capacity at 8, pkms at 0x10
-// and slotExists at 0x250, a PartyPkm of 0x60 bytes, so five of them fill pkms.
+// setup's party pointers at 0x20 for the player (index 1) and 0x1c for the opponent (index 0),
+// PokeParty's count at 0, capacity at 8, pkms at 0x10 and slotExists at 0x250, a PartyPkm of 0x60
+// bytes, so five of them fill pkms. scripts/gen5-derived-real.test.ts holds that no hop here
+// equals the one the same derivation gives on the generated numbers.
 
 const SETUP = 0x0230003c
 const { layout } = takeover(ENTRY, ROUTINE)
@@ -28,49 +29,49 @@ describe('partyWrites', () => {
         kind: 'bytes',
         field: 'player.party.pkms[0]',
         address: SETUP,
-        hops: [0x24, 0x10],
+        hops: [0x20, 0x10],
         bytes: [...ONE],
       },
       {
         kind: 'bytes',
         field: 'player.party.pkms[1]',
         address: SETUP,
-        hops: [0x24, 0x70],
+        hops: [0x20, 0x70],
         bytes: [...TWO],
       },
       {
         kind: 'bytes',
         field: 'player.party.count',
         address: SETUP,
-        hops: [0x24, 0],
+        hops: [0x20, 0],
         bytes: [2, 0, 0, 0],
       },
       {
         kind: 'bytes',
         field: 'player.party.slotExists',
         address: SETUP,
-        hops: [0x24, 0x250],
+        hops: [0x20, 0x250],
         bytes: [0b11],
       },
       {
         kind: 'bytes',
         field: 'opponent.party.pkms[0]',
         address: SETUP,
-        hops: [0x20, 0x10],
+        hops: [0x1c, 0x10],
         bytes: [...THREE],
       },
       {
         kind: 'bytes',
         field: 'opponent.party.count',
         address: SETUP,
-        hops: [0x20, 0],
+        hops: [0x1c, 0],
         bytes: [1, 0, 0, 0],
       },
       {
         kind: 'bytes',
         field: 'opponent.party.slotExists',
         address: SETUP,
-        hops: [0x20, 0x250],
+        hops: [0x1c, 0x250],
         bytes: [0b1],
       },
     ])
@@ -115,18 +116,18 @@ describe('partyChecks', () => {
       {
         name: 'player.party.capacity',
         address: SETUP,
-        hops: [0x24, 8],
+        hops: [0x20, 8],
         width: 4,
         oneOf: [5],
       },
       {
         name: 'opponent.party.capacity',
         address: SETUP,
-        hops: [0x20, 8],
+        hops: [0x1c, 8],
         width: 4,
         oneOf: [5],
       },
-      { name: 'opponent.party.count', address: SETUP, hops: [0x20, 0], width: 4, oneOf: [0] },
+      { name: 'opponent.party.count', address: SETUP, hops: [0x1c, 0], width: 4, oneOf: [0] },
     ])
   })
 })
@@ -134,8 +135,8 @@ describe('partyChecks', () => {
 describe('partyCounts', () => {
   it('reads back the count written for each side', () => {
     expect(partyCounts(ENTRY, layout, { player: [ONE, TWO], opponent: [THREE] })).toEqual([
-      { name: 'player.party.count', address: SETUP, hops: [0x24, 0], width: 4, oneOf: [2] },
-      { name: 'opponent.party.count', address: SETUP, hops: [0x20, 0], width: 4, oneOf: [1] },
+      { name: 'player.party.count', address: SETUP, hops: [0x20, 0], width: 4, oneOf: [2] },
+      { name: 'opponent.party.count', address: SETUP, hops: [0x1c, 0], width: 4, oneOf: [1] },
     ])
   })
 })

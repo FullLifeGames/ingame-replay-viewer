@@ -2,8 +2,9 @@
 // constant here is made up for them. The functions, data, constants, structs and members carry
 // pokebw2's names, since the plan looks them up by name, and the layouts hold only the members the
 // plan reads, in an order of their own. scripts/gen5-fixtures-real.test.ts holds that no number
-// here equals the one that build/gen5/bw2.json generates under the same name. The routine's build
-// is ours, not pokebw2's.
+// here equals the one that build/gen5/bw2.json generates under the same name, and
+// scripts/gen5-derived-real.test.ts holds the same of what the plan derives from them, such as a
+// side's slot in the setup's arrays. The routine's build is ours, not pokebw2's.
 import type { Bw2Symbol, EntryNumbers, StructLayout } from './bw2-numbers.ts'
 import type { RoutineBuild } from './routine-order.ts'
 import { ORDER_MEMBERS } from './routine-order.ts'
@@ -62,9 +63,9 @@ export const ENTRY: EntryNumbers = {
     BtlSetup: layout(0x100, {
       battleStyle: word(0x0c),
       'fieldSituation.bgm': { offset: 0x0a, size: 2 },
-      party: { offset: 0x20, size: 16 },
-      playerInfo: { offset: 0x30, size: 16 },
-      trainers: { offset: 0x44, size: 16 },
+      party: { offset: 0x1c, size: 16 },
+      playerInfo: { offset: 0x40, size: 16 },
+      trainers: { offset: 0x50, size: 16 },
       gameData: word(0x64),
       config: word(0x68),
     }),
