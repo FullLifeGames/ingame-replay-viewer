@@ -117,9 +117,9 @@ The user's course, set at wave 3's gate: "I wanna finish Gen 3 though an M2, so 
 
 - A picker before the dump opens on "None: start the game only"; with a replay picked the page boots through the direct entry and plays every block. The list of lines not shown sits beside the game from 56rem and under it on a phone, from a game-neutral module shared with the Gen 3 page (W6-152). Both Gen 5 servers serve the generated file and the routine under `/gen5-build/`, and the page's build output holds neither (W6-109).
 
-### S13, lane a: print the lines Black 2 lacks (#118), in work
+### S13, lane a: print the lines Black 2 lacks (#118)
 
-- Way C: the page empties the battle window's string buffer, sends one standard message carrying a neutral line of the game, and writes our text into the buffer after the game formats the carrier and before it prints. Steps done: the probe (118-P), the generator's `textBox` key (118-1), the backend's `print` rule for forfeit, win and tie with one block per page (118-2) and the printed block's steps (118-3). 118-4 runs.
+- Way C: the page empties the battle window's string buffer, sends one standard message carrying a neutral line of the game, and writes our text into the buffer after the game formats the carrier and before it prints. Steps: the probe (118-P), the generator's `textBox` key (118-1), the backend's `print` rule for forfeit, win and tie with one block per page (118-2), the printed block's steps (118-3), and the runs, the numbers file's version and the docs (118-4). The fix round after the review moved the text box relations' numbers into a fixture under the guard, listed an empty message and printed a message that falls inside an action after it. The stage reached master as one commit (W6-168).
 
 ## Evidence
 
@@ -151,7 +151,7 @@ The check lines give coverage over all of `src/`; an exit of 0 shows that each o
 - S11, lane b: the check 339 files, 4,666 passed, 23 skipped; three guard specs each shown able to fail. Review: 15 Confirmed, 1 Wrong, 2 Unclear.
 - S10, lane a: the smoke run answered 30 of 30 blocks. The three full runs, each on its first try: R1 gen5ou 2718717830, 58 of 58 blocks in 22.6 minutes, the longest 875 of 3,000 frames; R2 the same figures in 23.9 minutes, all 968 marks agreeing with R1 by frame and main RAM hash; R3 smogtours-gen5ou 862240, 76 of 76 blocks in 29.1 minutes. The not-shown lists equal the replay spec's. #119's probe: 4 minutes 20 seconds, 11 of 11 relations true. The check 347 files, 4,743 passed, 11 skipped; lines 96.82 %, branches 95.13 %. Review: 29 Confirmed, 6 Wrong, 9 Unclear.
 - S12, lane b: the page played R1's replay on the dev server in 23.6 minutes and from the build in 21.7, 58 of 58 blocks each, every one of 968 marks equal to R1's; the page's 137 rows equal the Node run's. The page's index chunk 2,019.71 kB (gzip 409.99) after the list moved to a game-neutral module, against 2,194.80 kB before. The check 358 files, 4,835 passed, 11 skipped; the import-cycle check found none over 249 modules. Review: 21 Confirmed, 3 Wrong, 13 Unclear; all six criteria met.
-- S13, lane a, so far: the probe passed 55 of 55 truth lines; the check at 118-3 363 files, 4,887 passed, 11 skipped.
+- S13, lane a: the probe passed 55 of 55 truth lines. Two full runs from power-on, each on its first try: gen5ou 2718717830, 60 of 60 blocks in 24.4 minutes, and smogtours-gen5ou 862240, 78 of 78 in 32.4 minutes; each printed its forfeit and its winner's line from the first letter, with no letter of the carrier showing. The page played the first replay by itself, all 978 marks equal to the run script's by frame and main RAM hash, with 135 rows. The check after the fix round 363 files, 4,900 passed, 11 skipped; lines 96.56 %, branches 94.65 %. Review: 27 Confirmed, 4 Wrong, 11 Unclear; all four criteria met.
 
 ## Decided without the user
 
@@ -322,13 +322,16 @@ Each entry gives the scene, the options, the choice and what a reversal costs. P
 - W6-157 118-P's probe ran way C in the emulator, 55 of 55 truth lines. The builder changed the plan in two places: block b2 became Darmanitan's Grass Knot on Politoed, since the plan's move was not super effective, and the format mark's truth line became "the arm landed" and "still empty one frame after the write". (a) accept and go to 118-1, (b) a second probe on another replay. Chosen (a). Reversal: one probe run.
 - W6-159 #111's fix round takes W1 to W3, the cut of the scripts' import cycle with a check, a try around each run-end listener and a failed progress for a refused query. Chosen over (b) W1 to W3 alone: #117's round showed a cycle losing code silently. Reversal: none.
 - W6-160 118-1's builder read five files, not six, made one commit, not two, and measured the window by the widest Latin letter. (a) accept, (b) the plan's form. Chosen (a): each follows a rule of the tree. Reversal: none.
+- W6-168 A spec of 118-1 held four of pokebw2's numbers by name outside every fixtures module, public on the lane's branch. (a) fix forward and merge, (b) fix forward and open the stage's pull request from one squashed commit on master's base, deleting the old remote lane branch, as W5-43 did, (c) rewrite the lane's commits. Chosen (b): no commit in master's history holds the literal. Reversal: push the old branch again.
+- W6-170 The fix round's rule against typed literals in specs found 36 such literals in 21 spec files, over its brief's limit of five. A walk by member path found small layout numbers equal to pokebw2's in two older specs, `src/gen5/battle-mons.test.ts` and `src/gen5/battle-check.test.ts`. (a) merge #118 and give the rule and the moves to the Gen 5 tooling proposal, (b) one more step before the merge, (c) an allow list. Chosen (a): #118's own literal is gone, and the older ones sit in master's history either way. Reversal: none in code.
 - W6-163 118-2's rulings: a fixture page of three lines, the winner's name as the log gives it, and a "?" counted as `character` under `party` (a wording rest). (a) accept, (b) send back. Chosen (a). Reversal: one kind.
 - Plain acceptances of a hand-back:
   - S9, lane b: W6-141 (#109's fix round).
   - S10, lane a: W6-142 (#119's probe; the question returns as `gen5-hp-hide`).
   - S11, lane b: W6-143 (117-1).
   - S12, lane b: W6-158 (111-4), W6-161 (#111's fix round), W6-162 (#123 merged under W6-70).
-  - S13, lane a: W6-164 (118-3).
+  - S13, lane a: W6-164 (118-3), W6-167 (118-4), W6-171 (#124 merged under W6-70).
+  - The gate: W6-169 (the gate plan's proposals and questions).
 
 ## Gate
 
@@ -352,7 +355,7 @@ State on 28.11.2026, before the gate:
 | S11   | b    | #117                       | #121         | merged, bcec9cc                                                            |
 | S10   | a    | #110, #119                 | #122         | merged, 93dc61c                                                            |
 | S12   | b    | #111                       | #123         | merged, cc7c440                                                            |
-| S13   | a    | #118                       | (to come)    | in work: 118-P, 118-1, 118-2 and 118-3 done; 118-4 builds                  |
+| S13   | a    | #118                       | #124         | merged, 4a1ae21                                                            |
 
 The user's answers during the wave:
 
@@ -369,11 +372,13 @@ The user's answers during the wave:
 
 Open on the page: `gen5-hp-hide` (since 27.11.2026, with #119's pictures): a keep 54/100, b hide the numbers (recommended; it approves the build as a new issue), c hide them with a switch on the page. Every Pokémon keeps 100 HP until the answer.
 
+The gate's questions, on the page since 28.11.2026 with their pictures, each with a recommendation: `wave7-cut` (a, one generation at a time), `m3-gen6-8` (a, file the six Gen 6 to 8 issues), `gen5-next` (b, Gen 1 to 4 replays, forms and the trainer's class; the visitor's page parked), `proposals-pages` (a, the status lines, the list in plain words, the checks under load), `proposals-gen3` (b, the stand-in lines, the pop-ups with #40 and the specs; the move looks and the cases no replay holds parked), `proposals-gen5` (a, the tool cleanup, the closer blocks and a census) and `device-checks` (a, one checklist page).
+
 Still waiting for the user from waves 4 and 5: the phone runs for #47 and #49, the device checks of #56 to #59, two saved files for #56, #59's report link, and the speed figures for the Gen 5 page.
 
 ## The next wave
 
-For the integrator to complete at the gate. #118 closes with 118-4 and its stage pull request. The answer to `gen5-hp-hide` decides whether the HP build follows as an issue. The Gen 5 cut keeps proposals behind its first milestone (forms, Gen 1 to 4 formats on Gen 5, the EXP bar, the walk's removal, sound, the visitor's page, a double's moment, the trainer's class), and the rests below can each start a proposal.
+For the integrator to complete at the gate. #118 closed with #124. The answer to `gen5-hp-hide` decides whether the HP build follows as an issue. The Gen 5 cut keeps proposals behind its first milestone (forms, Gen 1 to 4 formats on Gen 5, the EXP bar, the walk's removal, sound, the visitor's page, a double's moment, the trainer's class), and the rests below can each start a proposal.
 
 ## Rests
 
@@ -407,7 +412,7 @@ The Gen 3 backend and ROM:
 - The first Tera line keeps PRINT's long wait, 64 frames the game does not wait (W6-104).
 - The Tera outro test's THEN holds without a Tera, so its SCENE alone proves the op ran (stage 7's fix-1).
 - `first-tera`'s red run needs a tracked way to shoot a stream a lane makes (89-5).
-- Each ability pop-up slides off before its line ends, by the expansion's own timer (stage 6, W6-118).
+- Each ability pop-up slides off before its line ends, by the expansion's own timer (stage 6's and stage 7's testers).
 - Gen 3 neither prints nor lists the game's "acquired Mummy" line, as with Trace (W6-144).
 - The send-out streams and `scripts/rom-shot-stream.ts` write "… would like to battle!" by hand; the phrase module's line changes the intro frames and needs a new baseline (W6-90).
 - Bide's first turn stays in `NAMED_AHEAD` until a test replay holds Bide (W6-110).
