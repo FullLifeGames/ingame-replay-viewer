@@ -27,6 +27,7 @@ const COVERED_KINDS = [
   ['a critical hit', '-crit'],
   ['a miss', '-miss'],
   ['a multi-hit move', '-hitcount'],
+  ['Mega Evolution', '-mega'],
 ] as const
 
 function kindOf(line: string): string | undefined {
@@ -36,10 +37,10 @@ function kindOf(line: string): string | undefined {
 const kinds = new Set(replays.flatMap(({ replay }) => replay.log.split('\n').map(kindOf)))
 
 /**
- * The ids a test replay may have: a Gen 1 to 5 or Gen 9 OU battle or random battle, from a
+ * The ids a test replay may have: a Gen 1 to 6 or Gen 9 OU battle or random battle, from a
  * Smogon tournament (`smogtours-`) or the ladder. The group is the format the id names.
  */
-const TEST_REPLAY_ID = /^(?:smogtours-)?(gen(?:[1-5]|9)(?:ou|randombattle))-\d+$/
+const TEST_REPLAY_ID = /^(?:smogtours-)?(gen(?:[1-6]|9)(?:ou|randombattle))-\d+$/
 
 /** The format an id names: `gen1ou` for `smogtours-gen1ou-995161`. */
 const formatOf = (id: string) => TEST_REPLAY_ID.exec(id)?.[1]
@@ -54,13 +55,15 @@ describe('the test replays', () => {
   // Preview, one from a Smogon tournament and one from the ladder (#87), and two Gen 9 OU replays
   // with Terastallization, one from a Smogon tournament with Ivy Cudgel's looks and one from the
   // ladder with snow (#88), and two Gen 9 random battles from the ladder in which Zoroark's
-  // Illusion ends, once on a hit it survives and once on a knock-out (#98).
-  it('are ten tournament replays and nine from the ladder', () => {
-    expect(replays.filter(({ file }) => file.startsWith('smogtours-'))).toHaveLength(10)
-    expect(replays).toHaveLength(19)
+  // Illusion ends, once on a hit it survives and once on a knock-out (#98), and two Gen 6 OU
+  // replays with a Mega Evolution on each side, one from a Smogon tournament with Trace after Mega
+  // Alakazam's and one from the ladder with Drought's sun after Mega Charizard Y's (#125).
+  it('are eleven tournament replays and ten from the ladder', () => {
+    expect(replays.filter(({ file }) => file.startsWith('smogtours-'))).toHaveLength(11)
+    expect(replays).toHaveLength(21)
   })
 
-  it('hold seven Gen 3 OU, one Gen 1, two each of Gen 2, 4, 5 and 9 OU, and three random battles', () => {
+  it('hold seven Gen 3 OU, one Gen 1, two each of Gen 2, 4, 5, 6 and 9 OU, and three random battles', () => {
     const formats = replays.map(({ file }) => formatOf(file))
     expect(formats.filter((format) => format === 'gen3ou')).toHaveLength(7)
     expect(formats.filter((format) => format === 'gen3randombattle')).toHaveLength(1)
@@ -68,12 +71,13 @@ describe('the test replays', () => {
     expect(formats.filter((format) => format === 'gen2ou')).toHaveLength(2)
     expect(formats.filter((format) => format === 'gen4ou')).toHaveLength(2)
     expect(formats.filter((format) => format === 'gen5ou')).toHaveLength(2)
+    expect(formats.filter((format) => format === 'gen6ou')).toHaveLength(2)
     expect(formats.filter((format) => format === 'gen9ou')).toHaveLength(2)
     expect(formats.filter((format) => format === 'gen9randombattle')).toHaveLength(2)
   })
 
   it.each(replays)(
-    '$file is a saved Gen 1 to 5 or Gen 9 singles replay, OU or random',
+    '$file is a saved Gen 1 to 6 or Gen 9 singles replay, OU or random',
     ({ file, replay }) => {
       expect(replay.id).toBe(file)
       expect(replay.id).toMatch(TEST_REPLAY_ID)
@@ -94,6 +98,8 @@ describe('formatOf', () => {
     ['gen3randombattle-2717609379', 'gen3randombattle'],
     ['smogtours-gen4ou-690421', 'gen4ou'],
     ['smogtours-gen5ou-862240', 'gen5ou'],
+    ['smogtours-gen6ou-995596', 'gen6ou'],
+    ['gen6ou-2719620803', 'gen6ou'],
     ['smogtours-gen9ou-886489', 'gen9ou'],
     ['gen9ou-2719598518', 'gen9ou'],
     ['gen9randombattle-2719775756', 'gen9randombattle'],
@@ -102,7 +108,7 @@ describe('formatOf', () => {
   })
 
   it.each([
-    'gen6ou-1',
+    'gen7ou-1',
     'gen8ou-1',
     'gen3uu-1',
     'gen3randomdoublesbattle-1',

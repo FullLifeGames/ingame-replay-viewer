@@ -5,7 +5,7 @@ import { replayLabel } from './label'
 import { FIRST_REPLAY, TEST_REPLAYS } from './replays'
 
 describe('TEST_REPLAYS', () => {
-  it('lists the nineteen test replays, 994052 first', () => {
+  it('lists the twenty-one test replays, 994052 first', () => {
     expect(FIRST_REPLAY).toBe('smogtours-gen3ou-994052')
     expect(TEST_REPLAYS.map(({ id }) => id)).toEqual([
       'smogtours-gen3ou-994052',
@@ -15,6 +15,7 @@ describe('TEST_REPLAYS', () => {
       'gen3randombattle-2717609379',
       'gen4ou-2719079523',
       'gen5ou-2718717830',
+      'gen6ou-2719620803',
       'gen9ou-2719598518',
       'gen9randombattle-2719775756',
       'gen9randombattle-2719812975',
@@ -26,6 +27,7 @@ describe('TEST_REPLAYS', () => {
       'smogtours-gen3ou-994176',
       'smogtours-gen4ou-690421',
       'smogtours-gen5ou-862240',
+      'smogtours-gen6ou-995596',
       'smogtours-gen9ou-886489',
     ])
   })
@@ -49,6 +51,7 @@ describe('the labels of the example replays', () => {
       'Gen 3 Random Battle: NewbiePlsForgiveMe vs joltylocks (2717609379)',
       'Gen 4 OU: beanstockg vs Model Magneton (2719079523)',
       'Gen 5 OU: isolatedstar vs abc2158 (2718717830)',
+      'Gen 6 OU: Johnald714 vs primary trout (2719620803)',
       'Gen 9 OU: hat_fm vs Snurke (2719598518)',
       'Gen 9 Random Battle: yourmomisaduck vs mmesmerizer (2719775756)',
       'Gen 9 Random Battle: yiurfhasa+ vs aroki 5.0 (2719812975)',
@@ -60,6 +63,7 @@ describe('the labels of the example replays', () => {
       'Gen 3 OU: Mindnight vs KeshBa45 (994176)',
       "Gen 4 OU: UnMecQuiS'enBranle vs Malekith (690421)",
       'Gen 5 OU: tizio potente ao vs Monai (862240)',
+      'Gen 6 OU: White Atoq vs ManOfMany (995596)',
       'Gen 9 OU: Setsu vs badcluelesswashed (886489)',
     ])
   })

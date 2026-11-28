@@ -4,6 +4,7 @@ import { Gen3Error } from '../errors'
 import abilities from './abilities.json'
 import { genericMove } from './generic'
 import { abilityOf, constantOf, itemOf, moveOf, readTable, speciesOf, typeOf } from './lookup'
+import species from './species.json'
 
 describe('constantOf (T8)', () => {
   it.each([
@@ -28,6 +29,14 @@ describe('lookups by @pkmn name', () => {
     expect(moveOf('Will-O-Wisp')).toEqual({ number: 261, name: 'Will-O-Wisp' })
     expect(abilityOf('Sand Stream').fallback).toBeUndefined()
     expect(itemOf('Poke Ball')).toEqual({ number: 1, name: 'Poké Ball' })
+  })
+
+  // The expansion names every Mega like its base species (#125): the sprite changes, the name
+  // stays.
+  it('give a Mega forme its own SPECIES_* row under its base name', () => {
+    const [number] = species.SPECIES_CHARIZARD_MEGA_X
+    expect(speciesOf('Charizard-Mega-X')).toEqual({ number, name: 'Charizard' })
+    expect(number).not.toBe(speciesOf('Charizard').number)
   })
 
   it('take the given name where the expansion has no display name', () => {

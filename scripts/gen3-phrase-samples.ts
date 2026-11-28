@@ -132,6 +132,12 @@ export const SAMPLES: Readonly<Record<string, Sample>> = {
   'effects.disabled': withValue('B_BUFF1', nb('Body Slam'), FAR),
   'effects.transformed': withValue('B_BUFF1', 'Tyranitar', FAR),
   'effects.terastallized': withValue('B_BUFF1', 'Fairy', FAR),
+  'effects.megaReacting': {
+    args: [FAR, 'Venusaurite', ERIC],
+    fill: { B_LAST_ITEM: 'Venusaurite', B_ATK_TRAINER_NAME: ERIC },
+  },
+  'effects.megaEvolved': withValue('B_BUFF1', 'Venusaur', FAR),
+  'effects.megaWish': { args: [ERIC, FAR], fill: { B_ATK_TRAINER_NAME: ERIC } },
   'effects.tookAttack': withValue('B_BUFF1', nb('Future Sight'), FAR),
   'effects.bufferEnds': withValue('B_BUFF1', 'Taunt', FAR),
   'effects.inLoveWith': { args: [FAR, NEAR], fill: { B_SCR_NAME_WITH_PREFIX2: 'Dugtrio' } },

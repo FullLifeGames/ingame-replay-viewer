@@ -17,7 +17,7 @@ import {
 } from './effects'
 import { message, tie, win } from './end'
 import { fieldActivate, sideEnd, sideStart, weather } from './field'
-import { formChange, terastallize } from './forms'
+import { formChange, megaEvolve, terastallize } from './forms'
 import { showHidden } from './hidden'
 import { item, itemEnd } from './items'
 import { battleStart, endIntro, player, teamSize, turn } from './intro'
@@ -81,6 +81,7 @@ const HANDLERS = {
   transform,
   formChange,
   terastallize,
+  megaEvolve,
   singleTurn,
   singleMove,
   copyBoost,

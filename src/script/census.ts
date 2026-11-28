@@ -82,7 +82,7 @@ export const NAMED_KINDS: Readonly<Partial<Record<Protocol.ArgName, NamedKind>>>
   '|tournament|autodq|': OUTSIDE,
 
   // Newer generations.
-  '|detailschange|': newer('a permanent forme change'),
+  '|detailschange|': newer('a permanent forme change other than Mega Evolution'),
   '|-swapboost|': newer('stat stages swapped between two Pokémon'),
   '|-invertboost|': newer('stat stages inverted'),
   '|-clearboost|': newer("one Pokémon's stat stages cleared by a move"),
@@ -91,7 +91,6 @@ export const NAMED_KINDS: Readonly<Partial<Record<Protocol.ArgName, NamedKind>>>
   '|-fieldend|': newer('a field condition ending'),
   '|-swapsideconditions|': newer('side conditions swapped between the sides'),
   '|-endability|': newer('an ability suppressed'),
-  '|-mega|': newer('Mega Evolution'),
   '|-primal|': newer('Primal Reversion'),
   '|-burst|': newer('Ultra Burst'),
   '|-zpower|': newer('a Z-Move'),
