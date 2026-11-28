@@ -4,7 +4,9 @@
 // name. Each rule says what becomes of its event; the kinds that Black 2 does not play yet are
 // listed as unplayed, each a rest for the gate (#110, lane plan D8). Every event before the first
 // turn that would play is the game's own: BtlServerFlow_StartBattle runs the leads' switch-in
-// effects before the server holds (#109, lane plan D3).
+// effects before the server holds (#109, lane plan D3). A line Black 2 lacks that has words of
+// its own prints in the game's text box (#118).
+import { tie, won } from '../../script/end-words.ts'
 import type { ScriptEvent } from '../../script/events.ts'
 import { type Gen5Fallback, lineFallback, unplayedFallback } from './fallbacks.ts'
 
@@ -12,10 +14,11 @@ import { type Gen5Fallback, lineFallback, unplayedFallback } from './fallbacks.t
  * `boundary`: it parts the blocks. `play`: the writer plays it where its Pokémon stand in place
  * (moves.ts), a switch-in as its switch, drag or send-in (switches.ts), a faint as the server's
  * faint (faints.ts), an effect by its module (effects.ts), and a charge skip (charge.ts).
- * `unplayed`: Black 2 does not play it yet. `line`: Black 2 has no line for it, and nothing
- * shows. */
+ * `unplayed`: Black 2 does not play it yet. `print`: Black 2 has no line for it, and `text`
+ * prints in its text box (printed.ts). `line`: Black 2 has no line for it, and nothing shows. */
 export type Outcome =
   | { readonly as: 'park' | 'game' | 'boundary' | 'play' | 'unplayed' }
+  | { readonly as: 'print'; readonly text: string }
   | { readonly as: 'line'; readonly detail: string }
 
 /** The event of one kind, also where one event type carries two kinds (`sideStart | sideEnd`). */
@@ -35,6 +38,7 @@ const park = (): Outcome => ({ as: 'park' })
 const play = (): Outcome => PLAY
 const unplayed = (): Outcome => ({ as: 'unplayed' })
 const line = (detail: string): Outcome => ({ as: 'line', detail })
+const print = (text: string): Outcome => ({ as: 'print', text })
 
 /** Lane plan D5: no command follows the last block, and the page names how the battle ended. */
 const LAST_SCENE = 'Black 2 holds the last scene; the page names'
@@ -48,9 +52,17 @@ const RULES = {
   faint: play,
   // Lane plan D14: the game keeps the disguise's Pokémon in place (party-state.ts).
   replace: () => line('Black 2 shows the disguise throughout'),
-  message: (event) => line(`Black 2 has no line for "${event.text}"`),
-  win: (event) => line(`${LAST_SCENE} the winner, ${event.name}`),
-  tie: () => line(`${LAST_SCENE} the tie`),
+  // A message with no words would print no page (#118).
+  message: (event) =>
+    event.text.trim() === ''
+      ? line('the message is empty, so Black 2 prints nothing')
+      : print(event.text),
+  // A winner neither player of the intro is has no name to print (#118, gen5-print-win).
+  win: (event) =>
+    event.side === undefined
+      ? line(`${LAST_SCENE} the winner, ${event.name}`)
+      : print(won(event.name)),
+  tie: () => print(tie()),
   move: play,
   prepare: play,
   anim: play,
@@ -122,8 +134,8 @@ export function outcomesOf(events: readonly ScriptEvent[]): Outcome[] {
   })
 }
 
-/** A fallback for each event that Black 2 does not play yet or whose line it lacks, in event
- * order. */
+/** A fallback for each event that Black 2 does not play yet or whose line it lacks and does not
+ * print, in event order. */
 export function ruleFallbacks(events: readonly ScriptEvent[]): Gen5Fallback[] {
   const outcomes = outcomesOf(events)
   return events.flatMap((event, i) => {

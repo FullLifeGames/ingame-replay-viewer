@@ -232,10 +232,8 @@ export function fieldActivated(effect: Effect): Phrase {
   return ownPhrase(`${held(effect.name)} took effect!`, `${effect.name} on the field`)
 }
 
-/** The win line (D8); `trainer` is the winner's name for text. */
-export const won = (trainer: string) => `${trainer} won the battle!`
-
-export const tie = () => 'The battle ended in a tie!'
+/** The win and tie lines (D8), shared with the Gen 5 backend. */
+export { tie, won } from '../../script/end-words'
 
 /** A line of the simulator's own, such as a forfeit, as it reads. */
 export const simulatorMessage = (text: string): Fitted => fitCharset(text)

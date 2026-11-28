@@ -81,7 +81,8 @@ Order after milestone 2 (user, 22.11.2026): milestone 3 starts first, and Gen 5 
    - Open: memory access in the GBA emulator, the transport, and the choice screens.
    - Smogon's bot policy (2026-10-09) doesn't apply: it covers autonomous bots, and here a human plays (user's call, 2026-11-20).
 8. **Gen 5 expansion.** A Black 2/White 2 with later generations' content, built from pinned pokebw2.
-   - Open: everything. First check whether a community effort on pokebw2 already exists.
+   - Printed lines (#118, done): the lines Black 2 has no message for, a forfeit, a note of the simulator, the winner and a tie, print in the game's own text box, in its font and at its pace, with no code of ours in the game. Both Gen 5 OU test replays print their forfeit and their winner at their place in a run, and of the lines Black 2 has no message for, the list of what the game does not show keeps the weather's turns alone (`docs/gen5-backend.md`, "Lines of ours in the text box").
+   - Open: everything else. First check whether a community effort on pokebw2 already exists.
    - Candidate: Boundless Black 2 by magickappy, due on 28.11.2026 (user's pointer, 21.11.2026). The hack puts all 1,025 species into Black 2, with regional forms, the Fairy type, Megas, modern moves, abilities and items, and animated Gen 5-style sprites. Its engine is White2Upgrade (721 species and the Fairy type), expanded to 1,025. A fan site says the developer plans to open the source a few weeks after release; nobody has named a licence or the build method yet. Once the source is out, check whether it builds from pokebw2 or patches the binary, and whether its licence allows a pinned build as ADR 0007 describes.
 9. **3D (Gen 9).** Scarlet/Violet.
    - Open: everything.

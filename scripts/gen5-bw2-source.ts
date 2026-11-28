@@ -87,6 +87,13 @@ export const POKEBW2_FILES: readonly string[] = [
   // The characters the battle view's two fonts draw (#106).
   'res/fonts/font/00/font.json',
   'res/fonts/font/02/font.json',
+  // The battle view's text box (#118): the text work's root, the view's core and its string buffer,
+  // and the message window.
+  'src/battle/btl_string.c',
+  'src/battle/btlv_core.c',
+  'include/battle/btlv.h',
+  'src/battle/btlv_scu.c',
+  'include/gfl/bmpwin.h',
 ]
 
 /** Reads one file of pokebw2 by its path inside the checkout. */

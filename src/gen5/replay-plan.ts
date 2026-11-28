@@ -1,21 +1,23 @@
-// The steps that play a Gen 5 replay (#107, #110): the direct entry from power-on with the
+// The steps that play a Gen 5 replay (#107, #110, #118): the direct entry from power-on with the
 // replay's parties and trainer names, then the hold of the server, the player's answer to the
 // first action menu, and each block once the client answered the one before, with no button press
-// between. After the last block nothing is written and the game holds the last scene. Both plans
-// refuse a replay of another format version or built on another pokebw2 pin than the numbers they
-// write with, before any step. The moment script (scripts/gen5-moment-plan.ts) and its hand scenes
-// (scripts/gen5-moment-blocks.ts) write through the same steps, and the page plays them frame by
-// frame. Pure: no Node, no DOM.
+// between. A printed block writes its page into the text box over the carrier line
+// (src/gen5/text-box.ts) once the client formatted it. After the last block nothing is written
+// and the game holds the last scene. Both plans refuse a replay of another format version or
+// built on another pokebw2 pin than the numbers they write with, before any step. The moment
+// script (scripts/gen5-moment-plan.ts) and its hand scenes (scripts/gen5-moment-blocks.ts) write
+// through the same steps, and the page plays them frame by frame. Pure: no Node, no DOM.
 import { type AdapterNumbers, adapterWrites, holdWrites } from './adapter.ts'
 import { sealParties } from './backend/party-mon.ts'
 import { type Gen5Block, GEN5_REPLAY_VERSION, type Gen5Replay } from './backend/replay.ts'
-import type { EntryNumbers, ServerCmdTable } from './bw2-numbers.ts'
+import type { EntryNumbers, ServerCmdTable, TextBoxNumbers } from './bw2-numbers.ts'
 import { type DirectEntry, directEntry } from './direct-entry.ts'
 import { mark, type MacroStep, wait } from './macro.ts'
 import type { PkmFormat } from './pkm-members.ts'
 import type { RamCheck } from './ram-check.ts'
 import type { RoutineBuild } from './routine-order.ts'
 import { packCommands } from './server-cmd.ts'
+import { armWrites, formattedCheck, pageWrites, TEXT_LIMIT, textBox } from './text-box.ts'
 
 /** Frames the player's answer to the menu may take; A every MASH_EVERY frames for 3. */
 const MENU_LIMIT = 1800
@@ -52,32 +54,39 @@ export function answered(setup: BlockSetup): RamCheck {
   return { name: 'returned', address, width: 1, mask, oneOf: [2 ** (field.bit ?? 0)] }
 }
 
-/** A block to write: its name, the log lines it shows (none for a moment's block) and its
- * commands. */
-type PlanBlock = Pick<Gen5Block, 'name' | 'commands'> & { readonly lines?: readonly number[] }
+/** A block to write: its name, the log lines it shows (none for a moment's block), its commands
+ * and, for a printed block, its page. */
+type PlanBlock = Pick<Gen5Block, 'name' | 'commands'> & {
+  readonly lines?: readonly number[]
+  readonly print?: string | undefined
+}
 
-/** The writes of one block; a block past the adapter's room fails by its name and lines, with the
- * adapter's error as the cause. */
-function namedWrites(setup: BlockSetup, { name, lines, commands }: PlanBlock) {
-  const block = packCommands(setup.table, commands)
+/** The block's name, with its log lines when it has any. */
+const labelOf = ({ name, lines }: PlanBlock) =>
+  lines === undefined ? name : `${name} (lines ${lines.join(', ')})`
+
+/** `writes()`, or its RangeError named by the block, with the error as the cause. */
+function named<T>(block: PlanBlock, writes: () => T): T {
   try {
-    return adapterWrites(setup.adapterNumbers, setup.adapter, block)
+    return writes()
   } catch (error) {
     if (!(error instanceof RangeError)) throw error
-    const label = lines === undefined ? name : `${name} (lines ${lines.join(', ')})`
-    throw new RangeError(`${label}: ${error.message}`, { cause: error })
+    throw new RangeError(`${labelOf(block)}: ${error.message}`, { cause: error })
   }
 }
 
-/** The steps of one block: its write, the wait for the client's answer, and the mark
- * `<name>-answered`. */
-export function blockSteps(
-  setup: BlockSetup & Pick<ReplaySetup, 'markEvery'>,
-  block: PlanBlock,
-): MacroStep[] {
-  const { name } = block
+/** The writes of one block; a block past the adapter's room fails by its name and lines, with the
+ * adapter's error as the cause. */
+function namedWrites(setup: BlockSetup, block: PlanBlock) {
+  const packed = packCommands(setup.table, block.commands)
+  return named(block, () => adapterWrites(setup.adapterNumbers, setup.adapter, packed))
+}
+
+type StepSetup = BlockSetup & Pick<ReplaySetup, 'markEvery'>
+
+/** The wait for the client's answer to the block `name`, and the mark `<name>-answered`. */
+function answerSteps(setup: StepSetup, name: string): MacroStep[] {
   return [
-    { kind: 'write', name, writes: namedWrites(setup, block) },
     {
       kind: 'until',
       name,
@@ -88,6 +97,41 @@ export function blockSteps(
     },
     { kind: 'mark', name: `${name}-answered` },
   ]
+}
+
+/** The steps of a printed block (#118, lane plan section 2): the box's guard, which holds at
+ * once; the arm with the carrier's block; the wait for the client's format with the guard again;
+ * the page written over the carrier before the paused stream reads it; then the answer. */
+function printSteps(setup: StepSetup, block: PlanBlock, page: string, box: TextBoxNumbers) {
+  const { name } = block
+  const { guard } = textBox(box)
+  const steps: MacroStep[] = [
+    { kind: 'until', name: `${name}-box`, checks: guard, holdFor: 1, limit: 1 },
+    { kind: 'write', name, writes: [...armWrites(box), ...namedWrites(setup, block)] },
+    {
+      kind: 'until',
+      name: `${name}-text`,
+      checks: [...guard, formattedCheck(box)],
+      holdFor: 1,
+      limit: TEXT_LIMIT,
+    },
+    { kind: 'write', name: `${name}-text`, writes: named(block, () => pageWrites(box, page)) },
+  ]
+  return [...steps, ...answerSteps(setup, name)]
+}
+
+/** The steps of one block: its write, the wait for the client's answer, and the mark
+ * `<name>-answered`; a printed block's through the text box `box`, and without one it throws by
+ * the block's name. */
+export function blockSteps(setup: StepSetup, block: PlanBlock, box?: TextBoxNumbers): MacroStep[] {
+  const { name, print } = block
+  if (print === undefined) {
+    return [{ kind: 'write', name, writes: namedWrites(setup, block) }, ...answerSteps(setup, name)]
+  }
+  if (box === undefined) {
+    throw new Error(`${labelOf(block)} prints a page, but the replay carries no text box`)
+  }
+  return printSteps(setup, block, print, box)
 }
 
 /** Throws by name unless the replay has this plan's version and was built on `pin`. */
@@ -104,7 +148,7 @@ export function checkReplay(replay: Pick<Gen5Replay, 'version' | 'pin'>, pin: st
 /** The steps of each of the replay's blocks in order, once the replay is checked. */
 export function replaySteps(replay: Gen5Replay, setup: ReplaySetup): MacroStep[] {
   checkReplay(replay, setup.pin)
-  return replay.blocks.flatMap((block) => blockSteps(setup, block))
+  return replay.blocks.flatMap((block) => blockSteps(setup, block, replay.textBox))
 }
 
 /** The steps before the first block: hold the server, let the player answer the action menu by

@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import type { Bw2Numbers, StructLayout } from '../src/gen5/bw2-numbers'
+import { BW2_NUMBERS_VERSION, type Bw2Numbers, type StructLayout } from '../src/gen5/bw2-numbers'
 import { REPLAY_NUMBERS } from '../src/gen5/backend/replay.fixtures'
 import { outsideMainRam, quietLines } from './gen5-bw2-report'
+import { textBoxNumbers } from './gen5-bw2-textbox'
+import { TEXT_BOX_INPUT } from './gen5-bw2-textbox.fixtures'
 
 // An invented layout; the quiet report reads none of it.
 const LAYOUT: StructLayout = { size: 0x50, align: 4, fields: {} }
@@ -36,6 +38,7 @@ describe('quietLines', () => {
     module: 'ov001',
   })
   const numbers: Bw2Numbers = {
+    version: BW2_NUMBERS_VERSION,
     pokebw2: { repository: 'https://example.invalid/pokebw2.git', commit: 'c0ffee' },
     symbols: { inside: symbol('inside', 0x02012345), itcm: symbol('itcm', 0x01ff8123) },
     adapterCommands: { ACMD_A: 7, ACMD_B: 9 },
@@ -107,7 +110,10 @@ describe('quietLines', () => {
       chargeRelease: 0x17,
     },
     effects: REPLAY_NUMBERS.effects,
+    textBox: textBoxNumbers(TEXT_BOX_INPUT),
   }
+  const TEXT_BOX_LINE =
+    'text box places found: 11, sWork in main RAM, an advance for each character, carrier Bank0019_Text_ButNothingHappened'
 
   it('gives the pin, the count of symbols and the checks, and no address, offset or value', () => {
     expect(quietLines(numbers)).toEqual([
@@ -123,7 +129,21 @@ describe('quietLines', () => {
       "text labels of the backend's lines found: standard 1 of 4, set 0 of 5",
       "text labels of the backend's effect lines found: standard 0 of 2, set 1 of 38",
       "line sources checked: each of the backend's lines is what its function puts",
+      TEXT_BOX_LINE,
     ])
+  })
+
+  // Scene: the text box's numbers (#118) reach the public log as a count of our keys, truth values
+  // and the carrier's label.
+  it("says where the text box's root lies and whether a character lacks an advance", () => {
+    const textBox = {
+      ...numbers.textBox,
+      stringWork: symbol('sWork', 0x01ff8040),
+      advances: { Z: 13 },
+    }
+    expect(quietLines({ ...numbers, textBox }).at(-1)).toBe(
+      'text box places found: 11, sWork outside main RAM, characters without an advance, carrier Bank0019_Text_ButNothingHappened',
+    )
   })
 
   // Scene: the direct entry's numbers (#97) reach the public log as names and checks alone.
@@ -166,7 +186,9 @@ describe('quietLines', () => {
     expect(pin).toBe('pokebw2 c0ffee')
     expect(rest).toEqual(expect.arrayContaining(ours))
     expect(
-      rest.filter((line) => ![...ours, 'symbols 2'].includes(line) && /\d/.test(line)),
+      rest.filter(
+        (line) => ![...ours, 'symbols 2', TEXT_BOX_LINE].includes(line) && /\d/.test(line),
+      ),
     ).toEqual([])
   })
 

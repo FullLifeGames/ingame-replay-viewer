@@ -241,8 +241,41 @@ export interface TextNumbers {
   set: Record<string, number>
 }
 
+/** The battle view's text box (#118, scripts/gen5-bw2-textbox.ts): the chain from btl_string.c's
+ * static work to the string buffer the message window streams from, the buffer's layout, the
+ * values that guard and end a text, the window's size, font 0's advances and the carrier line. */
+export interface TextBoxNumbers {
+  /** btl_string.c's static `sWork`, the chain's root. */
+  stringWork: Bw2Symbol
+  /** The chain's pointers by member: `BtlStringWork.mainModule`, `BtlMainModule.viewCore` and
+   * `BtlvCore.strbuf`, each at its offset in its struct. */
+  mainModule: number
+  viewCore: number
+  strbuf: number
+  /** StrBuf, whole: `size`, `length`, `magic` and `chars`. */
+  strBuf: StructLayout
+  /** A StrBuf's magic while it is valid, the string terminator and the line break. */
+  constants: { STRBUF_MAGIC: number; CHAR_EOM: number; CHAR_NEWLINE: number }
+  /** The size BtlvCore_Create gives `core->strbuf`, in characters with the terminator. */
+  room: number
+  /** The message window's width in pixels, and the lines it shows a page. */
+  windowWidth: number
+  pageLines: number
+  /** Font 0's advance in pixels for each character both battle fonts draw. */
+  advances: Record<string, number>
+  /** The label of the carrier line in the standard bank (src/gen5/text-box.ts). */
+  carrier: string
+}
+
+/** The version of build/gen5/bw2.json's shape: scripts/gen5-bw2.ts writes it, and numbersOf
+ * (src/gen5/build-files.ts) refuses a file of another version or of none. Raise it whenever a key
+ * joins, leaves or changes. 2 since the text box joined (#118); the files before it carry none. */
+export const BW2_NUMBERS_VERSION = 2
+
 /** The whole of build/gen5/bw2.json. */
 export interface Bw2Numbers extends ServerCmdTable {
+  /** BW2_NUMBERS_VERSION when the file was made. */
+  version: number
   pokebw2: { repository: string; commit: string }
   symbols: Record<string, Bw2Symbol>
   adapterCommands: Record<string, number>
@@ -261,4 +294,5 @@ export interface Bw2Numbers extends ServerCmdTable {
   text: TextNumbers
   flow: FlowNumbers
   effects: EffectNumbers
+  textBox: TextBoxNumbers
 }

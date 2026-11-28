@@ -6,8 +6,8 @@
 // format (#97), the battle's constants, the mon-ID rule, the setup flag and the characters of the
 // battle's fonts (#106), the labels of the battle's standard and set text banks, each line the
 // backend sends held to what its function puts, and the flow's damage kinds and heal effect (#107),
-// recall effects and faint flag (#108), and the numbers of the effects' sequences and the lines of
-// the effects (#109).
+// recall effects and faint flag (#108), the numbers of the effects' sequences and the lines of the
+// effects (#109), and the battle view's text box, where a line Black 2 lacks prints (#118).
 // The checkout lives in .cache/gen5/pokebw2/ and the output in build/gen5/; nothing of pokebw2 is
 // committed.
 // Usage: node scripts/gen5-bw2.ts [--checkout <dir>] [--quiet] (fetches on the first run). With
@@ -17,7 +17,13 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 import { parseArgs } from 'node:util'
 
-import type { ArgFormat, Bw2Numbers, FieldLayout, StructLayout } from '../src/gen5/bw2-numbers.ts'
+import {
+  type ArgFormat,
+  BW2_NUMBERS_VERSION,
+  type Bw2Numbers,
+  type FieldLayout,
+  type StructLayout,
+} from '../src/gen5/bw2-numbers.ts'
 import {
   defineValue,
   enumAround,
@@ -41,6 +47,7 @@ import { fullLines, quietLines, report } from './gen5-bw2-report.ts'
 import { checkout, listedReader, POKEBW2, type Pokebw2Read } from './gen5-bw2-source.ts'
 import { structLayout } from './gen5-bw2-struct.ts'
 import { TEXT_SOURCES, textNumbers } from './gen5-bw2-text.ts'
+import { TEXT_BOX_SOURCES, textBoxNumbers } from './gen5-bw2-textbox.ts'
 import { SAVE_TRAINER, saveTrainer } from './gen5-bw2-trainer.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 
@@ -175,6 +182,7 @@ const SOURCES = {
   ...TEXT_SOURCES,
   ...FLOW_SOURCES,
   ...EFFECT_SOURCES,
+  ...TEXT_BOX_SOURCES,
 }
 
 type Sources = Record<keyof typeof SOURCES, string> & { bootLinks: Record<string, string> }
@@ -203,6 +211,7 @@ function parse(sources: Sources): Bw2Numbers {
   const pkm = pkmNumbers(sources)
   checkPartyRoom(battle.monIds, pkm.constants.PARTY_SIZE ?? Infinity)
   const text = textNumbers(sources)
+  const font = fontNumbers(sources)
   checkBackendLines(sources, text)
   const effects = effectNumbers(sources, battle.constants)
   checkEffectLiterals(sources, {
@@ -212,6 +221,7 @@ function parse(sources: Sources): Bw2Numbers {
     addEffects: effects.addEffects,
   })
   return {
+    version: BW2_NUMBERS_VERSION,
     pokebw2: { ...POKEBW2 },
     symbols: pickSymbols(ov167, SYMBOL_NAMES),
     adapterCommands: enumAround(sources.adapterH, 'BTL_ACMD_SERVER_CMD'),
@@ -235,10 +245,11 @@ function parse(sources: Sources): Bw2Numbers {
       battleOverlay: BATTLE_OVERLAY,
     }),
     pkm,
-    font: fontNumbers(sources),
+    font,
     text,
     flow: flowNumbers(sources),
     effects,
+    textBox: textBoxNumbers({ ...sources, standard: text.standard, chars: font.chars }),
   }
 }
 

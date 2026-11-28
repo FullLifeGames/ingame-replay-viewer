@@ -54,11 +54,16 @@ describe('outcomesOf the intro and the turns', () => {
     ).toEqual(['turn boundary', 'switchIn play', 'faint play'])
   })
 
-  it('lists a message of the simulator as a line the game lacks', () => {
+  // #118: a forfeit prints in Black 2's text box with the log's own words.
+  it('prints a message of the simulator', () => {
     expect(outcomesFrom('|turn|1', '|message|Bob forfeited.')).toEqual([
       'turn boundary',
-      'message line',
+      'message print',
     ])
+    expect(outcomesOf(scriptOf('|turn|1', '|message|Bob forfeited.').events).at(-1)).toEqual({
+      as: 'print',
+      text: 'Bob forfeited.',
+    })
   })
 })
 
@@ -172,8 +177,9 @@ describe('outcomesOf the kinds that play and those that do not', () => {
     ).toEqual(['turn boundary', 'damage play', 'replace line', 'effectEnd play'])
   })
 
-  // Lane plan D5: Black 2 holds the last scene, and the page names the winner or the tie.
-  it('plays a charge skip and lists the end as a line naming the winner', () => {
+  // #118 (gen5-print-win): the winner and a tie print in the Gen 3 viewer's words; a winner
+  // neither player is has no name to print, so Black 2 holds the last scene and the page names it.
+  it('plays a charge skip and prints the winner and a tie', () => {
     const lines = [
       '|turn|1',
       '|move|p1a: Dugtrio|Solar Beam||[still]',
@@ -186,17 +192,15 @@ describe('outcomesOf the kinds that play and those that do not', () => {
       'move play',
       'prepare play',
       'anim play',
-      'win line',
+      'win print',
     ])
-    expect(outcomesOf(scriptOf(...lines).events).at(-1)).toEqual({
+    const last = (...end: string[]) => outcomesOf(scriptOf('|turn|1', ...end).events).at(-1)
+    expect(last('|win|Alice')).toEqual({ as: 'print', text: 'Alice won the battle!' })
+    expect(last('|tie')).toEqual({ as: 'print', text: 'The battle ended in a tie!' })
+    expect(last('|win|Carol')).toEqual({
       as: 'line',
-      detail: 'Black 2 holds the last scene; the page names the winner, Alice',
+      detail: 'Black 2 holds the last scene; the page names the winner, Carol',
     })
-    expect(outcomesFrom('|turn|1', '|move|p1a: Dugtrio|Solar Beam||[still]', '|tie')).toEqual([
-      'turn boundary',
-      'move play',
-      'tie line',
-    ])
   })
 
   // Lane plan D8: the kinds no fixture holds wait as unplayed, each a rest for the gate.
@@ -225,8 +229,13 @@ describe('outcomesOf the kinds that play and those that do not', () => {
 
 // Scene: the replay lists each event that does not play yet beside the dropped lines.
 describe('ruleFallbacks', () => {
-  it('names each unplayed event and the text of each missing line', () => {
-    const script = scriptOf('|turn|1', '|-hitcount|p2a: Tyranitar|2', '|message|Bob forfeited.')
+  it('names each unplayed event and each missing line, and none for a printed one', () => {
+    const script = scriptOf(
+      '|turn|1',
+      '|-hitcount|p2a: Tyranitar|2',
+      '|message|Bob forfeited.',
+      '|win|Carol',
+    )
     expect(ruleFallbacks(script.events)).toEqual([
       {
         line: NEXT + 1,
@@ -235,11 +244,25 @@ describe('ruleFallbacks', () => {
         detail: 'Black 2 does not play this yet',
       },
       {
-        line: NEXT + 2,
+        line: NEXT + 3,
         kind: 'line',
-        event: 'message',
-        detail: 'Black 2 has no line for "Bob forfeited."',
+        event: 'win',
+        detail: 'Black 2 holds the last scene; the page names the winner, Carol',
       },
     ])
+  })
+
+  // Scene: a message with no words would print no page, so it shows neither in the game nor in
+  // the page's list unless it is listed.
+  it('lists a message whose text is empty or blank as a missing line', () => {
+    const script = scriptOf('|turn|1', '|message|', '|-message|   ')
+    expect(ruleFallbacks(script.events)).toEqual(
+      [1, 2].map((at) => ({
+        line: NEXT + at,
+        kind: 'line',
+        event: 'message',
+        detail: 'the message is empty, so Black 2 prints nothing',
+      })),
+    )
   })
 })

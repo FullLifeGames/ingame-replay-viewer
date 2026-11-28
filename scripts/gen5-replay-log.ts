@@ -1,13 +1,14 @@
 // The log lines of a whole replay's run (#110): a line per block with its answer's frame, the
-// frames it took against its limit and the battle log lines it showed; the battle's end; the
-// not-shown list; and the run's summary. Pure: scripts/gen5-replay.ts prints the lines.
+// frames it took against its limit, the battle log lines it showed and the page it printed in the
+// text box (#118); the battle's end; the not-shown list; and the run's summary. Pure:
+// scripts/gen5-replay.ts prints the lines.
 import type { ReplayEnd } from '../src/gen5/backend/end.ts'
 import type { NotShown } from '../src/gen5/backend/not-shown.ts'
 import type { Gen5Block } from '../src/gen5/backend/replay.ts'
 import type { MarkRecord } from '../src/gen5/hook.ts'
 import { BLOCK_LIMIT } from '../src/gen5/replay-plan.ts'
 
-type Block = Pick<Gen5Block, 'name' | 'lines'>
+type Block = Pick<Gen5Block, 'name' | 'lines' | 'print'>
 type Mark = Pick<MarkRecord, 'name' | 'frame'>
 
 /** A block's answer: its mark's frame, and the frames since the mark before it (the block
@@ -31,8 +32,18 @@ function answersOf(blocks: readonly Block[], marks: readonly Mark[]): Answer[] {
   })
 }
 
+/** A printed block's page as the replay holds it, each line quoted: a mark reads RAM one frame
+ * late, so the page never comes from there (lane ledger 118-P). */
+const printedText = ({ print }: Block) =>
+  print === undefined
+    ? ''
+    : `; prints ${print
+        .split('\n')
+        .map((line) => JSON.stringify(line))
+        .join(' / ')}`
+
 /** One line per block: its answer's frame and its frames of the limit, or no answer mark, then
- * its lines by number and text. */
+ * its lines by number and text, and the page it prints. */
 export function blockReport(
   blocks: readonly Block[],
   marks: readonly Mark[],
@@ -43,15 +54,16 @@ export function blockReport(
     const answer =
       frame === undefined ? 'no answer mark' : `answered at frame ${String(frame)}${took}`
     const shown = block.lines.map((line) => lines[line] ?? `(no log line ${String(line)})`)
-    return `${block.name}: ${answer}; lines ${block.lines.join(', ')}: ${shown.join(' / ')}`
+    const head = `${block.name}: ${answer}; lines ${block.lines.join(', ')}`
+    return `${head}: ${shown.join(' / ')}${printedText(block)}`
   })
 }
 
-/** The battle's result, then each message after the last turn, which the game does not show. */
+/** The battle's result, then each message after the last turn, which prints in the text box. */
 export function endLines(end: ReplayEnd): string[] {
   const { result } = end
   const messages = end.messages.map(
-    ({ line, text }) => `end: not in the game: "${text}" (line ${String(line)})`,
+    ({ line, text }) => `end: printed in the text box: "${text}" (line ${String(line)})`,
   )
   if (result === undefined) return ['end: the log names no winner', ...messages]
   const at = `line ${String(result.line)}`

@@ -3,7 +3,7 @@
 // scripts/gen5-routine.ts builds. Both servers answer them under BUILD_PREFIX from build/gen5/
 // (scripts/gen5-files.ts), and the page's build output holds neither. Here are their routes, the
 // checks on what they hold and every sentence the page shows when one is wrong.
-import type { Bw2Numbers } from './bw2-numbers.ts'
+import { BW2_NUMBERS_VERSION, type Bw2Numbers } from './bw2-numbers.ts'
 import { POKEBW2 } from './pokebw2-pin.ts'
 import type { RoutineBuild } from './routine-order.ts'
 
@@ -54,8 +54,27 @@ function commitOf(json: unknown): string | undefined {
   return typeof commit === 'string' ? commit : undefined
 }
 
+/** The version of the numbers' shape the file names, if it names one. */
+function versionOf(json: unknown): number | undefined {
+  const version = isRecord(json) ? json.version : undefined
+  return typeof version === 'number' ? version : undefined
+}
+
+/** The sentence for numbers whose shape is not this page's, or undefined when it is. */
+function versionProblem(json: unknown): string | undefined {
+  const version = versionOf(json)
+  if (version === BW2_NUMBERS_VERSION) return undefined
+  const ours = `this page reads version ${String(BW2_NUMBERS_VERSION)}`
+  const theirs =
+    version === undefined
+      ? 'names no version of its numbers'
+      : `holds its numbers in version ${String(version)}`
+  return `${pathOf('numbers')} ${theirs}, and ${ours}. ${runMaker('numbers')} to make them anew.`
+}
+
 /** The numbers as the page reads them, or the sentence why not: they must name `pin`, the commit
- * this page was built for, since numbers of another commit can drive the game wrong. */
+ * this page was built for, since numbers of another commit can drive the game wrong, and
+ * BW2_NUMBERS_VERSION, since a file of another shape fails later where a key is missing. */
 export function numbersOf(
   json: unknown,
   pin: string = POKEBW2.commit,
@@ -70,7 +89,15 @@ export function numbersOf(
       problem: `${pathOf('numbers')} holds the numbers of pokebw2 ${commit}, and this page reads pokebw2 ${pin}. ${again} to make them anew.`,
     }
   }
-  return { numbers: json as Bw2Numbers }
+  const problem = versionProblem(json)
+  return problem === undefined ? { numbers: json as Bw2Numbers } : { problem }
+}
+
+/** The numbers through numbersOf's check, for the run scripts: its sentence as an Error. */
+export function checkedNumbers(json: unknown): Bw2Numbers {
+  const got = numbersOf(json)
+  if ('problem' in got) throw new Error(got.problem)
+  return got.numbers
 }
 
 const isCount = (value: unknown) => Number.isInteger(value)

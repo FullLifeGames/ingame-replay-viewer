@@ -5,15 +5,20 @@ import {
   BUILD_PREFIX,
   buildFileProblem,
   buildFileUrl,
+  checkedNumbers,
   numbersOf,
   routineOf,
 } from './build-files'
+import { BW2_NUMBERS_VERSION } from './bw2-numbers'
 import { ROUTINE } from './direct-entry.fixtures'
 import { POKEBW2 } from './pokebw2-pin'
 
 const THEIRS = 'a'.repeat(40)
 
-const numbersAt = (commit: string) => ({ pokebw2: { repository: POKEBW2.repository, commit } })
+const numbersAt = (commit: string, version: unknown = BW2_NUMBERS_VERSION) => ({
+  version,
+  pokebw2: { repository: POKEBW2.repository, commit },
+})
 
 describe('numbersOf', () => {
   // Scene: build/gen5/bw2.json was made before the pin moved; the page must not play it.
@@ -39,6 +44,38 @@ describe('numbersOf', () => {
 
   it('holds the file to the pin it is given', () => {
     expect(numbersOf(numbersAt(THEIRS), THEIRS)).toEqual({ numbers: numbersAt(THEIRS) })
+  })
+
+  // Scene: build/gen5/bw2.json was made at the same pin before a key joined the numbers (#118's
+  // text box); the page must not play it and fail later with a message of the library.
+  it('refuses a numbers file of another version with a sentence that names both versions', () => {
+    const older = BW2_NUMBERS_VERSION - 1
+    expect(numbersOf(numbersAt(POKEBW2.commit, older))).toEqual({
+      problem: `build/gen5/bw2.json holds its numbers in version ${String(older)}, and this page reads version ${String(BW2_NUMBERS_VERSION)}. Run node scripts/gen5-bw2.ts on the build machine to make them anew.`,
+    })
+  })
+
+  it('refuses a numbers file that names no version', () => {
+    const problem = `build/gen5/bw2.json names no version of its numbers, and this page reads version ${String(BW2_NUMBERS_VERSION)}. Run node scripts/gen5-bw2.ts on the build machine to make them anew.`
+    const none = { pokebw2: numbersAt(POKEBW2.commit).pokebw2 }
+    for (const json of [none, numbersAt(POKEBW2.commit, '2'), numbersAt(POKEBW2.commit, null)]) {
+      expect(numbersOf(json)).toEqual({ problem })
+    }
+  })
+})
+
+// Scene: the run scripts read build/gen5/bw2.json on the build machine through the page's check.
+describe('checkedNumbers', () => {
+  it('passes the numbers of the pin and the version through', () => {
+    const json = numbersAt(POKEBW2.commit)
+    expect(checkedNumbers(json)).toBe(json)
+  })
+
+  it("throws the page's sentence for a file it refuses", () => {
+    const older = numbersAt(POKEBW2.commit, BW2_NUMBERS_VERSION - 1)
+    const { problem } = numbersOf(older) as { problem: string }
+    expect(problem).toMatch(/^build\/gen5\/bw2.json holds its numbers in version /)
+    expect(() => checkedNumbers(older)).toThrow(new Error(problem))
   })
 })
 
