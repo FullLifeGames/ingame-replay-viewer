@@ -98,6 +98,17 @@ describe('buildGen3Stream', () => {
     })
   })
 
+  it('builds a stream for a Gen 6 battle (#125)', () => {
+    const script = buildBattleScript(
+      ['|gen|6', '|player|p1|Alice|1|', '|player|p2|Bob|2|', '|start'].join('\n') +
+        '\n|switch|p1a: Venusaur|Venusaur, M|100/100\n|switch|p2a: Sylveon|Sylveon, F|100/100\n',
+    )
+    expect(buildGen3Stream(script).instructions.at(-1)).toEqual({
+      line: 5,
+      instruction: { op: 'end', outcome: 'unknown' },
+    })
+  })
+
   it('builds a stream for a Gen 9 battle (#88)', () => {
     const script = buildBattleScript(
       ['|gen|9', '|player|p1|Alice|1|', '|player|p2|Bob|2|', '|start'].join('\n') +
@@ -109,8 +120,8 @@ describe('buildGen3Stream', () => {
     })
   })
 
-  it.each([6, 7, 8])(
-    'refuses a Gen %i battle with a GenerationRefusal that carries the gen (#87, #88)',
+  it.each([7, 8])(
+    'refuses a Gen %i battle with a GenerationRefusal that carries the gen (#87, #88, #125)',
     (gen) => {
       const script = buildBattleScript(`|gen|${String(gen)}\n`)
       expect(() => buildGen3Stream(script)).toThrow(GenerationRefusal)
@@ -125,7 +136,7 @@ describe('buildGen3Stream', () => {
       expect.objectContaining({
         name: 'GenerationRefusal',
         gen: 8,
-        message: 'the stream plays Gen 1 to 5 and Gen 9 battles, this one is Gen 8',
+        message: 'the stream plays Gen 1 to 6 and Gen 9 battles, this one is Gen 8',
       }),
     )
   })
@@ -133,7 +144,7 @@ describe('buildGen3Stream', () => {
 
 describe('gensText', () => {
   it('writes a run of generations as a range and joins the runs with "and" (#88)', () => {
-    expect(gensText([1, 2, 3, 4, 5, 9])).toBe('Gen 1 to 5 and Gen 9')
+    expect(gensText([1, 2, 3, 4, 5, 6, 9])).toBe('Gen 1 to 6 and Gen 9')
   })
 
   it('sorts the generations before it joins their runs', () => {

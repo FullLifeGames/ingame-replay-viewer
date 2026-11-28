@@ -8,8 +8,11 @@ import { encodeStream } from './stream/encode'
 import type { Placed } from './translate/context'
 import { translate } from './translate'
 
-/** The generations the stream plays (#86, #87, #88): Gen 6 to 8 bring mechanics it lacks. */
-export const PLAYED_GENS: readonly number[] = [1, 2, 3, 4, 5, 9]
+/**
+ * The generations the stream plays (#86, #87, #88, #125): Gen 7 and 8 bring Z-Moves and Dynamax,
+ * which it lacks.
+ */
+export const PLAYED_GENS: readonly number[] = [1, 2, 3, 4, 5, 6, 9]
 
 /** A run of generations from `first` to `last`, as the words name it. */
 interface Run {
