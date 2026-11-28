@@ -1,31 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import { battleRefs } from './battle-check'
+import { CHECK_NUMBERS } from './battle-check.fixtures'
 import type { Bw2Numbers } from './bw2-numbers'
 
-// The few parts of bw2.json the checks read, in its shape, with invented addresses, offsets and
-// values.
-const NUMBERS = {
-  symbols: {
-    sAdapters: { name: 'sAdapters', kind: 'bss', address: 0x02100004, module: 'ov1' },
-    sCommMode: { name: 'sCommMode', kind: 'bss', address: 0x02100000, module: 'ov1' },
-  },
-  adapterCommands: { BTL_ACMD_SELECT_ACTION: 6, BTL_ACMD_SERVER_CMD: 0x0b },
-  queueSize: 1200,
-  adapter: {
-    size: 0x30,
-    align: 4,
-    fields: {
-      isNet: { offset: 0x20, size: 1, bit: 0, bits: 4 },
-      returned: { offset: 0x20, size: 1, bit: 4, bits: 3 },
-      clientId: { offset: 0x21, size: 1 },
-      cmd: { offset: 0x22, size: 1 },
-      state: { offset: 0x23, size: 1 },
-      'sendCmd.size': { offset: 0x28, size: 2 },
-      'sendCmd.cmd': { offset: 0x2a, size: 2 },
-    },
-  },
-} as unknown as Bw2Numbers
+const NUMBERS = CHECK_NUMBERS
 
 // Scene: the route ends once the battle's action menu stands: a local battle (sCommMode 0), the
 // player's adapter in main RAM, its client on BTL_ACMD_SELECT_ACTION and not yet replied.

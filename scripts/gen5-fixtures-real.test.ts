@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { Bw2Numbers } from '../src/gen5/bw2-numbers.ts'
 import { ADAPTER_LAYOUT } from '../src/gen5/adapter.fixtures.ts'
+import { CHECK_NUMBERS } from '../src/gen5/battle-check.fixtures.ts'
 import { BATTLE, ONE_CLIENT_TWICE, SWAPPED_SINGLE } from '../src/gen5/battle-mons.fixtures.ts'
 import { REPLAY_NUMBERS } from '../src/gen5/backend/replay.fixtures.ts'
 import { ENTRY } from '../src/gen5/direct-entry.fixtures.ts'
@@ -22,6 +23,7 @@ import { battleNumbers } from './gen5-bw2-battle.ts'
 import { effectNumbers } from './gen5-bw2-effects.ts'
 import { EFFECTS_CONSTANTS, EFFECTS_INPUT, EFFECTS_ITEMS } from './gen5-bw2-effects.fixtures.ts'
 import { flowNumbers } from './gen5-bw2-flow.ts'
+import { PARTY_NUMBERS } from './gen5-moment-party.fixtures.ts'
 import { ROOMY_NUMBERS } from './gen5-moment-room.fixtures.ts'
 import { FLOW_INPUT } from './gen5-bw2-flow.fixtures.ts'
 import { BATTLE_SOURCES } from './gen5-bw2-battle.fixtures.ts'
@@ -71,6 +73,12 @@ const COMPARED = [
     value,
     path: ['battle', 'single'],
   })),
+  {
+    module: 'src/gen5/battle-check.fixtures.ts',
+    name: 'CHECK_NUMBERS',
+    value: CHECK_NUMBERS,
+    path: [],
+  },
   { module: 'src/gen5/hp-numbers.fixtures.ts', name: 'GAUGE', value: GAUGE, path: ['gauge'] },
   {
     module: 'src/gen5/hp-numbers.fixtures.ts',
@@ -172,6 +180,12 @@ const COMPARED = [
     name: 'EFFECTS_ITEMS',
     value: EFFECTS_ITEMS,
     path: ['pkm', 'items'],
+  },
+  {
+    module: 'scripts/gen5-moment-party.fixtures.ts',
+    name: 'PARTY_NUMBERS',
+    value: PARTY_NUMBERS.battle,
+    path: ['battle'],
   },
   ...(['queueSize', 'adapter'] as const).map((key) => ({
     module: 'scripts/gen5-moment-room.fixtures.ts',

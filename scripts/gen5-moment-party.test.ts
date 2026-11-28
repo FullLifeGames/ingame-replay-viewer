@@ -3,15 +3,12 @@ import { describe, expect, it } from 'vitest'
 
 import type { PartyOrders } from '../src/gen5/backend/moves'
 import type { Gen5Block } from '../src/gen5/backend/replay'
-import type { BattleNumbers } from '../src/gen5/bw2-numbers'
 import { type PartyStart, partyLines, partyRefs } from './gen5-moment-party'
+import { MON_ID_AT, PARTY_NUMBERS } from './gen5-moment-party.fixtures'
 
-// Invented numbers: the mon ID's offset in BattleMonCore, the slots' addresses, the clients and
-// the mon IDs. The species are national dex numbers, read from @pkmn.
-const MON_ID_AT = 0x31
-const NUMBERS = {
-  battle: { monCore: { size: 0x40, fields: { monId: { offset: MON_ID_AT, size: 1 } } } },
-} as unknown as { battle: BattleNumbers }
+// Invented numbers: the mon ID's offset in BattleMonCore (from the fixtures module), the slots'
+// addresses, the clients and the mon IDs. The species are national dex numbers, read from @pkmn.
+const NUMBERS = PARTY_NUMBERS
 /** A species' national dex number, from @pkmn. */
 const dex = (name: string) => Dex.species.get(name).num
 
