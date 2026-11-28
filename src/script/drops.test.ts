@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
+import { noRuleReason } from './census'
 import { dropReasonOf } from './drops'
 import { readLines } from './lines'
 import type { LogLine } from './lines'
+import { NEXT, scriptOf } from './testing'
 
 function lineOf(text: string): LogLine {
   const [line] = readLines(`${text}\n`)
@@ -69,6 +71,25 @@ describe('dropReasonOf', () => {
 
   it("drops Roost's turn as state: the client keeps the volatile and the game says nothing", () => {
     expect(dropReasonOf(lineOf('|-singleturn|p1a: Skarmory|move: Roost'), true)).toBe('state')
+  })
+
+  // Showdown writes a Mega's details before its `-mega` line, which plays the change, and turns a
+  // fainted Mega back for the team list (#125).
+  it.each([
+    '|detailschange|p2a: Venusaur|Venusaur-Mega, M',
+    '|detailschange|p2a: Charizard|Charizard-Mega-X, F',
+    '|detailschange|p2: Venusaur|Venusaur, M|[silent]',
+  ])('drops %j as state', (text) => {
+    expect(dropReasonOf(lineOf(text), true)).toBe('state')
+  })
+
+  it('keeps a permanent forme change other than Mega Evolution unsupported, by its reason', () => {
+    const text = '|detailschange|p2a: Tyranitar|Kyogre-Primal'
+    expect(dropReasonOf(lineOf(text), true)).toBeUndefined()
+    expect(scriptOf(text).dropped.filter(({ line }) => line >= NEXT)).toEqual([
+      { line: NEXT, text, reason: 'unsupported', detail: noRuleReason('|detailschange|') },
+    ])
+    expect(noRuleReason('|detailschange|')).toMatch(/^a permanent forme change other than Mega/)
   })
 
   it.each([

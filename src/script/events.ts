@@ -13,6 +13,7 @@ import type {
   ItemEndEvent,
   ItemEvent,
   CopyBoostEvent,
+  MegaEvolveEvent,
   ReplaceEvent,
   SingleMoveEvent,
   SingleTurnEvent,
@@ -346,6 +347,7 @@ export type ScriptEvent =
   | FormChangeEvent
   | ReplaceEvent
   | TerastallizeEvent
+  | MegaEvolveEvent
   | SingleTurnEvent
   | SingleMoveEvent
   | CopyBoostEvent

@@ -10,12 +10,18 @@
 // storing energy!", TERA with the game's number of the type, which plays the two animations and
 // leaves the tint and the type's mark, then "X terastallized into the T type!". A type the game
 // lacks keeps both lines and names a mechanic fallback.
+//
+// A Mega Evolution (#125) plays `BattleScript_MegaEvolution`: flushtextbox, "X's stone is
+// reacting to P's Mega Ring!", the form change, then "X has Mega Evolved into Mega S!". Rayquaza
+// takes `BattleScript_WishMegaEvolution`, whose wish line comes first in place of the stone's.
+// The change is FORM_CHANGE, the scene Castform's Forecast plays; the Mega animation and mark
+// follow with #126 and name a mechanic fallback. A forme the game lacks keeps both lines.
 import { toID } from '@pkmn/dex'
 
 import type { Effect } from '../../script/types'
-import { teraTypeGap } from '../fallbacks'
+import { mechanicGap, teraTypeGap } from '../fallbacks'
 import { speciesOf, typeOf } from '../tables/lookup'
-import { formChanged, terastallizing } from '../text/phrases-effects'
+import { formChanged, megaEvolving, terastallizing } from '../text/phrases-effects'
 import type { Context, EventOf } from './context'
 
 const FORECAST = 'forecast'
@@ -51,4 +57,19 @@ export function terastallize(event: EventOf<'terastallize'>, ctx: Context): void
   if (teraType === undefined) ctx.note(line, teraTypeGap(type))
   else ctx.emit(line, { op: 'tera', side: ctx.activeSide(who), teraType })
   ctx.print(line, into)
+}
+
+export function megaEvolve(event: EventOf<'megaEvolve'>, ctx: Context): void {
+  const { who, line, species, item } = event
+  const trainer = ctx.player(who.side).text
+  const [reacting, evolved] = megaEvolving(ctx.mon(who), item, trainer, species)
+  const found = speciesOf(species)
+  ctx.emit(line, { op: 'flushTextBox' })
+  ctx.print(line, reacting)
+  ctx.note(line, found.fallback)
+  if (found.fallback === undefined) {
+    ctx.emit(line, { op: 'formChange', side: ctx.activeSide(who), species: found.number })
+  }
+  ctx.print(line, evolved)
+  ctx.note(line, mechanicGap('Mega Evolution', 'starting'))
 }

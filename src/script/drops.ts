@@ -1,4 +1,4 @@
-import { toID } from '@pkmn/dex'
+import { Dex, toID } from '@pkmn/dex'
 import type { Protocol } from '@pkmn/protocol'
 
 import type { LogLine } from './lines'
@@ -67,6 +67,19 @@ function isStateSingleTurn({ key, args: [, , effect] }: LogLine): boolean {
   return STATE_SINGLE_TURNS.has(toID(effectOf(effect).name))
 }
 
+/**
+ * Whether `line` is a `detailschange` the game never shows (#125). Showdown writes a Mega's
+ * details before its `-mega` line, which plays the change, and turns a fainted Mega back
+ * (`[silent]`) for the team list, which the game never shows. The species is the details' text
+ * before the first comma.
+ */
+function isStateDetailsChange({ key, args: [, , details], kwArgs }: LogLine): boolean {
+  if (key !== '|detailschange|' || typeof details !== 'string') return false
+  if ('silent' in kwArgs) return true
+  const [species = ''] = details.split(',')
+  return Dex.species.get(species).isMega === true
+}
+
 /** A `|player|` line that names its player, as the intro shows it. */
 export function isNamedPlayer(args: Protocol.ArgType): args is NamedPlayerArgs {
   return args[0] === 'player' && typeof args[2] === 'string' && args[2] !== ''
@@ -83,7 +96,7 @@ export function dropReasonOf(line: LogLine, started: boolean): DropReason | unde
   if (line.key === '|player|') {
     return started || !isNamedPlayer(line.args) ? 'room' : undefined
   }
-  if (isStateSingleTurn(line)) {
+  if (isStateSingleTurn(line) || isStateDetailsChange(line)) {
     return 'state'
   }
   return line.key && dropReasonOfKind(line.key)

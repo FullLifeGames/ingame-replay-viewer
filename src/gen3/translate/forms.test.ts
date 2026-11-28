@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { NEXT } from '../../script/testing'
-import { teraTypeGap } from '../fallbacks'
+import { mechanicGap, teraTypeGap } from '../fallbacks'
 import { speciesOf } from '../tables/lookup'
 import { plain, popUp, streamOfLog } from '../testing'
 
@@ -138,5 +138,62 @@ describe('a Terastallization (#88, #89)', () => {
       'The opposing Tyranitar terastallized into the ??? type!',
     ])
     expect(fallbacksOf(line)).toEqual([{ line: NEXT, ...teraTypeGap('???') }])
+  })
+})
+
+describe('a Mega Evolution (#125)', () => {
+  // `BattleScript_MegaEvolution`: flushtextbox, STRINGID_MEGAEVOREACTING, the form change, then
+  // STRINGID_MEGAEVOEVOLVED. The Mega animation and mark follow with #126: a named gap.
+  const LOOK = { line: NEXT + 2, ...mechanicGap('Mega Evolution', 'starting') }
+  const megaOf = (ident: string, details: string, base: string, stone: string) => [
+    `|switch|${ident}|${base}|100/100`,
+    `|detailschange|${ident}|${details}`,
+    `|-mega|${ident}|${base}|${stone}`,
+  ]
+
+  it('empties the text box, says the stone reacts, changes the far form, then says so', () => {
+    const lines = megaOf('p2a: Venusaur', 'Venusaur-Mega, M', 'Venusaur', 'Venusaurite')
+    expect(sceneFrom(NEXT + 2, ...lines)).toEqual([
+      { op: 'flushTextBox' },
+      "The opposing Venusaur's Venusaurite is reacting to Bob's Mega Ring!",
+      formChange('Venusaur-Mega'),
+      'The opposing Venusaur has Mega Evolved into Mega Venusaur!',
+    ])
+    expect(fallbacksOf(...lines)).toEqual([LOOK])
+  })
+
+  it('names our own Pokémon without "The opposing" and our player\'s Mega Ring', () => {
+    const lines = megaOf('p1a: Alakazam', 'Alakazam-Mega, M', 'Alakazam', 'Alakazite')
+    expect(sceneFrom(NEXT + 2, ...lines)).toEqual([
+      { op: 'flushTextBox' },
+      "Alakazam's Alakazite is reacting to Alice's Mega Ring!",
+      { op: 'formChange', side: 'near', species: speciesOf('Alakazam-Mega').number },
+      'Alakazam has Mega Evolved into Mega Alakazam!',
+    ])
+    expect(formChange('Alakazam-Mega').species).not.toBe(speciesOf('Alakazam').number)
+  })
+
+  it("says Rayquaza's fervent wish in place of a stone", () => {
+    const lines = megaOf('p2a: Rayquaza', 'Rayquaza-Mega', 'Rayquaza', '')
+    expect(sceneFrom(NEXT + 2, ...lines)).toEqual([
+      { op: 'flushTextBox' },
+      "Bob's fervent wish has reached the opposing Rayquaza!",
+      formChange('Rayquaza-Mega'),
+      'The opposing Rayquaza has Mega Evolved into Mega Rayquaza!',
+    ])
+  })
+
+  it('says both lines of a forme the expansion lacks and names it, with no form change', () => {
+    const lines = [
+      '|detailschange|p2a: Tyranitar|Rockruff-Dusk, M',
+      '|-mega|p2a: Tyranitar|Tyranitar|Tyranitarite',
+    ]
+    expect(sceneFrom(NEXT + 1, ...lines)).toEqual([
+      { op: 'flushTextBox' },
+      "The opposing Tyranitar's Tyranitarite is reacting to Bob's Mega Ring!",
+      'The opposing Tyranitar has Mega Evolved into Mega Rockruff!',
+    ])
+    const noted = fallbacksOf(...lines).filter(({ line }) => line === NEXT + 1)
+    expect(noted.map(({ kind }) => kind)).toEqual(['form', 'mechanic'])
   })
 })
