@@ -170,3 +170,60 @@ REPLAY_TEST("The outro returns a Mega and hides its mark")
         EXPECT(GetIndicator(battler)->invisible);
     }
 }
+
+// The game reverts a Mega only when it faints or the battle ends (CanBattlerFormChange), so a Mega
+// that comes back keeps its party species, and the switch-in draws the Mega with its mark.
+REPLAY_TEST("A Mega switched out and back keeps its Mega species and its mark")
+{
+    u32 battler = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
+
+    STREAM
+    {
+        StartBattle();
+        ReplayStream_MegaEvolve(REPLAY_SIDE_FAR, SPECIES_VENUSAUR_MEGA);
+        ReplayStream_Withdraw(REPLAY_SIDE_FAR);
+        ReplayStream_SwitchIn(REPLAY_SIDE_FAR, 1, 100, REPLAY_STATUS_NONE);
+        ReplayStream_Withdraw(REPLAY_SIDE_FAR);
+        ReplayStream_SwitchIn(REPLAY_SIDE_FAR, 0, 100, REPLAY_STATUS_NONE);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE
+    {
+        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_MEGA_EVOLUTION, farMon);
+        NONE_OF
+        {
+            ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_MEGA_EVOLUTION, farMon);
+            ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_FORM_CHANGE, farMon);
+        }
+    }
+    THEN
+    {
+        EXPECT_EQ(farMon->species, SPECIES_VENUSAUR_MEGA);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_SPECIES), SPECIES_VENUSAUR_MEGA);
+        EXPECT_EQ(GetActiveGimmick(battler), GIMMICK_MEGA);
+        EXPECT(ShowsMegaIndicator(battler));
+    }
+}
+
+// The gimmick stays with the party slot that left (slot 0), so the slot that comes in has none.
+REPLAY_TEST("The mon that comes in for a Mega has neither its form nor its mark")
+{
+    u32 battler = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
+
+    STREAM
+    {
+        StartBattle();
+        ReplayStream_MegaEvolve(REPLAY_SIDE_FAR, SPECIES_VENUSAUR_MEGA);
+        ReplayStream_Withdraw(REPLAY_SIDE_FAR);
+        ReplayStream_SwitchIn(REPLAY_SIDE_FAR, 1, 100, REPLAY_STATUS_NONE);
+        ReplayStream_End(REPLAY_OUTCOME_NEAR_WON);
+    }
+    SCENE { ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_MEGA_EVOLUTION, farMon); }
+    THEN
+    {
+        EXPECT_EQ(farMon->species, SPECIES_WOBBUFFET);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_SPECIES), SPECIES_VENUSAUR_MEGA);
+        EXPECT_EQ(GetActiveGimmick(battler), GIMMICK_NONE);
+        EXPECT(GetIndicator(battler)->invisible);
+    }
+}

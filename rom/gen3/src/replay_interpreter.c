@@ -1,6 +1,7 @@
 #include "global.h"
 #include "battle.h"
 #include "battle_controllers.h"
+#include "battle_gimmick.h"
 #include "battle_main.h"
 #include "battle_message.h"
 #include "battle_util.h"
@@ -302,18 +303,21 @@ u32 Replay_GetStatus1(u32 status)
 // As the engine does when a mon enters: the battle mon is a copy of the party mon. The party mon
 // takes the species of the stream's team table first, so a mon that left the field in another
 // form (FORM_CHANGE) enters in its own, as the game's Castform does after a switch; Showdown logs
-// no change back. The side is the battler's (REPLAY_SIDE_NEAR is B_SIDE_PLAYER, replay_setup.c).
+// no change back. That holds unless its party slot Mega Evolved (MEGA_EVOLVE): the game reverts a
+// Mega only when it faints or the battle ends (CanBattlerFormChange), so a Mega enters as the
+// Mega. The side is the battler's (REPLAY_SIDE_NEAR is B_SIDE_PLAYER, replay_setup.c).
 void Replay_PutMonOnField(u32 battler, u32 slot, u32 hp, u32 status)
 {
     struct Pokemon *mon = &GetBattlerParty(battler)[slot];
     u32 species = Replay_ReadU16(Replay_GetMon(sReplay.stream, GetBattlerSide(battler), slot) + REPLAY_MON_OFFSET_SPECIES);
     u32 status1 = sStatus1[status];
 
-    SetMonData(mon, MON_DATA_SPECIES, &species);
+    gBattlerPartyIndexes[battler] = slot;
+    if (GetActiveGimmick(battler) != GIMMICK_MEGA)
+        SetMonData(mon, MON_DATA_SPECIES, &species);
     hp = min(hp, GetMonData(mon, MON_DATA_MAX_HP));
     SetMonData(mon, MON_DATA_HP, &hp);
     SetMonData(mon, MON_DATA_STATUS, &status1);
-    gBattlerPartyIndexes[battler] = slot;
     PokemonToBattleMon(mon, &gBattleMons[battler]);
 }
 
