@@ -30,6 +30,8 @@ import { PKM_INPUT } from './gen5-bw2-pkm.fixtures.ts'
 import { GEN5_PATHS } from './gen5-paths.ts'
 import { textNumbers } from './gen5-bw2-text.ts'
 import { TEXT_INPUT } from './gen5-bw2-text.fixtures.ts'
+import { textBoxNumbers } from './gen5-bw2-textbox.ts'
+import { TEXT_BOX_INPUT, TEXT_BOX_NUMBERS } from './gen5-bw2-textbox.fixtures.ts'
 
 const FILE = GEN5_PATHS.bw2Json
 
@@ -86,6 +88,18 @@ const COMPARED = [
     path: ['text'],
   },
   {
+    module: 'scripts/gen5-bw2-textbox.fixtures.ts',
+    name: 'TEXT_BOX_INPUT',
+    value: textBoxNumbers(TEXT_BOX_INPUT),
+    path: ['textBox'],
+  },
+  {
+    module: 'scripts/gen5-bw2-textbox.fixtures.ts',
+    name: 'TEXT_BOX_NUMBERS',
+    value: TEXT_BOX_NUMBERS,
+    path: ['textBox'],
+  },
+  {
     module: 'scripts/gen5-bw2-flow.fixtures.ts',
     name: 'FLOW_INPUT',
     value: flowNumbers(FLOW_INPUT),
@@ -116,7 +130,16 @@ const COMPARED = [
     path: [key],
   })),
   ...(
-    ['text', 'flow', 'effects', 'serverCommands', 'messages', 'queueSize', 'battle'] as const
+    [
+      'text',
+      'flow',
+      'effects',
+      'serverCommands',
+      'messages',
+      'queueSize',
+      'battle',
+      'textBox',
+    ] as const
   ).map((key) => ({
     module: 'src/gen5/backend/replay.fixtures.ts',
     name: `REPLAY_NUMBERS.${key}`,

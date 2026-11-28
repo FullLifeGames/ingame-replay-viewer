@@ -54,7 +54,7 @@ describe('checkReplay', () => {
   it('refuses a replay of version 1 by name', () => {
     expect(() => {
       checkReplay({ ...REPLAY, version: 1 }, 'c0ffee')
-    }).toThrow('a Gen 5 replay of version 1; this plan reads version 2')
+    }).toThrow('a Gen 5 replay of version 1; this plan reads version 3')
   })
 
   it('refuses a replay built on another pin by name', () => {

@@ -6,6 +6,7 @@ import type {
   Bw2Symbol,
   EntryNumbers,
   PkmNumbers,
+  TextBoxNumbers,
   TextNumbers,
 } from '../src/gen5/bw2-numbers.ts'
 import { inMainRam } from '../src/gen5/main-ram.ts'
@@ -106,6 +107,16 @@ const textChecks = (text: TextNumbers) =>
 /** The generator has held each of the backend's lines to what its function puts, or thrown. */
 const LINES_CHECKED = "line sources checked: each of the backend's lines is what its function puts"
 
+/** The text box's places by name (#118), which the generator has read and checked or thrown: how
+ * many of its keys, where its root lies, whether font 0 gives every character of both fonts an
+ * advance, and the carrier's label. Counts of our own keys and truth values alone. */
+function textBoxCheck(textBox: TextBoxNumbers, chars: string): string {
+  const root = inMainRam(textBox.stringWork.address) ? 'in main RAM' : 'outside main RAM'
+  const all = chars.split('').every((char) => Object.hasOwn(textBox.advances, char))
+  const advances = all ? 'an advance for each character' : 'characters without an advance'
+  return `text box places found: ${count(textBox)}, sWork ${root}, ${advances}, carrier ${textBox.carrier}`
+}
+
 /** The report for a public log: the pin, the count of the symbols it looked up by our own names,
  * and the two checks, and no number of pokebw2: no address, offset, value or size. Each of
  * pokebw2's lists runs from 0, so a list's size would give away its last entry's number. */
@@ -120,6 +131,7 @@ export function quietLines(numbers: Bw2Numbers): string[] {
     pkmCheck(numbers.pkm),
     ...textChecks(numbers.text),
     LINES_CHECKED,
+    textBoxCheck(numbers.textBox, numbers.font.chars),
   ]
 }
 
@@ -194,6 +206,7 @@ export function fullLines(numbers: Bw2Numbers): string[] {
     ),
     LINES_CHECKED,
     `flow ${JSON.stringify(numbers.flow)}`,
+    `text box ${JSON.stringify(numbers.textBox)}`,
   ]
 }
 

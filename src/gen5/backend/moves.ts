@@ -7,8 +7,9 @@
 // that copies its server function (effects.ts, #109), and the turn's end opens with the hidden
 // message window. An event that plays and names a Pokémon not in place fails by name. A charge
 // skip plays its charge and release (charge.ts, #110); an action with a called move, several
-// hits, a charge turn the move spends or a look of its own waits whole, listed as unplayed. Pure:
-// every number of the game comes in from build/gen5/bw2.json.
+// hits, a charge turn the move spends or a look of its own waits whole, listed as unplayed. An
+// event that prints gives its pages and the carrier (printed.ts, #118). Pure: every number of the
+// game comes in from build/gen5/bw2.json.
 import type { BattleScript, ScriptEvent } from '../../script/events.ts'
 import type { PokemonRef } from '../../script/types.ts'
 import type { EffectNumbers, FlowNumbers } from '../bw2-flow-numbers.ts'
@@ -23,12 +24,13 @@ import { faintCommands } from './faints.ts'
 import { type Gen5Fallback, unplayedFallback } from './fallbacks.ts'
 import { hitCommands, type PlayedMove, silentBar } from './hits.ts'
 import { gen5, gen5Move } from './names.ts'
+import { printedCommand, type PrintNumbers, printedPages } from './printed.ts'
 import { type EventOf, type Outcome, outcomesOf } from './rules.ts'
 import { substituteShows } from './substitute.ts'
 import { switchCommands } from './switches.ts'
 
 /** The numbers the writer takes. */
-export interface WriteNumbers {
+export interface WriteNumbers extends PrintNumbers {
   readonly text: TextNumbers
   readonly flow: FlowNumbers
   readonly effects: EffectNumbers
@@ -175,10 +177,17 @@ function eventCommands(scene: Scene, place: Place, event: ScriptEvent): ServerCo
   return silentBar(hits, event)
 }
 
-/** What one event writes: ServerControl_TurnCheck's SC_HIDE_MSG_WINDOW before the first commands
- * of a turn's end (lane plan D9), and a Substitute's start shows its HP drop's line (D10). */
+/** What one event writes: a printed event its pages and the carrier, ServerControl_TurnCheck's
+ * SC_HIDE_MSG_WINDOW before the first commands of a turn's end (lane plan D9), and a
+ * Substitute's start shows its HP drop's line (D10). */
 function writtenOf(scene: Scene, place: Place, event: ScriptEvent): Written {
   const { line } = event
+  const outcome = scene.outcomes.get(event)
+  if (outcome?.as === 'print') {
+    const { pages, fallbacks } = printedPages(outcome.text, line, scene.numbers)
+    scene.fallbacks.push(...fallbacks)
+    return { line, commands: [printedCommand(scene.numbers)], pages }
+  }
   const commands = eventCommands(scene, place, event)
   const shows = substituteShows(scene.script.events, place.at)
   const opens = commands.length > 0 && !scene.hidden && scene.residual(line)
@@ -221,12 +230,13 @@ export function writeScript(
   }
   const { state } = scene
   const orders: PartyOrders[] = []
-  let at = 0
+  // An event that prints amid an action plays after it (blocks.ts), so replay order can differ
+  // from log order: each event's place is its own in the script.
+  const places = new Map(script.events.map((event, at) => [event, at]))
   const actions = actionsOf(script).map((action) => {
     const played = playedOf(action, state)
     return action.map((event, index) => {
-      const written = writtenOf(scene, { played, index, at }, event)
-      at += 1
+      const written = writtenOf(scene, { played, index, at: places.get(event) ?? -1 }, event)
       follow(scene, event)
       const { line } = event
       orders.push({ line, near: state.partyMonIds('near'), far: state.partyMonIds('far') })

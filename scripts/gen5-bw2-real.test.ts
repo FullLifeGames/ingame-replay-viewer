@@ -30,6 +30,7 @@ import {
 } from './gen5-bw2-trainer.ts'
 import { MOMENT_COMMANDS, namesOutsideMainRam, zeroArguments } from './gen5-bw2-report.ts'
 import { listedReader, POKEBW2 } from './gen5-bw2-source.ts'
+import { textBoxRelations } from './gen5-bw2-textbox.ts'
 import {
   moveLineLabel,
   type SceneName,
@@ -315,6 +316,12 @@ describe.skipIf(!existsSync(FILE))('the Gen 5 code on the generated numbers', ()
     expect((bufferSizes.TrainerBattleSetup_Create ?? 0) > 1, 'room for a name').toBe(true)
     const pkm = layouts.PartyPkm?.size ?? 0
     expect(pkm > 0 && size('PokeParty', 'pkms') % pkm === 0, 'whole Pokémon').toBe(true)
+  })
+
+  // Scene: a printed line (#118) goes through sWork's chain into the core's buffer, a page of full
+  // lines must fit it and the window, and the carrier must be the bank's.
+  it("hold the text box's chain, buffer, window, advances and carrier to their relations", () => {
+    expect(textBoxRelations(real())).toEqual([])
   })
 
   it("fit each block in its chunk and give the block table a row for each selector's value", () => {

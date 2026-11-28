@@ -13,13 +13,23 @@ const SAND = replayScript('smogtours-gen5ou-862240')
 
 // Scene: the run takes a test replay's trainers and teams into Black 2's battle at its start.
 describe('a Gen 5 replay from a battle script', () => {
-  it('carries version 2, the pin, the trainers and the dropped lines', () => {
+  it('carries version 3, the pin, the trainers and the dropped lines', () => {
     const replay = buildGen5Replay(SUN_RAIN, NUMBERS)
-    expect(GEN5_REPLAY_VERSION).toBe(2)
+    expect(GEN5_REPLAY_VERSION).toBe(3)
     expect(replay.version).toBe(GEN5_REPLAY_VERSION)
     expect(replay.pin).toBe('c0ffee')
     expect(replay.trainers).toEqual({ player: 'isolatedstar', opponent: 'abc2158' })
     expect(replay.dropped).toBe(SUN_RAIN.dropped)
+  })
+
+  // Lane plan D5: the page writes a printed block's text through the text box the replay carries.
+  it('carries the text box when a block prints, and none when no block does', () => {
+    expect(buildGen5Replay(SUN_RAIN, NUMBERS).textBox).toEqual(NUMBERS.textBox)
+    const ends = new Set(['message', 'win', 'tie'])
+    const events = SUN_RAIN.events.filter((event) => !ends.has(event.kind))
+    const silent = buildGen5Replay({ ...SUN_RAIN, events }, NUMBERS)
+    expect(silent.blocks.filter((block) => block.print !== undefined)).toEqual([])
+    expect('textBox' in silent).toBe(false)
   })
 
   it('writes twelve species by number, each at HP 100 of 100, its trainer as the OT', () => {

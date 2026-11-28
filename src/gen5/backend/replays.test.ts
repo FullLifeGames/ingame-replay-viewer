@@ -6,6 +6,7 @@ import { blockRoom } from '../adapter.ts'
 import { packCommands } from '../server-cmd.ts'
 import type { Gen5Fallback } from './fallbacks.ts'
 import { notShown } from './not-shown.ts'
+import { printedCommand } from './printed.ts'
 import { buildGen5Replay, type Gen5Replay } from './replay.ts'
 import { REPLAY_NUMBERS as NUMBERS } from './replay.fixtures.ts'
 
@@ -24,13 +25,12 @@ const REPLAYS = Object.entries(FIXTURES).map(([id, script]) => ({
  * before the first turn itself (lane plan D3). */
 const SHOWN = new Set<ScriptEvent['kind']>(['player', 'teamSize', 'battleStart', 'turn'])
 
-/** The events whose line Black 2 lacks: a message of the simulator, a weather's turn (D2), the
- * end of a disguise (D14) and the battle's end, where the game holds the last scene (#110, D5). */
+/** The events whose line Black 2 lacks and that print nothing: a weather's turn (D2), the end
+ * of a disguise (D14) and a winner neither player is, where the game holds the last scene (#110,
+ * D5). A message of the simulator, a winner and a tie print in the text box (#118). */
 const lacksLine = (event: ScriptEvent) =>
-  event.kind === 'message' ||
   event.kind === 'replace' ||
-  event.kind === 'win' ||
-  event.kind === 'tie' ||
+  (event.kind === 'win' && event.side === undefined) ||
   (event.kind === 'weather' && event.phase === 'upkeep')
 /** The kinds that play in a block while a part of them is listed: a bar that moves silently
  * while its line waits (D6), and a switch-in that plays as a plain switch (`plain`). */
@@ -98,18 +98,40 @@ describe('the Gen 5 OU test replays', () => {
     }
   })
 
-  // The list that #110 leaves: nothing unplayed, only the lines Black 2 lacks and the forms.
+  // #118, criterion 3: the forfeit and the winner print after the last turn's blocks, each in a
+  // block of its own that sends the carrier alone.
+  it('print the forfeit and the winner, each in a block of its own at the end', () => {
+    const carrier = printedCommand(NUMBERS)
+    const printed = Object.fromEntries(
+      REPLAYS.map(({ id, script, replay }) => {
+        const ends = script.events.filter((e) => e.kind === 'message' || e.kind === 'win')
+        const last = replay.blocks.slice(-ends.length)
+        expect(last.map((block) => block.lines)).toEqual(ends.map((event) => [event.line]))
+        expect(last.every((block) => block.commands.length === 1)).toBe(true)
+        expect(last.map((block) => block.commands[0])).toEqual(ends.map(() => carrier))
+        const before = replay.blocks.slice(0, -ends.length)
+        expect(before.filter((block) => block.print !== undefined)).toEqual([])
+        return [id, last.map((block) => block.print)]
+      }),
+    )
+    expect(printed).toEqual({
+      'gen5ou-2718717830': ['isolatedstar forfeited.', 'abc2158 won the battle!'],
+      'smogtours-gen5ou-862240': ['Monai forfeited.', 'tizio potente ao won the battle!'],
+    })
+  })
+
+  // The list that #118 leaves: nothing unplayed, only the weather's turns and the forms.
   it('list what does not show by its kind and by event kind', () => {
     const lists = Object.fromEntries(
       REPLAYS.map(({ id, replay }) => [id, notShown(replay.fallbacks)]),
     )
     expect(lists).toEqual({
       'gen5ou-2718717830': {
-        line: { message: 1, weather: 10, win: 1 },
+        line: { weather: 10 },
         form: { party: 1 },
       },
       'smogtours-gen5ou-862240': {
-        line: { message: 1, weather: 15, win: 1 },
+        line: { weather: 15 },
         form: { party: 2 },
       },
     })

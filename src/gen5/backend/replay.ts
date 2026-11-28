@@ -6,7 +6,7 @@ import type { BattleScript } from '../../script/events.ts'
 import type { DroppedLine, Side } from '../../script/types.ts'
 import { HP_SCALE } from '../../script/hp-scale.ts'
 import { blockRoom } from '../adapter.ts'
-import type { BattleNumbers, Bw2Numbers, ServerCmdTable } from '../bw2-numbers.ts'
+import type { BattleNumbers, Bw2Numbers, ServerCmdTable, TextBoxNumbers } from '../bw2-numbers.ts'
 import type { ParkNames } from '../direct-park.ts'
 import { pkmConstant } from '../pkm-cipher.ts'
 import { pkmFormat } from '../pkm-members.ts'
@@ -21,15 +21,17 @@ import { byParkSide, PARK_SIDES } from './slots.ts'
 import { leadAbilityFallbacks, partyTeams } from './teams.ts'
 
 /** The version of the replay's format; a reader refuses one it does not know. Version 2 brought
- * the blocks and the fallbacks of the events. */
-export const GEN5_REPLAY_VERSION = 2
+ * the blocks and the fallbacks of the events, version 3 the printed pages. */
+export const GEN5_REPLAY_VERSION = 3
 
-/** The server commands of one action or one residual line, named `b1`, `b2`… in replay order,
- * with the log lines they show. */
+/** The server commands of one action, one residual line or one printed page, named `b1`, `b2`…
+ * in replay order, with the log lines they show. A printed page's block sends the carrier alone,
+ * and `print` is the page, its lines joined by "\n" (#118). */
 export interface Gen5Block {
   readonly name: string
   readonly lines: readonly number[]
   readonly commands: readonly ServerCommand[]
+  readonly print?: string
 }
 
 export interface Gen5Replay {
@@ -43,12 +45,24 @@ export interface Gen5Replay {
   /** In line order. */
   readonly fallbacks: readonly Gen5Fallback[]
   readonly dropped: readonly DroppedLine[]
+  /** The text box the page writes the printed pages through; only when a block prints (lane plan
+   * D5). */
+  readonly textBox?: TextBoxNumbers
 }
 
 /** The numbers a replay is built from. */
 export type ReplayNumbers = Pick<
   Bw2Numbers,
-  'pkm' | 'entry' | 'font' | 'pokebw2' | 'text' | 'flow' | 'effects' | 'adapter' | 'queueSize'
+  | 'pkm'
+  | 'entry'
+  | 'font'
+  | 'pokebw2'
+  | 'text'
+  | 'flow'
+  | 'effects'
+  | 'adapter'
+  | 'queueSize'
+  | 'textBox'
 > &
   ServerCmdTable & { readonly battle: Pick<BattleNumbers, 'single' | 'monIds' | 'constants'> }
 
@@ -89,12 +103,14 @@ export function buildGen5Replay(script: BattleScript, numbers: ReplayNumbers): G
       writtenMon(mon, { ot, salt, format, hp: HP_SCALE }),
     )
   }
+  const blocks = blocksOf(writes.actions, { table: numbers, room })
+  const prints = blocks.some((block) => block.print !== undefined)
   return {
     version: GEN5_REPLAY_VERSION,
     pin: numbers.pokebw2.commit,
     trainers,
     parties: byParkSide(written),
-    blocks: blocksOf(writes.actions, { table: numbers, room }),
+    blocks,
     fallbacks: inLineOrder([
       ...teams.fallbacks,
       ...leadAbilityFallbacks(script, numbers.effects.memberInAbilities),
@@ -104,5 +120,6 @@ export function buildGen5Replay(script: BattleScript, numbers: ReplayNumbers): G
       ...writes.fallbacks,
     ]),
     dropped: script.dropped,
+    ...(prints && { textBox: numbers.textBox }),
   }
 }
